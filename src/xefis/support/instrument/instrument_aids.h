@@ -174,7 +174,7 @@ class InstrumentAids
 	 * Convert angle to units proper for QPainter::drawArc (...) and QPainter::drawChord (...) functions.
 	 */
 	static constexpr float
-	angle_for_qpainter (Angle deg);
+	angle_for_qpainter (si::Angle deg);
 
 	/**
 	 * Return default shadow.
@@ -279,9 +279,9 @@ InstrumentAids::centrify (QRectF& rectf)
 
 
 constexpr float
-InstrumentAids::angle_for_qpainter (Angle deg)
+InstrumentAids::angle_for_qpainter (si::Angle deg)
 {
-	return 16 * deg.in<Degree>();
+	return 16 * deg.in<si::Degree>();
 }
 
 

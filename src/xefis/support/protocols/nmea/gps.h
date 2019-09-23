@@ -149,10 +149,10 @@ class GPGGA: public Sentence
 	std::optional<GPSTimeOfDay>		fix_time;
 
 	// Latitude, positive is North:
-	std::optional<Angle>			latitude;
+	std::optional<si::Angle>		latitude;
 
 	// Longitude, positive is East:
-	std::optional<Angle>			longitude;
+	std::optional<si::Angle>		longitude;
 
 	// GPS fix quality information:
 	std::optional<GPSFixQuality>	fix_quality;
@@ -164,7 +164,7 @@ class GPGGA: public Sentence
 	std::optional<float>			hdop;
 
 	// Altitude, above mean sea level:
-	std::optional<Length>			altitude_amsl;
+	std::optional<si::Length>		altitude_amsl;
 
 	/**
 	 * Height of geoid (mean sea level) above WGS84 ellipsoid
@@ -176,10 +176,10 @@ class GPGGA: public Sentence
 	 * Some units do not report negative altitudes at all.
 	 * This is the only sentence that reports altitude.
 	 */
-	std::optional<Length>			geoid_height;
+	std::optional<si::Length>		geoid_height;
 
 	// Time since last DGPS update:
-	std::optional<Time>				dgps_last_update_time;
+	std::optional<si::Time>			dgps_last_update_time;
 
 	// DGPS station ID number:
 	std::optional<uint64_t>			dgps_station_id;
@@ -250,22 +250,22 @@ class GPRMC: public Sentence
 	std::optional<GPSReceiverStatus>	receiver_status;
 
 	// Latitude, positive is North:
-	std::optional<Angle>				latitude;
+	std::optional<si::Angle>			latitude;
 
 	// Longitude, positive is East:
-	std::optional<Angle>				longitude;
+	std::optional<si::Angle>			longitude;
 
 	// Ground-speed:
-	std::optional<Speed>				ground_speed;
+	std::optional<si::Speed>			ground_speed;
 
 	// Track angle, True direction:
-	std::optional<Angle>				track_true;
+	std::optional<si::Angle>			track_true;
 
 	// Date (UTC):
 	std::optional<GPSDate>				fix_date;
 
 	// Magnetic variation;
-	std::optional<Angle>				magnetic_variation;
+	std::optional<si::Angle>			magnetic_variation;
 };
 
 
@@ -281,7 +281,7 @@ to_string (GPSFixQuality);
  * Convert GPS date and time to Unix time.
  * Throw BadDateTime when conversion is not possible.
  */
-extern Time
+extern si::Time
 to_unix_time (xf::nmea::GPSDate const&, xf::nmea::GPSTimeOfDay const&);
 
 extern std::string

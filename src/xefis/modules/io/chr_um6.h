@@ -35,6 +35,10 @@
 #include <xefis/utility/actions.h>
 
 
+namespace si = neutrino::si;
+using namespace neutrino::si::literals;
+
+
 class CHRUM6_IO: public xf::ModuleIO
 {
   public:

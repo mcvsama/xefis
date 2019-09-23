@@ -56,14 +56,14 @@ class LiftMod
 		/**
 		 * Return real flaps or spoilers setting angle.
 		 */
-		Angle const&
+		si::Angle
 		angle() const noexcept;
 
 		/**
 		 * Return range of allowed IAS speeds
 		 * for this flaps or spoilers setting.
 		 */
-		Range<Speed> const&
+		Range<si::Speed> const&
 		speed_range() const noexcept;
 
 		/**
@@ -72,7 +72,7 @@ class LiftMod
 		 * Nominal critical AOA should be decreased by this amount
 		 * to get critical AOA corrected for this flap or spoilers setting.
 		 */
-		Angle const&
+		si::Angle
 		aoa_correction() const noexcept;
 
 		/**
@@ -100,16 +100,16 @@ class LiftMod
 		link (Setting const* prev, Setting const* next);
 
 	  private:
-		QString			_label				= "<none>";
-		Angle			_angle				= 0_deg;
-		Range<Speed>	_speed_range		= { 0_kt, 9999_kt };
-		Angle			_aoa_correction		= 0_deg;
-		double			_cl_correction		= 0.0;
-		Setting const*	_next				= nullptr;
-		Setting const*	_prev				= nullptr;
+		QString				_label				= "<none>";
+		si::Angle			_angle				= 0_deg;
+		Range<si::Speed>	_speed_range		= { 0_kt, 9999_kt };
+		si::Angle			_aoa_correction		= 0_deg;
+		double				_cl_correction		= 0.0;
+		Setting const*		_next				= nullptr;
+		Setting const*		_prev				= nullptr;
 	};
 
-	typedef std::map<Angle, Setting> Settings;
+	typedef std::map<si::Angle, Setting> Settings;
 
   public:
 	// Ctor
@@ -127,42 +127,42 @@ class LiftMod
 	 * flaps/spoilers angle.
 	 */
 	Setting const&
-	find_setting (Angle const& surfaces_angle) const;
+	find_setting (si::Angle surfaces_angle) const;
 
 	/**
 	 * Get next flaps/spoilers setting (more extended flaps/spoilers setting).
 	 * Return nullptr if there's none.
 	 */
 	Setting const*
-	next_setting (Angle const& surfaces_angle) const;
+	next_setting (si::Angle surfaces_angle) const;
 
 	/**
 	 * Get previous flaps/spoilers setting (more retracted one).
 	 * Return nullptr if there's none.
 	 */
 	Setting const*
-	prev_setting (Angle const& surfaces_angle) const;
+	prev_setting (si::Angle surfaces_angle) const;
 
 	/**
 	 * Compute AOA correction for given surfaces angle setting
 	 * (how much absolute AOA a flaps/spoilers setting adds to the current AOA).
 	 * This value is interpolated.
 	 */
-	Angle
-	get_aoa_correction (Angle const& surfaces_angle) const;
+	si::Angle
+	get_aoa_correction (si::Angle surfaces_angle) const;
 
 	/**
 	 * Compute speeds range for given surfaces angle.
 	 * Value is interpolated.
 	 */
-	Range<Speed>
-	get_speed_range (Angle const& surfaces_angle) const;
+	Range<si::Speed>
+	get_speed_range (si::Angle surfaces_angle) const;
 
 	/**
 	 * Return interator to a setting for given surfaces angle.
 	 */
 	Settings::const_iterator
-	find_setting_iterator (Angle const& surfaces_angle) const;
+	find_setting_iterator (si::Angle surfaces_angle) const;
 
   private:
 	Settings	_settings;
@@ -181,21 +181,21 @@ LiftMod::Setting::label() const noexcept
 }
 
 
-inline Angle const&
+inline si::Angle
 LiftMod::Setting::angle() const noexcept
 {
 	return _angle;
 }
 
 
-inline Range<Speed> const&
+inline Range<si::Speed> const&
 LiftMod::Setting::speed_range() const noexcept
 {
 	return _speed_range;
 }
 
 
-inline Angle const&
+inline si::Angle
 LiftMod::Setting::aoa_correction() const noexcept
 {
 	return _aoa_correction;

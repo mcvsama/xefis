@@ -37,6 +37,10 @@
 #include <xefis/utility/event_timestamper.h>
 
 
+namespace si = neutrino::si;
+using namespace neutrino::si::literals;
+
+
 // TODO handle nans
 class ADI_IO: public xf::ModuleIO
 {
@@ -229,8 +233,8 @@ namespace adi_detail {
 class Parameters
 {
 	// TODO change to vector<> for speed
-	using VelocityBugs	= std::map<QString, Velocity>;
-	using AltitudeBugs	= std::map<QString, Length>;
+	using VelocityBugs	= std::map<QString, si::Velocity>;
+	using AltitudeBugs	= std::map<QString, si::Length>;
 
   public:
 	si::Time					timestamp;
@@ -655,15 +659,13 @@ class VelocityLadder
 	paint_failure (AdiPaintRequest&) const;
 
 	float
-	kt_to_px (AdiPaintRequest&, Velocity) const;
+	kt_to_px (AdiPaintRequest&, si::Velocity) const;
 
   private:
-	xf::Synchronized<VelocityLadder*> mutable
-				_mutable_this { this };
-
+	xf::Synchronized<VelocityLadder*> mutable _mutable_this { this };
 	QTransform		_transform;
-	Velocity		_min_shown;
-	Velocity		_max_shown;
+	si::Velocity	_min_shown;
+	si::Velocity	_max_shown;
 	int				_rounded_speed;
 	QRectF			_ladder_rect;
 	QPainterPath	_ladder_clip_path;
@@ -737,12 +739,10 @@ class AltitudeLadder
 	ft_to_px (AdiPaintRequest&, si::Length) const;
 
   private:
-	xf::Synchronized<AltitudeLadder*> mutable
-						_mutable_this { this };
-
+	xf::Synchronized<AltitudeLadder*> mutable _mutable_this { this };
 	QTransform			_transform;
-	Length				_min_shown;
-	Length				_max_shown;
+	si::Length			_min_shown;
+	si::Length			_max_shown;
 	int					_rounded_altitude;
 	QRectF				_ladder_rect;
 	QPainterPath		_ladder_clip_path;

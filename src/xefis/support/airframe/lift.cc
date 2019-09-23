@@ -45,7 +45,7 @@ Lift::Lift (QDomElement const& config)
 			if (!e.hasAttribute ("cl"))
 				throw MissingDomAttribute (e, "cl");
 
-			auto aoa = parse<Angle> (e.attribute ("aoa").toStdString());
+			auto aoa = si::parse<si::Angle> (e.attribute ("aoa").toStdString());
 			LiftCoefficient cl (e.attribute ("cl").toDouble());
 			data[aoa] = cl;
 		}
@@ -54,7 +54,7 @@ Lift::Lift (QDomElement const& config)
 	if (data.empty())
 		throw BadConfiguration ("lift module not properly configured");
 
-	_aoa_to_cl = Field<Angle, LiftCoefficient> (std::move (data));
+	_aoa_to_cl = Field<si::Angle, LiftCoefficient> (std::move (data));
 	// TODO initialize _cl_to_aoa_normal_regime
 
 	// Find maximum C_L and AOA angle for maximum C_L (critical AOA):
@@ -65,7 +65,7 @@ Lift::Lift (QDomElement const& config)
 
 
 LiftCoefficient
-Lift::get_cl (Angle const& aoa) const
+Lift::get_cl (si::Angle const aoa) const
 {
 	return _aoa_to_cl.extrapolated_value (aoa);
 }
@@ -78,14 +78,14 @@ Lift::max_cl() const noexcept
 }
 
 
-Angle
+si::Angle
 Lift::critical_aoa() const noexcept
 {
 	return _critical_aoa;
 }
 
 
-std::optional<Angle>
+std::optional<si::Angle>
 Lift::get_aoa_in_normal_regime (LiftCoefficient const& cl) const noexcept
 {
 	return _cl_to_aoa_normal_regime (cl);

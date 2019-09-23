@@ -39,10 +39,11 @@ Drag::Drag (QDomElement const& config)
 		{
 			if (!e.hasAttribute ("aoa"))
 				throw MissingDomAttribute (e, "aoa");
+
 			if (!e.hasAttribute ("cd"))
 				throw MissingDomAttribute (e, "cd");
 
-			auto aoa = parse<Angle> (e.attribute ("aoa").toStdString());
+			auto aoa = si::parse<si::Angle> (e.attribute ("aoa").toStdString());
 			DragCoefficient cd = e.attribute ("cd").toDouble();
 			data[aoa] = cd;
 		}
@@ -51,12 +52,12 @@ Drag::Drag (QDomElement const& config)
 	if (data.empty())
 		throw BadConfiguration ("drag module not properly configured");
 
-	_aoa_to_cd = Field<Angle, DragCoefficient> (std::move (data));
+	_aoa_to_cd = Field<si::Angle, DragCoefficient> (std::move (data));
 }
 
 
 DragCoefficient
-Drag::get_cd (Angle const& aoa) const
+Drag::get_cd (si::Angle const& aoa) const
 {
 	return _aoa_to_cd.extrapolated_value (aoa);
 }

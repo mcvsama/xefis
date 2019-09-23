@@ -34,12 +34,12 @@ LiftMod::Setting::Setting (QDomElement const& config)
 {
 	_label = config.attribute ("label");
 
-	parse (config.attribute ("angle").toStdString(), _angle);
+	si::parse (config.attribute ("angle").toStdString(), _angle);
 
-	_speed_range.set_min (parse<Velocity> (config.attribute ("minimum-speed").toStdString()));
-	_speed_range.set_max (parse<Velocity> (config.attribute ("maximum-speed").toStdString()));
+	_speed_range.set_min (si::parse<si::Velocity> (config.attribute ("minimum-speed").toStdString()));
+	_speed_range.set_max (si::parse<si::Velocity> (config.attribute ("maximum-speed").toStdString()));
 
-	parse (config.attribute ("aoa-correction").toStdString(), _aoa_correction);
+	si::parse (config.attribute ("aoa-correction").toStdString(), _aoa_correction);
 	_cl_correction = config.attribute ("lift-coefficient-correction").toDouble();
 }
 
@@ -89,14 +89,14 @@ LiftMod::LiftMod (QDomElement const& config)
 
 
 LiftMod::Setting const&
-LiftMod::find_setting (Angle const& surface_angle) const
+LiftMod::find_setting (si::Angle const surface_angle) const
 {
 	return find_setting_iterator (surface_angle)->second;
 }
 
 
 LiftMod::Setting const*
-LiftMod::next_setting (Angle const& surface_angle) const
+LiftMod::next_setting (si::Angle const surface_angle) const
 {
 	auto it = find_setting_iterator (surface_angle);
 	if (++it != _settings.end())
@@ -106,7 +106,7 @@ LiftMod::next_setting (Angle const& surface_angle) const
 
 
 LiftMod::Setting const*
-LiftMod::prev_setting (Angle const& surface_angle) const
+LiftMod::prev_setting (si::Angle const surface_angle) const
 {
 	auto it = find_setting_iterator (surface_angle);
 	if (it != _settings.begin())
@@ -115,26 +115,26 @@ LiftMod::prev_setting (Angle const& surface_angle) const
 }
 
 
-Angle
-LiftMod::get_aoa_correction (Angle const& surface_angle) const
+si::Angle
+LiftMod::get_aoa_correction (si::Angle const surface_angle) const
 {
 	auto range = adjacent_find (_settings.begin(), _settings.end(), surface_angle, [](Settings::value_type pair) { return pair.first; });
 
-	Range<Angle> from (range.first->first, range.second->first);
-	Range<Angle> to (range.first->second.aoa_correction(), range.second->second.aoa_correction());
+	Range<si::Angle> from (range.first->first, range.second->first);
+	Range<si::Angle> to (range.first->second.aoa_correction(), range.second->second.aoa_correction());
 
 	return renormalize (surface_angle, from, to);
 }
 
 
-Range<Speed>
-LiftMod::get_speed_range (Angle const& surface_angle) const
+Range<si::Speed>
+LiftMod::get_speed_range (si::Angle const surface_angle) const
 {
 	auto range = adjacent_find (_settings.begin(), _settings.end(), surface_angle, [](Settings::value_type pair) { return pair.first; });
 
-	Range<Angle> from (range.first->first, range.second->first);
-	Range<Speed> to_min (range.first->second.speed_range().min(), range.first->second.speed_range().min());
-	Range<Speed> to_max (range.first->second.speed_range().max(), range.first->second.speed_range().max());
+	Range<si::Angle> from (range.first->first, range.second->first);
+	Range<si::Speed> to_min (range.first->second.speed_range().min(), range.first->second.speed_range().min());
+	Range<si::Speed> to_max (range.first->second.speed_range().max(), range.first->second.speed_range().max());
 
 	return {
 		renormalize (surface_angle, from, to_min),
@@ -144,7 +144,7 @@ LiftMod::get_speed_range (Angle const& surface_angle) const
 
 
 LiftMod::Settings::const_iterator
-LiftMod::find_setting_iterator (Angle const& surface_angle) const
+LiftMod::find_setting_iterator (si::Angle const surface_angle) const
 {
 	using std::abs;
 

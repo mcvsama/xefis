@@ -40,8 +40,8 @@ class NavaidStorage
 {
 	struct Group
 	{
-		std::map<QString, Navaid const*>		by_identifier;
-		std::multimap<Frequency, Navaid const*>	by_frequency;
+		std::map<QString, Navaid const*>			by_identifier;
+		std::multimap<si::Frequency, Navaid const*>	by_frequency;
 	};
 
 	typedef std::map<Navaid::Type, Group> NavaidsByType;
@@ -76,10 +76,10 @@ class NavaidStorage
 	typedef std::vector<Navaid> Navaids;
 
   private:
-	static Angle::Value
+	static si::Angle::Value
 	access_position (Navaid const& navaid, std::size_t const dimension);
 
-	typedef KDTree::KDTree<2, Navaid, std::function<Angle::Value (Navaid const&, std::size_t)>> NavaidsTree;
+	typedef KDTree::KDTree<2, Navaid, std::function<si::Angle::Value (Navaid const&, std::size_t)>> NavaidsTree;
 
   public:
 	// Ctor
@@ -113,7 +113,7 @@ class NavaidStorage
 	 * \threadsafe
 	 */
 	Navaids
-	get_navs (LonLat const& position, Length radius) const;
+	get_navs (si::LonLat const& position, si::Length radius) const;
 
 	/**
 	 * Find navaid of given type by its @identifier.
@@ -129,7 +129,7 @@ class NavaidStorage
 	 * \threadsafe
 	 */
 	Navaids
-	find_by_frequency (LonLat const& position, Navaid::Type, Frequency frequency) const;
+	find_by_frequency (si::LonLat const& position, Navaid::Type, si::Frequency frequency) const;
 
   private:
 	void
@@ -153,10 +153,10 @@ class NavaidStorage
 };
 
 
-inline Angle::Value
+inline si::Angle::Value
 NavaidStorage::access_position (Navaid const& navaid, std::size_t const dimension)
 {
-	return dimension == 0 ? navaid.position().lat().in<Degree>() : navaid.position().lon().in<Degree>();
+	return dimension == 0 ? navaid.position().lat().in<si::Degree>() : navaid.position().lon().in<si::Degree>();
 }
 
 } // namespace xf

@@ -27,6 +27,9 @@
 #include <xefis/support/instrument/instrument_support.h>
 
 
+namespace si = neutrino::si;
+
+
 // TODO handle nans
 class FlapsIO: public xf::ModuleIO
 {

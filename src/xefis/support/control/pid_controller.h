@@ -186,19 +186,19 @@ template<class pInput, class pProcessVariable = pInput, class pParam = double>
 		 * Same as process (Input, Time), but also provide target value to be set.
 		 */
 		ProcessVariable
-		process (Input target, Input measured, Time dt) noexcept;
+		process (Input target, Input measured, si::Time dt) noexcept;
 
 		/**
 		 * Alias for process().
 		 */
 		ProcessVariable
-		operator() (Input input, Time dt) noexcept;
+		operator() (Input input, si::Time dt) noexcept;
 
 		/**
 		 * Alias for process().
 		 */
 		ProcessVariable
-		operator() (Input target, Input measured, Time dt) noexcept;
+		operator() (Input target, Input measured, si::Time dt) noexcept;
 
 		/**
 		 * Return current controller output value.
@@ -397,7 +397,7 @@ template<class V, class C, class P>
 
 template<class V, class C, class P>
 	inline typename PIDController<V, C, P>::ProcessVariable
-	PIDController<V, C, P>::process (Input measured, Time dt) noexcept
+	PIDController<V, C, P>::process (Input measured, si::Time dt) noexcept
 	{
 		using si::isfinite;
 		using si::abs;
@@ -435,7 +435,7 @@ template<class V, class C, class P>
 
 template<class V, class C, class P>
 	inline typename PIDController<V, C, P>::ProcessVariable
-	PIDController<V, C, P>::process (Input target, Input measured, Time dt) noexcept
+	PIDController<V, C, P>::process (Input target, Input measured, si::Time dt) noexcept
 	{
 		set_target (target);
 		return process (measured, dt);
@@ -444,7 +444,7 @@ template<class V, class C, class P>
 
 template<class V, class C, class P>
 	inline typename PIDController<V, C, P>::ProcessVariable
-	PIDController<V, C, P>::operator() (Input measured, Time dt) noexcept
+	PIDController<V, C, P>::operator() (Input measured, si::Time dt) noexcept
 	{
 		return process (measured, dt);
 	}
@@ -452,7 +452,7 @@ template<class V, class C, class P>
 
 template<class V, class C, class P>
 	inline typename PIDController<V, C, P>::ProcessVariable
-	PIDController<V, C, P>::operator() (Input target, Input measured, Time dt) noexcept
+	PIDController<V, C, P>::operator() (Input target, Input measured, si::Time dt) noexcept
 	{
 		return process (target, measured, dt);
 	}

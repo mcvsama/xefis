@@ -33,6 +33,10 @@
 #include <xefis/utility/smoother.h>
 
 
+namespace si = neutrino::si;
+using namespace neutrino::si::literals;
+
+
 class XBeeIO: public xf::ModuleIO
 {
   public:
@@ -90,13 +94,13 @@ class XBee:
 	static constexpr uint8_t	kPeriodicPingFrameID		= 0xfd;
 	static constexpr uint8_t	kClearChannelFrameID		= 0xfe;
 
-	static constexpr Time		kCommandTimeout				= 200_ms;
-	static constexpr Time		kRestartAfter				= 500_ms;
-	static constexpr Time		kPeriodicAliveCheck			= 500_ms;
-	static constexpr Time		kPeriodicAliveCheckTimeout	= 500_ms;
-	static constexpr Time		kClearChannelCheck			= 2_s;
-	static constexpr Time		kAfterRestartGraceTime		= 500_ms;
-	static constexpr Time		kRSSITimeout				= 1_s;
+	static constexpr si::Time	kCommandTimeout				= 200_ms;
+	static constexpr si::Time	kRestartAfter				= 500_ms;
+	static constexpr si::Time	kPeriodicAliveCheck			= 500_ms;
+	static constexpr si::Time	kPeriodicAliveCheckTimeout	= 500_ms;
+	static constexpr si::Time	kClearChannelCheck			= 2_s;
+	static constexpr si::Time	kAfterRestartGraceTime		= 500_ms;
+	static constexpr si::Time	kRSSITimeout				= 1_s;
 
 	// Modem API frame types:
 	enum class SendAPI: uint8_t
@@ -389,7 +393,7 @@ class XBee:
 	 * given time limit, failure() is called.
 	 */
 	void
-	ping (Time timeout = 250_ms);
+	ping (si::Time timeout = 250_ms);
 
 	/**
 	 * Call it to indicate that ping() should be cancelled.
@@ -442,7 +446,7 @@ class XBee:
 	std::string							_output_buffer;
 	std::string							_last_at_command;
 	xf::Smoother<si::Power>				_rssi_smoother			{ 200_ms };
-	Time								_last_rssi_time;
+	si::Time							_last_rssi_time;
 	uint8_t								_at_frame_id			{ 0x00 };
 	xf::PropChanged<std::string>		_send_changed			{ io.send };
 };

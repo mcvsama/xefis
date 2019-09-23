@@ -35,6 +35,10 @@
 #include <xefis/utility/delta_decoder.h>
 
 
+namespace si = neutrino::si;
+using namespace neutrino::si::literals;
+
+
 class StatusIO: public xf::ModuleIO
 {
   public:
@@ -82,7 +86,7 @@ class Status:
 		Warning,
 	};
 
-	static constexpr Time kMessageHideTimeout = 5_s;
+	static constexpr si::Time kMessageHideTimeout = 5_s;
 
 	class Message
 	{

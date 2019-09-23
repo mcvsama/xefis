@@ -24,6 +24,10 @@
 #include <xefis/core/setting.h>
 
 
+namespace si = neutrino::si;
+using namespace neutrino::si::literals;
+
+
 class AFCS_RollAutotrim_IO: public xf::ModuleIO
 {
   public:

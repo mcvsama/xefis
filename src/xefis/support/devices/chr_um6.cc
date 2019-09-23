@@ -161,10 +161,10 @@ CHRUM6::command (CommandAddress address, CommandCallback callback)
 
 
 uint32_t
-CHRUM6::sample_rate_setting (Frequency frequency) noexcept
+CHRUM6::sample_rate_setting (si::Frequency const frequency) noexcept
 {
 	// Use formula from the spec: freq = (280/255) * sample_rate + 20.
-	uint32_t x = (std::max ((frequency - 20_Hz), 0.1_Hz) / (280.0 / 255.0)).in<Hertz>();
+	uint32_t x = (std::max ((frequency - 20_Hz), 0.1_Hz) / (280.0 / 255.0)).in<si::Hertz>();
 	return xf::clamped (x, 0u, 255u);
 }
 
@@ -340,7 +340,7 @@ CHRUM6::process_packet (uint32_t address, bool failed, bool, uint32_t data)
 	if (_alive_check_callback)
 		_alive_check_callback();
 
-	Time now = TimeHelper::now();
+	si::Time const now = TimeHelper::now();
 
 	if (failed)
 	{

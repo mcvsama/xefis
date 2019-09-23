@@ -24,6 +24,10 @@
 #include <xefis/core/property_observer.h>
 
 
+namespace si = neutrino::si;
+using namespace neutrino::si::literals;
+
+
 class IMU_CPF_IO: public xf::ModuleIO
 {
   public:

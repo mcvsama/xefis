@@ -30,6 +30,10 @@
 #include <xefis/core/setting.h>
 
 
+namespace si = neutrino::si;
+using namespace neutrino::si::literals;
+
+
 class FlightGearIO: public xf::ModuleIO
 {
   public:

@@ -30,6 +30,10 @@
 #include <xefis/utility/smoother.h>
 
 
+namespace si = neutrino::si;
+using namespace neutrino::si::literals;
+
+
 class AFCS_AP_IO: public xf::ModuleIO
 {
   public:

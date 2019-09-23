@@ -39,7 +39,7 @@ class PaintRequest
 	  public:
 		// Ctor
 		explicit
-		Metric (QSize canvas_size, PixelDensity, si::Length pen_width, si::Length font_height);
+		Metric (QSize canvas_size, si::PixelDensity, si::Length pen_width, si::Length font_height);
 
 		[[nodiscard]]
 		bool
@@ -54,7 +54,7 @@ class PaintRequest
 		canvas_size() const noexcept;
 
 		[[nodiscard]]
-		PixelDensity
+		si::PixelDensity
 		pixel_density() const noexcept;
 
 		[[nodiscard]]
@@ -113,7 +113,7 @@ class PaintRequest
 
 
 inline
-PaintRequest::Metric::Metric (QSize canvas_size, PixelDensity pixel_density, si::Length pen_width, si::Length font_height):
+PaintRequest::Metric::Metric (QSize canvas_size, si::PixelDensity pixel_density, si::Length pen_width, si::Length font_height):
 	_canvas_size (canvas_size),
 	_pixel_density (pixel_density),
 	_pen_width (pen_width),
@@ -145,7 +145,7 @@ PaintRequest::Metric::canvas_size() const noexcept
 }
 
 
-inline PixelDensity
+inline si::PixelDensity
 PaintRequest::Metric::pixel_density() const noexcept
 {
 	return _pixel_density;

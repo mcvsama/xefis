@@ -39,16 +39,16 @@ haversine (si::LonLat const& a, si::LonLat const& b)
 	using std::atan2;
 	using std::sqrt;
 
-	si::Angle dlat = b.lat() - a.lat();
-	si::Angle dlon = b.lon() - a.lon();
+	si::Angle const dlat = b.lat() - a.lat();
+	si::Angle const dlon = b.lon() - a.lon();
 
-	si::Angle::Value latsin = sin (dlat / 2.0);
-	si::Angle::Value lonsin = sin (dlon / 2.0);
+	si::Angle::Value const latsin = sin (dlat / 2.0);
+	si::Angle::Value const lonsin = sin (dlon / 2.0);
 
-	si::Angle::Value z = latsin * latsin
-					   + lonsin * lonsin
-					   * cos (a.lat())
-					   * cos (b.lat());
+	si::Angle::Value const z = latsin * latsin
+							 + lonsin * lonsin
+							 * cos (a.lat())
+							 * cos (b.lat());
 
 	return 2.0 * atan2 (sqrt (z), sqrt (1.0 - z));
 }
@@ -61,13 +61,12 @@ initial_bearing (si::LonLat const& a, si::LonLat const& b)
 	using std::cos;
 	using std::atan2;
 
-	si::Angle dlon = b.lon() - a.lon();
-	si::Angle lat1 = a.lat();
-	si::Angle lat2 = b.lat();
+	si::Angle const dlon = b.lon() - a.lon();
+	si::Angle const lat1 = a.lat();
+	si::Angle const lat2 = b.lat();
 
-	double y = sin (dlon) * cos (lat2);
-	double x = cos (lat1) * sin (lat2)
-			 - sin (lat1) * cos (lat2) * cos (dlon);
+	double const y = sin (dlon) * cos (lat2);
+	double const x = cos (lat1) * sin (lat2) - sin (lat1) * cos (lat2) * cos (dlon);
 
 	return 1_rad * atan2 (y, x);
 }
@@ -78,19 +77,19 @@ great_arcs_angle (si::LonLat const& a, si::LonLat const& common, si::LonLat cons
 {
 	using std::arg;
 
-	LonLat z1 (a.lon() - common.lon(), a.lat() - common.lat());
-	LonLat zero (0_deg, 0_deg);
-	LonLat z2 (b.lon() - common.lon(), b.lat() - common.lat());
+	si::LonLat const z1 (a.lon() - common.lon(), a.lat() - common.lat());
+	si::LonLat const zero (0_deg, 0_deg);
+	si::LonLat const z2 (b.lon() - common.lon(), b.lat() - common.lat());
 
-	std::complex<si::Angle::Value> x1 (z1.lon().in<si::Degree>(), z1.lat().in<si::Degree>());
-	std::complex<si::Angle::Value> x2 (z2.lon().in<si::Degree>(), z2.lat().in<si::Degree>());
+	std::complex<si::Angle::Value> const x1 (z1.lon().in<si::Degree>(), z1.lat().in<si::Degree>());
+	std::complex<si::Angle::Value> const x2 (z2.lon().in<si::Degree>(), z2.lat().in<si::Degree>());
 
 	return 1_deg * xf::floored_mod<double> ((1_rad * (arg (x1) - arg (x2))).in<si::Degree>(), 360.0);
 }
 
 
 std::string
-to_dms (si::Angle a, bool three_digits)
+to_dms (si::Angle const a, bool const three_digits)
 {
 	auto const angle_degs = a.in<si::Degree>();
 	auto const degs = std::trunc (xf::floored_mod (angle_degs, -180.0, +180.0));
@@ -106,7 +105,7 @@ to_dms (si::Angle a, bool three_digits)
 
 
 std::string
-to_latitude_dms (Angle a)
+to_latitude_dms (si::Angle const a)
 {
 	std::string dms = to_dms (a, false);
 
@@ -120,7 +119,7 @@ to_latitude_dms (Angle a)
 
 
 std::string
-to_longitude_dms (Angle a)
+to_longitude_dms (si::Angle const a)
 {
 	std::string dms = to_dms (a, true);
 
@@ -133,15 +132,15 @@ to_longitude_dms (Angle a)
 }
 
 
-Angle
-mean (Angle lhs, Angle rhs)
+si::Angle
+mean (si::Angle const lhs, si::Angle const rhs)
 {
 	using std::sin;
 	using std::cos;
 	using std::atan2;
 
-	Angle::Value x = 0.5 * cos (lhs) + cos (rhs);
-	Angle::Value y = 0.5 * sin (lhs) + sin (rhs);
+	si::Angle::Value x = 0.5 * cos (lhs) + cos (rhs);
+	si::Angle::Value y = 0.5 * sin (lhs) + sin (rhs);
 
 	return 1_rad * atan2 (y, x);
 }

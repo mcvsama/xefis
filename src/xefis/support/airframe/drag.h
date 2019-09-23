@@ -37,7 +37,7 @@ class Drag
 	/**
 	 * Get range of AOA for which lift is defined.
 	 */
-	Range<Angle>
+	Range<si::Angle>
 	get_aoa_range() const noexcept;
 
 	/**
@@ -46,14 +46,14 @@ class Drag
 	 * Uses linear interpolation.
 	 */
 	DragCoefficient
-	get_cd (Angle const& aoa) const;
+	get_cd (si::Angle const& aoa) const;
 
   private:
-	Field<Angle, DragCoefficient> _aoa_to_cd { };
+	Field<si::Angle, DragCoefficient> _aoa_to_cd { };
 };
 
 
-inline Range<Angle>
+inline Range<si::Angle>
 Drag::get_aoa_range() const noexcept
 {
 	return _aoa_to_cd.domain();

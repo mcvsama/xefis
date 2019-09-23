@@ -249,7 +249,7 @@ PerformanceComputer::compute_speeds()
 	io.v_s_5_deg = get_stall_ias (5_deg);
 	io.v_s_30_deg = get_stall_ias (30_deg);
 	// Stall speed for current bank angle:
-	io.v_s = get_stall_ias (std::min<Angle> (60_deg, io.bank_angle.value_or (60_deg)));
+	io.v_s = get_stall_ias (std::min<si::Angle> (60_deg, io.bank_angle.value_or (60_deg)));
 
 	// V_r:
 	if (io.v_s_0_deg)
@@ -340,7 +340,7 @@ PerformanceComputer::compute_speeds_vbg()
 
 
 std::optional<si::Velocity>
-PerformanceComputer::get_stall_ias (Angle const& max_bank_angle) const
+PerformanceComputer::get_stall_ias (si::Angle const max_bank_angle) const
 {
 	// Formula:
 	//   V_s = sqrt((load_factor * weight) / (0.5 * air_density * wings_area * C_L_max)).
@@ -365,7 +365,7 @@ PerformanceComputer::get_stall_ias (Angle const& max_bank_angle) const
 
 
 std::optional<si::Velocity>
-PerformanceComputer::tas_to_ias (si::Velocity const& tas) const
+PerformanceComputer::tas_to_ias (si::Velocity const tas) const
 {
 	if (io.density_altitude)
 		return xf::indicated_airspeed (tas, *io.density_altitude);
@@ -494,7 +494,7 @@ PerformanceComputer::compute_slip_skid()
 
 
 inline std::optional<si::Velocity>
-PerformanceComputer::aoa_to_tas_now (Angle const& aoa, std::optional<Acceleration> const& load) const
+PerformanceComputer::aoa_to_tas_now (si::Angle const aoa, std::optional<si::Acceleration> const load) const
 {
 	if (_airframe && io.load && io.aircraft_mass && io.air_density_static && io.flaps_angle && io.spoilers_angle)
 	{

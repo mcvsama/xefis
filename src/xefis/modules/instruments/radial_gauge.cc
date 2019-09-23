@@ -25,6 +25,11 @@
 #include "radial_gauge.h"
 
 
+namespace si = neutrino::si;
+using namespace neutrino::si::literals;
+using namespace xf::literals;
+
+
 static QColor const normal_fill (0x43, 0x49, 0x54);
 
 
@@ -123,8 +128,6 @@ BasicRadialGauge::paint_text (GaugeValues const& values, xf::PaintRequest const&
 void
 BasicRadialGauge::paint_indicator (GaugeValues const& values, xf::InstrumentAids& aids, xf::InstrumentPainter& painter, float r) const
 {
-	using namespace xf::literals;
-
 	constexpr si::Angle kValueSpanAngle = 210_deg;
 
 	auto get_round_pen = [&aids] (QColor color, float width) {

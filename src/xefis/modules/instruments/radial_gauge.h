@@ -34,6 +34,9 @@
 #include "basic_gauge.h"
 
 
+namespace si = neutrino::si;
+
+
 // TODO handle nans
 template<class Value>
 	class RadialGaugeIO: public BasicGaugeIO<Value>

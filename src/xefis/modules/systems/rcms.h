@@ -27,6 +27,10 @@
 #include <xefis/core/property_observer.h>
 
 
+namespace si = neutrino::si;
+using namespace neutrino::si::literals;
+
+
 class RemoteControlManagementSystemIO: public xf::ModuleIO
 {
   public:

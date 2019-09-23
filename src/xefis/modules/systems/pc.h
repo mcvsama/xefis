@@ -28,6 +28,10 @@
 #include <xefis/utility/range_smoother.h>
 
 
+namespace si = neutrino::si;
+using namespace neutrino::si::literals;
+
+
 class PerformanceComputerIO: public xf::ModuleIO
 {
   public:
@@ -138,10 +142,10 @@ class PerformanceComputer: public xf::Module<PerformanceComputerIO>
 	compute_speeds_vbg();
 
 	std::optional<si::Velocity>
-	get_stall_ias (Angle const& max_bank_angle) const;
+	get_stall_ias (si::Angle max_bank_angle) const;
 
 	std::optional<si::Velocity>
-	tas_to_ias (si::Velocity const& tas) const;
+	tas_to_ias (si::Velocity tas) const;
 
 	void
 	compute_critical_aoa();
@@ -166,7 +170,7 @@ class PerformanceComputer: public xf::Module<PerformanceComputerIO>
 	 * May return empty result if it's not possible to compute TAS.
 	 */
 	std::optional<si::Velocity>
-	aoa_to_tas_now (si::Angle const& aoa, std::optional<si::Acceleration> const& load = {}) const;
+	aoa_to_tas_now (si::Angle aoa, std::optional<si::Acceleration> load = {}) const;
 
   private:
 	xf::Airframe*					_airframe;

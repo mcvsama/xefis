@@ -32,8 +32,8 @@ AFCS_RollAutotrim::process (xf::Cycle const&)
 	if (io.measured_ias && io.measured_engine_torque)
 	{
 		// TODO Do this correctly, now it's just too simple.
-		auto ias_part = *io.ias_coefficient / io.measured_ias->in<MeterPerSecond>();
-		auto torque_part = *io.engine_torque_coefficient * io.measured_engine_torque->in<NewtonMeter>();
+		auto ias_part = *io.ias_coefficient / io.measured_ias->in<si::MeterPerSecond>();
+		auto torque_part = *io.engine_torque_coefficient * io.measured_engine_torque->in<si::NewtonMeter>();
 		si::Angle correction = 1_deg * (ias_part + torque_part);
 
 		io.ailerons_correction = *io.total_coefficient * correction;

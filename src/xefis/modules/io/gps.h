@@ -35,6 +35,10 @@
 #include <xefis/support/protocols/nmea/parser.h>
 
 
+namespace si = neutrino::si;
+using namespace neutrino::si::literals;
+
+
 class GPS_IO: public xf::ModuleIO
 {
   public:
@@ -96,8 +100,8 @@ class GPS:
   private:
 	static constexpr char			kLoggerScope[]						= "mod::GPS";
 	static constexpr unsigned int	kConnectionAttemptsPerPowerCycle	= 4;
-	static constexpr Time			kPowerRestartDelay					= 1_s;
-	static constexpr Time			kAliveCheckInterval					= 2_s;
+	static constexpr si::Time		kPowerRestartDelay					= 1_s;
+	static constexpr si::Time		kAliveCheckInterval					= 2_s;
 	static constexpr unsigned int	kMaxRestartAttempts					= 2;
 	static constexpr const char*	MTK_SET_NMEA_BAUDRATE				= "PMTK251";
 	static constexpr const char*	MTK_SET_NMEA_FREQUENCIES			= "PMTK314";

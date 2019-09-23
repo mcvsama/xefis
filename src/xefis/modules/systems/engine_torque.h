@@ -29,6 +29,10 @@
 #include <xefis/utility/temporal.h>
 
 
+namespace si = neutrino::si;
+using namespace neutrino::si::literals;
+
+
 class EngineTorqueIO: public xf::ModuleIO
 {
   public:

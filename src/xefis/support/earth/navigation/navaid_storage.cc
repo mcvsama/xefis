@@ -167,7 +167,7 @@ NavaidStorage::async_loader()
 
 
 NavaidStorage::Navaids
-NavaidStorage::get_navs (LonLat const& position, Length radius) const
+NavaidStorage::get_navs (si::LonLat const& position, si::Length const radius) const
 {
 	if (!_loaded)
 		return {};
@@ -185,7 +185,7 @@ NavaidStorage::get_navs (LonLat const& position, Length radius) const
 	};
 
 	Navaid navaid_at_position (Navaid::OTHER, position, "", "", 0_nmi);
-	_navaids_tree.find_nearest_if (navaid_at_position, std::numeric_limits<Length::Value>::max(), inserter_and_predicate);
+	_navaids_tree.find_nearest_if (navaid_at_position, std::numeric_limits<si::Length::Value>::max(), inserter_and_predicate);
 
 	return set;
 }
@@ -209,7 +209,7 @@ NavaidStorage::find_by_id (Navaid::Type type, QString const& identifier) const
 
 
 NavaidStorage::Navaids
-NavaidStorage::find_by_frequency (LonLat const& position, Navaid::Type type, Frequency frequency) const
+NavaidStorage::find_by_frequency (si::LonLat const& position, Navaid::Type type, si::Frequency const frequency) const
 {
 	if (!_loaded)
 		return {};
@@ -245,7 +245,7 @@ NavaidStorage::parse_nav_dat()
 
 		int type_int;
 		Nav type;
-		LonLat pos;
+		si::LonLat pos;
 		double elevation_ft;
 		double khz;
 		QString identifier;
@@ -259,7 +259,7 @@ NavaidStorage::parse_nav_dat()
 		if (type_int == 99) // EOF sentinel
 			break;
 
-		pos = LonLat (1_deg * pos_lon, 1_deg * pos_lat);
+		pos = si::LonLat (1_deg * pos_lon, 1_deg * pos_lat);
 		type = static_cast<Nav> (type_int);
 
 		switch (type)
@@ -350,7 +350,7 @@ NavaidStorage::parse_fix_dat()
 	{
 		auto& line_ts = *line;
 
-		LonLat pos;
+		si::LonLat pos;
 		QString identifier;
 		double pos_lon;
 		double pos_lat;
@@ -360,7 +360,7 @@ NavaidStorage::parse_fix_dat()
 		if (pos_lat == 99.0) // EOF sentinel
 			break;
 
-		pos = LonLat (1_deg * pos_lon, 1_deg * pos_lat);
+		pos = si::LonLat (1_deg * pos_lon, 1_deg * pos_lat);
 
 		_navaids_tree.insert (Navaid (Navaid::FIX, pos, identifier, identifier, 0_nmi));
 	}
@@ -382,8 +382,9 @@ NavaidStorage::parse_apt_dat()
 		if (cur_land_airport && !runways.empty())
 		{
 			// Compute position:
-			LonLat min_position = runways[0].pos_1();
-			LonLat max_position = min_position;
+			si::LonLat min_position = runways[0].pos_1();
+			si::LonLat max_position = min_position;
+
 			for (auto const& rwy: runways)
 			{
 				for (auto const& point: { rwy.pos_1(), rwy.pos_2() })
@@ -394,8 +395,9 @@ NavaidStorage::parse_apt_dat()
 					max_position.lat() = std::max (max_position.lat(), point.lat());
 				}
 			}
-			LonLat mean_position (xf::mean (min_position.lon(), max_position.lon()),
-								  xf::mean (min_position.lat(), max_position.lat()));
+
+			si::LonLat mean_position (xf::mean (min_position.lon(), max_position.lon()),
+									  xf::mean (min_position.lat(), max_position.lat()));
 			cur_land_airport->set_position (mean_position);
 			cur_land_airport->set_runways (runways);
 
@@ -467,9 +469,9 @@ NavaidStorage::parse_apt_dat()
 								>> runway_markings[i] >> approach_lighting[i] >> touchdown_zone_lighting[i] >> runway_end_identifier_lights[i];
 
 					Navaid::Runway runway (identifier[0],
-										   LonLat (1_deg * lon_deg[0], 1_deg * lat_deg[0]),
+										   si::LonLat (1_deg * lon_deg[0], 1_deg * lat_deg[0]),
 										   identifier[1],
-										   LonLat (1_deg * lon_deg[1], 1_deg * lat_deg[1]));
+										   si::LonLat (1_deg * lon_deg[1], 1_deg * lat_deg[1]));
 					runway.set_width (1_m * width_m);
 					runways.push_back (runway);
 				}

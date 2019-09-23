@@ -34,7 +34,7 @@ class Navaid
 	  public:
 		// Ctor
 		explicit
-		Runway (QString const& identifier_1, LonLat const& pos_1, QString const& identifier_2, LonLat const& pos_2) noexcept;
+		Runway (QString const& identifier_1, si::LonLat const& pos_1, QString const& identifier_2, si::LonLat const& pos_2) noexcept;
 
 		/**
 		 * Runway ID of the first end.
@@ -45,7 +45,7 @@ class Navaid
 		/**
 		 * Location of the first end.
 		 */
-		LonLat const&
+		si::LonLat const&
 		pos_1() const noexcept;
 
 		/**
@@ -57,27 +57,27 @@ class Navaid
 		/**
 		 * Location of the second end.
 		 */
-		LonLat const&
+		si::LonLat const&
 		pos_2() const noexcept;
 
 		/**
 		 * Get width.
 		 */
-		Length
+		si::Length
 		width() const noexcept;
 
 		/**
 		 * Set width.
 		 */
 		void
-		set_width (Length width) noexcept;
+		set_width (si::Length width) noexcept;
 
 	  private:
-		QString	_identifier_1;
-		LonLat	_pos_1;
-		QString	_identifier_2;
-		LonLat	_pos_2;
-		Length	_width;
+		QString		_identifier_1;
+		si::LonLat	_pos_1;
+		QString		_identifier_2;
+		si::LonLat	_pos_2;
+		si::Length	_width;
 	};
 
 	enum Type
@@ -107,7 +107,7 @@ class Navaid
 
 	// Ctor
 	explicit
-	Navaid (Type, LonLat const&, QString const& identifier, QString const& name, Length range);
+	Navaid (Type, si::LonLat const&, QString const& identifier, QString const& name, si::Length range);
 
 	bool
 	operator< (Navaid const& other) const;
@@ -115,11 +115,11 @@ class Navaid
 	Type
 	type() const noexcept;
 
-	LonLat const&
+	si::LonLat const&
 	position() const noexcept;
 
 	void
-	set_position (LonLat const& position) noexcept;
+	set_position (si::LonLat const& position) noexcept;
 
 	QString const&
 	identifier() const noexcept;
@@ -133,34 +133,34 @@ class Navaid
 	void
 	set_name (QString const& name) noexcept;
 
-	Length
+	si::Length
 	range() const noexcept;
 
 	void
-	set_range (Length const& range) noexcept;
+	set_range (si::Length range) noexcept;
 
 	void
-	set_frequency (Frequency) noexcept;
+	set_frequency (si::Frequency) noexcept;
 
-	Frequency
+	si::Frequency
 	frequency() const noexcept;
 
 	void
-	set_slaved_variation (Angle) noexcept;
+	set_slaved_variation (si::Angle) noexcept;
 
-	Angle
+	si::Angle
 	slaved_variation() const noexcept;
 
 	void
-	set_elevation (Length) noexcept;
+	set_elevation (si::Length) noexcept;
 
-	Length
+	si::Length
 	elevation() const noexcept;
 
 	void
-	set_true_bearing (Angle) noexcept;
+	set_true_bearing (si::Angle) noexcept;
 
-	Angle
+	si::Angle
 	true_bearing() const noexcept;
 
 	void
@@ -206,24 +206,24 @@ class Navaid
 	set_runways (Runways const& runways);
 
   private:
-	Type		_type;
-	LonLat		_position			= { 0_deg, 0_deg };
-	QString		_identifier;
-	QString		_name;
-	Length		_range				= 0_nmi;
-	Frequency	_frequency			= 0_Hz;
-	Angle		_slaved_variation	= 0_deg; // VOR only
-	Length		_elevation			= 0_ft;
-	Angle		_true_bearing		= 0_deg; // LOC* only
-	QString		_icao;
-	QString		_runway_id;
-	VorType		_vor_type			= VOROnly;
-	Runways		_runways; // ARPT only
+	Type			_type;
+	si::LonLat		_position			= { 0_deg, 0_deg };
+	QString			_identifier;
+	QString			_name;
+	si::Length		_range				= 0_nmi;
+	si::Frequency	_frequency			= 0_Hz;
+	si::Angle		_slaved_variation	= 0_deg; // VOR only
+	si::Length		_elevation			= 0_ft;
+	si::Angle		_true_bearing		= 0_deg; // LOC* only
+	QString			_icao;
+	QString			_runway_id;
+	VorType			_vor_type			= VOROnly;
+	Runways			_runways; // ARPT only
 };
 
 
 inline
-Navaid::Runway::Runway (QString const& identifier_1, LonLat const& pos_1, QString const& identifier_2, LonLat const& pos_2) noexcept:
+Navaid::Runway::Runway (QString const& identifier_1, si::LonLat const& pos_1, QString const& identifier_2, si::LonLat const& pos_2) noexcept:
 	_identifier_1 (identifier_1),
 	_pos_1 (pos_1),
 	_identifier_2 (identifier_2),
@@ -238,7 +238,7 @@ Navaid::Runway::identifier_1() const noexcept
 }
 
 
-inline LonLat const&
+inline si::LonLat const&
 Navaid::Runway::pos_1() const noexcept
 {
 	return _pos_1;
@@ -252,14 +252,14 @@ Navaid::Runway::identifier_2() const noexcept
 }
 
 
-inline LonLat const&
+inline si::LonLat const&
 Navaid::Runway::pos_2() const noexcept
 {
 	return _pos_2;
 }
 
 
-inline Length
+inline si::Length
 Navaid::Runway::width() const noexcept
 {
 	return _width;
@@ -267,7 +267,7 @@ Navaid::Runway::width() const noexcept
 
 
 inline void
-Navaid::Runway::set_width (Length width) noexcept
+Navaid::Runway::set_width (si::Length width) noexcept
 {
 	_width = width;
 }
@@ -280,7 +280,7 @@ Navaid::Navaid (Type type):
 
 
 inline
-Navaid::Navaid (Type type, LonLat const& position, QString const& identifier, QString const& name, Length range):
+Navaid::Navaid (Type type, si::LonLat const& position, QString const& identifier, QString const& name, si::Length range):
 	_type (type),
 	_position (position),
 	_identifier (identifier),
@@ -304,7 +304,7 @@ Navaid::type() const noexcept
 }
 
 
-inline LonLat const&
+inline si::LonLat const&
 Navaid::position() const noexcept
 {
 	return _position;
@@ -312,7 +312,7 @@ Navaid::position() const noexcept
 
 
 inline void
-Navaid::set_position (LonLat const& position) noexcept
+Navaid::set_position (si::LonLat const& position) noexcept
 {
 	_position = position;
 }
@@ -346,7 +346,7 @@ Navaid::set_name (QString const& name) noexcept
 }
 
 
-inline Length
+inline si::Length
 Navaid::range() const noexcept
 {
 	return _range;
@@ -354,20 +354,20 @@ Navaid::range() const noexcept
 
 
 inline void
-Navaid::set_range (Length const& range) noexcept
+Navaid::set_range (si::Length const range) noexcept
 {
 	_range = range;
 }
 
 
 inline void
-Navaid::set_frequency (Frequency frequency) noexcept
+Navaid::set_frequency (si::Frequency const frequency) noexcept
 {
 	_frequency = frequency;
 }
 
 
-inline Frequency
+inline si::Frequency
 Navaid::frequency() const noexcept
 {
 	return _frequency;
@@ -375,13 +375,13 @@ Navaid::frequency() const noexcept
 
 
 inline void
-Navaid::set_slaved_variation (Angle degrees) noexcept
+Navaid::set_slaved_variation (si::Angle const degrees) noexcept
 {
 	_slaved_variation = degrees;
 }
 
 
-inline Angle
+inline si::Angle
 Navaid::slaved_variation() const noexcept
 {
 	return _slaved_variation;
@@ -389,13 +389,13 @@ Navaid::slaved_variation() const noexcept
 
 
 inline void
-Navaid::set_elevation (Length elevation) noexcept
+Navaid::set_elevation (si::Length const elevation) noexcept
 {
 	_elevation = elevation;
 }
 
 
-inline Length
+inline si::Length
 Navaid::elevation() const noexcept
 {
 	return _elevation;
@@ -403,13 +403,13 @@ Navaid::elevation() const noexcept
 
 
 inline void
-Navaid::set_true_bearing (Angle bearing) noexcept
+Navaid::set_true_bearing (si::Angle const bearing) noexcept
 {
 	_true_bearing = bearing;
 }
 
 
-inline Angle
+inline si::Angle
 Navaid::true_bearing() const noexcept
 {
 	return _true_bearing;

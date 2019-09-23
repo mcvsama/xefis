@@ -48,6 +48,8 @@
 #define XEFIS_LINK_RECV_DEBUG 0
 
 
+namespace si = neutrino::si;
+
 class LinkIO;
 
 

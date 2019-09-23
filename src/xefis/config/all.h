@@ -22,6 +22,7 @@
 namespace xf {
 
 using namespace neutrino;
+using namespace neutrino::si::literals;
 
 } // namespace xf
 

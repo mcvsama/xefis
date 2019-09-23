@@ -38,7 +38,7 @@ FlapsControl::FlapsControl (std::unique_ptr<FlapsControlIO> module_io, xf::Airfr
 
 	_timer = std::make_unique<QTimer>();
 	_timer->setTimerType (Qt::PreciseTimer);
-	_timer->setInterval (kUpdateInterval.in<Millisecond>());
+	_timer->setInterval (kUpdateInterval.in<si::Millisecond>());
 	_timer->setSingleShot (false);
 	QObject::connect (_timer.get(), &QTimer::timeout, std::bind (&FlapsControl::update_flap_position, this));
 
@@ -81,7 +81,7 @@ FlapsControl::update_flap_position()
 	using si::abs;
 
 	si::Angle difference = _setting - _current;
-	double sgn = xf::sgn (difference.in<Degree>());
+	double sgn = xf::sgn (difference.in<si::Degree>());
 	si::Angle delta = kUpdateInterval * *io.angular_velocity;
 
 	if (abs (difference) > delta)

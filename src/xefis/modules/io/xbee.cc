@@ -50,25 +50,25 @@ XBee::XBee (std::unique_ptr<XBeeIO> module_io, xf::Logger const& logger, std::st
 	_logger (logger.with_scope (std::string (kLoggerScope) + "#" + instance))
 {
 	_restart_timer = new QTimer (this);
-	_restart_timer->setInterval (kRestartAfter.in<Millisecond>());
+	_restart_timer->setInterval (kRestartAfter.in<si::Millisecond>());
 	_restart_timer->setSingleShot (true);
 	QObject::connect (_restart_timer, SIGNAL (timeout()), this, SLOT (open_device()));
 
 	// Ping timer pings modem periodically. After each ping alive-check-timer is started
 	// to see if there's response. If there's none, failure() is called.
 	_periodic_ping_timer = new QTimer (this);
-	_periodic_ping_timer->setInterval (kPeriodicAliveCheck.in<Millisecond>());
+	_periodic_ping_timer->setInterval (kPeriodicAliveCheck.in<si::Millisecond>());
 	_periodic_ping_timer->setSingleShot (false);
 	QObject::connect (_periodic_ping_timer, SIGNAL (timeout()), this, SLOT (periodic_ping()));
 
 	// Clear channel assessment timer.
 	_clear_channel_timer = new QTimer (this);
-	_clear_channel_timer->setInterval (kClearChannelCheck.in<Millisecond>());
+	_clear_channel_timer->setInterval (kClearChannelCheck.in<si::Millisecond>());
 	_clear_channel_timer->setSingleShot (false);
 	QObject::connect (_clear_channel_timer, SIGNAL (timeout()), this, SLOT (clear_channel_check()));
 
 	_periodic_pong_timer = new QTimer (this);
-	_periodic_pong_timer->setInterval (kPeriodicAliveCheckTimeout.in<Millisecond>());
+	_periodic_pong_timer->setInterval (kPeriodicAliveCheckTimeout.in<si::Millisecond>());
 	_periodic_pong_timer->setSingleShot (true);
 	QObject::connect (_periodic_pong_timer, SIGNAL (timeout()), this, SLOT (periodic_pong_timeout()));
 
@@ -77,12 +77,12 @@ XBee::XBee (std::unique_ptr<XBeeIO> module_io, xf::Logger const& logger, std::st
 	QObject::connect (_pong_timer, SIGNAL (timeout()), this, SLOT (pong_timeout()));
 
 	_after_reset_timer = new QTimer (this);
-	_after_reset_timer->setInterval (kAfterRestartGraceTime.in<Millisecond>());
+	_after_reset_timer->setInterval (kAfterRestartGraceTime.in<si::Millisecond>());
 	_after_reset_timer->setSingleShot (true);
 	QObject::connect (_after_reset_timer, SIGNAL (timeout()), this, SLOT (continue_after_reset()));
 
 	_rssi_timer = new QTimer (this);
-	_rssi_timer->setInterval (kRSSITimeout.in<Millisecond>());
+	_rssi_timer->setInterval (kRSSITimeout.in<si::Millisecond>());
 	_rssi_timer->setSingleShot (true);
 	QObject::connect (_rssi_timer, SIGNAL (timeout()), this, SLOT (rssi_timeout()));
 	_rssi_timer->start();
@@ -1034,17 +1034,17 @@ XBee::report_rssi (int dbm)
 
 	// Convert dBm to milliwatts:
 	si::Power power = 1_mW * std::pow (10.0, 0.1 * static_cast<double> (dbm));
-	Time now = xf::TimeHelper::now();
+	si::Time now = xf::TimeHelper::now();
 	io.rssi = _rssi_smoother (power, now - _last_rssi_time);
 	_last_rssi_time = now;
 }
 
 
 void
-XBee::ping (Time timeout)
+XBee::ping (si::Time const timeout)
 {
 	_pong_timer->stop();
-	_pong_timer->setInterval (timeout.in<Millisecond>());
+	_pong_timer->setInterval (timeout.in<si::Millisecond>());
 	_pong_timer->start();
 }
 

@@ -35,6 +35,10 @@
 #include <xefis/utility/temporal.h>
 
 
+namespace si = neutrino::si;
+using namespace neutrino::si::literals;
+
+
 // TODO handle nans
 namespace hsi {
 
@@ -276,47 +280,47 @@ class Parameters
 	si::Time								update_time								{ 0_s };
 	hsi::DisplayMode						display_mode							{ hsi::DisplayMode::Expanded };
 	hsi::HeadingMode						heading_mode							{ hsi::HeadingMode::Magnetic };
-	Length									range									{ 1_nmi };
+	si::Length								range									{ 1_nmi };
 	std::optional<si::Angle>				heading_magnetic;
 	std::optional<si::Angle>				heading_true;
 	bool									ap_visible								{ false };
 	bool									ap_line_visible							{ false };
-	std::optional<Angle>					ap_heading_magnetic;
-	std::optional<Angle>					ap_track_magnetic;
+	std::optional<si::Angle>				ap_heading_magnetic;
+	std::optional<si::Angle>				ap_track_magnetic;
 	std::optional<bool>						ap_use_trk;
 	bool									track_visible							{ false };
 	std::optional<si::Angle>				track_magnetic;
 	bool									course_visible							{ false };
-	std::optional<Angle>					course_setting_magnetic;
-	std::optional<Angle>					course_deviation;
+	std::optional<si::Angle>				course_setting_magnetic;
+	std::optional<si::Angle>				course_deviation;
 	std::optional<bool>						course_to_flag;
 	QString									navaid_selected_reference;
 	QString									navaid_selected_identifier;
-	std::optional<Length>					navaid_selected_distance;
-	std::optional<Time>						navaid_selected_eta;
-	std::optional<Angle>					navaid_selected_course_magnetic;
+	std::optional<si::Length>				navaid_selected_distance;
+	std::optional<si::Time>					navaid_selected_eta;
+	std::optional<si::Angle>				navaid_selected_course_magnetic;
 	hsi::NavType							navaid_left_type						{ hsi::NavType::A };
 	QString									navaid_left_reference;
 	QString									navaid_left_identifier;
-	std::optional<Length>					navaid_left_distance;
-	std::optional<Angle>					navaid_left_initial_bearing_magnetic;
+	std::optional<si::Length>				navaid_left_distance;
+	std::optional<si::Angle>				navaid_left_initial_bearing_magnetic;
 	hsi::NavType							navaid_right_type						{ hsi::NavType::A };
 	QString									navaid_right_reference;
 	QString									navaid_right_identifier;
-	std::optional<Length>					navaid_right_distance;
-	std::optional<Angle>					navaid_right_initial_bearing_magnetic;
-	std::optional<Length>					navigation_required_performance;
-	std::optional<Length>					navigation_actual_performance;
+	std::optional<si::Length>				navaid_right_distance;
+	std::optional<si::Angle>				navaid_right_initial_bearing_magnetic;
+	std::optional<si::Length>				navigation_required_performance;
+	std::optional<si::Length>				navigation_actual_performance;
 	bool									center_on_track							{ false };
 	bool									home_track_visible						{ false };
-	std::optional<Angle>					true_home_direction;
+	std::optional<si::Angle>				true_home_direction;
 	std::optional<si::Length>				dist_to_home_ground;
 	std::optional<si::Length>				dist_to_home_vlos;
 	std::optional<si::Length>				dist_to_home_vert;
-	std::optional<LonLat>					home;
-	std::optional<Speed>					ground_speed;
-	std::optional<Speed>					true_air_speed;
-	std::optional<AngularVelocity>			track_lateral_rotation;
+	std::optional<si::LonLat>				home;
+	std::optional<si::Speed>				ground_speed;
+	std::optional<si::Speed>				true_air_speed;
+	std::optional<si::AngularVelocity>		track_lateral_rotation;
 	std::optional<si::Length>				altitude_reach_distance;
 	std::optional<si::Angle>				wind_from_magnetic_heading;
 	std::optional<si::Velocity>				wind_tas_speed;
@@ -331,13 +335,13 @@ class Parameters
 	QString									highlighted_loc;
 	xf::Temporal<std::optional<QString>>	positioning_hint;
 	std::optional<bool>						tcas_on;
-	std::optional<Length>					tcas_range;
-	Length									arpt_runways_range_threshold;
-	Length									arpt_map_range_threshold;
-	Length									arpt_runway_extension_length;
-	std::array<Time, 3>						trend_vector_durations;
-	std::array<Length, 3>					trend_vector_min_ranges;
-	Length									trend_vector_max_range;
+	std::optional<si::Length>				tcas_range;
+	si::Length								arpt_runways_range_threshold;
+	si::Length								arpt_map_range_threshold;
+	si::Length								arpt_runway_extension_length;
+	std::array<si::Time, 3>					trend_vector_durations;
+	std::array<si::Length, 3>				trend_vector_min_ranges;
+	si::Length								trend_vector_max_range;
 	double									radio_range_pattern_scale;
 	bool									round_clip								{ false };
 	std::optional<CircularArea>				flight_range_warning;
@@ -402,7 +406,7 @@ struct CurrentNavaids
 	xf::NavaidStorage::Navaids	arpt_navs;
 
 	bool						retrieved			{ false };
-	LonLat						retrieve_position	{ 0_deg, 0_deg };
+	si::LonLat					retrieve_position	{ 0_deg, 0_deg };
 	si::Length					retrieve_range		{ 0_nmi };
 };
 
@@ -507,7 +511,7 @@ class PaintingWork
 	 * relative to the aircraft (assumes usage with aircraft-centered transform).
 	 */
 	QPointF
-	get_feature_xy (LonLat const& navaid_position) const;
+	get_feature_xy (si::LonLat const& navaid_position) const;
 
 	/**
 	 * Trend vector range.
@@ -524,7 +528,7 @@ class PaintingWork
 	/**
 	 * Time gap between lines on trend vector.
 	 */
-	Time
+	si::Time
 	trend_time_gap() const;
 
 	float

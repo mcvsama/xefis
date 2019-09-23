@@ -39,14 +39,14 @@ class WindTriangle
 	 * The angle doesn't have to be normalized to 0..360°.
 	 */
 	void
-	set_air_vector (Speed true_air_speed, Angle heading);
+	set_air_vector (si::Speed true_air_speed, si::Angle heading);
 
 	/**
 	 * Set ground speed and ground track.
 	 * The angle doesn't have to be normalized to 0..360°.
 	 */
 	void
-	set_ground_vector (Speed ground_speed, Angle track);
+	set_ground_vector (si::Speed ground_speed, si::Angle track);
 
 	/**
 	 * Set wind speed and direction.
@@ -56,7 +56,7 @@ class WindTriangle
 	 * Add 180° to the angle if you have a 'from' angle.
 	 */
 	void
-	set_wind_vector (Speed wind_speed, Angle direction);
+	set_wind_vector (si::Speed wind_speed, si::Angle direction);
 
 	/**
 	 * Compute air vector.
@@ -79,54 +79,54 @@ class WindTriangle
 	/**
 	 * Return resulting air speed (TAS).
 	 */
-	Speed
+	si::Speed
 	air_speed() const;
 
 	/**
 	 * Return resulting air direction (aircraft heading).
 	 * Result is normalized to 0..360°.
 	 */
-	Angle
+	si::Angle
 	air_direction() const;
 
 	/**
 	 * Return resulting ground speed.
 	 */
-	Speed
+	si::Speed
 	ground_speed() const;
 
 	/**
 	 * Return resulting ground direction (ground track).
 	 * Result is normalized to 0..360°.
 	 */
-	Angle
+	si::Angle
 	ground_direction() const;
 
 	/**
 	 * Return resulting wind speed.
 	 */
-	Speed
+	si::Speed
 	wind_speed() const;
 
 	/**
 	 * Return resulting wind direction (heading TO which wind blows).
 	 * Result is normalized to 0..360°.
 	 */
-	Angle
+	si::Angle
 	wind_direction() const;
 
 	/**
 	 * Return resulting wind direction (heading FROM which wind blows).
 	 * Result is normalized to 0..360°.
 	 */
-	Angle
+	si::Angle
 	wind_from() const;
 
 	/**
 	 * Compute ground speed in given direction.
 	 */
-	Speed
-	get_ground_speed (Angle heading) const;
+	si::Speed
+	get_ground_speed (si::Angle heading) const;
 
   private:
 	// Speeds are in mps() and angles in rad():
@@ -137,23 +137,23 @@ class WindTriangle
 
 
 inline void
-WindTriangle::set_air_vector (Speed true_air_speed, Angle heading)
+WindTriangle::set_air_vector (si::Speed true_air_speed, si::Angle heading)
 {
-	_air_vector = std::polar (true_air_speed.in<MeterPerSecond>(), heading.in<Radian>());
+	_air_vector = std::polar (true_air_speed.in<si::MeterPerSecond>(), heading.in<si::Radian>());
 }
 
 
 inline void
-WindTriangle::set_ground_vector (Speed ground_speed, Angle track)
+WindTriangle::set_ground_vector (si::Speed ground_speed, si::Angle track)
 {
-	_ground_vector = std::polar (ground_speed.in<MeterPerSecond>(), track.in<Radian>());
+	_ground_vector = std::polar (ground_speed.in<si::MeterPerSecond>(), track.in<si::Radian>());
 }
 
 
 inline void
-WindTriangle::set_wind_vector (Speed wind_speed, Angle direction)
+WindTriangle::set_wind_vector (si::Speed wind_speed, si::Angle direction)
 {
-	_wind_vector = std::polar (wind_speed.in<MeterPerSecond>(), direction.in<Radian>());
+	_wind_vector = std::polar (wind_speed.in<si::MeterPerSecond>(), direction.in<si::Radian>());
 }
 
 
@@ -181,57 +181,57 @@ WindTriangle::compute_ground_vector()
 }
 
 
-inline Speed
+inline si::Speed
 WindTriangle::air_speed() const
 {
 	return 1_mps * std::abs (_air_vector);
 }
 
 
-inline Angle
+inline si::Angle
 WindTriangle::air_direction() const
 {
 	return floored_mod (1_rad * std::arg (_air_vector), 360_deg);
 }
 
 
-inline Speed
+inline si::Speed
 WindTriangle::ground_speed() const
 {
 	return 1_mps * std::abs (_ground_vector);
 }
 
 
-inline Angle
+inline si::Angle
 WindTriangle::ground_direction() const
 {
 	return floored_mod (1_rad * std::arg (_ground_vector), 360_deg);
 }
 
 
-inline Speed
+inline si::Speed
 WindTriangle::wind_speed() const
 {
 	return 1_mps * std::abs (_wind_vector);
 }
 
 
-inline Angle
+inline si::Angle
 WindTriangle::wind_direction() const
 {
 	return floored_mod (1_rad * std::arg (_wind_vector), 360_deg);
 }
 
 
-inline Angle
+inline si::Angle
 WindTriangle::wind_from() const
 {
 	return floored_mod (wind_direction() + 180_deg, 360_deg);
 }
 
 
-inline Speed
-WindTriangle::get_ground_speed (Angle aircraft_heading) const
+inline si::Speed
+WindTriangle::get_ground_speed (si::Angle aircraft_heading) const
 {
 	WindTriangle wt (*this);
 	wt.set_air_vector (air_speed(), aircraft_heading);

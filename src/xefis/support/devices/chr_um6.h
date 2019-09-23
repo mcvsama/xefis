@@ -266,8 +266,8 @@ class CHRUM6
 		friend class Write;
 
 		uint32_t		address			= -1u;
-		Time			start_timestamp;
-		Time			finish_timestamp;
+		si::Time		start_timestamp;
+		si::Time		finish_timestamp;
 		bool			finished		= false;
 		bool			success			= false;
 		ProtocolError	protocol_error	= ProtocolError::None;
@@ -323,7 +323,7 @@ class CHRUM6
 		 * Return point in time at which command
 		 * was executed.
 		 */
-		Time
+		si::Time
 		timestamp() const noexcept;
 
 		/**
@@ -331,7 +331,7 @@ class CHRUM6
 		 * finished. If not finished yet, return
 		 * now - timestamp().
 		 */
-		Time
+		si::Time
 		duration() const noexcept;
 
 		/**
@@ -570,7 +570,7 @@ class CHRUM6
 	 * to be written to the Communication register.
 	 */
 	static uint32_t
-	sample_rate_setting (Frequency) noexcept;
+	sample_rate_setting (si::Frequency) noexcept;
 
 	/**
 	 * Return bit value used in communication register
@@ -653,14 +653,14 @@ CHRUM6::Request::address() const noexcept
 }
 
 
-inline Time
+inline si::Time
 CHRUM6::Request::timestamp() const noexcept
 {
 	return data()->start_timestamp;
 }
 
 
-inline Time
+inline si::Time
 CHRUM6::Request::duration() const noexcept
 {
 	if (finished())

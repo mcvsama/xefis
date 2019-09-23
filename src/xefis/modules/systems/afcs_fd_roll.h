@@ -30,6 +30,10 @@
 #include "afcs_api.h"
 
 
+namespace si = neutrino::si;
+using namespace neutrino::si::literals;
+
+
 class AFCS_FD_Roll_IO: public xf::ModuleIO
 {
   public:

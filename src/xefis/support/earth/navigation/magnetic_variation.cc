@@ -34,7 +34,7 @@ void
 MagneticVariation::update()
 {
     double field[6];
-    _magnetic_declination = 1_rad * _implementation.calc_magvar (_position.lat().in<Radian>(), _position.lon().in<Radian>(), _altitude_amsl.in<Kilometer>(), _julian_date, field);
+    _magnetic_declination = 1_rad * _implementation.calc_magvar (_position.lat().in<si::Radian>(), _position.lon().in<si::Radian>(), _altitude_amsl.in<si::Kilometer>(), _julian_date, field);
 	_magnetic_inclination = 1_rad * std::atan (field[5] / std::sqrt (field[3] * field[3] + field[4] * field[4]));
 }
 

@@ -34,7 +34,7 @@
 
 namespace xf {
 
-ProcessingLoop::ProcessingLoop (Machine& machine, std::string_view const& instance, Frequency loop_frequency, Logger const& logger):
+ProcessingLoop::ProcessingLoop (Machine& machine, std::string_view const& instance, si::Frequency loop_frequency, Logger const& logger):
 	Module (std::make_unique<ProcessingLoopIO> (instance), instance),
 	_machine (machine),
 	_xefis (machine.xefis()),
@@ -44,7 +44,7 @@ ProcessingLoop::ProcessingLoop (Machine& machine, std::string_view const& instan
 	_loop_timer = new QTimer (this);
 	_loop_timer->setSingleShot (false);
 	_loop_timer->setTimerType (Qt::PreciseTimer);
-	_loop_timer->setInterval (_loop_period.in<Millisecond>());
+	_loop_timer->setInterval (_loop_period.in<si::Millisecond>());
 	QObject::connect (_loop_timer, &QTimer::timeout, this, &ProcessingLoop::execute_cycle);
 
 	_logger.set_logger_tag_provider (*this);

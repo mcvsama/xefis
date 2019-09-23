@@ -48,22 +48,22 @@ CHRUM6::CHRUM6 (std::unique_ptr<CHRUM6_IO> module_io, xf::SerialPort&& serial_po
 	_serial_port.set_max_read_failures (3);
 
 	_restart_timer = std::make_unique<QTimer> (this);
-	_restart_timer->setInterval (kRestartDelay.in<Millisecond>());
+	_restart_timer->setInterval (kRestartDelay.in<si::Millisecond>());
 	_restart_timer->setSingleShot (true);
 	QObject::connect (_restart_timer.get(), SIGNAL (timeout()), this, SLOT (open_device()));
 
 	_alive_check_timer = std::make_unique<QTimer> (this);
-	_alive_check_timer->setInterval (kAliveCheckInterval.in<Millisecond>());
+	_alive_check_timer->setInterval (kAliveCheckInterval.in<si::Millisecond>());
 	_alive_check_timer->setSingleShot (false);
 	QObject::connect (_alive_check_timer.get(), SIGNAL (timeout()), this, SLOT (alive_check_failed()));
 
 	_status_check_timer = std::make_unique<QTimer> (this);
-	_status_check_timer->setInterval (kStatusCheckInterval.in<Millisecond>());
+	_status_check_timer->setInterval (kStatusCheckInterval.in<si::Millisecond>());
 	_status_check_timer->setSingleShot (false);
 	QObject::connect (_status_check_timer.get(), &QTimer::timeout, this, &CHRUM6::status_check);
 
 	_initialization_timer = std::make_unique<QTimer> (this);
-	_initialization_timer->setInterval (kInitializationDelay.in<Millisecond>());
+	_initialization_timer->setInterval (kInitializationDelay.in<si::Millisecond>());
 	_initialization_timer->setSingleShot (true);
 	QObject::connect (_initialization_timer.get(), SIGNAL (timeout()), this, SLOT (initialization_timeout()));
 
@@ -91,26 +91,26 @@ CHRUM6::process (xf::Cycle const&)
 
 		if (_output_acceleration_x_changed() || _input_centripetal_x_changed())
 		{
-			Acceleration earth_x = 0_g;
+			si::Acceleration earth_x = 0_g;
 			if (io.acceleration_x && io.centripetal_x)
 				earth_x = *io.acceleration_x + *io.centripetal_x;
-			_sensor->write (xf::CHRUM6::ConfigurationAddress::AccelRefX, static_cast<float> (earth_x.in<Gravity>()));
+			_sensor->write (xf::CHRUM6::ConfigurationAddress::AccelRefX, static_cast<float> (earth_x.in<si::Gravity>()));
 		}
 
 		if (_output_acceleration_y_changed() || _input_centripetal_y_changed())
 		{
-			Acceleration earth_y = 0_g;
+			si::Acceleration earth_y = 0_g;
 			if (io.acceleration_y && io.centripetal_y)
 				earth_y = *io.acceleration_y + *io.centripetal_y;
-			_sensor->write (xf::CHRUM6::ConfigurationAddress::AccelRefY, static_cast<float> (earth_y.in<Gravity>()));
+			_sensor->write (xf::CHRUM6::ConfigurationAddress::AccelRefY, static_cast<float> (earth_y.in<si::Gravity>()));
 		}
 
 		if (_output_acceleration_z_changed() || _input_centripetal_z_changed())
 		{
-			Acceleration earth_z = 1_g;
+			si::Acceleration earth_z = 1_g;
 			if (io.acceleration_z && io.centripetal_z)
 				earth_z = *io.acceleration_z + *io.centripetal_z;
-			_sensor->write (xf::CHRUM6::ConfigurationAddress::AccelRefZ, static_cast<float> (earth_z.in<Gravity>()));
+			_sensor->write (xf::CHRUM6::ConfigurationAddress::AccelRefZ, static_cast<float> (earth_z.in<si::Gravity>()));
 		}
 	}
 }
@@ -366,7 +366,7 @@ CHRUM6::process_message (xf::CHRUM6::Read req)
 		case static_cast<uint32_t> (DataAddress::Temperature):
 		{
 			if (req.success())
-				io.internal_temperature = Quantity<Celsius> (req.value_as_float());
+				io.internal_temperature = si::Quantity<si::Celsius> (req.value_as_float());
 			break;
 		}
 

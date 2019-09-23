@@ -27,6 +27,10 @@
 #include <xefis/utility/actions.h>
 
 
+namespace si = neutrino::si;
+using namespace neutrino::si::literals;
+
+
 class FlapsBugsIO: public xf::ModuleIO
 {
   public:

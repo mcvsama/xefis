@@ -44,9 +44,9 @@ System::~System()
 
 
 bool
-System::set_clock (Time const& unix_time)
+System::set_clock (si::Time const& unix_time)
 {
-	::timeval tv = { static_cast<time_t> (unix_time.in<Second>()), 0 };
+	::timeval tv = { static_cast<time_t> (unix_time.in<si::Second>()), 0 };
 	if (::settimeofday (&tv, nullptr) < 0)
 	{
 		_logger << "Could not setup system time: settimeofday() failed with error '" << strerror (errno) << "'; "

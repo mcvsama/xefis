@@ -387,7 +387,7 @@ to_string (GPSFixQuality code)
 }
 
 
-Time
+si::Time
 to_unix_time (xf::nmea::GPSDate const& date, xf::nmea::GPSTimeOfDay const& time)
 {
 	struct tm timeinfo;

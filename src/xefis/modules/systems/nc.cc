@@ -121,7 +121,7 @@ NavigationComputer::compute_position()
 	si::Length const failed_accuracy = 100_nmi;
 
 	Position position;
-	position.lateral_position = LonLat (*io.position_longitude, *io.position_latitude);
+	position.lateral_position = si::LonLat (*io.position_longitude, *io.position_latitude);
 	position.lateral_position_stddev = io.position_lateral_stddev.value_or (failed_accuracy);
 	position.altitude = io.position_altitude_amsl.value_or (0.0_ft);
 	position.altitude_stddev = io.position_vertical_stddev.value_or (failed_accuracy);
@@ -166,12 +166,12 @@ NavigationComputer::compute_magnetic_variation()
 	if (io.position_longitude && io.position_latitude)
 	{
 		xf::MagneticVariation mv;
-		mv.set_position (LonLat (*io.position_longitude, *io.position_latitude));
+		mv.set_position (si::LonLat (*io.position_longitude, *io.position_latitude));
 		if (io.position_altitude_amsl)
 			mv.set_altitude_amsl (*io.position_altitude_amsl);
 		else
 			mv.set_altitude_amsl (0_ft);
-		QDate today = QDateTime::fromTime_t (xf::TimeHelper::now().in<Second>()).date();
+		QDate today = QDateTime::fromTime_t (xf::TimeHelper::now().in<si::Second>()).date();
 		mv.set_date (today.year(), today.month(), today.day());
 		mv.update();
 		io.magnetic_declination = mv.magnetic_declination();

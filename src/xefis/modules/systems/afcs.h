@@ -33,6 +33,10 @@
 #include "afcs_api.h"
 
 
+namespace si = neutrino::si;
+using namespace neutrino::si::literals;
+
+
 class AFCS_IO: public xf::ModuleIO
 {
   public:
@@ -186,7 +190,7 @@ class AFCS: public xf::Module<AFCS_IO>
 	static constexpr xf::Range<si::Length>		kAltitudeRange	{ -5000_ft, 50'000_ft };
 	static constexpr si::Velocity				kVSStep			{ 10_fpm };
 	static constexpr xf::Range<si::Velocity>	kVSRange		{ -8'000_fpm, +8'000_fpm };
-	static constexpr Angle						kFPAStep		{ 0.1_deg };
+	static constexpr si::Angle					kFPAStep		{ 0.1_deg };
 	static constexpr xf::Range<si::Angle>		kFPARange		{ -10_deg, +10_deg };
 
 	// TODO ensure those classes are used

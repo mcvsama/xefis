@@ -30,6 +30,10 @@
 #include <xefis/core/property.h>
 
 
+namespace si = neutrino::si;
+using namespace neutrino::si::literals;
+
+
 class TestGeneratorIO: public xf::ModuleIO
 {
   public:

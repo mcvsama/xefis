@@ -27,6 +27,10 @@
 #include <xefis/utility/smoother.h>
 
 
+namespace si = neutrino::si;
+using namespace neutrino::si::literals;
+
+
 class AltAcqIO: public xf::ModuleIO
 {
   public:

@@ -37,7 +37,7 @@ class Lift
 	/**
 	 * Get range of AOA for which lift is defined.
 	 */
-	Range<Angle>
+	Range<si::Angle>
 	get_aoa_range() const noexcept;
 
 	/**
@@ -46,7 +46,7 @@ class Lift
 	 * Uses linear interpolation.
 	 */
 	LiftCoefficient
-	get_cl (Angle const& aoa) const;
+	get_cl (si::Angle aoa) const;
 
 	/**
 	 * Return maximum possible lift.
@@ -57,25 +57,25 @@ class Lift
 	/**
 	 * Return angle for which C_L is maximum.
 	 */
-	Angle
+	si::Angle
 	critical_aoa() const noexcept;
 
 	/**
 	 * Return AOA in normal regime (not stalled) for given C_L.
 	 */
-	std::optional<Angle>
+	std::optional<si::Angle>
 	get_aoa_in_normal_regime (LiftCoefficient const& cl) const noexcept;
 
   private:
 	// TODO Reynolds to Angle to LiftCoefficient
-	Field<Angle, LiftCoefficient>	_aoa_to_cl					{ };
-	Field<LiftCoefficient, Angle>	_cl_to_aoa_normal_regime	{ };
-	LiftCoefficient					_max_cl;
-	Angle							_critical_aoa;
+	Field<si::Angle, LiftCoefficient>	_aoa_to_cl					{ };
+	Field<LiftCoefficient, si::Angle>	_cl_to_aoa_normal_regime	{ };
+	LiftCoefficient						_max_cl;
+	si::Angle							_critical_aoa;
 };
 
 
-inline Range<Angle>
+inline Range<si::Angle>
 Lift::get_aoa_range() const noexcept
 {
 	return _aoa_to_cl.domain();

@@ -49,7 +49,7 @@ template<class tValueType>
 
 		// Ctor
 		explicit
-		Temporal (ValueType&& value, Time const& update_time) noexcept (noexcept (ValueType (value)));
+		Temporal (ValueType&& value, si::Time update_time) noexcept (noexcept (ValueType (value)));
 
 		// Copy ctor
 		Temporal (Temporal const&) = default;
@@ -72,7 +72,7 @@ template<class tValueType>
 		 * Assign new value with given timestamp.
 		 */
 		void
-		set (ValueType&& value, Time const& update_time) noexcept (noexcept (value = value));
+		set (ValueType&& value, si::Time update_time) noexcept (noexcept (value = value));
 
 		/**
 		 * Return contained value.
@@ -95,12 +95,12 @@ template<class tValueType>
 		/**
 		 * Return update timestamp.
 		 */
-		Time const&
+		si::Time
 		update_time() const noexcept;
 
 	  private:
-		ValueType		_value;
-		Time			_update_time;
+		ValueType	_value;
+		si::Time	_update_time;
 	};
 
 
@@ -114,7 +114,7 @@ template<class T>
 
 template<class T>
 	inline
-	Temporal<T>::Temporal (ValueType&& value, Time const& update_time) noexcept (noexcept (ValueType (value))):
+	Temporal<T>::Temporal (ValueType&& value, si::Time update_time) noexcept (noexcept (ValueType (value))):
 		_value (std::forward<ValueType> (value)),
 		_update_time (update_time)
 	{ }
@@ -131,7 +131,7 @@ template<class T>
 
 template<class T>
 	inline void
-	Temporal<T>::set (ValueType&& value, Time const& update_time) noexcept (noexcept (value = value))
+	Temporal<T>::set (ValueType&& value, si::Time update_time) noexcept (noexcept (value = value))
 	{
 		_value.operator= (std::forward<ValueType> (value));
 		_update_time = update_time;
@@ -163,7 +163,7 @@ template<class T>
 
 
 template<class T>
-	inline Time const&
+	inline si::Time
 	Temporal<T>::update_time() const noexcept
 	{
 		return _update_time;

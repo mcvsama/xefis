@@ -348,11 +348,11 @@ FlightGear::read_input()
 		io.gear_right_up = fg_data.gear_right_position < 0.001;
 
 		// TAT
-		io.total_air_temperature = Quantity<Celsius> (fg_data.total_air_temperature_degc);
+		io.total_air_temperature = si::Quantity<si::Celsius> (fg_data.total_air_temperature_degc);
 
 		// Convert EGT from °F to Kelvins:
-		io.engine_1_egt = Quantity<Fahrenheit> (fg_data.engine_1_egt_degf);
-		io.engine_2_egt = Quantity<Fahrenheit> (fg_data.engine_2_egt_degf);
+		io.engine_1_egt = si::Quantity<si::Fahrenheit> (fg_data.engine_1_egt_degf);
+		io.engine_2_egt = si::Quantity<si::Fahrenheit> (fg_data.engine_2_egt_degf);
 
 		// Engine thrust:
 		io.engine_1_thrust = 1_lb * fg_data.engine_1_thrust_lb * 1_g;

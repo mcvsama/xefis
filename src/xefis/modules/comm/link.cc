@@ -34,6 +34,9 @@
 #include "link.h"
 
 
+using namespace neutrino::si::literals;
+
+
 LinkProtocol::Sequence::Sequence (PacketList packets):
 	_packets (packets)
 { }
@@ -487,7 +490,7 @@ Link::Link (std::unique_ptr<LinkIO> module_io, std::unique_ptr<LinkProtocol> pro
 	{
 		_failsafe_timer = new QTimer (this);
 		_failsafe_timer->setSingleShot (true);
-		_failsafe_timer->setInterval (io.failsafe_after->in<Millisecond>());
+		_failsafe_timer->setInterval (io.failsafe_after->in<si::Millisecond>());
 		QObject::connect (_failsafe_timer, SIGNAL (timeout()), this, SLOT (failsafe()));
 	}
 
@@ -495,7 +498,7 @@ Link::Link (std::unique_ptr<LinkIO> module_io, std::unique_ptr<LinkProtocol> pro
 	{
 		_reacquire_timer = new QTimer (this);
 		_reacquire_timer->setSingleShot (true);
-		_reacquire_timer->setInterval (io.reacquire_after->in<Millisecond>());
+		_reacquire_timer->setInterval (io.reacquire_after->in<si::Millisecond>());
 		QObject::connect (_reacquire_timer, SIGNAL (timeout()), this, SLOT (reacquire()));
 	}
 

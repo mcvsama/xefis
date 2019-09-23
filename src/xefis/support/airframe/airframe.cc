@@ -37,30 +37,30 @@ Airframe::Airframe (AirframeDefinition definition):
 
 
 LiftCoefficient
-Airframe::get_cl (Angle const& aoa, FlapsAngle const& flaps_angle, SpoilersAngle const& spoilers_angle) const
+Airframe::get_cl (si::Angle const aoa, FlapsAngle const flaps_angle, SpoilersAngle const spoilers_angle) const
 {
-	Angle total_aoa = aoa + flaps().get_aoa_correction (flaps_angle) + spoilers().get_aoa_correction (spoilers_angle);
+	si::Angle total_aoa = aoa + flaps().get_aoa_correction (flaps_angle) + spoilers().get_aoa_correction (spoilers_angle);
 	return LiftCoefficient (lift().get_cl (total_aoa));
 }
 
 
 DragCoefficient
-Airframe::get_cd (Angle const& aoa, FlapsAngle const& flaps_angle, SpoilersAngle const& spoilers_angle) const
+Airframe::get_cd (si::Angle const aoa, FlapsAngle const flaps_angle, SpoilersAngle const spoilers_angle) const
 {
-	Angle total_aoa = aoa + flaps().get_aoa_correction (flaps_angle) + spoilers().get_aoa_correction (spoilers_angle);
+	si::Angle total_aoa = aoa + flaps().get_aoa_correction (flaps_angle) + spoilers().get_aoa_correction (spoilers_angle);
 	return DragCoefficient (drag().get_cd (total_aoa));
 }
 
 
-std::optional<Angle>
-Airframe::get_aoa_in_normal_regime (LiftCoefficient const& cl, FlapsAngle const& flaps_angle, SpoilersAngle const& spoilers_angle) const
+std::optional<si::Angle>
+Airframe::get_aoa_in_normal_regime (LiftCoefficient const cl, FlapsAngle const flaps_angle, SpoilersAngle const spoilers_angle) const
 {
-	std::optional<Angle> normal_aoa = lift().get_aoa_in_normal_regime (cl);
+	std::optional<si::Angle> normal_aoa = lift().get_aoa_in_normal_regime (cl);
 
 	if (normal_aoa)
 	{
-		Angle flaps_aoa_correction = flaps().get_aoa_correction (flaps_angle);
-		Angle spoilers_aoa_correction = spoilers().get_aoa_correction (spoilers_angle);
+		si::Angle flaps_aoa_correction = flaps().get_aoa_correction (flaps_angle);
+		si::Angle spoilers_aoa_correction = spoilers().get_aoa_correction (spoilers_angle);
 		return *normal_aoa - flaps_aoa_correction - spoilers_aoa_correction;
 	}
 	else
@@ -68,18 +68,18 @@ Airframe::get_aoa_in_normal_regime (LiftCoefficient const& cl, FlapsAngle const&
 }
 
 
-Angle
-Airframe::get_critical_aoa (FlapsAngle const& flaps_angle, SpoilersAngle const& spoilers_angle) const
+si::Angle
+Airframe::get_critical_aoa (FlapsAngle const flaps_angle, SpoilersAngle const spoilers_angle) const
 {
-	Angle critical_aoa = lift().critical_aoa();
+	si::Angle critical_aoa = lift().critical_aoa();
 	critical_aoa -= flaps().find_setting (flaps_angle).aoa_correction();
 	critical_aoa += spoilers().find_setting (spoilers_angle).aoa_correction();
 	return critical_aoa;
 }
 
 
-Angle
-Airframe::get_max_safe_aoa (FlapsAngle const& flaps_angle, SpoilersAngle const& spoilers_angle) const
+si::Angle
+Airframe::get_max_safe_aoa (FlapsAngle const flaps_angle, SpoilersAngle const spoilers_angle) const
 {
 	return get_critical_aoa (flaps_angle, spoilers_angle) + safe_aoa_correction();
 }

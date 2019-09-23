@@ -31,6 +31,10 @@
 #include <xefis/core/setting.h>
 
 
+namespace si = neutrino::si;
+using namespace neutrino::si::literals;
+
+
 class BMP085_IO: public xf::ModuleIO
 {
   public:

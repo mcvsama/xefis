@@ -37,7 +37,7 @@ Parameters::sanitize()
 {
 	using xf::floored_mod;
 
-	range = xf::clamped<Length> (range, 1_ft, 5000_nmi);
+	range = xf::clamped<si::Length> (range, 1_ft, 5000_nmi);
 
 	if (heading_magnetic)
 		heading_magnetic = floored_mod (*heading_magnetic, 360_deg);
@@ -92,10 +92,10 @@ PaintingWork::PaintingWork (xf::PaintRequest const& paint_request, xf::Instrumen
 	_rotation = _p.center_on_track ? _track : _heading;
 
 	if (_heading)
-		_heading_transform.rotate (-_heading->in<Degree>());
+		_heading_transform.rotate (-_heading->in<si::Degree>());
 
 	if (_track)
-		_track_transform.rotate (-_track->in<Degree>());
+		_track_transform.rotate (-_track->in<si::Degree>());
 
 	_rotation_transform =
 		_p.center_on_track
@@ -106,13 +106,13 @@ PaintingWork::PaintingWork (xf::PaintRequest const& paint_request, xf::Instrumen
 
 	if (_p.heading_mode == hsi::HeadingMode::Magnetic)
 		if (_p.heading_magnetic && _p.heading_true)
-			_features_transform.rotate ((*_p.heading_magnetic - *_p.heading_true).in<Degree>());
+			_features_transform.rotate ((*_p.heading_magnetic - *_p.heading_true).in<si::Degree>());
 
 	_pointers_transform = _rotation_transform;
 
 	if (_p.heading_mode == hsi::HeadingMode::True)
 		if (_p.heading_magnetic && _p.heading_true)
-			_pointers_transform.rotate ((*_p.heading_true - *_p.heading_magnetic).in<Degree>());
+			_pointers_transform.rotate ((*_p.heading_true - *_p.heading_magnetic).in<si::Degree>());
 
 	_ap_use_trk = _p.ap_use_trk;
 
@@ -409,7 +409,7 @@ PaintingWork::paint_aircraft()
 	// AP info: SEL HDG/TRK 000
 	if (_p.display_mode == hsi::DisplayMode::Auxiliary && _ap_bug_magnetic && _ap_use_trk)
 	{
-		int sel_hdg = static_cast<int> (_ap_bug_magnetic->in<Degree>() + 0.5f) % 360;
+		int sel_hdg = static_cast<int> (_ap_bug_magnetic->in<si::Degree>() + 0.5f) % 360;
 
 		if (sel_hdg == 0)
 			sel_hdg = 360;
@@ -431,12 +431,12 @@ PaintingWork::paint_aircraft()
 		if (_p.center_on_track)
 		{
 			if (_track)
-				hdg = _track->in<Degree>() + 0.5f;
+				hdg = _track->in<si::Degree>() + 0.5f;
 		}
 		else
 		{
 			if (_heading)
-				hdg = _heading->in<Degree>() + 0.5f;
+				hdg = _heading->in<si::Degree>() + 0.5f;
 		}
 
 		hdg %= 360;
@@ -526,7 +526,7 @@ PaintingWork::paint_navperf()
 				_painter.setClipping (false);
 				_painter.translate (0.5f * size.width(), size.height());
 
-				auto val = QString ("%1").arg (_p.navigation_required_performance->in<Meter>(), 0, 'f', 2);
+				auto val = QString ("%1").arg (_p.navigation_required_performance->in<si::Meter>(), 0, 'f', 2);
 
 				xf::TextLayout layout;
 				layout.set_background (Qt::black, { _c.hmargin, 0.0f });
@@ -543,7 +543,7 @@ PaintingWork::paint_navperf()
 				_painter.setClipping (false);
 				_painter.translate (0.5f * size.width(), size.height());
 
-				auto val = QString ("%1").arg (_p.navigation_actual_performance->in<Meter>(), 0, 'f', 2);
+				auto val = QString ("%1").arg (_p.navigation_actual_performance->in<si::Meter>(), 0, 'f', 2);
 
 				QColor text_color = xf::InstrumentAids::kNavigationColor;
 				if (_p.navigation_required_performance)
@@ -625,7 +625,7 @@ PaintingWork::paint_ap_settings()
 
 		_painter.setTransform (_c.aircraft_center_transform);
 		_painter.setClipPath (_c.outer_map_clip);
-		_painter.rotate ((*_ap_bug_magnetic - *_rotation).in<Degree>());
+		_painter.rotate ((*_ap_bug_magnetic - *_rotation).in<si::Degree>());
 
 		for (auto const& p: { shadow_pen, pen })
 		{
@@ -637,7 +637,8 @@ PaintingWork::paint_ap_settings()
 	// A/P bug
 	if (_p.heading_magnetic && _p.heading_true && _ap_bug_magnetic)
 	{
-		Angle limited_rotation;
+		si::Angle limited_rotation;
+
 		switch (_p.display_mode)
 		{
 			case hsi::DisplayMode::Auxiliary:
@@ -650,7 +651,7 @@ PaintingWork::paint_ap_settings()
 		}
 
 		QTransform transform = _c.aircraft_center_transform;
-		transform.rotate (limited_rotation.in<Degree>());
+		transform.rotate (limited_rotation.in<si::Degree>());
 		transform.translate (0.f, -_c.r);
 
 		QPen pen_1 = _aids.autopilot_pen_1;
@@ -744,7 +745,7 @@ PaintingWork::paint_directions()
 void
 PaintingWork::paint_track (bool paint_heading_triangle)
 {
-	Length const trend_range = actual_trend_range();
+	si::Length const trend_range = actual_trend_range();
 	float const start_point = _p.track_lateral_rotation ? -to_px (trend_range) - 0.25f * _c.q : 0.f;
 
 	_painter.setTransform (_c.aircraft_center_transform);
@@ -757,7 +758,7 @@ PaintingWork::paint_track (bool paint_heading_triangle)
 	{
 		// Scale and track line:
 		_painter.setPen (_aids.get_pen (xf::InstrumentAids::kSilver, 1.3f, Qt::SolidLine, Qt::RoundCap));
-		_painter.rotate ((*_track - *_rotation).in<Degree>());
+		_painter.rotate ((*_track - *_rotation).in<si::Degree>());
 		float extension = 0.0;
 
 		if (_p.display_mode != hsi::DisplayMode::Auxiliary && _p.center_on_track)
@@ -774,10 +775,10 @@ PaintingWork::paint_track (bool paint_heading_triangle)
 		// Scale ticks:
 		auto paint_range_tick = [&] (float ratio, bool draw_text) -> void
 		{
-			Length range;
+			si::Length range;
 
 			if (ratio == 0.5 && _p.range >= 2_nmi)
-				range = 1_nmi * std::round (((10.f * ratio * _p.range) / 10.f).in<NauticalMile>());
+				range = 1_nmi * std::round (((10.f * ratio * _p.range) / 10.f).in<si::NauticalMile>());
 			else
 				range = ratio * _p.range;
 
@@ -788,7 +789,7 @@ PaintingWork::paint_track (bool paint_heading_triangle)
 			if (range < 1_nmi)
 				precision = 1;
 
-			QString half_range_str = QString ("%1").arg (range.in<NauticalMile>(), 0, 'f', precision);
+			QString half_range_str = QString ("%1").arg (range.in<si::NauticalMile>(), 0, 'f', precision);
 
 			_painter.paint (_c.black_shadow, [&] {
 				_painter.drawLine (QPointF (-range_tick_hpx, -range_tick_vpx), QPointF (range_tick_hpx, -range_tick_vpx));
@@ -818,7 +819,7 @@ PaintingWork::paint_track (bool paint_heading_triangle)
 		// Heading triangle:
 		_painter.setClipRect (_c.map_clip_rect);
 		_painter.setTransform (_c.aircraft_center_transform);
-		_painter.rotate ((*_heading - *_rotation).in<Degree>());
+		_painter.rotate ((*_heading - *_rotation).in<si::Degree>());
 
 		_painter.setPen (_aids.get_pen (Qt::white, 2.2f));
 		_painter.translate (0.f, -1.003f * _c.r);
@@ -873,15 +874,15 @@ PaintingWork::paint_trend_vector()
 		_painter.setTransform (_c.aircraft_center_transform);
 		_painter.setClipRect (_c.trend_vector_clip_rect);
 
-		Time step = *std::min_element (_p.trend_vector_durations.begin(), _p.trend_vector_durations.end()) / 100.0;
-		Angle const angle_per_step = step * *_p.track_lateral_rotation;
-		Angle total_angle = 0_deg;
+		si::Time step = *std::min_element (_p.trend_vector_durations.begin(), _p.trend_vector_durations.end()) / 100.0;
+		si::Angle const angle_per_step = step * *_p.track_lateral_rotation;
+		si::Angle total_angle = 0_deg;
 
 		QTransform transform;
 		QPolygonF polygon;
 
 		// Initially rotate the transform to match HDG or TRK setting:
-		transform.rotate ((*_track - *_rotation).in<Degree>());
+		transform.rotate ((*_track - *_rotation).in<si::Degree>());
 
 		// Take wind into consideration if track info is available:
 		std::optional<xf::WindTriangle> wt;
@@ -894,12 +895,12 @@ PaintingWork::paint_trend_vector()
 			wt->compute_wind_vector();
 		}
 
-		for (Time t = 0_s; t < _p.trend_vector_durations[2]; t += step)
+		for (si::Time t = 0_s; t < _p.trend_vector_durations[2]; t += step)
 		{
-			transform.rotate (angle_per_step.in<Degree>());
+			transform.rotate (angle_per_step.in<si::Degree>());
 			total_angle += angle_per_step;
 
-			Speed ground_speed = wt
+			si::Speed ground_speed = wt
 				? wt->get_ground_speed (*_track + total_angle)
 				: *_p.ground_speed;
 
@@ -955,7 +956,7 @@ PaintingWork::paint_speeds_and_wind()
 	QString gs_str = "---";
 
 	if (_p.ground_speed)
-		gs_str = QString::number (static_cast<int> (_p.ground_speed->in<Knot>()));
+		gs_str = QString::number (static_cast<int> (_p.ground_speed->in<si::Knot>()));
 
 	layout.add_fragment (gs_str, font_b, Qt::white);
 	layout.add_fragment (" ", font_a, Qt::white);
@@ -965,7 +966,7 @@ PaintingWork::paint_speeds_and_wind()
 	QString tas_str = "---";
 
 	if (_p.true_air_speed)
-		tas_str = QString::number (static_cast<int> (_p.true_air_speed->in<Knot>()));
+		tas_str = QString::number (static_cast<int> (_p.true_air_speed->in<si::Knot>()));
 
 	layout.add_fragment (tas_str, font_b, Qt::white);
 
@@ -975,12 +976,12 @@ PaintingWork::paint_speeds_and_wind()
 		QString s_dir ("---°");
 
 		if (_p.wind_from_magnetic_heading)
-			s_dir = QString ("%1°").arg (static_cast<long> (_p.wind_from_magnetic_heading->in<Degree>()), 3, 10, QChar ('0'));
+			s_dir = QString ("%1°").arg (static_cast<long> (_p.wind_from_magnetic_heading->in<si::Degree>()), 3, 10, QChar ('0'));
 
 		QString s_tas ("---");
 
 		if (_p.wind_tas_speed)
-			s_tas = QString ("%1").arg (static_cast<long> (_p.wind_tas_speed->in<Knot>()), 3, 10, QChar (L'\u2007'));
+			s_tas = QString ("%1").arg (static_cast<long> (_p.wind_tas_speed->in<si::Knot>()), 3, 10, QChar (L'\u2007'));
 
 		QString wind_str = s_dir + "/" + s_tas;
 		layout.add_new_line();
@@ -996,7 +997,7 @@ PaintingWork::paint_speeds_and_wind()
 	{
 		_painter.setPen (_aids.get_pen (Qt::white, 0.6f));
 		_painter.translate (0.8f * _c.q + _c.hmargin, 0.8f * _c.q + layout.height());
-		_painter.rotate ((*_p.wind_from_magnetic_heading - *_p.heading_magnetic + 180_deg).in<Degree>());
+		_painter.rotate ((*_p.wind_from_magnetic_heading - *_p.heading_magnetic + 180_deg).in<si::Degree>());
 		_painter.setPen (_aids.get_pen (Qt::white, 1.0));
 		_painter.paint (_c.black_shadow, [&] {
 			QPointF a = QPointF (0.f, -0.7f * _c.q);
@@ -1052,7 +1053,7 @@ PaintingWork::paint_home_direction()
 				<< QPointF (0.0, -z)
 				<< QPointF (+0.2 * z, -0.8 * z)
 				<< QPointF (0.0, -0.8 * z);
-			_painter.rotate ((*_p.true_home_direction - *_p.heading_true).in<Degree>());
+			_painter.rotate ((*_p.true_home_direction - *_p.heading_true).in<si::Degree>());
 			_painter.paint (_c.black_shadow, [&] {
 				_painter.drawPolyline (home_arrow);
 			});
@@ -1077,7 +1078,7 @@ PaintingWork::paint_home_direction()
 
 		std::string vert_str = "---";
 		if (_p.dist_to_home_vert)
-			vert_str = (boost::format ("%+d") % static_cast<int> (_p.dist_to_home_vert->in<Foot>())).str();
+			vert_str = (boost::format ("%+d") % static_cast<int> (_p.dist_to_home_vert->in<si::Foot>())).str();
 		layout.add_fragment ("↑", font_b, Qt::gray);
 		layout.add_fragment (vert_str, font_b, Qt::white);
 		layout.add_fragment ("FT", font_a, xf::InstrumentAids::kCyan);
@@ -1085,7 +1086,7 @@ PaintingWork::paint_home_direction()
 
 		QString vlos_str = "---";
 		if (_p.dist_to_home_vlos)
-			vlos_str = QString ("%1").arg (_p.dist_to_home_vlos->in<NauticalMile>(), 0, 'f', 2, QChar ('0'));
+			vlos_str = QString ("%1").arg (_p.dist_to_home_vlos->in<si::NauticalMile>(), 0, 'f', 2, QChar ('0'));
 		layout.add_fragment ("VLOS ", font_a, xf::InstrumentAids::kCyan);
 		layout.add_fragment (vlos_str, font_b, Qt::white);
 		layout.add_fragment ("NM", font_a, xf::InstrumentAids::kCyan);
@@ -1093,7 +1094,7 @@ PaintingWork::paint_home_direction()
 
 		QString ground_str = "---";
 		if (_p.dist_to_home_ground)
-			ground_str = QString ("%1").arg (_p.dist_to_home_ground->in<NauticalMile>(), 0, 'f', 2, QChar ('0'));
+			ground_str = QString ("%1").arg (_p.dist_to_home_ground->in<si::NauticalMile>(), 0, 'f', 2, QChar ('0'));
 		layout.add_fragment (ground_str, font_b, Qt::white);
 		layout.add_fragment ("NM", font_a, xf::InstrumentAids::kCyan);
 
@@ -1117,7 +1118,7 @@ PaintingWork::paint_course()
 	_painter.setTransform (_c.aircraft_center_transform);
 	_painter.setClipPath (_c.outer_map_clip);
 	_painter.setTransform (_c.aircraft_center_transform);
-	_painter.rotate ((*_course_heading - *_rotation).in<Degree>());
+	_painter.rotate ((*_course_heading - *_rotation).in<si::Degree>());
 
 	float k = 1.0;
 	float z = 1.0;
@@ -1190,13 +1191,14 @@ PaintingWork::paint_course()
 	if (_p.course_deviation)
 	{
 		bool filled = false;
-		Angle deviation = xf::clamped<Angle> (*_p.course_deviation, -2.5_deg, +2.5_deg);
+		si::Angle deviation = xf::clamped<si::Angle> (*_p.course_deviation, -2.5_deg, +2.5_deg);
+
 		if (abs (*_p.course_deviation) <= abs (deviation))
 			filled = true;
 
 		float const pw = _aids.pen_width (1.75f);
 		QRectF bar (-z, -2.5f * k + pw, 2.f * z, 5.f * k - 2.f * pw);
-		bar.translate (dev_1_deg_px * deviation.in<Degree>(), 0.f);
+		bar.translate (dev_1_deg_px * deviation.in<si::Degree>(), 0.f);
 
 		_painter.setPen (_aids.get_pen (Qt::black, 2.0));
 		_painter.setBrush (Qt::NoBrush);
@@ -1250,7 +1252,7 @@ PaintingWork::paint_selected_navaid_info()
 	std::string course_str = "/---°";
 	if (_p.navaid_selected_course_magnetic)
 	{
-		int course_int = xf::symmetric_round (_p.navaid_selected_course_magnetic->in<Degree>());
+		int course_int = xf::symmetric_round (_p.navaid_selected_course_magnetic->in<si::Degree>());
 		if (course_int == 0)
 			course_int = 360;
 		course_str = (boost::format ("/%03d°") % course_int).str();
@@ -1260,14 +1262,14 @@ PaintingWork::paint_selected_navaid_info()
 	std::string eta_sec = "--";
 	if (_p.navaid_selected_eta)
 	{
-		int s_int = _p.navaid_selected_eta->in<Second>();
+		int s_int = _p.navaid_selected_eta->in<si::Second>();
 		eta_min = (boost::format ("%02d") % (s_int / 60)).str();
 		eta_sec = (boost::format ("%02d") % (s_int % 60)).str();
 	}
 
 	std::string distance_str = "---";
 	if (_p.navaid_selected_distance)
-		distance_str = (boost::format ("%3.1f") % _p.navaid_selected_distance->in<NauticalMile>()).str();
+		distance_str = (boost::format ("%3.1f") % _p.navaid_selected_distance->in<si::NauticalMile>()).str();
 
 	xf::TextLayout layout;
 	layout.set_background (Qt::black, { _c.hmargin, 0.0 });
@@ -1322,7 +1324,7 @@ PaintingWork::paint_tcas_and_navaid_info()
 		layout.add_fragment (identifier.isEmpty() ? "---" : identifier, font_b, color);
 		layout.add_new_line();
 		layout.add_fragment ("DME ", font_a, color);
-		layout.add_fragment (distance ? (boost::format ("%.1f") % distance->in<NauticalMile>()).str() : std::string ("---"), font_b, color);
+		layout.add_fragment (distance ? (boost::format ("%.1f") % distance->in<si::NauticalMile>()).str() : std::string ("---"), font_b, color);
 	};
 
 	xf::TextLayout left_layout;
@@ -1406,7 +1408,7 @@ PaintingWork::paint_pointers()
 		_painter.setTransform (_c.aircraft_center_transform);
 		_painter.setClipRect (_c.map_clip_rect);
 		_painter.setTransform (_pointers_transform * _c.aircraft_center_transform);
-		_painter.rotate (opts.angle->in<Degree>());
+		_painter.rotate (opts.angle->in<si::Degree>());
 
 		if (opts.is_primary)
 		{
@@ -1485,9 +1487,9 @@ PaintingWork::paint_range()
 		QString r;
 
 		if (_p.range < 1_nmi)
-			r = QString::fromStdString ((boost::format ("%.1f") % _p.range.in<NauticalMile>()).str());
+			r = QString::fromStdString ((boost::format ("%.1f") % _p.range.in<si::NauticalMile>()).str());
 		else
-			r = QString::fromStdString ((boost::format ("%d") % _p.range.in<NauticalMile>()).str());
+			r = QString::fromStdString ((boost::format ("%d") % _p.range.in<si::NauticalMile>()).str());
 
 		QRectF rect (0.f, 0.f, std::max (metr_a.width (s), metr_b.width (r)) + 0.4f * _c.q, metr_a.height() + metr_b.height());
 
@@ -1523,7 +1525,7 @@ PaintingWork::paint_navaids()
 	// Return feature position on screen relative to _c.aircraft_center_transform.
 	// Essentially does get_feature_xy() but it may additionally "limit-to-range" (which is used by eg. Home feature)
 	// to be drawn on the edge even if it so far that it shouldn't be visible at all).
-	auto position_feature = [&](LonLat const& position, bool* limit_to_range = nullptr) -> QPointF
+	auto position_feature = [&] (si::LonLat const& position, bool* limit_to_range = nullptr) -> QPointF
 	{
 		QPointF mapped_pos = get_feature_xy (position);
 
@@ -1535,7 +1537,7 @@ PaintingWork::paint_navaids()
 			if (*limit_to_range)
 			{
 				QTransform rot;
-				rot.rotate ((1_rad * std::atan2 (mapped_pos.y(), mapped_pos.x())).in<Degree>());
+				rot.rotate ((1_rad * std::atan2 (mapped_pos.y(), mapped_pos.x())).in<si::Degree>());
 				mapped_pos = rot.map (QPointF (range, 0.0));
 			}
 		}
@@ -1636,7 +1638,7 @@ PaintingWork::paint_navaids()
 						QTransform tr_r; tr_r.translate (+half_width, 0.0);
 						// Find runway's true bearing from pos_1 to pos_2 and runway
 						// length in pixels:
-						Angle true_bearing = xf::initial_bearing (runway.pos_1(), runway.pos_2());
+						si::Angle true_bearing = xf::initial_bearing (runway.pos_1(), runway.pos_2());
 						float const length_px = to_px (xf::haversine_earth (runway.pos_1(), runway.pos_2()));
 						float const extended_length_px = to_px (_p.arpt_runway_extension_length);
 						// Create transform so that the first end of the runway
@@ -1645,7 +1647,7 @@ PaintingWork::paint_navaids()
 						QTransform transform = _c.aircraft_center_transform;
 						transform.translate (point_1.x(), point_1.y());
 						transform = _features_transform * transform;
-						transform.rotate (true_bearing.in<Degree>());
+						transform.rotate (true_bearing.in<si::Degree>());
 
 						_painter.setTransform (transform);
 						// The runway:
@@ -1830,7 +1832,7 @@ PaintingWork::paint_locs()
 		QTransform transform = _c.aircraft_center_transform;
 		transform.translate (navaid_pos.x(), navaid_pos.y());
 		transform = _features_transform * transform;
-		transform.rotate (navaid.true_bearing().in<Degree>());
+		transform.rotate (navaid.true_bearing().in<si::Degree>());
 
 		float const line_1 = to_px (navaid.range());
 		float const line_2 = 1.03f * line_1;
@@ -2029,7 +2031,7 @@ PaintingWork::retrieve_navaids()
 
 
 QPointF
-PaintingWork::get_feature_xy (LonLat const& navaid_position) const
+PaintingWork::get_feature_xy (si::LonLat const& navaid_position) const
 {
 	if (!_p.position)
 		return QPointF();
@@ -2044,7 +2046,7 @@ PaintingWork::actual_trend_range() const
 {
 	if (_p.ground_speed && _p.range <= _p.trend_vector_max_range)
 	{
-		Time time = 0_s;
+		si::Time time = 0_s;
 
 		if (_p.range >= _p.trend_vector_min_ranges[2])
 			time = _p.trend_vector_durations[2];
@@ -2149,7 +2151,7 @@ HSI::process (xf::Cycle const& cycle)
 	params.dist_to_home_vert = io.home_distance_vertical.get_optional();
 
 	if (io.home_position_longitude && io.home_position_latitude)
-		params.home = LonLat (*io.home_position_longitude, *io.home_position_latitude);
+		params.home = si::LonLat (*io.home_position_longitude, *io.home_position_latitude);
 	else
 		params.home.reset();
 
@@ -2165,7 +2167,7 @@ HSI::process (xf::Cycle const& cycle)
 	params.wind_tas_speed = io.wind_speed_tas.get_optional();
 
 	if (io.position_longitude && io.position_latitude)
-		params.position = LonLat (*io.position_longitude, *io.position_latitude);
+		params.position = si::LonLat (*io.position_longitude, *io.position_latitude);
 	else
 		params.position.reset();
 
@@ -2192,7 +2194,7 @@ HSI::process (xf::Cycle const& cycle)
 	if (io.flight_range_warning_longitude && io.flight_range_warning_latitude && io.flight_range_warning_radius)
 	{
 		params.flight_range_warning = {
-			LonLat (*io.flight_range_warning_longitude, *io.flight_range_warning_latitude),
+			si::LonLat (*io.flight_range_warning_longitude, *io.flight_range_warning_latitude),
 			*io.flight_range_warning_radius,
 		};
 	}
@@ -2202,7 +2204,7 @@ HSI::process (xf::Cycle const& cycle)
 	if (io.flight_range_critical_longitude && io.flight_range_critical_latitude && io.flight_range_critical_radius)
 	{
 		params.flight_range_critical = {
-			LonLat (*io.flight_range_critical_longitude, *io.flight_range_critical_latitude),
+			si::LonLat (*io.flight_range_critical_longitude, *io.flight_range_critical_latitude),
 			*io.flight_range_critical_radius,
 		};
 	}
@@ -2210,7 +2212,7 @@ HSI::process (xf::Cycle const& cycle)
 		params.flight_range_critical.reset();
 
 	if (io.radio_position_longitude && io.radio_position_latitude)
-		params.radio_position = LonLat (*io.radio_position_longitude, *io.radio_position_latitude);
+		params.radio_position = si::LonLat (*io.radio_position_longitude, *io.radio_position_latitude);
 	else
 		params.radio_position.reset();
 

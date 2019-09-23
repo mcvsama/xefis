@@ -37,7 +37,7 @@ class Cycle
   public:
 	// Ctor
 	explicit
-	Cycle (Number number, Time update_time, Time update_dt, Time intended_update_dt, Logger const&);
+	Cycle (Number number, si::Time update_time, si::Time update_dt, si::Time intended_update_dt, Logger const&);
 
 	/**
 	 * Return this cycle serial number.
@@ -91,7 +91,7 @@ class Cycle
 
 
 inline
-Cycle::Cycle (Number number, Time update_time, Time update_dt, Time intended_update_dt, Logger const& logger):
+Cycle::Cycle (Number number, si::Time update_time, si::Time update_dt, si::Time intended_update_dt, Logger const& logger):
 	_number (number),
 	_update_time (update_time),
 	_update_dt (update_dt),

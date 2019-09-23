@@ -63,29 +63,29 @@ dynamic_air_viscosity (si::Temperature);
 inline si::Velocity
 speed_of_sound (si::Temperature static_air_temperature)
 {
-	return 38.967854_kt * std::sqrt (static_air_temperature.in<Kelvin>());
+	return 38.967854_kt * std::sqrt (static_air_temperature.in<si::Kelvin>());
 }
 
 
 inline si::Length
 density_altitude (si::Length pressure_altitude, si::Temperature static_air_temperature)
 {
-	float t_s = 273.15 + (15.0 - (0.0019812 * pressure_altitude.in<Foot>()));
-	return pressure_altitude + 1_ft * (t_s / 0.0019812) * (1.0 - std::pow (t_s / static_air_temperature.in<Kelvin>(), 0.2349690));
+	float t_s = 273.15 + (15.0 - (0.0019812 * pressure_altitude.in<si::Foot>()));
+	return pressure_altitude + 1_ft * (t_s / 0.0019812) * (1.0 - std::pow (t_s / static_air_temperature.in<si::Kelvin>(), 0.2349690));
 }
 
 
 inline si::Velocity
 true_airspeed (si::Velocity indicated_airspeed, si::Length density_altitude)
 {
-	return indicated_airspeed / std::pow (1.0 - 6.8755856 * 1e-6 * density_altitude.in<Foot>(), 2.127940);
+	return indicated_airspeed / std::pow (1.0 - 6.8755856 * 1e-6 * density_altitude.in<si::Foot>(), 2.127940);
 }
 
 
 inline si::Velocity
 indicated_airspeed (si::Velocity true_airspeed, si::Length density_altitude)
 {
-	return true_airspeed * std::pow (1.0 - 6.8755856 * 1e-6 * density_altitude.in<Foot>(), 2.127940);
+	return true_airspeed * std::pow (1.0 - 6.8755856 * 1e-6 * density_altitude.in<si::Foot>(), 2.127940);
 }
 
 

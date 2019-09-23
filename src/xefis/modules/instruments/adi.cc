@@ -40,12 +40,12 @@ Parameters::sanitize()
 	al_number_every = std::max (al_number_every, 1);
 	al_emphasis_every = std::max (al_emphasis_every, 1);
 	al_bold_every = std::max (al_bold_every, 1);
-	al_extent = std::max<Length> (al_extent, 1_ft);
+	al_extent = std::max<si::Length> (al_extent, 1_ft);
 
 	// Set orientation angles to range -180…180°:
 	{
-		std::optional<Angle> p;
-		std::optional<Angle> r;
+		std::optional<si::Angle> p;
+		std::optional<si::Angle> r;
 
 		if (this->orientation_pitch)
 			p = xf::floored_mod (*this->orientation_pitch + 180_deg, 360_deg) - 180_deg;
@@ -79,10 +79,10 @@ Parameters::sanitize()
 	// Limit FPM position:
 	{
 		if (this->flight_path_alpha)
-			this->flight_path_alpha = xf::clamped<Angle> (*this->flight_path_alpha, -25.0_deg, +25.0_deg);
+			this->flight_path_alpha = xf::clamped<si::Angle> (*this->flight_path_alpha, -25.0_deg, +25.0_deg);
 
 		if (this->flight_path_beta)
-			this->flight_path_beta = xf::clamped<Angle> (*this->flight_path_beta, -25.0_deg, +25.0_deg);
+			this->flight_path_beta = xf::clamped<si::Angle> (*this->flight_path_beta, -25.0_deg, +25.0_deg);
 	}
 
 	// Speed limits:
@@ -193,7 +193,7 @@ AdiPaintRequest::AdiPaintRequest (xf::PaintRequest const& paint_request, xf::Ins
 
 
 inline float
-AdiPaintRequest::pitch_to_px (si::Angle degrees) const
+AdiPaintRequest::pitch_to_px (si::Angle const degrees) const
 {
 	auto const correction = 0.775;
 	return -degrees / (params.fov * correction) * aids.lesser_dimension();
@@ -201,7 +201,7 @@ AdiPaintRequest::pitch_to_px (si::Angle degrees) const
 
 
 inline float
-AdiPaintRequest::heading_to_px (si::Angle degrees) const
+AdiPaintRequest::heading_to_px (si::Angle const degrees) const
 {
 	return pitch_to_px (-degrees);
 }
@@ -402,7 +402,7 @@ ArtificialHorizon::precompute (AdiPaintRequest& pr)
 	_pitch_transform.translate (0.f, -pr.pitch_to_px (pr.params.orientation_pitch.value_or (0_deg)));
 
 	_roll_transform.reset();
-	_roll_transform.rotate (-pr.params.orientation_roll.value_or (0_deg).in<Degree>());
+	_roll_transform.rotate (-pr.params.orientation_roll.value_or (0_deg).in<si::Degree>());
 
 	_heading_transform.reset();
 	_heading_transform.translate (-pr.heading_to_px (pr.params.orientation_heading.value_or (0_deg)), 0.f);
@@ -531,8 +531,8 @@ ArtificialHorizon::paint_pitch_scale (AdiPaintRequest& pr) const
 
 		// Pitch scale is clipped to small rectangle, so narrow it even more:
 		float const clipped_pitch_factor = 0.45f;
-		xf::Range<Angle> deg_range (*pr.params.orientation_pitch - clipped_pitch_factor * 0.485f * pr.params.fov,
-									*pr.params.orientation_pitch + clipped_pitch_factor * 0.365f * pr.params.fov);
+		xf::Range<si::Angle> deg_range (*pr.params.orientation_pitch - clipped_pitch_factor * 0.485f * pr.params.fov,
+										*pr.params.orientation_pitch + clipped_pitch_factor * 0.365f * pr.params.fov);
 
 		pr.painter.setPen (pr.aids.get_pen (Qt::white, 1.f));
 
@@ -598,7 +598,7 @@ ArtificialHorizon::paint_pitch_scale (AdiPaintRequest& pr) const
 		{
 			for (auto const& pen: { pr.aids.autopilot_pen_1, pr.aids.autopilot_pen_2 })
 			{
-				Angle fpa = *pr.params.cmd_fpa;
+				si::Angle fpa = *pr.params.cmd_fpa;
 				pr.painter.setPen (pen);
 
 				for (auto y_angle: { fpa - 0.5_deg, fpa + 0.5_deg })
@@ -752,8 +752,8 @@ ArtificialHorizon::paint_heading (AdiPaintRequest& pr) const
 		if (pr.params.orientation_heading)
 		{
 			float clipped_pitch_factor = 0.5f;
-			xf::Range<Angle> deg_range (*pr.params.orientation_heading - clipped_pitch_factor * 0.485f * pr.params.fov,
-										*pr.params.orientation_heading + clipped_pitch_factor * 0.350f * pr.params.fov);
+			xf::Range<si::Angle> deg_range (*pr.params.orientation_heading - clipped_pitch_factor * 0.485f * pr.params.fov,
+											*pr.params.orientation_heading + clipped_pitch_factor * 0.350f * pr.params.fov);
 
 			pr.painter.setTransform (_heading_transform * _horizon_transform);
 			if (pr.params.orientation_heading_numbers_visible)
@@ -814,7 +814,7 @@ ArtificialHorizon::paint_tcas_ra (AdiPaintRequest& pr) const
 		else
 			pr.painter.setClipping (false);
 
-		auto paint_red_lines = [&] (Angle pitch1, Angle pitch2)
+		auto paint_red_lines = [&] (si::Angle const pitch1, si::Angle const pitch2)
 		{
 			pr.painter.setTransform (_horizon_transform);
 			pr.painter.translate (0.f, pr.pitch_to_px (pitch1));
@@ -980,7 +980,7 @@ VelocityLadder::precompute (AdiPaintRequest& pr)
 	if (_min_shown < 0_kt)
 		_min_shown = 0_kt;
 
-	_rounded_speed = static_cast<int> (speed.in<Knot>() + 0.5);
+	_rounded_speed = static_cast<int> (speed.in<si::Knot>() + 0.5);
 
 	if (pr.paint_request.size_changed())
 	{
@@ -1082,11 +1082,11 @@ VelocityLadder::paint_black_box (AdiPaintRequest& pr, float const x) const
 		pr.painter.setFont (actual_speed_font);
 
 		if (_digits == 4)
-			pr.paint_rotating_digit (box_1000, pr.params.speed->in<Knot>(), 1000, 1.25f, 0.0005f, 0.5f, false, true);
+			pr.paint_rotating_digit (box_1000, pr.params.speed->in<si::Knot>(), 1000, 1.25f, 0.0005f, 0.5f, false, true);
 
-		pr.paint_rotating_digit (box_0100, pr.params.speed->in<Knot>(), 100, 1.25f, 0.005f, 0.5f, false, true, true);
-		pr.paint_rotating_digit (box_0010, pr.params.speed->in<Knot>(), 10, 1.25f, 0.05f, 0.5f, false, false);
-		float pos_0001 = _rounded_speed - pr.params.speed->in<Knot>();
+		pr.paint_rotating_digit (box_0100, pr.params.speed->in<si::Knot>(), 100, 1.25f, 0.005f, 0.5f, false, true, true);
+		pr.paint_rotating_digit (box_0010, pr.params.speed->in<si::Knot>(), 10, 1.25f, 0.05f, 0.5f, false, false);
+		float pos_0001 = _rounded_speed - pr.params.speed->in<si::Knot>();
 		pr.paint_rotating_value (box_0001, pos_0001, 0.7f,
 								 QString::number (static_cast<int> (std::abs (std::fmod (1.f * _rounded_speed + 1.f, 10.f)))),
 								 QString::number (static_cast<int> (std::abs (std::fmod (1.f * _rounded_speed, 10.f)))),
@@ -1134,8 +1134,8 @@ VelocityLadder::paint_ladder_scale (AdiPaintRequest& pr, float const x) const
 
 		pr.painter.setPen (_scale_pen);
 		// -+line_every is to have drawn also numbers that barely fit the scale.
-		for (int kt = (static_cast<int> (_min_shown.in<Knot>()) / pr.params.vl_line_every) * pr.params.vl_line_every - pr.params.vl_line_every;
-			 kt <= _max_shown.in<Knot>() + pr.params.vl_line_every;
+		for (int kt = (static_cast<int> (_min_shown.in<si::Knot>()) / pr.params.vl_line_every) * pr.params.vl_line_every - pr.params.vl_line_every;
+			 kt <= _max_shown.in<si::Knot>() + pr.params.vl_line_every;
 			 kt += pr.params.vl_line_every)
 		{
 			if (kt < pr.params.vl_minimum || kt > pr.params.vl_maximum)
@@ -1343,7 +1343,7 @@ VelocityLadder::paint_mach_or_gs (AdiPaintRequest& pr, float const x) const
 			layout.set_alignment (Qt::AlignHCenter);
 			layout.add_fragment ("GS", pr.aids.font_3.font, Qt::white);
 			layout.add_fragment (" ", pr.aids.font_1.font, Qt::white);
-			layout.add_fragment (QString::number (static_cast<int> (pr.params.speed_ground->in<Knot>())), pr.aids.font_5.font, Qt::white);
+			layout.add_fragment (QString::number (static_cast<int> (pr.params.speed_ground->in<si::Knot>())), pr.aids.font_5.font, Qt::white);
 			layout.paint (paint_position, Qt::AlignCenter, pr.painter, pr.default_shadow);
 		}
 	}
@@ -1374,7 +1374,7 @@ VelocityLadder::paint_ap_setting (AdiPaintRequest& pr) const
 		}
 		else if (pr.params.cmd_speed)
 		{
-			value = QString::number (std::abs (static_cast<int> (pr.params.cmd_speed->in<Knot>())));
+			value = QString::number (std::abs (static_cast<int> (pr.params.cmd_speed->in<si::Knot>())));
 			digits = 4;
 		}
 
@@ -1442,7 +1442,7 @@ VelocityLadder::paint_failure (AdiPaintRequest& pr) const
 
 
 inline float
-VelocityLadder::kt_to_px (AdiPaintRequest& pr, Velocity const speed) const
+VelocityLadder::kt_to_px (AdiPaintRequest& pr, si::Velocity const speed) const
 {
 	return -0.5 * _ladder_rect.height() * (speed - pr.params.speed.value_or (0_mps)) / (0.5 * pr.params.vl_extent);
 }
@@ -1509,7 +1509,7 @@ AltitudeLadder::precompute (AdiPaintRequest& pr)
 
 	_min_shown = altitude_amsl - 0.5f * pr.params.al_extent;
 	_max_shown = altitude_amsl + 0.5f * pr.params.al_extent;
-	_rounded_altitude = static_cast<int> (altitude_amsl.in<Foot>() + sgn * 10.f) / 20 * 20;
+	_rounded_altitude = static_cast<int> (altitude_amsl.in<si::Foot>() + sgn * 10.f) / 20 * 20;
 
 	_transform = pr.precomputed.center_transform;
 	_transform.translate (+0.4f * ld, 0.f);
@@ -1617,7 +1617,7 @@ AltitudeLadder::paint_black_box (AdiPaintRequest& pr, float const x) const
 			pr.painter.fast_draw_text (m_pos, Qt::AlignLeft | Qt::AlignVCenter, "M", pr.default_shadow);
 			pr.painter.setPen (pr.aids.get_pen (Qt::white, 1.f));
 			pr.painter.fast_draw_text (m_pos + QPointF (-xcorr, 0.f), Qt::AlignRight | Qt::AlignVCenter,
-									   QString ("%1").arg (std::round (pr.params.altitude_amsl->in<Meter>()), 0, 'f', 0), pr.default_shadow);
+									   QString ("%1").arg (std::round (pr.params.altitude_amsl->in<si::Meter>()), 0, 'f', 0), pr.default_shadow);
 		}
 
 		pr.painter.setPen (_black_box_pen);
@@ -1636,13 +1636,13 @@ AltitudeLadder::paint_black_box (AdiPaintRequest& pr, float const x) const
 
 		// 11100 part:
 		pr.painter.setFont (b_font);
-		pr.paint_rotating_digit (box_10000, pr.params.altitude_amsl->in<Foot>(), 10000, 1.25f * s_digit_height / b_digit_height, 0.0005f, 5.f, true, true);
-		pr.paint_rotating_digit (box_01000, pr.params.altitude_amsl->in<Foot>(), 1000, 1.25f * s_digit_height / b_digit_height, 0.005f, 5.f, false, false);
+		pr.paint_rotating_digit (box_10000, pr.params.altitude_amsl->in<si::Foot>(), 10000, 1.25f * s_digit_height / b_digit_height, 0.0005f, 5.f, true, true);
+		pr.paint_rotating_digit (box_01000, pr.params.altitude_amsl->in<si::Foot>(), 1000, 1.25f * s_digit_height / b_digit_height, 0.005f, 5.f, false, false);
 		pr.painter.setFont (s_font);
-		pr.paint_rotating_digit (box_00100, pr.params.altitude_amsl->in<Foot>(), 100, 1.25f, 0.05f, 5.f, false, false);
+		pr.paint_rotating_digit (box_00100, pr.params.altitude_amsl->in<si::Foot>(), 100, 1.25f, 0.05f, 5.f, false, false);
 
 		// 00011 part:
-		float pos_00011 = (_rounded_altitude - pr.params.altitude_amsl->in<Foot>()) / 20.f;
+		float pos_00011 = (_rounded_altitude - pr.params.altitude_amsl->in<si::Foot>()) / 20.f;
 		pr.paint_rotating_value (box_00011, pos_00011, 0.75f,
 								 QString::number (static_cast<int> (std::abs (std::fmod (_rounded_altitude / 10.f + 2.f, 10.f)))) + "0",
 								 QString::number (static_cast<int> (std::abs (std::fmod (_rounded_altitude / 10.f + 0.f, 10.f)))) + "0",
@@ -1689,8 +1689,8 @@ AltitudeLadder::paint_ladder_scale (AdiPaintRequest& pr, float const x) const
 		pr.painter.translate (-2.f * x, 0.f);
 
 		// -+line_every is to have drawn also numbers that barely fit the scale.
-		for (int ft = (static_cast<int> (_min_shown.in<Foot>()) / pr.params.al_line_every) * pr.params.al_line_every - pr.params.al_line_every;
-			 ft <= _max_shown.in<Foot>() + pr.params.al_line_every;
+		for (int ft = (static_cast<int> (_min_shown.in<si::Foot>()) / pr.params.al_line_every) * pr.params.al_line_every - pr.params.al_line_every;
+			 ft <= _max_shown.in<si::Foot>() + pr.params.al_line_every;
 			 ft += pr.params.al_line_every)
 		{
 			if (ft > 100000.f)
@@ -1859,7 +1859,7 @@ AltitudeLadder::paint_bugs (AdiPaintRequest& pr, float const x) const
 		// AP bug:
 		if (pr.params.cmd_altitude)
 		{
-			Length cmd_altitude = xf::clamped<Length> (*pr.params.cmd_altitude, -99999_ft, +99999_ft);
+			si::Length cmd_altitude = xf::clamped<si::Length> (*pr.params.cmd_altitude, -99999_ft, +99999_ft);
 			float posy = xf::clamped (ft_to_px (pr, cmd_altitude),
 									  static_cast<float> (-_ladder_rect.height() / 2), static_cast<float> (_ladder_rect.height() / 2));
 			QPolygonF const bug_shape ({
@@ -2044,7 +2044,7 @@ AltitudeLadder::paint_vertical_speed (AdiPaintRequest& pr, float const x) const
 
 		// Numeric indicators above and below:
 		pr.painter.setPen (bold_white_pen);
-		int abs_vertical_speed = static_cast<int> (std::abs (pr.params.vertical_speed->in<FootPerMinute>())) / 10 * 10;
+		int abs_vertical_speed = static_cast<int> (std::abs (pr.params.vertical_speed->in<si::FootPerMinute>())) / 10 * 10;
 
 		if (abs_vertical_speed >= 100)
 		{
@@ -2104,7 +2104,7 @@ AltitudeLadder::paint_pressure (AdiPaintRequest& pr, float const x) const
 
 		QString unit_str = pr.params.pressure_display_hpa? " HPA" : " IN";
 		int precision = pr.params.pressure_display_hpa ? 0 : 2;
-		QString pressure_str = QString ("%1").arg (pr.params.pressure_display_hpa ? pr.params.pressure_qnh->in<HectoPascal>() : pr.params.pressure_qnh->in<InchOfMercury>(), 0, 'f', precision);
+		QString pressure_str = QString ("%1").arg (pr.params.pressure_display_hpa ? pr.params.pressure_qnh->in<si::HectoPascal>() : pr.params.pressure_qnh->in<si::InchOfMercury>(), 0, 'f', precision);
 
 		QRectF nn_rect (0.f, _ladder_rect.bottom(), metrics_a.width (pressure_str), 1.2f * pr.aids.font_3.digit_height);
 		QRectF uu_rect (0.f, nn_rect.top(), metrics_b.width (unit_str), nn_rect.height());
@@ -2136,7 +2136,7 @@ AltitudeLadder::paint_ap_setting (AdiPaintRequest& pr) const
 {
 	if (pr.params.cmd_altitude)
 	{
-		Length cmd_altitude = xf::clamped<Length> (*pr.params.cmd_altitude, -99999_ft, +99999_ft);
+		si::Length cmd_altitude = xf::clamped<si::Length> (*pr.params.cmd_altitude, -99999_ft, +99999_ft);
 
 		QFont const& b_font = pr.aids.font_5.font;
 		QFontMetricsF const b_metrics (b_font);
@@ -2185,7 +2185,7 @@ AltitudeLadder::paint_ap_setting (AdiPaintRequest& pr) const
 			pr.painter.fast_draw_text (m_pos, Qt::AlignLeft | Qt::AlignVCenter, "M", pr.default_shadow);
 			pr.painter.setPen (pr.aids.get_pen (pr.aids.kAutopilotColor, 1.f));
 			pr.painter.fast_draw_text (m_pos + QPointF (-xcorr, 0.f), Qt::AlignRight | Qt::AlignVCenter,
-									   QString ("%1").arg (std::round (cmd_altitude.in<Meter>()), 0, 'f', 0), pr.default_shadow);
+									   QString ("%1").arg (std::round (cmd_altitude.in<si::Meter>()), 0, 'f', 0), pr.default_shadow);
 		}
 
 		pr.painter.setPen (pr.aids.get_pen (Qt::black, 0.5f));
@@ -2213,7 +2213,7 @@ AltitudeLadder::paint_ap_setting (AdiPaintRequest& pr) const
 		QRectF box_11000 = b_digits_box.adjusted (margin, margin, 0.f, -margin);
 		QString minus_sign_s = cmd_altitude < -0.5_ft ? pr.aids.kMinusSignStrUTF8 : "";
 		pr.painter.fast_draw_text (box_11000, Qt::AlignVCenter | Qt::AlignRight,
-								   minus_sign_s + QString::number (std::abs (xf::symmetric_round (cmd_altitude.in<Foot>()) / 1000)),
+								   minus_sign_s + QString::number (std::abs (xf::symmetric_round (cmd_altitude.in<si::Foot>()) / 1000)),
 								   pr.default_shadow);
 
 		pr.painter.setFont (s_font);
@@ -2221,7 +2221,7 @@ AltitudeLadder::paint_ap_setting (AdiPaintRequest& pr) const
 		// 00111 part of the altitude setting:
 		QRectF box_00111 = s_digits_box.adjusted (0.f, margin, -margin, -margin);
 		pr.painter.fast_draw_text (box_00111, Qt::AlignVCenter | Qt::AlignLeft,
-								   QString ("%1").arg (static_cast<int> (std::round (std::abs (cmd_altitude.in<Foot>()))) % 1000, 3, 'f', 0, '0'),
+								   QString ("%1").arg (static_cast<int> (std::round (std::abs (cmd_altitude.in<si::Foot>()))) % 1000, 3, 'f', 0, '0'),
 								   pr.default_shadow);
 	}
 }
@@ -2264,7 +2264,7 @@ AltitudeLadder::paint_failure (AdiPaintRequest& pr) const
 float
 AltitudeLadder::scale_vertical_speed (si::Velocity vertical_speed, float const max_value) const
 {
-	float vspd = std::abs (vertical_speed.in<FootPerMinute>());
+	float vspd = std::abs (vertical_speed.in<si::FootPerMinute>());
 
 	if (vspd < 1000.f)
 		vspd = vspd / 1000.f * 0.46f;
@@ -2283,7 +2283,7 @@ AltitudeLadder::scale_vertical_speed (si::Velocity vertical_speed, float const m
 
 
 float
-AltitudeLadder::scale_energy_variometer (AdiPaintRequest& pr, Power const power, float const max_value) const
+AltitudeLadder::scale_energy_variometer (AdiPaintRequest& pr, si::Power const power, float const max_value) const
 {
 	si::Velocity equivalent_speed = power / pr.params.energy_variometer_1000_fpm_power * 1000_fpm;
 	return scale_vertical_speed (equivalent_speed, max_value);
@@ -2422,7 +2422,7 @@ PaintingWork::paint_flight_director (AdiPaintRequest& pr) const
 	using std::abs;
 
 	float const w = pr.aids.lesser_dimension() * 1.4f / 9.f;
-	Angle const range = pr.params.fov / 4.f;
+	si::Angle const range = pr.params.fov / 4.f;
 
 	if (pr.params.flight_director_guidance_visible && pr.params.orientation_pitch && pr.params.orientation_roll)
 	{
@@ -2436,7 +2436,7 @@ PaintingWork::paint_flight_director (AdiPaintRequest& pr) const
 
 		if (pr.params.flight_director_pitch)
 		{
-			Angle pitch = si::cos (*pr.params.orientation_roll) * (*pr.params.flight_director_pitch - *pr.params.orientation_pitch);
+			si::Angle pitch = si::cos (*pr.params.orientation_roll) * (*pr.params.flight_director_pitch - *pr.params.orientation_pitch);
 			pitch = xf::clamped (pitch, -range, +range);
 			float const ypos = pr.pitch_to_px (pitch);
 
@@ -2449,10 +2449,10 @@ PaintingWork::paint_flight_director (AdiPaintRequest& pr) const
 
 		if (pr.params.flight_director_roll)
 		{
-			Angle roll = *pr.params.flight_director_roll - *pr.params.orientation_roll;
+			si::Angle roll = *pr.params.flight_director_roll - *pr.params.orientation_roll;
 
 			if (abs (roll) > 180_deg)
-				roll = roll - sgn (roll.in<Degree>()) * 360_deg;
+				roll = roll - sgn (roll.in<si::Degree>()) * 360_deg;
 
 			roll = xf::clamped (roll, -range, +range);
 
@@ -2484,10 +2484,10 @@ PaintingWork::paint_control_surfaces (AdiPaintRequest& pr) const
 	if (pr.params.control_surfaces_visible)
 	{
 		float const w = pr.aids.lesser_dimension() * 0.2f / 9.f;
-		Angle const range = 17.5_deg;
+		si::Angle const range = 17.5_deg;
 
-		Angle pitch = xf::renormalize (xf::clamped (pr.params.control_surfaces_elevator, -1.0f, +1.0f), -1.0f, +1.0f, -range, +range);
-		Angle roll = xf::renormalize (xf::clamped (pr.params.control_surfaces_ailerons, -1.0f, +1.0f), -1.0f, +1.0f, -range, +range);
+		si::Angle pitch = xf::renormalize (xf::clamped (pr.params.control_surfaces_elevator, -1.0f, +1.0f), -1.0f, +1.0f, -range, +range);
+		si::Angle roll = xf::renormalize (xf::clamped (pr.params.control_surfaces_ailerons, -1.0f, +1.0f), -1.0f, +1.0f, -range, +range);
 
 		float ypos = pr.pitch_to_px (pitch);
 		float xpos = pr.heading_to_px (roll);
@@ -2534,7 +2534,7 @@ PaintingWork::paint_altitude_agl (AdiPaintRequest& pr) const
 {
 	if (pr.params.altitude_agl)
 	{
-		Length aagl = xf::clamped<Length> (*pr.params.altitude_agl, -9999_ft, +99999_ft);
+		si::Length aagl = xf::clamped<si::Length> (*pr.params.altitude_agl, -9999_ft, +99999_ft);
 		QFont const& radar_altimeter_font = pr.aids.font_5.font;
 		float const digit_width = pr.aids.font_5.digit_width;
 		float const digit_height = pr.aids.font_5.digit_height;
@@ -2562,7 +2562,7 @@ PaintingWork::paint_altitude_agl (AdiPaintRequest& pr) const
 		pr.painter.setFont (radar_altimeter_font);
 
 		QRectF box = box_rect.adjusted (margin, margin, -margin, -margin);
-		pr.painter.fast_draw_text (box, Qt::AlignVCenter | Qt::AlignHCenter, QString ("%1").arg (std::round (aagl.in<Foot>())), pr.default_shadow);
+		pr.painter.fast_draw_text (box, Qt::AlignVCenter | Qt::AlignHCenter, QString ("%1").arg (std::round (aagl.in<si::Foot>())), pr.default_shadow);
 	}
 }
 
@@ -2583,7 +2583,7 @@ PaintingWork::paint_decision_height_setting (AdiPaintRequest& pr) const
 		QFontMetricsF const metrics_b (font_b);
 
 		QString mins_str = pr.params.decision_height_type;
-		QString alt_str = QString ("%1").arg (pr.params.decision_height_setting.in<Foot>(), 0, 'f', 0);
+		QString alt_str = QString ("%1").arg (pr.params.decision_height_setting.in<si::Foot>(), 0, 'f', 0);
 
 		QRectF mins_rect (1.35f * x, 1.8f * x, metrics_a.width (mins_str), metrics_a.height());
 		mins_rect.moveRight (mins_rect.left());
@@ -2630,7 +2630,7 @@ PaintingWork::paint_nav (AdiPaintRequest& pr) const
 		QString loc_str = pr.params.navaid_identifier;
 		if (pr.params.navaid_course_magnetic)
 		{
-			int course_int = xf::symmetric_round (pr.params.navaid_course_magnetic->in<Degree>());
+			int course_int = xf::symmetric_round (pr.params.navaid_course_magnetic->in<si::Degree>());
 			if (course_int == 0)
 				course_int = 360;
 			loc_str += QString::fromStdString ((boost::format ("/%03d°") % course_int).str());
@@ -2649,7 +2649,7 @@ PaintingWork::paint_nav (AdiPaintRequest& pr) const
 
 		QString dme_val = "DME ---";
 		if (pr.params.navaid_distance)
-			dme_val = QString::fromStdString ((boost::format ("DME %.1f") % pr.params.navaid_distance->in<NauticalMile>()).str());
+			dme_val = QString::fromStdString ((boost::format ("DME %.1f") % pr.params.navaid_distance->in<si::NauticalMile>()).str());
 
 		pr.painter.setPen (Qt::white);
 		pr.painter.setFont (pr.aids.font_1.font);
@@ -2657,14 +2657,17 @@ PaintingWork::paint_nav (AdiPaintRequest& pr) const
 
 		QPen ladder_pen (pr.kLadderBorderColor, pr.aids.pen_width (0.75f), Qt::SolidLine, Qt::RoundCap, Qt::MiterJoin);
 
-		auto paint_ladder = [&](std::optional<Angle> original_approach_deviation, std::optional<Angle> original_path_deviation) -> void
+		auto paint_ladder = [&](std::optional<si::Angle> original_approach_deviation, std::optional<si::Angle> original_path_deviation) -> void
 		{
-			Angle approach_deviation;
+			si::Angle approach_deviation;
+
 			if (original_approach_deviation)
-				approach_deviation = xf::clamped<Angle> (*original_approach_deviation, -2.25_deg, +2.25_deg);
-			Angle path_deviation;
+				approach_deviation = xf::clamped<si::Angle> (*original_approach_deviation, -2.25_deg, +2.25_deg);
+
+			si::Angle path_deviation;
+
 			if (original_path_deviation)
-				path_deviation = xf::clamped<Angle> (*original_path_deviation, -2.25_deg, +2.25_deg);
+				path_deviation = xf::clamped<si::Angle> (*original_path_deviation, -2.25_deg, +2.25_deg);
 
 			QRectF rect (0.f, 0.f, 0.385f * ld, 0.055f * ld);
 			pr.aids.centrify (rect);
@@ -2696,7 +2699,7 @@ PaintingWork::paint_nav (AdiPaintRequest& pr) const
 					QPointF (-1.6f * w, 0.f),
 					QPointF (0.f, -w)
 				});
-				pink_pointer.translate (approach_deviation.in<Degree>() * 0.075f * ld, 0.f);
+				pink_pointer.translate (approach_deviation.in<si::Degree>() * 0.075f * ld, 0.f);
 				pink_visible = !!original_approach_deviation;
 				pink_filled = original_approach_deviation && abs (*original_approach_deviation) <= abs (approach_deviation);
 				white_visible = false;
@@ -2710,7 +2713,7 @@ PaintingWork::paint_nav (AdiPaintRequest& pr) const
 					QPointF (+1.0f * w, 2.0f * w),
 					QPointF (-1.0f * w, 2.0f * w)
 				});
-				pink_pointer.translate (path_deviation.in<Degree>() * 0.075f * ld, 0.f);
+				pink_pointer.translate (path_deviation.in<si::Degree>() * 0.075f * ld, 0.f);
 				pink_visible = !!original_path_deviation;
 				pink_filled = original_path_deviation && abs (*original_path_deviation) <= abs (path_deviation);
 				white_pointer = QPolygonF ({
@@ -2720,7 +2723,7 @@ PaintingWork::paint_nav (AdiPaintRequest& pr) const
 					QPointF (-1.6f * w, 0.f),
 					QPointF (0.f, -0.8f * w)
 				});
-				white_pointer.translate (approach_deviation.in<Degree>() * 0.075f * ld, -0.65f * w);
+				white_pointer.translate (approach_deviation.in<si::Degree>() * 0.075f * ld, -0.65f * w);
 				white_visible = !!original_approach_deviation;
 			}
 
@@ -2805,8 +2808,8 @@ PaintingWork::paint_nav (AdiPaintRequest& pr) const
 		float w = 0.15f * ld;
 		float h = 0.05f * ld;
 		float p = 1.3f;
-		float offset = 0.5f * xf::clamped (pr.params.deviation_lateral_approach->in<Degree>(), -1.5, +1.5);
-		float ypos = -pr.pitch_to_px (xf::clamped<Angle> (*pr.params.raising_runway_position + 3.5_deg, 3.5_deg, 25_deg));
+		float offset = 0.5f * xf::clamped (pr.params.deviation_lateral_approach->in<si::Degree>(), -1.5, +1.5);
+		float ypos = -pr.pitch_to_px (xf::clamped<si::Angle> (*pr.params.raising_runway_position + 3.5_deg, 3.5_deg, 25_deg));
 
 		pr.painter.setTransform (pr.precomputed.center_transform);
 		pr.painter.translate (0.f, ypos);
@@ -2964,7 +2967,7 @@ PaintingWork::paint_critical_aoa (AdiPaintRequest& pr) const
 	{
 		pr.painter.setClipping (false);
 		pr.painter.setTransform (pr.precomputed.center_transform);
-		pr.painter.translate (0.f, pr.pitch_to_px (xf::clamped<Angle> (*pr.params.critical_aoa - *pr.params.aoa_alpha, -20_deg, +16_deg)));
+		pr.painter.translate (0.f, pr.pitch_to_px (xf::clamped<si::Angle> (*pr.params.critical_aoa - *pr.params.aoa_alpha, -20_deg, +16_deg)));
 
 		float const w = pr.aids.lesser_dimension() * 3.f / 9.f;
 
@@ -3301,7 +3304,7 @@ ADI::process (xf::Cycle const& cycle)
 	if (*io.enable_raising_runway && io.navaid_reference_visible.value_or (false) && io.altitude_agl &&
 		io.flight_path_deviation_lateral_approach && *io.altitude_agl <= *io.raising_runway_visibility)
 	{
-		params.raising_runway_position = xf::clamped<Length> (io.altitude_agl.value_or (0_ft), 0_ft, *io.raising_runway_threshold) / *io.raising_runway_threshold * 25_deg;
+		params.raising_runway_position = xf::clamped<si::Length> (io.altitude_agl.value_or (0_ft), 0_ft, *io.raising_runway_threshold) / *io.raising_runway_threshold * 25_deg;
 	}
 	else
 		params.raising_runway_position.reset();
@@ -3396,9 +3399,9 @@ ADI::compute_fpv()
 
 	if (io.fpv_visible.value_or (false) && !hidden && io.orientation_pitch && io.orientation_roll && io.track_vertical && heading && track_lateral)
 	{
-		Angle vdiff = xf::floored_mod<Angle> (*io.orientation_pitch - *io.track_vertical, -180_deg, +180_deg);
-		Angle hdiff = xf::floored_mod<Angle> (**heading - **track_lateral, -180_deg, +180_deg);
-		Angle roll = *io.orientation_roll;
+		si::Angle vdiff = xf::floored_mod<si::Angle> (*io.orientation_pitch - *io.track_vertical, -180_deg, +180_deg);
+		si::Angle hdiff = xf::floored_mod<si::Angle> (**heading - **track_lateral, -180_deg, +180_deg);
+		si::Angle roll = *io.orientation_roll;
 
 		_computed_fpv_alpha = vdiff * si::cos (roll) + hdiff * si::sin (roll);
 		_computed_fpv_beta = -vdiff * si::sin (roll) + hdiff * si::cos (roll);

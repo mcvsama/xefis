@@ -45,7 +45,7 @@ GPS::Connection::Connection (GPS& gps_module, PowerCycle& power_cycle, unsigned 
 	_gps_module.logger() << "Create GPS serial connection" << std::endl;
 
 	_alive_check_timer = std::make_unique<QTimer> (this);
-	_alive_check_timer->setInterval (kAliveCheckInterval.in<Millisecond>());
+	_alive_check_timer->setInterval (kAliveCheckInterval.in<si::Millisecond>());
 	_alive_check_timer->setSingleShot (true);
 	QObject::connect (_alive_check_timer.get(), &QTimer::timeout, this, &Connection::alive_check_failed);
 
@@ -371,12 +371,12 @@ GPS::Connection::get_nmea_frequencies_setup_messages (unsigned int baud_rate)
 		constexpr signed int GSA_maxlen = header + 1 + 1 + (12 * 2) + (3 * 4) + epilog + 17;
 		constexpr signed int RMC_maxlen = header + 10 + 1 + 9 + 1 + 9 + 1 + 6 + 6 + 6 + 6 + 1 + 1 + epilog + 12;
 
-		Frequency gga_per_second = 1.0 / fix_interval / gga_period;
-		Frequency gsa_per_second = 1.0 / fix_interval / gsa_period;
-		Frequency rmc_per_second = 1.0 / fix_interval / rmc_period;
+		si::Frequency gga_per_second = 1.0 / fix_interval / gga_period;
+		si::Frequency gsa_per_second = 1.0 / fix_interval / gsa_period;
+		si::Frequency rmc_per_second = 1.0 / fix_interval / rmc_period;
 
-		Frequency byte_freq = GGA_maxlen * gga_per_second + GSA_maxlen * gsa_per_second + RMC_maxlen * rmc_per_second;
-		return static_cast<unsigned int> (std::ceil (8 * byte_freq.in<Hertz>()));
+		si::Frequency byte_freq = GGA_maxlen * gga_per_second + GSA_maxlen * gsa_per_second + RMC_maxlen * rmc_per_second;
+		return static_cast<unsigned int> (std::ceil (8 * byte_freq.in<si::Hertz>()));
 	};
 
 	si::Time fix_interval = 100_ms;
@@ -404,7 +404,7 @@ GPS::Connection::get_nmea_frequencies_setup_messages (unsigned int baud_rate)
 		}
 	}
 
-	unsigned int fix_interval_rounded_to_100ms = static_cast<unsigned int> (fix_interval.in<Millisecond>()) / 100 * 100;
+	unsigned int fix_interval_rounded_to_100ms = static_cast<unsigned int> (fix_interval.in<si::Millisecond>()) / 100 * 100;
 	std::string mtk_set_nmea_frequencies_body = (boost::format ("%s,0,%d,0,%d,%d,0,0,0,0,0,0,0,0,0,0,0,0,0,0") % MTK_SET_NMEA_FREQUENCIES % rmc_period % gga_period % gsa_period).str();
 	std::string mtk_set_nmea_frequencies = xf::nmea::make_mtk_sentence (mtk_set_nmea_frequencies_body);
 	std::string mtk_set_nmea_position_fix_interval_body = std::string (MTK_SET_NMEA_POSITION_FIX_INTERVAL) + "," + std::to_string (fix_interval_rounded_to_100ms);
@@ -516,7 +516,7 @@ GPS::GPS (std::unique_ptr<GPS_IO> module_io, xf::System* system, xf::SerialPort:
 	// TODO check logic that setting_target_baud_rate >= setting_default_baud_rate
 
 	_power_cycle_timer = std::make_unique<QTimer> (this);
-	_power_cycle_timer->setInterval (kPowerRestartDelay.in<Millisecond>());
+	_power_cycle_timer->setInterval (kPowerRestartDelay.in<si::Millisecond>());
 	_power_cycle_timer->setSingleShot (true);
 	QObject::connect (_power_cycle_timer.get(), SIGNAL (timeout()), this, SLOT (power_on()));
 

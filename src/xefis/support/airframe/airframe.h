@@ -78,19 +78,19 @@ class Airframe
 	/**
 	 * Return range of useful AOA, for which computations make sense.
 	 */
-	Range<Angle> const&
+	Range<si::Angle> const&
 	get_defined_aoa_range() const noexcept;
 
 	/**
 	 * Return total wings area.
 	 */
-	Area
+	si::Area
 	wings_area() const;
 
 	/**
 	 * Return chord length of the airfoil.
 	 */
-	Length
+	si::Length
 	wings_chord() const;
 
 	/**
@@ -98,7 +98,7 @@ class Airframe
 	 * This + critical AOA gives the maximum safe AOA to fly at, where controls
 	 * are retained.
 	 */
-	Angle
+	si::Angle
 	safe_aoa_correction() const;
 
 	/**
@@ -108,7 +108,7 @@ class Airframe
 	 *        Angle of attack as detected by AOA sensor.
 	 */
 	LiftCoefficient
-	get_cl (Angle const& aoa, FlapsAngle const&, SpoilersAngle const&) const;
+	get_cl (si::Angle aoa, FlapsAngle, SpoilersAngle) const;
 
 	/**
 	 * Return C_D, including corrections for flaps and spoilers.
@@ -117,7 +117,7 @@ class Airframe
 	 *        Angle of attack as detected by AOA sensor.
 	 */
 	DragCoefficient
-	get_cd (Angle const& aoa, FlapsAngle const&, SpoilersAngle const&) const;
+	get_cd (si::Angle aoa, FlapsAngle, SpoilersAngle) const;
 
 	/**
 	 * Return AOA for given C_L, corrected for flaps and spoilers.
@@ -125,20 +125,20 @@ class Airframe
 	 * \param cl
 	 *        Lift coefficient.
 	 */
-	std::optional<Angle>
-	get_aoa_in_normal_regime (LiftCoefficient const& cl, FlapsAngle const&, SpoilersAngle const&) const;
+	std::optional<si::Angle>
+	get_aoa_in_normal_regime (LiftCoefficient cl, FlapsAngle, SpoilersAngle) const;
 
 	/**
 	 * Return critical AOA for given flaps and spoilers settings.
 	 */
-	Angle
-	get_critical_aoa (FlapsAngle const&, SpoilersAngle const&) const;
+	si::Angle
+	get_critical_aoa (FlapsAngle, SpoilersAngle) const;
 
 	/**
 	 * Return maximum safe AOA for given flaps and spoilers settings.
 	 */
-	Angle
-	get_max_safe_aoa (FlapsAngle const&, SpoilersAngle const&) const;
+	si::Angle
+	get_max_safe_aoa (FlapsAngle, SpoilersAngle) const;
 
 	/**
 	 * Return maximum safe load factor limits to fly at:
@@ -149,7 +149,7 @@ class Airframe
 
   private:
 	AirframeDefinition	_definition;
-	Range<Angle>		_defined_aoa_range;
+	Range<si::Angle>	_defined_aoa_range;
 };
 
 
@@ -181,28 +181,28 @@ Airframe::drag() const
 }
 
 
-inline Range<Angle> const&
+inline Range<si::Angle> const&
 Airframe::get_defined_aoa_range() const noexcept
 {
 	return _defined_aoa_range;
 }
 
 
-inline Area
+inline si::Area
 Airframe::wings_area() const
 {
 	return _definition.wings_area;
 }
 
 
-inline Length
+inline si::Length
 Airframe::wings_chord() const
 {
 	return _definition.wing_chord;
 }
 
 
-inline Angle
+inline si::Angle
 Airframe::safe_aoa_correction() const
 {
 	return _definition.safe_aoa_correction;

@@ -182,10 +182,10 @@ class PropertyObserver
 	// Time of last change of observed property:
 	si::Time				_obs_update_time			{ 0_s };
 	// Time of last firing of the callback function:
-	Time					_fire_time					= 0_s;
-	Time					_fire_dt					= 0_s;
-	Time					_accumulated_dt				= 0_s;
-	Time					_minimum_dt					= 0_s;
+	si::Time				_fire_time					= 0_s;
+	si::Time				_fire_dt					= 0_s;
+	si::Time				_accumulated_dt				= 0_s;
+	si::Time				_minimum_dt					= 0_s;
 	std::optional<si::Time>	_longest_smoothing_time;
 	// Set to true, when observed property is updated, but
 	// _minimum_dt prevented firing the callback.

@@ -71,13 +71,13 @@ class MagneticVariation
 	 * Set position on earth.
 	 */
 	void
-	set_position (LonLat const& position);
+	set_position (si::LonLat const& position);
 
 	/**
 	 * Set altitude.
 	 */
 	void
-	set_altitude_amsl (Length altitude_amsl);
+	set_altitude_amsl (si::Length altitude_amsl);
 
 	/**
 	 * Set date. Supported years: 1950…2049.
@@ -94,47 +94,47 @@ class MagneticVariation
 	/**
 	 * Return resulting magnetic declination.
 	 */
-	Angle
+	si::Angle
 	magnetic_declination() const;
 
 	/**
 	 * Return resulting magnetic inclination.
 	 */
-	Angle
+	si::Angle
 	magnetic_inclination() const;
 
   private:
-	LonLat					_position;
-	Length					_altitude_amsl;
+	si::LonLat				_position;
+	si::Length				_altitude_amsl;
 	long					_julian_date;
-	Angle					_magnetic_declination;
-	Angle					_magnetic_inclination;
+	si::Angle				_magnetic_declination;
+	si::Angle				_magnetic_inclination;
 	MagneticVariationImpl	_implementation;
 };
 
 
 inline void
-MagneticVariation::set_position (LonLat const& position)
+MagneticVariation::set_position (si::LonLat const& position)
 {
 	_position = position;
 }
 
 
 inline void
-MagneticVariation::set_altitude_amsl (Length altitude_amsl)
+MagneticVariation::set_altitude_amsl (si::Length altitude_amsl)
 {
 	_altitude_amsl = altitude_amsl;
 }
 
 
-inline Angle
+inline si::Angle
 MagneticVariation::magnetic_declination() const
 {
 	return _magnetic_declination;
 }
 
 
-inline Angle
+inline si::Angle
 MagneticVariation::magnetic_inclination() const
 {
 	return _magnetic_inclination;

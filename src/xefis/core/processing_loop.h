@@ -90,7 +90,7 @@ class ProcessingLoop:
   public:
 	// Ctor
 	explicit
-	ProcessingLoop (Machine& machine, std::string_view const& instance, Frequency loop_frequency, Logger const&);
+	ProcessingLoop (Machine& machine, std::string_view const& instance, si::Frequency loop_frequency, Logger const&);
 
 	// Dtor
 	virtual

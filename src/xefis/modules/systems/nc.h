@@ -29,6 +29,10 @@
 #include <xefis/utility/range_smoother.h>
 
 
+namespace si = neutrino::si;
+using namespace neutrino::si::literals;
+
+
 class NavigationComputerIO: public xf::ModuleIO
 {
   public:

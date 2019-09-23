@@ -616,7 +616,7 @@ AFCS::update_mcp()
 	{
 		case SpeedControl::KIAS:
 			io.mcp_speed_format_out = *io.mcp_speed_format_kias;
-			io.mcp_speed_display = xf::symmetric_round (_mcp_ias.in<Knot>());
+			io.mcp_speed_display = xf::symmetric_round (_mcp_ias.in<si::Knot>());
 			break;
 
 		case SpeedControl::Mach:
@@ -632,11 +632,11 @@ AFCS::update_mcp()
 	switch (_lateral_control)
 	{
 		case LateralControl::Heading:
-			lateral_angle = xf::symmetric_round (_mcp_heading.in<Degree>());
+			lateral_angle = xf::symmetric_round (_mcp_heading.in<si::Degree>());
 			break;
 
 		case LateralControl::Track:
-			lateral_angle = xf::symmetric_round (_mcp_track.in<Degree>());
+			lateral_angle = xf::symmetric_round (_mcp_track.in<si::Degree>());
 			break;
 	}
 
@@ -647,7 +647,7 @@ AFCS::update_mcp()
 
 	// Altitude window:
 	io.mcp_altitude_format_out = *io.mcp_altitude_format;
-	io.mcp_altitude_display = xf::symmetric_round (_mcp_altitude.in<Foot>());
+	io.mcp_altitude_display = xf::symmetric_round (_mcp_altitude.in<si::Foot>());
 
 	// Vertical-control window:
 	switch (_vertical_control)
@@ -656,7 +656,7 @@ AFCS::update_mcp()
 			io.mcp_vertical_format_out = *io.mcp_vertical_format_vs;
 
 			if (_mcp_vs)
-				io.mcp_vertical_display = xf::symmetric_round (_mcp_vs->in<FootPerMinute>());
+				io.mcp_vertical_display = xf::symmetric_round (_mcp_vs->in<si::FootPerMinute>());
 			else
 				io.mcp_vertical_display = xf::nil;
 			break;
@@ -665,7 +665,7 @@ AFCS::update_mcp()
 			io.mcp_vertical_format_out = *io.mcp_vertical_format_fpa;
 
 			if (_mcp_fpa)
-				io.mcp_vertical_display = xf::symmetric_round (10.0 * _mcp_fpa->in<Degree>()) / 10.0;
+				io.mcp_vertical_display = xf::symmetric_round (10.0 * _mcp_fpa->in<si::Degree>()) / 10.0;
 			else
 				io.mcp_vertical_display = xf::nil;
 			break;

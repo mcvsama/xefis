@@ -24,6 +24,9 @@
 #include "flaps.h"
 
 
+using namespace neutrino::si::literals;
+
+
 Flaps::Flaps (std::unique_ptr<FlapsIO> module_io, xf::Graphics const& graphics, std::string_view const& instance):
 	Instrument (std::move (module_io), instance),
 	InstrumentSupport (graphics)
@@ -95,7 +98,7 @@ Flaps::async_paint (xf::PaintRequest const& paint_request, PaintingParams const&
 	// Filled block showing current value:
 	if (pp.current_angle)
 	{
-		Angle current = xf::clamped<Angle> (*pp.current_angle, 0_deg, pp.maximum_angle);
+		si::Angle current = xf::clamped<si::Angle> (*pp.current_angle, 0_deg, pp.maximum_angle);
 		QRectF filled_block = block;
 		filled_block.setHeight (current / pp.maximum_angle * filled_block.height());
 		painter.setPen (Qt::NoPen);
@@ -107,7 +110,7 @@ Flaps::async_paint (xf::PaintRequest const& paint_request, PaintingParams const&
 	if (pp.set_angle)
 	{
 		// Green line:
-		Angle setting = xf::clamped<Angle> (*pp.set_angle, 0_deg, pp.maximum_angle);
+		si::Angle setting = xf::clamped<si::Angle> (*pp.set_angle, 0_deg, pp.maximum_angle);
 		float w = 0.3f * block.width();
 		float s = block.top() + setting / pp.maximum_angle * block.height();
 		painter.setPen (aids->get_pen (Qt::green, 2.f));
@@ -118,7 +121,7 @@ Flaps::async_paint (xf::PaintRequest const& paint_request, PaintingParams const&
 		// Number or UP
 		QString number = "UP";
 		if (setting > 0.5_deg)
-			number = QString ("%1").arg (xf::symmetric_round (setting.in<Degree>()));
+			number = QString ("%1").arg (xf::symmetric_round (setting.in<si::Degree>()));
 		painter.setFont (setting_font);
 		painter.fast_draw_text (QPointF (block.right() + 2.f * w, s), Qt::AlignVCenter | Qt::AlignLeft, number);
 	}
