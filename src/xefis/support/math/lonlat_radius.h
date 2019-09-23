@@ -40,7 +40,8 @@ class LonLatRadius: public si::LonLat
 	constexpr si::Length&
 	radius() noexcept;
 
-	constexpr si::Length const&
+	[[nodiscard]]
+	constexpr si::Length
 	radius() const noexcept;
 
   private:
@@ -69,7 +70,7 @@ LonLatRadius::radius() noexcept
 }
 
 
-constexpr si::Length const&
+constexpr si::Length
 LonLatRadius::radius() const noexcept
 {
 	return _radius;

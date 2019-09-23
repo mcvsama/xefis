@@ -57,7 +57,7 @@ Drag::Drag (QDomElement const& config)
 
 
 DragCoefficient
-Drag::get_cd (si::Angle const& aoa) const
+Drag::get_cd (si::Angle const aoa) const
 {
 	return _aoa_to_cd.extrapolated_value (aoa);
 }

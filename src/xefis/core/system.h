@@ -42,7 +42,7 @@ class System
 	 * Return true on success.
 	 */
 	bool
-	set_clock (si::Time const& unix_time);
+	set_clock (si::Time unix_time);
 
   private:
 	Logger _logger;

@@ -109,7 +109,7 @@ polar (SpaceVector<si::Length, ECEFFrame> const& vector)
 template<class TF = void, class SF = TF>
 	[[nodiscard]]
 	constexpr RotationMatrix<TF, SF>
-	x_rotation (si::Angle const& angle)
+	x_rotation (si::Angle const angle)
 	{
 		double const sin_a = sin (angle);
 		double const cos_a = cos (angle);
@@ -128,7 +128,7 @@ template<class TF = void, class SF = TF>
 template<class TF = void, class SF = TF>
 	[[nodiscard]]
 	constexpr RotationMatrix<TF, SF>
-	y_rotation (si::Angle const& angle)
+	y_rotation (si::Angle const angle)
 	{
 		double const sin_a = sin (angle);
 		double const cos_a = cos (angle);
@@ -147,7 +147,7 @@ template<class TF = void, class SF = TF>
 template<class TF = void, class SF = TF>
 	[[nodiscard]]
 	constexpr RotationMatrix<TF, SF>
-	z_rotation (si::Angle const& angle)
+	z_rotation (si::Angle const angle)
 	{
 		double const sin_a = sin (angle);
 		double const cos_a = cos (angle);
@@ -166,7 +166,7 @@ template<class TF = void, class SF = TF>
 template<class TF = void, class SF = TF>
 	[[nodiscard]]
 	constexpr RotationMatrix<TF, SF>
-	rotation_about (SpaceVector<double, TF> const& axis, si::Angle const& angle)
+	rotation_about (SpaceVector<double, TF> const& axis, si::Angle const angle)
 	{
 		auto const sin_a = sin (angle);
 		auto const cos_a = cos (angle);

@@ -46,7 +46,7 @@ class Drag
 	 * Uses linear interpolation.
 	 */
 	DragCoefficient
-	get_cd (si::Angle const& aoa) const;
+	get_cd (si::Angle aoa) const;
 
   private:
 	Field<si::Angle, DragCoefficient> _aoa_to_cd { };
