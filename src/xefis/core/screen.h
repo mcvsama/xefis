@@ -263,6 +263,7 @@ class Screen:
 	QTimer*						_hide_logo_timer;
 	QTimer*						_refresh_timer;
 	QImage						_canvas;
+	std::optional<QImage>		_logo_image;
 	std::vector<InstrumentTracker::Disclosure*>
 								_z_index_sorted_disclosures;
 	ScreenSpec					_screen_spec;

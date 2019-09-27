@@ -196,13 +196,17 @@ void
 Screen::paint_logo_to_buffer()
 {
 	auto const lesser_dim = 0.5 * std::min (_canvas.width(), _canvas.height());
-	_canvas.fill (Qt::black);
-	auto logo_image = allocate_image (QSize (lesser_dim, lesser_dim));
-	logo_image.fill (Qt::transparent);
-    QPainter logo_image_painter (&logo_image);
-	QSvgRenderer (QString (kLogoPath)).render (&logo_image_painter);
+
+	if (!_logo_image)
+	{
+		_logo_image = allocate_image (QSize (lesser_dim, lesser_dim));
+		_logo_image->fill (Qt::transparent);
+		QPainter logo_image_painter (&*_logo_image);
+		QSvgRenderer (QString (kLogoPath)).render (&logo_image_painter);
+	}
+
 	QPainter canvas_painter (&_canvas);
-	canvas_painter.drawImage (_canvas.rect().center() - 0.5 * QPoint (lesser_dim, lesser_dim), logo_image);
+	canvas_painter.drawImage (_canvas.rect().center() - 0.5 * QPoint (lesser_dim, lesser_dim), *_logo_image);
 }
 
 
@@ -375,6 +379,7 @@ void
 Screen::hide_logo()
 {
 	_displaying_logo = false;
+	_logo_image.reset();
 }
 
 
