@@ -11,11 +11,11 @@
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="31mm"
    height="31mm"
-   viewBox="0 0 31 31"
+   viewBox="0 0 31 30.999999"
    version="1.1"
    id="svg49"
    inkscape:version="0.92.3 (2405546, 2018-03-11)"
-   sodipodi:docname="xefis.n.svg">
+   sodipodi:docname="xefis.svg">
   <defs
      id="defs43" />
   <sodipodi:namedview
@@ -25,9 +25,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.49497475"
-     inkscape:cx="363.30069"
-     inkscape:cy="-267.92249"
+     inkscape:zoom="3.959798"
+     inkscape:cx="63.448816"
+     inkscape:cy="14.066012"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -56,17 +56,51 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(238.04809,-14.451553)">
-    <text
-       id="text821"
-       y="33.745678"
-       x="-237.68549"
-       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:10.58333302px;line-height:1.25;font-family:'Familiar Pro';-inkscape-font-specification:'Familiar Pro, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.26458332;"
-       xml:space="preserve"><tspan
-         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:10.58333302px;font-family:'Familiar Pro';-inkscape-font-specification:'Familiar Pro, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.26458332;fill:#ffffff;"
-         y="33.745678"
-         x="-237.68549"
-         id="tspan819"
-         sodipodi:role="line">XEFIS</tspan></text>
+     transform="translate(237.53495,8.2189141)">
+    <g
+       id="g1261"
+       transform="translate(0.02538213,-11.104042)">
+      <g
+         id="text11"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:10.58333302px;line-height:1.25;font-family:'Familiar Pro';-inkscape-font-specification:'Familiar Pro, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.86500001;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         aria-label="XEFIS">
+        <path
+           inkscape:connector-curvature="0"
+           id="path1226"
+           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:10.58333302px;font-family:'Familiar Pro';-inkscape-font-specification:'Familiar Pro, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:none;stroke:#000000;stroke-width:0.86500001;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           d="m -237.10249,22.179253 h 1.8415 l 1.5875,-2.592917 1.524,2.592917 h 1.905 l -2.51883,-3.926417 2.33891,-3.661833 h -1.82033 l -1.41817,2.44475 -1.40758,-2.44475 h -1.86267 l 2.32834,3.683 z" />
+        <path
+           inkscape:connector-curvature="0"
+           id="path1228"
+           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:10.58333302px;font-family:'Familiar Pro';-inkscape-font-specification:'Familiar Pro, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:none;stroke:#000000;stroke-width:0.86500001;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           d="m -229.33465,22.179253 h 5.76791 v -1.30175 h -4.20158 v -2.021417 h 3.72533 v -1.30175 h -3.72533 v -1.661583 h 4.03225 v -1.30175 h -5.59858 z" />
+        <path
+           inkscape:connector-curvature="0"
+           id="path1230"
+           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:10.58333302px;font-family:'Familiar Pro';-inkscape-font-specification:'Familiar Pro, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:none;stroke:#000000;stroke-width:0.86500001;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           d="m -222.26532,22.179253 h 1.56634 v -3.20675 h 3.29141 v -1.30175 h -3.29141 v -1.778 h 3.76766 v -1.30175 h -5.334 z" />
+        <path
+           inkscape:connector-curvature="0"
+           id="path1232"
+           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:10.58333302px;font-family:'Familiar Pro';-inkscape-font-specification:'Familiar Pro, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:none;stroke:#000000;stroke-width:0.86500001;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           d="m -215.90126,22.179253 h 1.56633 v -7.58825 h -1.56633 z" />
+        <path
+           inkscape:connector-curvature="0"
+           id="path1234"
+           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:10.58333302px;font-family:'Familiar Pro';-inkscape-font-specification:'Familiar Pro, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:none;stroke:#000000;stroke-width:0.86500001;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           d="m -213.23062,19.798003 c 0.0952,1.576916 0.77258,2.550583 3.24908,2.550583 1.13242,0 2.96333,-0.201083 2.96333,-2.338917 0,-1.513416 -0.91016,-1.93675 -1.98966,-2.2225 l -1.69334,-0.455083 c -0.4445,-0.116417 -0.77258,-0.275167 -0.77258,-0.8255 0,-0.60325 0.40217,-0.751417 1.19592,-0.751417 1.35466,0 1.38641,0.423334 1.4605,1.058334 h 1.56633 c -0.0318,-1.354667 -0.73025,-2.391833 -2.96333,-2.391833 -2.3495,0 -2.84692,1.142999 -2.84692,2.233083 0,1.386416 0.81492,1.830916 1.73567,2.074333 l 1.8415,0.497417 c 0.66675,0.179916 0.87841,0.433916 0.87841,0.899583 0,0.772583 -0.58208,0.889 -1.37583,0.889 -1.50283,0 -1.61925,-0.423333 -1.68275,-1.217083 z" />
+      </g>
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:10.58333302px;line-height:1.25;font-family:'Familiar Pro';-inkscape-font-specification:'Familiar Pro, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+         x="-237.19774"
+         y="22.179253"
+         id="text821"><tspan
+           sodipodi:role="line"
+           id="tspan819"
+           x="-237.19774"
+           y="22.179253"
+           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:10.58333302px;font-family:'Familiar Pro';-inkscape-font-specification:'Familiar Pro, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;stroke-width:0.26458332">XEFIS</tspan></text>
+    </g>
   </g>
 </svg>
