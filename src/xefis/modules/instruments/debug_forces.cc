@@ -59,7 +59,7 @@ DebugForces::async_paint (xf::PaintRequest const& paint_request, PaintingParams 
 {
 	auto aids = get_aids (paint_request);
 	auto painter = get_painter (paint_request);
-	paint_request.canvas().fill (QColor (0x55, 0x63, 0x71));
+	painter.fillRect (paint_request.metric().canvas_rect(), QColor (0x55, 0x63, 0x71));
 
 	double one_gravity_length = 0.15 * aids->height();
 	QPointF center (0.0, 0.0);

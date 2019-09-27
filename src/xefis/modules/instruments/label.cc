@@ -56,6 +56,6 @@ Label::async_paint (xf::PaintRequest const& paint_request, PaintingParams const&
 
 	painter.setFont (font);
 	painter.setPen (pp.color);
-	painter.fast_draw_text (paint_request.canvas().rect(), pp.alignment, pp.label);
+	painter.fast_draw_text (paint_request.metric().canvas_rect(), pp.alignment, pp.label);
 }
 

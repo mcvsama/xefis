@@ -43,7 +43,7 @@ BasicRadialGauge::async_paint (xf::PaintRequest const& paint_request, GaugeValue
 {
 	auto aids = get_aids (paint_request);
 	auto painter = get_painter (paint_request);
-	auto rect = aids->centered_rect (paint_request.canvas().rect(), xf::WidthForHeight (250.0 / 200.0));
+	auto rect = aids->centered_rect (paint_request.metric().canvas_rect(), xf::WidthForHeight (250.0 / 200.0));
 	float const q = 0.068f * rect.height();
 	float const r = values.dial_scale * 6.5f * q;
 

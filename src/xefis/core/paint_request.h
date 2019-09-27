@@ -19,7 +19,7 @@
 #include <atomic>
 
 // Qt:
-#include <QImage>
+#include <QPaintDevice>
 
 // Neutrino:
 #include <neutrino/noncopyable.h>
@@ -51,7 +51,13 @@ class PaintRequest
 
 		[[nodiscard]]
 		QSize
-		canvas_size() const noexcept;
+		canvas_size() const noexcept
+			{ return _canvas_size; }
+
+		[[nodiscard]]
+		QRect
+		canvas_rect() const noexcept
+			{ return QRect (QPoint (0, 0), _canvas_size); }
 
 		[[nodiscard]]
 		si::PixelDensity
@@ -75,7 +81,7 @@ class PaintRequest
   public:
 	// Ctor
 	explicit
-	PaintRequest (QImage&, Metric const&, QSize previous_canvas_size);
+	PaintRequest (QPaintDevice&, Metric const&, QSize previous_canvas_size);
 
 	// Move ctor
 	PaintRequest (PaintRequest&&) = default;
@@ -88,7 +94,7 @@ class PaintRequest
 	 * Access the canvas to paint on.
 	 */
 	[[nodiscard]]
-	QImage&
+	QPaintDevice&
 	canvas() const noexcept;
 
 	/**
@@ -106,9 +112,9 @@ class PaintRequest
 	size_changed() const noexcept;
 
   private:
-	QImage*	_canvas;
-	Metric	_metric;
-	bool	_size_changed;
+	QPaintDevice*	_canvas;
+	Metric			_metric;
+	bool			_size_changed;
 };
 
 
@@ -138,13 +144,6 @@ PaintRequest::Metric::operator!= (PaintRequest::Metric const& other) const noexc
 }
 
 
-inline QSize
-PaintRequest::Metric::canvas_size() const noexcept
-{
-	return _canvas_size;
-}
-
-
 inline si::PixelDensity
 PaintRequest::Metric::pixel_density() const noexcept
 {
@@ -167,14 +166,14 @@ PaintRequest::Metric::font_height() const noexcept
 
 
 inline
-PaintRequest::PaintRequest (QImage& canvas, Metric const& metric, QSize previous_canvas_size):
+PaintRequest::PaintRequest (QPaintDevice& canvas, Metric const& metric, QSize previous_canvas_size):
 	_canvas (&canvas),
 	_metric (metric),
-	_size_changed (canvas.size() != previous_canvas_size)
+	_size_changed (QSize (canvas.width(), canvas.height()) != previous_canvas_size)
 { }
 
 
-inline QImage&
+inline QPaintDevice&
 PaintRequest::canvas() const noexcept
 {
 	return *_canvas;
