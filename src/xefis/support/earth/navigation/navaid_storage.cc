@@ -160,7 +160,7 @@ NavaidStorage::async_loader()
 {
 	_async_requested = true;
 	return std::packaged_task<void()> ([this] {
-		load();
+		Exception::catch_and_log (_logger, std::bind (&NavaidStorage::load, this));
 		_loaded = true;
 	});
 }
