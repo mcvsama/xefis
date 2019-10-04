@@ -1010,7 +1010,7 @@ AFCS::current_rounded_vs() const
 	if (io.measured_vs)
 		return std::round (*io.measured_vs / *io.vs_rounding) * *io.vs_rounding;
 
-	return { };
+	return std::nullopt;
 }
 
 
@@ -1020,7 +1020,7 @@ AFCS::current_rounded_fpa() const
 	if (io.measured_fpa)
 		return std::round (*io.measured_fpa / *io.fpa_rounding) * *io.fpa_rounding;
 
-	return { };
+	return std::nullopt;
 }
 
 
