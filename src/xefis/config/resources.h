@@ -64,7 +64,7 @@ namespace xf::resources {
 	static inline QPixmap key()							\
 	{													\
 		QPixmap p;										\
-		if (!QPixmapCache::find (#key, p))				\
+		if (!QPixmapCache::find (#key, &p))				\
 		{												\
 			p = QPixmap (file);							\
 			QPixmapCache::insert (#key, p);				\

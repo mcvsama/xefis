@@ -42,7 +42,7 @@ Widget::create_color_widget (QColor color, QWidget* parent)
 	auto palette = widget->palette();
 
 	widget->setAutoFillBackground (true);
-	palette.setColor (QPalette::Background, color);
+	palette.setColor (QPalette::Window, color);
 	widget->setPalette (palette);
 	widget->update();
 
