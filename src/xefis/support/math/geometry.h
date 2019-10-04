@@ -141,6 +141,22 @@ template<class T, class F>
 		return (~vector * normalized (onto)) * onto;
 	}
 
+
+/**
+ * Return normal vector for given triangle (front face is defined by CCW vertex order).
+ */
+inline SpaceVector<double>
+triangle_surface_normal (auto const& triangle)
+{
+	if (triangle.size() != 3)
+		throw InvalidArgument ("triangle_surface_normal(): triangle.size() must be 3");
+
+	auto const scalar = decltype (triangle[0].position()[0]) { 1 };
+
+	return normalized (cross_product (triangle[1].position() - triangle[0].position(),
+									  triangle[2].position() - triangle[0].position()) / scalar / scalar);
+}
+
 } // namespace xf
 
 #endif
