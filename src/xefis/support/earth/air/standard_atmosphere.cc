@@ -1,6 +1,6 @@
 /* vim:ts=4
  *
- * Copyleft 2012…2018  Michał Gawron
+ * Copyleft 2008…2018  Michał Gawron
  * Marduk Unix Labs, http://mulabs.org/
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,11 +22,10 @@
 #include <xefis/support/nature/constants.h>
 
 // Local:
-#include "air.h"
+#include "standard_atmosphere.h"
 
 
 namespace xf {
-
 namespace {
 
 struct InternationalStandardAtmosphereParams
@@ -127,6 +126,50 @@ standard_temperature_gradient (std::map<si::Length, InternationalStandardAtmosph
 }
 
 } // namespace
+
+Air
+StandardAtmosphere::air_at (SpaceVector<si::Length, ECEFFrame> const& position) const
+{
+	return air_at_radius (abs (position));
+}
+
+
+Air
+StandardAtmosphere::air_at_radius (si::Length radius) const
+{
+	return air_at_amsl (radius - kEarthMeanRadius);
+}
+
+
+Air
+StandardAtmosphere::air_at_amsl (si::Length geometric_altitude_amsl) const
+{
+	Air air;
+	air.density = standard_density (geometric_altitude_amsl);
+	air.pressure = standard_pressure (geometric_altitude_amsl);
+	air.temperature = standard_temperature (geometric_altitude_amsl);
+	air.dynamic_viscosity = dynamic_air_viscosity (air.temperature);
+	air.speed_of_sound = speed_of_sound (air.temperature);
+	return air;
+}
+
+
+SpaceVector<si::Velocity, ECEFFrame>
+StandardAtmosphere::wind_at (SpaceVector<si::Length, ECEFFrame> const&) const
+{
+	// TODO model
+	return { 0_mps, 0_mps, 0_mps };
+}
+
+
+AtmosphereState<ECEFFrame>
+StandardAtmosphere::state_at (SpaceVector<si::Length, ECEFFrame> const& position) const
+{
+	return {
+		air_at (position),
+		wind_at (position),
+	};
+}
 
 
 si::Density

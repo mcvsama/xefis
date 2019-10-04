@@ -30,36 +30,6 @@ namespace xf {
 using Reynolds = StrongType<double, struct ReynoldsType>;
 
 
-struct Air
-{
-	si::Density				density;
-	si::Pressure			pressure;
-	si::Temperature			temperature;
-	si::DynamicViscosity	dynamic_viscosity;
-	si::Velocity			speed_of_sound;
-};
-
-
-si::Density
-standard_density (si::Length geometric_altitude_amsl);
-
-
-si::Pressure
-standard_pressure (si::Length geometric_altitude_amsl);
-
-
-si::Temperature
-standard_temperature (si::Length geometric_altitude_amsl);
-
-
-si::TemperatureGradient
-standard_temperature_gradient (si::Length geometric_altitude_amsl);
-
-
-si::DynamicViscosity
-dynamic_air_viscosity (si::Temperature);
-
-
 inline si::Velocity
 speed_of_sound (si::Temperature static_air_temperature)
 {

@@ -16,10 +16,10 @@
 #include <cmath>
 
 // Neutrino:
-#include <neutrino/test/test.h>
+#include <neutrino/test/auto_test.h>
 
 // Xefis:
-#include <xefis/support/earth/air.h>
+#include <xefis/support/earth/air/standard_atmosphere.h>
 
 
 namespace xf::test {
@@ -43,22 +43,22 @@ template<class Function>
 	}
 
 
-RuntimeTest t_standard_density ("xf::standard_density() doesn't return NaNs", []{
+AutoTest t_standard_density ("xf::standard_density() doesn't return NaNs", []{
 	test_nans_for_altitude (standard_density);
 });
 
 
-RuntimeTest t_standard_pressure ("xf::standard_pressure() doesn't return NaNs", []{
+AutoTest t_standard_pressure ("xf::standard_pressure() doesn't return NaNs", []{
 	test_nans_for_altitude (standard_pressure);
 });
 
 
-RuntimeTest t_standard_temperature ("xf::standard_temperature() doesn't return NaNs", []{
+AutoTest t_standard_temperature ("xf::standard_temperature() doesn't return NaNs", []{
 	test_nans_for_altitude (standard_temperature);
 });
 
 
-RuntimeTest t_standard_temperature_gradient ("xf::standard_temperature_gradient() doesn't return NaNs", []{
+AutoTest t_standard_temperature_gradient ("xf::standard_temperature_gradient() doesn't return NaNs", []{
 	test_nans_for_altitude (standard_temperature_gradient);
 });
 

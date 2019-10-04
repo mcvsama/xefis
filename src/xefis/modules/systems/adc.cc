@@ -23,7 +23,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/airframe/airframe.h>
-#include <xefis/support/earth/air.h>
+#include <xefis/support/earth/air/standard_atmosphere.h>
 #include <xefis/support/nature/constants.h>
 #include <xefis/utility/convergence.h>
 
