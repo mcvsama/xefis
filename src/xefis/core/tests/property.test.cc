@@ -20,7 +20,7 @@
 
 // Neutrino:
 #include <neutrino/demangle.h>
-#include <neutrino/test/test.h>
+#include <neutrino/test/auto_test.h>
 
 // Xefis:
 #include <xefis/core/cycle.h>
@@ -233,7 +233,7 @@ template<class T>
 	}
 
 
-RuntimeTest t1 ("xf::Property nil and non-nil values", for_all_types ([](auto value1, auto value2) {
+AutoTest t1 ("xf::Property nil and non-nil values", for_all_types ([](auto value1, auto value2) {
 	TestEnvironment<decltype (value1)> env;
 
 	// The property should initially be nil:
@@ -256,7 +256,7 @@ RuntimeTest t1 ("xf::Property nil and non-nil values", for_all_types ([](auto va
 }));
 
 
-RuntimeTest t2 ("xf::Property fallback values", for_all_types ([](auto value1, auto value2) {
+AutoTest t2 ("xf::Property fallback values", for_all_types ([](auto value1, auto value2) {
 	using T = decltype (value1);
 
 	{
@@ -331,7 +331,7 @@ RuntimeTest t2 ("xf::Property fallback values", for_all_types ([](auto value1, a
 }));
 
 
-RuntimeTest t3 ("xf::Property serial numbers", for_all_types ([](auto value1, auto value2) {
+AutoTest t3 ("xf::Property serial numbers", for_all_types ([](auto value1, auto value2) {
 	using T = decltype (value1);
 
 	// Serial number:
@@ -374,7 +374,7 @@ RuntimeTest t3 ("xf::Property serial numbers", for_all_types ([](auto value1, au
 }));
 
 
-RuntimeTest t4 ("xf::Property transferring data", for_all_types ([](auto value1, auto value2) {
+AutoTest t4 ("xf::Property transferring data", for_all_types ([](auto value1, auto value2) {
 	using T = decltype (value1);
 
 	TestEnvironment<T> env;
@@ -401,7 +401,7 @@ RuntimeTest t4 ("xf::Property transferring data", for_all_types ([](auto value1,
 }));
 
 
-RuntimeTest t5 ("xf::Property serialization", for_all_types ([](auto value1, auto value2) {
+AutoTest t5 ("xf::Property serialization", for_all_types ([](auto value1, auto value2) {
 	using T = decltype (value1);
 
 	// Serialization:
@@ -465,7 +465,7 @@ RuntimeTest t5 ("xf::Property serialization", for_all_types ([](auto value1, aut
 }));
 
 
-RuntimeTest t6 ("xf::Property various behavior", for_all_types ([](auto value1, auto) {
+AutoTest t6 ("xf::Property various behavior", for_all_types ([](auto value1, auto) {
 	using T = decltype (value1);
 
 	ModuleIO io;
@@ -490,7 +490,7 @@ template<class T>
 	{ };
 
 
-RuntimeTest t7 ("xf::Property operator=", for_all_types ([](auto value1, auto value2) {
+AutoTest t7 ("xf::Property operator=", for_all_types ([](auto value1, auto value2) {
 	using T = decltype (value1);
 
 	ModuleIO io;

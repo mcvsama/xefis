@@ -19,7 +19,7 @@
 #include <boost/range/adaptor/indexed.hpp>
 
 // Neutrino:
-#include <neutrino/test/test.h>
+#include <neutrino/test/auto_test.h>
 
 // Xefis:
 #include <xefis/core/module_io.h>
@@ -44,7 +44,7 @@ template<class T>
 	}
 
 
-RuntimeTest t1 ("QuadratureDecoder + QuadratureCounter", []{
+AutoTest t1 ("QuadratureDecoder + QuadratureCounter", []{
 	// QuadratureDecoder will be tested by testing QuadratureCounter, so no need for separate tests.
 
 	// Tuple is <input_a, input_b, delta, callback_expected>:

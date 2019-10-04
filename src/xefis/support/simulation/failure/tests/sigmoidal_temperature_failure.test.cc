@@ -15,7 +15,7 @@
 #include <cmath>
 
 // Neutrino:
-#include <neutrino/test/test.h>
+#include <neutrino/test/auto_test.h>
 
 // Xefis:
 #include <xefis/config/all.h>

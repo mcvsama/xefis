@@ -17,7 +17,7 @@
 
 // Neutrino:
 #include <neutrino/demangle.h>
-#include <neutrino/test/test.h>
+#include <neutrino/test/auto_test.h>
 
 // Xefis:
 #include <xefis/utility/blob.h>
@@ -67,7 +67,7 @@ template<class Value>
 	}
 
 
-RuntimeTest t1 ("blob: value_to_blob", []{
+AutoTest t1 ("blob: value_to_blob", []{
 	enum class TestEnum {
 		Value1, Value2, Value3,
 	};
@@ -93,7 +93,7 @@ RuntimeTest t1 ("blob: value_to_blob", []{
 });
 
 
-RuntimeTest t2 ("blob: little-endianess of serialized int", []{
+AutoTest t2 ("blob: little-endianess of serialized int", []{
 	Blob result;
 	value_to_blob<uint32_t> (0x44332211, result);
 
@@ -105,7 +105,7 @@ RuntimeTest t2 ("blob: little-endianess of serialized int", []{
 });
 
 
-RuntimeTest t3 ("blob: test sizes of serialized data", []{
+AutoTest t3 ("blob: test sizes of serialized data", []{
 	enum class TestEnum8: uint8_t {
 		Value,
 	};

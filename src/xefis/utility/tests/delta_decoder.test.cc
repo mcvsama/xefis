@@ -15,7 +15,7 @@
 #include <cstddef>
 
 // Neutrino:
-#include <neutrino/test/test.h>
+#include <neutrino/test/auto_test.h>
 
 // Xefis:
 #include <xefis/core/module_io.h>
@@ -26,7 +26,7 @@
 namespace xf::test {
 namespace {
 
-RuntimeTest t1 ("DeltaDecoder", []{
+AutoTest t1 ("DeltaDecoder", []{
 	using Integer = int16_t;
 	using Callback = std::function<void (std::optional<Integer>)>;
 

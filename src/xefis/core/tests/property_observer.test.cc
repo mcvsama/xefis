@@ -15,7 +15,7 @@
 #include <cstddef>
 
 // Neutrino:
-#include <neutrino/test/test.h>
+#include <neutrino/test/auto_test.h>
 
 // Xefis:
 #include <xefis/core/cycle.h>
@@ -80,7 +80,7 @@ template<class T>
 	};
 
 
-RuntimeTest t1 ("xf::PropertyObserver noticing changes", []{
+AutoTest t1 ("xf::PropertyObserver noticing changes", []{
 	TestEnvironment<TestedType> env;
 
 	env.out = kValue1;
@@ -97,7 +97,7 @@ RuntimeTest t1 ("xf::PropertyObserver noticing changes", []{
 });
 
 
-RuntimeTest t2 ("xf::PropertyObserver set_minimum_dt()", []{
+AutoTest t2 ("xf::PropertyObserver set_minimum_dt()", []{
 	TestEnvironment<TestedType> env;
 
 	env.observer.set_minimum_dt (5_s);
@@ -112,7 +112,7 @@ RuntimeTest t2 ("xf::PropertyObserver set_minimum_dt()", []{
 });
 
 
-RuntimeTest t3 ("xf::PropertyObserver serial()", []{
+AutoTest t3 ("xf::PropertyObserver serial()", []{
 	TestEnvironment<TestedType> env;
 
 	auto serial = env.observer.serial();
@@ -130,7 +130,7 @@ RuntimeTest t3 ("xf::PropertyObserver serial()", []{
 });
 
 
-RuntimeTest t4 ("xf::PropertyObserver update_time()", []{
+AutoTest t4 ("xf::PropertyObserver update_time()", []{
 	TestEnvironment<TestedType> env;
 
 	auto ut = (env.cycle += 1_s).update_time();
@@ -151,7 +151,7 @@ RuntimeTest t4 ("xf::PropertyObserver update_time()", []{
 });
 
 
-RuntimeTest t5 ("xf::PropertyObserver touch()", []{
+AutoTest t5 ("xf::PropertyObserver touch()", []{
 	TestEnvironment<TestedType> env;
 
 	env.out = kValue1;
@@ -170,7 +170,7 @@ RuntimeTest t5 ("xf::PropertyObserver touch()", []{
 });
 
 
-RuntimeTest t6 ("xf::PropertyObserver depending smoothers", []{
+AutoTest t6 ("xf::PropertyObserver depending smoothers", []{
 	TestEnvironment<TestedType> env;
 	xf::Smoother<TestedType> smoother { 5_s };
 
@@ -191,7 +191,7 @@ RuntimeTest t6 ("xf::PropertyObserver depending smoothers", []{
 });
 
 
-RuntimeTest t7 ("xf::PropertyObserver observing other observers", []{
+AutoTest t7 ("xf::PropertyObserver observing other observers", []{
 	// TODO
 });
 

@@ -15,7 +15,7 @@
 #include <cstddef>
 
 // Neutrino:
-#include <neutrino/test/test.h>
+#include <neutrino/test/auto_test.h>
 
 // Xefis:
 #include <xefis/modules/comm/link.h>
@@ -123,7 +123,7 @@ void transmit (LinkProtocol& tx_protocol, LinkProtocol& rx_protocol)
 }
 
 
-RuntimeTest t1 ("modules/io/link: protocol: valid data transmission", []{
+AutoTest t1 ("modules/io/link: protocol: valid data transmission", []{
 	GCS_Tx_LinkIO tx_io;
 	Aircraft_Rx_LinkIO rx_io;
 	GCS_Tx_LinkProtocol tx_protocol (&tx_io);
@@ -175,7 +175,7 @@ RuntimeTest t1 ("modules/io/link: protocol: valid data transmission", []{
 });
 
 
-RuntimeTest t2 ("modules/io/link: protocol: nils and out-of range values transmission", []{
+AutoTest t2 ("modules/io/link: protocol: nils and out-of range values transmission", []{
 	GCS_Tx_LinkIO tx_io;
 	Aircraft_Rx_LinkIO rx_io;
 	GCS_Tx_LinkProtocol tx_protocol (&tx_io);
@@ -215,7 +215,7 @@ RuntimeTest t2 ("modules/io/link: protocol: nils and out-of range values transmi
 });
 
 
-RuntimeTest t3 ("modules/io/link: protocol: offsets increase precision", []{
+AutoTest t3 ("modules/io/link: protocol: offsets increase precision", []{
 	GCS_Tx_LinkIO tx_io;
 	Aircraft_Rx_LinkIO rx_io;
 	GCS_Tx_LinkProtocol tx_protocol (&tx_io);
@@ -230,7 +230,7 @@ RuntimeTest t3 ("modules/io/link: protocol: offsets increase precision", []{
 });
 
 
-RuntimeTest t4 ("modules/io/link: protocol: invalid data transmission (wrong signature)", []{
+AutoTest t4 ("modules/io/link: protocol: invalid data transmission (wrong signature)", []{
 	// This tests signature verification and checks if values are retained or not, according to the protocol.
 
 	GCS_Tx_LinkIO tx_io;
@@ -313,7 +313,7 @@ RuntimeTest t4 ("modules/io/link: protocol: invalid data transmission (wrong sig
 });
 
 
-RuntimeTest t5 ("modules/io/link: protocol: send-every/send-offset", []{
+AutoTest t5 ("modules/io/link: protocol: send-every/send-offset", []{
 	// The third envelope should be sent every two packets, starting from packet with index 1.
 
 	GCS_Tx_LinkIO tx_io;
