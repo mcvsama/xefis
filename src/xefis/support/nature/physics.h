@@ -288,12 +288,12 @@ template<class PointMassIterator>
  * Calculate equivalent force and torque about the center of mass.
  */
 template<class Frame>
-	inline ForceTorque<Frame>
+	inline ForceMoments<Frame>
 	resultant_force (Wrench<Frame> const& wrench)
 	{
-		ForceTorque<Frame> result (wrench);
+		ForceMoments<Frame> result (wrench);
 		result.set_torque (result.torque() + cross_product (wrench.position(), wrench.force()));
-		// TODO orientation of position is not necessarily same as orientation of force??????????????????//////
+		// TODO orientation of position is not necessarily same as orientation of force?
 		return result;
 	}
 
@@ -303,10 +303,10 @@ template<class Frame>
  * from a set of forces and torques at various points in space.
  */
 template<class Frame, class WrenchIterator>
-	inline ForceTorque<Frame>
+	inline ForceMoments<Frame>
 	resultant_force (WrenchIterator begin, WrenchIterator end)
 	{
-		ForceTorque<Frame> total;
+		ForceMoments<Frame> total;
 
 		for (auto j = begin; j != end; ++j)
 		{
