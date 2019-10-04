@@ -253,14 +253,14 @@ JoystickInput::button (HandlerID id)
 
 
 inline xf::PropertyOut<double>&
-JoystickInput::axis (HandlerID id)
+JoystickInput::axis (HandlerID const id)
 {
 	return *_axis_properties[id];
 }
 
 
 inline xf::PropertyOut<si::Angle>&
-JoystickInput::angle_axis (HandlerID id, xf::Range<si::Angle> range)
+JoystickInput::angle_axis (HandlerID const id, xf::Range<si::Angle> const range)
 {
 	_angle_axis_ranges[id] = range;
 	return *_angle_axis_properties[id];
