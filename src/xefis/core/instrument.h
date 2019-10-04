@@ -124,17 +124,25 @@ template<class IO = ModuleIO>
 		 * Ctor
 		 * Version for modules that do have their own IO class.
 		 */
-		template<class = std::enable_if_t<!std::is_same_v<IO, ModuleIO>>>
+		template<class U = IO>
+			requires (!std::is_same_v<IO, ModuleIO>)
 			explicit
-			Instrument (std::unique_ptr<IO> io, std::string_view const& instance = {});
+			Instrument (std::unique_ptr<IO> module_io, std::string_view const& instance = {}):
+				BasicInstrument (std::move (module_io), instance),
+				io (static_cast<IO&> (*io_base()))
+			{ }
 
 		/**
 		 * Ctor
 		 * Version for modules that do not have any IO class.
 		 */
-		template<class = std::enable_if_t<std::is_same_v<IO, ModuleIO>>>
+		template<class U = IO>
+			requires (std::is_same_v<IO, ModuleIO>)
 			explicit
-			Instrument (std::string_view const& instance = {});
+			Instrument (std::string_view const& instance = {}):
+				BasicInstrument (std::make_unique<IO>(), instance),
+				io (static_cast<IO&> (*io_base()))
+			{ }
 
 	  protected:
 		IO& io;
@@ -187,24 +195,6 @@ BasicInstrument::mark_dirty() noexcept
 {
 	_dirty.store (true);
 }
-
-
-template<class IO>
-	template<class>
-		inline
-		Instrument<IO>::Instrument (std::unique_ptr<IO> module_io, std::string_view const& instance):
-			BasicInstrument (std::move (module_io), instance),
-			io (static_cast<IO&> (*io_base()))
-		{ }
-
-
-template<class IO>
-	template<class>
-		inline
-		Instrument<IO>::Instrument (std::string_view const& instance):
-			BasicInstrument (std::make_unique<IO>(), instance),
-			io (static_cast<IO&> (*io_base()))
-		{ }
 
 } // namespace xf
 

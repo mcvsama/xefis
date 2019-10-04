@@ -272,17 +272,25 @@ template<class IO = NoModuleIO>
 		 * Ctor
 		 * Version for modules that do have their own IO class.
 		 */
-		template<class = std::enable_if_t<!std::is_same_v<IO, NoModuleIO>>>
+		template<class U = IO>
+			requires (!std::is_same_v<U, NoModuleIO>)
 			explicit
-			Module (std::unique_ptr<IO> io, std::string_view const& instance = {});
+			Module (std::unique_ptr<IO> module_io, std::string_view const& instance = {}):
+				BasicModule (std::move (module_io), instance),
+				io (static_cast<IO&> (*io_base()))
+			{ }
 
 		/**
 		 * Ctor
 		 * Version for modules that do not have any IO class.
 		 */
-		template<class = std::enable_if_t<std::is_same_v<IO, NoModuleIO>>>
+		template<class U = IO>
+			requires (std::is_same_v<U, NoModuleIO>)
 			explicit
-			Module (std::string_view const& instance = {});
+			Module (std::string_view const& instance = {}):
+				BasicModule (std::make_unique<IO>(), instance),
+				io (static_cast<IO&> (*io_base()))
+			{ }
 
 	  protected:
 		IO& io;
@@ -376,24 +384,6 @@ BasicModule::set_nil_on_exception (bool enable) noexcept
 {
 	_set_nil_on_exception = enable;
 }
-
-
-template<class IO>
-	template<class>
-		inline
-		Module<IO>::Module (std::unique_ptr<IO> module_io, std::string_view const& instance):
-			BasicModule (std::move (module_io), instance),
-			io (static_cast<IO&> (*io_base()))
-		{ }
-
-
-template<class IO>
-	template<class>
-		inline
-		Module<IO>::Module (std::string_view const& instance):
-			BasicModule (std::make_unique<IO>(), instance),
-			io (static_cast<IO&> (*io_base()))
-		{ }
 
 
 /*

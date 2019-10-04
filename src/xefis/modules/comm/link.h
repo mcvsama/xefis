@@ -192,7 +192,8 @@ class LinkProtocol
 			 *			that could be used as nil.
 			 *			Note this fallback_value is only used on transmitting side only, if property is nil.
 			 */
-			template<class = std::enable_if_t<std::is_integral_v<Value>>>
+			template<class U = Value>
+				requires (std::is_integral_v<U>)
 				explicit
 				Property (xf::Property<Value>&, Retained retained, Value fallback_value);
 
@@ -207,7 +208,8 @@ class LinkProtocol
 			 * \param	offset_value
 			 *			If used, set to value where most precision is needed. Useful for 2-byte floats.
 			 */
-			template<class = std::enable_if_t<std::is_floating_point_v<Value> || si::is_quantity_v<Value>>>
+			template<class U = Value>
+				requires (std::is_floating_point_v<U> || si::is_quantity_v<U>)
 				explicit
 				Property (xf::Property<Value>&, Retained retained, std::optional<Value> offset = {});
 
@@ -555,7 +557,8 @@ class Link:
 
 
 template<uint8_t B, class V>
-	template<class>
+	template<class U>
+		requires (std::is_integral_v<U>)
 		inline
 		LinkProtocol::Property<B, V>::Property (xf::Property<Value>& property, Retained retained, Value fallback_value):
 			_property (property),
@@ -581,7 +584,8 @@ template<uint8_t B, class V>
 
 
 template<uint8_t B, class V>
-	template<class>
+	template<class U>
+		requires (std::is_floating_point_v<U> || si::is_quantity_v<U>)
 		inline
 		LinkProtocol::Property<B, V>::Property (xf::Property<Value>& property, Retained retained, std::optional<Value> offset):
 			_property (property),
