@@ -30,7 +30,7 @@ namespace xf {
 class PropertyConversionSettings
 {
   public:
-	static constexpr const char kDefaultNilValue[] = u8"∅";
+	static constexpr const char kDefaultNilValue[] = "∅"; // TODO use u8"" and std::u8string
 
   public:
 	// Common settings:
