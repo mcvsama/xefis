@@ -487,7 +487,7 @@ void
 PerformanceComputer::compute_slip_skid()
 {
 	if (io.y_acceleration && io.z_acceleration)
-		io.slip_skid = si::atan2 (*io.y_acceleration, -*io.z_acceleration);
+		io.slip_skid = 1_rad * si::atan2 (*io.y_acceleration, -*io.z_acceleration);
 	else
 		io.slip_skid = xf::nil;
 }
