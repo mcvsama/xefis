@@ -1,1 +1,1 @@
-/home/mcv/git/xefis/src/neutrino/Makefiles/Makefile
+neutrino/Makefiles/Makefile
