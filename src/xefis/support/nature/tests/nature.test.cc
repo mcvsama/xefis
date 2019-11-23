@@ -22,6 +22,7 @@
 // Xefis:
 #include <xefis/support/nature/mass_moments.h>
 #include <xefis/support/nature/velocity_moments.h>
+#include <xefis/support/nature/wrench.h>
 
 
 namespace xf::test {
@@ -144,6 +145,60 @@ AutoTest t2 ("Nature: VelocityMoments calculations", []{
 												  SpaceLength<> { 1_m, 0_m, 0_m }).velocity(),
 											 SpaceVector<si::Velocity> { 0_mps, 0_mps, 0_mps },
 											 1e-12_mps);
+});
+
+
+AutoTest t3 ("Nature: Wrench: resultant_force()", []{
+	Wrench<> w1 ({ 0_N, 1_N, 0_N }, { 0_Nm, 0_Nm, 0_Nm }, { 1_m, 0_m, 0_m });
+	Wrench<> w2 ({ 0_N, 0_N, 0_N }, { 0_Nm, 0_Nm, 1_Nm }, { 2_m, 0_m, 0_m });
+	Wrench<> w3 ({ 0_N, 2_N, 0_N }, { 0_Nm, 0_Nm, 1_Nm }, { 2_m, 0_m, 0_m });
+
+	auto const rw1 = resultant_force (w1);
+	auto const rw2 = resultant_force (w2);
+	auto const rw3 = resultant_force (w3);
+
+	test_asserts::verify_equal_with_epsilon ("(rw1 F)", rw1.force(), SpaceForce<> { 0_N, 1_N, 0_N }, 1e-6_N);
+	test_asserts::verify_equal_with_epsilon ("(rw1 M)", rw1.torque(), SpaceTorque<> { 0_Nm, 0_Nm, 1_Nm }, 1e-6_Nm);
+
+	test_asserts::verify_equal_with_epsilon ("(rw2 F)", rw2.force(), SpaceForce<> { 0_N, 0_N, 0_N }, 1e-6_N);
+	test_asserts::verify_equal_with_epsilon ("(rw2 M)", rw2.torque(), SpaceTorque<> { 0_Nm, 0_Nm, 1_Nm }, 1e-6_Nm);
+
+	test_asserts::verify_equal_with_epsilon ("(rw3 F)", rw3.force(), SpaceForce<> { 0_N, 2_N, 0_N }, 1e-6_N);
+	test_asserts::verify_equal_with_epsilon ("(rw3 M)", rw3.torque(), SpaceTorque<> { 0_Nm, 0_Nm, 5_Nm }, 1e-6_Nm);
+});
+
+
+AutoTest t4 ("Nature: Wrench + offset", []{
+	Wrench<> w1 ({ 0_N, 1_N, 0_N }, { 0_Nm, 0_Nm, 0_Nm }, { 1_m, 0_m, 0_m });
+	Wrench<> w2 ({ 0_N, 0_N, 0_N }, { 0_Nm, 0_Nm, 1_Nm }, { 2_m, 0_m, 0_m });
+	Wrench<> w3 ({ 0_N, 2_N, 0_N }, { 0_Nm, 0_Nm, 1_Nm }, { 2_m, 0_m, 0_m });
+
+	auto const o1 = w1 + SpaceLength<> { 1_m, 0_m, 0_m };
+	auto const o2 = w2 + SpaceLength<> { 1_m, 0_m, 0_m };
+	auto const o3 = w3 + SpaceLength<> { 1_m, 0_m, 0_m };
+
+	auto const rw1 = resultant_force (w1);
+	auto const rw2 = resultant_force (w2);
+	auto const rw3 = resultant_force (w3);
+
+	auto const ro1 = resultant_force (o1);
+	auto const ro2 = resultant_force (o2);
+	auto const ro3 = resultant_force (o3);
+
+	test_asserts::verify_equal_with_epsilon ("(rw1 F)", rw1.force(), SpaceForce<> { 0_N, 1_N, 0_N }, 1e-6_N);
+	test_asserts::verify_equal_with_epsilon ("(rw1 M)", rw1.torque(), SpaceTorque<> { 0_Nm, 0_Nm, 1_Nm }, 1e-6_Nm);
+	test_asserts::verify_equal_with_epsilon ("(ro1 F)", ro1.force(), SpaceForce<> { 0_N, 1_N, 0_N }, 1e-6_N);
+	test_asserts::verify_equal_with_epsilon ("(ro1 M)", ro1.torque(), SpaceTorque<> { 0_Nm, 0_Nm, 2_Nm }, 1e-6_Nm);
+
+	test_asserts::verify_equal_with_epsilon ("(rw2 F)", rw2.force(), SpaceForce<> { 0_N, 0_N, 0_N }, 1e-6_N);
+	test_asserts::verify_equal_with_epsilon ("(rw2 M)", rw2.torque(), SpaceTorque<> { 0_Nm, 0_Nm, 1_Nm }, 1e-6_Nm);
+	test_asserts::verify_equal_with_epsilon ("(ro2 F)", ro2.force(), SpaceForce<> { 0_N, 0_N, 0_N }, 1e-6_N);
+	test_asserts::verify_equal_with_epsilon ("(ro2 M)", ro2.torque(), SpaceTorque<> { 0_Nm, 0_Nm, 1_Nm }, 1e-6_Nm);
+
+	test_asserts::verify_equal_with_epsilon ("(rw3 F)", rw3.force(), SpaceForce<> { 0_N, 2_N, 0_N }, 1e-6_N);
+	test_asserts::verify_equal_with_epsilon ("(rw3 M)", rw3.torque(), SpaceTorque<> { 0_Nm, 0_Nm, 5_Nm }, 1e-6_Nm);
+	test_asserts::verify_equal_with_epsilon ("(ro3 F)", ro3.force(), SpaceForce<> { 0_N, 2_N, 0_N }, 1e-6_N);
+	test_asserts::verify_equal_with_epsilon ("(ro3 M)", ro3.torque(), SpaceTorque<> { 0_Nm, 0_Nm, 7_Nm }, 1e-6_Nm);
 });
 
 } // namespace
