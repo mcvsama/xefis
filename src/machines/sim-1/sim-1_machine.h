@@ -20,6 +20,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/machine.h>
+#include <xefis/support/earth/air/standard_atmosphere.h>
 #include <xefis/support/simulation/constraints/angular_servo_constraint.h>
 #include <xefis/support/simulation/electrical/network.h>
 #include <xefis/support/simulation/electrical/node_voltage_solver.h>
@@ -62,6 +63,7 @@ class Sim1Machine: public xf::Machine
 
   private:
 	xf::Logger							_logger;
+	xf::StandardAtmosphere				_standard_atmosphere;
 	xf::rigid_body::System				_rigid_body_system;
 	xf::rigid_body::ImpulseSolver		_rigid_body_solver			{ _rigid_body_system, 5 };
 	xf::electrical::Network				_electrical_network;

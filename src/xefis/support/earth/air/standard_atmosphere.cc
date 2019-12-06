@@ -127,6 +127,7 @@ standard_temperature_gradient (std::map<si::Length, InternationalStandardAtmosph
 
 } // namespace
 
+
 Air
 StandardAtmosphere::air_at (SpaceVector<si::Length, ECEFSpace> const& position) const
 {

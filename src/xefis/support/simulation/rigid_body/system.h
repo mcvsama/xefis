@@ -113,6 +113,21 @@ class System: private Noncopyable
 			requires (std::is_base_of_v<BasicFramePrecalculation, SpecificFramePrecalculation>);
 
 	/**
+	 * Return atmosphere model to use by bodies or nullptr if it wasn't set.
+	 */
+	[[nodiscard]]
+	AtmosphereModel const*
+	atmosphere_model() const noexcept
+		{ return _atmosphere_model; }
+
+	/**
+	 * Set atmosphere model to use by bodies or set it to nullptr.
+	 */
+	void
+	set_atmosphere_model (AtmosphereModel const* atmosphere_model) noexcept
+		{ _atmosphere_model = atmosphere_model; }
+
+	/**
 	 * Make a group belonging to this system.
 	 */
 	[[nodiscard]]
@@ -185,6 +200,7 @@ class System: private Noncopyable
 	// Bodies acting on all bodies gravitationally (contains pointers to elements in _bodies):
 	BodyPointers			_gravitational_bodies;
 	BodyPointers			_non_gravitational_bodies;
+	AtmosphereModel const*	_atmosphere_model { nullptr };
 };
 
 } // namespace xf::rigid_body

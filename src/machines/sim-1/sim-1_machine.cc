@@ -47,6 +47,7 @@ Sim1Machine::Sim1Machine (xf::Xefis& xefis):
 	Machine (xefis),
 	_logger (xefis.logger())
 {
+	_rigid_body_system.set_atmosphere_model (&_standard_atmosphere);
 	auto aircraft = construct_aircraft();
 
 	auto const kXFrontZUpToStandardAircraftFrameRotation = xf::x_rotation<rb::WorldSpace> (180_deg) * xf::z_rotation<rb::WorldSpace> (-90_deg);

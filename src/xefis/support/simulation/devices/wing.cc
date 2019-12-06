@@ -42,39 +42,41 @@ Wing::Wing (Airfoil const& airfoil, si::Density const material_density):
 
 
 void
-Wing::update_external_forces()
+Wing::update_external_forces (AtmosphereModel const* atmosphere)
 {
-	StandardAtmosphere _standard_atmosphere; // FIXME should be provided from outside.
-	// TODO Create special UnitMatrix<TF, SF> which only changes the frame, and operator* that doesn't really compute anything
-	// Rotations:
-	auto const world_to_ecef = RotationMatrix<ECEFSpace, rigid_body::WorldSpace> (math::unit);
-	auto const body_to_airfoil_spline = RotationMatrix<AirfoilSplineSpace, rigid_body::BodySpace> (math::unit);
-	auto const world_to_body = location().base_to_body_rotation();
-	// ECEF → WorldSpace → BodySpace → AirfoilSplineSpace:
-	RotationMatrix<AirfoilSplineSpace, ECEFSpace> ecef_to_spline = body_to_airfoil_spline * world_to_body * ~world_to_ecef;
+	if (atmosphere)
+	{
+		// TODO Create special UnitMatrix<TF, SF> which only changes the frame, and operator* that doesn't really compute anything
+		// Rotations:
+		auto const world_to_ecef = RotationMatrix<ECEFSpace, rigid_body::WorldSpace> (math::unit);
+		auto const body_to_airfoil_spline = RotationMatrix<AirfoilSplineSpace, rigid_body::BodySpace> (math::unit);
+		auto const world_to_body = location().base_to_body_rotation();
+		// ECEF → WorldSpace → BodySpace → AirfoilSplineSpace:
+		RotationMatrix<AirfoilSplineSpace, ECEFSpace> ecef_to_spline = body_to_airfoil_spline * world_to_body * ~world_to_ecef;
 
-	auto const body_position_in_ecef = world_to_ecef * location().position();
-	auto const body_velocity_in_ecef = world_to_ecef * velocity_moments<rigid_body::WorldSpace>().velocity();
-	// FIXME take velocity_moments().angular_velocity() into account
+		auto const body_position_in_ecef = world_to_ecef * location().position();
+		auto const body_velocity_in_ecef = world_to_ecef * velocity_moments<rigid_body::WorldSpace>().velocity();
+		// FIXME take velocity_moments().angular_velocity() into account
 
-	auto const air = _standard_atmosphere.air_at (body_position_in_ecef);
-	auto const ecef_wind = _standard_atmosphere.wind_at (body_position_in_ecef) - body_velocity_in_ecef;
-	auto const spline_wind = ecef_to_spline * ecef_wind;
-	auto const atmosphere_state = AtmosphereState<AirfoilSplineSpace> { air, spline_wind };
-	AngleOfAttack aoa;
+		auto const air = atmosphere->air_at (body_position_in_ecef);
+		auto const ecef_wind = atmosphere->wind_at (body_position_in_ecef) - body_velocity_in_ecef;
+		auto const spline_wind = ecef_to_spline * ecef_wind;
+		auto const atmosphere_state = AtmosphereState<AirfoilSplineSpace> { air, spline_wind };
+		AngleOfAttack aoa;
 
-	// Center of pressure Wrench:
-	auto const spline_aeroforces_at_origin = _airfoil.aerodynamic_forces (atmosphere_state, aoa);
-	auto const body_aeroforces_at_origin = ~body_to_airfoil_spline * spline_aeroforces_at_origin;
+		// Center of pressure Wrench:
+		auto const spline_aeroforces_at_origin = _airfoil.aerodynamic_forces (atmosphere_state, aoa);
+		auto const body_aeroforces_at_origin = ~body_to_airfoil_spline * spline_aeroforces_at_origin;
 
-	// Compute 'at COM' values:
-	_lift_force = body_aeroforces_at_origin.lift;
-	_drag_force = body_aeroforces_at_origin.drag;
-	_pitching_moment = body_aeroforces_at_origin.pitching_moment;
-	_center_of_pressure = body_aeroforces_at_origin.center_of_pressure + _com_to_planar_origin;
+		// Compute 'at COM' values:
+		_lift_force = body_aeroforces_at_origin.lift;
+		_drag_force = body_aeroforces_at_origin.drag;
+		_pitching_moment = body_aeroforces_at_origin.pitching_moment;
+		_center_of_pressure = body_aeroforces_at_origin.center_of_pressure + _com_to_planar_origin;
 
-	apply_force (ForceMoments<rigid_body::BodySpace> (_lift_force, _pitching_moment), _center_of_pressure);
-	apply_force (ForceMoments<rigid_body::BodySpace> (_drag_force, math::zero), _center_of_pressure);
+		apply_force (ForceMoments<rigid_body::BodySpace> (_lift_force, _pitching_moment), _center_of_pressure);
+		apply_force (ForceMoments<rigid_body::BodySpace> (_drag_force, math::zero), _center_of_pressure);
+	}
 }
 
 } // namespace xf::sim

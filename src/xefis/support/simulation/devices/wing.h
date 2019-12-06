@@ -70,7 +70,7 @@ class Wing: public rigid_body::Body
 
 	// Body API
 	void
-	update_external_forces() override;
+	update_external_forces (AtmosphereModel const*) override;
 
   private:
 	static MassMoments<rigid_body::BodySpace>

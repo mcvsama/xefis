@@ -146,7 +146,7 @@ void
 ImpulseSolver::update_external_forces()
 {
 	for (auto& body: _system.bodies())
-		body->update_external_forces();
+		body->update_external_forces (_system.atmosphere_model());
 
 	for (auto& body: _system.bodies())
 	{

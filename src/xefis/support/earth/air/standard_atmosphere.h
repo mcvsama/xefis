@@ -20,60 +20,40 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/earth/air/air.h>
+#include <xefis/support/earth/air/atmosphere_model.h>
 #include <xefis/support/math/geometry.h>
 
 
 namespace xf {
 
-struct Air
-{
-	si::Density				density;
-	si::Pressure			pressure;
-	si::Temperature			temperature;
-	si::DynamicViscosity	dynamic_viscosity;
-	si::Velocity			speed_of_sound;
-};
-
-
 /**
- * StandardAtmosphere state at some given position.
- */
-template<class Frame>
-	struct AtmosphereState
-	{
-		Air									air;
-		SpaceVector<si::Velocity, Frame>	wind;
-	};
-
-
-/**
- * General atmosphere model.
+ * Standard atmosphere model.
  * TODO use Perlin noise for winds. http://flafla2.github.io/2014/08/09/perlinnoise.html
  * TODO use winds to affect density/pressure at that point.
  * TODO maybe the winds model should be a separate class plugged in into Atmosphere object?
  */
-class StandardAtmosphere
+class StandardAtmosphere: public AtmosphereModel
 {
   public:
 	[[nodiscard]]
 	Air
-	air_at (SpaceVector<si::Length, ECEFSpace> const& position) const;
+	air_at (SpaceVector<si::Length, ECEFSpace> const& position) const override;
 
 	[[nodiscard]]
 	Air
-	air_at_radius (si::Length radius) const;
+	air_at_radius (si::Length radius) const override;
 
 	[[nodiscard]]
 	Air
-	air_at_amsl (si::Length amsl_height) const;
+	air_at_amsl (si::Length amsl_height) const override;
 
 	[[nodiscard]]
 	SpaceVector<si::Velocity, ECEFSpace>
-	wind_at (SpaceVector<si::Length, ECEFSpace> const& position) const;
+	wind_at (SpaceVector<si::Length, ECEFSpace> const& position) const override;
 
 	[[nodiscard]]
 	AtmosphereState<ECEFSpace>
-	state_at (SpaceVector<si::Length, ECEFSpace> const& position) const;
+	state_at (SpaceVector<si::Length, ECEFSpace> const& position) const override;
 };
 
 
