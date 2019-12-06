@@ -55,7 +55,7 @@ Sim1Machine::Sim1Machine (xf::Xefis& xefis):
 	// Transform to standard aircraft coordinates (X-front, Y-right, Z-down):
 	aircraft.rigid_group.rotate_about_world_origin (kXFrontZUpToStandardAircraftFrameRotation);
 
-	auto const location = xf::LonLatRadius (0_deg, 45_deg, xf::kEarthMeanRadius + 11_km);
+	auto const location = xf::LonLatRadius (0_deg, 45_deg, xf::kEarthMeanRadius + 0.1_km);
 	auto const tait_bryan_angles = xf::TaitBryanAngles (-45_deg, 0_deg, 0_deg);
 	aircraft.rigid_group.rotate_about_world_origin (math::reframe<rb::WorldSpace, rb::WorldSpace> (airframe_to_ecef_rotation (tait_bryan_angles, location)));
 	aircraft.rigid_group.translate (math::reframe<rb::WorldSpace, void> (xf::cartesian (location)));
@@ -94,7 +94,7 @@ Sim1Machine::construct_aircraft()
 {
 	auto const kDihedral = 0_deg;
 	auto const kWingletAngle = 30_deg;
-	auto const kFoamDensity = 0.12_kg / (3600000 * 1_mm * 1_mm * 1_mm);
+	auto const kFoamDensity = 0.12_kg / (3'600'000 * 1_mm * 1_mm * 1_mm);
 
 	auto const z_minus_90_rotation = xf::z_rotation<rb::WorldSpace> (-90_deg);
 	auto const wing_to_normal_rotation = z_minus_90_rotation * xf::x_rotation<rb::WorldSpace> (+90_deg);
