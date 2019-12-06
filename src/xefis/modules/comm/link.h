@@ -29,6 +29,7 @@
 #include <QtCore/QTimer>
 
 // Neutrino:
+#include <neutrino/endian.h>
 #include <neutrino/logger.h>
 #include <neutrino/numeric.h>
 #include <neutrino/stdexcept.h>
@@ -240,6 +241,7 @@ class LinkProtocol
 			 * Unserialize data from Blob and put it to src.
 			 */
 			template<class CastType, class SourceType>
+				[[nodiscard]]
 				static Blob::const_iterator
 				unserialize (Blob::const_iterator begin, Blob::const_iterator end, SourceType&);
 
@@ -603,7 +605,7 @@ template<uint8_t B, class V>
 							: (*_property).base_value()
 						: _fallback_value;
 
-					serialize<ne::float_for_width_t<kBytes>> (blob, value);
+					serialize<neutrino::float_for_width_t<kBytes>> (blob, value);
 				}
 				else if constexpr (std::is_floating_point<Value>())
 				{
@@ -613,14 +615,14 @@ template<uint8_t B, class V>
 							: *_property
 						: _fallback_value;
 
-					serialize<ne::float_for_width_t<kBytes>> (blob, value);
+					serialize<neutrino::float_for_width_t<kBytes>> (blob, value);
 				}
 			};
 
 			_eat = [this](Blob::const_iterator begin, Blob::const_iterator end) -> Blob::const_iterator {
-				ne::float_for_width_t<kBytes> float_value;
+				neutrino::float_for_width_t<kBytes> float_value;
 
-				auto result = unserialize<ne::float_for_width_t<kBytes>> (begin, end, float_value);
+				auto result = unserialize<neutrino::float_for_width_t<kBytes>> (begin, end, float_value);
 
 				if (std::isnan (float_value))
 					_value.reset();
@@ -705,7 +707,7 @@ template<uint8_t B, class V>
 		{
 			std::size_t size = sizeof (CastType);
 			CastType casted (src);
-			boost::endian::native_to_little (casted);
+			neutrino::native_to_little (casted);
 			uint8_t* ptr = reinterpret_cast<uint8_t*> (&casted);
 			blob.resize (blob.size() + size);
 			std::copy (ptr, ptr + size, &blob[blob.size() - size]);
@@ -723,7 +725,7 @@ template<uint8_t B, class V>
 			std::size_t size = sizeof (CastType);
 			CastType casted;
 			std::copy (begin, begin + size, reinterpret_cast<uint8_t*> (&casted));
-			boost::endian::little_to_native (casted);
+			neutrino::little_to_native (casted);
 			src = casted;
 			return begin + size;
 		}
