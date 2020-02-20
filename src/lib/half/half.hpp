@@ -1218,8 +1218,8 @@ namespace half_float
 				if(e < 0x3C00)
 					return half((arg.data_&0x8000)|(0x3C00&-static_cast<uint16>((arg.data_>>15)&((arg.data_&0x7FFF)!=0))), true);
 				e = 25 - (e>>10);
-				unsigned int mask = (1<<e) - 1;
-				return half((arg.data_&~mask)+(((arg.data_>>15)&((arg.data_&mask)!=0))<<e), true);
+				unsigned int mask = (1u<<e) - 1u;
+				return half((arg.data_ & ~mask) + static_cast<unsigned int> (((arg.data_ >> 15) & ((arg.data_ & mask) != 0)) << e), true);
 			}
 
 			/// Ceiling implementation.
@@ -1233,8 +1233,8 @@ namespace half_float
 				if(e < 0x3C00)
 					return half((arg.data_&0x8000)|(0x3C00&-static_cast<uint16>(~(arg.data_>>15)&((arg.data_&0x7FFF)!=0))), true);
 				e = 25 - (e>>10);
-				unsigned int mask = (1<<e) - 1;
-				return half((arg.data_&~mask)+((~(arg.data_>>15)&((arg.data_&mask)!=0))<<e), true);
+				unsigned int mask = (1u << e) - 1u;
+				return half((arg.data_ & ~mask) + static_cast<unsigned int> ((~(arg.data_ >> 15) & ((arg.data_ & mask) != 0)) << e), true);
 			}
 
 			/// Truncation implementation.
@@ -1306,7 +1306,7 @@ namespace half_float
 				if(e < 0x3C00)
 					return iptr->data_ = arg.data_ & 0x8000, arg;
 				e >>= 10;
-				unsigned int mask = (1<<(25-e)) - 1, m = arg.data_ & mask;
+				unsigned int mask = (1u << (25u - e)) - 1u, m = arg.data_ & mask;
 				iptr->data_ = arg.data_ & ~mask;
 				if(!m)
 					return half(arg.data_&0x8000, true);
