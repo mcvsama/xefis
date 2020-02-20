@@ -705,7 +705,7 @@ template<uint8_t B, class V>
 		inline void
 		LinkProtocol::Property<B, V>::serialize (Blob& blob, SourceType src)
 		{
-			std::size_t size = sizeof (CastType);
+			auto const size = sizeof (CastType);
 			CastType casted (src);
 			neutrino::native_to_little (casted);
 			uint8_t* ptr = reinterpret_cast<uint8_t*> (&casted);
@@ -719,15 +719,16 @@ template<uint8_t B, class V>
 		inline Blob::const_iterator
 		LinkProtocol::Property<B, V>::unserialize (Blob::const_iterator begin, Blob::const_iterator end, SourceType& src)
 		{
-			if (static_cast<std::size_t> (std::distance (begin, end)) < sizeof (CastType))
+			if (neutrino::to_unsigned (std::distance (begin, end)) < sizeof (CastType))
 				throw ParseError();
 
 			std::size_t size = sizeof (CastType);
+			auto const work_end = begin + neutrino::to_signed (size);
 			CastType casted;
-			std::copy (begin, begin + size, reinterpret_cast<uint8_t*> (&casted));
+			std::copy (begin, work_end, reinterpret_cast<uint8_t*> (&casted));
 			neutrino::little_to_native (casted);
 			src = casted;
-			return begin + size;
+			return work_end;
 		}
 
 

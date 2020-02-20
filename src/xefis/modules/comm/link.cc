@@ -138,7 +138,7 @@ LinkProtocol::Bitfield::produce (Blob& blob)
 
 		for (std::vector<bool>::size_type k = 0; k < 8; ++k)
 			if (bits[k + b])
-				byte |= 1 << k;
+				byte |= 1u << k;
 
 		blob.push_back (byte);
 	}
@@ -154,7 +154,7 @@ LinkProtocol::Bitfield::eat (Blob::const_iterator begin, Blob::const_iterator en
 	std::vector<bool> bits;
 	bits.reserve (8 * size());
 
-	for (Blob::const_iterator cur = begin; cur < begin + size(); ++cur)
+	for (Blob::const_iterator cur = begin; cur < begin + neutrino::to_signed (size()); ++cur)
 		for (uint8_t b = 0; b < 8; ++b)
 			bits.push_back ((*cur >> b) & 1);
 
@@ -167,14 +167,14 @@ LinkProtocol::Bitfield::eat (Blob::const_iterator begin, Blob::const_iterator en
 
 			for (uint8_t b = 0; b < bs.bits; ++b)
 				if (*(bit + b))
-					v |= 1 << b;
+					v |= 1u << b;
 
 			bs.value = v;
 			std::advance (bit, bs.bits);
 		}, bsvariant);
 	}
 
-	return begin + size();
+	return begin + neutrino::to_signed (size());
 }
 
 
@@ -239,8 +239,8 @@ LinkProtocol::Signature::produce (Blob& blob)
 	xf::HMAC hmac (xf::HMAC::Key (_key), _temp, xf::Hash::SHA1);
 
 	// Add some of the bytes of HMAC signature:
-	size_t hmac_bytes = std::min<size_t> (_signature_bytes, std::distance (hmac.begin(), hmac.end()));
-	_temp.insert (_temp.end(), hmac.begin(), hmac.begin() + hmac_bytes);
+	size_t hmac_bytes = std::min<size_t> (_signature_bytes, neutrino::to_unsigned (std::distance (hmac.begin(), hmac.end())));
+	_temp.insert (_temp.end(), hmac.begin(), hmac.begin() + neutrino::to_signed (hmac_bytes));
 
 	// Output:
 	blob.insert (blob.end(), _temp.begin(), _temp.end());
@@ -256,8 +256,8 @@ LinkProtocol::Signature::eat (Blob::const_iterator begin, Blob::const_iterator e
 	if (std::distance (begin, end) < static_cast<Blob::difference_type> (whole_size))
 		throw InsufficientDataError();
 
-	auto const sign_begin = begin + data_size + _nonce_bytes;
-	auto const sign_end = begin + whole_size;
+	auto const sign_begin = begin + neutrino::to_signed (data_size + _nonce_bytes);
+	auto const sign_end = begin + neutrino::to_signed (whole_size);
 
 	// Make a temporary copy of the data:
 	_temp.resize (data_size + _nonce_bytes);
@@ -269,10 +269,12 @@ LinkProtocol::Signature::eat (Blob::const_iterator begin, Blob::const_iterator e
 	if (!std::equal (sign_begin, sign_end, hmac.begin()))
 		throw ParseError();
 
-	if (Sequence::eat (begin, begin + data_size) != begin + data_size)
+	auto const eating_end = begin + neutrino::to_signed (data_size);
+
+	if (Sequence::eat (begin, eating_end) != eating_end)
 		throw ParseError();
 
-	return begin + whole_size;
+	return begin + neutrino::to_signed (whole_size);
 }
 
 
@@ -377,7 +379,7 @@ LinkProtocol::eat (Blob::const_iterator begin, Blob::const_iterator end, LinkIO*
 		xf::Exception::catch_and_log (logger, [&] {
 			try {
 				// Find the right magic and envelope:
-				std::copy (begin, begin + _magic_size, _aux_magic_buffer.begin());
+				std::copy (begin, begin + neutrino::to_signed (_magic_size), _aux_magic_buffer.begin());
 				auto envelope_and_magic = _envelope_magics.find (_aux_magic_buffer);
 
 				// If not found, retry starting with next byte:
@@ -387,14 +389,14 @@ LinkProtocol::eat (Blob::const_iterator begin, Blob::const_iterator end, LinkIO*
 				auto envelope = envelope_and_magic->second;
 				// Now see if we have enough data in input buffer for this envelope type.
 				// If not, return and retry when enough data is read.
-				if (static_cast<Blob::size_type> (std::distance (begin, end)) - _magic_size < envelope->size())
+				if (neutrino::to_unsigned (std::distance (begin, end)) - _magic_size < envelope->size())
 				{
 					return_from_outer_function = true;
 					outer_result = begin;
 					return;
 				}
 
-				auto e = envelope->eat (begin + _magic_size, end);
+				auto e = envelope->eat (begin + neutrino::to_signed (_magic_size), end);
 
 				if (e != begin)
 				{

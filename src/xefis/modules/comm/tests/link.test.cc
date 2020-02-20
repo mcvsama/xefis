@@ -167,7 +167,7 @@ AutoTest t1 ("modules/io/link: protocol: valid data transmission", []{
 		test();
 	}
 
-	for (unsigned int i: { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 })
+	for (unsigned int i: { 0u, 1u, 2u, 3u, 4u, 5u, 6u, 7u, 8u, 9u, 10u, 11u, 12u, 13u, 14u, 15u })
 	{
 		tx_io.uint_prop << xf::ConstantSource (i);
 		test();
