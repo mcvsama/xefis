@@ -56,13 +56,13 @@ Sentence::read_next()
 	if (comma == std::string::npos)
 	{
 		_val.resize (_sentence.size() - start_pos);
-		std::copy (_sentence.begin() + start_pos, _sentence.end(), _val.begin());
+		std::copy (_sentence.begin() + neutrino::to_signed (start_pos), _sentence.end(), _val.begin());
 		_pos = std::string::npos;
 	}
 	else
 	{
 		_val.resize (comma - start_pos);
-		std::copy (_sentence.begin() + start_pos, _sentence.begin() + comma, _val.begin());
+		std::copy (_sentence.begin() + neutrino::to_signed (start_pos), _sentence.begin() + neutrino::to_signed (comma), _val.begin());
 		_pos = comma + 1;
 	}
 

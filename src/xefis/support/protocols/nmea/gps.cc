@@ -37,9 +37,9 @@ using std::to_string;
 
 
 static inline unsigned int
-mknum (uint8_t c10, uint8_t c01)
+mknum (char c10, char c01)
 {
-	return digit_from_ascii (c10) * 10
+	return digit_from_ascii (c10) * 10u
 		 + digit_from_ascii (c01);
 }
 
@@ -247,7 +247,7 @@ GPGSA::GPGSA (std::string const& sentence):
 		this->fix_mode = GPSFixMode::Fix3D;
 
 	// PRNs of satellites used for the fix:
-	for (int i = 0; i < 12; ++i)
+	for (uint32_t i = 0u; i < 12u; ++i)
 	{
 		if (!read_next())
 			return;
@@ -383,7 +383,7 @@ to_string (GPSFixQuality code)
 	if (code_int < 0 || 8 < code_int)
 		code_int = static_cast<int> (GPSFixQuality::Invalid);
 
-	return fix_quality_strings[code_int];
+	return fix_quality_strings[static_cast<size_t> (code_int)];
 }
 
 
