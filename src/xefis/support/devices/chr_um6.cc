@@ -66,8 +66,8 @@ CHRUM6::Command::firmware_version() const
 {
 	std::string version (4, ' ');
 	uint32_t v = value();
-	for (int i = 3; i >= 0; --i)
-		version[3 - i] = static_cast<char> ((v >> (8 * i)) & 0xff);
+	for (uint32_t i = 3u; i <= 3u; --i)
+		version[3u - i] = static_cast<char> ((v >> (8u * i)) & 0xff);
 	return version;
 }
 
@@ -172,13 +172,13 @@ CHRUM6::sample_rate_setting (si::Frequency const frequency) noexcept
 uint32_t
 CHRUM6::bits_for_baud_rate (unsigned int baud_rate)
 {
-	static std::map<int, uint32_t> const baud_rates_map {
-		{ 9600, 0 },
-		{ 14400, 1 },
-		{ 19200, 2 },
-		{ 38400, 3 },
-		{ 57600, 4 },
-		{ 115200, 5 },
+	static std::map<unsigned int, uint32_t> const baud_rates_map {
+		{ 9600u, 0 },
+		{ 14400u, 1 },
+		{ 19200u, 2 },
+		{ 38400u, 3 },
+		{ 57600u, 4 },
+		{ 115200u, 5 },
 	};
 
 	auto c = baud_rates_map.find (baud_rate);
