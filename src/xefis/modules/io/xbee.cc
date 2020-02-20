@@ -180,7 +180,7 @@ XBee::read()
 		for (;;)
 		{
 			std::string::size_type prev_size = buffer.size();
-			std::string::size_type try_read = 1024;
+			std::string::size_type try_read = 1024u;
 			buffer.resize (prev_size + try_read);
 			int n = ::read (_device, &buffer[prev_size], try_read);
 
@@ -201,7 +201,8 @@ XBee::read()
 			}
 			else
 			{
-				buffer.resize (prev_size + n);
+				buffer.resize (prev_size + neutrino::to_unsigned (n));
+
 				if (n == 0)
 				{
 					_read_failure_count++;
@@ -623,9 +624,11 @@ XBee::make_frame (std::string_view const& data) const
 	result += data;
 	// Checksum:
 	uint8_t checksum = 0xff;
+
 	for (char c: data)
 		checksum -= static_cast<uint8_t> (c);
-	result.push_back (checksum);
+
+	result.push_back (static_cast<char> (checksum));
 
 	return result;
 }
@@ -681,7 +684,7 @@ XBee::make_at_command (std::string_view const& at_command, uint8_t frame_id)
 	// API ID:
 	result.push_back (static_cast<uint8_t> (SendAPI::ATCommand));
 	// Frame ID for ACK (select ATFrameID just to get any response):
-	result.push_back (frame_id);
+	result.push_back (static_cast<char> (frame_id));
 	// Command:
 	result += at_command;
 
@@ -801,9 +804,9 @@ XBee::process_packet (std::string& input, ResponseAPI& api, std::string& data)
 		}
 
 		// Discard non-parseable data:
-		input.erase (input.begin(), input.begin() + p);
+		input.erase (input.begin(), input.begin() + neutrino::to_signed (p));
 
-		io.input_errors = *io.input_errors + p;
+		io.input_errors = *io.input_errors + neutrino::to_signed (p);
 
 		// Delimiter (1B) + packet size (2B) + data (1B) + checksum (1B) gives
 		// at least 5 bytes:
@@ -811,7 +814,7 @@ XBee::process_packet (std::string& input, ResponseAPI& api, std::string& data)
 			return false;
 
 		// Packet size:
-		uint32_t size = (static_cast<uint16_t> (input[1]) << 8) + input[2];
+		uint32_t size = (static_cast<uint32_t> (input[1]) << 8u) + static_cast<uint32_t> (input[2]);
 		if (input.size() < size + 4u) // delimiter, size, checksum = 4B
 			return false;
 
@@ -851,15 +854,15 @@ XBee::process_rx64_frame (std::string_view const& frame)
 
 	// 64-bit address:
 	uint64_t address = 0;
-	for (int b = 0; b < 8; ++b)
-		address |= (static_cast<uint16_t> (frame[b]) << (8 * (7 - b)));
+	for (auto b = 0u; b < 8u; ++b)
+		address |= (static_cast<uint32_t> (frame[b]) << (8u * (7u - b)));
 
 	// -RSSI dBm:
 	int rssi = frame[8];
 	rssi = -rssi;
 
 	// Options:
-	uint8_t options = frame[9];
+	uint8_t options = static_cast<uint8_t> (frame[9]);
 	// We're not going to accept broadcast packets, sorry:
 	if (options & 0x06)
 	{
@@ -897,7 +900,7 @@ XBee::process_rx16_frame (std::string_view const& frame)
 	rssi = -rssi;
 
 	// Options:
-	uint8_t options = frame[3];
+	uint8_t options = static_cast<uint8_t> (frame[3]);
 	// We're not going to accept broadcast packets, sorry:
 	if (options & 0x06)
 	{
@@ -982,7 +985,7 @@ XBee::process_at_response_frame (std::string_view const& frame)
 
 	// AT command response:
 	// 1B frame-ID:
-	uint8_t frame_id = frame[0];
+	uint8_t frame_id = static_cast<uint8_t> (frame[0]);
 
 	// 2B AT command - skip
 	std::string_view command = frame.substr (1, 2);
