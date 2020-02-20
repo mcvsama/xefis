@@ -176,13 +176,13 @@ Status::process (xf::Cycle const& cycle)
 		_last_message_timestamp = xf::TimeHelper::now();
 
 	std::copy (to_show, _hidden_messages.end(), std::back_inserter (_visible_messages));
-	_hidden_messages.resize (std::distance (_hidden_messages.begin(), to_show));
+	_hidden_messages.resize (neutrino::to_unsigned (std::distance (_hidden_messages.begin(), to_show)));
 
 	auto to_hide = std::remove_if (_visible_messages.begin(), _visible_messages.end(),
 								   [](Message* m) { return !m->should_be_shown(); });
 
 	std::copy (to_hide, _visible_messages.end(), std::back_inserter (_hidden_messages));
-	_visible_messages.resize (std::distance (_visible_messages.begin(), to_hide));
+	_visible_messages.resize (neutrino::to_unsigned (std::distance (_visible_messages.begin(), to_hide)));
 
 	// Update CAUTION and WARNING alarms:
 
@@ -229,7 +229,7 @@ Status::async_paint (xf::PaintRequest const& paint_request, PaintingParams const
 		if (cache->viewport.height() <= 0)
 			cache->max_visible_messages = 0;
 		else
-			cache->max_visible_messages = static_cast<unsigned int> (cache->viewport.height() / cache->line_height);
+			cache->max_visible_messages = cache->viewport.height() / cache->line_height;
 
 		// Fix viewport size to be integral number of shown messages:
 		cache->viewport.setHeight (cache->line_height * cache->max_visible_messages);
@@ -239,10 +239,11 @@ Status::async_paint (xf::PaintRequest const& paint_request, PaintingParams const
 	// Messages:
 	painter.setBrush (Qt::NoBrush);
 	painter.setFont (cache->font);
-	int n = std::min<int> (static_cast<int> (pp.visible_messages.size()) - cache->scroll_pos, cache->max_visible_messages);
+	int const n = std::min<int> (static_cast<int> (pp.visible_messages.size()) - cache->scroll_pos, cache->max_visible_messages);
+
 	for (int i = 0; i < n; ++i)
 	{
-		Message const* message = pp.visible_messages[i + cache->scroll_pos];
+		Message const* message = pp.visible_messages[neutrino::to_unsigned (i + cache->scroll_pos)];
 		painter.setPen (QPen (message->color()));
 		painter.fast_draw_text (QPointF (cache->viewport.left(),
 										 cache->viewport.top() + cache->line_height * (i + 0.5)),
@@ -339,7 +340,7 @@ Status::cursor_del()
 	if (!cache->cursor_visible)
 		return;
 
-	_hidden_messages.push_back (_visible_messages[cache->cursor_pos]);
+	_hidden_messages.push_back (_visible_messages[neutrino::to_unsigned (cache->cursor_pos)]);
 	_visible_messages.erase (_visible_messages.begin() + cache->cursor_pos);
 	_cursor_hide_timer->start();
 	cache->solve_scroll_and_cursor (_visible_messages);
