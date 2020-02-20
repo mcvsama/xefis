@@ -79,7 +79,7 @@ class SmootherBase
 	 * Subclass implementation.
 	 */
 	virtual void
-	set_smoothing_time_impl (int milliseconds) noexcept = 0;
+	set_smoothing_time_impl (unsigned int milliseconds) noexcept = 0;
 
   protected:
 	si::Time	_smoothing_time;
@@ -135,7 +135,7 @@ template<class pValue>
 
 	  protected:
 		void
-		set_smoothing_time_impl (int milliseconds) noexcept override;
+		set_smoothing_time_impl (unsigned int milliseconds) noexcept override;
 
 	  private:
 		void
@@ -161,11 +161,13 @@ SmootherBase::set_smoothing_time (si::Time smoothing_time) noexcept
 {
 	_smoothing_time = smoothing_time;
 	int millis = _smoothing_time.in<si::Millisecond>();
+
 	// Due to the nature of the Hann window, minimum number of samples is 3,
 	// therefore the minimum smoothing time is 3 ms.
 	if (millis < 3)
 		millis = 3;
-	set_smoothing_time_impl (millis);
+
+	set_smoothing_time_impl (neutrino::to_unsigned (millis));
 }
 
 
@@ -203,7 +205,7 @@ template<class V>
 
 template<class V>
 	inline void
-	Smoother<V>::set_smoothing_time_impl (int millis) noexcept
+	Smoother<V>::set_smoothing_time_impl (unsigned int millis) noexcept
 	{
 		_history.resize (millis);
 		_window.resize (millis);
