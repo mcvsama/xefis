@@ -42,7 +42,7 @@ class MagneticVariationImpl
 	yymmdd_to_julian_days (int yyyy, int mm, int dd);
 
 	double
-	calc_magvar (double lat, double lon, double h, long dat, double* field);
+	calc_magvar (double lat, double lon, double h, uint64_t dat, double* field);
 
 #ifdef TEST_NHV_HACKS
 	double
@@ -106,7 +106,7 @@ class MagneticVariation
   private:
 	si::LonLat				_position;
 	si::Length				_altitude_amsl;
-	long					_julian_date;
+	uint64_t				_julian_date;
 	si::Angle				_magnetic_declination;
 	si::Angle				_magnetic_inclination;
 	MagneticVariationImpl	_implementation;

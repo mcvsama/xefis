@@ -220,7 +220,7 @@ MagneticVariationImpl::yymmdd_to_julian_days( int yyyy, int mm, int dd )
 {
 	// Removed stupid hack with two-digit year. <mcv>
 
-    unsigned long jd;
+    int64_t jd;
 	int yy;
 
 	yy = clamped (yyyy, 1950, 2049);
@@ -229,7 +229,7 @@ MagneticVariationImpl::yymmdd_to_julian_days( int yyyy, int mm, int dd )
     jd = jd - 3 * ((yy + 4900L + (mm - 14) / 12) / 100) / 4;
 
     /* printf("julian date = %d\n", jd ); */
-    return jd;
+    return static_cast<uint64_t> (jd);
 }
 
 
@@ -239,12 +239,12 @@ MagneticVariationImpl::yymmdd_to_julian_days( int yyyy, int mm, int dd )
  * N and E lat and long are positive, S and W negative
 */
 double
-MagneticVariationImpl::calc_magvar( double lat, double lon, double h, long dat, double* field )
+MagneticVariationImpl::calc_magvar( double lat, double lon, double h, uint64_t dat, double* field )
 {
     /* output field B_r,B_th,B_phi,B_x,B_y,B_z */
     int n,m;
     /* reference date for current model is 1 januari 2005 */
-    long date0_wmm2005 = yymmdd_to_julian_days(5,1,1);
+    auto date0_wmm2005 = yymmdd_to_julian_days(5,1,1);
 
     double yearfrac,sr,r,theta,c,s,psi,fn,fn_0,B_r,B_theta,B_phi,X,Y,Z;
     double sinpsi, cospsi, inv_s;
