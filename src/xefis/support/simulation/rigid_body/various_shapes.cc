@@ -271,12 +271,12 @@ make_airfoil_shape (AirfoilSpline const& spline, si::Length const chord_length, 
 		face2->emplace_back (SpaceLength<BodySpace> (0_m, 0_m, wing_length), SpaceVector<double, BodySpace> (0.0, 0.0, +1.0), material);
 	}
 
-	ptrdiff_t const n_points = spline.points().size();
+	auto const n_points = spline.points().size();
 
-	for (ptrdiff_t i = n_points + 1; i > 0; --i)
+	for (ptrdiff_t i = neutrino::to_signed (n_points) + 1; i > 0; --i)
 	{
 		auto const prev_point = spline.points()[wrap_array_index (i - 1, n_points)];
-		auto const point = spline.points()[i % n_points];
+		auto const point = spline.points()[to_unsigned (i) % n_points];
 		auto const next_point = spline.points()[wrap_array_index (i + 1, n_points)];
 
 		auto const x_len = chord_length * point[0];

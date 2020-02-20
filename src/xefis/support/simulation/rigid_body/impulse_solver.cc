@@ -101,7 +101,7 @@ ImpulseSolver::update_gravitational_forces()
 	// Gravity interactions between gravitational bodies:
 	if (gravitational_bodies.size() > 1)
 		for (auto i1: gravitational_bodies | boost::adaptors::indexed())
-			for (auto i2: gravitational_bodies | boost::adaptors::sliced (i1.index() + 1, _system.bodies().size()) | boost::adaptors::indexed())
+			for (auto i2: gravitational_bodies | boost::adaptors::sliced (neutrino::to_unsigned (i1.index()) + 1u, _system.bodies().size()) | boost::adaptors::indexed())
 				update_gravitational_forces (*i1.value(), *i2.value());
 
 	// Gravity interactions between gravitational bodies and the rest:
