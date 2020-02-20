@@ -15,6 +15,9 @@
 #include <cstddef>
 #include <algorithm>
 
+// Neutrino:
+#include <neutrino/numeric.h>
+
 // Local:
 #include "packet_reader.h"
 
@@ -48,14 +51,16 @@ PacketReader::set_buffer_capacity (std::size_t bytes) noexcept
 void
 PacketReader::feed (Blob const& data)
 {
+	using neutrino::to_signed;
+
 	if (_capacity > 0 && _buffer.size() + data.size() > _capacity)
 	{
 		// Trim input buffer:
 		if (data.size() > _capacity)
-			_buffer = Blob (data.begin() + data.size() - _capacity, data.end());
+			_buffer = Blob (data.begin() + to_signed (data.size()) - to_signed (_capacity), data.end());
 		else
 		{
-			_buffer.erase (_buffer.begin(), _buffer.begin() + _buffer.size() + data.size() - _capacity);
+			_buffer.erase (_buffer.begin(), _buffer.begin() + to_signed (_buffer.size()) + to_signed (data.size()) - to_signed (_capacity));
 			_buffer.insert (_buffer.end(), data.begin(), data.end());
 		}
 	}
@@ -78,7 +83,7 @@ PacketReader::feed (Blob const& data)
 				std::size_t parsed_bytes = _parse();
 				if (parsed_bytes > 0)
 				{
-					_buffer.erase (_buffer.begin(), _buffer.begin() + parsed_bytes);
+					_buffer.erase (_buffer.begin(), _buffer.begin() + to_signed (parsed_bytes));
 					// If buffer is still non-empty, try parsing again:
 					if (!_buffer.empty())
 						continue;
