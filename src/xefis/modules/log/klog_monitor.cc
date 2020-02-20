@@ -49,24 +49,27 @@ void
 KLogMonitor::check_klog()
 {
 	const int read_all_command = 3;
-	std::size_t len = klogctl (read_all_command, _buffer.data(), _buffer.size());
-	std::string buffer (_buffer.data(), len);
-	std::transform (buffer.begin(), buffer.end(), buffer.begin(), tolower);
 
-	// Search for OOMs:
-	if (buffer.find ("oom-killer") != std::string::npos)
-		io.flag_oom = true;
+	if (auto len = klogctl (read_all_command, _buffer.data(), _buffer.size()); len > 0)
+	{
+		std::string buffer (_buffer.data(), neutrino::to_unsigned (len));
+		std::transform (buffer.begin(), buffer.end(), buffer.begin(), tolower);
 
-	// Search for I/O errors:
-	if (buffer.find ("i/o error") != std::string::npos)
-		io.flag_io = true;
+		// Search for OOMs:
+		if (buffer.find ("oom-killer") != std::string::npos)
+			io.flag_oom = true;
 
-	// Search for Oopses:
-	if (buffer.find (" oops") != std::string::npos)
-		io.flag_oops = true;
+		// Search for I/O errors:
+		if (buffer.find ("I/O error") != std::string::npos)
+			io.flag_io = true;
 
-	// Search for BUGs:
-	if (buffer.find (" bug") != std::string::npos)
-		io.flag_bug = true;
+		// Search for Oopses:
+		if (buffer.find (" oops") != std::string::npos)
+			io.flag_oops = true;
+
+		// Search for BUGs:
+		if (buffer.find (" bug") != std::string::npos)
+			io.flag_bug = true;
+	}
 }
 
