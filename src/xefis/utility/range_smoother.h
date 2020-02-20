@@ -80,7 +80,7 @@ template<class pValue>
 
 	  protected:
 		void
-		set_smoothing_time_impl (int milliseconds) noexcept override;
+		set_smoothing_time_impl (unsigned int milliseconds) noexcept override;
 
 	  private:
 		double
@@ -116,7 +116,7 @@ template<class V>
 
 template<class V>
 	inline void
-	RangeSmoother<V>::set_smoothing_time_impl (int millis) noexcept
+	RangeSmoother<V>::set_smoothing_time_impl (unsigned int millis) noexcept
 	{
 		_history.resize (millis);
 		_history_cos.resize (millis);
