@@ -84,7 +84,7 @@ UDP::got_udp_packet()
 	if (io.rx_interference)
 		interfere (_received_datagram);
 
-	io.receive = std::string (_received_datagram.data(), _received_datagram.size());
+	io.receive = std::string (_received_datagram.data(), neutrino::to_unsigned (_received_datagram.size()));
 }
 
 
