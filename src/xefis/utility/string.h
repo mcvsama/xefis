@@ -25,6 +25,7 @@
 
 // Neutrino:
 #include <neutrino/blob.h>
+#include <neutrino/numeric.h>
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -56,7 +57,7 @@ parse_hex_string (QString const& string)
 	};
 
 	Blob blob;
-	blob.reserve ((string.size() + 1) / 3);
+	blob.reserve (neutrino::to_unsigned ((string.size() + 1) / 3));
 	State state = MSB;
 	Blob::value_type val = 0;
 
