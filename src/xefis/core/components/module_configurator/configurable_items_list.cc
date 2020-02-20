@@ -92,7 +92,7 @@ template<class TempContainer, class ItemToPointerMapper>
 				auto new_end = std::remove (container.begin(), container.end(), ptr);
 
 				if (new_end != container.end())
-					container.resize (std::distance (container.begin(), new_end));
+					container.resize (neutrino::to_unsigned (std::distance (container.begin(), new_end)));
 				else
 					delete tree.takeChild (ci--);
 			}

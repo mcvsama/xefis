@@ -22,6 +22,7 @@
 #include <variant>
 
 // Neutrino:
+#include <neutrino/numeric.h>
 #include <neutrino/utility.h>
 #include <neutrino/variant.h>
 
@@ -313,7 +314,7 @@ template<class V>
 	PropertyOut<V>::dec_use_count (BasicProperty* data_sink) noexcept
 	{
 		auto new_end = std::remove (_data_sinks.begin(), _data_sinks.end(), data_sink);
-		_data_sinks.resize (std::distance (_data_sinks.begin(), new_end));
+		_data_sinks.resize (neutrino::to_unsigned (std::distance (_data_sinks.begin(), new_end)));
 	}
 
 

@@ -363,7 +363,7 @@ Screen::instrument_deregistered (InstrumentTracker::Disclosure& disclosure)
 {
 	wait_for_async_paint (disclosure);
 	auto new_end = std::remove (_z_index_sorted_disclosures.begin(), _z_index_sorted_disclosures.end(), &disclosure);
-	_z_index_sorted_disclosures.resize (new_end - _z_index_sorted_disclosures.begin());
+	_z_index_sorted_disclosures.resize (neutrino::to_unsigned (new_end - _z_index_sorted_disclosures.begin()));
 }
 
 

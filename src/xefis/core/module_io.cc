@@ -17,6 +17,7 @@
 
 // Neutrino:
 #include <neutrino/demangle.h>
+#include <neutrino/numeric.h>
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -97,7 +98,7 @@ void
 ModuleIO::ProcessingLoopAPI::unregister_input_property (BasicPropertyIn& property)
 {
 	auto new_end = std::remove (_io._registered_input_properties.begin(), _io._registered_input_properties.end(), &property);
-	_io._registered_input_properties.resize (std::distance (_io._registered_input_properties.begin(), new_end));
+	_io._registered_input_properties.resize (neutrino::to_unsigned (std::distance (_io._registered_input_properties.begin(), new_end)));
 }
 
 
@@ -112,7 +113,7 @@ void
 ModuleIO::ProcessingLoopAPI::unregister_output_property (BasicPropertyOut& property)
 {
 	auto new_end = std::remove (_io._registered_output_properties.begin(), _io._registered_output_properties.end(), &property);
-	_io._registered_output_properties.resize (std::distance (_io._registered_output_properties.begin(), new_end));
+	_io._registered_output_properties.resize (neutrino::to_unsigned (std::distance (_io._registered_output_properties.begin(), new_end)));
 }
 
 
