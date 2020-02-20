@@ -118,10 +118,10 @@ class BMP085:
 	void
 	handle_other (void (BMP085::*request_function)());
 
-	int32_t
+	int16_t
 	read_s16 (uint8_t base_register);
 
-	uint32_t
+	uint16_t
 	read_u16 (uint8_t base_register);
 
 	uint32_t
@@ -175,7 +175,7 @@ class BMP085:
 	int32_t						_mc;
 	int32_t						_md;
 	int32_t						_ut;
-	int32_t						_up;
+	uint32_t					_up;
 	int32_t						_ct;
 	int32_t						_cp;
 };

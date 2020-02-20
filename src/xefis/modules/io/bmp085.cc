@@ -190,12 +190,12 @@ BMP085::read_pressure()
 		x1 = _ac3 * _b6 >> 13;
 		x2 = (_b1 * (_b6 * _b6 >> 12)) >> 16;
 		x3 = ((x1 + x2) + 2) >> 2;
-		_b4 = (_ac4 * static_cast<uint32_t> (x3 + 32768)) >> 15;
-		_b7 = static_cast<uint32_t> (_up - _b3) * (50000 >> os);
-		if (_b7 < 0x80000000)
-			_cp = (_b7 * 2) / _b4;
+		_b4 = (static_cast<uint32_t> (_ac4) * static_cast<uint32_t> (x3 + 32768)) >> 15;
+		_b7 = (_up - static_cast<uint32_t> (_b3)) * (50000u >> os);
+		if (_b7 < 0x80000000u)
+			_cp = static_cast<int32_t> ((_b7 * 2) / _b4);
 		else
-			_cp = (_b7 / _b4) * 2;
+			_cp = static_cast<int32_t> ((_b7 / _b4) * 2);
 		x1 = (_cp >> 8) * (_cp >> 8);
 		x1 = (x1 * 3038) >> 16;
 		x2 = (-7357 * _cp) >> 16;
@@ -240,7 +240,7 @@ BMP085::handle_other (void (BMP085::*request_function)())
 }
 
 
-int32_t
+int16_t
 BMP085::read_s16 (uint8_t base_register)
 {
 	int16_t value = _i2c_device.read_register<int16_t> (base_register);
@@ -249,7 +249,7 @@ BMP085::read_s16 (uint8_t base_register)
 }
 
 
-uint32_t
+uint16_t
 BMP085::read_u16 (uint8_t base_register)
 {
 	uint16_t value = _i2c_device.read_register<uint16_t> (base_register);
