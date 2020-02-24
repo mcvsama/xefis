@@ -88,7 +88,7 @@ Airfoil::planar_aerodynamic_forces (AtmosphereState<AirfoilSplineSpace> const& a
 		// Pitching moment is always perpendicular to lift and drag forces.
 
 		SpaceVector<si::Length, AirfoilSplineSpace> const	cp_position			{ _airfoil_characteristics.center_of_pressure_position (*planar_re, wrap_angle_for_field (aoa.alpha)) * _chord_length, 0_m, 0_m };
-		// If atm.wind is 0, normalized will be nan³
+		// If atm.wind is 0, normalized will be nan³; FIXME any vector will do in such case
 		SpaceVector<double, AirfoilSplineSpace> const		drag_direction		= normalized (atm.wind) / 1_mps;
 		SpaceVector<double, AirfoilSplineSpace> const		lift_direction		= normalized (cross_product (SpaceVector<double, AirfoilSplineSpace> { 0.0, 0.0, +1.0 }, atm.wind)) / 1_mps;
 		SpaceVector<si::Torque, AirfoilSplineSpace> const	pitching_moment_vec	{ 0_Nm, 0_Nm, torque };

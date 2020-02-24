@@ -366,6 +366,7 @@ GPRMC::GPRMC (std::string const& sentence):
 std::string
 to_string (GPSFixQuality code)
 {
+	// TODO Use C++20 designated initializers with enum:
 	static std::array<std::string, 9> const fix_quality_strings {
 		"invalid",
 		"GPS",
