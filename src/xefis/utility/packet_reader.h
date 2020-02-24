@@ -28,6 +28,10 @@
 
 namespace xf {
 
+/**
+ * Helper object that collects input bytes until a certain amount is collected
+ * and only then calls the configured callback.
+ */
 class PacketReader: private Noncopyable
 {
   public:
