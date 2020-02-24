@@ -48,6 +48,12 @@ class System: private Noncopyable
 	using BodyPointers			= std::vector<Body*>;
 
   public:
+	// Ctor
+	System() = default;
+
+	// Ctor
+	System (AtmosphereModel const&);
+
 	/**
 	 * Add new body to the system.
 	 */
@@ -210,6 +216,12 @@ class System: private Noncopyable
 
 
 namespace xf::rigid_body {
+
+inline
+System::System (AtmosphereModel const& atmosphere_model):
+	_atmosphere_model (&atmosphere_model)
+{ }
+
 
 template<class SpecificBody, class ...Args>
 	inline SpecificBody&
