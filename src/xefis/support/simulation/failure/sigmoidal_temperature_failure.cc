@@ -21,7 +21,9 @@
 
 namespace xf {
 
-SigmoidalTemperatureFailure::SigmoidalTemperatureFailure (si::Time const expected_normal_lifetime, si::Temperature const normal_temperature, si::Temperature const stress_temperature):
+SigmoidalTemperatureFailure::SigmoidalTemperatureFailure (si::Time const expected_normal_lifetime,
+														  si::Temperature const normal_temperature,
+														  si::Temperature const stress_temperature):
 	_stress_temperature (stress_temperature)
 {
 	auto const normal_failure_probability_in_1s = 1_s / expected_normal_lifetime;
