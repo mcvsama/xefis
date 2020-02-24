@@ -40,7 +40,7 @@ ImpulseSolver::evolve (si::Time const dt)
 	// Reset required parts of frame cache:
 	for (auto& body: _system.bodies())
 	{
-		body->frame_cache().gravitational_force_moments = ForceMoments<WorldSpace>();
+		body->frame_cache().gravitational_force_moments = {};
 		body->frame_cache().velocity_moments = body->velocity_moments<WorldSpace>();
 	}
 
@@ -60,7 +60,7 @@ ImpulseSolver::evolve (si::Time const dt)
 	{
 		auto& body = _system.bodies()[_processed_frames % _system.bodies().size()];
 		auto loc = body->location();
-		loc.set_body_to_base_rotation (vector_normalized (orthogonalized (body->location().body_to_base_rotation())));
+		loc.set_body_to_base_rotation (vector_normalized (orthogonalized (loc.body_to_base_rotation())));
 		body->set_location (loc);
 	}
 
@@ -95,18 +95,18 @@ ImpulseSolver::update_mass_moments()
 void
 ImpulseSolver::update_gravitational_forces()
 {
-	auto const& gravitational_bodies = _system.gravitational_bodies();
-	auto const& non_gravitational_bodies = _system.non_gravitational_bodies();
+	auto const& gravitating_bodies = _system.gravitating_bodies();
+	auto const& non_gravitating_bodies = _system.non_gravitating_bodies();
 
-	// Gravity interactions between gravitational bodies:
-	if (gravitational_bodies.size() > 1)
-		for (auto i1: gravitational_bodies | boost::adaptors::indexed())
-			for (auto i2: gravitational_bodies | boost::adaptors::sliced (neutrino::to_unsigned (i1.index()) + 1u, _system.bodies().size()) | boost::adaptors::indexed())
-				update_gravitational_forces (*i1.value(), *i2.value());
+	// Gravity interactions between gravitating bodies:
+	if (gravitating_bodies.size() > 1)
+		for (auto i1: gravitating_bodies | boost::adaptors::indexed())
+			for (auto i2: gravitating_bodies | boost::adaptors::sliced (neutrino::to_unsigned (i1.index()) + 1u, _system.bodies().size()))
+				update_gravitational_forces (*i1.value(), *i2);
 
-	// Gravity interactions between gravitational bodies and the rest:
-	for (auto& b1: gravitational_bodies)
-		for (auto& b2: non_gravitational_bodies)
+	// Gravity interactions between gravitating bodies and the rest:
+	for (auto& b1: gravitating_bodies)
+		for (auto& b2: non_gravitating_bodies)
 			update_gravitational_forces (*b1, *b2);
 }
 
@@ -178,16 +178,19 @@ ImpulseSolver::update_constraint_forces (si::Time const dt)
 																	   b2.frame_cache().velocity_moments, total_ext_forces_2,
 																	   dt);
 
-				b1.frame_cache().constraint_force_moments += correction[0];
-				b2.frame_cache().constraint_force_moments += correction[1];
+				auto& fc1 = b1.frame_cache();
+				auto& fc2 = b2.frame_cache();
+
+				fc1.constraint_force_moments += correction[0];
+				fc2.constraint_force_moments += correction[1];
 
 				// Recalculate accelerations:
-				b1.frame_cache().acceleration_moments = acceleration_moments (b1, b1.frame_cache().all_force_moments());
-				b2.frame_cache().acceleration_moments = acceleration_moments (b2, b2.frame_cache().all_force_moments());
+				fc1.acceleration_moments = acceleration_moments (b1, fc1.all_force_moments());
+				fc2.acceleration_moments = acceleration_moments (b2, fc2.all_force_moments());
 
 				// Recalculate velocity moments:
-				b1.frame_cache().velocity_moments = velocity_moments (b1, b1.frame_cache().acceleration_moments, dt);
-				b2.frame_cache().velocity_moments = velocity_moments (b2, b2.frame_cache().acceleration_moments, dt);
+				fc1.velocity_moments = velocity_moments (b1, fc1.acceleration_moments, dt);
+				fc2.velocity_moments = velocity_moments (b2, fc2.acceleration_moments, dt);
 			}
 		}
 	}

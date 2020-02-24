@@ -64,7 +64,7 @@ AutoTest t_1 ("rigid_body::System: 90-minute simulation of gravitational forces"
 	auto rigid_body_system = rigid_body::System();
 	auto rigid_body_solver = rigid_body::ImpulseSolver (rigid_body_system);
 	auto const& iss = rigid_body_system.add (make_iss());
-	auto const& earth = rigid_body_system.add_gravitational (rigid_body::make_earth());
+	auto const& earth = rigid_body_system.add_gravitating (rigid_body::make_earth());
 
 	auto const real_time_limit = 10_s;
 	auto const orbital_period = 92.28532_min;

@@ -65,19 +65,19 @@ class System: private Noncopyable
 			requires (std::is_base_of_v<Body, SpecificBody>);
 
 	/**
-	 * Add new gravitational body to the system.
+	 * Add new gravitating body to the system.
 	 */
 	template<class SpecificBody, class ...Args>
 		SpecificBody&
-		add_gravitational (Args&&...)
+		add_gravitating (Args&&...)
 			requires (std::is_base_of_v<Body, SpecificBody>);
 
 	/**
-	 * Add new gravitational body to the system.
+	 * Add new gravitating body to the system.
 	 */
 	template<class SpecificBody>
 		SpecificBody&
-		add_gravitational (std::unique_ptr<SpecificBody>&&)
+		add_gravitating (std::unique_ptr<SpecificBody>&&)
 			requires (std::is_base_of_v<Body, SpecificBody>);
 
 	/**
@@ -143,20 +143,20 @@ class System: private Noncopyable
 		{ return _bodies; }
 
 	/**
-	 * Return sequence of simulated gravitational bodies.
+	 * Return sequence of simulated gravitating bodies.
 	 */
 	[[nodiscard]]
 	BodyPointers const&
-	gravitational_bodies() const noexcept
-		{ return _gravitational_bodies; }
+	gravitating_bodies() const noexcept
+		{ return _gravitating_bodies; }
 
 	/**
-	 * Return sequence of simulated non-gravitational bodies.
+	 * Return sequence of simulated non-gravitating bodies.
 	 */
 	[[nodiscard]]
 	BodyPointers const&
-	non_gravitational_bodies() const noexcept
-		{ return _non_gravitational_bodies; }
+	non_gravitating_bodies() const noexcept
+		{ return _non_gravitating_bodies; }
 
 	/**
 	 * Return sequence of body constraints.
@@ -198,8 +198,8 @@ class System: private Noncopyable
 	Bodies					_bodies;
 	Constraints				_constraints;
 	// Bodies acting on all bodies gravitationally (contains pointers to elements in _bodies):
-	BodyPointers			_gravitational_bodies;
-	BodyPointers			_non_gravitational_bodies;
+	BodyPointers			_gravitating_bodies;
+	BodyPointers			_non_gravitating_bodies;
 	AtmosphereModel const*	_atmosphere_model { nullptr };
 };
 
@@ -226,27 +226,27 @@ template<class SpecificBody>
 		requires (std::is_base_of_v<Body, SpecificBody>)
 	{
 		_bodies.push_back (std::move (body));
-		_non_gravitational_bodies.push_back (_bodies.back().get());
+		_non_gravitating_bodies.push_back (_bodies.back().get());
 		return static_cast<SpecificBody&> (*_bodies.back());
 	}
 
 
 template<class SpecificBody, class ...Args>
 	inline SpecificBody&
-	System::add_gravitational (Args&& ...args)
+	System::add_gravitating (Args&& ...args)
 		requires (std::is_base_of_v<Body, SpecificBody>)
 	{
-		return add_gravitational (std::make_unique<SpecificBody> (std::forward<Args> (args)...));
+		return add_gravitating (std::make_unique<SpecificBody> (std::forward<Args> (args)...));
 	}
 
 
 template<class SpecificBody>
 	inline SpecificBody&
-	System::add_gravitational (std::unique_ptr<SpecificBody>&& body)
+	System::add_gravitating (std::unique_ptr<SpecificBody>&& body)
 		requires (std::is_base_of_v<Body, SpecificBody>)
 	{
 		_bodies.push_back (std::move (body));
-		_gravitational_bodies.push_back (_bodies.back().get());
+		_gravitating_bodies.push_back (_bodies.back().get());
 		return static_cast<SpecificBody&> (*_bodies.back());
 	}
 

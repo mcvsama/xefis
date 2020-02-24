@@ -60,19 +60,19 @@ class Group
 			requires (std::is_base_of_v<Body, SpecificBody>);
 
 	/**
-	 * Add new gravitational body to the group and the system.
+	 * Add new gravitating body to the group and the system.
 	 */
 	template<class SpecificBody, class ...Args>
 		SpecificBody&
-		add_gravitational (Args&&...)
+		add_gravitating (Args&&...)
 			requires (std::is_base_of_v<Body, SpecificBody>);
 
 	/**
-	 * Add new gravitational body to the group and the system.
+	 * Add new gravitating body to the group and the system.
 	 */
 	template<class SpecificBody>
 		SpecificBody&
-		add_gravitational (std::unique_ptr<SpecificBody>&&)
+		add_gravitating (std::unique_ptr<SpecificBody>&&)
 			requires (std::is_base_of_v<Body, SpecificBody>);
 
 	/**
@@ -140,16 +140,16 @@ template<class SpecificBody>
 
 template<class SpecificBody, class ...Args>
 	inline SpecificBody&
-	Group::add_gravitational (Args&& ...args)
+	Group::add_gravitating (Args&& ...args)
 		requires (std::is_base_of_v<Body, SpecificBody>)
 	{
-		return add_gravitational (std::make_unique<SpecificBody> (std::forward<Args> (args)...));
+		return add_gravitating (std::make_unique<SpecificBody> (std::forward<Args> (args)...));
 	}
 
 
 template<class SpecificBody>
 	inline SpecificBody&
-	Group::add_gravitational (std::unique_ptr<SpecificBody>&& body)
+	Group::add_gravitating (std::unique_ptr<SpecificBody>&& body)
 		requires (std::is_base_of_v<Body, SpecificBody>)
 	{
 		auto& added_body = _system->add (std::move (body));
