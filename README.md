@@ -1,7 +1,24 @@
 XEFIS
 =====
 
-Qt-based "glass cockpit" and model airplane control software.
+Xefis is a framework that helps writing software for remote controlled vehicles
+and their ground stations.
+
+It focuses on flying vehicles.
+
+It has:
+    * display modules (EFIS) for ADI, HSI, various gauges
+    * communication modules with encryption and authentication support (eg. to connect GCS and the aircraft)
+    * a couple of hardware communication modules (BMP085 pressure sensor, EagleTree Airspeed sensor, XBee modem,
+      NMEA GPS modules, CHR UM6 IMU)
+    * computation modules to obtain performance and navigation data from sensor data
+      (airspeed, altitude, bearing, track, various other speeds, etc),
+    * automation modules that can automatically control a model
+    * rigid-body simulation framework to help testing of models
+    * basic system that allows data exchange between the modules
+
+Notes:
+No-one uses this besides the author. Don't expect any support.
 
 ![XEFIS](http://mcv.mulabs.org/app/xefis/screenshot-006.png)
 
@@ -16,5 +33,5 @@ qt-5
 mhash-0.9.9.9
 
 Packages required on Ubuntu 18:
-	qtbase5-dev
+    qtbase5-dev
 
