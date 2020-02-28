@@ -22,6 +22,10 @@
 
 // Lib:
 #include <lib/half/half.hpp>
+#include <type_safe/integer.hpp>
+
+
+namespace ts = type_safe;
 
 
 inline half_float::half

@@ -184,6 +184,16 @@ Xefis::print_copyrights (std::ostream& out)
 		<< endl
 		<< licenses::lib_kdtreeplusplus << endl
 		<< endl;
+	out << "The 'type_safe' library is distributed under the following license" << endl
+		<< "==================================================================" << endl
+		<< endl
+		<< licenses::lib_type_safe << endl
+		<< endl;
+	out << "The 'Microsoft GSL' library is distributed under the following license" << endl
+		<< "======================================================================" << endl
+		<< endl
+		<< licenses::lib_microsoft_gsl << endl
+		<< endl;
 }
 
 } // namespace xf
