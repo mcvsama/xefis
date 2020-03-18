@@ -216,7 +216,7 @@ RigidBodyViewer::display_menu()
 	show_forces_action->setCheckable (true);
 	show_forces_action->setChecked (_rigid_body_painter.forces_visible());
 
-	return !!menu.exec();
+	return !!menu.exec (QCursor::pos());
 }
 
 } // namespace xf
