@@ -1,3 +1,2 @@
 XEFIS_MACHINES += test_instruments
-XEFIS_MACHINES += sim-1
 
