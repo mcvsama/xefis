@@ -200,7 +200,7 @@ parse_color (QString color)
 inline Qt::Alignment
 parse_alignment (QString string)
 {
-	Qt::Alignment alignment = 0;
+	Qt::Alignment alignment;
 	QStringList list = string.split (" ");
 
 	if (list.contains ("top"))

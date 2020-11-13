@@ -140,14 +140,14 @@ TextPainter::fast_draw_text (QPointF const& position, QString const& text, std::
 {
 	QFontMetricsF metrics (font());
 	QRectF target (position - QPointF (0.f, metrics.ascent()), QSizeF (metrics.width (text), metrics.height()));
-	fast_draw_text (target, 0, text, shadow);
+	fast_draw_text (target, {}, text, shadow);
 }
 
 
 void
 TextPainter::fast_draw_text (QPointF const& position, Qt::Alignment flags, QString const& text, std::optional<Shadow> shadow)
 {
-	fast_draw_text (get_text_box (position, flags, text), 0, text, shadow);
+	fast_draw_text (get_text_box (position, flags, text), {}, text, shadow);
 }
 
 
