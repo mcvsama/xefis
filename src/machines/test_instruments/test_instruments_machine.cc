@@ -33,7 +33,7 @@ TestInstrumentsMachine::TestInstrumentsMachine (xf::Xefis& xefis):
 	_navaid_storage = std::make_unique<xf::NavaidStorage> (_logger, "share/nav/nav.dat.gz", "share/nav/fix.dat.gz", "share/nav/apt.dat.gz");
 	_work_performer->submit (_navaid_storage->async_loader());
 
-	_test_loop.emplace (*this, "Main loop", 120_Hz, _logger.with_scope ("short computations loop")),
+	_test_loop.emplace (*this, "Main loop", 120_Hz, _logger.with_scope ("short computations loop"));
 	register_processing_loop (*_test_loop);
 
 	auto line_width = 0.3525_mm;
@@ -43,11 +43,11 @@ TestInstrumentsMachine::TestInstrumentsMachine (xf::Xefis& xefis):
 
 	auto& test_screen_1 = _test_screen_1.emplace (spec, xefis.graphics(), *_navaid_storage, *this, _logger.with_scope ("test screen"));
 	test_screen_1->set_paint_bounding_boxes (false);
-	register_screen (*_test_screen_1);
+	register_screen (test_screen_1);
 
 	auto& test_screen_2 = _test_screen_2.emplace (spec, xefis.graphics(), *_navaid_storage, *this, _logger.with_scope ("test screen"));
 	test_screen_2->set_paint_bounding_boxes (false);
-	register_screen (*_test_screen_2);
+	register_screen (test_screen_2);
 
 	auto test_generator_io = std::make_unique<TestGeneratorIO>();
 	auto& test_generator_hsi_range											= test_generator_io->create_enum_property<si::Length> ("hsi/range", { { 5_nmi, 10_s }, { 20_nmi, 10_s }, { 40_nmi, 4_s }, { 80_nmi, 2_s }, { 160_nmi, 2_s } });
@@ -71,7 +71,7 @@ TestInstrumentsMachine::TestInstrumentsMachine (xf::Xefis& xefis):
 	auto  test_generator_hsi_home_position_latitude							= xf::ConstantSource (19.14_deg);
 	auto& test_generator_hsi_position_longitude								= test_generator_io->create_property<si::Angle> ("hsi/position/longitude", 51.9_deg, { 51.9_deg, 60_deg }, 0.001_deg / 1_s);
 	auto& test_generator_hsi_position_latitude								= test_generator_io->create_property<si::Angle> ("hsi/position/latitude", 19.14_deg, { 19.14_deg, 20.14_deg }, 0.001_deg / 1_s);
-	auto  test_generator_hsi_position_source								= xf::ConstantSource ("GPS");
+	auto  test_generator_hsi_position_source								= xf::ConstantSource<std::string> ("GPS");
 	auto& test_generator_hsi_range_warning_longitude						= test_generator_io->create_property<si::Angle> ("hsi/range/warning/longitude", 51.9_deg, { 51.9_deg, 60_deg }, 0.002_deg / 1_s);
 	auto& test_generator_hsi_range_warning_latitude							= test_generator_io->create_property<si::Angle> ("hsi/range/warning/latitude", 19.14_deg, { 19.14_deg, 20.14_deg }, 0.002_deg / 1_s);
 	auto& test_generator_hsi_range_warning_radius							= test_generator_io->create_property<si::Length> ("hsi/range/warning/radius", 10_nmi, { 0_nmi, 10_nmi }, 0.1_nmi / 1_s);
@@ -86,26 +86,26 @@ TestInstrumentsMachine::TestInstrumentsMachine (xf::Xefis& xefis):
 	auto& test_generator_hsi_course_setting_magnetic						= test_generator_io->create_property<si::Angle> ("hsi/course/setting.magnetic", 0_deg, { 0_deg, 720_deg }, 20_deg / 1_s);
 	auto& test_generator_hsi_course_deviation								= test_generator_io->create_property<si::Angle> ("hsi/course/deviation", 0_deg, { -10_deg, +10_deg }, 1_deg / 1_s);
 	auto& test_generator_hsi_course_to_flag									= test_generator_io->create_enum_property<bool> ("hsi/course/to-flag", { { true, 7_s }, { false, 3_s } });
-	auto  test_generator_hsi_navaid_selected_reference						= xf::ConstantSource ("REF");
-	auto  test_generator_hsi_navaid_selected_identifier						= xf::ConstantSource ("IDENT");
+	auto  test_generator_hsi_navaid_selected_reference						= xf::ConstantSource<std::string> ("REF");
+	auto  test_generator_hsi_navaid_selected_identifier						= xf::ConstantSource<std::string> ("IDENT");
 	auto& test_generator_hsi_navaid_selected_distance						= test_generator_io->create_property<si::Length> ("hsi/navaid/selected/distance", 0_nmi, { 0_nmi, 5_nmi }, 0.15_nmi / 1_s);
 	auto& test_generator_hsi_navaid_selected_eta							= test_generator_io->create_property<si::Time> ("hsi/navaid/selected/eta", 300_s, { 0_s, 300_s }, 1_s / 1_s);
 	auto& test_generator_hsi_navaid_selected_course_magnetic				= test_generator_io->create_property<si::Angle> ("hsi/navaid/selected/course-magnetic", 27_deg, { 23_deg, 31_deg },0.5_deg / 1_s);
 	auto  test_generator_hsi_navaid_left_type								= xf::ConstantSource (hsi::NavType::A);
-	auto  test_generator_hsi_navaid_left_reference							= xf::ConstantSource ("LREF");
-	auto  test_generator_hsi_navaid_left_identifier							= xf::ConstantSource ("LIDENT");
+	auto  test_generator_hsi_navaid_left_reference							= xf::ConstantSource<std::string> ("LREF");
+	auto  test_generator_hsi_navaid_left_identifier							= xf::ConstantSource<std::string> ("LIDENT");
 	auto& test_generator_hsi_navaid_left_distance							= test_generator_io->create_property<si::Length> ("hsi/navaid/left/distance", 0_nmi, { 0_nmi, 5_nmi }, 0.1_nmi / 1_s);
 	auto& test_generator_hsi_navaid_left_initial_bearing_magnetic			= test_generator_io->create_property<si::Angle> ("hsi/navaid/left/initial-bearing-magnetic", 30_deg, { 28_deg, 32_deg }, 0.25_deg / 1_s);
 	auto  test_generator_hsi_navaid_right_type								= xf::ConstantSource (hsi::NavType::B);
-	auto  test_generator_hsi_navaid_right_reference							= xf::ConstantSource ("RREF");
-	auto  test_generator_hsi_navaid_right_identifier						= xf::ConstantSource ("RIDENT");
+	auto  test_generator_hsi_navaid_right_reference							= xf::ConstantSource<std::string> ("RREF");
+	auto  test_generator_hsi_navaid_right_identifier						= xf::ConstantSource<std::string> ("RIDENT");
 	auto& test_generator_hsi_navaid_right_distance							= test_generator_io->create_property<si::Length> ("hsi/navaid/right/distance", 100_nmi, { 100_nmi, 105_nmi }, 0.1_nmi / 1_s);
 	auto& test_generator_hsi_navaid_right_initial_bearing_magnetic			= test_generator_io->create_property<si::Angle> ("hsi/navaid/right/initial-bearing-magnetic", 80_deg, { 78_deg, 82_deg }, 0.25_deg / 1_s);
 	auto  test_generator_hsi_navigation_required_performance				= xf::ConstantSource (4_m);
 	auto  test_generator_hsi_navigation_actual_performance					= xf::ConstantSource (1.2_m);
 	auto& test_generator_hsi_wind_from_magnetic								= test_generator_io->create_property<si::Angle> ("hsi/wind/from-magnetic", 100_deg, { 0_deg, 360_deg }, 2_deg / 1_s);
 	auto& test_generator_hsi_wind_speed_tas									= test_generator_io->create_property<si::Velocity> ("hsi/wind/speed-tas", 12_kt, { 10_kt, 15_kt }, 0.1_kt / 1_s);
-	auto  test_generator_hsi_localizer_id									= xf::ConstantSource ("LOCID");
+	auto  test_generator_hsi_localizer_id									= xf::ConstantSource<std::string> ("LOCID");
 	auto& test_generator_hsi_tcas_on										= test_generator_io->create_enum_property<bool> ("hsi/tcas/on", { { true, 5_s }, { false, 3_s } });
 	auto& test_generator_hsi_tcas_range										= test_generator_io->create_enum_property<si::Length> ("hsi/tcas/range", { { 3_nmi, 2_s }, { 6_nmi, 2_s }, { 9_nmi, 2_s }, { 12_nmi, 2_s } });
 	auto& test_generator_hsi_features_fix									= test_generator_io->create_enum_property<bool> ("hsi/features/fix", { { true, 3_s }, { true, 10_s }, { false, 1_s } });
@@ -183,8 +183,8 @@ TestInstrumentsMachine::TestInstrumentsMachine (xf::Xefis& xefis):
 	test_screen_1->adi_io->control_surfaces_ailerons						<< test_generator_io->create_property<double> ("adi/control-surfaces/ailerons", 0.0f, { -1.0f, +1.0f }, 0.3f / 1_s);
 	test_screen_1->adi_io->navaid_reference_visible							<< xf::ConstantSource (true);
 	test_screen_1->adi_io->navaid_course_magnetic							<< xf::ConstantSource (150_deg);
-	test_screen_1->adi_io->navaid_type_hint									<< xf::ConstantSource ("VOR");
-	test_screen_1->adi_io->navaid_identifier								<< xf::ConstantSource ("WRO");
+	test_screen_1->adi_io->navaid_type_hint									<< xf::ConstantSource<std::string> ("VOR");
+	test_screen_1->adi_io->navaid_identifier								<< xf::ConstantSource<std::string> ("WRO");
 	test_screen_1->adi_io->navaid_distance									<< xf::ConstantSource (1.5_nmi);
 	test_screen_1->adi_io->flight_path_deviation_lateral_serviceable		<< test_generator_io->create_enum_property<bool> ("adi/flight-path-deviation/lateral/serviceable", { { true, 9.5_s }, { false, 2_s } });
 	test_screen_1->adi_io->flight_path_deviation_lateral_approach			<< test_generator_io->create_property<si::Angle> ("adi/flight-path-deviation/lateral/approach", 0_deg, { -5_deg, 5_deg }, 1_deg / 1_s);
@@ -479,7 +479,7 @@ TestInstrumentsMachine::TestInstrumentsMachine (xf::Xefis& xefis):
 	test_screen_2->hsi_2_io->radio_range_warning							<< test_generator_hsi_radio_range_warning;
 	test_screen_2->hsi_2_io->radio_range_critical							<< test_generator_hsi_radio_range_critical;
 
-	_test_generator.emplace (std::move (test_generator_io), "test generator");
+	auto& test_generator = _test_generator.emplace (std::move (test_generator_io), "test generator");
 	test_screen_1->create_instruments();
 	test_screen_2->create_instruments();
 
@@ -493,7 +493,7 @@ TestInstrumentsMachine::TestInstrumentsMachine (xf::Xefis& xefis):
 		test_loop.register_module (disclosure.registrant());
 
 	// Register the rest:
-	test_loop.register_module (*_test_generator);
+	test_loop.register_module (test_generator);
 	test_loop.register_module (*_test_loop);
 	test_loop.start();
 
