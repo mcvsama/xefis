@@ -74,7 +74,6 @@ PanelNumericDisplay::paintEvent (QPaintEvent*)
 	QPainter painter (this);
 	painter.setRenderHint (QPainter::Antialiasing, true);
 	painter.setRenderHint (QPainter::SmoothPixmapTransform, true);
-	painter.setRenderHint (QPainter::NonCosmeticDefaultPen, true);
 
 	QSize ms = minimumSize();
 	QRect re (0.5f * (width() - ms.width()), 0.5f * (height() - ms.height()), ms.width() + 1, ms.height() + 1);

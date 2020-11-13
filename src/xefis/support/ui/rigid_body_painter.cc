@@ -61,7 +61,6 @@ RigidBodyPainter::paint (rigid_body::System const& system, QOpenGLPaintDevice& c
 	painter.setRenderHint (QPainter::Antialiasing, true);
 	painter.setRenderHint (QPainter::TextAntialiasing, true);
 	painter.setRenderHint (QPainter::SmoothPixmapTransform, true);
-	painter.setRenderHint (QPainter::NonCosmeticDefaultPen, true);
 
 	painter.translate (center);
 	painter.beginNativePainting();

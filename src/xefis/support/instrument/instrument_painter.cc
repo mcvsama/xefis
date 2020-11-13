@@ -30,7 +30,6 @@ InstrumentPainter::InstrumentPainter (QPaintDevice& device, TextPainter::Cache& 
 	setRenderHint (QPainter::Antialiasing, true);
 	setRenderHint (QPainter::TextAntialiasing, true);
 	setRenderHint (QPainter::SmoothPixmapTransform, true);
-	setRenderHint (QPainter::NonCosmeticDefaultPen, true);
 	set_font_position_correction ({ 0.0, 0.04 });
 }
 

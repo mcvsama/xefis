@@ -60,7 +60,6 @@ PanelRotaryEncoder::paintEvent (QPaintEvent*)
 	QPainter painter (&image);
 	painter.setRenderHint (QPainter::Antialiasing, true);
 	painter.setRenderHint (QPainter::SmoothPixmapTransform, true);
-	painter.setRenderHint (QPainter::NonCosmeticDefaultPen, true);
 
 	QPolygonF polygon;
 	QTransform transform;

@@ -60,7 +60,6 @@ HistogramWidget::update_canvas()
 		painter.setRenderHint (QPainter::Antialiasing, true);
 		painter.setRenderHint (QPainter::TextAntialiasing, true);
 		painter.setRenderHint (QPainter::SmoothPixmapTransform, true);
-		painter.setRenderHint (QPainter::NonCosmeticDefaultPen, true);
 
 		QFontMetricsF const font_metrics (font());
 		float const y_max_str_width = _y_legend_visible ? std::max (font_metrics.width (_y_max_str), font_metrics.width ("0000")) : 0.0f;
