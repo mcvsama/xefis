@@ -18,6 +18,9 @@
 // Neutrino:
 #include <neutrino/numeric.h>
 
+// Qt:
+#include <QPainterPath>
+
 // Xefis:
 #include <xefis/config/all.h>
 

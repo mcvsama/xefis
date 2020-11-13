@@ -22,6 +22,9 @@
 // Neutrino:
 #include <neutrino/synchronized.h>
 
+// Qt:
+#include <QPainterPath>
+
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/graphics.h>
