@@ -24,7 +24,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
-#include <xefis/core/property.h>
+#include <xefis/core/module_socket.h>
 #include <xefis/core/setting.h>
 #include <xefis/utility/temporal.h>
 
@@ -52,14 +52,14 @@ class EngineTorqueIO: public xf::ModuleIO
 	 * Input
 	 */
 
-	xf::PropertyIn<si::AngularVelocity>	engine_speed		{ this, "engine-speed" };
-	xf::PropertyIn<si::Current>			engine_current		{ this, "engine-current" };
+	xf::ModuleIn<si::AngularVelocity>	engine_speed		{ this, "engine-speed" };
+	xf::ModuleIn<si::Current>			engine_current		{ this, "engine-current" };
 
 	/*
 	 * Output
 	 */
 
-	xf::PropertyOut<si::Torque>			engine_torque		{ this, "engine-torque" };
+	xf::ModuleOut<si::Torque>			engine_torque		{ this, "engine-torque" };
 };
 
 

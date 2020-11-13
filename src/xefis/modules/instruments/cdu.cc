@@ -331,31 +331,31 @@ CDU::EmptyStrip::paint_button (QRectF const& rect, xf::InstrumentAids& aids, xf:
 }
 
 
-CDU::PropertyStrip::PropertyStrip (CDU& cdu,
-								   xf::PropertyStringifier const& property_stringifier,
-								   QString const& title,
-								   Column column):
+CDU::SocketStrip::SocketStrip (CDU& cdu,
+							   xf::SocketStringifier const& socket_stringifier,
+							   QString const& title,
+							   Column column):
 	Strip (cdu, title, column),
-	_property_stringifier (property_stringifier)
+	_socket_stringifier (socket_stringifier)
 { }
 
 
 void
-CDU::PropertyStrip::set_read_only (bool read_only)
+CDU::SocketStrip::set_read_only (bool read_only)
 {
 	_read_only = read_only;
 }
 
 
 bool
-CDU::PropertyStrip::fresh() const noexcept
+CDU::SocketStrip::fresh() const noexcept
 {
-	return true; // TODO _property.fresh();
+	return true; // TODO _socket.fresh();
 }
 
 
 void
-CDU::PropertyStrip::handle_mouse_press (QMouseEvent* event, CDU*)
+CDU::SocketStrip::handle_mouse_press (QMouseEvent* event, CDU*)
 {
 	if (!_read_only)
 		if (_button_rect.contains (event->pos()))
@@ -364,23 +364,23 @@ CDU::PropertyStrip::handle_mouse_press (QMouseEvent* event, CDU*)
 
 
 void
-CDU::PropertyStrip::handle_mouse_release (QMouseEvent* event, CDU* cdu)
+CDU::SocketStrip::handle_mouse_release (QMouseEvent* event, CDU* cdu)
 {
 	_button_state = ButtonState::Normal;
 
 	if (!_read_only && _button_rect.contains (event->pos()))
 	{
-		auto* bool_property = dynamic_cast<xf::Property<bool>*> (&_property_stringifier.property());
+		auto* bool_socket = dynamic_cast<xf::Socket<bool>*> (&_socket_stringifier.socket());
 
-		if (bool_property)
-			*bool_property = !**bool_property;
+		if (bool_socket)
+			*bool_socket = !**bool_socket;
 		else
 		{
 			std::string entry_value = cdu->entry_value().trimmed().toStdString();
 
 			// Try first to parse the value just as is. If it fails, try to append default unit.
 			try {
-				_property_stringifier.from_string (entry_value);
+				_socket_stringifier.from_string (entry_value);
 			}
 			catch (si::UnsupportedUnit const&)
 			{
@@ -402,7 +402,7 @@ CDU::PropertyStrip::handle_mouse_release (QMouseEvent* event, CDU* cdu)
 
 
 void
-CDU::PropertyStrip::paint_button (QRectF const& rect, xf::InstrumentAids& aids, xf::Painter& painter, Column column, bool)
+CDU::SocketStrip::paint_button (QRectF const& rect, xf::InstrumentAids& aids, xf::Painter& painter, Column column, bool)
 {
 	_button_rect = rect;
 	ButtonState button_state = ButtonState::Normal;
@@ -415,24 +415,24 @@ CDU::PropertyStrip::paint_button (QRectF const& rect, xf::InstrumentAids& aids, 
 
 
 void
-CDU::PropertyStrip::paint_title (QRectF const& rect, xf::InstrumentAids& aids, xf::Painter& painter, Column column, bool)
+CDU::SocketStrip::paint_title (QRectF const& rect, xf::InstrumentAids& aids, xf::Painter& painter, Column column, bool)
 {
 	paint_title_helper (rect, aids, painter, column, title(), QColor (0xcc, 0xd7, 0xe7));
 }
 
 
 void
-CDU::PropertyStrip::paint_value (QRectF const& rect, xf::InstrumentAids& aids, xf::Painter& painter, Column column, bool)
+CDU::SocketStrip::paint_value (QRectF const& rect, xf::InstrumentAids& aids, xf::Painter& painter, Column column, bool)
 {
-	if (_property_stringifier.property().valid())
+	if (_socket_stringifier.socket().valid())
 	{
-		auto* bool_property_ptr = dynamic_cast<xf::Property<bool>*> (&_property_stringifier.property());
+		auto* bool_socket_ptr = dynamic_cast<xf::Socket<bool>*> (&_socket_stringifier.socket());
 
-		if (bool_property_ptr)
+		if (bool_socket_ptr)
 		{
-			auto& bool_property = *bool_property_ptr;
-			auto p = bool_property ? *bool_property : false;
-			auto& converter = dynamic_cast<xf::PropertyStringifier::BoolConverter const&> (_property_stringifier.converter());
+			auto& bool_socket = *bool_socket_ptr;
+			auto p = bool_socket ? *bool_socket : false;
+			auto& converter = dynamic_cast<xf::SocketStringifier::BoolConverter const&> (_socket_stringifier.converter());
 
 			std::string const& nil_val = converter.nil_value();
 			std::string const act_val = p ? converter.true_value() : converter.false_value();
@@ -448,7 +448,7 @@ CDU::PropertyStrip::paint_value (QRectF const& rect, xf::InstrumentAids& aids, x
 					tl.add_fragment (inact_val, aids._font_13, Qt::white);
 					tl.add_fragment ("\u2008⬌\u2008", aids._font_20, Qt::white);
 
-					if (bool_property)
+					if (bool_socket)
 						tl.add_fragment (nil_val, aids._font_20, Qt::green);
 					else
 						tl.add_fragment (act_val, aids._font_20, Qt::green);
@@ -457,7 +457,7 @@ CDU::PropertyStrip::paint_value (QRectF const& rect, xf::InstrumentAids& aids, x
 					break;
 
 				case Column::Right:
-					if (bool_property)
+					if (bool_socket)
 						tl.add_fragment (nil_val, aids._font_20, Qt::green);
 					else
 						tl.add_fragment (act_val, aids._font_20, Qt::green);
@@ -474,7 +474,7 @@ CDU::PropertyStrip::paint_value (QRectF const& rect, xf::InstrumentAids& aids, x
 			std::string str_val;
 
 			auto error_str = xf::handle_format_exception ([&] {
-				str_val = _property_stringifier.to_string();
+				str_val = _socket_stringifier.to_string();
 			});
 
 			if (error_str)
@@ -505,7 +505,7 @@ CDU::PropertyStrip::paint_value (QRectF const& rect, xf::InstrumentAids& aids, x
 
 
 void
-CDU::PropertyStrip::paint_focus (QRectF const& rect, QRectF const& button_rect, xf::InstrumentAids& aids, xf::Painter& painter, Column column)
+CDU::SocketStrip::paint_focus (QRectF const& rect, QRectF const& button_rect, xf::InstrumentAids& aids, xf::Painter& painter, Column column)
 {
 	if (!_read_only)
 		paint_focus_helper (rect, button_rect, aids, painter, column);
@@ -603,7 +603,7 @@ CDU::Page::Page (CDU& cdu, QDomElement const& page_element, Config& config, xf::
 		{
 			if (e == "setting")
 			{
-				_strips.push_back (std::make_unique<PropertyStrip> (cdu, e, current_column_dir));
+				_strips.push_back (std::make_unique<SocketStrip> (cdu, e, current_column_dir));
 				current_column->push_back (_strips.back().get());
 			}
 			else if (e == "goto")
@@ -696,7 +696,7 @@ CDU::Page::strips_right() const noexcept
 
 
 bool
-CDU::Page::scan_properties() const noexcept
+CDU::Page::scan_sockets() const noexcept
 {
 	for (auto const& strip: _strips)
 		if (strip->fresh())
@@ -829,10 +829,10 @@ CDU::Config::Config (CDU& cdu, QDomElement const& pages_element, xf::Logger cons
 
 
 bool
-CDU::Config::scan_properties() const noexcept
+CDU::Config::scan_sockets() const noexcept
 {
 	for (auto const& page: _pages_by_id)
-		if (page.second->scan_properties())
+		if (page.second->scan_sockets())
 			return true;
 	return false;
 }
@@ -925,7 +925,7 @@ CDU::CDU (xf::Xefis*, QDomElement const& config, xf::Graphics const& graphics, s
 			_config = std::make_unique<Config> (*this, e, log());
 			break;
 		}
-		else if (e != "settings" && e != "properties")
+		else if (e != "settings" && e != "sockets")
 			throw xf::UnexpectedDomElement (e);
 	}
 
@@ -938,7 +938,7 @@ CDU::CDU (xf::Xefis*, QDomElement const& config, xf::Graphics const& graphics, s
 void
 CDU::data_updated()
 {
-	if (_config->scan_properties())
+	if (_config->scan_sockets())
 		update();
 }
 

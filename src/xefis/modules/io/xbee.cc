@@ -871,7 +871,7 @@ XBee::process_rx64_frame (std::string_view const& frame)
 	}
 
 	// Frame data:
-	write_output_property (frame.substr (10));
+	write_output_socket (frame.substr (10));
 	report_rssi (rssi);
 }
 
@@ -909,7 +909,7 @@ XBee::process_rx16_frame (std::string_view const& frame)
 	}
 
 	// Frame data:
-	write_output_property (frame.substr (4));
+	write_output_socket (frame.substr (4));
 	report_rssi (rssi);
 }
 
@@ -1022,7 +1022,7 @@ XBee::process_at_response_frame (std::string_view const& frame)
 
 
 void
-XBee::write_output_property (std::string_view const& data)
+XBee::write_output_socket (std::string_view const& data)
 {
 	if (configured())
 		io.receive = std::string (data);

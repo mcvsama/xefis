@@ -168,8 +168,8 @@ void
 AirDataComputer::process (xf::Cycle const& cycle)
 {
 	// Order is important:
-	xf::PropertyObserver* computers[] = {
-		// Computers that depend on input properties only:
+	xf::SocketObserver* computers[] = {
+		// Computers that depend on input sockets only:
 		&_total_pressure_computer,
 		&_altitude_computer,
 		// Computers depending on other computers:

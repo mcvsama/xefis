@@ -24,7 +24,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
-#include <xefis/core/property.h>
+#include <xefis/core/module_socket.h>
 #include <xefis/core/setting.h>
 #include <xefis/utility/actions.h>
 
@@ -42,23 +42,23 @@ class FlapsControlIO: public xf::ModuleIO
 
 	// How fast flaps should extend/retract:
 	xf::Setting<si::AngularVelocity>	angular_velocity	{ this, "angular_velocity", 10_deg / 1_s };
-	// Range of output_control property:
+	// Range of output_control socket:
 	xf::Setting<xf::Range<double>>		control_extents		{ this, "control_extents", { 0.0, 1.0 } };
 
 	/*
 	 * Input
 	 */
 
-	xf::PropertyIn<bool>				up					{ this, "up", false };
-	xf::PropertyIn<bool>				down				{ this, "down", false };
+	xf::ModuleIn<bool>					up					{ this, "up", false };
+	xf::ModuleIn<bool>					down				{ this, "down", false };
 
 	/*
 	 * Output
 	 */
 
-	xf::PropertyOut<si::Angle>			requested_setting	{ this, "requested-setting" };
-	xf::PropertyOut<si::Angle>			current				{ this, "current" };
-	xf::PropertyOut<double>				control				{ this, "control" };
+	xf::ModuleOut<si::Angle>			requested_setting	{ this, "requested-setting" };
+	xf::ModuleOut<si::Angle>			current				{ this, "current" };
+	xf::ModuleOut<double>				control				{ this, "control" };
 };
 
 

@@ -101,6 +101,6 @@ DebugForces::async_paint (xf::PaintRequest const& paint_request, PaintingParams 
 		painter.drawLine (center, centrifugal_accel);
 	}
 
-	// TODO set output properties
+	// TODO set output sockets
 }
 

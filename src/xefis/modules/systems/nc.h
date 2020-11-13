@@ -23,8 +23,8 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
-#include <xefis/core/property.h>
-#include <xefis/core/property_observer.h>
+#include <xefis/core/module_socket.h>
+#include <xefis/core/socket_observer.h>
 #include <xefis/utility/smoother.h>
 #include <xefis/utility/range_smoother.h>
 
@@ -40,38 +40,38 @@ class NavigationComputerIO: public xf::ModuleIO
 	 * Input
 	 */
 
-	xf::PropertyIn<si::Angle>				input_position_longitude			{ this, "position/longitude" };
-	xf::PropertyIn<si::Angle>				input_position_latitude				{ this, "position/latitude" };
-	xf::PropertyIn<si::Length>				input_position_altitude_amsl		{ this, "position/altitude.amsl" };
-	xf::PropertyIn<si::Length>				input_position_lateral_stddev		{ this, "position/lateral.standard-deviation" };
-	xf::PropertyIn<si::Length>				input_position_vertical_stddev		{ this, "position/vertical.standard-deviation" };
-	xf::PropertyIn<std::string>				input_position_source				{ this, "position/source" };
-	xf::PropertyIn<si::Angle>				input_orientation_pitch				{ this, "orientation/pitch" };
-	xf::PropertyIn<si::Angle>				input_orientation_roll				{ this, "orientation/roll" };
-	xf::PropertyIn<si::Angle>				input_orientation_heading_magnetic	{ this, "orientation/heading.magnetic" };
+	xf::ModuleIn<si::Angle>				input_position_longitude			{ this, "position/longitude" };
+	xf::ModuleIn<si::Angle>				input_position_latitude				{ this, "position/latitude" };
+	xf::ModuleIn<si::Length>			input_position_altitude_amsl		{ this, "position/altitude.amsl" };
+	xf::ModuleIn<si::Length>			input_position_lateral_stddev		{ this, "position/lateral.standard-deviation" };
+	xf::ModuleIn<si::Length>			input_position_vertical_stddev		{ this, "position/vertical.standard-deviation" };
+	xf::ModuleIn<std::string>			input_position_source				{ this, "position/source" };
+	xf::ModuleIn<si::Angle>				input_orientation_pitch				{ this, "orientation/pitch" };
+	xf::ModuleIn<si::Angle>				input_orientation_roll				{ this, "orientation/roll" };
+	xf::ModuleIn<si::Angle>				input_orientation_heading_magnetic	{ this, "orientation/heading.magnetic" };
 
 	/*
 	 * Output
 	 */
 
-	xf::PropertyOut<si::Angle>				position_longitude					{ this, "position/longitude" };
-	xf::PropertyOut<si::Angle>				position_latitude					{ this, "position/latitude" };
-	xf::PropertyOut<si::Length>				position_altitude_amsl				{ this, "position/altitude.amsl" };
-	xf::PropertyOut<si::Length>				position_lateral_stddev				{ this, "position/lateral.standard-deviation" };
-	xf::PropertyOut<si::Length>				position_vertical_stddev			{ this, "position/vertical.standard-deviation" };
-	xf::PropertyOut<si::Length>				position_stddev						{ this, "position/standard-deviation" };
-	xf::PropertyOut<std::string>			position_source						{ this, "position/source" };
-	xf::PropertyOut<si::Angle>				orientation_pitch					{ this, "orientation/pitch" };
-	xf::PropertyOut<si::Angle>				orientation_roll					{ this, "orientation/roll" };
-	xf::PropertyOut<si::Angle>				orientation_heading_magnetic		{ this, "orientation/heading.magnetic" };
-	xf::PropertyOut<si::Angle>				orientation_heading_true			{ this, "orientation/heading.true" };
-	xf::PropertyOut<si::Angle>				track_vertical						{ this, "track/vertical" };
-	xf::PropertyOut<si::Angle>				track_lateral_magnetic				{ this, "track/lateral.magnetic" };
-	xf::PropertyOut<si::Angle>				track_lateral_true					{ this, "track/lateral.true" };
-	xf::PropertyOut<si::AngularVelocity>	track_lateral_rotation				{ this, "track/rotation" };
-	xf::PropertyOut<si::Velocity>			track_ground_speed					{ this, "track/ground-speed" };
-	xf::PropertyOut<si::Angle>				magnetic_declination				{ this, "magnetic-declination" };
-	xf::PropertyOut<si::Angle>				magnetic_inclination				{ this, "magnetic-inclination" };
+	xf::ModuleOut<si::Angle>			position_longitude					{ this, "position/longitude" };
+	xf::ModuleOut<si::Angle>			position_latitude					{ this, "position/latitude" };
+	xf::ModuleOut<si::Length>			position_altitude_amsl				{ this, "position/altitude.amsl" };
+	xf::ModuleOut<si::Length>			position_lateral_stddev				{ this, "position/lateral.standard-deviation" };
+	xf::ModuleOut<si::Length>			position_vertical_stddev			{ this, "position/vertical.standard-deviation" };
+	xf::ModuleOut<si::Length>			position_stddev						{ this, "position/standard-deviation" };
+	xf::ModuleOut<std::string>			position_source						{ this, "position/source" };
+	xf::ModuleOut<si::Angle>			orientation_pitch					{ this, "orientation/pitch" };
+	xf::ModuleOut<si::Angle>			orientation_roll					{ this, "orientation/roll" };
+	xf::ModuleOut<si::Angle>			orientation_heading_magnetic		{ this, "orientation/heading.magnetic" };
+	xf::ModuleOut<si::Angle>			orientation_heading_true			{ this, "orientation/heading.true" };
+	xf::ModuleOut<si::Angle>			track_vertical						{ this, "track/vertical" };
+	xf::ModuleOut<si::Angle>			track_lateral_magnetic				{ this, "track/lateral.magnetic" };
+	xf::ModuleOut<si::Angle>			track_lateral_true					{ this, "track/lateral.true" };
+	xf::ModuleOut<si::AngularVelocity>	track_lateral_rotation				{ this, "track/rotation" };
+	xf::ModuleOut<si::Velocity>			track_ground_speed					{ this, "track/ground-speed" };
+	xf::ModuleOut<si::Angle>			magnetic_declination				{ this, "magnetic-declination" };
+	xf::ModuleOut<si::Angle>			magnetic_inclination				{ this, "magnetic-inclination" };
 };
 
 
@@ -119,8 +119,8 @@ class NavigationComputer: public xf::Module<NavigationComputerIO>
 	Positions							_positions								{ 3 };
 	Positions							_positions_accurate_2_times				{ 3 };
 	Positions							_positions_accurate_9_times				{ 3 };
-	// Note: PropertyObservers depend on Smoothers, so first Smoothers must be defined,
-	// then PropertyObservers, to ensure correct order of destruction.
+	// Note: SocketObservers depend on Smoothers, so first Smoothers must be defined,
+	// then SocketObservers, to ensure correct order of destruction.
 	xf::RangeSmoother<si::Angle>		_orientation_pitch_smoother				{ { -180.0_deg, +180.0_deg }, 25_ms };
 	xf::RangeSmoother<si::Angle>		_orientation_roll_smoother				{ { -180.0_deg, +180.0_deg }, 25_ms };
 	xf::RangeSmoother<si::Angle>		_orientation_heading_magnetic_smoother	{ { 0.0_deg, 360.0_deg }, 200_ms };
@@ -129,11 +129,11 @@ class NavigationComputer: public xf::Module<NavigationComputerIO>
 	xf::Smoother<si::AngularVelocity>	_track_lateral_rotation_smoother		{ 1500_ms };
 	xf::Smoother<si::Velocity>			_track_ground_speed_smoother			{ 2_s };
 	si::Time							_track_accumulated_dt					{ 0_s };
-	xf::PropertyObserver				_position_computer;
-	xf::PropertyObserver				_magnetic_variation_computer;
-	xf::PropertyObserver				_headings_computer;
-	xf::PropertyObserver				_track_computer;
-	xf::PropertyObserver				_ground_speed_computer;
+	xf::SocketObserver					_position_computer;
+	xf::SocketObserver					_magnetic_variation_computer;
+	xf::SocketObserver					_headings_computer;
+	xf::SocketObserver					_track_computer;
+	xf::SocketObserver					_ground_speed_computer;
 };
 
 #endif

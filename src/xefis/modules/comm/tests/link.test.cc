@@ -28,29 +28,29 @@ xf::LoggerOutput g_logger_output (std::clog);
 xf::Logger g_logger (g_logger_output);
 
 
-template<template<class> class PropertyType>
+template<template<class> class SocketType>
 	class GCS2AircraftLinkIO: public LinkIO
 	{
 	  public:
-		PropertyType<si::Angle>		nil_prop				{ this, "nil" };
-		PropertyType<si::Angle>		angle_prop				{ this, "angle" };
-		PropertyType<si::Angle>		angle_prop_r			{ this, "angle_r" };
-		PropertyType<si::Velocity>	velocity_prop			{ this, "velocity" };
-		PropertyType<si::Velocity>	velocity_prop_r			{ this, "velocity_r" };
-		PropertyType<si::Velocity>	velocity_prop_offset	{ this, "velocity_prop_offset" };
-		PropertyType<si::Velocity>	velocity_prop_offset_r	{ this, "velocity_prop_offset_r" };
-		PropertyType<bool>			bool_prop				{ this, "bool" };
-		PropertyType<bool>			bool_prop_r				{ this, "bool_r" };
-		PropertyType<int64_t>		int_prop				{ this, "int" };
-		PropertyType<int64_t>		int_prop_r				{ this, "int_r" };
-		PropertyType<uint64_t>		uint_prop				{ this, "uint" };
-		PropertyType<uint64_t>		uint_prop_r				{ this, "uint_r" };
-		PropertyType<int64_t>		dummy					{ this, "dummy" };
+		SocketType<si::Angle>		nil_si_prop				{ this, "nil" };
+		SocketType<si::Angle>		angle_prop				{ this, "angle" };
+		SocketType<si::Angle>		angle_prop_r			{ this, "angle_r" };
+		SocketType<si::Velocity>	velocity_prop			{ this, "velocity" };
+		SocketType<si::Velocity>	velocity_prop_r			{ this, "velocity_r" };
+		SocketType<si::Velocity>	velocity_prop_offset	{ this, "velocity_prop_offset" };
+		SocketType<si::Velocity>	velocity_prop_offset_r	{ this, "velocity_prop_offset_r" };
+		SocketType<bool>			bool_prop				{ this, "bool" };
+		SocketType<bool>			bool_prop_r				{ this, "bool_r" };
+		SocketType<int64_t>			int_prop				{ this, "int" };
+		SocketType<int64_t>			int_prop_r				{ this, "int_r" };
+		SocketType<uint64_t>		uint_prop				{ this, "uint" };
+		SocketType<uint64_t>		uint_prop_r				{ this, "uint_r" };
+		SocketType<int64_t>			dummy					{ this, "dummy" };
 	};
 
 
-using GCS_Tx_LinkIO = GCS2AircraftLinkIO<xf::PropertyIn>;
-using Aircraft_Rx_LinkIO = GCS2AircraftLinkIO<xf::PropertyOut>;
+using GCS_Tx_LinkIO = GCS2AircraftLinkIO<xf::ModuleIn>;
+using Aircraft_Rx_LinkIO = GCS2AircraftLinkIO<xf::ModuleOut>;
 
 
 constexpr auto kFallbackBool	= true;
@@ -67,29 +67,29 @@ class GCS_Tx_LinkProtocol: public LinkProtocol
 			LinkProtocol ({
 				envelope (Magic ({ 0xe4, 0x40 }), {
 					signature (NonceBytes (8), SignatureBytes (12), Key ({ 0x88, 0x99, 0xaa, 0xbb }), {
-						property<8> (io->nil_prop,					Retained (false)),
-						property<8> (io->angle_prop,				Retained (false)),
-						property<8> (io->angle_prop_r,				Retained (true)),
-						property<2> (io->velocity_prop,				Retained (false)),
-						property<2> (io->velocity_prop_r,			Retained (true)),
-						property<2> (io->velocity_prop_offset,		Retained (false),	1000_kph),
-						property<2> (io->velocity_prop_offset_r,	Retained (true),	1000_kph),
-						property<2> (io->int_prop,					Retained (false),	0L),
-						property<2> (io->int_prop_r,				Retained (true),	0L),
+						socket<8> (io->nil_si_prop,				Retained (false)),
+						socket<8> (io->angle_prop,				Retained (false)),
+						socket<8> (io->angle_prop_r,			Retained (true)),
+						socket<2> (io->velocity_prop,			Retained (false)),
+						socket<2> (io->velocity_prop_r,			Retained (true)),
+						socket<2> (io->velocity_prop_offset,	Retained (false),	1000_kph),
+						socket<2> (io->velocity_prop_offset_r,	Retained (true),	1000_kph),
+						socket<2> (io->int_prop,				Retained (false),	0L),
+						socket<2> (io->int_prop_r,				Retained (true),	0L),
 					}),
 				}),
 				envelope (Magic ({ 0xa3, 0x80 }), {
 					signature (NonceBytes (8), SignatureBytes (8), Key ({ 0x55, 0x37, 0x12, 0xf9 }), {
 						bitfield ({
-							bitfield_property (io->bool_prop,					Retained (false),	kFallbackBool),
-							bitfield_property (io->bool_prop_r,					Retained (true),	kFallbackBool),
-							bitfield_property (io->uint_prop,		Bits (4),	Retained (true),	kFallbackInt),
-							bitfield_property (io->uint_prop_r,		Bits (4),	Retained (true),	kFallbackInt),
+							bitfield_socket (io->bool_prop,					Retained (false),	kFallbackBool),
+							bitfield_socket (io->bool_prop_r,				Retained (true),	kFallbackBool),
+							bitfield_socket (io->uint_prop,		Bits (4),	Retained (true),	kFallbackInt),
+							bitfield_socket (io->uint_prop_r,	Bits (4),	Retained (true),	kFallbackInt),
 						}),
 					}),
 				}),
 				envelope (Magic ({ 0x01, 0x02 }), SendEvery (10), SendOffset (8), {
-					property<4> (io->dummy, Retained (false), 0L),
+					socket<4> (io->dummy, Retained (false), 0L),
 				}),
 			})
 		{ }
@@ -131,7 +131,7 @@ AutoTest t1 ("modules/io/link: protocol: valid data transmission", []{
 
 	auto test = [&] {
 		transmit (tx_protocol, rx_protocol);
-		test_asserts::verify ("nil_prop transmitted properly", rx_io.nil_prop.get_optional() == tx_io.nil_prop.get_optional());
+		test_asserts::verify ("nil_si_prop transmitted properly", rx_io.nil_si_prop.get_optional() == tx_io.nil_si_prop.get_optional());
 		test_asserts::verify ("angle_prop transmitted properly (optional() version)", rx_io.angle_prop.get_optional() == tx_io.angle_prop.get_optional());
 		test_asserts::verify ("angle_prop transmitted properly", *rx_io.angle_prop == *tx_io.angle_prop);
 		test_asserts::verify_equal_with_epsilon ("velocity transmitted properly", *rx_io.velocity_prop, *tx_io.velocity_prop, 0.1_kph);
@@ -239,7 +239,7 @@ AutoTest t4 ("modules/io/link: protocol: invalid data transmission (wrong signat
 	GCS_Tx_LinkProtocol rx_protocol (&rx_io);
 
 	// Transmit correctly first:
-	tx_io.nil_prop << xf::no_data_source;
+	tx_io.nil_si_prop << xf::no_data_source;
 	tx_io.angle_prop << xf::ConstantSource (15_rad);
 	tx_io.angle_prop_r << xf::ConstantSource (15_rad);
 	tx_io.velocity_prop << xf::ConstantSource (100_mps);
@@ -258,7 +258,7 @@ AutoTest t4 ("modules/io/link: protocol: invalid data transmission (wrong signat
 	rx_protocol.eat (blob.begin(), blob.end(), nullptr, nullptr, nullptr, g_logger);
 
 	// Transmit invalid data:
-	tx_io.nil_prop << xf::ConstantSource (1_rad);
+	tx_io.nil_si_prop << xf::ConstantSource (1_rad);
 	tx_io.angle_prop << xf::ConstantSource (16_rad);
 	tx_io.angle_prop_r << xf::ConstantSource (16_rad);
 	tx_io.velocity_prop << xf::ConstantSource (101_mps);
@@ -287,7 +287,7 @@ AutoTest t4 ("modules/io/link: protocol: invalid data transmission (wrong signat
 	rx_protocol.eat (blob.begin(), blob.end(), nullptr, nullptr, nullptr, g_logger);
 
 	// Test that values weren't changed during last invalid transmission:
-	test_asserts::verify ("nil_prop didn't change", !rx_io.nil_prop);
+	test_asserts::verify ("nil_si_prop didn't change", !rx_io.nil_si_prop);
 	test_asserts::verify ("angle_prop is didn't change", *rx_io.angle_prop == 15_rad);
 	test_asserts::verify_equal_with_epsilon ("velocity_prop didn't change", *rx_io.velocity_prop, 100_mps, 0.1_mps);
 	test_asserts::verify_equal_with_epsilon ("velocity_prop_offset didn't change", *rx_io.velocity_prop_offset, 102_mps, 0.1_mps);
@@ -297,7 +297,7 @@ AutoTest t4 ("modules/io/link: protocol: invalid data transmission (wrong signat
 
 	// Test fail-safe and retaining of original values:
 	rx_protocol.failsafe();
-	test_asserts::verify ("nil_prop is nil", !rx_io.nil_prop);
+	test_asserts::verify ("nil_si_prop is nil", !rx_io.nil_si_prop);
 	test_asserts::verify ("angle_prop is nil", !rx_io.angle_prop);
 	test_asserts::verify ("angle_prop_r is retained", *rx_io.angle_prop_r == 15_rad);
 	test_asserts::verify ("velocity_prop is nil", !rx_io.velocity_prop);
@@ -346,7 +346,7 @@ AutoTest t5 ("modules/io/link: protocol: send-every/send-offset", []{
 		test_asserts::verify ("last envelope not sent in subsequent transmissions", *rx_io.dummy == kFirstInt);
 	}
 
-	// 10th transmission updates the property:
+	// 10th transmission updates the socket:
 	transmit (tx_protocol, rx_protocol);
 	test_asserts::verify ("last envelope sent for the second time", *rx_io.dummy == kSecondInt);
 });

@@ -24,7 +24,8 @@
 
 // Xefis:
 #include <xefis/core/cycle.h>
-#include <xefis/core/property.h>
+#include <xefis/core/module_io.h>
+#include <xefis/core/module_socket.h>
 
 
 namespace xf::test {
@@ -133,9 +134,9 @@ template<class T>
 		std::unique_ptr<ModuleIO>	io		{ std::make_unique<ModuleIO>() };
 
 	  public:
-		PropertyOut<T>				out		{ io.get(), "out" };
-		PropertyOut<T>				mid		{ io.get(), "mid" };
-		PropertyIn<T>				in		{ io.get(), "in" };
+		ModuleOut<T>				out		{ io.get(), "out" };
+		ModuleIn<T>					mid		{ io.get(), "mid" };
+		ModuleIn<T>					in		{ io.get(), "in" };
 		Module<ModuleIO>			module	{ std::move (io) };
 		TestCycle					cycle;
 	};
@@ -175,51 +176,51 @@ template<class T>
 	}
 
 
-template<class T, template<class> class AnyProperty>
+template<class T, template<class> class AnySocket>
 	void
-	test_nil_values (AnyProperty<T> const& property, T test_value)
+	test_nil_values (AnySocket<T> const& socket, T test_value)
 	{
-		test_asserts::verify (desc_type<T> ("nil property is converted to false"),
-							  !property);
+		test_asserts::verify (desc_type<T> ("nil socket is converted to false"),
+							  !socket);
 
-		test_asserts::verify (desc_type<T> ("nil property says it's nil"),
-							  property.is_nil());
+		test_asserts::verify (desc_type<T> ("nil socket says it's nil"),
+							  socket.is_nil());
 
-		test_asserts::verify (desc_type<T> ("nil property says it's nil"),
-							  !property.valid());
+		test_asserts::verify (desc_type<T> ("nil socket says it's nil"),
+							  !socket.valid());
 
-		test_asserts::verify (desc_type<T> ("reading nil property with operator*() throws"),
-							  Exception::catch_and_log (g_null_logger, [&]{ static_cast<void> (*property); }));
+		test_asserts::verify (desc_type<T> ("reading nil socket with operator*() throws"),
+							  Exception::catch_and_log (g_null_logger, [&]{ static_cast<void> (*socket); }));
 
-		test_asserts::verify (desc_type<T> ("reading nil property with get_optional() returns empty std::optional"),
-							  !property.get_optional().has_value());
+		test_asserts::verify (desc_type<T> ("reading nil socket with get_optional() returns empty std::optional"),
+							  !socket.get_optional().has_value());
 
-		test_asserts::verify (desc_type<T> ("reading nil property with value_or() gives the argument"),
-							  property.value_or (test_value) == test_value);
+		test_asserts::verify (desc_type<T> ("reading nil socket with value_or() gives the argument"),
+							  socket.value_or (test_value) == test_value);
 	}
 
 
-template<class T, template<class> class AnyProperty>
+template<class T, template<class> class AnySocket>
 	void
-	test_non_nil_values (AnyProperty<T> const& property, T test_value, std::string what)
+	test_non_nil_values (AnySocket<T> const& socket, T test_value, std::string what)
 	{
 		test_asserts::verify (desc_type<T> (what + " converts to true"),
-							  !!property);
+							  !!socket);
 
 		test_asserts::verify (desc_type<T> ("reading " + what + " with operator*() does not throw"),
-							  !Exception::catch_and_log (g_null_logger, [&]{ static_cast<void> (*property); }));
+							  !Exception::catch_and_log (g_null_logger, [&]{ static_cast<void> (*socket); }));
 
-		test_asserts::verify (desc_type<T> ("property's value != test_value"),
-							  *property != test_value);
+		test_asserts::verify (desc_type<T> ("socket's value != test_value"),
+							  *socket != test_value);
 
-		test_asserts::verify (desc_type<T> ("reading non-nil property with value_or() gives property's value"),
-							  property.value_or (test_value) == *property);
+		test_asserts::verify (desc_type<T> ("reading non-nil socket with value_or() gives socket's value"),
+							  socket.value_or (test_value) == *socket);
 
-		test_asserts::verify (desc_type<T> ("reading non-nil property with get_optional() returns non-empty std::optional"),
-							  property.get_optional().has_value());
+		test_asserts::verify (desc_type<T> ("reading non-nil socket with get_optional() returns non-empty std::optional"),
+							  socket.get_optional().has_value());
 
-		test_asserts::verify (desc_type<T> ("reading property with get_optional() returns correct value"),
-							  *property.get_optional() == *property);
+		test_asserts::verify (desc_type<T> ("reading socket with get_optional() returns correct value"),
+							  *socket.get_optional() == *socket);
 	}
 
 
@@ -233,19 +234,19 @@ template<class T>
 	}
 
 
-AutoTest t1 ("xf::Property nil and non-nil values", for_all_types ([](auto value1, auto value2) {
+AutoTest t1 ("xf::Socket nil and non-nil values", for_all_types ([](auto value1, auto value2) {
 	TestEnvironment<decltype (value1)> env;
 
-	// The property should initially be nil:
+	// The socket should initially be nil:
 	test_nil_values (env.in, value2);
 	test_nil_values (env.out, value2);
 
 	// Non-nil values:
 	env.in << ConstantSource (value1);
-	test_non_nil_values (env.in, value2, "non-nil property");
+	test_non_nil_values (env.in, value2, "non-nil socket");
 
 	env.out = value1;
-	test_non_nil_values (env.out, value2, "non-nil property");
+	test_non_nil_values (env.out, value2, "non-nil socket");
 
 	// Nil again:
 	env.in << xf::no_data_source;
@@ -256,7 +257,7 @@ AutoTest t1 ("xf::Property nil and non-nil values", for_all_types ([](auto value
 }));
 
 
-AutoTest t2 ("xf::Property fallback values", for_all_types ([](auto value1, auto value2) {
+AutoTest t2 ("xf::Socket fallback values", for_all_types ([](auto value1, auto value2) {
 	using T = decltype (value1);
 
 	{
@@ -264,10 +265,10 @@ AutoTest t2 ("xf::Property fallback values", for_all_types ([](auto value1, auto
 
 		// Fallback values:
 		env.in.set_fallback (value1);
-		test_non_nil_values (env.in, value2, "property with fallback value");
+		test_non_nil_values (env.in, value2, "socket with fallback value");
 
 		env.out.set_fallback (value1);
-		test_non_nil_values (env.out, value2, "property with fallback value");
+		test_non_nil_values (env.out, value2, "socket with fallback value");
 
 		// No fallback again:
 		env.in.set_fallback (std::nullopt);
@@ -281,57 +282,57 @@ AutoTest t2 ("xf::Property fallback values", for_all_types ([](auto value1, auto
 	{
 		auto const fallback_value = value1;
 		ModuleIO io;
-		PropertyIn<T> tmp_prop (&io, "fallback-test", fallback_value);
+		ModuleIn<T> tmp_prop (&io, "fallback-test", fallback_value);
 		test_asserts::verify (desc_type<T> ("fallback-value set in ctor works"), *tmp_prop == fallback_value);
 	}
 
-	// Test fallback on connected properties:
+	// Test fallback on connected sockets:
 	{
 		TestEnvironment<T> env;
 
 		env.in << env.mid;
 		env.mid << env.out;
 
-		// Fallback on output property:
+		// Fallback on output socket:
 		env.out.set_fallback (value2);
 
 		env.out = value1;
 		env.in.fetch (env.cycle += 1_s);
-		test_asserts::verify ("non-fallback value on PropertyOut works", *env.in == value1);
+		test_asserts::verify ("non-fallback value on ModuleOut works", *env.in == value1);
 
 		env.out = xf::nil;
 		env.in.fetch (env.cycle += 1_s);
-		test_asserts::verify ("fallback value on PropertyOut works", *env.in == value2);
+		test_asserts::verify ("fallback value on ModuleOut works", *env.in == value2);
 
-		// Fallback on middle property:
+		// Fallback on middle socket:
 		env.out.set_fallback (std::nullopt);
 		env.mid.set_fallback (value2);
 
 		env.out = value1;
 		env.in.fetch (env.cycle += 1_s);
-		test_asserts::verify ("non-fallback value on middle PropertyOut works", *env.in == value1);
+		test_asserts::verify ("non-fallback value on middle ModuleOut works", *env.in == value1);
 
 		env.out = xf::nil;
 		env.in.fetch (env.cycle += 1_s);
-		test_asserts::verify ("fallback value on PropertyIn works", *env.in == value2);
+		test_asserts::verify ("fallback value on ModuleIn works", *env.in == value2);
 
-		// Fallback on input property:
+		// Fallback on input socket:
 		env.out.set_fallback (std::nullopt);
 		env.mid.set_fallback (std::nullopt);
 		env.in.set_fallback (value2);
 
 		env.out = value1;
 		env.in.fetch (env.cycle += 1_s);
-		test_asserts::verify ("non-fallback value on PropertyIn works", *env.in == value1);
+		test_asserts::verify ("non-fallback value on ModuleIn works", *env.in == value1);
 
 		env.out = xf::nil;
 		env.in.fetch (env.cycle += 1_s);
-		test_asserts::verify ("fallback value on PropertyIn works", *env.in == value2);
+		test_asserts::verify ("fallback value on ModuleIn works", *env.in == value2);
 	}
 }));
 
 
-AutoTest t3 ("xf::Property serial numbers", for_all_types ([](auto value1, auto value2) {
+AutoTest t3 ("xf::Socket serial numbers", for_all_types ([](auto value1, auto value2) {
 	using T = decltype (value1);
 
 	// Serial number:
@@ -350,7 +351,7 @@ AutoTest t3 ("xf::Property serial numbers", for_all_types ([](auto value1, auto 
 		test_asserts::verify (desc_type<T> ("serial does not increment when value doesn't change"), serial_2 == serial_1);
 	}
 
-	// Test serial on connected properties:
+	// Test serial on connected sockets:
 	{
 		TestEnvironment<T> env;
 
@@ -364,32 +365,32 @@ AutoTest t3 ("xf::Property serial numbers", for_all_types ([](auto value1, auto 
 		env.out = value2;
 		env.in.fetch (env.cycle += 1_s);
 		auto serial_1 = env.in.serial();
-		test_asserts::verify (desc_type<T> ("serial increments when value changes over connected properties"), serial_1 == serial_0 + 1);
+		test_asserts::verify (desc_type<T> ("serial increments when value changes over connected sockets"), serial_1 == serial_0 + 1);
 
 		env.out = value2;
 		env.in.fetch (env.cycle += 1_s);
 		auto serial_2 = env.in.serial();
-		test_asserts::verify (desc_type<T> ("serial does not increment when value doesn't change over connected properties"), serial_2 == serial_1);
+		test_asserts::verify (desc_type<T> ("serial does not increment when value doesn't change over connected sockets"), serial_2 == serial_1);
 	}
 }));
 
 
-AutoTest t4 ("xf::Property transferring data", for_all_types ([](auto value1, auto value2) {
+AutoTest t4 ("xf::Socket transferring data", for_all_types ([](auto value1, auto value2) {
 	using T = decltype (value1);
 
 	TestEnvironment<T> env;
 
-	// Test if data is transferred from output to input properties properly:
+	// Test if data is transferred from output to input sockets properly:
 	env.in << env.mid;
 	env.mid << env.out;
 
 	env.out = value1;
 	env.in.fetch (env.cycle += 1_s);
-	test_asserts::verify ("transferring data from output to input properties works (1)", *env.in == value1);
+	test_asserts::verify ("transferring data from output to input sockets works (1)", *env.in == value1);
 
 	env.out = value2;
 	env.in.fetch (env.cycle += 1_s);
-	test_asserts::verify ("transferring data from output to input properties works (2)", *env.in == value2);
+	test_asserts::verify ("transferring data from output to input sockets works (2)", *env.in == value2);
 
 	env.out = value1;
 	env.in.fetch (env.cycle); // Note the same cycle as before; value should not change.
@@ -397,11 +398,11 @@ AutoTest t4 ("xf::Property transferring data", for_all_types ([](auto value1, au
 
 	env.out = xf::nil;
 	env.in.fetch (env.cycle += 1_s);
-	test_asserts::verify ("transferring nil-values from output to input properties works", env.in.is_nil());
+	test_asserts::verify ("transferring nil-values from output to input sockets works", env.in.is_nil());
 }));
 
 
-AutoTest t5 ("xf::Property serialization", for_all_types ([](auto value1, auto value2) {
+AutoTest t5 ("xf::Socket serialization", for_all_types ([](auto value1, auto value2) {
 	using T = decltype (value1);
 
 	// Serialization:
@@ -414,7 +415,7 @@ AutoTest t5 ("xf::Property serialization", for_all_types ([](auto value1, auto v
 			env.in << ConstantSource (value1);
 			auto serialized = env.in.to_string();
 			env.out = value2;
-			test_asserts::verify (desc_type<T> ("to_string(): property == value2"), *env.out == value2);
+			test_asserts::verify (desc_type<T> ("to_string(): socket == value2"), *env.out == value2);
 			env.out.from_string (serialized);
 			test_asserts::verify (desc_type<T> ("to_string() serialization works correctly for"), *env.out == value1);
 
@@ -431,7 +432,7 @@ AutoTest t5 ("xf::Property serialization", for_all_types ([](auto value1, auto v
 			env.in << ConstantSource (value1);
 			auto serialized = env.in.to_blob();
 			env.out = value2;
-			test_asserts::verify (desc_type<T> ("to_blob(): property == value2"), *env.out == value2);
+			test_asserts::verify (desc_type<T> ("to_blob(): socket == value2"), *env.out == value2);
 			env.out.from_blob (serialized);
 			test_asserts::verify (desc_type<T> ("to_blob() serialization works correctly for"), *env.out == value1);
 		}
@@ -447,7 +448,7 @@ AutoTest t5 ("xf::Property serialization", for_all_types ([](auto value1, auto v
 			env.in << xf::no_data_source;
 			auto serialized = env.in.to_string();
 			env.out = value1;
-			test_asserts::verify (desc_type<T> ("to_string() on nil: property == value1"), *env.out == value1);
+			test_asserts::verify (desc_type<T> ("to_string() on nil: socket == value1"), *env.out == value1);
 			env.out.from_string (serialized);
 			test_asserts::verify (desc_type<T> ("to_string() serialization on nil value works correctly for"), !env.out);
 		}
@@ -457,7 +458,7 @@ AutoTest t5 ("xf::Property serialization", for_all_types ([](auto value1, auto v
 			env.in << xf::no_data_source;
 			auto serialized = env.in.to_blob();
 			env.out = value1;
-			test_asserts::verify (desc_type<T> ("to_blob() on nil: property == value1"), *env.out == value1);
+			test_asserts::verify (desc_type<T> ("to_blob() on nil: socket == value1"), *env.out == value1);
 			env.out.from_blob (serialized);
 			test_asserts::verify (desc_type<T> ("to_blob() serialization on nil value works correctly for"), !env.out);
 		}
@@ -465,12 +466,12 @@ AutoTest t5 ("xf::Property serialization", for_all_types ([](auto value1, auto v
 }));
 
 
-AutoTest t6 ("xf::Property various behavior", for_all_types ([](auto value1, auto) {
+AutoTest t6 ("xf::Socket various behavior", for_all_types ([](auto value1, auto) {
 	using T = decltype (value1);
 
 	ModuleIO io;
-	PropertyOut<T> out { &io, "out" };
-	PropertyIn<T> in { &io, "in" };
+	ModuleOut<T> out { &io, "out" };
+	ModuleIn<T> in { &io, "in" };
 
 	in << out;
 	test_asserts::verify ("fetch() throws when no Module is assigned",
@@ -490,25 +491,54 @@ template<class T>
 	{ };
 
 
-AutoTest t7 ("xf::Property operator=", for_all_types ([](auto value1, auto value2) {
+AutoTest t7 ("xf::Socket operator=", for_all_types ([](auto value1, auto value2) {
 	using T = decltype (value1);
 
 	ModuleIO io;
 
-	// Make sure PropertyIn<T>::operator= is forbidden as it may be misleading:
-	test_asserts::verify ("PropertyIn<T>::operator= (PropertyIn<T>) is forbidden", !HasAssignmentOperator<PropertyIn<T>>::value);
+	// Make sure ModuleIn<T>::operator= is forbidden as it may be misleading:
+	test_asserts::verify ("ModuleIn<T>::operator= (ModuleIn<T>) is forbidden", !HasAssignmentOperator<ModuleIn<T>>::value);
 
-	// Make sure operator= copies value, not the identity of PropertyOut:
-	PropertyOut<T> out1 { &io, "out1" };
-	PropertyOut<T> out2 { &io, "out2" };
+	// Make sure operator= copies value, not the identity of ModuleOut:
+	ModuleOut<T> out1 { &io, "out1" };
+	ModuleOut<T> out2 { &io, "out2" };
 	out1 = value1;
 	out2 = value2;
 	test_asserts::verify ("out1 has test value1", *out1 == value1);
 	test_asserts::verify ("out2 has test value2", *out2 == value2);
-	out1 = out2;
-	test_asserts::verify ("out1's identity haven't change", out1.path() == PropertyPath ("out1"));
+	out1 = *out2;
+	test_asserts::verify ("out1's identity haven't changed", out1.path() == ModuleSocketPath ("out1"));
 	test_asserts::verify ("out2 has test value2", *out1 == value2);
 }));
+
+
+// TODO AutoTest t8 ("xf::Socket << DynamicSource", []{
+// TODO 	TestEnvironment<int> env;
+// TODO 
+// TODO 	template<auto Value>
+// TODO 		class TestDynamicSource: public DynamicSource<decltype (Value)>
+// TODO 		{
+// TODO 		  public:
+// TODO 			[[nodiscard]]
+// TODO 			std::optional<decltype (Value)>
+// TODO 			get (Cycle const&) override
+// TODO 				{ return Value; }
+// TODO 		};
+// TODO 
+// TODO 	env.in << TestDynamicSource<12>();
+// TODO 	env.in.fetch (env.cycle += 1_s);
+// TODO 	test_asserts::verify ("expression transforms data properly", *in == 12);
+// TODO });
+
+
+// TODO AutoTest t9 ("xf::SocketExpression", []{
+// TODO 	TestEnvironment<int32_t> env;
+// TODO 
+// TODO 	env.out = 11;
+// TODO 	env.in << [](auto const value) { return value * 2; } << env.out;
+// TODO 	env.in.fetch (env.cycle += 1_s);
+// TODO 	test_asserts::verify ("expression transforms data properly", *in == 22);
+// TODO });
 
 } // namespace
 } // namespace xf::test

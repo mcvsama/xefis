@@ -22,7 +22,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/v1/property.h>
+#include <xefis/core/v1/socket.h>
 #include <xefis/support/ui/widgets/panel_widget.h>
 
 
@@ -50,7 +50,7 @@ class PanelButton: public PanelWidget
 	 * Create button with LED indicator.
 	 */
 	explicit
-	PanelButton (QWidget* parent, Panel*, LEDColor, v1::PropertyBoolean click_property, v1::PropertyBoolean toggle_property, v1::PropertyBoolean led_property);
+	PanelButton (QWidget* parent, Panel*, LEDColor, Socket<bool> click_socket, Socket<bool> toggle_socket, Socket<bool> led_socket);
 
   protected:
 	void
@@ -65,24 +65,24 @@ class PanelButton: public PanelWidget
 
   private slots:
 	/**
-	 * Read property and update state.
+	 * Read socket and update state.
 	 */
 	void
 	read();
 
 	/**
-	 * Write to controlled properties.
+	 * Write to controlled sockets.
 	 */
 	void
 	write();
 
   private:
-	QPushButton*		_button					= nullptr;
-	v1::PropertyBoolean	_click_property;
-	v1::PropertyBoolean	_toggle_property;
-	v1::PropertyBoolean	_led_property;
-	QIcon				_icon_on;
-	QIcon				_icon_off;
+	QPushButton*	_button { nullptr };
+	Socket<bool>	_click_socket;
+	Socket<bool>	_toggle_socket;
+	Socket<bool>	_led_socket;
+	QIcon			_icon_on;
+	QIcon			_icon_off;
 };
 
 } // namespace xf

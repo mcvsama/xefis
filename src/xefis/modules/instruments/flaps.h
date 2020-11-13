@@ -21,9 +21,9 @@
 #include <xefis/config/all.h>
 #include <xefis/core/graphics.h>
 #include <xefis/core/instrument.h>
-#include <xefis/core/property.h>
-#include <xefis/core/property_observer.h>
 #include <xefis/core/setting.h>
+#include <xefis/core/socket.h>
+#include <xefis/core/socket_observer.h>
 #include <xefis/support/instrument/instrument_support.h>
 
 
@@ -38,15 +38,15 @@ class FlapsIO: public xf::ModuleIO
 	 * Settings
 	 */
 
-	xf::Setting<si::Angle>		maximum_angle		{ this, "maximum_angle" };
-	xf::Setting<bool>			hide_retracted		{ this, "hide_retracted", true };
+	xf::Setting<si::Angle>	maximum_angle	{ this, "maximum_angle" };
+	xf::Setting<bool>		hide_retracted	{ this, "hide_retracted", true };
 
 	/*
 	 * Input
 	 */
 
-	xf::PropertyIn<si::Angle>	current_angle		{ this, "current-angle" };
-	xf::PropertyIn<si::Angle>	set_angle			{ this, "set-angle" };
+	xf::ModuleIn<si::Angle>	current_angle	{ this, "current-angle" };
+	xf::ModuleIn<si::Angle>	set_angle		{ this, "set-angle" };
 };
 
 
@@ -81,7 +81,7 @@ class Flaps:
 	async_paint (xf::PaintRequest const&, PaintingParams const&) const;
 
   private:
-	xf::PropertyObserver _inputs_observer;
+	xf::SocketObserver _inputs_observer;
 };
 
 #endif

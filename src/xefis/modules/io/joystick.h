@@ -33,7 +33,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
-#include <xefis/core/property.h>
+#include <xefis/core/module_socket.h>
 #include <xefis/core/setting.h>
 
 
@@ -50,7 +50,7 @@ class JoystickInputIO: public xf::ModuleIO
 
 	xf::Setting<bool>	restart_on_failure	{ this, "restart_on_failure", true };
 
-	// TODO PropertyOuts for axes and buttons
+	// TODO ModuleOuts for axes and buttons
 };
 
 
@@ -99,10 +99,10 @@ class JoystickInput:
 	  public:
 		// Ctor
 		explicit
-		Button (QDomElement const& button_element, xf::PropertyOut<bool>&);
+		Button (QDomElement const& button_element, xf::ModuleOut<bool>&);
 
-		xf::PropertyOut<bool>&
-		property();
+		xf::ModuleOut<bool>&
+		socket();
 
 		void
 		handle (EventType, HandlerID, int32_t value) override;
@@ -115,7 +115,7 @@ class JoystickInput:
 		set_value (float value);
 
 	  private:
-		xf::PropertyOut<bool>&	_property;
+		xf::ModuleOut<bool>& _socket;
 	};
 
 	class Axis: public Handler
@@ -123,16 +123,16 @@ class JoystickInput:
 	  public:
 		// Ctor
 		explicit
-		Axis (QDomElement const& axis_element, xf::PropertyOut<double>&, xf::PropertyOut<si::Angle>&, xf::Range<si::Angle>& angle_range);
+		Axis (QDomElement const& axis_element, xf::ModuleOut<double>&, xf::ModuleOut<si::Angle>&, xf::Range<si::Angle>& angle_range);
 
 		/**
 		 * Make Axis that is emulated by two buttons on the joystick.
 		 */
-		Axis (QDomElement const& axis_element, xf::PropertyOut<double>&, xf::PropertyOut<si::Angle>&, xf::Range<si::Angle>& angle_range,
+		Axis (QDomElement const& axis_element, xf::ModuleOut<double>&, xf::ModuleOut<si::Angle>&, xf::Range<si::Angle>& angle_range,
 			  std::optional<HandlerID> up_button_id, std::optional<HandlerID> down_button_id);
 
-		xf::PropertyOut<double>&
-		property();
+		xf::ModuleOut<double>&
+		socket();
 
 		void
 		handle (EventType, HandlerID id, int32_t value) override;
@@ -145,8 +145,8 @@ class JoystickInput:
 		set_value (float value);
 
 	  private:
-		xf::PropertyOut<double>&	_property;
-		xf::PropertyOut<si::Angle>&	_angle_property;
+		xf::ModuleOut<double>&		_socket;
+		xf::ModuleOut<si::Angle>&	_angle_socket;
 		xf::Range<si::Angle>&		_angle_range;
 		float						_center			= 0.f;
 		float						_dead_zone		= 0.f;
@@ -156,16 +156,16 @@ class JoystickInput:
 		float						_output_minimum	= -1.f;
 		float						_output_maximum	= +1.f;
 		// If these are present, Axis is emulated with those two buttons,
-		// that is when they're present, the property will be set to +1 or -1.
+		// that is when they're present, the socket will be set to +1 or -1.
 		std::optional<HandlerID>	_up_button_id;
 		std::optional<HandlerID>	_down_button_id;
 	};
 
-	typedef std::array<std::vector<std::shared_ptr<Handler>>, kMaxEventID>			Handlers;
-	typedef std::array<std::unique_ptr<xf::PropertyOut<bool>>, kMaxEventID>			ButtonProperties;
-	typedef std::array<std::unique_ptr<xf::PropertyOut<double>>, kMaxEventID>		AxisProperties;
-	typedef std::array<std::unique_ptr<xf::PropertyOut<si::Angle>>, kMaxEventID>	AngleAxisProperties;
-	typedef std::array<xf::Range<si::Angle>, kMaxEventID>							AngleAxisRanges;
+	typedef std::array<std::vector<std::shared_ptr<Handler>>, kMaxEventID>		Handlers;
+	typedef std::array<std::unique_ptr<xf::ModuleOut<bool>>, kMaxEventID>		ButtonSockets;
+	typedef std::array<std::unique_ptr<xf::ModuleOut<double>>, kMaxEventID>		AxisSockets;
+	typedef std::array<std::unique_ptr<xf::ModuleOut<si::Angle>>, kMaxEventID>	AngleAxisSockets;
+	typedef std::array<xf::Range<si::Angle>, kMaxEventID>						AngleAxisRanges;
 
   public:
 	// Ctor
@@ -177,23 +177,23 @@ class JoystickInput:
 	initialize() override;
 
 	/**
-	 * Return reference to a button property.
+	 * Return reference to a button socket.
 	 */
-	xf::PropertyOut<bool>&
+	xf::ModuleOut<bool>&
 	button (HandlerID);
 
 	/**
-	 * Return reference to an axis property.
+	 * Return reference to an axis socket.
 	 */
-	xf::PropertyOut<double>&
+	xf::ModuleOut<double>&
 	axis (HandlerID);
 
 	/**
-	 * Return reference to an axis property that uses si::Angle.
+	 * Return reference to an axis socket that uses si::Angle.
 	 * The range is defined per-axis, and subsequent calls to the same axis with different ranges will overwrite
 	 * previous ranges.
 	 */
-	xf::PropertyOut<si::Angle>&
+	xf::ModuleOut<si::Angle>&
 	angle_axis (HandlerID, xf::Range<si::Angle>);
 
   private slots:
@@ -223,10 +223,10 @@ class JoystickInput:
 
   private:
 	/**
-	 * Set all properties to nil.
+	 * Set all sockets to nil.
 	 */
 	void
-	reset_properties();
+	reset_sockets();
 
   private:
 	xf::Logger							_logger;
@@ -237,33 +237,33 @@ class JoystickInput:
 	std::set<HandlerID>					_available_buttons;
 	std::set<HandlerID>					_available_axes;
 	Handlers							_handlers;
-	ButtonProperties					_button_properties;
-	AxisProperties						_axis_properties;
-	AngleAxisProperties					_angle_axis_properties;
+	ButtonSockets						_button_sockets;
+	AxisSockets							_axis_sockets;
+	AngleAxisSockets					_angle_axis_sockets;
 	AngleAxisRanges						_angle_axis_ranges;
 	unsigned int						_failure_count		= 0;
 };
 
 
-inline xf::PropertyOut<bool>&
+inline xf::ModuleOut<bool>&
 JoystickInput::button (HandlerID id)
 {
-	return *_button_properties[id];
+	return *_button_sockets[id];
 }
 
 
-inline xf::PropertyOut<double>&
+inline xf::ModuleOut<double>&
 JoystickInput::axis (HandlerID const id)
 {
-	return *_axis_properties[id];
+	return *_axis_sockets[id];
 }
 
 
-inline xf::PropertyOut<si::Angle>&
+inline xf::ModuleOut<si::Angle>&
 JoystickInput::angle_axis (HandlerID const id, xf::Range<si::Angle> const range)
 {
 	_angle_axis_ranges[id] = range;
-	return *_angle_axis_properties[id];
+	return *_angle_axis_sockets[id];
 }
 
 #endif

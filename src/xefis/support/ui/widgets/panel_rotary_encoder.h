@@ -24,7 +24,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/v1/property.h>
+#include <xefis/core/v1/socket.h>
 #include <xefis/support/ui/widgets/panel_widget.h>
 
 
@@ -44,7 +44,7 @@ class PanelRotaryEncoder: public PanelWidget
 	 */
 	explicit
 	PanelRotaryEncoder (QWidget* parent, Panel*, QString const& knob_label,
-						v1::PropertyInteger value_property, v1::PropertyBoolean click_property);
+						Socket<int64_t> value_socket, Socket<bool> click_socket);
 
   protected:
 	void
@@ -67,7 +67,7 @@ class PanelRotaryEncoder: public PanelWidget
 
   private:
 	/**
-	 * Write to controlled properties.
+	 * Write to controlled sockets.
 	 */
 	void
 	write();
@@ -75,12 +75,12 @@ class PanelRotaryEncoder: public PanelWidget
   private:
 	std::unique_ptr<QTimer>		_click_timer;
 	QPoint						_mouse_last_position;
-	bool						_mouse_pressed			= false;
+	bool						_mouse_pressed			{ false };
 	QString						_knob_label;
-	si::Angle					_angle					= 0_deg;
-	v1::PropertyInteger::Type	_value					= 0;
-	v1::PropertyInteger			_value_property;
-	v1::PropertyBoolean			_click_property;
+	si::Angle					_angle					{ 0_deg };
+	Socket<int64_t>::Type		_value					{ 0 };
+	Socket<int64_t>				_value_socket;
+	Socket<bool>				_click_socket;
 };
 
 } // namespace xf

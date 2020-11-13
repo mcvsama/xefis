@@ -21,9 +21,9 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
-#include <xefis/core/property.h>
-#include <xefis/core/property_observer.h>
+#include <xefis/core/module_socket.h>
 #include <xefis/core/setting.h>
+#include <xefis/core/socket_observer.h>
 #include <xefis/support/control/pid_controller.h>
 #include <xefis/utility/actions.h>
 #include <xefis/utility/smoother.h>
@@ -43,31 +43,32 @@ class AFCS_AT_IO: public xf::ModuleIO
 	 * Settings
 	 */
 
-	xf::Setting<xf::PIDSettings<>>		ias_pid_settings		{ this, "ias_pid_settings" };
-	xf::Setting<double>					ias_pid_gain			{ this, "ias_pid_gain", 1.0 };
-	xf::Setting<si::Force>				output_thrust_minimum	{ this, "output_thrust_minimum", 0.0_N };
-	xf::Setting<si::Force>				output_thrust_maximum	{ this, "output_thrust_maximum", 1.0_N };
+	xf::Setting<xf::PIDSettings<>>	ias_pid_settings		{ this, "ias_pid_settings" };
+	xf::Setting<double>				ias_pid_gain			{ this, "ias_pid_gain", 1.0 };
+	xf::Setting<si::Force>			output_thrust_minimum	{ this, "output_thrust_minimum", 0.0_N };
+	xf::Setting<si::Force>			output_thrust_maximum	{ this, "output_thrust_maximum", 1.0_N };
 
 	/*
 	 * Input
 	 */
 
-	xf::PropertyIn<afcs::SpeedMode>		cmd_speed_mode			{ this, "cmd/speed-mode" };
-	xf::PropertyIn<si::Force>			cmd_thrust				{ this, "cmd/thrust" };
-	xf::PropertyIn<si::Velocity>		cmd_ias					{ this, "cmd/ias" };
-	xf::PropertyIn<si::Velocity>		measured_ias			{ this, "measurements/ias" };
+	xf::ModuleIn<afcs::SpeedMode>	cmd_speed_mode			{ this, "cmd/speed-mode" };
+	xf::ModuleIn<si::Force>			cmd_thrust				{ this, "cmd/thrust" };
+	xf::ModuleIn<si::Velocity>		cmd_ias					{ this, "cmd/ias" };
+	xf::ModuleIn<si::Velocity>		measured_ias			{ this, "measurements/ias" };
 
 	/*
 	 * Output
 	 */
 
-	xf::PropertyOut<si::Force>			thrust					{ this, "thrust" };
+	xf::ModuleOut<si::Force>		thrust					{ this, "thrust" };
 
 	/*
 	 * Input/Output
+	 * TODO what is this?
 	 */
 
-	xf::PropertyOut<bool>				disengage_at			{ this, "disengage-at" };
+	xf::ModuleOut<bool>				disengage_at			{ this, "disengage-at" };
 };
 
 
@@ -100,7 +101,7 @@ class AFCS_AT: public xf::Module<AFCS_AT_IO>
   private:
 	xf::PIDController<si::Velocity, si::Force>	_ias_pid;
 	xf::Smoother<si::Force>						_ias_pid_smoother		{ 250_ms };
-	xf::PropertyObserver						_thrust_computer;
+	xf::SocketObserver							_thrust_computer;
 };
 
 #endif

@@ -31,35 +31,35 @@
 #include "datatable.h"
 
 
-Datatable::Line::Line (std::string_view const& label, xf::BasicProperty const& property):
+Datatable::Line::Line (std::string_view const& label, xf::BasicSocket const& socket):
 	label (label),
-	property (property)
+	socket (socket)
 { }
 
 
-Datatable::Line::Line (std::string_view const& label, xf::BasicProperty const& property,
+Datatable::Line::Line (std::string_view const& label, xf::BasicSocket const& socket,
 					   QColor label_and_value_color):
 	label (label),
 	label_color (label_and_value_color),
 	value_color (label_and_value_color),
-	property (property)
+	socket (socket)
 { }
 
 
-Datatable::Line::Line (std::string_view const& label, xf::BasicProperty const& property,
+Datatable::Line::Line (std::string_view const& label, xf::BasicSocket const& socket,
 					   std::optional<QColor> label_color,
 					   std::optional<QColor> value_color):
 	label (label),
 	label_color (label_color.value_or (Qt::white)),
 	value_color (value_color.value_or (Qt::white)),
-	property (property)
+	socket (socket)
 { }
 
 
 void
 Datatable::Line::read()
 {
-	*_stringified.lock() = QString::fromStdString (property.to_string());
+	*_stringified.lock() = QString::fromStdString (socket.to_string());
 }
 
 
@@ -83,7 +83,7 @@ Datatable::Datatable (xf::Graphics const& graphics, std::string_view const& inst
 	});
 
 	for (auto& line: _list)
-		_inputs_observer.observe (line.property);
+		_inputs_observer.observe (line.socket);
 }
 
 

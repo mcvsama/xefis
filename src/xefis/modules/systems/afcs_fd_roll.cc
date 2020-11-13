@@ -159,8 +159,8 @@ AFCS_FD_Roll::compute_roll()
 
 std::optional<si::Angle>
 AFCS_FD_Roll::compute_roll (xf::PIDController<si::Angle, si::Angle>& pid,
-							xf::PropertyIn<si::Angle> const& cmd_direction,
-							xf::PropertyIn<si::Angle> const& measured_direction,
+							xf::ModuleIn<si::Angle> const& cmd_direction,
+							xf::ModuleIn<si::Angle> const& measured_direction,
 							si::Time update_dt) const
 {
 	xf::Range roll_limits { -*io.roll_limits, +*io.roll_limits };

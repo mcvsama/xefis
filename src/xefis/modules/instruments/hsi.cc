@@ -124,7 +124,7 @@ PaintingWork::PaintingWork (xf::PaintRequest const& paint_request, xf::Instrumen
 		else
 			_ap_bug_magnetic = _p.ap_heading_magnetic;
 	}
-	// If use_trk is unavailable (nil), then use the only heading/magnetic property
+	// If use_trk is unavailable (nil), then use the only heading/magnetic socket
 	// that is set. If both or neither is set, fail.
 	else
 	{
@@ -357,7 +357,7 @@ PaintingWork::PaintingWork (xf::PaintRequest const& paint_request, xf::Instrumen
 		_c.black_shadow.set_color (Qt::black);
 	}
 
-	if (_p.range != _mutable.prev_range || _paint_request.size_changed()) // TODO or input property radio_range_warning/_critical changes by more than… say, 100_m?
+	if (_p.range != _mutable.prev_range || _paint_request.size_changed()) // TODO or input socket radio_range_warning/_critical changes by more than… say, 100_m?
 		update_radio_range_heat_map();
 
 	_mutable.prev_display_mode = _p.display_mode;

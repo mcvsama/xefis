@@ -36,12 +36,12 @@
 
 
 void
-StateIO::register_property (std::string const& unique_identifier, xf::BasicPropertyOut& property)
+StateIO::register_socket (std::string const& unique_identifier, xf::BasicModuleOut& socket)
 {
-	if (auto f = _registered_properties.find (unique_identifier); f != _registered_properties.end())
-		throw xf::Exception ("StateIO::register_property: unique_identifier '" + unique_identifier + "' is not unique");
+	if (auto f = _registered_sockets.find (unique_identifier); f != _registered_sockets.end())
+		throw xf::Exception ("StateIO::register_socket: unique_identifier '" + unique_identifier + "' is not unique");
 
-	_registered_properties.emplace (unique_identifier, property);
+	_registered_sockets.emplace (unique_identifier, socket);
 }
 
 
@@ -63,7 +63,7 @@ State::~State()
 void
 State::process (xf::Cycle const&)
 {
-	for (auto& rp: io._registered_properties)
+	for (auto& rp: io._registered_sockets)
 	{
 		if (rp.second.changed())
 		{
@@ -111,10 +111,10 @@ State::load_state()
 				{
 					auto id = e.attribute ("id").toStdString();
 
-					if (auto rp = io._registered_properties.find (id); rp != io._registered_properties.end())
+					if (auto rp = io._registered_sockets.find (id); rp != io._registered_sockets.end())
 					{
 						try {
-							rp->second.property.from_blob (xf::parse_hex_string (e.attribute ("value")));
+							rp->second.socket.from_blob (xf::parse_hex_string (e.attribute ("value")));
 						}
 						catch (xf::Exception const& e)
 						{
@@ -144,11 +144,11 @@ State::save_state()
 		QDomElement root = doc.createElement ("xefis-mod-systems-state");
 		doc.appendChild (root);
 
-		for (auto const& rp: io._registered_properties)
+		for (auto const& rp: io._registered_sockets)
 		{
 			QDomElement rp_element = doc.createElement ("state-variable");
 			rp_element.setAttribute ("id", QString::fromStdString (rp.first));
-			rp_element.setAttribute ("value", QString::fromStdString (xf::to_hex_string (rp.second.property.to_blob())));
+			rp_element.setAttribute ("value", QString::fromStdString (xf::to_hex_string (rp.second.socket.to_blob())));
 			root.appendChild (rp_element);
 		}
 

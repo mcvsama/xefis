@@ -20,7 +20,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
-#include <xefis/core/property.h>
+#include <xefis/core/module_socket.h>
 #include <xefis/core/setting.h>
 
 
@@ -31,10 +31,10 @@ class VirtualJoystickIO: public xf::ModuleIO
 	 * Output
 	 */
 
-	xf::PropertyOut<double>		x_axis		{ this, "axis/x" };
-	xf::PropertyOut<double>		y_axis		{ this, "axis/y" };
-	xf::PropertyOut<double>		throttle	{ this, "throttle" };
-	xf::PropertyOut<double>		rudder		{ this, "rudder" };
+	xf::ModuleOut<double>	x_axis		{ this, "axis/x" };
+	xf::ModuleOut<double>	y_axis		{ this, "axis/y" };
+	xf::ModuleOut<double>	throttle	{ this, "throttle" };
+	xf::ModuleOut<double>	rudder		{ this, "rudder" };
 };
 
 

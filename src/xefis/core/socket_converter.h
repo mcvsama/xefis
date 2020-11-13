@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__CORE__PROPERTY_CONVERTER_H__INCLUDED
-#define XEFIS__CORE__PROPERTY_CONVERTER_H__INCLUDED
+#ifndef XEFIS__CORE__SOCKET_CONVERTER_H__INCLUDED
+#define XEFIS__CORE__SOCKET_CONVERTER_H__INCLUDED
 
 // Standard:
 #include <cstddef>
@@ -27,7 +27,7 @@
 
 namespace xf {
 
-class PropertyConversionSettings
+class SocketConversionSettings
 {
   public:
 	static constexpr const char kDefaultNilValue[] = "∅"; // TODO use u8"" and std::u8string
@@ -36,11 +36,11 @@ class PropertyConversionSettings
 	// Common settings:
 	std::string						nil_value				{ kDefaultNilValue };
 
-	// Bool properties:
+	// Bool sockets:
 	std::string						true_value				{ "true" };
 	std::string						false_value				{ "false" };
 
-	// int64_t, double and SI properties:
+	// int64_t, double and SI sockets:
 	boost::format					numeric_format			{ "%1%" };
 
 	// Preferred unit:

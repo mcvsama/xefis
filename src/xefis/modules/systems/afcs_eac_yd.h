@@ -21,8 +21,8 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
-#include <xefis/core/property.h>
-#include <xefis/core/property_observer.h>
+#include <xefis/core/module_socket.h>
+#include <xefis/core/socket_observer.h>
 #include <xefis/core/setting.h>
 #include <xefis/support/control/pid_controller.h>
 
@@ -42,14 +42,14 @@ class AFCS_EAC_YD_IO: public xf::ModuleIO
 	 * Input
 	 */
 
-	xf::PropertyIn<bool>			enabled				{ this, "enabled" };
-	xf::PropertyIn<si::Force>		slip_skid			{ this, "slip-skid" };
+	xf::ModuleIn<bool>				enabled				{ this, "enabled" };
+	xf::ModuleIn<si::Force>			slip_skid			{ this, "slip-skid" };
 
 	/*
 	 * Output
 	 */
 
-	xf::PropertyOut<si::Angle>		rudder_deflection	{ this, "rudder-deflection" };
+	xf::ModuleOut<si::Angle>		rudder_deflection	{ this, "rudder-deflection" };
 };
 
 
@@ -80,7 +80,7 @@ class AFCS_EAC_YD: public xf::Module<AFCS_EAC_YD_IO>
 
   private:
 	xf::PIDController<si::Force, si::Angle>	_rudder_pid;
-	xf::PropertyObserver					_rudder_computer;
+	xf::SocketObserver						_rudder_computer;
 };
 
 #endif

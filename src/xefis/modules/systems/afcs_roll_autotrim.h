@@ -20,7 +20,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
-#include <xefis/core/property.h>
+#include <xefis/core/module_socket.h>
 #include <xefis/core/setting.h>
 
 
@@ -35,22 +35,22 @@ class AFCS_RollAutotrim_IO: public xf::ModuleIO
 	 * Settings
 	 */
 
-	xf::Setting<double>				ias_coefficient				{ this, "ias_coefficient" };
-	xf::Setting<double>				engine_torque_coefficient	{ this, "engine_torque_coefficient" };
-	xf::Setting<double>				total_coefficient			{ this, "total_coefficient", 1.0 };
+	xf::Setting<double>			ias_coefficient				{ this, "ias_coefficient" };
+	xf::Setting<double>			engine_torque_coefficient	{ this, "engine_torque_coefficient" };
+	xf::Setting<double>			total_coefficient			{ this, "total_coefficient", 1.0 };
 
 	/*
 	 * Input
 	 */
 
-	xf::PropertyIn<si::Velocity>	measured_ias				{ this, "measured-ias" };
-	xf::PropertyIn<si::Torque>		measured_engine_torque		{ this, "measured-eng-torque" };
+	xf::ModuleIn<si::Velocity>	measured_ias				{ this, "measured-ias" };
+	xf::ModuleIn<si::Torque>	measured_engine_torque		{ this, "measured-eng-torque" };
 
 	/*
 	 * Output
 	 */
 
-	xf::PropertyOut<si::Angle>		ailerons_correction			{ this, "ailerons-correction" };
+	xf::ModuleOut<si::Angle>	ailerons_correction			{ this, "ailerons-correction" };
 };
 
 

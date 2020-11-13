@@ -100,8 +100,8 @@ HT16K33::KeyMatrix::array() noexcept
 }
 
 
-HT16K33::SingleLED::SingleLED (xf::PropertyIn<bool>& property, Row row, Column column):
-	_property (property),
+HT16K33::SingleLED::SingleLED (xf::ModuleIn<bool>& socket, Row row, Column column):
+	_socket (socket),
 	_row (row),
 	_column (column)
 {
@@ -113,12 +113,12 @@ HT16K33::SingleLED::SingleLED (xf::PropertyIn<bool>& property, Row row, Column c
 inline void
 HT16K33::SingleLED::update_led_matrix (LEDMatrix& led_matrix) const
 {
-	led_matrix.set (_row, _column, _property.value_or (false));
+	led_matrix.set (_row, _column, _socket.value_or (false));
 }
 
 
-HT16K33::SingleSwitch::SingleSwitch (xf::PropertyOut<bool>& property, Row row, Column column):
-	_property (property),
+HT16K33::SingleSwitch::SingleSwitch (xf::ModuleOut<bool>& socket, Row row, Column column):
+	_socket (socket),
 	_row (row),
 	_column (column)
 {
@@ -130,9 +130,9 @@ HT16K33::SingleSwitch::SingleSwitch (xf::PropertyOut<bool>& property, Row row, C
 bool
 HT16K33::SingleSwitch::key_matrix_updated (KeyMatrix const& key_matrix)
 {
-	bool prev_value = _property.value_or (false);
+	bool prev_value = _socket.value_or (false);
 	bool next_value = key_matrix.get (_row, _column);
-	_property = next_value;
+	_socket = next_value;
 
 	return prev_value != next_value;
 }
@@ -141,7 +141,7 @@ HT16K33::SingleSwitch::key_matrix_updated (KeyMatrix const& key_matrix)
 void
 HT16K33::SingleSwitch::invalidate()
 {
-	_property = xf::nil;
+	_socket = xf::nil;
 }
 
 

@@ -24,8 +24,8 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/instrument.h>
-#include <xefis/core/property.h>
 #include <xefis/core/setting.h>
+#include <xefis/core/socket.h>
 
 
 class MostBasicGaugeIO: public xf::ModuleIO

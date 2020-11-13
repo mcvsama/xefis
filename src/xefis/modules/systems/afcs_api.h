@@ -18,14 +18,14 @@
 #include <cstddef>
 
 // Xefis:
-#include <xefis/core/property.h>
+#include <xefis/core/socket.h>
 
 
 namespace afcs {
 
 /*
  * Warning: In all below enums, most significant bit is used to denote nil
- * value in Blob (see xf::EnumPropertyTraits<>), so the maximum possible
+ * value in Blob (see xf::EnumSocketTraits<>), so the maximum possible
  * value is 127.
  */
 
@@ -39,9 +39,9 @@ enum class ThrustMode: uint8_t
 	Continuous,
 	// Minimum thrust.
 	Idle,
-	// Try to follow speed set in CMD KIAS property.
+	// Try to follow speed set in CMD KIAS socket.
 	KIAS,
-	// Try to follow speed set in CMD Mach property.
+	// Try to follow speed set in CMD Mach socket.
 	Mach,
 	// Special value for nil.
 	xf_nil_value = 0xff,
@@ -52,9 +52,9 @@ enum class RollMode: uint8_t
 {
 	// No lateral movement control.
 	None,
-	// Follow heading from CMD HDG property.
+	// Follow heading from CMD HDG socket.
 	Heading,
-	// Follow heading from CMD TRK property.
+	// Follow heading from CMD TRK socket.
 	Track,
 	// Fly laterally with wings level. Don't hold onto any heading.
 	WingsLevel,
@@ -74,15 +74,15 @@ enum class PitchMode: uint8_t
 	None,
 	// Pitch for TO/GA.
 	TO_GA,
-	// Control airspeed to match value from CMD IAS property.
+	// Control airspeed to match value from CMD IAS socket.
 	KIAS,
-	// Control airspeed to match value from CMD Mach property.
+	// Control airspeed to match value from CMD Mach socket.
 	Mach,
-	// Control altitude to match value provided in CMD ALT property.
+	// Control altitude to match value provided in CMD ALT socket.
 	Altitude,
-	// Control vertical speed to match value provided in CMD VS property.
+	// Control vertical speed to match value provided in CMD VS socket.
 	VS,
-	// Control vertical speed to match value provided in CMD FPA property.
+	// Control vertical speed to match value provided in CMD FPA socket.
 	FPA,
 	// Control FPA to follow path provided by the VNAV module.
 	VNAVPath,

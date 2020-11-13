@@ -25,7 +25,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
-#include <xefis/core/property.h>
+#include <xefis/core/module_socket.h>
 #include <xefis/core/setting.h>
 #include <xefis/utility/actions.h>
 
@@ -41,14 +41,14 @@ class StateIO: public xf::ModuleIO
 {
 	friend class State;
 
-	struct SavedProperty
+	struct SavedSocket
 	{
-		SavedProperty (xf::BasicPropertyOut& property):
-			property (property)
+		SavedSocket (xf::BasicModuleOut& socket):
+			socket (socket)
 		{ }
 
-		xf::BasicPropertyOut&	property;
-		xf::SerialChanged		changed { property };
+		xf::BasicModuleOut&	socket;
+		xf::SerialChanged	changed { socket };
 	};
 
   public:
@@ -61,13 +61,13 @@ class StateIO: public xf::ModuleIO
 
   public:
 	/**
-	 * Register property for serialization/deserialization.
+	 * Register socket for serialization/deserialization.
 	 */
 	void
-	register_property (std::string const& unique_identifier, xf::BasicPropertyOut&);
+	register_socket (std::string const& unique_identifier, xf::BasicModuleOut&);
 
   private:
-	std::map<std::string, SavedProperty>	_registered_properties;
+	std::map<std::string, SavedSocket>	_registered_sockets;
 };
 
 

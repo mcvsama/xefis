@@ -21,7 +21,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
-#include <xefis/core/property.h>
+#include <xefis/core/module_socket.h>
 #include <xefis/core/setting.h>
 #include <xefis/support/airframe/flaps.h>
 #include <xefis/utility/actions.h>
@@ -38,24 +38,24 @@ class FlapsBugsIO: public xf::ModuleIO
 	 * Settings
 	 */
 
-	xf::Setting<double>				margin_factor	{ this, "margin_factor", 1.2 };
+	xf::Setting<double>			margin_factor	{ this, "margin_factor", 1.2 };
 
 	/*
 	 * Input
 	 */
 
-	xf::PropertyIn<si::Angle>		flaps_setting	{ this, "flaps-setting" };
+	xf::ModuleIn<si::Angle>		flaps_setting	{ this, "flaps-setting" };
 
 	/*
 	 * Output
 	 */
 
-	xf::PropertyOut<std::string>	flaps_up_label	{ this, "flaps-up-label" };
-	xf::PropertyOut<si::Velocity>	flaps_up_speed	{ this, "flaps-up-speed" };
-	xf::PropertyOut<std::string>	flaps_a_label	{ this, "flaps-a-label" };
-	xf::PropertyOut<si::Velocity>	flaps_a_speed	{ this, "flaps-a-speed" };
-	xf::PropertyOut<std::string>	flaps_b_label	{ this, "flaps-b-label" };
-	xf::PropertyOut<si::Velocity>	flaps_b_speed	{ this, "flaps-b-speed" };
+	xf::ModuleOut<std::string>	flaps_up_label	{ this, "flaps-up-label" };
+	xf::ModuleOut<si::Velocity>	flaps_up_speed	{ this, "flaps-up-speed" };
+	xf::ModuleOut<std::string>	flaps_a_label	{ this, "flaps-a-label" };
+	xf::ModuleOut<si::Velocity>	flaps_a_speed	{ this, "flaps-a-speed" };
+	xf::ModuleOut<std::string>	flaps_b_label	{ this, "flaps-b-label" };
+	xf::ModuleOut<si::Velocity>	flaps_b_speed	{ this, "flaps-b-speed" };
 };
 
 

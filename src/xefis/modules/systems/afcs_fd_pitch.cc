@@ -185,8 +185,8 @@ AFCS_FD_Pitch::compute_pitch()
 template<class Input, class Control>
 	std::optional<si::Angle>
 	AFCS_FD_Pitch::compute_pitch (xf::PIDController<Input, Control>& pid,
-								  xf::PropertyIn<Input> const& cmd_param,
-								  xf::PropertyIn<Input> const& measured_param,
+								  xf::ModuleIn<Input> const& cmd_param,
+								  xf::ModuleIn<Input> const& measured_param,
 								  si::Time update_dt) const
 	{
 		xf::Range pitch_limits { -*io.pitch_limits, +*io.pitch_limits };

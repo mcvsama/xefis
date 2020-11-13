@@ -22,8 +22,8 @@
 #include <xefis/core/graphics.h>
 #include <xefis/core/instrument.h>
 #include <xefis/core/module_io.h>
-#include <xefis/core/property.h>
-#include <xefis/core/property_observer.h>
+#include <xefis/core/socket.h>
+#include <xefis/core/socket_observer.h>
 #include <xefis/support/instrument/instrument_support.h>
 
 
@@ -35,13 +35,13 @@ class GearIO: public xf::ModuleIO
 	 * Input
 	 */
 
-	xf::PropertyIn<bool>	requested_down	{ this, "requested-down" };
-	xf::PropertyIn<bool>	nose_up			{ this, "nose-up" };
-	xf::PropertyIn<bool>	nose_down		{ this, "nose-down" };
-	xf::PropertyIn<bool>	left_up			{ this, "left-up" };
-	xf::PropertyIn<bool>	left_down		{ this, "left-down" };
-	xf::PropertyIn<bool>	right_up		{ this, "right-up" };
-	xf::PropertyIn<bool>	right_down		{ this, "right-down" };
+	xf::ModuleIn<bool>	requested_down	{ this, "requested-down" };
+	xf::ModuleIn<bool>	nose_up			{ this, "nose-up" };
+	xf::ModuleIn<bool>	nose_down		{ this, "nose-down" };
+	xf::ModuleIn<bool>	left_up			{ this, "left-up" };
+	xf::ModuleIn<bool>	left_down		{ this, "left-down" };
+	xf::ModuleIn<bool>	right_up		{ this, "right-up" };
+	xf::ModuleIn<bool>	right_down		{ this, "right-down" };
 };
 
 
@@ -79,7 +79,7 @@ class Gear:
 	async_paint (xf::PaintRequest const&, PaintingParams const&) const;
 
   private:
-	xf::PropertyObserver	_inputs_observer;
+	xf::SocketObserver _inputs_observer;
 };
 
 #endif

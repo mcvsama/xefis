@@ -93,7 +93,7 @@ NavigationComputer::NavigationComputer (std::unique_ptr<NavigationComputerIO> mo
 void
 NavigationComputer::process (xf::Cycle const& cycle)
 {
-	xf::PropertyObserver* computers[] = {
+	xf::SocketObserver* computers[] = {
 		// Order is important:
 		&_position_computer,
 		&_magnetic_variation_computer,

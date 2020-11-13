@@ -22,7 +22,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/property.h>
+#include <xefis/core/module_socket.h>
 #include <xefis/utility/actions.h>
 
 
@@ -41,10 +41,10 @@ template<class pInteger = int64_t>
 	  public:
 		// Ctor
 		explicit
-		DeltaDecoder (Property<Integer> const& property, Callback callback, Integer initial_value = {});
+		DeltaDecoder (Socket<Integer> const& socket, Callback callback, Integer initial_value = {});
 
 		/**
-		 * Signals that properties have been updated. May call the callback.
+		 * Signals that sockets have been updated. May call the callback.
 		 */
 		void
 		operator()();
@@ -56,18 +56,18 @@ template<class pInteger = int64_t>
 		force_callback (std::optional<Integer> delta) const;
 
 	  private:
-		Integer						_previous;
-		Property<Integer> const&	_value_property;
-		PropChanged<Integer>		_property_changed	{ _value_property };
-		Callback					_callback;
+		Integer					_previous;
+		Socket<Integer> const&	_value_socket;
+		PropChanged<Integer>	_socket_changed	{ _value_socket };
+		Callback				_callback;
 	};
 
 
 template<class I>
 	inline
-	DeltaDecoder<I>::DeltaDecoder (Property<Integer> const& property, Callback callback, Integer initial_value):
+	DeltaDecoder<I>::DeltaDecoder (Socket<Integer> const& socket, Callback callback, Integer initial_value):
 		_previous (initial_value),
-		_value_property (property),
+		_value_socket (socket),
 		_callback (callback)
 	{ }
 
@@ -76,11 +76,11 @@ template<class I>
 	inline void
 	DeltaDecoder<I>::operator()()
 	{
-		if (_callback && _property_changed())
+		if (_callback && _socket_changed())
 		{
-			if (_value_property)
+			if (_value_socket)
 			{
-				auto const current = *_value_property;
+				auto const current = *_value_socket;
 				_callback (current - _previous);
 				_previous = current;
 			}

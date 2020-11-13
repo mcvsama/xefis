@@ -23,7 +23,7 @@
 
 // Xefis:
 #include <xefis/core/module_io.h>
-#include <xefis/core/property.h>
+#include <xefis/core/module_socket.h>
 #include <xefis/utility/quadrature_decoder.h>
 
 
@@ -94,9 +94,9 @@ AutoTest t1 ("QuadratureDecoder + QuadratureCounter", []{
 		callback_result = { delta, total };
 	};
 	ModuleIO io;
-	PropertyOut<bool> property_a (&io, "line-a");
-	PropertyOut<bool> property_b (&io, "line-b");
-	QuadratureCounter<Integer> decoder (property_a, property_b, initial_value, callback);
+	ModuleOut<bool> socket_a (&io, "line-a");
+	ModuleOut<bool> socket_b (&io, "line-b");
+	QuadratureCounter<Integer> decoder (socket_a, socket_b, initial_value, callback);
 	auto expected_total = initial_value;
 
 	for (auto const& step: test_steps | boost::adaptors::indexed (0))
@@ -105,8 +105,8 @@ AutoTest t1 ("QuadratureDecoder + QuadratureCounter", []{
 		auto const callback_expected = std::get<3> (step.value());
 
 		callback_result.reset();
-		property_a = std::get<0> (step.value());
-		property_b = std::get<1> (step.value());
+		socket_a = std::get<0> (step.value());
+		socket_b = std::get<1> (step.value());
 		expected_total += expected_delta.value_or (0);
 		decoder();
 

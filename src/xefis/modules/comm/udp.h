@@ -27,7 +27,7 @@
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
 #include <xefis/core/module_io.h>
-#include <xefis/core/property.h>
+#include <xefis/core/module_socket.h>
 #include <xefis/core/setting.h>
 #include <xefis/utility/actions.h>
 
@@ -39,24 +39,24 @@ class UDP_IO: public xf::ModuleIO
 	 * Settings
 	 */
 
-	xf::Setting<QString>			tx_udp_host			{ this, "tx_udp_host", xf::BasicSetting::Optional };
-	xf::Setting<int>				tx_udp_port			{ this, "tx_udp_port" };
-	xf::Setting<bool>				tx_interference		{ this, "tx_interference", false };
-	xf::Setting<QString>			rx_udp_host			{ this, "rx_udp_host", xf::BasicSetting::Optional };
-	xf::Setting<int>				rx_udp_port			{ this, "rx_udp_port" };
-	xf::Setting<bool>				rx_interference		{ this, "rx_interference", false };
+	xf::Setting<QString>		tx_udp_host			{ this, "tx_udp_host", xf::BasicSetting::Optional };
+	xf::Setting<int>			tx_udp_port			{ this, "tx_udp_port" };
+	xf::Setting<bool>			tx_interference		{ this, "tx_interference", false };
+	xf::Setting<QString>		rx_udp_host			{ this, "rx_udp_host", xf::BasicSetting::Optional };
+	xf::Setting<int>			rx_udp_port			{ this, "rx_udp_port" };
+	xf::Setting<bool>			rx_interference		{ this, "rx_interference", false };
 
 	/*
 	 * Input
 	 */
 
-	xf::PropertyIn<std::string>		send				{ this, "send" };
+	xf::ModuleIn<std::string>	send				{ this, "send" };
 
 	/*
 	 * Output
 	 */
 
-	xf::PropertyOut<std::string>	receive				{ this, "receive" };
+	xf::ModuleOut<std::string>	receive				{ this, "receive" };
 };
 
 

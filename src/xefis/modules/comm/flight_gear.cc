@@ -130,7 +130,7 @@ FlightGear::FlightGear (std::unique_ptr<FlightGearIO> module_io, std::string_vie
 		&io.gps_serviceable,
 	};
 
-	_output_properties = {
+	_output_sockets = {
 		&io.rotation_x,
 		&io.rotation_y,
 		&io.rotation_z,
@@ -236,8 +236,8 @@ FlightGear::got_packet()
 void
 FlightGear::invalidate_all()
 {
-	for (auto* property: _output_properties)
-		*property = xf::nil;
+	for (auto* socket: _output_sockets)
+		*socket = xf::nil;
 
 	for (auto* flag: _serviceable_flags)
 		*flag = false;

@@ -18,55 +18,55 @@
 #include <xefis/config/all.h>
 
 // Local:
-#include "property_observer.h"
+#include "socket_observer.h"
 
 
 namespace xf {
 
 void
-PropertyObserver::observe (BasicProperty const& property)
+SocketObserver::observe (BasicSocket const& socket)
 {
-	_objects.push_back (Object (&property));
+	_objects.push_back (Object (&socket));
 }
 
 
 void
-PropertyObserver::observe (PropertyObserver& observer)
+SocketObserver::observe (SocketObserver& observer)
 {
 	_objects.push_back (Object (&observer));
 }
 
 
 void
-PropertyObserver::observe (std::initializer_list<Object> list)
+SocketObserver::observe (std::initializer_list<Object> list)
 {
 	_objects.insert (_objects.end(), list.begin(), list.end());
 }
 
 
 void
-PropertyObserver::set_callback (Callback callback) noexcept
+SocketObserver::set_callback (Callback callback) noexcept
 {
 	_callback = callback;
 }
 
 
 void
-PropertyObserver::set_minimum_dt (si::Time dt) noexcept
+SocketObserver::set_minimum_dt (si::Time dt) noexcept
 {
 	_minimum_dt = dt;
 }
 
 
 void
-PropertyObserver::process (si::Time update_time)
+SocketObserver::process (si::Time update_time)
 {
 	si::Time obs_dt = update_time - _obs_update_time;
 	_accumulated_dt += update_time - _fire_time;
 
 	for (Object& o: _objects)
 	{
-		BasicProperty::Serial new_serial = o.remote_serial();
+		BasicSocket::Serial new_serial = o.remote_serial();
 
 		if (new_serial != o._saved_serial)
 		{
@@ -107,7 +107,7 @@ PropertyObserver::process (si::Time update_time)
 
 
 void
-PropertyObserver::add_depending_smoother (SmootherBase& smoother)
+SocketObserver::add_depending_smoother (SmootherBase& smoother)
 {
 	_smoothers.push_back (&smoother);
 	_longest_smoothing_time.reset();
@@ -115,7 +115,7 @@ PropertyObserver::add_depending_smoother (SmootherBase& smoother)
 
 
 void
-PropertyObserver::add_depending_smoothers (std::initializer_list<SmootherBase*> list)
+SocketObserver::add_depending_smoothers (std::initializer_list<SmootherBase*> list)
 {
 	_smoothers.insert (_smoothers.end(), list.begin(), list.end());
 	_longest_smoothing_time.reset();
@@ -123,7 +123,7 @@ PropertyObserver::add_depending_smoothers (std::initializer_list<SmootherBase*> 
 
 
 si::Time
-PropertyObserver::longest_smoothing_time() noexcept
+SocketObserver::longest_smoothing_time() noexcept
 {
 	if (!_longest_smoothing_time)
 	{

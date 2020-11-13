@@ -50,8 +50,8 @@ class NoModuleIO: public ModuleIO
 
 
 /**
- * A "function" that takes input data in form of input properties, and computes result
- * in form of output properties. Implemented as a class since some modules will have to
+ * A "function" that takes input data in form of input sockets, and computes result
+ * in form of output sockets. Implemented as a class since some modules will have to
  * store some sort of state.
  *
  * Public method that computes the result is fetch_and_process(). It calls implementation-defined
@@ -98,7 +98,7 @@ class BasicModule:
 		communicate (Cycle const&);
 
 		/**
-		 * Request all connected input properties to be computed, and then
+		 * Request all connected input sockets to be computed, and then
 		 * call the process() method. It will compute results only once, until
 		 * reset_cache() is called.
 		 */
@@ -195,7 +195,7 @@ class BasicModule:
 	 * Ctor
 	 *
 	 * \param	module_io
-	 *			Object that storess all Settings, PropertyIns and PropertyOuts.
+	 *			Object that storess all Settings, ModuleIns and ModuleOuts.
 	 * \param	instance
 	 *			Instance name for GUI identification and debugging purposes.
 	 */
@@ -229,7 +229,7 @@ class BasicModule:
 	communicate (Cycle const& cycle);
 
 	/**
-	 * Compute output properties.
+	 * Compute output sockets.
 	 * Default implementation does nothing.
 	 */
 	virtual void
@@ -237,13 +237,13 @@ class BasicModule:
 
 	/**
 	 * Called when exception is caught from the process() method.
-	 * Default implementation logs the exception and sets all output properties to nil.
+	 * Default implementation logs the exception and sets all output sockets to nil.
 	 */
 	virtual void
 	rescue (Cycle const&, std::exception_ptr);
 
 	/**
-	 * Enable/disable option to set all output properties to xf::nil when
+	 * Enable/disable option to set all output sockets to xf::nil when
 	 * exception occurs within the process(Cycle) method.
 	 * This happens after calling the rescue() method.
 	 *

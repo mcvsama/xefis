@@ -31,7 +31,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/property.h>
+#include <xefis/core/module_socket.h>
 
 
 namespace xf {
@@ -178,13 +178,13 @@ class HT16K33: public QObject
 		/**
 		 * Read key values from the key memory
 		 * and do appropriate configured actions.
-		 * Return true if any property has been updated.
+		 * Return true if any socket has been updated.
 		 */
 		virtual bool
 		key_matrix_updated (KeyMatrix const&) = 0;
 
 		/**
-		 * Signal input failure to reset the property
+		 * Signal input failure to reset the socket
 		 * to nil-value.
 		 */
 		virtual void
@@ -199,20 +199,20 @@ class HT16K33: public QObject
 	  public:
 		/**
 		 * Set LEDMatrix bits according to configured
-		 * digits and the value read from properties.
+		 * digits and the value read from sockets.
 		 */
 		virtual void
 		update_led_matrix (LEDMatrix&) const = 0;
 	};
 
 	/**
-	 * Single on/off switch that manages a boolean property.
+	 * Single on/off switch that manages a boolean socket.
 	 */
 	class SingleSwitch: public Switch
 	{
 	  public:
 		// Ctor
-		SingleSwitch (xf::PropertyOut<bool>&, Row, Column);
+		SingleSwitch (xf::ModuleOut<bool>&, Row, Column);
 
 		bool
 		key_matrix_updated (KeyMatrix const&) override;
@@ -221,36 +221,36 @@ class HT16K33: public QObject
 		invalidate() override;
 
 	  private:
-		xf::PropertyOut<bool>&	_property;
+		xf::ModuleOut<bool>&	_socket;
 		Row						_row;
 		Column					_column;
 	};
 
 	/**
 	 * Handles single LEDs.
-	 * Reads input from boolean properties.
+	 * Reads input from boolean sockets.
 	 */
 	class SingleLED: public Display
 	{
 	  public:
 		// Ctor
-		SingleLED (xf::PropertyIn<bool>&, Row row, Column);
+		SingleLED (xf::ModuleIn<bool>&, Row row, Column);
 
 		void
 		update_led_matrix (LEDMatrix&) const override;
 
 	  private:
-		xf::PropertyIn<bool>&	_property;
-		Row						_row;
-		Column					_column;
+		xf::ModuleIn<bool>&	_socket;
+		Row					_row;
+		Column				_column;
 	};
 
 	/**
 	 * Handles array of 7-segment displays.
-	 * Reads input from float or int property.
+	 * Reads input from float or int socket.
 	 *
 	 * \param	pValue
-	 *			Value held by a Property.
+	 *			Value held by a Socket.
 	 * \param	pUnit
 	 *			SI unit from si::units:: used when reading si Value.
 	 */
@@ -266,7 +266,7 @@ class HT16K33: public QObject
 
 		  public:
 			// Ctor
-			NumericDisplay (xf::PropertyIn<Value>&, DigitRows, bool rounding = false);
+			NumericDisplay (xf::ModuleIn<Value>&, DigitRows, bool rounding = false);
 
 			void
 			update_led_matrix (LEDMatrix&) const override;
@@ -277,7 +277,7 @@ class HT16K33: public QObject
 			get_integer_value() const;
 
 		  private:
-			xf::PropertyIn<Value>&	_property;
+			xf::ModuleIn<Value>&	_socket;
 			DigitRows				_digit_rows;
 			bool					_rounding;
 		};
@@ -426,8 +426,8 @@ class HT16K33: public QObject
 
 
 template<class V, class U>
-	HT16K33::NumericDisplay<V, U>::NumericDisplay (xf::PropertyIn<Value>& property, DigitRows digit_rows, bool rounding):
-		_property (property),
+	HT16K33::NumericDisplay<V, U>::NumericDisplay (xf::ModuleIn<Value>& socket, DigitRows digit_rows, bool rounding):
+		_socket (socket),
 		_digit_rows (digit_rows),
 		_rounding (rounding)
 	{
@@ -506,7 +506,7 @@ template<class V, class U>
 	int64_t
 	HT16K33::NumericDisplay<V, U>::get_integer_value() const
 	{
-		auto value = si::quantity_in_units<Unit> (_property.value_or (Value{}));
+		auto value = si::quantity_in_units<Unit> (_socket.value_or (Value{}));
 
 		if (_rounding)
 			return value + 0.5;

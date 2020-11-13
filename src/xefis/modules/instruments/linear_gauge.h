@@ -25,9 +25,9 @@
 #include <xefis/config/all.h>
 #include <xefis/core/graphics.h>
 #include <xefis/core/instrument.h>
-#include <xefis/core/property.h>
-#include <xefis/core/property_observer.h>
 #include <xefis/core/setting.h>
+#include <xefis/core/socket.h>
+#include <xefis/core/socket_observer.h>
 #include <xefis/support/instrument/instrument_support.h>
 
 // Local:
@@ -52,7 +52,7 @@ template<class Value>
 		 * Input
 		 */
 
-		xf::PropertyIn<Value>		value			{ this, "value" };
+		xf::ModuleIn<Value>			value			{ this, "value" };
 	};
 
 
@@ -131,8 +131,8 @@ template<class Value>
 		paint (xf::PaintRequest) const override;
 
 	  private:
-		xf::PropertyObserver	_inputs_observer;
-		Converter				_converter;
+		xf::SocketObserver	_inputs_observer;
+		Converter			_converter;
 	};
 
 

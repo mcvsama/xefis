@@ -21,8 +21,8 @@
 #include <xefis/config/all.h>
 #include <xefis/core/logger.h>
 #include <xefis/core/module.h>
-#include <xefis/core/property.h>
 #include <xefis/core/setting.h>
+#include <xefis/core/socket.h>
 #include <xefis/utility/actions.h>
 
 
@@ -43,14 +43,14 @@ template<class Value>
 		 * Input
 		 */
 
-		xf::PropertyIn<Value>	input_a_value	{ this, "input.a" };
-		xf::PropertyIn<Value>	input_b_value	{ this, "input.b" };
+		xf::ModuleIn<Value>		input_a_value	{ this, "input.a" };
+		xf::ModuleIn<Value>		input_b_value	{ this, "input.b" };
 
 		/*
 		 * Output
 		 */
 
-		xf::PropertyOut<Value>	output_value	{ this, "value" };
+		xf::ModuleOut<Value>	output_value	{ this, "value" };
 	};
 
 

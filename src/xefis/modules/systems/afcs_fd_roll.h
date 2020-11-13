@@ -20,9 +20,9 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
-#include <xefis/core/property.h>
-#include <xefis/core/property_observer.h>
+#include <xefis/core/module_socket.h>
 #include <xefis/core/setting.h>
+#include <xefis/core/socket_observer.h>
 #include <xefis/support/control/pid_controller.h>
 #include <xefis/utility/range_smoother.h>
 
@@ -51,20 +51,20 @@ class AFCS_FD_Roll_IO: public xf::ModuleIO
 	 * Input
 	 */
 
-	xf::PropertyIn<bool>				autonomous				{ this, "autonomous" };
-	xf::PropertyIn<si::Angle>			roll_limits				{ this, "roll-limits" };
-	xf::PropertyIn<afcs::RollMode>		cmd_roll_mode			{ this, "cmd-roll-mode" };
-	xf::PropertyIn<si::Angle>			cmd_magnetic_hdg		{ this, "cmd-magnetic-heading" };
-	xf::PropertyIn<si::Angle>			cmd_magnetic_trk		{ this, "cmd-magnetic-track" };
-	xf::PropertyIn<si::Angle>			measured_magnetic_hdg	{ this, "measured-magnetic-heading" };
-	xf::PropertyIn<si::Angle>			measured_magnetic_trk	{ this, "measured-magnetic-track" };
+	xf::ModuleIn<bool>					autonomous				{ this, "autonomous" };
+	xf::ModuleIn<si::Angle>				roll_limits				{ this, "roll-limits" };
+	xf::ModuleIn<afcs::RollMode>		cmd_roll_mode			{ this, "cmd-roll-mode" };
+	xf::ModuleIn<si::Angle>				cmd_magnetic_hdg		{ this, "cmd-magnetic-heading" };
+	xf::ModuleIn<si::Angle>				cmd_magnetic_trk		{ this, "cmd-magnetic-track" };
+	xf::ModuleIn<si::Angle>				measured_magnetic_hdg	{ this, "measured-magnetic-heading" };
+	xf::ModuleIn<si::Angle>				measured_magnetic_trk	{ this, "measured-magnetic-track" };
 
 	/*
 	 * Output
 	 */
 
-	xf::PropertyOut<si::Angle>			roll					{ this, "output-roll" };
-	xf::PropertyOut<bool>				operative				{ this, "operative" };
+	xf::ModuleOut<si::Angle>			roll					{ this, "output-roll" };
+	xf::ModuleOut<bool>					operative				{ this, "operative" };
 };
 
 
@@ -102,7 +102,7 @@ class AFCS_FD_Roll: public xf::Module<AFCS_FD_Roll_IO>
 
   private:
 	/**
-	 * Compute all needed data and write to output properties.
+	 * Compute all needed data and write to output sockets.
 	 */
 	void
 	compute_roll();
@@ -112,8 +112,8 @@ class AFCS_FD_Roll: public xf::Module<AFCS_FD_Roll_IO>
 	 */
 	std::optional<si::Angle>
 	compute_roll (xf::PIDController<si::Angle, si::Angle>& pid,
-				  xf::PropertyIn<si::Angle> const& cmd_direction,
-				  xf::PropertyIn<si::Angle> const& measured_direction,
+				  xf::ModuleIn<si::Angle> const& cmd_direction,
+				  xf::ModuleIn<si::Angle> const& measured_direction,
 				  si::Time update_dt) const;
 
 	/**
@@ -127,7 +127,7 @@ class AFCS_FD_Roll: public xf::Module<AFCS_FD_Roll_IO>
 	DirectionPID					_magnetic_hdg_pid;
 	DirectionPID					_magnetic_trk_pid;
 	xf::RangeSmoother<si::Angle>	_output_roll_smoother	{ { -180.0_deg, +180.0_deg }, 2.5_s };
-	xf::PropertyObserver			_roll_computer;
+	xf::SocketObserver				_roll_computer;
 };
 
 #endif

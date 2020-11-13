@@ -18,10 +18,11 @@
 // Neutrino:
 #include <neutrino/demangle.h>
 #include <neutrino/numeric.h>
+#include <neutrino/utility.h>
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/property.h>
+#include <xefis/core/module_socket.h>
 #include <xefis/core/setting.h>
 #include <xefis/utility/types.h>
 
@@ -88,32 +89,32 @@ ModuleIO::ProcessingLoopAPI::register_setting (BasicSetting& setting)
 
 
 void
-ModuleIO::ProcessingLoopAPI::register_input_property (BasicPropertyIn& property)
+ModuleIO::ProcessingLoopAPI::register_input_socket (BasicModuleIn& socket)
 {
-	_io._registered_input_properties.push_back (&property);
+	_io._registered_input_sockets.push_back (&socket);
 }
 
 
 void
-ModuleIO::ProcessingLoopAPI::unregister_input_property (BasicPropertyIn& property)
+ModuleIO::ProcessingLoopAPI::unregister_input_socket (BasicModuleIn& socket)
 {
-	auto new_end = std::remove (_io._registered_input_properties.begin(), _io._registered_input_properties.end(), &property);
-	_io._registered_input_properties.resize (neutrino::to_unsigned (std::distance (_io._registered_input_properties.begin(), new_end)));
+	auto new_end = std::remove (_io._registered_input_sockets.begin(), _io._registered_input_sockets.end(), &socket);
+	_io._registered_input_sockets.resize (neutrino::to_unsigned (std::distance (_io._registered_input_sockets.begin(), new_end)));
 }
 
 
 void
-ModuleIO::ProcessingLoopAPI::register_output_property (BasicPropertyOut& property)
+ModuleIO::ProcessingLoopAPI::register_output_socket (BasicModuleOut& socket)
 {
-	_io._registered_output_properties.push_back (&property);
+	_io._registered_output_sockets.push_back (&socket);
 }
 
 
 void
-ModuleIO::ProcessingLoopAPI::unregister_output_property (BasicPropertyOut& property)
+ModuleIO::ProcessingLoopAPI::unregister_output_socket (BasicModuleOut& socket)
 {
-	auto new_end = std::remove (_io._registered_output_properties.begin(), _io._registered_output_properties.end(), &property);
-	_io._registered_output_properties.resize (neutrino::to_unsigned (std::distance (_io._registered_output_properties.begin(), new_end)));
+	auto new_end = std::remove (_io._registered_output_sockets.begin(), _io._registered_output_sockets.end(), &socket);
+	_io._registered_output_sockets.resize (neutrino::to_unsigned (std::distance (_io._registered_output_sockets.begin(), new_end)));
 }
 
 
@@ -124,28 +125,28 @@ ModuleIO::ProcessingLoopAPI::settings() const noexcept
 }
 
 
-Sequence<std::vector<BasicPropertyIn*>::const_iterator>
-ModuleIO::ProcessingLoopAPI::input_properties() const noexcept
+Sequence<std::vector<BasicModuleIn*>::const_iterator>
+ModuleIO::ProcessingLoopAPI::input_sockets() const noexcept
 {
-	return { _io._registered_input_properties.begin(), _io._registered_input_properties.end() };
+	return { _io._registered_input_sockets.begin(), _io._registered_input_sockets.end() };
 }
 
 
-Sequence<std::vector<BasicPropertyOut*>::const_iterator>
-ModuleIO::ProcessingLoopAPI::output_properties() const noexcept
+Sequence<std::vector<BasicModuleOut*>::const_iterator>
+ModuleIO::ProcessingLoopAPI::output_sockets() const noexcept
 {
-	return { _io._registered_output_properties.begin(), _io._registered_output_properties.end() };
+	return { _io._registered_output_sockets.begin(), _io._registered_output_sockets.end() };
 }
 
 
 ModuleIO::~ModuleIO()
 {
 	// Operate on copies since the deregister() method modifies vectors in this class.
-	for (auto* property: clone (_registered_input_properties))
-		property->deregister();
+	for (auto* socket: clone (_registered_input_sockets))
+		socket->deregister();
 
-	for (auto* property: clone (_registered_output_properties))
-		property->deregister();
+	for (auto* socket: clone (_registered_output_sockets))
+		socket->deregister();
 }
 
 

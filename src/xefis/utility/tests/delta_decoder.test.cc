@@ -19,7 +19,7 @@
 
 // Xefis:
 #include <xefis/core/module_io.h>
-#include <xefis/core/property.h>
+#include <xefis/core/module_socket.h>
 #include <xefis/utility/delta_decoder.h>
 
 
@@ -31,9 +31,9 @@ AutoTest t1 ("DeltaDecoder", []{
 	using Callback = std::function<void (std::optional<Integer>)>;
 
 	ModuleIO io;
-	PropertyOut<Integer> property (&io, "output");
+	ModuleOut<Integer> socket (&io, "output");
 	Callback verifications_callback;
-	DeltaDecoder<Integer> decoder (property, [&verifications_callback] (auto const delta) {
+	DeltaDecoder<Integer> decoder (socket, [&verifications_callback] (auto const delta) {
 		verifications_callback (delta);
 	}, 5);
 
@@ -54,29 +54,29 @@ AutoTest t1 ("DeltaDecoder", []{
 		verifications_callback = [](auto) {};
 	};
 
-	property = 6;
+	socket = 6;
 	verify (true, [](auto const delta) {
 		test_asserts::verify ("delta is +1", delta && *delta == 1);
 	});
 
-	property = 4;
+	socket = 4;
 	verify (true, [](auto const delta) {
 		test_asserts::verify ("delta is -2", delta && *delta == -2);
 	});
 
 	verify (false);
 
-	property = xf::nil;
+	socket = xf::nil;
 	verify (true, [](auto const delta) {
 		test_asserts::verify ("delta is std::nullopt", !delta);
 	});
 
-	property = 2;
+	socket = 2;
 	verify (true, [](auto const delta) {
 		test_asserts::verify ("delta is -2", delta && *delta == -2);
 	});
 
-	property = 4;
+	socket = 4;
 	decoder.force_callback (10);
 	verify (true, [](auto const delta) {
 		test_asserts::verify ("delta is +2 after force_callback (10)", delta && *delta == 2);

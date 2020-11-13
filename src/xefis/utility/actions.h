@@ -24,7 +24,7 @@
 namespace xf {
 
 /**
- * Checks if an action should be executed based on value of some properties and saved state.
+ * Checks if an action should be executed based on value of some sockets and saved state.
  */
 class PropAction
 {
@@ -40,20 +40,20 @@ class PropAction
 class SerialChanged: public PropAction
 {
   public:
-	using Serial	= BasicProperty::Serial;
+	using Serial	= BasicSocket::Serial;
 
   public:
 	// Ctor
 	explicit
-	SerialChanged (BasicProperty& property):
-		_property (property)
+	SerialChanged (BasicSocket& socket):
+		_socket (socket)
 	{ }
 
 	// PropAction API
 	bool
 	operator()() override
 	{
-		auto new_serial = _property.serial();
+		auto new_serial = _socket.serial();
 
 		if (new_serial != _serial)
 		{
@@ -66,12 +66,12 @@ class SerialChanged: public PropAction
 
   private:
 	Serial			_serial	{ 0 };
-	BasicProperty&	_property;
+	BasicSocket&	_socket;
 };
 
 
 /**
- * Checks whether a property changed its value since last check.
+ * Checks whether a socket changed its value since last check.
  */
 template<class pValue>
 	class PropChanged: public PropAction
@@ -79,21 +79,21 @@ template<class pValue>
 	  public:
 		using Value			= pValue;
 		using OptionalValue	= std::optional<Value>;
-		using Property		= xf::Property<Value>;
+		using Socket		= xf::Socket<Value>;
 
 	  public:
 		// Ctor
 		explicit
-		PropChanged (Property const& property):
-			_property (property),
-			_last_value (property.get_optional())
+		PropChanged (Socket const& socket):
+			_socket (socket),
+			_last_value (socket.get_optional())
 		{ }
 
 		// PropAction API
 		bool
 		operator()() override
 		{
-			auto current_value = _property.get_optional();
+			auto current_value = _socket.get_optional();
 
 			if (_last_value != current_value)
 			{
@@ -105,22 +105,22 @@ template<class pValue>
 		}
 
 		/**
-		 * Return reference to observed property.
+		 * Return reference to observed socket.
 		 */
-		Property const&
-		property() const noexcept
+		Socket const&
+		socket() const noexcept
 		{
-			return _property;
+			return _socket;
 		}
 
 	  private:
-		Property const&	_property;
+		Socket const&	_socket;
 		OptionalValue	_last_value;
 	};
 
 
 /**
- * Checks whether a property has changed and has now given value.
+ * Checks whether a socket has changed and has now given value.
  */
 template<class pValue>
 	class PropChangedTo: public PropChanged<pValue>
@@ -128,13 +128,13 @@ template<class pValue>
 	  public:
 		using Value			= pValue;
 		using OptionalValue	= typename PropChanged<Value>::OptionalValue;
-		using Property		= typename PropChanged<Value>::Property;
+		using Socket		= typename PropChanged<Value>::Socket;
 
 	  public:
 		// Ctor
 		constexpr
-		PropChangedTo (Property const& property, Value value):
-			PropChanged<Value> (property),
+		PropChangedTo (Socket const& socket, Value value):
+			PropChanged<Value> (socket),
 			_expected_value (value)
 		{ }
 
@@ -143,8 +143,8 @@ template<class pValue>
 		operator()() override
 		{
 			return PropChanged<Value>::operator()()
-				&& this->property().valid()
-				&& *this->property() == expected_value();
+				&& this->socket().valid()
+				&& *this->socket() == expected_value();
 		}
 
 		/**
@@ -162,7 +162,7 @@ template<class pValue>
 
 
 /**
- * Checks whether a property changed to nil.
+ * Checks whether a socket changed to nil.
  */
 template<class pValue>
 	class ChangedToNil: public PropChanged<pValue>
@@ -170,7 +170,7 @@ template<class pValue>
 	  public:
 		using Value			= pValue;
 		using OptionalValue	= typename PropChanged<Value>::OptionalValue;
-		using Property		= typename PropChanged<Value>::Property;
+		using Socket		= typename PropChanged<Value>::Socket;
 
 	  public:
 		using PropChanged<Value>::PropChanged;
@@ -180,7 +180,7 @@ template<class pValue>
 		operator()() override
 		{
 			return PropChanged<Value>::operator()
-				&& this->property().is_nil();
+				&& this->socket().is_nil();
 		}
 	};
 

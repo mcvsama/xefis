@@ -563,7 +563,7 @@ AFCS::button_press_clb_con()
 void
 AFCS::check_input()
 {
-	std::array<xf::BasicProperty*, 7> checked_props = { {
+	std::array<xf::BasicModuleSocket*, 7> checked_props = { {
 		&io.measured_ias,
 		&io.measured_mach,
 		&io.measured_heading_magnetic,
@@ -573,7 +573,7 @@ AFCS::check_input()
 		&io.measured_fpa,
 	} };
 
-	if (std::any_of (checked_props.begin(), checked_props.end(), [](xf::BasicProperty* p) { return !p->valid(); }))
+	if (std::any_of (checked_props.begin(), checked_props.end(), [](xf::BasicSocket* p) { return !p->valid(); }))
 	{
 		QStringList failed_props;
 		for (auto const& p: checked_props)
@@ -1055,9 +1055,9 @@ AFCS::transfer_airspeed_control_from_pitch_to_thrust()
 
 
 void
-AFCS::make_button_action (xf::PropertyIn<bool>& property, void (AFCS::* callback)())
+AFCS::make_button_action (xf::ModuleIn<bool>& socket, void (AFCS::* callback)())
 {
-	auto action = std::make_unique<xf::PropChangedToAction<bool>> (property, true, [this,callback] {
+	auto action = std::make_unique<xf::PropChangedToAction<bool>> (socket, true, [this,callback] {
 		try {
 			(this->*callback)();
 			solve();
@@ -1074,9 +1074,9 @@ AFCS::make_button_action (xf::PropertyIn<bool>& property, void (AFCS::* callback
 
 
 void
-AFCS::make_knob_action (xf::PropertyIn<int64_t>& property, void (AFCS::* callback)(int))
+AFCS::make_knob_action (xf::ModuleIn<int64_t>& socket, void (AFCS::* callback)(int))
 {
-	auto action = std::make_unique<xf::DeltaDecoder<>> (property, [this,callback](auto delta) {
+	auto action = std::make_unique<xf::DeltaDecoder<>> (socket, [this,callback](auto delta) {
 		try {
 			if (delta)
 				(this->*callback) (*delta);

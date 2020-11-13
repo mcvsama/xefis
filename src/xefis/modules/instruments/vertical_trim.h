@@ -21,9 +21,9 @@
 #include <xefis/config/all.h>
 #include <xefis/core/graphics.h>
 #include <xefis/core/instrument.h>
-#include <xefis/core/property.h>
-#include <xefis/core/property_observer.h>
 #include <xefis/core/setting.h>
+#include <xefis/core/socket.h>
+#include <xefis/core/socket_observer.h>
 #include <xefis/support/instrument/instrument_support.h>
 
 
@@ -41,10 +41,10 @@ class VerticalTrimIO: public xf::ModuleIO
 	 * Input
 	 */
 
-	xf::PropertyIn<double>	trim_value				{ this, "trim/value" };
-	xf::PropertyIn<double>	trim_reference			{ this, "trim/reference" };
-	xf::PropertyIn<double>	trim_reference_minimum	{ this, "trim/reference.minimum" };
-	xf::PropertyIn<double>	trim_reference_maximum	{ this, "trim/reference.maximum" };
+	xf::ModuleIn<double>	trim_value				{ this, "trim/value" };
+	xf::ModuleIn<double>	trim_reference			{ this, "trim/reference" };
+	xf::ModuleIn<double>	trim_reference_minimum	{ this, "trim/reference.minimum" };
+	xf::ModuleIn<double>	trim_reference_maximum	{ this, "trim/reference.maximum" };
 };
 
 
@@ -83,7 +83,7 @@ class VerticalTrim:
 	stringify (double value);
 
   private:
-	xf::PropertyObserver _inputs_observer;
+	xf::SocketObserver _inputs_observer;
 };
 
 #endif

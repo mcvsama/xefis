@@ -24,7 +24,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
-#include <xefis/core/property.h>
+#include <xefis/core/module_socket.h>
 
 
 class KLogMonitorIO: public xf::ModuleIO
@@ -34,10 +34,10 @@ class KLogMonitorIO: public xf::ModuleIO
 	 * Output
 	 */
 
-	xf::PropertyOut<bool>	flag_oom	{ this, "flags/oom" };
-	xf::PropertyOut<bool>	flag_io		{ this, "flags/io-error" };
-	xf::PropertyOut<bool>	flag_oops	{ this, "flags/oops" };
-	xf::PropertyOut<bool>	flag_bug	{ this, "flags/bug" };
+	xf::ModuleOut<bool>	flag_oom	{ this, "flags/oom" };
+	xf::ModuleOut<bool>	flag_io		{ this, "flags/io-error" };
+	xf::ModuleOut<bool>	flag_oops	{ this, "flags/oops" };
+	xf::ModuleOut<bool>	flag_bug	{ this, "flags/bug" };
 };
 
 

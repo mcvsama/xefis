@@ -20,8 +20,8 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
-#include <xefis/core/property.h>
-#include <xefis/core/property_observer.h>
+#include <xefis/core/module_socket.h>
+#include <xefis/core/socket_observer.h>
 
 
 namespace si = neutrino::si;
@@ -35,17 +35,17 @@ class SpeedsIO: public xf::ModuleIO
 	 * Input
 	 */
 
-	xf::PropertyIn<si::Angle>		flaps_angle				{ this, "flaps-angle" };
-	xf::PropertyIn<si::Velocity>	stall_speed_5deg		{ this, "stall-speed" };
+	xf::ModuleIn<si::Angle>		flaps_angle				{ this, "flaps-angle" };
+	xf::ModuleIn<si::Velocity>	stall_speed_5deg		{ this, "stall-speed" };
 
 	/*
 	 * Output
 	 */
 
-	xf::PropertyOut<si::Velocity>	speed_minimum			{ this, "speed.minimum" };
-	xf::PropertyOut<si::Velocity>	speed_minimum_maneuver	{ this, "speed.minimum-maneuver" };
-	xf::PropertyOut<si::Velocity>	speed_maximum_maneuver	{ this, "speed.maximum-maneuver" };
-	xf::PropertyOut<si::Velocity>	speed_maximum			{ this, "speed.maximum" };
+	xf::ModuleOut<si::Velocity>	speed_minimum			{ this, "speed.minimum" };
+	xf::ModuleOut<si::Velocity>	speed_minimum_maneuver	{ this, "speed.minimum-maneuver" };
+	xf::ModuleOut<si::Velocity>	speed_maximum_maneuver	{ this, "speed.maximum-maneuver" };
+	xf::ModuleOut<si::Velocity>	speed_maximum			{ this, "speed.maximum" };
 };
 
 
@@ -73,8 +73,8 @@ class Speeds: public xf::Module<SpeedsIO>
 		min (std::optional<T>, T);
 
   private:
-	xf::Airframe*			_airframe;
-	xf::PropertyObserver	_speeds_computer;
+	xf::Airframe*		_airframe;
+	xf::SocketObserver	_speeds_computer;
 };
 
 #endif

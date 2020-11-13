@@ -29,7 +29,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
-#include <xefis/core/property.h>
+#include <xefis/core/module_socket.h>
 #include <xefis/core/setting.h>
 #include <xefis/utility/smoother.h>
 
@@ -45,17 +45,17 @@ class ETSAirspeedIO: public xf::ModuleIO
 	 * Settings
 	 */
 
-	xf::Setting<si::Time>			read_interval		{ this, "read_interval", 100_ms };
-	xf::Setting<si::Time>			smoothing_time		{ this, "smoothing_time", 100_ms };
+	xf::Setting<si::Time>		read_interval		{ this, "read_interval", 100_ms };
+	xf::Setting<si::Time>		smoothing_time		{ this, "smoothing_time", 100_ms };
 
 	/*
 	 * Output
 	 */
 
-	xf::PropertyOut<bool>			serviceable			{ this, "serviceable" };
-	xf::PropertyOut<si::Velocity>	airspeed			{ this, "airspeed" };
-	xf::PropertyOut<si::Velocity>	airspeed_minimum	{ this, "airspeed.minimum" };
-	xf::PropertyOut<si::Velocity>	airspeed_maximum	{ this, "airspeed.maximum" };
+	xf::ModuleOut<bool>			serviceable			{ this, "serviceable" };
+	xf::ModuleOut<si::Velocity>	airspeed			{ this, "airspeed" };
+	xf::ModuleOut<si::Velocity>	airspeed_minimum	{ this, "airspeed.minimum" };
+	xf::ModuleOut<si::Velocity>	airspeed_maximum	{ this, "airspeed.maximum" };
 };
 
 
@@ -110,7 +110,7 @@ class ETSAirspeed:
 	reinitialize();
 
 	/**
-	 * Read data from the sensor and update properties.
+	 * Read data from the sensor and update sockets.
 	 */
 	void
 	read();

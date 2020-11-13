@@ -3380,8 +3380,8 @@ ADI::paint (xf::PaintRequest paint_request) const
 void
 ADI::compute_fpv()
 {
-	xf::PropertyIn<si::Angle>* heading = nullptr;
-	xf::PropertyIn<si::Angle>* track_lateral = nullptr;
+	xf::ModuleIn<si::Angle>* heading = nullptr;
+	xf::ModuleIn<si::Angle>* track_lateral = nullptr;
 
 	if (io.orientation_heading_magnetic && io.track_lateral_magnetic)
 	{
@@ -3418,16 +3418,16 @@ ADI::compute_fpv()
 
 template<class FloatingPoint>
 	bool
-	ADI::is_sane (xf::Property<FloatingPoint> const& property)
+	ADI::is_sane (xf::Socket<FloatingPoint> const& socket)
 	{
-		return property && isfinite (*property);
+		return socket && isfinite (*socket);
 	}
 
 
 template<class FloatingPoint>
 	bool
-	ADI::is_sane (xf::Property<FloatingPoint> const& property, xf::Range<FloatingPoint> const& sane_range)
+	ADI::is_sane (xf::Socket<FloatingPoint> const& socket, xf::Range<FloatingPoint> const& sane_range)
 	{
-		return is_sane (property) && sane_range.includes (*property);
+		return is_sane (socket) && sane_range.includes (*socket);
 	}
 

@@ -26,8 +26,8 @@
 #include <xefis/config/all.h>
 #include <xefis/core/graphics.h>
 #include <xefis/core/instrument.h>
-#include <xefis/core/property.h>
-#include <xefis/core/property_observer.h>
+#include <xefis/core/socket.h>
+#include <xefis/core/socket_observer.h>
 #include <xefis/support/instrument/instrument_support.h>
 
 // Local:
@@ -46,16 +46,16 @@ template<class Value>
 		 * Settings
 		 */
 
-		xf::Setting<float>		dial_scale	{ this, "dial_scale", 1.0f };
+		xf::Setting<float>	dial_scale	{ this, "dial_scale", 1.0f };
 
 		/*
 		 * Input
 		 */
 
-		xf::PropertyIn<Value>	value		{ this, "value" };
-		xf::PropertyIn<Value>	target		{ this, "target" };
-		xf::PropertyIn<Value>	reference	{ this, "reference" };
-		xf::PropertyIn<Value>	automatic	{ this, "automatic" };
+		xf::ModuleIn<Value>	value		{ this, "value" };
+		xf::ModuleIn<Value>	target		{ this, "target" };
+		xf::ModuleIn<Value>	reference	{ this, "reference" };
+		xf::ModuleIn<Value>	automatic	{ this, "automatic" };
 	};
 
 
@@ -134,8 +134,8 @@ template<class Value>
 		paint (xf::PaintRequest) const override;
 
 	  private:
-		xf::PropertyObserver	_inputs_observer;
-		Converter				_converter;
+		xf::SocketObserver	_inputs_observer;
+		Converter			_converter;
 	};
 
 

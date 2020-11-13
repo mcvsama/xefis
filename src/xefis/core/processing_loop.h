@@ -29,7 +29,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/property.h>
+#include <xefis/core/module_out.h>
 
 
 namespace xf {
@@ -44,8 +44,8 @@ class ProcessingLoopIO: public ModuleIO
 	std::string const			_loop_name;
 
   public:
-	PropertyOut<si::Frequency>	actual_frequency	{ this, "actual_frequency" };
-	PropertyOut<si::Time>		latency				{ this, "latency" };
+	ModuleOut<si::Frequency>	actual_frequency	{ this, "actual_frequency" };
+	ModuleOut<si::Time>			latency				{ this, "latency" };
 
   public:
 	ProcessingLoopIO (std::string_view const& loop_name):

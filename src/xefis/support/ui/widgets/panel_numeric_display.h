@@ -24,7 +24,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/v1/property.h>
+#include <xefis/core/v1/socket.h>
 #include <xefis/support/ui/widgets/panel_widget.h>
 
 
@@ -42,20 +42,20 @@ class PanelNumericDisplay: public PanelWidget
   private:
 	// Ctor
 	explicit
-	PanelNumericDisplay (QWidget* parent, Panel*, unsigned int num_digits, std::string unit, PropertyPath const& value_property_path);
+	PanelNumericDisplay (QWidget* parent, Panel*, unsigned int num_digits, std::string unit, ModuleSocketPath const& value_socket_path);
 
   public:
 	/**
-	 * Create 7-segment display for floatizable properties with hard-coded display format.
+	 * Create 7-segment display for floatizable sockets with hard-coded display format.
 	 */
 	explicit
-	PanelNumericDisplay (QWidget* parent, Panel*, unsigned int num_digits, std::string unit, PropertyPath const& value_property_path, std::string const& format);
+	PanelNumericDisplay (QWidget* parent, Panel*, unsigned int num_digits, std::string unit, ModuleSocketPath const& value_socket_path, std::string const& format);
 
 	/**
-	 * Create 7-segment display for floatizable properties with display format provided in a property.
+	 * Create 7-segment display for floatizable sockets with display format provided in a socket.
 	 */
 	explicit
-	PanelNumericDisplay (QWidget* parent, Panel*, unsigned int num_digits, std::string unit, PropertyPath const& value_property_path, v1::PropertyString const& format_property);
+	PanelNumericDisplay (QWidget* parent, Panel*, unsigned int num_digits, std::string unit, ModuleSocketPath const& value_socket_path, Socket<std::string> const& format_socket);
 
   protected:
 	void
@@ -66,7 +66,7 @@ class PanelNumericDisplay: public PanelWidget
 
   private slots:
 	/**
-	 * Read data from property.
+	 * Read data from socket.
 	 */
 	void
 	read();
@@ -84,9 +84,9 @@ class PanelNumericDisplay: public PanelWidget
 	unsigned int			_num_digits = 0;
 	std::string				_unit;
 	boost::format			_static_format;
-	v1::PropertyString		_dynamic_format;
+	Socket<std::string>		_dynamic_format;
 	std::vector<QPixmap*>	_digits_to_display;	// Pointers not owned.
-	v1::GenericProperty		_value_property;
+	BasicSocket				_value_socket;
 	std::array<QPixmap, 13>	_digit_images;		// [10] is minus sign, [11] is empty, [12] is dot.
 };
 

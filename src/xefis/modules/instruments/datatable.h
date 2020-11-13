@@ -30,8 +30,8 @@
 #include <xefis/core/graphics.h>
 #include <xefis/core/instrument.h>
 #include <xefis/core/module_io.h>
-#include <xefis/core/property.h>
-#include <xefis/core/property_observer.h>
+#include <xefis/core/socket.h>
+#include <xefis/core/socket_observer.h>
 #include <xefis/core/xefis.h>
 #include <xefis/support/instrument/instrument_support.h>
 
@@ -46,21 +46,21 @@ class Datatable:
 	  public:
 		// Ctor
 		explicit
-		Line (std::string_view const& label, xf::BasicProperty const&);
+		Line (std::string_view const& label, xf::BasicSocket const&);
 
 		// Ctor
 		explicit
-		Line (std::string_view const& label, xf::BasicProperty const&,
+		Line (std::string_view const& label, xf::BasicSocket const&,
 			  QColor label_and_value_color);
 
 		// Ctor
 		explicit
-		Line (std::string_view const& label, xf::BasicProperty const&,
+		Line (std::string_view const& label, xf::BasicSocket const&,
 			  std::optional<QColor> label_color,
 			  std::optional<QColor> value_color);
 
 		/**
-		 * Read the property value and cache it atomically, so that stringify()
+		 * Read the socket value and cache it atomically, so that stringify()
 		 * can be later called from another thread.
 		 */
 		void
@@ -78,7 +78,7 @@ class Datatable:
 		std::string					label;
 		QColor						label_color	{ Qt::white };
 		QColor						value_color	{ Qt::white };
-		xf::BasicProperty const&	property;
+		xf::BasicSocket const&		socket;
 
 	  private:
 		xf::Synchronized<QString>	_stringified;
@@ -128,11 +128,11 @@ class Datatable:
 	async_paint (xf::PaintRequest const&) const;
 
   private:
-	float					_label_font_size	{ 16.0 };
-	float					_value_font_size	{ 18.0 };
-	Qt::Alignment			_alignment			{ Qt::AlignTop };
-	std::vector<Line>		_list;
-	xf::PropertyObserver	_inputs_observer;
+	float				_label_font_size	{ 16.0 };
+	float				_value_font_size	{ 18.0 };
+	Qt::Alignment		_alignment			{ Qt::AlignTop };
+	std::vector<Line>	_list;
+	xf::SocketObserver	_inputs_observer;
 };
 
 

@@ -21,7 +21,7 @@
 #include <xefis/config/all.h>
 #include <xefis/core/graphics.h>
 #include <xefis/core/instrument.h>
-#include <xefis/core/property.h>
+#include <xefis/core/socket.h>
 #include <xefis/support/instrument/instrument_support.h>
 
 
@@ -36,15 +36,15 @@ class DebugForcesIO: public xf::ModuleIO
 	 * Input
 	 */
 
-	xf::PropertyIn<si::Angle>			orientation_pitch				{ this, "orientation/pitch" };
-	xf::PropertyIn<si::Angle>			orientation_roll				{ this, "orientation/roll" };
-	xf::PropertyIn<si::Angle>			orientation_magnetic_heading	{ this, "orientation/magnetic-heading" };
-	xf::PropertyIn<si::Acceleration>	measured_accel_x				{ this, "acceleration/x" };
-	xf::PropertyIn<si::Acceleration>	measured_accel_y				{ this, "acceleration/y" };
-	xf::PropertyIn<si::Acceleration>	measured_accel_z				{ this, "acceleration/z" };
-	xf::PropertyIn<si::Acceleration>	centrifugal_accel_x				{ this, "centrifugal-acceleration/x" };
-	xf::PropertyIn<si::Acceleration>	centrifugal_accel_y				{ this, "centrifugal-acceleration/y" };
-	xf::PropertyIn<si::Acceleration>	centrifugal_accel_z				{ this, "centrifugal-acceleration/z" };
+	xf::ModuleIn<si::Angle>			orientation_pitch				{ this, "orientation/pitch" };
+	xf::ModuleIn<si::Angle>			orientation_roll				{ this, "orientation/roll" };
+	xf::ModuleIn<si::Angle>			orientation_magnetic_heading	{ this, "orientation/magnetic-heading" };
+	xf::ModuleIn<si::Acceleration>	measured_accel_x				{ this, "acceleration/x" };
+	xf::ModuleIn<si::Acceleration>	measured_accel_y				{ this, "acceleration/y" };
+	xf::ModuleIn<si::Acceleration>	measured_accel_z				{ this, "acceleration/z" };
+	xf::ModuleIn<si::Acceleration>	centrifugal_accel_x				{ this, "centrifugal-acceleration/x" };
+	xf::ModuleIn<si::Acceleration>	centrifugal_accel_y				{ this, "centrifugal-acceleration/y" };
+	xf::ModuleIn<si::Acceleration>	centrifugal_accel_z				{ this, "centrifugal-acceleration/z" };
 };
 
 

@@ -20,8 +20,8 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
-#include <xefis/core/property.h>
-#include <xefis/core/property_observer.h>
+#include <xefis/core/module_socket.h>
+#include <xefis/core/socket_observer.h>
 
 
 namespace si = neutrino::si;
@@ -35,24 +35,24 @@ class IMU_CPF_IO: public xf::ModuleIO
 	 * Input
 	 */
 
-	xf::PropertyIn<si::AngularVelocity>	angular_velocity_x			{ this, "angular-velocity/x" };
-	xf::PropertyIn<si::AngularVelocity>	angular_velocity_y			{ this, "angular-velocity/y" };
-	xf::PropertyIn<si::AngularVelocity>	angular_velocity_z			{ this, "angular-velocity/z" };
-	xf::PropertyIn<si::Velocity>		tas_x						{ this, "tas/x" };
-	xf::PropertyIn<si::Velocity>		tas_y						{ this, "tas/y" };
-	xf::PropertyIn<si::Velocity>		tas_z						{ this, "tas/z" };
-	xf::PropertyIn<si::Mass>			mass						{ this, "mass" };
+	xf::ModuleIn<si::AngularVelocity>	angular_velocity_x			{ this, "angular-velocity/x" };
+	xf::ModuleIn<si::AngularVelocity>	angular_velocity_y			{ this, "angular-velocity/y" };
+	xf::ModuleIn<si::AngularVelocity>	angular_velocity_z			{ this, "angular-velocity/z" };
+	xf::ModuleIn<si::Velocity>			tas_x						{ this, "tas/x" };
+	xf::ModuleIn<si::Velocity>			tas_y						{ this, "tas/y" };
+	xf::ModuleIn<si::Velocity>			tas_z						{ this, "tas/z" };
+	xf::ModuleIn<si::Mass>				mass						{ this, "mass" };
 
 	/*
 	 * Output
 	 */
 
-	xf::PropertyOut<si::Acceleration>	centripetal_acceleration_x	{ this, "centripetal/x" };
-	xf::PropertyOut<si::Acceleration>	centripetal_acceleration_y	{ this, "centripetal/y" };
-	xf::PropertyOut<si::Acceleration>	centripetal_acceleration_z	{ this, "centripetal/z" };
-	xf::PropertyOut<si::Force>			centripetal_force_x			{ this, "force/x" };
-	xf::PropertyOut<si::Force>			centripetal_force_y			{ this, "force/y" };
-	xf::PropertyOut<si::Force>			centripetal_force_z			{ this, "force/z" };
+	xf::ModuleOut<si::Acceleration>		centripetal_acceleration_x	{ this, "centripetal/x" };
+	xf::ModuleOut<si::Acceleration>		centripetal_acceleration_y	{ this, "centripetal/y" };
+	xf::ModuleOut<si::Acceleration>		centripetal_acceleration_z	{ this, "centripetal/z" };
+	xf::ModuleOut<si::Force>			centripetal_force_x			{ this, "force/x" };
+	xf::ModuleOut<si::Force>			centripetal_force_y			{ this, "force/y" };
+	xf::ModuleOut<si::Force>			centripetal_force_z			{ this, "force/z" };
 };
 
 
@@ -80,7 +80,7 @@ class IMU_CPF: public xf::Module<IMU_CPF_IO>
 	xf::Smoother<si::Acceleration>	_smooth_accel_x			{ kSmoothingTime };
 	xf::Smoother<si::Acceleration>	_smooth_accel_y			{ kSmoothingTime };
 	xf::Smoother<si::Acceleration>	_smooth_accel_z			{ kSmoothingTime };
-	xf::PropertyObserver			_centripetal_computer;
+	xf::SocketObserver				_centripetal_computer;
 };
 
 #endif

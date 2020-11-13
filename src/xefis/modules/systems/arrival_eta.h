@@ -20,8 +20,8 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
-#include <xefis/core/property.h>
-#include <xefis/core/property_observer.h>
+#include <xefis/core/module_socket.h>
+#include <xefis/core/socket_observer.h>
 #include <xefis/utility/smoother.h>
 
 
@@ -36,17 +36,17 @@ class ArrivalETA_IO: public xf::ModuleIO
 	 * Input
 	 */
 
-	xf::PropertyIn<si::Angle>	station_latitude	{ this, "station-position/latitude" };
-	xf::PropertyIn<si::Angle>	station_longitude	{ this, "station-position/longitude" };
-	xf::PropertyIn<si::Angle>	aircraft_latitude	{ this, "aircraft-position/latitude" };
-	xf::PropertyIn<si::Angle>	aircraft_longitude	{ this, "aircraft-position/longitude" };
-	xf::PropertyIn<si::Angle>	track_lateral_true	{ this, "track-lateral-true" };
+	xf::ModuleIn<si::Angle>	station_latitude	{ this, "station-position/latitude" };
+	xf::ModuleIn<si::Angle>	station_longitude	{ this, "station-position/longitude" };
+	xf::ModuleIn<si::Angle>	aircraft_latitude	{ this, "aircraft-position/latitude" };
+	xf::ModuleIn<si::Angle>	aircraft_longitude	{ this, "aircraft-position/longitude" };
+	xf::ModuleIn<si::Angle>	track_lateral_true	{ this, "track-lateral-true" };
 
 	/*
 	 * Output
 	 */
 
-	xf::PropertyOut<si::Time>	eta					{ this, "eta" };
+	xf::ModuleOut<si::Time>	eta					{ this, "eta" };
 };
 
 
@@ -68,7 +68,7 @@ class ArrivalETA: public xf::Module<ArrivalETA_IO>
   private:
 	xf::Smoother<si::Time>		_smoother { 3_s };
 	std::optional<si::Length>	_prev_distance;
-	xf::PropertyObserver		_eta_computer;
+	xf::SocketObserver			_eta_computer;
 };
 
 #endif

@@ -23,9 +23,9 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
-#include <xefis/core/property.h>
-#include <xefis/core/property_observer.h>
+#include <xefis/core/module_socket.h>
 #include <xefis/core/setting.h>
+#include <xefis/core/socket_observer.h>
 #include <xefis/core/xefis.h>
 
 
@@ -42,16 +42,16 @@ class TrimControlIO: public xf::ModuleIO
 	 * Input
 	 */
 
-	xf::PropertyIn<double>	trim_axis			{ this, "axis" };
-	xf::PropertyIn<double>	trim_value			{ this, "value" };
-	xf::PropertyIn<bool>	up_trim_button		{ this, "up-button" };
-	xf::PropertyIn<bool>	down_trim_button	{ this, "down-button" };
+	xf::ModuleIn<double>	trim_axis			{ this, "axis" };
+	xf::ModuleIn<double>	trim_value			{ this, "value" };
+	xf::ModuleIn<bool>		up_trim_button		{ this, "up-button" };
+	xf::ModuleIn<bool>		down_trim_button	{ this, "down-button" };
 
 	/*
 	 * Output
 	 */
 
-	xf::PropertyOut<double>	output_trim_value	{ this, "trim-value" };
+	xf::ModuleOut<double>	output_trim_value	{ this, "trim-value" };
 };
 
 
@@ -84,19 +84,19 @@ class TrimControl: public xf::Module<TrimControlIO>
 	 * Return true if given button is 'pressed'.
 	 */
 	static bool
-	pressed (xf::Property<bool> const&);
+	pressed (xf::Socket<bool> const&);
 
 	/**
 	 * Return true if given axis is moved 'up'.
 	 */
 	static bool
-	moved_up (xf::Property<double> const&);
+	moved_up (xf::Socket<double> const&);
 
 	/**
 	 * Return true if given axis is moved 'down'.
 	 */
 	static bool
-	moved_down (xf::Property<double> const&);
+	moved_down (xf::Socket<double> const&);
 
   private:
 	xf::SoundManager*		_sound_manager	{ nullptr };
@@ -104,8 +104,8 @@ class TrimControl: public xf::Module<TrimControlIO>
 	bool					_trimming_up	{ false };
 	bool					_trimming_down	{ false };
 	std::unique_ptr<QTimer>	_timer;
-	xf::PropertyObserver	_trim_computer;
-	xf::PropertyObserver	_mix_computer;
+	xf::SocketObserver		_trim_computer;
+	xf::SocketObserver		_mix_computer;
 };
 
 #endif

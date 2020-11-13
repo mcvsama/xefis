@@ -21,8 +21,8 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
-#include <xefis/core/property.h>
-#include <xefis/core/property_observer.h>
+#include <xefis/core/module_socket.h>
+#include <xefis/core/socket_observer.h>
 #include <xefis/core/setting.h>
 #include <xefis/utility/smoother.h>
 #include <xefis/utility/range_smoother.h>
@@ -39,79 +39,79 @@ class PerformanceComputerIO: public xf::ModuleIO
 	 * Settings
 	 */
 
-	xf::Setting<si::Velocity>			tev_min_ias					{ this, "tev_min_ias", 0_kt };
+	xf::Setting<si::Velocity>		tev_min_ias					{ this, "tev_min_ias", 0_kt };
 
 	/*
 	 * Input
 	 */
 
-	xf::PropertyIn<si::Velocity>		speed_ias					{ this, "speed.ias" };
-	xf::PropertyIn<si::Velocity>		speed_tas					{ this, "speed.tas" };
-	xf::PropertyIn<si::Velocity>		speed_gs					{ this, "speed.gs" };
-	xf::PropertyIn<si::Velocity>		vertical_speed				{ this, "vertical-speed" };
-	xf::PropertyIn<si::Length>			altitude_amsl_std			{ this, "altitude.amsl" };
-	xf::PropertyIn<si::Angle>			track_lateral_true			{ this, "track.lateral.true" };
-	xf::PropertyIn<si::Angle>			orientation_heading_true	{ this, "orientation.heading.true" };
-	xf::PropertyIn<si::Angle>			magnetic_declination		{ this, "magnetic-declination" };
-	xf::PropertyIn<si::Length>			density_altitude			{ this, "density-altitude" };
-	xf::PropertyIn<si::Density>			air_density_static			{ this, "air-density.static" };
-	xf::PropertyIn<si::Mass>			aircraft_mass				{ this, "aircraft-mass" };
-	xf::PropertyIn<si::Angle>			flaps_angle					{ this, "flaps-angle" };
-	xf::PropertyIn<si::Angle>			spoilers_angle				{ this, "spoilers-angle" };
-	xf::PropertyIn<si::Angle>			aoa_alpha					{ this, "aoa.alpha" };
-	xf::PropertyIn<si::Acceleration>	load						{ this, "load" };
-	xf::PropertyIn<si::Angle>			bank_angle					{ this, "bank-angle" };
-	xf::PropertyIn<si::Acceleration>	y_acceleration				{ this, "acceleration.y" };
-	xf::PropertyIn<si::Acceleration>	z_acceleration				{ this, "acceleration.x" };
+	xf::ModuleIn<si::Velocity>		speed_ias					{ this, "speed.ias" };
+	xf::ModuleIn<si::Velocity>		speed_tas					{ this, "speed.tas" };
+	xf::ModuleIn<si::Velocity>		speed_gs					{ this, "speed.gs" };
+	xf::ModuleIn<si::Velocity>		vertical_speed				{ this, "vertical-speed" };
+	xf::ModuleIn<si::Length>		altitude_amsl_std			{ this, "altitude.amsl" };
+	xf::ModuleIn<si::Angle>			track_lateral_true			{ this, "track.lateral.true" };
+	xf::ModuleIn<si::Angle>			orientation_heading_true	{ this, "orientation.heading.true" };
+	xf::ModuleIn<si::Angle>			magnetic_declination		{ this, "magnetic-declination" };
+	xf::ModuleIn<si::Length>		density_altitude			{ this, "density-altitude" };
+	xf::ModuleIn<si::Density>		air_density_static			{ this, "air-density.static" };
+	xf::ModuleIn<si::Mass>			aircraft_mass				{ this, "aircraft-mass" };
+	xf::ModuleIn<si::Angle>			flaps_angle					{ this, "flaps-angle" };
+	xf::ModuleIn<si::Angle>			spoilers_angle				{ this, "spoilers-angle" };
+	xf::ModuleIn<si::Angle>			aoa_alpha					{ this, "aoa.alpha" };
+	xf::ModuleIn<si::Acceleration>	load						{ this, "load" };
+	xf::ModuleIn<si::Angle>			bank_angle					{ this, "bank-angle" };
+	xf::ModuleIn<si::Acceleration>	y_acceleration				{ this, "acceleration.y" };
+	xf::ModuleIn<si::Acceleration>	z_acceleration				{ this, "acceleration.x" };
 
 	/*
 	 * Output
 	 */
 
-	xf::PropertyOut<si::Angle>			wind_from_true				{ this, "wind.from.true" };
-	xf::PropertyOut<si::Angle>			wind_from_magnetic			{ this, "wind.from.magnetic" };
-	xf::PropertyOut<si::Velocity>		wind_tas					{ this, "wind.tas" };
-	xf::PropertyOut<double>				glide_ratio					{ this, "glide-ratio" };
-	xf::PropertyOut<std::string>		glide_ratio_string			{ this, "glide-ratio-string" };
-	xf::PropertyOut<si::Power>			total_energy_variometer		{ this, "total-energy-variometer" };
+	xf::ModuleOut<si::Angle>		wind_from_true				{ this, "wind.from.true" };
+	xf::ModuleOut<si::Angle>		wind_from_magnetic			{ this, "wind.from.magnetic" };
+	xf::ModuleOut<si::Velocity>		wind_tas					{ this, "wind.tas" };
+	xf::ModuleOut<double>			glide_ratio					{ this, "glide-ratio" };
+	xf::ModuleOut<std::string>		glide_ratio_string			{ this, "glide-ratio-string" };
+	xf::ModuleOut<si::Power>		total_energy_variometer		{ this, "total-energy-variometer" };
 	// Current stall IAS (depends on current bank angle):
-	xf::PropertyOut<si::Velocity>		v_s							{ this, "v.s" };
+	xf::ModuleOut<si::Velocity>		v_s							{ this, "v.s" };
 	// Stall IAS with wings level:
-	xf::PropertyOut<si::Velocity>		v_s_0_deg					{ this, "v.s-0-deg" };
+	xf::ModuleOut<si::Velocity>		v_s_0_deg					{ this, "v.s-0-deg" };
 	// Stall IAS at 5° bank angle:
-	xf::PropertyOut<si::Velocity>		v_s_5_deg					{ this, "v.s-5-deg" };
+	xf::ModuleOut<si::Velocity>		v_s_5_deg					{ this, "v.s-5-deg" };
 	// Stall IAS at 30° bank angle:
-	xf::PropertyOut<si::Velocity>		v_s_30_deg					{ this, "v.s-30-deg" };
+	xf::ModuleOut<si::Velocity>		v_s_30_deg					{ this, "v.s-30-deg" };
 	// Rotation IAS on take-off:
-	xf::PropertyOut<si::Velocity>		v_r							{ this, "v.r" };
+	xf::ModuleOut<si::Velocity>		v_r							{ this, "v.r" };
 	// Max maneuvering IAS:
-	xf::PropertyOut<si::Velocity>		v_a							{ this, "v.a" };
+	xf::ModuleOut<si::Velocity>		v_a							{ this, "v.a" };
 	// Approach IAS:
-	xf::PropertyOut<si::Velocity>		v_approach					{ this, "v.approach" };
+	xf::ModuleOut<si::Velocity>		v_approach					{ this, "v.approach" };
 	// Take-off decision speed: TODO compute:
-	xf::PropertyOut<si::Velocity>		v_1							{ this, "v.1" };
+	xf::ModuleOut<si::Velocity>		v_1							{ this, "v.1" };
 	// One engine inoperative decision IAS: TODO compute:
-	xf::PropertyOut<si::Velocity>		v_2							{ this, "v.2" };
+	xf::ModuleOut<si::Velocity>		v_2							{ this, "v.2" };
 	// Best unpowered range IAS (best glide IAS): TODO compute:
-	xf::PropertyOut<si::Velocity>		v_bg						{ this, "v.bg" };
+	xf::ModuleOut<si::Velocity>		v_bg						{ this, "v.bg" };
 	// Best powered range IAS: TODO compute
-	xf::PropertyOut<si::Velocity>		v_br						{ this, "v.br" };
+	xf::ModuleOut<si::Velocity>		v_br						{ this, "v.br" };
 	// Maximum unpowered airborne time IAS (minimum descent IAS): TODO compute
-	xf::PropertyOut<si::Velocity>		v_md						{ this, "v.md" };
+	xf::ModuleOut<si::Velocity>		v_md						{ this, "v.md" };
 	// Maximum powered airborne time IAS (best endurance IAS): TODO compute
-	xf::PropertyOut<si::Velocity>		v_be						{ this, "v.be" };
+	xf::ModuleOut<si::Velocity>		v_be						{ this, "v.be" };
 	// Best angle of climb (shortest ground distance climb): TODO compute
-	xf::PropertyOut<si::Velocity>		v_x							{ this, "v.x" };
+	xf::ModuleOut<si::Velocity>		v_x							{ this, "v.x" };
 	// Best rate of climb (shortest time climb): TODO compute
-	xf::PropertyOut<si::Velocity>		v_y							{ this, "v.y" };
-	xf::PropertyOut<si::Angle>			critical_aoa				{ this, "aoa.critical" };
-	xf::PropertyOut<bool>				stall						{ this, "stall" };
-	xf::PropertyOut<double>				lift_coefficient			{ this, "lift-coefficient" };
-	xf::PropertyOut<si::Velocity>		estimated_ias				{ this, "estimated.ias" };
-	xf::PropertyOut<si::Velocity>		estimated_ias_error			{ this, "estimated.ias-error" };
-	xf::PropertyOut<si::Angle>			estimated_aoa				{ this, "estimated.aoa" };
-	xf::PropertyOut<si::Angle>			estimated_aoa_error			{ this, "estimated.aoa-error" };
-	xf::PropertyOut<si::Angle>			slip_skid					{ this, "slip-skid" };
+	xf::ModuleOut<si::Velocity>		v_y							{ this, "v.y" };
+	xf::ModuleOut<si::Angle>		critical_aoa				{ this, "aoa.critical" };
+	xf::ModuleOut<bool>				stall						{ this, "stall" };
+	xf::ModuleOut<double>			lift_coefficient			{ this, "lift-coefficient" };
+	xf::ModuleOut<si::Velocity>		estimated_ias				{ this, "estimated.ias" };
+	xf::ModuleOut<si::Velocity>		estimated_ias_error			{ this, "estimated.ias-error" };
+	xf::ModuleOut<si::Angle>		estimated_aoa				{ this, "estimated.aoa" };
+	xf::ModuleOut<si::Angle>		estimated_aoa_error			{ this, "estimated.aoa-error" };
+	xf::ModuleOut<si::Angle>		slip_skid					{ this, "slip-skid" };
 };
 
 
@@ -175,20 +175,20 @@ class PerformanceComputer: public xf::Module<PerformanceComputerIO>
   private:
 	xf::Airframe*					_airframe;
 	si::Energy						_prev_total_energy					= 0_J;
-	// Note: PropertyObservers depend on Smoothers, so first Smoothers must be defined,
-	// then PropertyObservers, to ensure correct order of destruction.
+	// Note: SocketObservers depend on Smoothers, so first Smoothers must be defined,
+	// then SocketObservers, to ensure correct order of destruction.
 	xf::RangeSmoother<si::Angle>	_wind_direction_smoother			{ { 0.0_deg, 360.0_deg }, 5_s };
 	xf::Smoother<si::Velocity>		_wind_speed_smoother				{ 5_s };
 	xf::Smoother<si::Power>			_total_energy_variometer_smoother	{ 1_s };
 	xf::Smoother<double>			_cl_smoother						{ 1_s };
-	xf::PropertyObserver			_wind_computer;
-	xf::PropertyObserver			_glide_ratio_computer;
-	xf::PropertyObserver			_total_energy_variometer_computer;
-	xf::PropertyObserver			_speeds_computer;
-	xf::PropertyObserver			_aoa_computer;
-	xf::PropertyObserver			_cl_computer;
-	xf::PropertyObserver			_estimations_computer;
-	xf::PropertyObserver			_slip_skid_computer;
+	xf::SocketObserver				_wind_computer;
+	xf::SocketObserver				_glide_ratio_computer;
+	xf::SocketObserver				_total_energy_variometer_computer;
+	xf::SocketObserver				_speeds_computer;
+	xf::SocketObserver				_aoa_computer;
+	xf::SocketObserver				_cl_computer;
+	xf::SocketObserver				_estimations_computer;
+	xf::SocketObserver				_slip_skid_computer;
 };
 
 #endif

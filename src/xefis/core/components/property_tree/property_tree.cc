@@ -23,7 +23,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module_io.h>
-#include <xefis/core/property.h>
+#include <xefis/core/socket.h>
 
 // Local:
 #include "property_tree.h"
@@ -32,7 +32,7 @@
 
 namespace xf {
 
-PropertyTree::PropertyTree (QWidget* parent):
+SocketTree::SocketTree (QWidget* parent):
 	QWidget (parent)
 {
 	_tree = new QTreeWidget (this);
@@ -48,7 +48,7 @@ PropertyTree::PropertyTree (QWidget* parent):
 	_tree->setSizePolicy (QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 	_tree->setVerticalScrollMode (QAbstractItemView::ScrollPerPixel);
 	_tree->setContextMenuPolicy (Qt::CustomContextMenu);
-	_tree->setHeaderLabels ({ "Property", "Use count", "Actual value",  "Set value", "Fallback value" });
+	_tree->setHeaderLabels ({ "Socket", "Use count", "Actual value",  "Set value", "Fallback value" });
 
 	QHBoxLayout* layout = new QHBoxLayout (this);
 	layout->setMargin (0);
@@ -56,39 +56,39 @@ PropertyTree::PropertyTree (QWidget* parent):
 
 	_refresh_timer = new QTimer (this);
 	_refresh_timer->setInterval ((100_ms).in<si::Millisecond>());
-	QObject::connect (_refresh_timer, &QTimer::timeout, this, &PropertyTree::read_values);
+	QObject::connect (_refresh_timer, &QTimer::timeout, this, &SocketTree::read_values);
 
-	// TODO QObject::connect (this, &QTreeWidget::customContextMenuRequested, this, &PropertyTreeWidget::handle_context_menu_request);
+	// TODO QObject::connect (this, &QTreeWidget::customContextMenuRequested, this, &SocketTreeWidget::handle_context_menu_request);
 }
 
 
 void
-PropertyTree::setup_icons()
+SocketTree::setup_icons()
 {
 	for (QTreeWidgetItemIterator item (_tree); *item; ++item)
-		if (auto* property_item = dynamic_cast<PropertyItem*> (*item))
-			property_item->setup_appereance();
+		if (auto* socket_item = dynamic_cast<SocketItem*> (*item))
+			socket_item->setup_appereance();
 }
 
 
 void
-PropertyTree::read_values()
+SocketTree::read_values()
 {
 	for (QTreeWidgetItemIterator item (_tree); *item; ++item)
-		if (auto* property_item = dynamic_cast<PropertyItem*> (*item))
-			property_item->read();
+		if (auto* socket_item = dynamic_cast<SocketItem*> (*item))
+			socket_item->read();
 }
 
 
 void
-PropertyTree::showEvent (QShowEvent*)
+SocketTree::showEvent (QShowEvent*)
 {
 	_refresh_timer->start();
 }
 
 
 void
-PropertyTree::hideEvent (QHideEvent*)
+SocketTree::hideEvent (QHideEvent*)
 {
 	_refresh_timer->stop();
 }

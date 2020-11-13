@@ -64,7 +64,7 @@ GPS::Connection::Connection (GPS& gps_module, PowerCycle& power_cycle, unsigned 
 GPS::Connection::~Connection()
 {
 	_gps_module.logger() << "Stop GPS serial connection" << std::endl;
-	_gps_module.reset_data_properties();
+	_gps_module.reset_data_sockets();
 	_gps_module.io.serviceable = false;
 	_reliable_fix_quality = false;
 }
@@ -547,7 +547,7 @@ GPS::process (xf::Cycle const&)
 	if (_power_cycle_requested)
 	{
 		_power_cycle_requested = false;
-		reset_data_properties();
+		reset_data_sockets();
 		_power_cycle.reset();
 		_power_cycle_timer->start();
 	}
@@ -573,7 +573,7 @@ GPS::request_power_cycle()
 
 
 void
-GPS::reset_data_properties()
+GPS::reset_data_sockets()
 {
 	io.fix_quality = xf::nil;
 	io.fix_mode = xf::nil;

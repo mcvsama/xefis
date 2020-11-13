@@ -26,7 +26,7 @@
 
 namespace xf {
 
-PanelNumericDisplay::PanelNumericDisplay (QWidget* parent, Panel* panel, unsigned int num_digits, std::string unit, PropertyPath const& value_property_path):
+PanelNumericDisplay::PanelNumericDisplay (QWidget* parent, Panel* panel, unsigned int num_digits, std::string unit, ModuleSocketPath const& value_socket_path):
 	PanelWidget (parent, panel),
 	_num_digits (num_digits),
 	_unit (unit)
@@ -48,22 +48,22 @@ PanelNumericDisplay::PanelNumericDisplay (QWidget* parent, Panel* panel, unsigne
 	_digits_to_display.resize (_num_digits + 1, nullptr); // Add margin (+1) for dot image.
 	setMinimumSize (_digit_images[0].width() * _num_digits + 2 * (BorderWidth + Margin),
 					_digit_images[0].height() + 2 * (BorderWidth + Margin));
-	_value_property.set_path (value_property_path);
+	_value_socket.set_path (value_socket_path);
 }
 
 
-PanelNumericDisplay::PanelNumericDisplay (QWidget* parent, Panel* panel, unsigned int num_digits, std::string unit, PropertyPath const& value_property_path, std::string const& format):
-	PanelNumericDisplay (parent, panel, num_digits, unit, value_property_path)
+PanelNumericDisplay::PanelNumericDisplay (QWidget* parent, Panel* panel, unsigned int num_digits, std::string unit, ModuleSocketPath const& value_socket_path, std::string const& format):
+	PanelNumericDisplay (parent, panel, num_digits, unit, value_socket_path)
 {
 	_static_format = boost::format (format);
 	read();
 }
 
 
-PanelNumericDisplay::PanelNumericDisplay (QWidget* parent, Panel* panel, unsigned int num_digits, std::string unit, PropertyPath const& value_property_path, v1::PropertyString const& format_property):
-	PanelNumericDisplay (parent, panel, num_digits, unit, value_property_path)
+PanelNumericDisplay::PanelNumericDisplay (QWidget* parent, Panel* panel, unsigned int num_digits, std::string unit, ModuleSocketPath const& value_socket_path, Socket<std::string> const& format_socket):
+	PanelNumericDisplay (parent, panel, num_digits, unit, value_socket_path)
 {
-	_dynamic_format = format_property;
+	_dynamic_format = format_socket;
 	read();
 }
 
@@ -130,15 +130,15 @@ PanelNumericDisplay::data_updated()
 void
 PanelNumericDisplay::read()
 {
-	if (!_value_property.fresh())
+	if (!_value_socket.fresh())
 		return;
 
 	std::string digits;
 
-	if (_value_property.is_nil())
+	if (_value_socket.is_nil())
 		digits = std::string (_num_digits, ' ');
 	else
-		digits = convert_to_digits (_value_property.to_float (_unit));
+		digits = convert_to_digits (_value_socket.to_float (_unit));
 
 	std::fill (_digits_to_display.begin(), _digits_to_display.end(), nullptr);
 

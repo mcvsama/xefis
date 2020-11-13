@@ -52,14 +52,14 @@ ModuleWidget::ModuleWidget (BasicModule& module, QWidget* parent):
 
 	if (auto* io_base = _module.io_base())
 	{
-		_inputs_property_tree = new PropertyTree (this);
-		_inputs_property_tree->populate (ModuleIO::ProcessingLoopAPI (*io_base).input_properties());
+		_inputs_socket_tree = new SocketTree (this);
+		_inputs_socket_tree->populate (ModuleIO::ProcessingLoopAPI (*io_base).input_sockets());
 
-		_outputs_property_tree = new PropertyTree (this);
-		_outputs_property_tree->populate (ModuleIO::ProcessingLoopAPI (*io_base).output_properties());
+		_outputs_socket_tree = new SocketTree (this);
+		_outputs_socket_tree->populate (ModuleIO::ProcessingLoopAPI (*io_base).output_sockets());
 
-		tabs->addTab (_inputs_property_tree, "Data inputs");
-		tabs->addTab (_outputs_property_tree, "Data outputs");
+		tabs->addTab (_inputs_socket_tree, "Data inputs");
+		tabs->addTab (_outputs_socket_tree, "Data outputs");
 	}
 
 	if (auto module_with_config_widget = dynamic_cast<BasicModule::HasConfiguratorWidget*> (&_module))

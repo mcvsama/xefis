@@ -34,15 +34,15 @@
 #include "joystick.h"
 
 
-JoystickInput::Button::Button (QDomElement const&, xf::PropertyOut<bool>& property):
-	_property (property)
+JoystickInput::Button::Button (QDomElement const&, xf::ModuleOut<bool>& socket):
+	_socket (socket)
 { }
 
 
-xf::PropertyOut<bool>&
-JoystickInput::Button::property()
+xf::ModuleOut<bool>&
+JoystickInput::Button::socket()
 {
-	return _property;
+	return _socket;
 }
 
 
@@ -57,26 +57,26 @@ JoystickInput::Button::handle (EventType event_type, HandlerID, int32_t value)
 void
 JoystickInput::Button::reset()
 {
-	_property = xf::nil;
+	_socket = xf::nil;
 }
 
 
 inline void
 JoystickInput::Button::set_value (float value)
 {
-	_property = value;
+	_socket = value;
 }
 
 
-JoystickInput::Axis::Axis (QDomElement const& axis_element, xf::PropertyOut<double>& property, xf::PropertyOut<si::Angle>& angle_property, xf::Range<si::Angle>& angle_range):
-	Axis (axis_element, property, angle_property, angle_range, { }, { })
+JoystickInput::Axis::Axis (QDomElement const& axis_element, xf::ModuleOut<double>& socket, xf::ModuleOut<si::Angle>& angle_socket, xf::Range<si::Angle>& angle_range):
+	Axis (axis_element, socket, angle_socket, angle_range, { }, { })
 { }
 
 
-JoystickInput::Axis::Axis (QDomElement const& axis_element, xf::PropertyOut<double>& property, xf::PropertyOut<si::Angle>& angle_property, xf::Range<si::Angle>& angle_range,
+JoystickInput::Axis::Axis (QDomElement const& axis_element, xf::ModuleOut<double>& socket, xf::ModuleOut<si::Angle>& angle_socket, xf::Range<si::Angle>& angle_range,
 						   std::optional<HandlerID> up_button_id, std::optional<HandlerID> down_button_id):
-	_property (property),
-	_angle_property (angle_property),
+	_socket (socket),
+	_angle_socket (angle_socket),
 	_angle_range (angle_range),
 	_up_button_id (up_button_id),
 	_down_button_id (down_button_id)
@@ -109,10 +109,10 @@ JoystickInput::Axis::Axis (QDomElement const& axis_element, xf::PropertyOut<doub
 }
 
 
-xf::PropertyOut<double>&
-JoystickInput::Axis::property()
+xf::ModuleOut<double>&
+JoystickInput::Axis::socket()
 {
-	return _property;
+	return _socket;
 }
 
 
@@ -145,7 +145,7 @@ JoystickInput::Axis::handle (EventType event_type, HandlerID handler_id, int32_t
 void
 JoystickInput::Axis::reset()
 {
-	_property = xf::nil;
+	_socket = xf::nil;
 }
 
 
@@ -168,8 +168,8 @@ JoystickInput::Axis::set_value (float value)
 	// Renormalize from standard [-1.0, 1.0]:
 	value = xf::renormalize (value, xf::Range (-1.f, 1.f), xf::Range (_output_minimum, _output_maximum));
 
-	_property = value;
-	_angle_property = xf::renormalize (value, { -1.0f, +1.0f }, _angle_range);
+	_socket = value;
+	_angle_socket = xf::renormalize (value, { -1.0f, +1.0f }, _angle_range);
 }
 
 
@@ -178,14 +178,14 @@ JoystickInput::JoystickInput (std::unique_ptr<JoystickInputIO> module_io, QDomEl
 	_logger (logger.with_scope (std::string (kLoggerScope) + "#" + instance))
 {
 	for (std::size_t handler_id = 0; handler_id < kMaxEventID; ++handler_id)
-		_button_properties[handler_id] = std::make_unique<xf::PropertyOut<bool>> (&io, "buttons/" + std::to_string (handler_id));
+		_button_sockets[handler_id] = std::make_unique<xf::ModuleOut<bool>> (&io, "buttons/" + std::to_string (handler_id));
 
 	for (std::size_t handler_id = 0; handler_id < kMaxEventID; ++handler_id)
-		_axis_properties[handler_id] = std::make_unique<xf::PropertyOut<double>> (&io, "axes/" + std::to_string (handler_id));
+		_axis_sockets[handler_id] = std::make_unique<xf::ModuleOut<double>> (&io, "axes/" + std::to_string (handler_id));
 
 	for (std::size_t handler_id = 0; handler_id < kMaxEventID; ++handler_id)
 	{
-		_angle_axis_properties[handler_id] = std::make_unique<xf::PropertyOut<si::Angle>> (&io, "axes(angle)/" + std::to_string (handler_id));
+		_angle_axis_sockets[handler_id] = std::make_unique<xf::ModuleOut<si::Angle>> (&io, "axes(angle)/" + std::to_string (handler_id));
 		_angle_axis_ranges[handler_id] = { -45_deg, +45_deg };
 	}
 
@@ -199,10 +199,10 @@ JoystickInput::JoystickInput (std::unique_ptr<JoystickInputIO> module_io, QDomEl
 
 				if (id < _handlers.size())
 				{
-					auto& property = *_axis_properties[id];
-					auto& angle_property = *_angle_axis_properties[id];
+					auto& socket = *_axis_sockets[id];
+					auto& angle_socket = *_angle_axis_sockets[id];
 					auto& angle_range =_angle_axis_ranges[id];
-					_handlers[id].push_back (std::make_shared<Axis> (e, property, angle_property, angle_range));
+					_handlers[id].push_back (std::make_shared<Axis> (e, socket, angle_socket, angle_range));
 
 					if (e.hasAttribute ("up-button-id") && e.hasAttribute ("down-button-id"))
 					{
@@ -211,7 +211,7 @@ JoystickInput::JoystickInput (std::unique_ptr<JoystickInputIO> module_io, QDomEl
 
 						if (u_id < _handlers.size() && d_id < _handlers.size())
 						{
-							auto axis = std::make_shared<Axis> (e, property, angle_property, angle_range, u_id, d_id);
+							auto axis = std::make_shared<Axis> (e, socket, angle_socket, angle_range, u_id, d_id);
 
 							_handlers[u_id].push_back (axis);
 							_handlers[d_id].push_back (axis);
@@ -231,7 +231,7 @@ JoystickInput::JoystickInput (std::unique_ptr<JoystickInputIO> module_io, QDomEl
 				auto id = e.attribute ("id").toUInt();
 
 				if (id < _handlers.size())
-					_handlers[id].push_back (std::make_shared<Button> (e, *_button_properties[id]));
+					_handlers[id].push_back (std::make_shared<Button> (e, *_button_sockets[id]));
 				else
 					throw xf::BadDomAttribute (e, "id");
 			}
@@ -335,7 +335,7 @@ JoystickInput::read()
 				// fallthrough
 				case JS_EVENT_BUTTON:
 					event_type = EventType::ButtonEvent;
-					*_button_properties[handler_id] = ev.value;
+					*_button_sockets[handler_id] = ev.value;
 					break;
 
 				case JS_EVENT_AXIS + JS_EVENT_INIT:
@@ -357,16 +357,16 @@ JoystickInput::read()
 
 
 void
-JoystickInput::reset_properties()
+JoystickInput::reset_sockets()
 {
 	for (auto& handlers: _handlers)
 		for (auto& handler: handlers)
 			handler->reset();
 
-	for (auto& button: _button_properties)
+	for (auto& button: _button_sockets)
 		*button = xf::nil;
 
-	for (auto& axis: _axis_properties)
+	for (auto& axis: _axis_sockets)
 		*axis = xf::nil;
 }
 

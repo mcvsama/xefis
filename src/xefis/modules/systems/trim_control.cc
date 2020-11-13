@@ -105,22 +105,22 @@ TrimControl::update_trim_without_sound()
 
 
 inline bool
-TrimControl::pressed (xf::Property<bool> const& property)
+TrimControl::pressed (xf::Socket<bool> const& socket)
 {
-	return property && *property;
+	return socket && *socket;
 }
 
 
 inline bool
-TrimControl::moved_up (xf::Property<double> const& property)
+TrimControl::moved_up (xf::Socket<double> const& socket)
 {
-	return property.valid() && *property > 0.5;
+	return socket.valid() && *socket > 0.5;
 }
 
 
 inline bool
-TrimControl::moved_down (xf::Property<double> const& property)
+TrimControl::moved_down (xf::Socket<double> const& socket)
 {
-	return property.valid() && *property < -0.5;
+	return socket.valid() && *socket < -0.5;
 }
 

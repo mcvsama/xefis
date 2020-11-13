@@ -40,7 +40,7 @@ class CallbackAction: public PropAction
 
 
 /**
- * Calls a callback when a property changed its value since last check.
+ * Calls a callback when a socket changed its value since last check.
  */
 template<class pValue>
 	class PropChangedAction:
@@ -53,13 +53,13 @@ template<class pValue>
 
 	  public:
 		/**
-		 * \param	property
-		 *			Property to observe for changes.
+		 * \param	socket
+		 *			Socket to observe for changes.
 		 * \param	callback
 		 *			Function to call when change is detected.
 		 */
-		PropChangedAction (PropertyIn<bool>& property, Callback callback):
-			PropChanged<Value> (property),
+		PropChangedAction (ModuleIn<bool>& socket, Callback callback):
+			PropChanged<Value> (socket),
 			_callback (callback)
 		{ }
 
@@ -81,7 +81,7 @@ template<class pValue>
 
 
 /**
- * Calls a callback when a property has changed and has now given value.
+ * Calls a callback when a socket has changed and has now given value.
  */
 template<class pValue>
 	class PropChangedToAction:
@@ -94,13 +94,13 @@ template<class pValue>
 
 	  public:
 		/**
-		 * \param	property
-		 *			Property to observe for changes.
+		 * \param	socket
+		 *			Socket to observe for changes.
 		 * \param	callback
 		 *			Function to call when change is detected.
 		 */
-		PropChangedToAction (PropertyIn<bool>& property, Value value, Callback callback):
-			PropChangedTo<Value> (property, value),
+		PropChangedToAction (ModuleIn<bool>& socket, Value value, Callback callback):
+			PropChangedTo<Value> (socket, value),
 			_callback (callback)
 		{ }
 
@@ -130,7 +130,7 @@ class ToggleButtonAction: public CallbackAction
 
   public:
 	// Ctor
-	ToggleButtonAction (PropertyPath const& button_path, PropertyPath const& toggle_path)
+	ToggleButtonAction (SocketPath const& button_path, SocketPath const& toggle_path)
 	{
 		_button.set_path (button_path);
 		_toggle.set_path (toggle_path);
@@ -215,8 +215,8 @@ class ToggleButtonAction: public CallbackAction
 	}
 
   protected:
-	PropertyBoolean	_button;
-	PropertyBoolean	_toggle;
+	SocketBoolean	_button;
+	SocketBoolean	_toggle;
 	Callback		_callback;
 	bool			_radio_mode = false;
 };
@@ -231,7 +231,7 @@ class ButtonOptionsAction: public CallbackAction
 	  public:
 		// Ctor
 		Option (std::string const& button_path, std::string const& toggle_path, int value, bool is_default = false):
-			button (PropertyPath (button_path), PropertyPath (toggle_path)),
+			button (SocketPath (button_path), SocketPath (toggle_path)),
 			value (value),
 			is_default (is_default)
 		{
@@ -247,7 +247,7 @@ class ButtonOptionsAction: public CallbackAction
 
   public:
 	// Ctor
-	ButtonOptionsAction (PropertyPath const& value_path, Options const& options):
+	ButtonOptionsAction (SocketPath const& value_path, Options const& options):
 		_options (options)
 	{
 		_value_target.set_path (value_path);
@@ -280,7 +280,7 @@ class ButtonOptionsAction: public CallbackAction
 
   private:
 	Options			_options;
-	PropertyInteger	_value_target;
+	SocketInteger	_value_target;
 };
 #endif
 

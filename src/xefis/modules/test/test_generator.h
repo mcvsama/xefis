@@ -27,7 +27,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
-#include <xefis/core/property.h>
+#include <xefis/core/module_socket.h>
 
 
 namespace si = neutrino::si;
@@ -50,12 +50,12 @@ class TestGeneratorIO: public xf::ModuleIO
 		Mirroring,
 	};
 
-	class PropertyGenerator
+	class SocketGenerator
 	{
 	  public:
 		// Dtor
 		virtual
-		~PropertyGenerator() = default;
+		~SocketGenerator() = default;
 
 		virtual void
 		update (si::Time update_dt) = 0;
@@ -63,26 +63,26 @@ class TestGeneratorIO: public xf::ModuleIO
 
   public:
 	/**
-	 * Create and manage new output property for properties that can be used
+	 * Create and manage new output socket for sockets that can be used
 	 * with xf::Range<>.
 	 */
 	template<class Value,
 			 class = std::void_t<decltype (xf::Range<Value>()),
 								 RateOfChange<Value>>>
-		xf::PropertyOut<Value>&
-		create_property (std::string_view const& identifier,
-						 Value initial_value,
-						 xf::Range<Value> value_range,
-						 RateOfChange<Value> rate_of_change,
-						 BorderCondition border_condition = BorderCondition::Mirroring);
+		xf::ModuleOut<Value>&
+		create_socket (std::string_view const& identifier,
+					   Value initial_value,
+					   xf::Range<Value> value_range,
+					   RateOfChange<Value> rate_of_change,
+					   BorderCondition border_condition = BorderCondition::Mirroring);
 
 	/**
-	 * Create a property that enumerates all listed values for some period of time.
+	 * Create a socket that enumerates all listed values for some period of time.
 	 */
 	template<class Value>
-		xf::PropertyOut<Value>&
-		create_enum_property (std::string_view const& identifier,
-							  std::vector<EnumTuple<Value>> const& values_and_intervals);
+		xf::ModuleOut<Value>&
+		create_enum_socket (std::string_view const& identifier,
+							std::vector<EnumTuple<Value>> const& values_and_intervals);
 
 	/**
 	 * Update all generators.
@@ -91,7 +91,7 @@ class TestGeneratorIO: public xf::ModuleIO
 	update_all (si::Time update_dt);
 
   private:
-	std::vector<std::unique_ptr<PropertyGenerator>> _generators;
+	std::vector<std::unique_ptr<SocketGenerator>> _generators;
 };
 
 
@@ -110,17 +110,17 @@ class TestGenerator: public xf::Module<TestGeneratorIO>
 
 
 template<class Value, class>
-	inline xf::PropertyOut<Value>&
-	TestGeneratorIO::create_property (std::string_view const& identifier,
-									  Value const initial_value,
-									  xf::Range<Value> const value_range,
-									  RateOfChange<Value> const rate_of_change,
-									  BorderCondition border_condition)
+	inline xf::ModuleOut<Value>&
+	TestGeneratorIO::create_socket (std::string_view const& identifier,
+									Value const initial_value,
+									xf::Range<Value> const value_range,
+									RateOfChange<Value> const rate_of_change,
+									BorderCondition border_condition)
 	{
-		class RangeGenerator: public PropertyGenerator
+		class RangeGenerator: public SocketGenerator
 		{
 		  public:
-			xf::PropertyOut<Value> property;
+			xf::ModuleOut<Value> socket;
 
 		  public:
 			// Ctor
@@ -130,7 +130,7 @@ template<class Value, class>
 							xf::Range<Value> const value_range,
 							RateOfChange<Value> const rate_of_change,
 							BorderCondition const border_condition):
-				property (io, identifier),
+				socket (io, identifier),
 				_initial_value (initial_value),
 				_value_range (value_range),
 				_rate_of_change (rate_of_change),
@@ -141,7 +141,7 @@ template<class Value, class>
 			void
 			update (si::Time const update_dt) override
 			{
-				auto new_value = this->property.value_or (_initial_value) + update_dt * _rate_of_change;
+				auto new_value = this->socket.value_or (_initial_value) + update_dt * _rate_of_change;
 
 				if (!_value_range.includes (new_value))
 				{
@@ -169,7 +169,7 @@ template<class Value, class>
 					}
 				}
 
-				this->property = new_value;
+				this->socket = new_value;
 			}
 
 		  private:
@@ -180,26 +180,26 @@ template<class Value, class>
 		};
 
 		_generators.emplace_back (std::make_unique<RangeGenerator> (this, identifier, initial_value, value_range, rate_of_change, border_condition));
-		return static_cast<RangeGenerator&> (*_generators.back()).property;
+		return static_cast<RangeGenerator&> (*_generators.back()).socket;
 	}
 
 
 template<class Value>
-	inline xf::PropertyOut<Value>&
-	TestGeneratorIO::create_enum_property (std::string_view const& identifier,
-										   std::vector<EnumTuple<Value>> const& values_and_intervals)
+	inline xf::ModuleOut<Value>&
+	TestGeneratorIO::create_enum_socket (std::string_view const& identifier,
+										 std::vector<EnumTuple<Value>> const& values_and_intervals)
 	{
-		class EnumGenerator: public PropertyGenerator
+		class EnumGenerator: public SocketGenerator
 		{
 		  public:
-			xf::PropertyOut<Value> property;
+			xf::ModuleOut<Value> socket;
 
 		  public:
 			// Ctor
 			EnumGenerator (TestGeneratorIO* io,
 						   std::string_view const& identifier,
 						   std::vector<EnumTuple<Value>> const& values_and_intervals):
-				property (io, identifier),
+				socket (io, identifier),
 				_values_and_intervals (values_and_intervals)
 			{ }
 
@@ -219,10 +219,10 @@ template<class Value>
 
 				std::visit (xf::overload {
 					[&] (Value const& value) {
-						this->property = value;
+						this->socket = value;
 					},
 					[&] (xf::Nil) {
-						this->property = xf::nil;
+						this->socket = xf::nil;
 					},
 				}, variant);
 			}
@@ -234,7 +234,7 @@ template<class Value>
 		};
 
 		_generators.emplace_back (std::make_unique<EnumGenerator> (this, identifier, values_and_intervals));
-		return static_cast<EnumGenerator&> (*_generators.back()).property;
+		return static_cast<EnumGenerator&> (*_generators.back()).socket;
 	}
 
 #endif

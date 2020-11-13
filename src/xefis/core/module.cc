@@ -21,7 +21,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/property.h>
+#include <xefis/core/module_socket.h>
 #include <xefis/core/setting.h>
 
 // Local:
@@ -56,8 +56,8 @@ BasicModule::ProcessingLoopAPI::fetch_and_process (Cycle const& cycle)
 		{
 			_module._cached = true;
 
-			for (auto* prop: _module.io_base()->_registered_input_properties)
-				prop->fetch (cycle);
+			for (auto* socket: _module.io_base()->_registered_input_sockets)
+				socket->fetch (cycle);
 
 			auto processing_time = TimeHelper::measure ([&] {
 				_module.process (cycle);
@@ -80,10 +80,10 @@ BasicModule::ProcessingLoopAPI::handle_exception (Cycle const& cycle, std::strin
 	try {
 		_module.rescue (cycle, std::current_exception());
 
-		// Set all output properties to nil.
+		// Set all output sockets to nil.
 		if (_module._set_nil_on_exception)
-			for (auto* property: _module._io->_registered_output_properties)
-				*property = xf::nil;
+			for (auto* socket: _module._io->_registered_output_sockets)
+				*socket = xf::nil;
 	}
 	catch (...)
 	{

@@ -26,13 +26,13 @@
 
 namespace xf {
 
-PanelButton::PanelButton (QWidget* parent, Panel* panel, LEDColor color, v1::PropertyBoolean click_property, v1::PropertyBoolean toggle_property, v1::PropertyBoolean led_property):
+PanelButton::PanelButton (QWidget* parent, Panel* panel, LEDColor color, Socket<bool> click_socket, Socket<bool> toggle_socket, Socket<bool> led_socket):
 	PanelWidget (parent, panel),
-	_click_property (click_property),
-	_toggle_property (toggle_property),
-	_led_property (led_property)
+	_click_socket (click_socket),
+	_toggle_socket (toggle_socket),
+	_led_socket (led_socket)
 {
-	if (_led_property.configured())
+	if (_led_socket.configured())
 	{
 		switch (color)
 		{
@@ -91,18 +91,18 @@ PanelButton::set_led_enabled (bool enabled)
 void
 PanelButton::read()
 {
-	set_led_enabled (*_led_property);
+	set_led_enabled (*_led_socket);
 }
 
 
 void
 PanelButton::write()
 {
-	if (_click_property.configured())
-		_click_property.write (_button->isDown() || _button->isChecked());
+	if (_click_socket.configured())
+		_click_socket.write (_button->isDown() || _button->isChecked());
 
-	if (_button->isDown() && _toggle_property.configured())
-		_toggle_property.write (!_toggle_property.read (false));
+	if (_button->isDown() && _toggle_socket.configured())
+		_toggle_socket.write (!_toggle_socket.read (false));
 }
 
 } // namespace xf

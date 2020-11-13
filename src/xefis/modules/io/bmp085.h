@@ -27,7 +27,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
-#include <xefis/core/property.h>
+#include <xefis/core/module_socket.h>
 #include <xefis/core/setting.h>
 
 
@@ -51,9 +51,9 @@ class BMP085_IO: public xf::ModuleIO
 	 * Output
 	 */
 
-	xf::PropertyOut<bool>				serviceable					{ this, "serviceable" };
-	xf::PropertyOut<si::Temperature>	temperature					{ this, "measured-temperature" };
-	xf::PropertyOut<si::Pressure>		pressure					{ this, "measured-pressure" };
+	xf::ModuleOut<bool>					serviceable					{ this, "serviceable" };
+	xf::ModuleOut<si::Temperature>		temperature					{ this, "measured-temperature" };
+	xf::ModuleOut<si::Pressure>			pressure					{ this, "measured-pressure" };
 };
 
 

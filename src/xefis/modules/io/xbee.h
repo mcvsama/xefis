@@ -27,7 +27,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
-#include <xefis/core/property.h>
+#include <xefis/core/module_socket.h>
 #include <xefis/core/setting.h>
 #include <xefis/utility/actions.h>
 #include <xefis/utility/smoother.h>
@@ -57,18 +57,18 @@ class XBeeIO: public xf::ModuleIO
 	 * Input
 	 */
 
-	xf::PropertyIn<std::string>		send			{ this, "send" };
+	xf::ModuleIn<std::string>		send			{ this, "send" };
 
 	/*
 	 * Output
 	 */
 
-	xf::PropertyOut<bool>			serviceable		{ this, "serviceable" };
-	xf::PropertyOut<std::string>	receive			{ this, "receive" };
-	xf::PropertyOut<int64_t>		input_errors	{ this, "input-errors" };
-	xf::PropertyOut<int64_t>		failures		{ this, "failures" };
-	xf::PropertyOut<int64_t>		cca_failures	{ this, "clear-channel-failures" };
-	xf::PropertyOut<si::Power>		rssi			{ this, "rssi" };
+	xf::ModuleOut<bool>				serviceable		{ this, "serviceable" };
+	xf::ModuleOut<std::string>		receive			{ this, "receive" };
+	xf::ModuleOut<int64_t>			input_errors	{ this, "input-errors" };
+	xf::ModuleOut<int64_t>			failures		{ this, "failures" };
+	xf::ModuleOut<int64_t>			cca_failures	{ this, "clear-channel-failures" };
+	xf::ModuleOut<si::Power>		rssi			{ this, "rssi" };
 };
 
 
@@ -204,7 +204,7 @@ class XBee:
 	failure (std::string_view const& reason);
 
 	/**
-	 * Reset to default state and resets properties.
+	 * Reset to default state and resets sockets.
 	 */
 	void
 	reset();
@@ -376,14 +376,14 @@ class XBee:
 	process_at_response_frame (std::string_view const& data);
 
 	/**
-	 * Write output data to the output property.
+	 * Write output data to the output socket.
 	 */
 	void
-	write_output_property (std::string_view const& data);
+	write_output_socket (std::string_view const& data);
 
 	/**
 	 * Report RSSI. Add it to data smoother and
-	 * update the RSSI property.
+	 * update the RSSI socket.
 	 */
 	void
 	report_rssi (int dbm);

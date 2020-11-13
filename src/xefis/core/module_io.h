@@ -33,8 +33,8 @@ namespace xf {
 
 class BasicModule;
 class BasicSetting;
-class BasicPropertyIn;
-class BasicPropertyOut;
+class BasicModuleIn;
+class BasicModuleOut;
 
 
 namespace module_io {
@@ -129,28 +129,28 @@ class ModuleIO
 		register_setting (BasicSetting&);
 
 		/**
-		 * Register an input property with this module.
+		 * Register an input socket with this module.
 		 */
 		void
-		register_input_property (BasicPropertyIn&);
+		register_input_socket (BasicModuleIn&);
 
 		/**
-		 * Unregister an input property.
+		 * Unregister an input socket.
 		 */
 		void
-		unregister_input_property (BasicPropertyIn&);
+		unregister_input_socket (BasicModuleIn&);
 
 		/**
-		 * Register an output property with this module.
+		 * Register an output socket with this module.
 		 */
 		void
-		register_output_property (BasicPropertyOut&);
+		register_output_socket (BasicModuleOut&);
 
 		/**
-		 * Unregister an output property.
+		 * Unregister an output socket.
 		 */
 		void
-		unregister_output_property (BasicPropertyOut&);
+		unregister_output_socket (BasicModuleOut&);
 
 		/**
 		 * Return registered settings.
@@ -159,16 +159,16 @@ class ModuleIO
 		settings() const noexcept;
 
 		/**
-		 * Return registered input properties.
+		 * Return registered input sockets.
 		 */
-		Sequence<std::vector<BasicPropertyIn*>::const_iterator>
-		input_properties() const noexcept;
+		Sequence<std::vector<BasicModuleIn*>::const_iterator>
+		input_sockets() const noexcept;
 
 		/**
-		 * Return registered output properties.
+		 * Return registered output sockets.
 		 */
-		Sequence<std::vector<BasicPropertyOut*>::const_iterator>
-		output_properties() const noexcept;
+		Sequence<std::vector<BasicModuleOut*>::const_iterator>
+		output_sockets() const noexcept;
 
 	  private:
 		ModuleIO& _io;
@@ -195,8 +195,8 @@ class ModuleIO
   private:
 	BasicModule*					_module = nullptr;
 	std::vector<BasicSetting*>		_registered_settings;
-	std::vector<BasicPropertyIn*>	_registered_input_properties;
-	std::vector<BasicPropertyOut*>	_registered_output_properties;
+	std::vector<BasicModuleIn*>		_registered_input_sockets;
+	std::vector<BasicModuleOut*>	_registered_output_sockets;
 };
 
 

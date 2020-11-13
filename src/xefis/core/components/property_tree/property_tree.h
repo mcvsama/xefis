@@ -31,6 +31,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
+#include <xefis/core/module_socket.h>
 
 // Local:
 #include "property_item.h"
@@ -38,7 +39,7 @@
 
 namespace xf {
 
-class PropertyTree: public QWidget
+class SocketTree: public QWidget
 {
   public:
 	constexpr static int NameColumn				= 0;
@@ -50,7 +51,7 @@ class PropertyTree: public QWidget
   private:
 	/**
 	 * Helper class used by populate_tree to effectively create a tree of
-	 * QTreeItem from a set of xf::Property objects.
+	 * QTreeItem from a set of xf::Socket objects.
 	 */
 	class Item
 	{
@@ -77,19 +78,24 @@ class PropertyTree: public QWidget
 		/**
 		 * Adds children recursively.
 		 */
-		template<class Property>
+		template<class SocketType>
 			void
-			add_child (Property& property)
+			add_child (SocketType& socket)
 			{
 				std::vector<std::string> steps;
-				boost::split (steps, property.path().string(), boost::is_any_of ("/"));
-				add_child (property, steps.begin(), steps.end());
+
+				if (auto* module_socket = dynamic_cast<BasicModuleSocket*> (&socket))
+					boost::split (steps, module_socket->path().string(), boost::is_any_of ("/"));
+				else
+					steps = { "free floating" };
+
+				add_child (socket, steps.begin(), steps.end());
 			}
 
 	  private:
-		template<class Property, class Iterator>
+		template<class SocketType, class Iterator>
 			void
-			add_child (Property& property, Iterator begin, Iterator end)
+			add_child (SocketType& socket, Iterator begin, Iterator end)
 			{
 				if (begin != end)
 				{
@@ -98,13 +104,13 @@ class PropertyTree: public QWidget
 
 					if (found == _children_map.end())
 					{
-						auto new_item = new PropertyItem (std::next (begin) == end ? &property : nullptr, _tree_item);
-						new_item->setText (PropertyTree::NameColumn, QString::fromStdString (name));
+						auto new_item = new SocketItem (std::next (begin) == end ? &socket : nullptr, _tree_item);
+						new_item->setText (SocketTree::NameColumn, QString::fromStdString (name));
 						setup_appereance (*new_item);
 						found = _children_map.try_emplace (name, name, *new_item).first;
 					}
 
-					found->second.add_child (property, std::next (begin), end);
+					found->second.add_child (socket, std::next (begin), end);
 				}
 			}
 
@@ -118,7 +124,7 @@ class PropertyTree: public QWidget
   public:
 	// Ctor
 	explicit
-	PropertyTree (QWidget* parent);
+	SocketTree (QWidget* parent);
 
 	template<class Iterator>
 		void
@@ -148,13 +154,13 @@ class PropertyTree: public QWidget
 
 template<class Iterator>
 	inline void
-	PropertyTree::populate (Sequence<Iterator> const& sequence)
+	SocketTree::populate (Sequence<Iterator> const& sequence)
 	{
 		Item root ("Root", *_tree->invisibleRootItem());
 
-		for (auto const& property: sequence)
-			if (auto* basic_property = dynamic_cast<BasicProperty*> (property))
-				root.add_child (*basic_property);
+		for (auto const& socket: sequence)
+			if (auto* basic_socket = dynamic_cast<BasicSocket*> (socket))
+				root.add_child (*basic_socket);
 
 		setup_icons();
 	}

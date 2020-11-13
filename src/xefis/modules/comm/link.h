@@ -16,14 +16,14 @@
 
 // Standard:
 #include <cstddef>
-#include <memory>
-#include <random>
-#include <vector>
-#include <variant>
-#include <optional>
 #include <functional>
-#include <type_traits>
 #include <initializer_list>
+#include <memory>
+#include <optional>
+#include <random>
+#include <type_traits>
+#include <variant>
+#include <vector>
 
 // Qt:
 #include <QtCore/QTimer>
@@ -39,7 +39,7 @@
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
 #include <xefis/core/module_io.h>
-#include <xefis/core/property.h>
+#include <xefis/core/module_socket.h>
 #include <xefis/core/setting.h>
 #include <xefis/utility/actions.h>
 #include <xefis/utility/types.h>
@@ -123,13 +123,13 @@ class LinkProtocol
 		eat (Blob::const_iterator, Blob::const_iterator) = 0;
 
 		/**
-		 * Apply parsed data to properties, etc.
+		 * Apply parsed data to sockets, etc.
 		 */
 		virtual void
 		apply() = 0;
 
 		/**
-		 * Set all managed properties to nil.
+		 * Set all managed sockets to nil.
 		 */
 		virtual void
 		failsafe() = 0;
@@ -167,10 +167,10 @@ class LinkProtocol
 	};
 
 	/**
-	 * Packet that refers to a particular Property, so it can send/receive value of that property.
+	 * Packet that refers to a particular Socket, so it can send/receive value of that module socket.
 	 */
 	template<uint8_t pBytes, class pValue>
-		class Property: public Packet
+		class Socket: public Packet
 		{
 		  public:
 			using Value = pValue;
@@ -182,21 +182,21 @@ class LinkProtocol
 						   ((std::is_floating_point<Value>() || si::is_quantity<Value>()) &&
 							(kBytes == 2 || kBytes == 4 || kBytes == 8)));
 
-		  public:
+		  private:
 			/**
 			 * Ctor for integrals
 			 *
 			 * \param	retained
-			 *			True if input property should retain its last value when link is down or corrupted.
+			 *			True if module input should retain its last value when link is down or corrupted.
 			 * \param	fallback_value
 			 *			Value that should be used for nil-values, because integers don't have any special values
 			 *			that could be used as nil.
-			 *			Note this fallback_value is only used on transmitting side only, if property is nil.
+			 *			Note this fallback_value is only used on transmitting side only, if module socket is nil.
 			 */
 			template<class U = Value>
 				requires (std::is_integral_v<U>)
 				explicit
-				Property (xf::Property<Value>&, Retained retained, Value fallback_value);
+				Socket (xf::Socket<Value>&, xf::AssignableSocket<Value>*, Retained, Value fallback_value);
 
 			/**
 			 * Ctor for floating-point values and SI values
@@ -205,23 +205,59 @@ class LinkProtocol
 			 * if quantities differ by, eg. scaling ratio.
 			 *
 			 * \param	retained
-			 *			True if input property should retain its last value when link is down or corrupted.
+			 *			True if input module socket should retain its last value when link is down or corrupted.
 			 * \param	offset_value
 			 *			If used, set to value where most precision is needed. Useful for 2-byte floats.
 			 */
 			template<class U = Value>
 				requires (std::is_floating_point_v<U> || si::is_quantity_v<U>)
 				explicit
-				Property (xf::Property<Value>&, Retained retained, std::optional<Value> offset = {});
+				Socket (xf::Socket<Value>&, xf::AssignableSocket<Value>*, Retained, std::optional<Value> offset = {});
+
+		  public:
+			/**
+			 * Ctor for read-only integral sockets.
+			 */
+			explicit
+			Socket (xf::Socket<Value>& socket, Retained retained, Value fallback_value):
+				Socket (socket, nullptr, retained, fallback_value)
+			{ }
+
+			/**
+			 * Ctor for read-only floating-point and SI-value sockets.
+			 */
+			explicit
+			Socket (xf::Socket<Value>& socket, Retained retained, std::optional<Value> offset = {}):
+				Socket (socket, nullptr, retained, offset)
+			{ }
+
+			/**
+			 * Ctor for writable integral sockets.
+			 */
+			explicit
+			Socket (xf::AssignableSocket<Value>& assignable_socket, Retained retained, Value fallback_value):
+				Socket (assignable_socket, &assignable_socket, retained, fallback_value)
+			{ }
+
+			/**
+			 * Ctor for writable floating-point and SI-value sockets.
+			 */
+			explicit
+			Socket (xf::AssignableSocket<Value>& assignable_socket, Retained retained, std::optional<Value> offset = {}):
+				Socket (assignable_socket, &assignable_socket, retained, offset)
+			{ }
 
 			Blob::size_type
-			size() const override;
+			size() const override
+				{ return kBytes; }
 
 			void
-			produce (Blob&) override;
+			produce (Blob& blob) override
+				{ _produce (blob); }
 
 			Blob::const_iterator
-			eat (Blob::const_iterator, Blob::const_iterator) override;
+			eat (Blob::const_iterator const begin, Blob::const_iterator const end) override
+				{ return _eat (begin, end); }
 
 			void
 			apply() override;
@@ -246,21 +282,21 @@ class LinkProtocol
 				unserialize (Blob::const_iterator begin, Blob::const_iterator end, SourceType&);
 
 		  private:
-			xf::Property<Value>&		_property;
-			xf::PropertyOut<Value>*		_property_out;
-			si::decay_quantity_t<Value>	_fallback_value {};
-			std::optional<Value>		_value;
+			xf::Socket<Value>&				_socket;
+			xf::AssignableSocket<Value>*	_assignable_socket;
+			si::decay_quantity_t<Value>		_fallback_value {};
+			std::optional<Value>			_value;
 			// Retain last valid value on error (when value is NaN or failsafe kicks in):
-			bool						_retained;
-			std::optional<Value>		_offset;
-			std::function<void (Blob&)>	_produce;
+			bool							_retained;
+			std::optional<Value>			_offset;
+			std::function<void (Blob&)>		_produce;
 			std::function<Blob::const_iterator (Blob::const_iterator, Blob::const_iterator)>
-										_eat;
+											_eat;
 		};
 
 	/**
 	 * An packet that contains boolean or limited-width integers.
-	 * Refers to multiple boolean/integer Properties.
+	 * Refers to multiple boolean/integer sockets.
 	 */
 	class Bitfield: public Packet
 	{
@@ -268,13 +304,13 @@ class LinkProtocol
 		template<class Value>
 			struct BitSource
 			{
-				xf::Property<Value>&	property;
-				xf::PropertyOut<Value>*	property_out;
+				xf::Socket<Value>&				socket;
+				xf::AssignableSocket<Value>*	assignable_socket;
 				// More than 1 bit only makes sense for integer Values:
-				uint8_t					bits			{ 1 };
-				bool					retained		{ false };
-				Value					fallback_value	{};
-				Value					value			{};
+				uint8_t							bits			{ 1 };
+				bool							retained		{ false }; // TODO Use class Retained?
+				Value							fallback_value	{}; // TODO make class FallbackValue
+				Value							value			{};
 			};
 
 		using SourceVariant	= std::variant<BitSource<bool>, BitSource<uint8_t>, BitSource<uint16_t>,
@@ -392,50 +428,92 @@ class LinkProtocol
 
 	template<size_t Bytes, class Value, class = std::enable_if_t<std::is_integral_v<Value>>>
 		static auto
-		property (xf::Property<Value>& property, Retained retained, Value fallback_value)
+		socket (xf::Socket<Value>& socket, Retained retained, Value fallback_value)
 		{
-			return std::make_shared<Property<Bytes, Value>> (property, retained, fallback_value);
+			return std::make_shared<Socket<Bytes, Value>> (socket, retained, fallback_value);
+		}
+
+	template<size_t Bytes, class Value, class = std::enable_if_t<std::is_integral_v<Value>>>
+		static auto
+		socket (xf::AssignableSocket<Value>& assignable_socket, Retained retained, Value fallback_value)
+		{
+			return std::make_shared<Socket<Bytes, Value>> (assignable_socket, retained, fallback_value);
 		}
 
 	template<size_t Bytes, class Value, class = std::enable_if_t<std::is_floating_point_v<Value> || si::is_quantity_v<Value>>>
 		static auto
-		property (xf::Property<Value>& property, Retained retained)
+		socket (xf::Socket<Value>& socket, Retained retained)
 		{
-			return std::make_shared<Property<Bytes, Value>> (property, retained);
+			return std::make_shared<Socket<Bytes, Value>> (socket, retained);
+		}
+
+	template<size_t Bytes, class Value, class = std::enable_if_t<std::is_floating_point_v<Value> || si::is_quantity_v<Value>>>
+		static auto
+		socket (xf::AssignableSocket<Value>& assignable_socket, Retained retained)
+		{
+			return std::make_shared<Socket<Bytes, Value>> (assignable_socket, retained);
 		}
 
 	template<size_t Bytes, class Value, class Offset, class = std::enable_if_t<std::is_floating_point_v<Value> || si::is_quantity_v<Value>>>
 		static auto
-		property (xf::Property<Value>& property, Retained retained, Offset offset)
+		socket (xf::Socket<Value>& socket, Retained retained, Offset offset)
 		{
 			// Allow Offset to be a Quantity specified over different but compatible Unit (eg. Feet instead of Meters).
-			return std::make_shared<Property<Bytes, Value>> (property, retained, std::optional<Value> (offset));
+			return std::make_shared<Socket<Bytes, Value>> (socket, retained, std::optional<Value> (offset));
+		}
+
+	template<size_t Bytes, class Value, class Offset, class = std::enable_if_t<std::is_floating_point_v<Value> || si::is_quantity_v<Value>>>
+		static auto
+		socket (xf::AssignableSocket<Value>& assignable_socket, Retained retained, Offset offset)
+		{
+			// Allow Offset to be a Quantity specified over different but compatible Unit (eg. Feet instead of Meters).
+			return std::make_shared<Socket<Bytes, Value>> (assignable_socket, retained, std::optional<Value> (offset));
 		}
 
 	static auto
-	bitfield (std::initializer_list<Bitfield::SourceVariant>&& properties)
+	bitfield (std::initializer_list<Bitfield::SourceVariant>&& sockets)
 	{
-		return std::make_shared<Bitfield> (std::forward<std::remove_reference_t<decltype (properties)>> (properties));
+		return std::make_shared<Bitfield> (std::forward<std::remove_reference_t<decltype (sockets)>> (sockets));
 	}
 
 	static Bitfield::BitSource<bool>
-	bitfield_property (xf::Property<bool>& property, Retained retained, bool fallback_value)
+	bitfield_socket (xf::Socket<bool>& socket, Retained retained, bool fallback_value)
 	{
-		return { property, dynamic_cast<xf::PropertyOut<bool>*> (&property), 1, *retained, fallback_value, false };
+		return { socket, nullptr, 1, *retained, fallback_value, false };
+	}
+
+	static Bitfield::BitSource<bool>
+	bitfield_socket (xf::AssignableSocket<bool>& assignable_socket, Retained retained, bool fallback_value)
+	{
+		return { assignable_socket, &assignable_socket, 1, *retained, fallback_value, false };
 	}
 
 	/**
-	 * Note that fallback_value will be used not only when property is nil, but also be used when integer value doesn't
+	 * Note that fallback_value will be used not only when socket is nil, but also be used when integer value doesn't
 	 * fit in given number of bits.
 	 */
 	template<class Unsigned>
 		static Bitfield::BitSource<Unsigned>
-		bitfield_property (xf::Property<Unsigned>& property, Bits bits, Retained retained, Unsigned fallback_value)
+		bitfield_socket (xf::Socket<Unsigned>& socket, Bits bits, Retained retained, Unsigned fallback_value)
 		{
 			if (!fits_in_bits (fallback_value, bits))
 				throw xf::InvalidArgument ("fallback_value doesn't fit in given number of bits");
 
-			return { property, dynamic_cast<xf::PropertyOut<Unsigned>*> (&property), *bits, *retained, fallback_value, 0 };
+			return { socket, nullptr, *bits, *retained, fallback_value, 0 };
+		}
+
+	/**
+	 * Note that fallback_value will be used not only when socket is nil, but also be used when integer value doesn't
+	 * fit in given number of bits.
+	 */
+	template<class Unsigned>
+		static Bitfield::BitSource<Unsigned>
+		bitfield_socket (xf::AssignableSocket<Unsigned>& assignable_socket, Bits bits, Retained retained, Unsigned fallback_value)
+		{
+			if (!fits_in_bits (fallback_value, bits))
+				throw xf::InvalidArgument ("fallback_value doesn't fit in given number of bits");
+
+			return { assignable_socket, &assignable_socket, *bits, *retained, fallback_value, 0 };
 		}
 
 	static auto
@@ -465,7 +543,8 @@ class LinkProtocol
 	to_string (Blob const&);
 
 	static constexpr bool
-	fits_in_bits (uint_least64_t value, Bits bits);
+	fits_in_bits (uint_least64_t value, Bits bits)
+		{ return value < xf::static_pow (2U, *bits); }
 
   private:
 	std::vector<std::shared_ptr<Envelope>>		_envelopes;
@@ -482,27 +561,27 @@ class LinkIO: public xf::ModuleIO
 	 * Settings
 	 */
 
-	xf::Setting<si::Frequency>		send_frequency			{ this, "send_frequency", xf::BasicSetting::Optional };
-	xf::Setting<si::Time>			reacquire_after			{ this, "reacquire_after", xf::BasicSetting::Optional };
-	xf::Setting<si::Time>			failsafe_after			{ this, "failsafe_after", xf::BasicSetting::Optional };
+	xf::Setting<si::Frequency>	send_frequency			{ this, "send_frequency", xf::BasicSetting::Optional };
+	xf::Setting<si::Time>		reacquire_after			{ this, "reacquire_after", xf::BasicSetting::Optional };
+	xf::Setting<si::Time>		failsafe_after			{ this, "failsafe_after", xf::BasicSetting::Optional };
 
 	/*
 	 * Input
 	 */
 
-	xf::PropertyIn<std::string>		link_input				{ this, "input" };
+	xf::ModuleIn<std::string>	link_input				{ this, "input" };
 
 	/*
 	 * Output
 	 */
 
-	xf::PropertyOut<std::string>	link_output				{ this, "output" };
-	xf::PropertyOut<bool>			link_valid				{ this, "link-valid" };
-	xf::PropertyOut<int64_t>		link_failsafes			{ this, "failsafes" };
-	xf::PropertyOut<int64_t>		link_reacquires			{ this, "reacquires" };
-	xf::PropertyOut<int64_t>		link_error_bytes		{ this, "error-bytes" };
-	xf::PropertyOut<int64_t>		link_valid_bytes		{ this, "valid-bytes" };
-	xf::PropertyOut<int64_t>		link_valid_envelopes	{ this, "valid-envelopes" };
+	xf::ModuleOut<std::string>	link_output				{ this, "output" };
+	xf::ModuleOut<bool>			link_valid				{ this, "link-valid" };
+	xf::ModuleOut<int64_t>		link_failsafes			{ this, "failsafes" };
+	xf::ModuleOut<int64_t>		link_reacquires			{ this, "reacquires" };
+	xf::ModuleOut<int64_t>		link_error_bytes		{ this, "error-bytes" };
+	xf::ModuleOut<int64_t>		link_valid_bytes		{ this, "valid-bytes" };
+	xf::ModuleOut<int64_t>		link_valid_envelopes	{ this, "valid-envelopes" };
 
   public:
 	void
@@ -562,15 +641,15 @@ template<uint8_t B, class V>
 	template<class U>
 		requires (std::is_integral_v<U>)
 		inline
-		LinkProtocol::Property<B, V>::Property (xf::Property<Value>& property, Retained retained, Value fallback_value):
-			_property (property),
-			_property_out (dynamic_cast<xf::PropertyOut<Value>*> (&property)),
+		LinkProtocol::Socket<B, V>::Socket (xf::Socket<Value>& socket, xf::AssignableSocket<Value>* assignable_socket, Retained retained, Value fallback_value):
+			_socket (socket),
+			_assignable_socket (assignable_socket),
 			_fallback_value (fallback_value),
 			_retained (*retained)
 		{
 			_produce = [this](Blob& blob) {
-				int64_t int_value = _property
-					? *_property
+				int64_t int_value = _socket
+					? *_socket
 					: _fallback_value;
 
 				serialize<xf::int_for_width_t<kBytes>> (blob, int_value);
@@ -589,9 +668,9 @@ template<uint8_t B, class V>
 	template<class U>
 		requires (std::is_floating_point_v<U> || si::is_quantity_v<U>)
 		inline
-		LinkProtocol::Property<B, V>::Property (xf::Property<Value>& property, Retained retained, std::optional<Value> offset):
-			_property (property),
-			_property_out (dynamic_cast<xf::PropertyOut<Value>*> (&property)),
+		LinkProtocol::Socket<B, V>::Socket (xf::Socket<Value>& socket, xf::AssignableSocket<Value>* assignable_socket, Retained retained, std::optional<Value> offset):
+			_socket (socket),
+			_assignable_socket (assignable_socket),
 			_fallback_value (std::numeric_limits<decltype (_fallback_value)>::quiet_NaN()),
 			_retained (*retained),
 			_offset (offset)
@@ -599,20 +678,20 @@ template<uint8_t B, class V>
 			_produce = [this](Blob& blob) {
 				if constexpr (si::is_quantity<Value>())
 				{
-					typename Value::Value const value = _property
+					typename Value::Value const value = _socket
 						? _offset
-							? (*_property - *_offset).base_value()
-							: (*_property).base_value()
+							? (*_socket - *_offset).base_value()
+							: (*_socket).base_value()
 						: _fallback_value;
 
 					serialize<neutrino::float_for_width_t<kBytes>> (blob, value);
 				}
 				else if constexpr (std::is_floating_point<Value>())
 				{
-					Value const value = _property
+					Value const value = _socket
 						? _offset
-							? *_property - *_offset
-							: *_property
+							? *_socket - *_offset
+							: *_socket
 						: _fallback_value;
 
 					serialize<neutrino::float_for_width_t<kBytes>> (blob, value);
@@ -640,52 +719,28 @@ template<uint8_t B, class V>
 
 
 template<uint8_t B, class V>
-	inline Blob::size_type
-	LinkProtocol::Property<B, V>::size() const
-	{
-		return kBytes;
-	}
-
-
-template<uint8_t B, class V>
 	inline void
-	LinkProtocol::Property<B, V>::produce (Blob& blob)
+	LinkProtocol::Socket<B, V>::apply()
 	{
-		_produce (blob);
-	}
-
-
-template<uint8_t B, class V>
-	inline Blob::const_iterator
-	LinkProtocol::Property<B, V>::eat (Blob::const_iterator begin, Blob::const_iterator end)
-	{
-		return _eat (begin, end);
-	}
-
-
-template<uint8_t B, class V>
-	inline void
-	LinkProtocol::Property<B, V>::apply()
-	{
-		if (_property_out)
+		if (_assignable_socket)
 		{
 			if constexpr (std::is_integral<Value>())
 			{
 				if (_value)
-					*_property_out = _value;
+					*_assignable_socket = _value;
 				else if (!_retained)
-					*_property_out = xf::nil;
+					*_assignable_socket = xf::nil;
 			}
 			else if constexpr (std::is_floating_point<Value>() || si::is_quantity<Value>())
 			{
 				if (_value)
 				{
-					*_property_out = _offset
+					*_assignable_socket = _offset
 						? *_value + *_offset
 						: *_value;
 				}
 				else if (!_retained)
-					*_property_out = xf::nil;
+					*_assignable_socket = xf::nil;
 			}
 		}
 	}
@@ -693,17 +748,17 @@ template<uint8_t B, class V>
 
 template<uint8_t B, class V>
 	inline void
-	LinkProtocol::Property<B, V>::failsafe()
+	LinkProtocol::Socket<B, V>::failsafe()
 	{
-		if (_property_out && !_retained)
-			*_property_out = xf::nil;
+		if (_assignable_socket && !_retained)
+			*_assignable_socket = xf::nil;
 	}
 
 
 template<uint8_t B, class V>
 	template<class CastType, class SourceType>
 		inline void
-		LinkProtocol::Property<B, V>::serialize (Blob& blob, SourceType src)
+		LinkProtocol::Socket<B, V>::serialize (Blob& blob, SourceType src)
 		{
 			auto const size = sizeof (CastType);
 			CastType casted (src);
@@ -717,7 +772,7 @@ template<uint8_t B, class V>
 template<uint8_t B, class V>
 	template<class CastType, class SourceType>
 		inline Blob::const_iterator
-		LinkProtocol::Property<B, V>::unserialize (Blob::const_iterator begin, Blob::const_iterator end, SourceType& src)
+		LinkProtocol::Socket<B, V>::unserialize (Blob::const_iterator begin, Blob::const_iterator end, SourceType& src)
 		{
 			if (neutrino::to_unsigned (std::distance (begin, end)) < sizeof (CastType))
 				throw ParseError();
@@ -730,13 +785,6 @@ template<uint8_t B, class V>
 			src = casted;
 			return work_end;
 		}
-
-
-constexpr bool
-LinkProtocol::fits_in_bits (uint_least64_t value, Bits bits)
-{
-	return value < xf::static_pow (2U, *bits);
-}
 
 #endif
 

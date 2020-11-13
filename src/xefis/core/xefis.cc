@@ -125,7 +125,7 @@ Xefis::parse_args (int argc, char** argv)
 		if (arg_name == "--help")
 		{
 			std::cout << "List of available options:" << std::endl;
-			std::cout << "  --modules-debug-log - dump module settings/properties information" << std::endl;
+			std::cout << "  --modules-debug-log - dump module settings/sockets information" << std::endl;
 			std::cout << "  --copyright         - print license info" << std::endl;
 			throw QuitInstruction();
 		}

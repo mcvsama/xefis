@@ -28,8 +28,8 @@
 #include <xefis/config/all.h>
 #include <xefis/core/graphics.h>
 #include <xefis/core/instrument.h>
-#include <xefis/core/property.h>
 #include <xefis/core/setting.h>
+#include <xefis/core/socket.h>
 #include <xefis/support/instrument/instrument_support.h>
 #include <xefis/utility/actions.h>
 #include <xefis/utility/delta_decoder.h>
@@ -46,25 +46,25 @@ class StatusIO: public xf::ModuleIO
 	 * Settings
 	 */
 
-	xf::Setting<si::Time>	status_minimum_display_time		{ this, "status_minimum_display_time", 5_s };
+	xf::Setting<si::Time>	status_minimum_display_time	{ this, "status_minimum_display_time", 5_s };
 
 	/*
 	 * Input
 	 */
 
-	xf::PropertyIn<int64_t>	cursor_value					{ this, "cursor/value" };
-	xf::PropertyIn<bool>	button_cursor_del				{ this, "button/cursor-del" };
-	xf::PropertyIn<bool>	button_recall					{ this, "button/recall" };
-	xf::PropertyIn<bool>	button_clear					{ this, "button/clear" };
-	xf::PropertyIn<bool>	button_master_caution			{ this, "button/master-caution" };
-	xf::PropertyIn<bool>	button_master_warning			{ this, "button/master-warning" };
+	xf::ModuleIn<int64_t>	cursor_value			{ this, "cursor/value" };
+	xf::ModuleIn<bool>		button_cursor_del		{ this, "button/cursor-del" };
+	xf::ModuleIn<bool>		button_recall			{ this, "button/recall" };
+	xf::ModuleIn<bool>		button_clear			{ this, "button/clear" };
+	xf::ModuleIn<bool>		button_master_caution	{ this, "button/master-caution" };
+	xf::ModuleIn<bool>		button_master_warning	{ this, "button/master-warning" };
 
 	/*
 	 * Output
 	 */
 
-	xf::PropertyOut<bool>	master_caution					{ this, "master-caution" };
-	xf::PropertyOut<bool>	master_warning					{ this, "master-warning" };
+	xf::ModuleOut<bool>		master_caution			{ this, "master-caution" };
+	xf::ModuleOut<bool>		master_warning			{ this, "master-warning" };
 };
 
 
@@ -108,21 +108,21 @@ class Status:
 		severity() const noexcept;
 
 		/**
-		 * Show message when given property has given value.
+		 * Show message when given socket has given value.
 		 *
 		 * \return	pointer to itself.
 		 */
 		template<class Value>
 			Message*
-			show_when (xf::Property<Value> const&, Value);
+			show_when (xf::Socket<Value> const&, Value);
 
 		/**
-		 * Show message when given property has the nil value.
+		 * Show message when given socket has the nil value.
 		 *
 		 * \return	pointer to itself.
 		 */
 		Message*
-		show_when (xf::BasicProperty const&, xf::Nil);
+		show_when (xf::BasicSocket const&, xf::Nil);
 
 		/**
 		 * Show message when given function returns true.
@@ -133,7 +133,7 @@ class Status:
 		show_when (std::function<bool()>);
 
 		/**
-		 * Process observed property and compute whether message should be visible or not. Call this method once every
+		 * Process observed socket and compute whether message should be visible or not. Call this method once every
 		 * xf::Cycle.
 		 */
 		void
@@ -141,7 +141,7 @@ class Status:
 
 		/**
 		 * Return true when message should be visible on screen
-		 * according to the configuration and current property state.
+		 * according to the configuration and current socket state.
 		 */
 		bool
 		should_be_shown() const noexcept;
@@ -284,20 +284,20 @@ Status::Message::severity() const noexcept
 
 template<class Value>
 	inline Status::Message*
-	Status::Message::show_when (xf::Property<Value> const& property, Value value)
+	Status::Message::show_when (xf::Socket<Value> const& socket, Value value)
 	{
-		_conditions.push_back ([&property,value] {
-			return property && *property == value;
+		_conditions.push_back ([&socket,value] {
+			return socket && *socket == value;
 		});
 		return this;
 	}
 
 
 inline Status::Message*
-Status::Message::show_when (xf::BasicProperty const& property, xf::Nil)
+Status::Message::show_when (xf::BasicSocket const& socket, xf::Nil)
 {
-	_conditions.push_back ([&property] {
-		return property == xf::nil;
+	_conditions.push_back ([&socket] {
+		return socket == xf::nil;
 	});
 	return this;
 }

@@ -57,8 +57,8 @@ class Cycle
 
 	/**
 	 * Return time difference between last and previous update.
-	 * Be sure not to use it if you're skipping some of the updates, because you're watching just one property or
-	 * something.
+	 * Be sure not to use it if you're skipping some of the updates,
+	 * because you're watching just one socket or something.
 	 */
 	[[nodiscard]]
 	si::Time

@@ -31,11 +31,11 @@
 namespace xf {
 
 PanelRotaryEncoder::PanelRotaryEncoder (QWidget* parent, Panel* panel, QString const& knob_label,
-										v1::PropertyInteger value_property, v1::PropertyBoolean click_property):
+										Socket<int64_t> value_socket, Socket<bool> click_socket):
 	PanelWidget (parent, panel),
 	_knob_label (knob_label),
-	_value_property (value_property),
-	_click_property (click_property)
+	_value_socket (value_socket),
+	_click_socket (click_socket)
 {
 	QVBoxLayout* layout = new QVBoxLayout (this);
 	layout->setMargin (0);
@@ -46,8 +46,8 @@ PanelRotaryEncoder::PanelRotaryEncoder (QWidget* parent, Panel* panel, QString c
 	_click_timer->setSingleShot (true);
 	_click_timer->setInterval (20);
 	QObject::connect (_click_timer.get(), &QTimer::timeout, [&] {
-		if (_click_property.configured())
-			_click_property.write (false);
+		if (_click_socket.configured())
+			_click_socket.write (false);
 	});
 }
 
@@ -76,7 +76,8 @@ PanelRotaryEncoder::paintEvent (QPaintEvent*)
 	}
 
 	float rot = 0;
-	v1::PropertyInteger::Type value_mod = floored_mod<v1::PropertyInteger::Type> (_value, 0, 4);
+	Socket<int64_t>::Type value_mod = floored_mod<Socket<int64_t>::Type> (_value, 0, 4);
+
 	if (value_mod == 1)
 		rot = 360.f / Notches / 4.f * 1.f;
 	else if (value_mod == 2)
@@ -187,9 +188,9 @@ PanelRotaryEncoder::wheelEvent (QWheelEvent* event)
 void
 PanelRotaryEncoder::mouseDoubleClickEvent (QMouseEvent*)
 {
-	if (_click_property.configured())
+	if (_click_socket.configured())
 	{
-		_click_property.write (true);
+		_click_socket.write (true);
 		_click_timer->start();
 	}
 }
@@ -198,8 +199,8 @@ PanelRotaryEncoder::mouseDoubleClickEvent (QMouseEvent*)
 void
 PanelRotaryEncoder::write()
 {
-	if (_value_property.configured())
-		_value_property = _value;
+	if (_value_socket.configured())
+		_value_socket = _value;
 }
 
 } // namespace xf

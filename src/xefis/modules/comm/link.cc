@@ -122,8 +122,9 @@ LinkProtocol::Bitfield::produce (Blob& blob)
 		std::visit ([&bits] (auto&& bs) {
 			uint_least64_t v = bs.fallback_value;
 
-			if (bs.property && fits_in_bits (*bs.property, Bits (bs.bits)))
-				v = *bs.property;
+			if (bs.socket && fits_in_bits (*bs.socket, Bits (bs.bits)))
+				v = *bs.socket;
+			// TODO signal error if doesn't fits_in_bits()?
 
 			for (uint8_t b = 0; b < bs.bits; ++b)
 				bits.push_back ((v >> b) & 1);
@@ -184,8 +185,8 @@ LinkProtocol::Bitfield::apply()
 	for (auto& bsvariant: _bit_sources)
 	{
 		std::visit ([](auto&& bs) {
-			if (bs.property_out)
-				*bs.property_out = bs.value;
+			if (bs.assignable_socket)
+				*bs.assignable_socket = bs.value;
 		}, bsvariant);
 	}
 }
@@ -197,8 +198,8 @@ LinkProtocol::Bitfield::failsafe()
 	for (auto& bsvariant: _bit_sources)
 	{
 		std::visit ([](auto&& bs) {
-			if (bs.property_out && !bs.retained)
-				*bs.property_out = xf::nil;
+			if (bs.assignable_socket && !bs.retained)
+				*bs.assignable_socket = xf::nil;
 		}, bsvariant);
 	}
 }

@@ -19,8 +19,10 @@
 
 // Xefis:
 #include <xefis/core/cycle.h>
-#include <xefis/core/property.h>
-#include <xefis/core/property_observer.h>
+#include <xefis/core/socket.h>
+#include <xefis/core/module_io.h>
+#include <xefis/core/module_out.h>
+#include <xefis/core/socket_observer.h>
 
 
 namespace xf::test {
@@ -58,11 +60,11 @@ template<class T>
 		std::unique_ptr<ModuleIO>	io		{ std::make_unique<ModuleIO>() };
 
 	  public:
-		PropertyOut<T>				out		{ io.get(), "out" };
-		PropertyIn<T>				in		{ io.get(), "in" };
+		ModuleOut<T>				out		{ io.get(), "out" };
+		ModuleIn<T>					in		{ io.get(), "in" };
 		Module<ModuleIO>			module	{ std::move (io) };
 		TestCycle					cycle;
-		PropertyObserver			observer;
+		SocketObserver				observer;
 		std::optional<T>			result;
 		size_t						calls	{ 0 };
 
@@ -80,104 +82,104 @@ template<class T>
 	};
 
 
-AutoTest t1 ("xf::PropertyObserver noticing changes", []{
+AutoTest t1 ("xf::SocketObserver noticing changes", []{
 	TestEnvironment<TestedType> env;
 
 	env.out = kValue1;
 	env.in.fetch (env.cycle += 1_s);
 	env.observer.process (env.cycle.update_time());
-	test_asserts::verify ("PropertyObserver calls callback on change to non-nil", env.result && (*env.result == kValue1));
-	test_asserts::verify ("PropertyObserver calls callback once", env.calls == 1);
+	test_asserts::verify ("SocketObserver calls callback on change to non-nil", env.result && (*env.result == kValue1));
+	test_asserts::verify ("SocketObserver calls callback once", env.calls == 1);
 
 	env.out = xf::nil;
 	env.in.fetch (env.cycle += 1_s);
 	env.observer.process (env.cycle.update_time());
-	test_asserts::verify ("PropertyObserver calls callback on change to nil", !env.result);
-	test_asserts::verify ("PropertyObserver calls callback twice", env.calls == 2);
+	test_asserts::verify ("SocketObserver calls callback on change to nil", !env.result);
+	test_asserts::verify ("SocketObserver calls callback twice", env.calls == 2);
 });
 
 
-AutoTest t2 ("xf::PropertyObserver set_minimum_dt()", []{
+AutoTest t2 ("xf::SocketObserver set_minimum_dt()", []{
 	TestEnvironment<TestedType> env;
 
 	env.observer.set_minimum_dt (5_s);
 	env.out = kValue2;
 	env.in.fetch (env.cycle += 1_s);
 	env.observer.process (env.cycle.update_time());
-	test_asserts::verify ("PropertyObserver waits minimum_dt before firing (no fire)", !env.result);
+	test_asserts::verify ("SocketObserver waits minimum_dt before firing (no fire)", !env.result);
 
 	env.in.fetch (env.cycle += 4.01_s);
 	env.observer.process (env.cycle.update_time());
-	test_asserts::verify ("PropertyObserver waits minimum_dt before firing (fire)", env.result && (*env.result == kValue2));
+	test_asserts::verify ("SocketObserver waits minimum_dt before firing (fire)", env.result && (*env.result == kValue2));
 });
 
 
-AutoTest t3 ("xf::PropertyObserver serial()", []{
+AutoTest t3 ("xf::SocketObserver serial()", []{
 	TestEnvironment<TestedType> env;
 
 	auto serial = env.observer.serial();
 	env.out = kValue1;
 	env.in.fetch (env.cycle += 1_s);
-	test_asserts::verify ("PropertyObserver serial() doesn't change before calling process()", env.observer.serial() == serial);
+	test_asserts::verify ("SocketObserver serial() doesn't change before calling process()", env.observer.serial() == serial);
 	env.observer.process (env.cycle.update_time());
-	test_asserts::verify ("PropertyObserver serial() gets updated after calling process()", env.observer.serial() > serial);
+	test_asserts::verify ("SocketObserver serial() gets updated after calling process()", env.observer.serial() > serial);
 
 	serial = env.observer.serial();
 	env.out = xf::nil;
 	env.in.fetch (env.cycle += 1_s);
 	env.observer.process (env.cycle.update_time());
-	test_asserts::verify ("PropertyObserver serial() gets updated after calling process() even for nil values", env.observer.serial() > serial);
+	test_asserts::verify ("SocketObserver serial() gets updated after calling process() even for nil values", env.observer.serial() > serial);
 });
 
 
-AutoTest t4 ("xf::PropertyObserver update_time()", []{
+AutoTest t4 ("xf::SocketObserver update_time()", []{
 	TestEnvironment<TestedType> env;
 
 	auto ut = (env.cycle += 1_s).update_time();
 	env.out = kValue1;
 	env.in.fetch (env.cycle);
 	env.observer.process (env.cycle.update_time());
-	test_asserts::verify ("PropertyObserver update_time() returns last time of actually firing a callback (1)", env.observer.update_time() == ut);
+	test_asserts::verify ("SocketObserver update_time() returns last time of actually firing a callback (1)", env.observer.update_time() == ut);
 
 	env.in.fetch (env.cycle += 1_s);
 	env.observer.process (env.cycle.update_time());
-	test_asserts::verify ("PropertyObserver update_time() returns last time of actually firing a callback (2)", env.observer.update_time() == ut);
+	test_asserts::verify ("SocketObserver update_time() returns last time of actually firing a callback (2)", env.observer.update_time() == ut);
 
 	ut = (env.cycle += 1_s).update_time();
 	env.out = kValue2;
 	env.in.fetch (env.cycle);
 	env.observer.process (env.cycle.update_time());
-	test_asserts::verify ("PropertyObserver update_time() returns last time of actually firing a callback (3)", env.observer.update_time() == ut);
+	test_asserts::verify ("SocketObserver update_time() returns last time of actually firing a callback (3)", env.observer.update_time() == ut);
 });
 
 
-AutoTest t5 ("xf::PropertyObserver touch()", []{
+AutoTest t5 ("xf::SocketObserver touch()", []{
 	TestEnvironment<TestedType> env;
 
 	env.out = kValue1;
 	env.in.fetch (env.cycle += 1_s);
 	env.observer.process (env.cycle.update_time());
-	test_asserts::verify ("PropertyObserver calls callback once", env.calls == 1);
+	test_asserts::verify ("SocketObserver calls callback once", env.calls == 1);
 
 	env.in.fetch (env.cycle += 1_s);
 	env.observer.process (env.cycle.update_time());
-	test_asserts::verify ("PropertyObserver doesn't call callback on no change", env.calls == 1);
+	test_asserts::verify ("SocketObserver doesn't call callback on no change", env.calls == 1);
 
 	env.observer.touch();
 	env.in.fetch (env.cycle += 1_s);
 	env.observer.process (env.cycle.update_time());
-	test_asserts::verify ("PropertyObserver calls callback after touch()", env.calls == 2);
+	test_asserts::verify ("SocketObserver calls callback after touch()", env.calls == 2);
 });
 
 
-AutoTest t6 ("xf::PropertyObserver depending smoothers", []{
+AutoTest t6 ("xf::SocketObserver depending smoothers", []{
 	TestEnvironment<TestedType> env;
 	xf::Smoother<TestedType> smoother { 5_s };
 
 	env.observer.add_depending_smoother (smoother);
 	env.out = kValue1;
 
-	// Verify that callback gets called multiple times even if property value doesn't change, to make sure that Smoother can continue to properly smooth and
+	// Verify that callback gets called multiple times even if socket value doesn't change, to make sure that Smoother can continue to properly smooth and
 	// output the data.
 	for (size_t i = 0; i < 10; ++i)
 	{
@@ -187,11 +189,11 @@ AutoTest t6 ("xf::PropertyObserver depending smoothers", []{
 
 	// Expect total 7 calls, 1 for value change, 5 for 5 seconds of smoothing time plus one additional
 	// to ensure smoother has finished.
-	test_asserts::verify ("callback was called 5 times after last property change", env.calls == 7);
+	test_asserts::verify ("callback was called 5 times after last socket change", env.calls == 7);
 });
 
 
-AutoTest t7 ("xf::PropertyObserver observing other observers", []{
+AutoTest t7 ("xf::SocketObserver observing other observers", []{
 	// TODO
 });
 

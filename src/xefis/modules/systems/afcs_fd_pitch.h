@@ -20,9 +20,9 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
-#include <xefis/core/property.h>
-#include <xefis/core/property_observer.h>
+#include <xefis/core/module_socket.h>
 #include <xefis/core/setting.h>
+#include <xefis/core/socket_observer.h>
 #include <xefis/support/control/pid_controller.h>
 #include <xefis/utility/range_smoother.h>
 
@@ -48,36 +48,36 @@ class AFCS_FD_Pitch_IO: public xf::ModuleIO
 	 * Settings
 	 */
 
-	xf::Setting<IAS_PID::Settings>			ias_pid_settings		{ this, "ias_pid_settings" };
-	xf::Setting<MachPID::Settings>			mach_pid_settings		{ this, "mach_pid_settings" };
-	xf::Setting<AltitudePID::Settings>		altitude_pid_settings	{ this, "altitude_pid_settings" };
-	xf::Setting<VS_PID::Settings>			vs_pid_settings			{ this, "vs_pid_settings" };
-	xf::Setting<FPA_PID::Settings>			fpa_pid_settings		{ this, "fpa_pid_settings" };
+	xf::Setting<IAS_PID::Settings>		ias_pid_settings		{ this, "ias_pid_settings" };
+	xf::Setting<MachPID::Settings>		mach_pid_settings		{ this, "mach_pid_settings" };
+	xf::Setting<AltitudePID::Settings>	altitude_pid_settings	{ this, "altitude_pid_settings" };
+	xf::Setting<VS_PID::Settings>		vs_pid_settings			{ this, "vs_pid_settings" };
+	xf::Setting<FPA_PID::Settings>		fpa_pid_settings		{ this, "fpa_pid_settings" };
 
 	/*
 	 * Input
 	 */
 
-	xf::PropertyIn<bool>					autonomous				{ this, "autonomous" };
-	xf::PropertyIn<si::Angle>				pitch_limits			{ this, "pitch-limits" };
-	xf::PropertyIn<afcs::PitchMode>			cmd_pitch_mode			{ this, "cmd-pitch-mode" };
-	xf::PropertyIn<si::Velocity>			cmd_ias					{ this, "cmd-ias" };
-	xf::PropertyIn<double>					cmd_mach				{ this, "cmd-match" };
-	xf::PropertyIn<si::Length>				cmd_alt					{ this, "cmd-altitude" };
-	xf::PropertyIn<si::Velocity>			cmd_vs					{ this, "cmd-vs" };
-	xf::PropertyIn<si::Angle>				cmd_fpa					{ this, "cmd-fpa" };
-	xf::PropertyIn<si::Velocity>			measured_ias			{ this, "measured-ias" };
-	xf::PropertyIn<double>					measured_mach			{ this, "measured-mach" };
-	xf::PropertyIn<si::Length>				measured_alt			{ this, "measured-altitude" };
-	xf::PropertyIn<si::Velocity>			measured_vs				{ this, "measured-vs" };
-	xf::PropertyIn<si::Angle>				measured_fpa			{ this, "measured-fpa" };
+	xf::ModuleIn<bool>					autonomous				{ this, "autonomous" };
+	xf::ModuleIn<si::Angle>				pitch_limits			{ this, "pitch-limits" };
+	xf::ModuleIn<afcs::PitchMode>		cmd_pitch_mode			{ this, "cmd-pitch-mode" };
+	xf::ModuleIn<si::Velocity>			cmd_ias					{ this, "cmd-ias" };
+	xf::ModuleIn<double>				cmd_mach				{ this, "cmd-match" };
+	xf::ModuleIn<si::Length>			cmd_alt					{ this, "cmd-altitude" };
+	xf::ModuleIn<si::Velocity>			cmd_vs					{ this, "cmd-vs" };
+	xf::ModuleIn<si::Angle>				cmd_fpa					{ this, "cmd-fpa" };
+	xf::ModuleIn<si::Velocity>			measured_ias			{ this, "measured-ias" };
+	xf::ModuleIn<double>				measured_mach			{ this, "measured-mach" };
+	xf::ModuleIn<si::Length>			measured_alt			{ this, "measured-altitude" };
+	xf::ModuleIn<si::Velocity>			measured_vs				{ this, "measured-vs" };
+	xf::ModuleIn<si::Angle>				measured_fpa			{ this, "measured-fpa" };
 
 	/*
 	 * Output
 	 */
 
-	xf::PropertyOut<si::Angle>				pitch					{ this, "output-pitch" };
-	xf::PropertyOut<bool>					operative				{ this, "operative" };
+	xf::ModuleOut<si::Angle>			pitch					{ this, "output-pitch" };
+	xf::ModuleOut<bool>					operative				{ this, "operative" };
 };
 
 
@@ -120,7 +120,7 @@ class AFCS_FD_Pitch: public xf::Module<AFCS_FD_Pitch_IO>
 
   private:
 	/**
-	 * Compute all needed data and write to output properties.
+	 * Compute all needed data and write to output sockets.
 	 */
 	void
 	compute_pitch();
@@ -131,8 +131,8 @@ class AFCS_FD_Pitch: public xf::Module<AFCS_FD_Pitch_IO>
 	template<class Input, class Control>
 		std::optional<si::Angle>
 		compute_pitch (xf::PIDController<Input, Control>& pid,
-					   xf::PropertyIn<Input> const& cmd_param,
-					   xf::PropertyIn<Input> const& measured_param,
+					   xf::ModuleIn<Input> const& cmd_param,
+					   xf::ModuleIn<Input> const& measured_param,
 					   si::Time update_dt) const;
 
 	/**
@@ -149,7 +149,7 @@ class AFCS_FD_Pitch: public xf::Module<AFCS_FD_Pitch_IO>
 	VS_PID							_vs_pid;
 	FPA_PID							_fpa_pid;
 	xf::RangeSmoother<si::Angle>	_output_pitch_smoother	{ { -180.0_deg, +180.0_deg }, 2.5_s };
-	xf::PropertyObserver			_pitch_computer;
+	xf::SocketObserver				_pitch_computer;
 };
 
 #endif

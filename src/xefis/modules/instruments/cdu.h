@@ -26,8 +26,8 @@
 #include <xefis/config/all.h>
 #include <xefis/core/graphics.h>
 #include <xefis/core/instrument.h>
-#include <xefis/core/property.h>
-#include <xefis/core/property_stringifier.h>
+#include <xefis/core/socket.h>
+#include <xefis/core/socket_stringifier.h>
 #include <xefis/core/setting.h>
 #include <xefis/core/instrument_aids.h>
 
@@ -42,13 +42,13 @@ class CDU:
 	 * Settings
 	 */
 
-	xf::Setting<bool>			show_time	{ this, "show_time", true };
+	xf::Setting<bool>		show_time	{ this, "show_time", true };
 
 	/*
 	 * Input
 	 */
 
-	xf::PropertyIn<si::Time>	time_utc	{ this, "time/utc" };
+	xf::ModuleIn<si::Time>	time_utc	{ this, "time/utc" };
 
   private:
 	static constexpr double kButtonWidthForHeight = 0.9;
@@ -104,7 +104,7 @@ class CDU:
 		cdu() const noexcept;
 
 		/**
-		 * Return true if any followed property is fresh.
+		 * Return true if any followed socket is fresh.
 		 */
 		virtual bool
 		fresh() const noexcept;
@@ -167,12 +167,12 @@ class CDU:
 	/**
 	 * Strip that contains a value that can be configured.
 	 */
-	class PropertyStrip: public Strip
+	class SocketStrip: public Strip
 	{
 	  public:
 		// Ctor
 		explicit
-		PropertyStrip (CDU&, xf::PropertyStringifier const&, QString const& title, Column);
+		SocketStrip (CDU&, xf::SocketStringifier const&, QString const& title, Column);
 
 		void
 		set_read_only (bool read_only);
@@ -206,7 +206,7 @@ class CDU:
 		paint_focus (QRectF const& rect, QRectF const& button_rect, xf::InstrumentAids&, xf::Painter&, Column) override;
 
 	  private:
-		xf::PropertyStringifier	_property_stringifier;
+		xf::SocketStringifier	_socket_stringifier;
 		bool					_read_only		= false;
 		ButtonState				_button_state	= ButtonState::Normal;
 		QRectF					_button_rect;
@@ -304,10 +304,10 @@ class CDU:
 		strips_right() const noexcept;
 
 		/**
-		 * Return true if any of the properties is fresh.
+		 * Return true if any of the sockets is fresh.
 		 */
 		bool
-		scan_properties() const noexcept;
+		scan_sockets() const noexcept;
 
 		/**
 		 * Handle mouse move event.
@@ -370,10 +370,10 @@ class CDU:
 		Config (CDU& cdu, QDomElement const& pages_element, xf::Logger const&);
 
 		/**
-		 * Return true if any of the properties is fresh.
+		 * Return true if any of the sockets is fresh.
 		 */
 		bool
-		scan_properties() const noexcept;
+		scan_sockets() const noexcept;
 
 		/**
 		 * Return default page ID.

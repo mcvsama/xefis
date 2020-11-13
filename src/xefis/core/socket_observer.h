@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__CORE__PROPERTY_OBSERVER_H__INCLUDED
-#define XEFIS__CORE__PROPERTY_OBSERVER_H__INCLUDED
+#ifndef XEFIS__CORE__MODULE_SOCKET_OBSERVER_H__INCLUDED
+#define XEFIS__CORE__MODULE_SOCKET_OBSERVER_H__INCLUDED
 
 // Standard:
 #include <cstddef>
@@ -25,77 +25,77 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/property.h>
+#include <xefis/core/socket.h>
 #include <xefis/utility/smoother.h>
 
 
 namespace xf {
 
 /**
- * Observes a set of properties, and checks if their values have changed.
+ * Observes a set of sockets, and checks if their values have changed.
  * If they did, calls registered callback function.
  */
-class PropertyObserver
+class SocketObserver
 {
   public:
 	/**
-	 * Encapsulates object to be observed: a property or another observer.
+	 * Encapsulates object to be observed: a module socket or another observer.
 	 */
 	class Object
 	{
-		friend class PropertyObserver;
+		friend class SocketObserver;
 
 	  public:
 		// Ctor
-		Object (BasicProperty const*);
+		Object (BasicSocket const*);
 
 		// Ctor
-		Object (PropertyObserver*);
+		Object (SocketObserver*);
 
-		BasicProperty::Serial
+		BasicSocket::Serial
 		remote_serial() const noexcept;
 
 	  private:
-		std::variant<BasicProperty const*, PropertyObserver*>	_observable;
-		BasicProperty::Serial									_saved_serial	= 0;
+		std::variant<BasicSocket const*, SocketObserver*>	_observable;
+		BasicSocket::Serial									_saved_serial	= 0;
 	};
 
 	typedef std::vector<Object>			ObjectsList;
 	typedef std::vector<SmootherBase*>	SmoothersList;
 
   public:
-	typedef BasicProperty::Serial		Serial;
+	typedef BasicSocket::Serial			Serial;
 	typedef std::function<void()>		Callback;
 
   public:
 	/**
-	 * Add property to be observed.
-	 * When property's value changes the callback function is called.
+	 * Add socket to be observed.
+	 * When socket's value changes the callback function is called.
 	 *
-	 * Property is held by reference, so the property object must live as long as the PropertyObserver.
+	 * ModuleSocket is held by reference, so the socket object must live as long as the SocketObserver.
 	 */
 	void
-	observe (BasicProperty const& property);
+	observe (BasicSocket const& socket);
 
 	/**
-	 * Add another PropertyObserver to observe.
-	 * Similarly to observing property, if the other observer fires its callback function, then this observer
+	 * Add another SocketObserver to observe.
+	 * Similarly to observing a socket, if the other observer fires its callback function, then this observer
 	 * will fire its own.
 	 *
 	 * The other observer is held by reference, and it must live as long as this observer lives.
 	 */
 	void
-	observe (PropertyObserver& observer);
+	observe (SocketObserver& observer);
 
 	/**
-	 * Add list of properties to be tracked.
-	 * Same as calling observe (GenericProperty&) for each of the objects in list, in sequence.
+	 * Add list of sockets to be tracked.
+	 * Same as calling observe (GenericModuleSocket&) for each of the objects in list, in sequence.
 	 */
 	void
 	observe (std::initializer_list<Object> list);
 
 	/**
-	 * Add list of properties to be tracked, from a sequence.
+	 * Add list of sockets to be tracked, from a sequence.
 	 */
 	template<class Iterator>
 		void
@@ -103,7 +103,7 @@ class PropertyObserver
 
 	/**
 	 * Setup callback function.
-	 * This function will be called when one of observed properties is changed or observers is fired.
+	 * This function will be called when one of observed sockets is changed or observers is fired.
 	 */
 	void
 	set_callback (Callback callback) noexcept;
@@ -144,8 +144,8 @@ class PropertyObserver
 
 	/**
 	 * Register smoother with this observer.
-	 * PropertyObserver will fire callbacks more than once after last property change to accommodate for period of time greater or equal to the smoothing-time
-	 * of the longest-smoothing Smoother. This is to ensure that smoothers continue to work and smooth data even after single-event property change occurs.
+	 * SocketObserver will fire callbacks more than once after last socket change to accommodate for period of time greater or equal to the smoothing-time
+	 * of the longest-smoothing Smoother. This is to ensure that smoothers continue to work and smooth data even after single-event socket change occurs.
 	 *
 	 * Smoother is held by reference, so it must live as long as this object lives.
 	 */
@@ -160,7 +160,7 @@ class PropertyObserver
 	add_depending_smoothers (std::initializer_list<SmootherBase*> list);
 
 	/**
-	 * Tells the property observer to do a callback on next occasion, regardless of other conditions, but takes into
+	 * Tells the socket observer to do a callback on next occasion, regardless of other conditions, but takes into
 	 * consideration minimum dt set with set_minimum_dt().
 	 */
 	void
@@ -179,7 +179,7 @@ class PropertyObserver
 	SmoothersList			_smoothers;
 	Callback				_callback;
 	Serial					_serial						{ 0 };
-	// Time of last change of observed property:
+	// Time of last change of observed socket:
 	si::Time				_obs_update_time			{ 0_s };
 	// Time of last firing of the callback function:
 	si::Time				_fire_time					= 0_s;
@@ -187,7 +187,7 @@ class PropertyObserver
 	si::Time				_accumulated_dt				= 0_s;
 	si::Time				_minimum_dt					= 0_s;
 	std::optional<si::Time>	_longest_smoothing_time;
-	// Set to true, when observed property is updated, but
+	// Set to true, when observed socket is updated, but
 	// _minimum_dt prevented firing the callback.
 	bool					_need_callback				{ false };
 	bool					_additional_recompute		{ false };
@@ -196,19 +196,19 @@ class PropertyObserver
 
 
 inline
-PropertyObserver::Object::Object (BasicProperty const* property):
-	_observable (property)
+SocketObserver::Object::Object (BasicSocket const* socket):
+	_observable (socket)
 { }
 
 
 inline
-PropertyObserver::Object::Object (PropertyObserver* observer):
+SocketObserver::Object::Object (SocketObserver* observer):
 	_observable (observer)
 { }
 
 
-inline BasicProperty::Serial
-PropertyObserver::Object::remote_serial() const noexcept
+inline BasicSocket::Serial
+SocketObserver::Object::remote_serial() const noexcept
 {
 	return std::visit ([](auto const& observable) noexcept {
 		return observable->serial();
@@ -218,36 +218,36 @@ PropertyObserver::Object::remote_serial() const noexcept
 
 template<class Iterator>
 	void
-	PropertyObserver::observe (Iterator begin, Iterator end)
+	SocketObserver::observe (Iterator begin, Iterator end)
 	{
 		for (Iterator p = begin; p != end; ++p)
 			observe (*p);
 	}
 
 
-inline PropertyObserver::Serial
-PropertyObserver::serial() const noexcept
+inline SocketObserver::Serial
+SocketObserver::serial() const noexcept
 {
 	return _serial;
 }
 
 
 inline si::Time
-PropertyObserver::update_time() const noexcept
+SocketObserver::update_time() const noexcept
 {
 	return _fire_time;
 }
 
 
 inline si::Time
-PropertyObserver::update_dt() const noexcept
+SocketObserver::update_dt() const noexcept
 {
 	return _fire_dt;
 }
 
 
 inline void
-PropertyObserver::touch() noexcept
+SocketObserver::touch() noexcept
 {
 	_touch = true;
 }

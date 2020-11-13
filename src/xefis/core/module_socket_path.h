@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__CORE__PROPERTY_PATH_H__INCLUDED
-#define XEFIS__CORE__PROPERTY_PATH_H__INCLUDED
+#ifndef XEFIS__CORE__MODULE_SOCKET_PATH_H__INCLUDED
+#define XEFIS__CORE__MODULE_SOCKET_PATH_H__INCLUDED
 
 // Standard:
 #include <cstddef>
@@ -30,38 +30,38 @@ namespace xf {
 /**
  * Encapsulates string used as path, for better type safety.
  */
-class PropertyPath
+class ModuleSocketPath
 {
   public:
 	// Ctor
-	PropertyPath() = default;
+	ModuleSocketPath() = default;
 
 	// Ctor
 	explicit
-	PropertyPath (const char* path);
+	ModuleSocketPath (const char* path);
 
 	// Ctor
 	explicit
-	PropertyPath (std::string_view const& path);
+	ModuleSocketPath (std::string_view const& path);
 
 	// Ctor
 	explicit
-	PropertyPath (QString const& path);
+	ModuleSocketPath (QString const& path);
 
 	// Ctor
-	PropertyPath (PropertyPath const&) = default;
+	ModuleSocketPath (ModuleSocketPath const&) = default;
 
 	// Ctor
-	PropertyPath (PropertyPath&&) = default;
+	ModuleSocketPath (ModuleSocketPath&&) = default;
 
-	PropertyPath&
-	operator= (PropertyPath const&) = default;
+	ModuleSocketPath&
+	operator= (ModuleSocketPath const&) = default;
 
-	PropertyPath&
-	operator= (PropertyPath&&) = default;
+	ModuleSocketPath&
+	operator= (ModuleSocketPath&&) = default;
 
 	bool
-	operator== (PropertyPath const& other) const noexcept;
+	operator== (ModuleSocketPath const& other) const noexcept;
 
 	/**
 	 * Return string reference.
@@ -75,32 +75,32 @@ class PropertyPath
 
 
 inline
-PropertyPath::PropertyPath (const char* path):
+ModuleSocketPath::ModuleSocketPath (const char* path):
 	_path (path)
 { }
 
 
 inline
-PropertyPath::PropertyPath (std::string_view const& path):
+ModuleSocketPath::ModuleSocketPath (std::string_view const& path):
 	_path (path)
 { }
 
 
 inline
-PropertyPath::PropertyPath (QString const& path):
-	PropertyPath (path.toStdString())
+ModuleSocketPath::ModuleSocketPath (QString const& path):
+	ModuleSocketPath (path.toStdString())
 { }
 
 
 inline bool
-PropertyPath::operator== (PropertyPath const& other) const noexcept
+ModuleSocketPath::operator== (ModuleSocketPath const& other) const noexcept
 {
 	return _path == other._path;
 }
 
 
 inline std::string const&
-PropertyPath::string() const noexcept
+ModuleSocketPath::string() const noexcept
 {
 	return _path;
 }

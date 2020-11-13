@@ -23,20 +23,20 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
-#include <xefis/core/property.h>
+#include <xefis/core/socket.h>
 
 
 namespace xf {
 
-class PropertyItem: public QTreeWidgetItem
+class SocketItem: public QTreeWidgetItem
 {
   public:
 	// Ctor
 	explicit
-	PropertyItem (BasicProperty*, QTreeWidgetItem& parent);
+	SocketItem (BasicSocket*, QTreeWidgetItem& parent);
 
 	/**
-	 * Should be called after populating the tree with all properties.
+	 * Should be called after populating the tree with all sockets.
 	 */
 	void
 	setup_appereance();
@@ -45,7 +45,7 @@ class PropertyItem: public QTreeWidgetItem
 	read();
 
   private:
-	BasicProperty* _property;
+	BasicSocket* _socket;
  };
 
 } // namespace xf

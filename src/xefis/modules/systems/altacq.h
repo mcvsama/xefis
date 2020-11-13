@@ -20,9 +20,9 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
-#include <xefis/core/property.h>
-#include <xefis/core/property_observer.h>
+#include <xefis/core/module_socket.h>
 #include <xefis/core/setting.h>
+#include <xefis/core/socket_observer.h>
 #include <xefis/utility/actions.h>
 #include <xefis/utility/smoother.h>
 
@@ -38,25 +38,25 @@ class AltAcqIO: public xf::ModuleIO
 	 * Settings
 	 */
 
-	xf::Setting<si::Length>			minimum_altitude_difference	{ this, "minimum_altitude_difference" };
-	xf::Setting<si::Length>			flag_diff_on				{ this, "flag_diff_on", 1000_ft };
-	xf::Setting<si::Length>			flag_diff_off				{ this, "flag_diff_off", 100_ft };
+	xf::Setting<si::Length>		minimum_altitude_difference	{ this, "minimum_altitude_difference" };
+	xf::Setting<si::Length>		flag_diff_on				{ this, "flag_diff_on", 1000_ft };
+	xf::Setting<si::Length>		flag_diff_off				{ this, "flag_diff_off", 100_ft };
 
 	/*
 	 * Input
 	 */
 
-	xf::PropertyIn<si::Length>		altitude_amsl				{ this, "altitude-amsl" };
-	xf::PropertyIn<si::Length>		altitude_acquire_amsl		{ this, "altitude-acquire-amsl" };
-	xf::PropertyIn<si::Velocity>	vertical_speed				{ this, "vertical-speed" };
-	xf::PropertyIn<si::Velocity>	ground_speed				{ this, "ground-speed" };
+	xf::ModuleIn<si::Length>	altitude_amsl				{ this, "altitude-amsl" };
+	xf::ModuleIn<si::Length>	altitude_acquire_amsl		{ this, "altitude-acquire-amsl" };
+	xf::ModuleIn<si::Velocity>	vertical_speed				{ this, "vertical-speed" };
+	xf::ModuleIn<si::Velocity>	ground_speed				{ this, "ground-speed" };
 
 	/*
 	 * Output
 	 */
 
-	xf::PropertyOut<si::Length>		altitude_acquire_distance	{ this, "acquire-distance" };
-	xf::PropertyOut<bool>			altitude_acquire_flag		{ this, "acquire-flag" };
+	xf::ModuleOut<si::Length>	altitude_acquire_distance	{ this, "acquire-distance" };
+	xf::ModuleOut<bool>			altitude_acquire_flag		{ this, "acquire-flag" };
 };
 
 
@@ -77,10 +77,10 @@ class AltAcq: public xf::Module<AltAcqIO>
 
   private:
 	bool						_flag_armed							{ false };
-	// Note: PropertyObservers depend on Smoothers, so first Smoothers must be defined,
-	// then PropertyObservers, to ensure correct order of destruction.
+	// Note: SocketObservers depend on Smoothers, so first Smoothers must be defined,
+	// then SocketObservers, to ensure correct order of destruction.
 	xf::Smoother<si::Length>	_output_smoother					{ 2_s };
-	xf::PropertyObserver		_output_computer;
+	xf::SocketObserver			_output_computer;
 	xf::PropChanged<si::Length>	_altitude_amsl_changed				{ io.altitude_amsl };
 	xf::PropChanged<si::Length>	_altitude_acquire_amsl_changed		{ io.altitude_acquire_amsl };
 };
