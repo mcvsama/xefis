@@ -25,13 +25,21 @@ No-one uses this besides the author. Don't expect any support.
 Required depenencies
 ====================
 
+pkg-config
 uuid-dev
-gcc-5.3
+gcc or clang
 boost
 boost-endian
 qt-5
 mhash-0.9.9.9
 
 Packages required on Ubuntu 18:
+	pkg-config
     qtbase5-dev
+	libqt5svg5
+	libqt5x11extras5-dev
+	libboost-all-dev
+	uuid-dev
+	libmhash-dev
+
 
