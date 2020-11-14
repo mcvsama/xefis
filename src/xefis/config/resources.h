@@ -77,8 +77,8 @@ namespace xf::resources {
 #define XEFIS_CONFIG_HAS_ICON_16(key, file) \
 		XEFIS_CONFIG_HAS_ICON(key, XEFIS_SHARED_DIRECTORY "/images/16/" file)
 
-		XEFIS_CONFIG_HAS_ICON_16 (socket_dir, "property-dir.png")
-		XEFIS_CONFIG_HAS_ICON_16 (socket_value, "property-value.png")
+		XEFIS_CONFIG_HAS_ICON_16 (socket_dir, "socket-dir.png")
+		XEFIS_CONFIG_HAS_ICON_16 (socket_value, "socket-value.png")
 		XEFIS_CONFIG_HAS_ICON_16 (led_green_on, "led-green-on.png")
 		XEFIS_CONFIG_HAS_ICON_16 (led_amber_on, "led-amber-on.png")
 		XEFIS_CONFIG_HAS_ICON_16 (led_red_on, "led-red-on.png")
