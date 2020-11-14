@@ -131,8 +131,8 @@ AutoTest t1 ("modules/io/link: protocol: valid data transmission", []{
 
 	auto test = [&] {
 		transmit (tx_protocol, rx_protocol);
-		test_asserts::verify ("nil_si_prop transmitted properly", rx_io.nil_si_prop.get_optional() == tx_io.nil_si_prop.get_optional());
-		test_asserts::verify ("angle_prop transmitted properly (optional() version)", rx_io.angle_prop.get_optional() == tx_io.angle_prop.get_optional());
+		test_asserts::verify ("nil_si_prop transmitted properly", rx_io.nil_si_prop == tx_io.nil_si_prop);
+		test_asserts::verify ("angle_prop transmitted properly (optional() version)", rx_io.angle_prop == tx_io.angle_prop);
 		test_asserts::verify ("angle_prop transmitted properly", *rx_io.angle_prop == *tx_io.angle_prop);
 		test_asserts::verify_equal_with_epsilon ("velocity transmitted properly", *rx_io.velocity_prop, *tx_io.velocity_prop, 0.1_kph);
 		test_asserts::verify_equal_with_epsilon ("velocity prop with offset transmitted properly", *rx_io.velocity_prop_offset, *tx_io.velocity_prop_offset, 0.1_mps);

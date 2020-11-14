@@ -300,6 +300,14 @@ template<class pValue>
 
 	  public:
 		/**
+		 * Compare current values with another Socket, nil-value included.
+		 * Nothing else is compared (eg. fallback value), only the current value.
+		 */
+		[[nodiscard]]
+		bool
+		operator== (Socket<Value> const& other);
+
+		/**
 		 * Return contained value.
 		 * Throw exception NilValueException if value is nil and no fallback-value is set.
 		 */
@@ -494,6 +502,15 @@ template<class V>
 			return *_fallback_value;
 		else
 			throw NilValueException();
+	}
+
+
+template<class V>
+	bool
+	Socket<V>::operator== (Socket<Value> const& other)
+	{
+		return (!_value && !other._value)
+			|| (_value && other._value && *_value == *other._value);
 	}
 
 
