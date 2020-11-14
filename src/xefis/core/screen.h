@@ -193,6 +193,10 @@ class Screen:
 	void
 	resizeEvent (QResizeEvent*) override;
 
+	// QWidget API:
+	void
+	showEvent (QShowEvent* event) override;
+
   private:
 	/**
 	 * Update screen canvas if parameters changed.

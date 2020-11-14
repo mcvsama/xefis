@@ -74,8 +74,7 @@ Screen::Screen (ScreenSpec const& spec, Graphics const& graphics, Machine& machi
 	_hide_logo_timer->setSingleShot (true);
 	_hide_logo_timer->setInterval (kLogoDisplayTime.in<si::Millisecond>());
 	QObject::connect (_hide_logo_timer, &QTimer::timeout, this, &Screen::hide_logo);
-	// TODO start should be called first time show() is called (or each time?)
-	_hide_logo_timer->start();
+	// Start will be called in the showEvent.
 
 	_refresh_timer = new QTimer (this);
 	_refresh_timer->setSingleShot (false);
@@ -175,6 +174,14 @@ void
 Screen::resizeEvent (QResizeEvent* resize_event)
 {
 	update_canvas (resize_event->size());
+}
+
+
+void
+Screen::showEvent (QShowEvent* event)
+{
+	QWidget::showEvent (event);
+	_hide_logo_timer->start();
 }
 
 
