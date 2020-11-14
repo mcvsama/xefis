@@ -490,7 +490,6 @@ RigidBodyPainter::paint_ecef_basis (QOpenGLPaintDevice& canvas)
 	glDisable (GL_FOG);
 
 	float const scale = 0.4;
-	// FIXME the lengts might not work correctly with different DPIs
 	si::Length const radius = 4_mm * scale;
 	si::Length const length = 20_cm * scale;
 	si::Length const cone_radius = 15_mm * scale;
