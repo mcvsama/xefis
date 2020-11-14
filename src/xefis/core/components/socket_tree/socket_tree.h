@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__CORE__COMPONENTS__PROPERTY_TREE__PROPERTY_TREE_H__INCLUDED
-#define XEFIS__CORE__COMPONENTS__PROPERTY_TREE__PROPERTY_TREE_H__INCLUDED
+#ifndef XEFIS__CORE__COMPONENTS__SOCKET_TREE__SOCKET_TREE_H__INCLUDED
+#define XEFIS__CORE__COMPONENTS__SOCKET_TREE__SOCKET_TREE_H__INCLUDED
 
 // Standard:
 #include <cstddef>
@@ -34,7 +34,7 @@
 #include <xefis/core/module_socket.h>
 
 // Local:
-#include "property_item.h"
+#include "socket_item.h"
 
 
 namespace xf {

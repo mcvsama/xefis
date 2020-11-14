@@ -26,8 +26,8 @@
 #include <xefis/core/socket.h>
 
 // Local:
-#include "property_tree.h"
-#include "property_item.h"
+#include "socket_tree.h"
+#include "socket_item.h"
 
 
 namespace xf {

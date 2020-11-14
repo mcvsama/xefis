@@ -22,8 +22,8 @@
 #include <xefis/core/socket_converter.h>
 
 // Local:
-#include "property_item.h"
-#include "property_tree.h"
+#include "socket_item.h"
+#include "socket_tree.h"
 
 
 namespace xf {
