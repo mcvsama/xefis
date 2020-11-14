@@ -22,6 +22,7 @@
 #include <xefis/config/all.h>
 
 
+// Add some Xefis-specific stuff to the neutrino namespace.
 namespace neutrino {
 
 /**
