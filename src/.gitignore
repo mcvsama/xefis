@@ -3,5 +3,19 @@
 /.commit
 /release
 /Makefile.local*
-__todo
+/da
+/dx
+/noa
+/nom
+/nosim1
+/nox
+/oa
+/om
+/osim1
+/ox
+/perf.stat
+/perf.record
+/perf.data
+/perf.data.old
+__*
 
