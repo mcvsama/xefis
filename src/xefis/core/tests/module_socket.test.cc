@@ -474,8 +474,13 @@ AutoTest t6 ("xf::Socket various behavior", for_all_types ([](auto value1, auto)
 	ModuleIn<T> in { &io, "in" };
 
 	in << out;
-	test_asserts::verify ("fetch() throws when no Module is assigned",
-						  Exception::catch_and_log (g_null_logger, [&]{ in.fetch (TestCycle()); }));
+
+	test_asserts::verify ("nil_by_fetch_exception flag is false before first fetching",
+						  !in.nil_by_fetch_exception());
+	test_asserts::verify ("fetch() doesn't throw when no Module is assigned",
+						  !Exception::catch_and_log (g_null_logger, [&]{ in.fetch (TestCycle()); }));
+	test_asserts::verify ("fetch() signals nil_by_fetch_exception flag when no Module is assigned",
+						  in.nil_by_fetch_exception());
 }));
 
 

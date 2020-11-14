@@ -254,6 +254,16 @@ class BasicSocket:
 	virtual Blob
 	to_blob() const = 0;
 
+	/**
+	 * True if currently held nil value was caused by exception
+	 * thrown by source socket when fetching data from it.
+	 * Will get reset on next successful fetch.
+	 */
+	[[nodiscard]]
+	bool
+	nil_by_fetch_exception() const
+		{ return _nil_by_fetch_exception; }
+
   protected:
 	/**
 	 * Fetch the data from the source unconditionally.
@@ -280,12 +290,20 @@ class BasicSocket:
 	virtual void
 	protected_set_nil() = 0;
 
+	/**
+	 * Set the nil-by-fetch-exception flag.
+	 */
+	void
+	set_nil_by_fetch_exception (bool value)
+		{ _nil_by_fetch_exception = value; }
+
   private:
 	si::Time					_modification_timestamp	= 0_s;
 	si::Time					_valid_timestamp		= 0_s;
 	Serial						_serial					= 0;
 	Cycle::Number				_fetched_cycle_number	= 0;
 	std::vector<BasicSocket*>	_targets;
+	bool						_nil_by_fetch_exception = false;
 };
 
 

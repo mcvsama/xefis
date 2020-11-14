@@ -60,19 +60,25 @@ Xefis::Xefis (int& argc, char** argv):
 		_system = std::make_unique<System> (_logger);
 		_graphics = std::make_unique<Graphics> (_logger);
 		_machine = ::xefis_machine (*this);
-		_configurator_widget = std::make_unique<ConfiguratorWidget> (*_machine, nullptr);
 
-		_posix_signals_check_timer = new QTimer (this);
-		_posix_signals_check_timer->setSingleShot (false);
-		_posix_signals_check_timer->setInterval ((100_ms).in<si::Millisecond>());
-		QObject::connect (_posix_signals_check_timer, &QTimer::timeout, [&] {
-			if (g_hup_received.load())
-			{
-				_logger << "HUP received, exiting." << std::endl;
-				quit();
-			}
-		});
-		_posix_signals_check_timer->start();
+		if (_machine)
+		{
+			_configurator_widget = std::make_unique<ConfiguratorWidget> (*_machine, nullptr);
+
+			_posix_signals_check_timer = new QTimer (this);
+			_posix_signals_check_timer->setSingleShot (false);
+			_posix_signals_check_timer->setInterval ((100_ms).in<si::Millisecond>());
+			QObject::connect (_posix_signals_check_timer, &QTimer::timeout, [&] {
+				if (g_hup_received.load())
+				{
+					_logger << "HUP received, exiting." << std::endl;
+					quit();
+				}
+			});
+			_posix_signals_check_timer->start();
+		}
+		else
+			_logger << "No machine was compiled-in." << std::endl;
 	});
 }
 
@@ -99,6 +105,16 @@ Xefis::quit()
 {
 	closeAllWindows();
 	QApplication::quit();
+}
+
+
+Logger const&
+Xefis::fallback_exception_logger()
+{
+	static LoggerOutput	fallback_exception_logger_output	{ std::cerr };
+	static Logger		fallback_exception_logger			{ fallback_exception_logger_output };
+
+	return fallback_exception_logger;
 }
 
 
@@ -198,4 +214,15 @@ Xefis::print_copyrights (std::ostream& out)
 }
 
 } // namespace xf
+
+
+/**
+ * Default xefis_machine() function, used when there's no other provided.
+ */
+[[gnu::weak]]
+std::unique_ptr<xf::Machine>
+xefis_machine (xf::Xefis&)
+{
+	return nullptr;
+}
 

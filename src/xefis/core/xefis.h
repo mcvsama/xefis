@@ -142,7 +142,15 @@ class Xefis: public QApplication
 	 */
 	[[nodiscard]]
 	Logger const&
-	logger() const noexcept;
+	logger() const noexcept
+		{ return _logger; }
+
+	/**
+	 * Return global fallback exception logger (one to use when there's no better-fitted one).
+	 */
+	[[nodiscard]]
+	static Logger const&
+	fallback_exception_logger();
 
   private:
 	/**
@@ -216,13 +224,6 @@ Xefis::configurator_widget() const
 		throw UninitializedServiceException ("ConfiguratorWidget");
 
 	return *_configurator_widget.get();
-}
-
-
-inline Logger const&
-Xefis::logger() const noexcept
-{
-	return _logger;
 }
 
 } // namespace xf

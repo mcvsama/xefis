@@ -92,6 +92,22 @@ template<class pValue>
 	};
 
 
+/**
+ * Returns logger to use for exceptions thrown when fetching data
+ * from connected sockets.
+ * By default it's Xefis::fallback_exception_logger().
+ */
+Logger const*
+connectable_socket_fetch_exception_logger();
+
+/**
+ * Set new logger to return by connectable_socket_fetch_exception_logger().
+ * May be nullptr to hide exception.
+ */
+void
+set_connectable_socket_fetch_exception_logger (Logger const*);
+
+
 template<class V>
 	inline void
 	ConnectableSocket<V>::operator<< (NoDataSource const)
@@ -203,14 +219,37 @@ template<class V>
 	inline void
 	ConnectableSocket<V>::fetch_from_socket (Socket<Value>& socket, Cycle const& cycle)
 	{
-		// TODO try and on exception perhaps set nil and also a flag nil_by_fetch_exception
-		// TODO this flag should get propagated along the graph path
-		socket.fetch (cycle);
+		auto const execute = [&] {
+			socket.fetch (cycle);
 
-		if (auto const new_value = socket.get_optional())
-			this->protected_set (*new_value);
+			if (auto const new_value = socket.get_optional())
+				this->protected_set (*new_value);
+			else
+			{
+				// Propagate nil-by-fetch-exception flag from the source socket:
+				this->set_nil_by_fetch_exception (socket.nil_by_fetch_exception());
+				this->protected_set_nil();
+			}
+		};
+
+		bool thrown = false;
+		this->set_nil_by_fetch_exception (false);
+
+		if (auto const* logger = connectable_socket_fetch_exception_logger())
+			thrown = Exception::catch_and_log (*logger, execute);
 		else
-			this->protected_set_nil();
+		{
+			try {
+				execute();
+			}
+			catch (...)
+			{
+				thrown = true;
+			}
+		}
+
+		if (thrown)
+			this->set_nil_by_fetch_exception (true);
 	}
 
 } // namespace xf

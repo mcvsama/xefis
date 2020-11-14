@@ -13,12 +13,14 @@
 
 // Standards:
 #include <cstddef>
+#include <memory>
 
 // Neutrino:
 #include <neutrino/test/auto_test.h>
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/machine.h>
 
 
 int
