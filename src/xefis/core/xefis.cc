@@ -138,25 +138,26 @@ Xefis::parse_args (int argc, char** argv)
 		{
 			if (!arg_value.empty())
 				throw NonValuedArgumentException (arg_name);
-			_options[Option::ModulesDebugLog] = "";
+
+			_options.modules_debug_log = true;
 		}
 		else if (arg_name == "--watchdog-write-fd")
 		{
 			if (arg_value.empty())
 				throw MissingValueException (arg_name);
-			_options[Option::WatchdogWriteFd] = arg_value;
+
+			_options.watchdog_write_fd = boost::lexical_cast<int> (arg_value);
 		}
 		else if (arg_name == "--watchdog-read-fd")
 		{
 			if (arg_value.empty())
 				throw MissingValueException (arg_name);
-			_options[Option::WatchdogReadFd] = arg_value;
+
+			_options.watchdog_read_fd = boost::lexical_cast<int> (arg_value);
 		}
 		else
 			throw Exception ("unrecognized option '" + arg_name + "', try --help");
 	}
-
-	_options_helper = std::make_unique<OptionsHelper> (*this);
 }
 
 

@@ -77,40 +77,18 @@ class Xefis: public QApplication
 		UninitializedServiceException (std::string const& service_name);
 	};
 
-	class QuitInstruction { };
-
-  public:
 	/**
-	 * Contains methods that return command line argument values
-	 * with proper type.
+	 * A set of options provided on command-line (or not provided).
 	 */
-	class OptionsHelper
+	class Options
 	{
 	  public:
-		// Ctor
-		explicit
-		OptionsHelper (Xefis const&);
-
-		std::optional<int>
-		watchdog_write_fd() const noexcept;
-
-		std::optional<int>
-		watchdog_read_fd() const noexcept;
-
-	  private:
-		std::optional<int>	_watchdog_write_fd;
-		std::optional<int>	_watchdog_read_fd;
+		std::optional<bool>	modules_debug_log;
+		std::optional<int>	watchdog_write_fd;
+		std::optional<int>	watchdog_read_fd;
 	};
 
-	// Options related to command line arguments.
-	enum class Option
-	{
-		ModulesDebugLog		= 1UL << 0,
-		WatchdogWriteFd		= 1UL << 1,
-		WatchdogReadFd		= 1UL << 2,
-	};
-
-	typedef std::map<Option, std::string> OptionsMap;
+	class QuitInstruction { };
 
   public:
 	// Ctor
@@ -152,27 +130,12 @@ class Xefis: public QApplication
 	configurator_widget() const;
 
 	/**
-	 * Return true if application was run with given command-line option.
+	 * Return Options object that contains values provided on command-line.
 	 */
 	[[nodiscard]]
-	bool
-	has_option (Option) const;
-
-	/**
-	 * Return value of given command-line options.
-	 * If no value was given, return empty string.
-	 */
-	[[nodiscard]]
-	std::string
-	option (Option) const;
-
-	/**
-	 * Return Options object that contains methods for retrieving
-	 * various options with correct type.
-	 */
-	[[nodiscard]]
-	OptionsHelper const&
-	options() const noexcept;
+	Options const&
+	options() const noexcept
+		{ return _options; }
 
 	/**
 	 * Return logger to use by machines.
@@ -197,13 +160,12 @@ class Xefis: public QApplication
   private:
 	LoggerOutput						_logger_output	{ std::clog };
 	Logger								_logger			{ _logger_output };
-	OptionsMap							_options;
+	Options								_options;
 	QTimer*								_posix_signals_check_timer;
 
 	// Basic subsystems:
 	std::unique_ptr<System>				_system;
 	std::unique_ptr<ConfiguratorWidget>	_configurator_widget;
-	std::unique_ptr<OptionsHelper>		_options_helper;
 	std::unique_ptr<Graphics>			_graphics;
 	std::unique_ptr<Machine>			_machine;
 };
@@ -225,32 +187,6 @@ inline
 Xefis::UninitializedServiceException::UninitializedServiceException (std::string const& service_name):
 	Exception ("service '" + service_name + "' is not initialized")
 { }
-
-
-inline
-Xefis::OptionsHelper::OptionsHelper (Xefis const& xefis)
-{
-	// TODO instead of has_option use std::optional<>
-	if (xefis.has_option (Xefis::Option::WatchdogWriteFd))
-		_watchdog_write_fd = boost::lexical_cast<int> (xefis.option (Xefis::Option::WatchdogWriteFd));
-
-	if (xefis.has_option (Xefis::Option::WatchdogReadFd))
-		_watchdog_read_fd = boost::lexical_cast<int> (xefis.option (Xefis::Option::WatchdogReadFd));
-}
-
-
-inline std::optional<int>
-Xefis::OptionsHelper::watchdog_write_fd() const noexcept
-{
-	return _watchdog_write_fd;
-}
-
-
-inline std::optional<int>
-Xefis::OptionsHelper::watchdog_read_fd() const noexcept
-{
-	return _watchdog_read_fd;
-}
 
 
 inline System&
@@ -280,30 +216,6 @@ Xefis::configurator_widget() const
 		throw UninitializedServiceException ("ConfiguratorWidget");
 
 	return *_configurator_widget.get();
-}
-
-
-inline bool
-Xefis::has_option (Option option) const
-{
-	return _options.find (option) != _options.end();
-}
-
-
-inline std::string
-Xefis::option (Option option) const
-{
-	if (auto o = _options.find (option); o != _options.end())
-		return o->second;
-	else
-		return std::string();
-}
-
-
-inline Xefis::OptionsHelper const&
-Xefis::options() const noexcept
-{
-	return *_options_helper;
 }
 
 
