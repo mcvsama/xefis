@@ -43,6 +43,21 @@ InstrumentDetails::InstrumentDetails (BasicInstrument& instrument, WorkPerformer
 	work_performer (&work_performer)
 { }
 
+
+void
+InstrumentDetails::compute_position (QSize const canvas_size)
+{
+	auto const w = canvas_size.width();
+	auto const h = canvas_size.height();
+	QPointF const top_left { w * this->requested_position.left(), h * this->requested_position.top() };
+	QPointF const bottom_right { w * this->requested_position.right(), h * this->requested_position.bottom() };
+	QPointF const anchor_position { this->anchor_position.x() * this->requested_position.size().width() * w,
+									this->anchor_position.y() * this->requested_position.size().height() * h };
+
+	this->computed_position = QRectF { top_left, bottom_right }.translated (-anchor_position).toRect();
+	this->instrument.mark_dirty();
+}
+
 } // namespace detail
 
 
@@ -218,11 +233,9 @@ Screen::paint_logo_to_buffer()
 
 
 void
-Screen::paint_instruments_to_buffer()
+Screen::update_instruments()
 {
 	QSize const canvas_size = _canvas.size();
-
-	_canvas.fill (Qt::black);
 
 	// Ask instruments to paint themselves:
 	for (auto* disclosure: _z_index_sorted_disclosures)
@@ -231,17 +244,7 @@ Screen::paint_instruments_to_buffer()
 		auto& details = disclosure->details();
 
 		if (!details.computed_position)
-		{
-			auto const w = canvas_size.width();
-			auto const h = canvas_size.height();
-			QPointF const top_left { w * details.requested_position.left(), h * details.requested_position.top() };
-			QPointF const bottom_right { w * details.requested_position.right(), h * details.requested_position.bottom() };
-			QPointF const anchor_position { details.anchor_position.x() * details.requested_position.size().width() * w,
-											details.anchor_position.y() * details.requested_position.size().height() * h };
-
-			details.computed_position = QRectF { top_left, bottom_right }.translated (-anchor_position).toRect();
-			details.instrument.mark_dirty();
-		}
+			details.compute_position (canvas_size);
 
 		if (details.computed_position->isValid())
 		{
@@ -291,29 +294,32 @@ Screen::paint_instruments_to_buffer()
 		else
 			std::clog << "Instrument " << identifier (instrument) << " has invalid size/position." << std::endl;
 	}
+}
 
-	// Compose all images into our painting buffer:
+
+void
+Screen::compose_instruments()
+{
+	_canvas.fill (Qt::black);
+	QPainter canvas_painter (&_canvas);
+
+	for (auto* disclosure: _z_index_sorted_disclosures)
 	{
-		QPainter canvas_painter (&_canvas);
+		auto& details = disclosure->details();
 
-		for (auto* disclosure: _z_index_sorted_disclosures)
+		if (details.computed_position && details.computed_position->isValid())
 		{
-			auto& details = disclosure->details();
-
-			if (details.computed_position && details.computed_position->isValid())
+			if (auto* painted_image = details.canvas_to_use.get())
 			{
-				if (auto* painted_image = details.canvas_to_use.get())
-				{
-					// Discard images that have different size than requested computed_position->size(), beacuse
-					// it means a resize happened during async painting of the instrument.
-					if (details.computed_position->size() == painted_image->size())
-						canvas_painter.drawImage (*details.computed_position, *painted_image, QRect (QPoint (0, 0), details.computed_position->size()));
+				// Discard images that have different size than requested computed_position->size(), beacuse
+				// it means a resize happened during async painting of the instrument.
+				if (details.computed_position->size() == painted_image->size())
+					canvas_painter.drawImage (*details.computed_position, *painted_image, QRect (QPoint (0, 0), details.computed_position->size()));
 
-					if (_paint_bounding_boxes)
-					{
-						canvas_painter.setPen (QPen (QBrush (Qt::red), 2.0));
-						canvas_painter.drawRect (*details.computed_position);
-					}
+				if (_paint_bounding_boxes)
+				{
+					canvas_painter.setPen (QPen (QBrush (Qt::red), 2.0));
+					canvas_painter.drawRect (*details.computed_position);
 				}
 			}
 		}
@@ -393,13 +399,11 @@ Screen::hide_logo()
 void
 Screen::refresh()
 {
+	update_instruments();
+	compose_instruments();
+
 	if (_displaying_logo)
-	{
-		paint_instruments_to_buffer();
 		paint_logo_to_buffer();
-	}
-	else
-		paint_instruments_to_buffer();
 
 	update();
 }

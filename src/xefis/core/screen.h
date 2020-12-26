@@ -80,6 +80,12 @@ class InstrumentDetails
 	// Ctor
 	explicit
 	InstrumentDetails (BasicInstrument&, WorkPerformer& work_performer);
+
+	/**
+	 * Compute position of this instrument on canvas.
+	 */
+	void
+	compute_position (QSize const canvas_size);
 };
 
 } // namespace detail
@@ -211,10 +217,16 @@ class Screen:
 	paint_logo_to_buffer();
 
 	/**
-	 * Request painting of all instruments on the canvas-buffer.
+	 * Request painting of all instruments on their own canvases.
 	 */
 	void
-	paint_instruments_to_buffer();
+	update_instruments();
+
+	/**
+	 * Paint all current instrument canvases onto the main screen canvas.
+	 */
+	void
+	compose_instruments();
 
 	/**
 	 * Wait for async paint to be done in an active loop.

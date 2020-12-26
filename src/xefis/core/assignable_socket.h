@@ -66,6 +66,8 @@ template<class pValue>
 		using Value = pValue;
 
 	  public:
+		using Socket<Value>::Socket;
+
 		/**
 		 * Alias for AssignableSocket::protected_set_nil().
 		 */
