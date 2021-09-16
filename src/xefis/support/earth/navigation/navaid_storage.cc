@@ -14,6 +14,7 @@
 // Standard:
 #include <cstddef>
 #include <memory>
+#include <thread>
 
 // Qt:
 #include <QFile>
