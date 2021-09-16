@@ -122,6 +122,9 @@ class ImpulseSolver: private Noncopyable
 	void
 	update_locations (si::Time dt);
 
+	void
+	orthonormalize_rotation_matrices();
+
 	template<class Frame>
 		void
 		apply_limits (ForceMoments<Frame>&) const;
