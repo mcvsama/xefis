@@ -21,6 +21,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/simulation/constraints/hinge_precalculation.h>
+#include <xefis/support/simulation/devices/servo.h>
 #include <xefis/support/simulation/rigid_body/body.h>
 #include <xefis/support/simulation/rigid_body/constraint.h>
 
