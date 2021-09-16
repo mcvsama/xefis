@@ -141,35 +141,35 @@ AutoTest t1 ("modules/io/link: protocol: valid data transmission", []{
 		test_asserts::verify ("uint_prop transmitted properly", *rx_io.uint_prop == *tx_io.uint_prop);
 	};
 
-	tx_io.angle_prop << xf::ConstantSource (1.99_rad);
-	tx_io.velocity_prop << xf::ConstantSource (101_kph);
-	tx_io.velocity_prop_offset << xf::ConstantSource (101_kph);
-	tx_io.bool_prop << xf::ConstantSource (true);
-	tx_io.int_prop << xf::ConstantSource (-2);
-	tx_io.uint_prop << xf::ConstantSource (3u);
+	tx_io.angle_prop << 1.99_rad;
+	tx_io.velocity_prop << 101_kph;
+	tx_io.velocity_prop_offset << 101_kph;
+	tx_io.bool_prop << true;
+	tx_io.int_prop << -2;
+	tx_io.uint_prop << 3u;
 	test();
 
 	for (auto const& angle: { -12_rad, 0_rad, 0.99_rad, 1.59_rad, 300_rad })
 	{
-		tx_io.angle_prop << xf::ConstantSource (angle);
+		tx_io.angle_prop << angle;
 		test();
 	}
 
 	for (auto b: { false, true })
 	{
-		tx_io.bool_prop << xf::ConstantSource (b);
+		tx_io.bool_prop << b;
 		test();
 	}
 
 	for (auto i: { -9, -7, -5, -3, -2, -1, 0, 1, 2, 3, 5, 7, 9 })
 	{
-		tx_io.int_prop << xf::ConstantSource (i);
+		tx_io.int_prop << i;
 		test();
 	}
 
 	for (unsigned int i: { 0u, 1u, 2u, 3u, 4u, 5u, 6u, 7u, 8u, 9u, 10u, 11u, 12u, 13u, 14u, 15u })
 	{
-		tx_io.uint_prop << xf::ConstantSource (i);
+		tx_io.uint_prop << i;
 		test();
 	}
 });
@@ -183,11 +183,11 @@ AutoTest t2 ("modules/io/link: protocol: nils and out-of range values transmissi
 
 	// Test bit-bool:
 
-	tx_io.bool_prop << xf::ConstantSource (true);
+	tx_io.bool_prop << true;
 	transmit (tx_protocol, rx_protocol);
 	test_asserts::verify ("bit-bool 1 is transmitted properly", *rx_io.bool_prop == *tx_io.bool_prop);
 
-	tx_io.bool_prop << xf::ConstantSource (false);
+	tx_io.bool_prop << false;
 	transmit (tx_protocol, rx_protocol);
 	test_asserts::verify ("bit-bool 0 is transmitted properly", *rx_io.bool_prop == *tx_io.bool_prop);
 
@@ -197,15 +197,15 @@ AutoTest t2 ("modules/io/link: protocol: nils and out-of range values transmissi
 
 	// Test bit-int:
 
-	tx_io.uint_prop << xf::ConstantSource (11u);
+	tx_io.uint_prop << 11u;
 	transmit (tx_protocol, rx_protocol);
 	test_asserts::verify ("bit-int 11 transmitted properly", *rx_io.uint_prop == *tx_io.uint_prop);
 
-	tx_io.uint_prop << xf::ConstantSource (17u);
+	tx_io.uint_prop << 17u;
 	transmit (tx_protocol, rx_protocol);
 	test_asserts::verify ("out-of-range bit-int set to fall-back value", *rx_io.uint_prop == kFallbackInt);
 
-	tx_io.uint_prop << xf::ConstantSource (15u);
+	tx_io.uint_prop << 15u;
 	transmit (tx_protocol, rx_protocol);
 	test_asserts::verify ("bit-int 15 transmitted properly", *rx_io.uint_prop == *tx_io.uint_prop);
 
@@ -221,8 +221,8 @@ AutoTest t3 ("modules/io/link: protocol: offsets increase precision", []{
 	GCS_Tx_LinkProtocol tx_protocol (&tx_io);
 	GCS_Tx_LinkProtocol rx_protocol (&rx_io);
 
-	tx_io.velocity_prop << xf::ConstantSource (1001_kph);
-	tx_io.velocity_prop_offset << xf::ConstantSource (1001_kph);
+	tx_io.velocity_prop << 1001_kph;
+	tx_io.velocity_prop_offset << 1001_kph;
 	transmit (tx_protocol, rx_protocol);
 	auto delta = si::abs (*rx_io.velocity_prop - *tx_io.velocity_prop);
 	auto delta_with_offset = si::abs (*rx_io.velocity_prop_offset - *tx_io.velocity_prop_offset);
@@ -240,37 +240,37 @@ AutoTest t4 ("modules/io/link: protocol: invalid data transmission (wrong signat
 
 	// Transmit correctly first:
 	tx_io.nil_si_prop << xf::no_data_source;
-	tx_io.angle_prop << xf::ConstantSource (15_rad);
-	tx_io.angle_prop_r << xf::ConstantSource (15_rad);
-	tx_io.velocity_prop << xf::ConstantSource (100_mps);
-	tx_io.velocity_prop_r << xf::ConstantSource (100_mps);
-	tx_io.velocity_prop_offset << xf::ConstantSource (102_mps);
-	tx_io.velocity_prop_offset_r << xf::ConstantSource (102_mps);
-	tx_io.bool_prop << xf::ConstantSource (false);
-	tx_io.bool_prop_r << xf::ConstantSource (false);
-	tx_io.int_prop << xf::ConstantSource (-5);
-	tx_io.int_prop_r << xf::ConstantSource (-5);
-	tx_io.uint_prop << xf::ConstantSource (15u);
-	tx_io.uint_prop_r << xf::ConstantSource (15u);
+	tx_io.angle_prop << 15_rad;
+	tx_io.angle_prop_r << 15_rad;
+	tx_io.velocity_prop << 100_mps;
+	tx_io.velocity_prop_r << 100_mps;
+	tx_io.velocity_prop_offset << 102_mps;
+	tx_io.velocity_prop_offset_r << 102_mps;
+	tx_io.bool_prop << false;
+	tx_io.bool_prop_r << false;
+	tx_io.int_prop << -5;
+	tx_io.int_prop_r << -5;
+	tx_io.uint_prop << 15u;
+	tx_io.uint_prop_r << 15u;
 
 	Blob blob;
 	tx_protocol.produce (blob, g_logger);
 	rx_protocol.eat (blob.begin(), blob.end(), nullptr, nullptr, nullptr, g_logger);
 
 	// Transmit invalid data:
-	tx_io.nil_si_prop << xf::ConstantSource (1_rad);
-	tx_io.angle_prop << xf::ConstantSource (16_rad);
-	tx_io.angle_prop_r << xf::ConstantSource (16_rad);
-	tx_io.velocity_prop << xf::ConstantSource (101_mps);
-	tx_io.velocity_prop_r << xf::ConstantSource (101_mps);
-	tx_io.velocity_prop_offset << xf::ConstantSource (103_mps);
-	tx_io.velocity_prop_offset_r << xf::ConstantSource (103_mps);
-	tx_io.bool_prop << xf::ConstantSource (true);
-	tx_io.bool_prop_r << xf::ConstantSource (true);
-	tx_io.int_prop << xf::ConstantSource (-3);
-	tx_io.int_prop_r << xf::ConstantSource (-3);
-	tx_io.uint_prop << xf::ConstantSource (12u);
-	tx_io.uint_prop_r << xf::ConstantSource (12u);
+	tx_io.nil_si_prop << 1_rad;
+	tx_io.angle_prop << 16_rad;
+	tx_io.angle_prop_r << 16_rad;
+	tx_io.velocity_prop << 101_mps;
+	tx_io.velocity_prop_r << 101_mps;
+	tx_io.velocity_prop_offset << 103_mps;
+	tx_io.velocity_prop_offset_r << 103_mps;
+	tx_io.bool_prop << true;
+	tx_io.bool_prop_r << true;
+	tx_io.int_prop << -3;
+	tx_io.int_prop_r << -3;
+	tx_io.uint_prop << 12u;
+	tx_io.uint_prop_r << 12u;
 
 	blob.clear();
 	tx_protocol.produce (blob, g_logger);
@@ -324,7 +324,7 @@ AutoTest t5 ("modules/io/link: protocol: send-every/send-offset", []{
 	constexpr int64_t kFirstInt = 11223344;
 	constexpr int64_t kSecondInt = 66775544;
 
-	tx_io.dummy << xf::ConstantSource (kFirstInt);
+	tx_io.dummy << kFirstInt;
 	// According to envelope settings, one need to transmit 7 times before the envelope will be
 	// actually sent:
 	for (size_t i = 0; i < 8; ++i)
@@ -337,7 +337,7 @@ AutoTest t5 ("modules/io/link: protocol: send-every/send-offset", []{
 	transmit (tx_protocol, rx_protocol);
 	test_asserts::verify ("last envelope sent for the first time", *rx_io.dummy == *tx_io.dummy);
 
-	tx_io.dummy << xf::ConstantSource (kSecondInt);
+	tx_io.dummy << kSecondInt;
 
 	// Next 9 transmissions should not send last envelope (it's sent every 10th):
 	for (size_t i = 0; i < 9; ++i)

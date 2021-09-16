@@ -318,6 +318,18 @@ template<class pValue>
 
 	  public:
 		/**
+		 * Create AssignableSocket with no initial value.
+		 */
+		explicit
+		Socket() = default;
+
+		/**
+		 * Create AssignableSocket with initial value.
+		 */
+		explicit
+		Socket (Value const& value, std::optional<Value> const& fallback_value = {});
+
+		/**
 		 * Compare current values with another Socket, nil-value included.
 		 * Nothing else is compared (eg. fallback value), only the current value.
 		 */
@@ -511,6 +523,23 @@ BasicSocket::dec_use_count (BasicSocket* listener)
 
 
 template<class V>
+	inline
+	Socket<V>::Socket (Value const& value, std::optional<Value> const& fallback_value):
+		_value (value),
+		_fallback_value (fallback_value)
+	{ }
+
+
+template<class V>
+	inline bool
+	Socket<V>::operator== (Socket<Value> const& other)
+	{
+		return (!_value && !other._value)
+			|| (_value && other._value && *_value == *other._value);
+	}
+
+
+template<class V>
 	inline typename Socket<V>::Value const&
 	Socket<V>::get() const
 	{
@@ -520,15 +549,6 @@ template<class V>
 			return *_fallback_value;
 		else
 			throw NilValueException();
-	}
-
-
-template<class V>
-	bool
-	Socket<V>::operator== (Socket<Value> const& other)
-	{
-		return (!_value && !other._value)
-			|| (_value && other._value && *_value == *other._value);
 	}
 
 

@@ -242,7 +242,7 @@ AutoTest t1 ("xf::Socket nil and non-nil values", for_all_types ([](auto value1,
 	test_nil_values (env.out, value2);
 
 	// Non-nil values:
-	env.in << ConstantSource (value1);
+	env.in << value1;
 	test_non_nil_values (env.in, value2, "non-nil socket");
 
 	env.out = value1;
@@ -412,7 +412,7 @@ AutoTest t5 ("xf::Socket serialization", for_all_types ([](auto value1, auto val
 		// String serialization:
 		if constexpr (should_test_string_serialization<T>())
 		{
-			env.in << ConstantSource (value1);
+			env.in << value1;
 			auto serialized = env.in.to_string();
 			env.out = value2;
 			test_asserts::verify (desc_type<T> ("to_string(): socket == value2"), *env.out == value2);
@@ -429,7 +429,7 @@ AutoTest t5 ("xf::Socket serialization", for_all_types ([](auto value1, auto val
 
 		// Blob serialization:
 		{
-			env.in << ConstantSource (value1);
+			env.in << value1;
 			auto serialized = env.in.to_blob();
 			env.out = value2;
 			test_asserts::verify (desc_type<T> ("to_blob(): socket == value2"), *env.out == value2);
@@ -517,23 +517,18 @@ AutoTest t7 ("xf::Socket operator=", for_all_types ([](auto value1, auto value2)
 }));
 
 
-// TODO AutoTest t8 ("xf::Socket << DynamicSource", []{
-// TODO 	TestEnvironment<int> env;
-// TODO 
-// TODO 	template<auto Value>
-// TODO 		class TestDynamicSource: public DynamicSource<decltype (Value)>
-// TODO 		{
-// TODO 		  public:
-// TODO 			[[nodiscard]]
-// TODO 			std::optional<decltype (Value)>
-// TODO 			get (Cycle const&) override
-// TODO 				{ return Value; }
-// TODO 		};
-// TODO 
-// TODO 	env.in << TestDynamicSource<12>();
-// TODO 	env.in.fetch (env.cycle += 1_s);
-// TODO 	test_asserts::verify ("expression transforms data properly", *in == 12);
-// TODO });
+AutoTest t8 ("xf::Socket << value_socket (5)", []{
+	TestEnvironment<int> env1;
+	TestEnvironment<std::string> env2;
+
+	env1.in << 5;
+	env1.in.fetch (env1.cycle += 1_s);
+	test_asserts::verify ("can use literal constant as data source", *env1.in == 5);
+
+	env2.in << "abc";
+	env2.in.fetch (env2.cycle += 1_s);
+	test_asserts::verify ("can use literal constant as data source", *env2.in == "abc");
+});
 
 
 // TODO AutoTest t9 ("xf::SocketExpression", []{

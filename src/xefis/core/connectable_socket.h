@@ -20,6 +20,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/socket.h>
+#include <xefis/core/connectable_socket.h>
 
 
 namespace xf {
@@ -46,28 +47,44 @@ template<class pValue>
 		>;
 
 	  public:
+		using Socket<Value>::Socket;
+
 		// BasicSocket API
 		void
 		operator<< (NoDataSource) override;
 
 		/**
-		 * Set a constant value as a data source for this socket.
-		 */
-		template<class ConstantValue>
-			void
-			operator<< (ConstantSource<ConstantValue> const&);
-
-		/**
 		 * Set non-owned Socket as a data source for this socket.
 		 */
-		void
-		operator<< (Socket<Value>& other);
+		template<template<class> class SocketType>
+			requires (std::is_base_of_v<Socket<Value>, SocketType<Value>>)
+			void
+			operator<< (SocketType<Value>&);
 
 		/**
 		 * Set owned Socket as a data source for this socket.
 		 */
-		void
-		operator<< (std::unique_ptr<Socket<Value>>&&);
+		template<template<class> class SocketType>
+			requires (std::is_base_of_v<Socket<Value>, SocketType<Value>>)
+			void
+			operator<< (std::unique_ptr<SocketType<Value>>&&);
+
+		/**
+		 * Set a constant value as a data source for this socket.
+		 */
+		template<class CompatibleValue>
+			requires (std::is_convertible_v<CompatibleValue, Value> || si::is_quantity_v<CompatibleValue>)
+			void
+			operator<< (ConstantSource<CompatibleValue> const&);
+
+		/**
+		 * Set a constant value as a data source for this socket.
+		 */
+		template<class CompatibleValue>
+			requires (std::is_convertible_v<CompatibleValue, Value> || si::is_quantity_v<CompatibleValue>)
+			void
+			operator<< (CompatibleValue const& compatible_value)
+				{ return *this << ConstantSource<Value> (static_cast<Value> (compatible_value)); }
 
 	  protected:
 		// BasicSocket API
@@ -119,37 +136,42 @@ template<class V>
 
 
 template<class V>
-	template<class C>
+	template<template<class> class SocketType>
+		requires (std::is_base_of_v<Socket<V>, SocketType<V>>)
 		inline void
-		ConnectableSocket<V>::operator<< (ConstantSource<C> const& source)
+		ConnectableSocket<V>::operator<< (SocketType<Value>& source)
+		{
+			dec_source_use_count();
+			_source = &source;
+			inc_source_use_count();
+			this->protected_set (source);
+		}
+
+
+template<class V>
+	template<template<class> class SocketType>
+		requires (std::is_base_of_v<Socket<V>, SocketType<V>>)
+		inline void
+		ConnectableSocket<V>::operator<< (std::unique_ptr<SocketType<Value>>&& source)
+		{
+			dec_source_use_count();
+			_source = std::move (source);
+			inc_source_use_count();
+			this->protected_set (*std::get<std::unique_ptr<Socket<Value>>> (_source));
+		}
+
+
+template<class V>
+	template<class CompatibleValue>
+		requires (std::is_convertible_v<CompatibleValue, V> || si::is_quantity_v<CompatibleValue>)
+		inline void
+		ConnectableSocket<V>::operator<< (ConstantSource<CompatibleValue> const& source)
 		{
 			dec_source_use_count();
 			_source = ConstantSource<Value> { source.value };
 			inc_source_use_count();
 			this->protected_set (source.value);
 		}
-
-
-template<class V>
-	inline void
-	ConnectableSocket<V>::operator<< (Socket<Value>& source)
-	{
-		dec_source_use_count();
-		_source = &source;
-		inc_source_use_count();
-		this->protected_set (source);
-	}
-
-
-template<class V>
-	inline void
-	ConnectableSocket<V>::operator<< (std::unique_ptr<Socket<Value>>&& source)
-	{
-		dec_source_use_count();
-		_source = std::move (source);
-		inc_source_use_count();
-		this->protected_set (*std::get<std::unique_ptr<Socket<Value>>> (_source));
-	}
 
 
 template<class V>
