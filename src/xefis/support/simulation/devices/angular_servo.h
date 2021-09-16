@@ -28,7 +28,7 @@
 namespace xf::sim {
 
 class AngularServo: public rigid_body::Body
-	// TODO and electrial device
+					// TODO and electrial device
 {
   public:
 	/**
