@@ -531,6 +531,21 @@ AutoTest t8 ("xf::Socket << 5; xf::Socket << \"abc\"", []{
 });
 
 
+AutoTest t9 ("xf::Socket << std::unique_ptr<xf::Socket>", []{
+	TestEnvironment<int> env1;
+
+	auto mid = std::make_unique<xf::ConnectableSocket<int>>();
+	*mid << 5;
+	auto& mid_ref = env1.in << std::move (mid);
+	env1.in.fetch (env1.cycle += 1_s);
+	test_asserts::verify ("can use unique_ptr<Socket> as data source", env1.in.value_or (0) == 5);
+
+	mid_ref << env1.out;
+	env1.out = 10;
+	env1.in.fetch (env1.cycle += 1_s);
+	test_asserts::verify ("can use unique_ptr<Socket> as data source", env1.in.value_or (0) == 10);
+});
+
 // TODO AutoTest t9 ("xf::SocketExpression", []{
 // TODO 	TestEnvironment<int32_t> env;
 // TODO 
