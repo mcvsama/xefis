@@ -316,13 +316,13 @@ template<class pValue>
 
 	  public:
 		/**
-		 * Create AssignableSocket with no initial value.
+		 * Create a Socket with no initial value.
 		 */
 		explicit
 		Socket() = default;
 
 		/**
-		 * Create AssignableSocket with initial value.
+		 * Create a Socket with initial value.
 		 */
 		explicit
 		Socket (Value const& value, std::optional<Value> const& fallback_value = {});
