@@ -82,6 +82,10 @@ class JoystickInput:
 	class Handler
 	{
 	  public:
+		// Dtor
+		virtual
+		~Handler() = default;
+
 		/**
 		 * Called when new joystick event comes.
 		 * \param	value

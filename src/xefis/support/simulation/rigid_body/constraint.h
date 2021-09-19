@@ -46,6 +46,10 @@ class Constraint: public ConnectedBodies
 	static constexpr double kDefaultBaumgarteFactor	= 0.5;
 
   public:
+	// Dtor
+	virtual
+	~Constraint() = default;
+
 	// Jacobian matrix for linear velocities:
 	template<std::size_t N>
 		using JacobianV = math::Matrix<double, 3, N, WorldSpace, WorldSpace>;

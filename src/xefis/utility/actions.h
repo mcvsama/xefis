@@ -29,6 +29,10 @@ namespace xf {
 class PropAction
 {
   public:
+	// Dtor
+	virtual
+	~PropAction() = default;
+
 	/**
 	 * Tell whether condition was met to execute an action.
 	 */

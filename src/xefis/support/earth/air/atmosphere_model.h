@@ -52,6 +52,10 @@ template<class Frame>
 class AtmosphereModel
 {
   public:
+	// Dtor
+	virtual
+	~AtmosphereModel() = default;
+
 	[[nodiscard]]
 	virtual Air
 	air_at (SpaceVector<si::Length, ECEFSpace> const& position) const = 0;

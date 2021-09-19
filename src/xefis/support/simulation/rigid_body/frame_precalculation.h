@@ -39,6 +39,10 @@ class BasicFramePrecalculation: public ConnectedBodies
 	explicit
 	BasicFramePrecalculation (Body& body_1, Body& body_2);
 
+	// Dtor
+	virtual
+	~BasicFramePrecalculation() = default;
+
 	/**
 	 * Forget the calculated data.
 	 */

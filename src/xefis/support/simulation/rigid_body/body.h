@@ -77,6 +77,10 @@ class Body: public Noncopyable
 	};
 
   public:
+	// Dtor
+	virtual
+	~Body() = default;
+
 	// A helper for ensuring Frame is either WorldSpace or BodySpace
 	template<class Frame>
 		[[nodiscard]]

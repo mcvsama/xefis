@@ -313,6 +313,10 @@ class CHRUM6
 		setup (uint32_t generic_address, bool write_operation, uint32_t data);
 
 	  public:
+		// Dtor
+		virtual
+		~Request() = default;
+
 		/**
 		 * Return register address.
 		 */

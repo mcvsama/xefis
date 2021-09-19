@@ -45,6 +45,10 @@ class Element: public Noncopyable
 	Element (Type type, std::string_view const& name);
 
   public:
+	// Dtor
+	virtual
+	~Element() = default;
+
 	/**
 	 * Return element type.
 	 */

@@ -175,6 +175,10 @@ class HT16K33: public QObject
 	class Switch
 	{
 	  public:
+		// Dtor
+		virtual
+		~Switch() = default;
+
 		/**
 		 * Read key values from the key memory
 		 * and do appropriate configured actions.
@@ -197,6 +201,10 @@ class HT16K33: public QObject
 	class Display
 	{
 	  public:
+		// Dtor
+		virtual
+		~Display() = default;
+
 		/**
 		 * Set LEDMatrix bits according to configured
 		 * digits and the value read from sockets.
