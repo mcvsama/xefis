@@ -68,7 +68,7 @@ template<class pValue>
 		 */
 		template<template<class> class SocketType>
 			requires (std::is_base_of_v<Socket<Value>, SocketType<Value>>)
-			void
+			SocketType<Value>&
 			operator<< (std::unique_ptr<SocketType<Value>>&&);
 
 		/**
@@ -161,13 +161,15 @@ template<class V>
 template<class V>
 	template<template<class> class SocketType>
 		requires (std::is_base_of_v<Socket<V>, SocketType<V>>)
-		inline void
+		inline SocketType<V>&
 		ConnectableSocket<V>::operator<< (std::unique_ptr<SocketType<Value>>&& source)
 		{
 			dec_source_use_count();
 			_source = std::move (source);
 			inc_source_use_count();
-			this->protected_set (*std::get<std::unique_ptr<Socket<Value>>> (_source));
+			auto& uptr_ref = std::get<std::unique_ptr<Socket<Value>>> (_source);
+			this->protected_set (*uptr_ref);
+			return static_cast<SocketType<V>&> (*uptr_ref);
 		}
 
 
