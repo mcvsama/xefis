@@ -517,17 +517,17 @@ AutoTest t7 ("xf::Socket operator=", for_all_types ([](auto value1, auto value2)
 }));
 
 
-AutoTest t8 ("xf::Socket << value_socket (5)", []{
+AutoTest t8 ("xf::Socket << 5; xf::Socket << \"abc\"", []{
 	TestEnvironment<int> env1;
 	TestEnvironment<std::string> env2;
 
 	env1.in << 5;
 	env1.in.fetch (env1.cycle += 1_s);
-	test_asserts::verify ("can use literal constant as data source", *env1.in == 5);
+	test_asserts::verify ("can use literal constant as data source", env1.in.value_or (0) == 5);
 
 	env2.in << "abc";
 	env2.in.fetch (env2.cycle += 1_s);
-	test_asserts::verify ("can use literal constant as data source", *env2.in == "abc");
+	test_asserts::verify ("can use literal constant as data source", env2.in.value_or ("") == "abc");
 });
 
 
