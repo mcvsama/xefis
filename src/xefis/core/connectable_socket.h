@@ -48,6 +48,9 @@ template<class pValue>
 	  public:
 		using Socket<Value>::Socket;
 
+		// Dtor
+		~ConnectableSocket();
+
 		// BasicSocket API
 		void
 		operator<< (NoDataSource) override;
@@ -122,6 +125,14 @@ connectable_socket_fetch_exception_logger();
  */
 void
 set_connectable_socket_fetch_exception_logger (Logger const*);
+
+
+template<class V>
+	ConnectableSocket<V>::~ConnectableSocket()
+	{
+		// Unregister ourselves from the source:
+		dec_source_use_count();
+	}
 
 
 template<class V>
