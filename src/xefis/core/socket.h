@@ -93,8 +93,6 @@ template<class Value>
 
 /**
  * A value holder.
- * Can source its value from a connected socket.
- * Can be source of a value for other connected sockets.
  *
  * TODO Note: perhaps the *_age() methods should not use the timestamp of the set() call, but some timestamp provided from
  * outside, eg. some souce data sampling timestamp. That would be more proper from digital signal processing
