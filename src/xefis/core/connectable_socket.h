@@ -27,26 +27,40 @@ namespace xf {
 /**
  * A Socket that can use other sockets and constant values as data source.
  */
-template<class pValue>
-	class ConnectableSocket: public Socket<pValue>
+template<class pObservedValue, class pAssignedValue = pObservedValue>
+	class ConnectableSocket: public Socket<pObservedValue>
 	{
 	  public:
-		using Value = pValue;
+		using ObservedValue = pObservedValue;
+		using AssignedValue = pAssignedValue;
+		// Functions that transform assigned value before it's actually assigned:
+		using Transformer1 = std::function<ObservedValue (AssignedValue)>;
+		using Transformer2 = std::function<ObservedValue (std::optional<AssignedValue>)>;
+		using Transformer3 = std::function<std::optional<ObservedValue> (AssignedValue)>;
+		using Transformer4 = std::function<std::optional<ObservedValue> (std::optional<AssignedValue>)>;
+		using Transformer = std::variant<Transformer1, Transformer2, Transformer3, Transformer4>;
 
 	  private:
 		using SourceVariant = std::variant<
 			// Not connected to any source (giving nil values):
 			std::monostate,
 			// Constant value source:
-			ConstantSource<Value>,
+			ConstantSource<AssignedValue>,
 			// Non-owned socket (eg. ModuleOuts of Modules):
-			Socket<Value>*,
+			Socket<AssignedValue>*,
 			// Owned socket (filters in chains, etc.):
-			std::unique_ptr<Socket<Value>>
+			std::unique_ptr<Socket<AssignedValue>>
 		>;
 
 	  public:
-		using Socket<Value>::Socket;
+		using Socket<ObservedValue>::Socket;
+
+		/**
+		 * Passing empty std::function will cause this socket to always report nil-value.
+		 */
+		ConnectableSocket (Transformer const& transformer):
+			_transformer (transformer)
+		{ }
 
 		// Dtor
 		~ConnectableSocket();
@@ -59,23 +73,23 @@ template<class pValue>
 		 * Set non-owned Socket as a data source for this socket.
 		 */
 		template<template<class> class SocketType>
-			requires (std::is_base_of_v<Socket<Value>, SocketType<Value>>)
-			void
-			operator<< (SocketType<Value>&);
+			requires (std::is_base_of_v<Socket<AssignedValue>, SocketType<AssignedValue>>)
+			SocketType<AssignedValue>&
+			operator<< (SocketType<AssignedValue>&);
 
 		/**
 		 * Set owned Socket as a data source for this socket.
 		 */
 		template<template<class> class SocketType>
-			requires (std::is_base_of_v<Socket<Value>, SocketType<Value>>)
-			SocketType<Value>&
-			operator<< (std::unique_ptr<SocketType<Value>>&&);
+			requires (std::is_base_of_v<Socket<AssignedValue>, SocketType<AssignedValue>>)
+			SocketType<AssignedValue>&
+			operator<< (std::unique_ptr<SocketType<AssignedValue>>&&);
 
 		/**
 		 * Set a constant value as a data source for this socket.
 		 */
 		template<class CompatibleValue>
-			requires (std::is_convertible_v<CompatibleValue, Value> || si::is_quantity_v<CompatibleValue>)
+			requires (std::is_convertible_v<CompatibleValue, AssignedValue> || si::is_quantity_v<CompatibleValue>)
 			void
 			operator<< (ConstantSource<CompatibleValue> const&);
 
@@ -83,15 +97,53 @@ template<class pValue>
 		 * Set a constant value as a data source for this socket.
 		 */
 		template<class CompatibleValue>
-			requires (std::is_convertible_v<CompatibleValue, Value> || si::is_quantity_v<CompatibleValue>)
+			requires (std::is_convertible_v<CompatibleValue, AssignedValue> || si::is_quantity_v<CompatibleValue>)
 			void
 			operator<< (CompatibleValue const& compatible_value)
-				{ return *this << ConstantSource<Value> (static_cast<Value> (compatible_value)); }
+				{ return *this << ConstantSource<AssignedValue> (static_cast<AssignedValue> (compatible_value)); }
+
+		/**
+		 * Set a function to be data source for this socket.
+		 * Return a reference to a new Socket that wraps the provided function and can be further chained.
+		 */
+		template<class FunctionArgument>
+			ConnectableSocket<AssignedValue, FunctionArgument>&
+			operator<< (std::function<AssignedValue (FunctionArgument)> const&);
+
+		/**
+		 * Set a function to be data source for this socket.
+		 * Return a reference to a new Socket that wraps the provided function and can be further chained.
+		 */
+		template<class FunctionArgument>
+			ConnectableSocket<AssignedValue, FunctionArgument>&
+			operator<< (std::function<AssignedValue (std::optional<FunctionArgument>)> const&);
+
+		/**
+		 * Set a function to be data source for this socket.
+		 * Return a reference to a new Socket that wraps the provided function and can be further chained.
+		 */
+		template<class FunctionArgument>
+			ConnectableSocket<AssignedValue, FunctionArgument>&
+			operator<< (std::function<std::optional<AssignedValue> (FunctionArgument)> const&);
+
+		/**
+		 * Set a function to be data source for this socket.
+		 * Return a reference to a new Socket that wraps the provided function and can be further chained.
+		 */
+		template<class FunctionArgument>
+			ConnectableSocket<AssignedValue, FunctionArgument>&
+			operator<< (std::function<std::optional<AssignedValue> (std::optional<FunctionArgument>)> const&);
 
 	  protected:
 		// BasicSocket API
 		void
 		do_fetch (Cycle const&) override;
+
+		/**
+		 * Transform argument with the internal transformer function.
+		 */
+		std::optional<ObservedValue>
+		transform (std::optional<AssignedValue> const&) const;
 
 	  private:
 		void
@@ -104,10 +156,11 @@ template<class pValue>
 		 * Fetch data from given socket.
 		 */
 		void
-		fetch_from_socket (Socket<Value>&, Cycle const&);
+		fetch_from_socket (Socket<AssignedValue>&, Cycle const&);
 
 	  private:
-		SourceVariant _source;
+		SourceVariant				_source;
+		std::optional<Transformer>	_transformer;
 	};
 
 
@@ -127,147 +180,131 @@ void
 set_connectable_socket_fetch_exception_logger (Logger const*);
 
 
-template<class V>
-	ConnectableSocket<V>::~ConnectableSocket()
+template<class OV, class AV>
+	ConnectableSocket<OV, AV>::~ConnectableSocket()
 	{
 		// Unregister ourselves from the source:
 		dec_source_use_count();
 	}
 
 
-template<class V>
+template<class OV, class AV>
 	inline void
-	ConnectableSocket<V>::operator<< (NoDataSource const)
+	ConnectableSocket<OV, AV>::operator<< (NoDataSource const)
 	{
 		dec_source_use_count();
 		_source = std::monostate{};
-		this->protected_set_nil();
 	}
 
 
-template<class V>
+template<class OV, class AV>
 	template<template<class> class SocketType>
-		requires (std::is_base_of_v<Socket<V>, SocketType<V>>)
-		inline void
-		ConnectableSocket<V>::operator<< (SocketType<Value>& source)
+		requires (std::is_base_of_v<Socket<AV>, SocketType<AV>>)
+		inline SocketType<AV>&
+		ConnectableSocket<OV, AV>::operator<< (SocketType<AssignedValue>& source)
 		{
 			dec_source_use_count();
 			_source = &source;
 			inc_source_use_count();
-			this->protected_set (source);
+
+			return source;
 		}
 
 
-template<class V>
+template<class OV, class AV>
 	template<template<class> class SocketType>
-		requires (std::is_base_of_v<Socket<V>, SocketType<V>>)
-		inline SocketType<V>&
-		ConnectableSocket<V>::operator<< (std::unique_ptr<SocketType<Value>>&& source)
+		requires (std::is_base_of_v<Socket<AV>, SocketType<AV>>)
+		inline SocketType<AV>&
+		ConnectableSocket<OV, AV>::operator<< (std::unique_ptr<SocketType<AssignedValue>>&& source)
 		{
 			dec_source_use_count();
 			_source = std::move (source);
 			inc_source_use_count();
-			auto& uptr_ref = std::get<std::unique_ptr<Socket<Value>>> (_source);
-			this->protected_set (*uptr_ref);
-			return static_cast<SocketType<V>&> (*uptr_ref);
+
+			auto& uptr_ref = std::get<std::unique_ptr<Socket<AssignedValue>>> (_source);
+			return static_cast<SocketType<AssignedValue>&> (*uptr_ref);
 		}
 
 
-template<class V>
+template<class OV, class AV>
 	template<class CompatibleValue>
-		requires (std::is_convertible_v<CompatibleValue, V> || si::is_quantity_v<CompatibleValue>)
+		requires (std::is_convertible_v<CompatibleValue, AV> || si::is_quantity_v<CompatibleValue>)
 		inline void
-		ConnectableSocket<V>::operator<< (ConstantSource<CompatibleValue> const& source)
+		ConnectableSocket<OV, AV>::operator<< (ConstantSource<CompatibleValue> const& source)
 		{
 			dec_source_use_count();
-			_source = ConstantSource<Value> { source.value };
+			_source = ConstantSource<AssignedValue> { source.value };
 			inc_source_use_count();
-			this->protected_set (source.value);
 		}
 
 
-template<class V>
+template<class OV, class AV>
+	template<class FunctionArgument>
+		inline ConnectableSocket<AV, FunctionArgument>&
+		ConnectableSocket<OV, AV>::operator<< (std::function<AssignedValue (FunctionArgument)> const& transformer)
+		{
+			auto u = std::make_unique<ConnectableSocket<AssignedValue, FunctionArgument>> (transformer);
+			auto b = std::unique_ptr<Socket<AssignedValue>> (static_cast<Socket<AssignedValue>*> (u.release()));
+			return static_cast<ConnectableSocket<AssignedValue, FunctionArgument>&> (*this << std::move (b));
+		}
+
+
+template<class OV, class AV>
+	template<class FunctionArgument>
+		inline ConnectableSocket<AV, FunctionArgument>&
+		ConnectableSocket<OV, AV>::operator<< (std::function<AssignedValue (std::optional<FunctionArgument>)> const& transformer)
+		{
+			auto u = std::make_unique<ConnectableSocket<AssignedValue, FunctionArgument>> (transformer);
+			auto b = std::unique_ptr<Socket<AssignedValue>> (static_cast<Socket<AssignedValue>*> (u.release()));
+			return static_cast<ConnectableSocket<AssignedValue, FunctionArgument>&> (*this << std::move (b));
+		}
+
+
+template<class OV, class AV>
+	template<class FunctionArgument>
+		inline ConnectableSocket<AV, FunctionArgument>&
+		ConnectableSocket<OV, AV>::operator<< (std::function<std::optional<AssignedValue> (FunctionArgument)> const& transformer)
+		{
+			auto u = std::make_unique<ConnectableSocket<AssignedValue, FunctionArgument>> (transformer);
+			auto b = std::unique_ptr<Socket<AssignedValue>> (static_cast<Socket<AssignedValue>*> (u.release()));
+			return static_cast<ConnectableSocket<AssignedValue, FunctionArgument>&> (*this << std::move (b));
+		}
+
+
+template<class OV, class AV>
+	template<class FunctionArgument>
+		inline ConnectableSocket<AV, FunctionArgument>&
+		ConnectableSocket<OV, AV>::operator<< (std::function<std::optional<AssignedValue> (std::optional<FunctionArgument>)> const& transformer)
+		{
+			auto u = std::make_unique<ConnectableSocket<AssignedValue, FunctionArgument>> (transformer);
+			auto b = std::unique_ptr<Socket<AssignedValue>> (static_cast<Socket<AssignedValue>*> (u.release()));
+			return static_cast<ConnectableSocket<AssignedValue, FunctionArgument>&> (*this << std::move (b));
+		}
+
+
+template<class OV, class AV>
 	inline void
-	ConnectableSocket<V>::do_fetch (Cycle const& cycle)
+	ConnectableSocket<OV, AV>::do_fetch (Cycle const& cycle)
 	{
-		std::visit (overload {
-			[&] (std::monostate) {
-				this->protected_set_nil();
-			},
-			[&] (ConstantSource<Value>& constant_source) {
-				this->protected_set (constant_source.value);
-			},
-			[&] (Socket<Value>* socket) {
-				fetch_from_socket (*socket, cycle);
-			},
-			[&] (std::unique_ptr<Socket<Value>>& socket) {
-				fetch_from_socket (*socket, cycle);
-			}
-		}, _source);
-	}
-
-
-template<class V>
-	inline void
-	ConnectableSocket<V>::inc_source_use_count()
-	{
-		std::visit (overload {
-			[&] (std::monostate) noexcept {
-				// No action
-			},
-			[&] (ConstantSource<Value>&) noexcept {
-				// No action
-			},
-			[&] (Socket<Value>* socket) {
-				socket->inc_use_count (this);
-			},
-			[&] (std::unique_ptr<Socket<Value>>& socket) {
-				socket->inc_use_count (this);
-			}
-		}, _source);
-	}
-
-
-template<class V>
-	inline void
-	ConnectableSocket<V>::dec_source_use_count()
-	{
-		std::visit (overload {
-			[&] (std::monostate) noexcept {
-				// No action
-			},
-			[&] (ConstantSource<Value>&) noexcept {
-				// No action
-			},
-			[&] (Socket<Value>* socket) {
-				socket->dec_use_count (this);
-			},
-			[&] (std::unique_ptr<Socket<Value>>& socket) {
-				socket->dec_use_count (this);
-			}
-		}, _source);
-	}
-
-
-template<class V>
-	inline void
-	ConnectableSocket<V>::fetch_from_socket (Socket<Value>& socket, Cycle const& cycle)
-	{
-		auto const execute = [&] {
-			socket.fetch (cycle);
-
-			if (auto const new_value = socket.get_optional())
-				this->protected_set (*new_value);
-			else
-			{
-				// Propagate nil-by-fetch-exception flag from the source socket:
-				this->set_nil_by_fetch_exception (socket.nil_by_fetch_exception());
-				this->protected_set_nil();
-			}
-		};
-
 		bool thrown = false;
 		this->set_nil_by_fetch_exception (false);
+
+		auto const execute = [&] {
+			std::visit (overload {
+				[&] (std::monostate) {
+					this->protected_set_nil();
+				},
+				[&] (ConstantSource<AssignedValue>& constant_source) {
+					this->protected_set (transform (constant_source.value));
+				},
+				[&] (Socket<AssignedValue>* socket) {
+					fetch_from_socket (*socket, cycle);
+				},
+				[&] (std::unique_ptr<Socket<AssignedValue>>& socket) {
+					fetch_from_socket (*socket, cycle);
+				}
+			}, _source);
+		};
 
 		if (auto const* logger = connectable_socket_fetch_exception_logger())
 			thrown = Exception::catch_and_log (*logger, execute);
@@ -284,6 +321,100 @@ template<class V>
 
 		if (thrown)
 			this->set_nil_by_fetch_exception (true);
+	}
+
+
+template<class OV, class AV>
+	inline std::optional<OV>
+	ConnectableSocket<OV, AV>::transform (std::optional<AssignedValue> const& value) const
+	{
+		if (_transformer)
+		{
+			return std::visit (overload {
+				[&] (Transformer1 const& transformer) -> std::optional<ObservedValue> {
+					if (value)
+						return transformer (*value);
+					else
+						return std::nullopt;
+				},
+				[&] (Transformer2 const& transformer) -> std::optional<ObservedValue> {
+					return transformer (value);
+				},
+				[&] (Transformer3 const& transformer) -> std::optional<ObservedValue> {
+					if (value)
+						return transformer (*value);
+					else
+						return std::nullopt;
+				},
+				[&] (Transformer4 const& transformer) -> std::optional<ObservedValue> {
+					return transformer (value);
+				},
+			}, *_transformer);
+		}
+		else if constexpr (std::is_same_v<OV, AV>)
+			return value;
+		else
+			return std::nullopt;
+	}
+
+
+template<class OV, class AV>
+	inline void
+	ConnectableSocket<OV, AV>::inc_source_use_count()
+	{
+		std::visit (overload {
+			[&] (std::monostate) noexcept {
+				// No action
+			},
+			[&] (ConstantSource<AssignedValue>&) noexcept {
+				// No action
+			},
+			[&] (Socket<AssignedValue>* socket) {
+				socket->inc_use_count (this);
+			},
+			[&] (std::unique_ptr<Socket<AssignedValue>>& socket) {
+				socket->inc_use_count (this);
+			}
+		}, _source);
+	}
+
+
+template<class OV, class AV>
+	inline void
+	ConnectableSocket<OV, AV>::dec_source_use_count()
+	{
+		std::visit (overload {
+			[&] (std::monostate) noexcept {
+				// No action
+			},
+			[&] (ConstantSource<AssignedValue>&) noexcept {
+				// No action
+			},
+			[&] (Socket<AssignedValue>* socket) {
+				socket->dec_use_count (this);
+			},
+			[&] (std::unique_ptr<Socket<AssignedValue>>& socket) {
+				socket->dec_use_count (this);
+			}
+		}, _source);
+	}
+
+
+template<class OV, class AV>
+	inline void
+	ConnectableSocket<OV, AV>::fetch_from_socket (Socket<AssignedValue>& socket, Cycle const& cycle)
+	{
+		socket.fetch (cycle);
+
+		auto const source_value = socket.get_optional();
+		auto const transformed_value = transform (source_value);
+
+		this->protected_set (transformed_value);
+
+		// If both before and after transformation results are nil, then also
+		// propagate the nil-by-exception flag:
+		if (!source_value && !transformed_value)
+			this->set_nil_by_fetch_exception (socket.nil_by_fetch_exception());
 	}
 
 } // namespace xf

@@ -393,6 +393,7 @@ PROJECTS.xefis_autotest.files_moc	+= $(PROJECTS.neutrino_autotest.files_moc)
 PROJECTS.xefis_autotest.files		+= xefis/autotest.cc
 PROJECTS.xefis_autotest.files		+= xefis/core/tests/module_socket.test.cc
 PROJECTS.xefis_autotest.files		+= xefis/core/tests/socket_observer.test.cc
+PROJECTS.xefis_autotest.files		+= xefis/core/tests/test_cycle.h
 PROJECTS.xefis_autotest.files		+= xefis/modules/comm/tests/link.test.cc
 PROJECTS.xefis_autotest.files		+= xefis/support/earth/air/atmosphere_model.h
 PROJECTS.xefis_autotest.files		+= xefis/support/earth/tests/standard_atmosphere.test.cc

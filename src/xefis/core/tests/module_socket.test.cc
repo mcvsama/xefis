@@ -23,6 +23,7 @@
 #include <neutrino/test/auto_test.h>
 
 // Xefis:
+#include <xefis/core/tests/test_cycle.h>
 #include <xefis/core/cycle.h>
 #include <xefis/core/module_io.h>
 #include <xefis/core/module_socket.h>
@@ -108,23 +109,6 @@ parse (std::string_view const& str, TestEnumWithNil& value)
 
 
 xf::Logger g_null_logger;
-
-
-class TestCycle: public Cycle
-{
-  public:
-	explicit
-	TestCycle():
-		Cycle (1, 0_s, 1_s, 1_s, g_null_logger)
-	{ }
-
-	TestCycle&
-	operator+= (si::Time dt)
-	{
-		Cycle::operator= (Cycle (number() + 1, update_time() + dt, dt, dt, g_null_logger));
-		return *this;
-	}
-};
 
 
 template<class T>
@@ -243,16 +227,20 @@ AutoTest t1 ("xf::Socket nil and non-nil values", for_all_types ([](auto value1,
 
 	// Non-nil values:
 	env.in << value1;
+	env.in.fetch (env.cycle += 1_s);
 	test_non_nil_values (env.in, value2, "non-nil socket");
 
 	env.out = value1;
+	// No fetching needed when directly assigning.
 	test_non_nil_values (env.out, value2, "non-nil socket");
 
 	// Nil again:
 	env.in << xf::no_data_source;
+	env.in.fetch (env.cycle += 1_s);
 	test_nil_values (env.in, value2);
 
 	env.out = xf::nil;
+	// No fetching needed when directly assigning.
 	test_nil_values (env.out, value2);
 }));
 
@@ -413,6 +401,7 @@ AutoTest t5 ("xf::Socket serialization", for_all_types ([](auto value1, auto val
 		if constexpr (should_test_string_serialization<T>())
 		{
 			env.in << value1;
+			env.in.fetch (env.cycle += 1_s);
 			auto serialized = env.in.to_string();
 			env.out = value2;
 			test_asserts::verify (desc_type<T> ("to_string(): socket == value2"), *env.out == value2);
@@ -430,6 +419,7 @@ AutoTest t5 ("xf::Socket serialization", for_all_types ([](auto value1, auto val
 		// Blob serialization:
 		{
 			env.in << value1;
+			env.in.fetch (env.cycle += 1_s);
 			auto serialized = env.in.to_blob();
 			env.out = value2;
 			test_asserts::verify (desc_type<T> ("to_blob(): socket == value2"), *env.out == value2);
@@ -446,6 +436,7 @@ AutoTest t5 ("xf::Socket serialization", for_all_types ([](auto value1, auto val
 		if constexpr (should_test_string_serialization<T>())
 		{
 			env.in << xf::no_data_source;
+			env.in.fetch (env.cycle += 1_s);
 			auto serialized = env.in.to_string();
 			env.out = value1;
 			test_asserts::verify (desc_type<T> ("to_string() on nil: socket == value1"), *env.out == value1);
@@ -456,6 +447,7 @@ AutoTest t5 ("xf::Socket serialization", for_all_types ([](auto value1, auto val
 		// Blob serialization:
 		{
 			env.in << xf::no_data_source;
+			env.in.fetch (env.cycle += 1_s);
 			auto serialized = env.in.to_blob();
 			env.out = value1;
 			test_asserts::verify (desc_type<T> ("to_blob() on nil: socket == value1"), *env.out == value1);
@@ -546,14 +538,74 @@ AutoTest t9 ("xf::Socket << std::unique_ptr<xf::Socket>", []{
 	test_asserts::verify ("can use unique_ptr<Socket> as data source", env1.in.value_or (0) == 10);
 });
 
-// TODO AutoTest t9 ("xf::SocketExpression", []{
-// TODO 	TestEnvironment<int32_t> env;
-// TODO 
-// TODO 	env.out = 11;
-// TODO 	env.in << [](auto const value) { return value * 2; } << env.out;
-// TODO 	env.in.fetch (env.cycle += 1_s);
-// TODO 	test_asserts::verify ("expression transforms data properly", *in == 22);
-// TODO });
+AutoTest t10 ("xf::ConnectableSocket expression", []{
+	TestEnvironment<int32_t> env;
+
+	env.in << std::function<int (int)> ([](auto const value) { return value * 2; }) << env.out;
+
+	env.out = 11;
+	env.in.fetch (env.cycle += 1_s);
+	test_asserts::verify ("expression transforms data properly", *env.in == 22);
+});
+
+
+AutoTest t11 ("xf::ConnectableSocket expression (different input/output types)", []{
+	std::unique_ptr<ModuleIO>	io		{ std::make_unique<ModuleIO>() };
+	ModuleOut<int>				out		{ io.get(), "out" };
+	ModuleIn<std::string>		in		{ io.get(), "in" };
+	Module<ModuleIO>			module	{ std::move (io) };
+	TestCycle					cycle;
+
+	in
+		<< std::function<std::string (int)> ([](auto const value) { return std::to_string (value) + "abc"; })
+		<< std::function<int (std::string)> ([](auto const value) { return std::stoi (value) + 11; })
+		<< std::function<std::string (int)> ([](auto const value) { return std::to_string (value) + "000"; })
+		<< out;
+
+	out = 33;
+	in.fetch (cycle += 1_s);
+	test_asserts::verify ("expression transforms data properly", *in == "33011abc");
+});
+
+
+AutoTest t12 ("xf::ConnectableSocket expression (reactions to nil)", []{
+	std::unique_ptr<ModuleIO>	io		{ std::make_unique<ModuleIO>() };
+	ModuleOut<int>				out		{ io.get(), "out" };
+	ModuleIn<std::string>		in0		{ io.get(), "in0" };
+	ModuleIn<std::string>		in1		{ io.get(), "in1" };
+	ModuleIn<std::string>		in2		{ io.get(), "in2" };
+	ModuleIn<std::string>		in3		{ io.get(), "in3" };
+	ModuleIn<std::string>		in4nil	{ io.get(), "in4nil" };
+	ModuleIn<std::string>		in4str	{ io.get(), "in4str" };
+	ModuleIn<std::string>		in5		{ io.get(), "in5" };
+	Module<ModuleIO>			module	{ std::move (io) };
+	TestCycle					cycle;
+
+	in0 << std::function<std::string (int)>() << out;
+	in1 << std::function<std::string (int)> ([](auto const) { return "never"; }) << out;
+	in2 << std::function<std::string (std::optional<int>)> ([](auto const) { return "always str"; }) << out;
+	in3 << std::function<std::optional<std::string> (int)> ([](auto const) { return "never str"; }) << out;
+	in4nil << std::function<std::optional<std::string> (std::optional<int>)> ([](auto const) { return std::nullopt; }) << out;
+	in4str << std::function<std::optional<std::string> (std::optional<int>)> ([](auto const) { return "always str"; }) << out;
+	in5 << std::function<std::optional<std::string> (std::optional<int>)> ([](std::optional<int> const) -> std::optional<std::string> { throw "exception"; }) << out;
+
+	out = xf::nil;
+	cycle += 1_s;
+	in0.fetch (cycle);
+	in1.fetch (cycle);
+	in2.fetch (cycle);
+	in3.fetch (cycle);
+	in4nil.fetch (cycle);
+	in4str.fetch (cycle);
+	in5.fetch (cycle);
+	test_asserts::verify ("expression transforms data properly (in0)", in0.is_nil());
+	test_asserts::verify ("expression transforms data properly (in1)", in1.is_nil());
+	test_asserts::verify ("expression transforms data properly (in2)", *in2 == "always str");
+	test_asserts::verify ("expression transforms data properly (in3)", in3.is_nil());
+	test_asserts::verify ("expression transforms data properly (in4nil)", in4nil.is_nil());
+	test_asserts::verify ("expression transforms data properly (in4str)", *in4str == "always str");
+	test_asserts::verify ("expression transforms data properly (in5)", in5.is_nil());
+});
 
 } // namespace
 } // namespace xf::test

@@ -87,7 +87,7 @@ class NilValueException: public Exception
 };
 
 
-template<class Value>
+template<class ObservedValue, class AssignedValue>
 	class ConnectableSocket;
 
 
@@ -105,7 +105,7 @@ class BasicSocket:
 	template<class Value>
 		friend class Socket;
 
-	template<class Value>
+	template<class Value, class AssignedValue>
 		friend class ConnectableSocket;
 
   public:

@@ -18,6 +18,7 @@
 #include <neutrino/test/auto_test.h>
 
 // Xefis:
+#include <xefis/core/tests/test_cycle.h>
 #include <xefis/modules/comm/link.h>
 
 
@@ -46,6 +47,31 @@ template<template<class> class SocketType>
 		SocketType<uint64_t>		uint_prop				{ this, "uint" };
 		SocketType<uint64_t>		uint_prop_r				{ this, "uint_r" };
 		SocketType<int64_t>			dummy					{ this, "dummy" };
+
+	  public:
+		void
+		fetch_all (Cycle const& cycle)
+		{
+			std::initializer_list<BasicSocket*> const sockets = {
+				&nil_si_prop,
+				&angle_prop,
+				&angle_prop_r,
+				&velocity_prop,
+				&velocity_prop_r,
+				&velocity_prop_offset,
+				&velocity_prop_offset_r,
+				&bool_prop,
+				&bool_prop_r,
+				&int_prop,
+				&int_prop_r,
+				&uint_prop,
+				&uint_prop_r,
+				&dummy,
+			};
+
+			for (auto* socket: sockets)
+				socket->fetch (cycle);
+		}
 	};
 
 
@@ -128,8 +154,11 @@ AutoTest t1 ("modules/io/link: protocol: valid data transmission", []{
 	Aircraft_Rx_LinkIO rx_io;
 	GCS_Tx_LinkProtocol tx_protocol (&tx_io);
 	GCS_Tx_LinkProtocol rx_protocol (&rx_io);
+	TestCycle cycle;
 
 	auto test = [&] {
+		cycle += 1_s;
+		tx_io.fetch_all (cycle);
 		transmit (tx_protocol, rx_protocol);
 		test_asserts::verify ("nil_si_prop transmitted properly", rx_io.nil_si_prop == tx_io.nil_si_prop);
 		test_asserts::verify ("angle_prop transmitted properly (optional() version)", rx_io.angle_prop == tx_io.angle_prop);
@@ -180,36 +209,44 @@ AutoTest t2 ("modules/io/link: protocol: nils and out-of range values transmissi
 	Aircraft_Rx_LinkIO rx_io;
 	GCS_Tx_LinkProtocol tx_protocol (&tx_io);
 	GCS_Tx_LinkProtocol rx_protocol (&rx_io);
+	TestCycle cycle;
 
 	// Test bit-bool:
 
 	tx_io.bool_prop << true;
+	tx_io.fetch_all (cycle += 1_s);
 	transmit (tx_protocol, rx_protocol);
 	test_asserts::verify ("bit-bool 1 is transmitted properly", *rx_io.bool_prop == *tx_io.bool_prop);
 
 	tx_io.bool_prop << false;
+	tx_io.fetch_all (cycle += 1_s);
 	transmit (tx_protocol, rx_protocol);
 	test_asserts::verify ("bit-bool 0 is transmitted properly", *rx_io.bool_prop == *tx_io.bool_prop);
 
 	tx_io.bool_prop << xf::no_data_source;
+	tx_io.fetch_all (cycle += 1_s);
 	transmit (tx_protocol, rx_protocol);
 	test_asserts::verify ("nil bit-bool set to fall-back value", *rx_io.bool_prop == kFallbackBool);
 
 	// Test bit-int:
 
 	tx_io.uint_prop << 11u;
+	tx_io.fetch_all (cycle += 1_s);
 	transmit (tx_protocol, rx_protocol);
 	test_asserts::verify ("bit-int 11 transmitted properly", *rx_io.uint_prop == *tx_io.uint_prop);
 
 	tx_io.uint_prop << 17u;
+	tx_io.fetch_all (cycle += 1_s);
 	transmit (tx_protocol, rx_protocol);
 	test_asserts::verify ("out-of-range bit-int set to fall-back value", *rx_io.uint_prop == kFallbackInt);
 
 	tx_io.uint_prop << 15u;
+	tx_io.fetch_all (cycle += 1_s);
 	transmit (tx_protocol, rx_protocol);
 	test_asserts::verify ("bit-int 15 transmitted properly", *rx_io.uint_prop == *tx_io.uint_prop);
 
 	tx_io.uint_prop << xf::no_data_source;
+	tx_io.fetch_all (cycle += 1_s);
 	transmit (tx_protocol, rx_protocol);
 	test_asserts::verify ("nil bit-int set to fall-back value", *rx_io.uint_prop == kFallbackInt);
 });
@@ -220,9 +257,11 @@ AutoTest t3 ("modules/io/link: protocol: offsets increase precision", []{
 	Aircraft_Rx_LinkIO rx_io;
 	GCS_Tx_LinkProtocol tx_protocol (&tx_io);
 	GCS_Tx_LinkProtocol rx_protocol (&rx_io);
+	TestCycle cycle;
 
 	tx_io.velocity_prop << 1001_kph;
 	tx_io.velocity_prop_offset << 1001_kph;
+	tx_io.fetch_all (cycle += 1_s);
 	transmit (tx_protocol, rx_protocol);
 	auto delta = si::abs (*rx_io.velocity_prop - *tx_io.velocity_prop);
 	auto delta_with_offset = si::abs (*rx_io.velocity_prop_offset - *tx_io.velocity_prop_offset);
@@ -237,6 +276,7 @@ AutoTest t4 ("modules/io/link: protocol: invalid data transmission (wrong signat
 	Aircraft_Rx_LinkIO rx_io;
 	GCS_Tx_LinkProtocol tx_protocol (&tx_io);
 	GCS_Tx_LinkProtocol rx_protocol (&rx_io);
+	TestCycle cycle;
 
 	// Transmit correctly first:
 	tx_io.nil_si_prop << xf::no_data_source;
@@ -252,6 +292,7 @@ AutoTest t4 ("modules/io/link: protocol: invalid data transmission (wrong signat
 	tx_io.int_prop_r << -5;
 	tx_io.uint_prop << 15u;
 	tx_io.uint_prop_r << 15u;
+	tx_io.fetch_all (cycle += 1_s);
 
 	Blob blob;
 	tx_protocol.produce (blob, g_logger);
@@ -271,6 +312,7 @@ AutoTest t4 ("modules/io/link: protocol: invalid data transmission (wrong signat
 	tx_io.int_prop_r << -3;
 	tx_io.uint_prop << 12u;
 	tx_io.uint_prop_r << 12u;
+	tx_io.fetch_all (cycle += 1_s);
 
 	blob.clear();
 	tx_protocol.produce (blob, g_logger);
@@ -320,11 +362,13 @@ AutoTest t5 ("modules/io/link: protocol: send-every/send-offset", []{
 	Aircraft_Rx_LinkIO rx_io;
 	GCS_Tx_LinkProtocol tx_protocol (&tx_io);
 	GCS_Tx_LinkProtocol rx_protocol (&rx_io);
+	TestCycle cycle;
 
 	constexpr int64_t kFirstInt = 11223344;
 	constexpr int64_t kSecondInt = 66775544;
 
 	tx_io.dummy << kFirstInt;
+	tx_io.fetch_all (cycle += 1_s);
 	// According to envelope settings, one need to transmit 7 times before the envelope will be
 	// actually sent:
 	for (size_t i = 0; i < 8; ++i)
@@ -338,6 +382,7 @@ AutoTest t5 ("modules/io/link: protocol: send-every/send-offset", []{
 	test_asserts::verify ("last envelope sent for the first time", *rx_io.dummy == *tx_io.dummy);
 
 	tx_io.dummy << kSecondInt;
+	tx_io.fetch_all (cycle += 1_s);
 
 	// Next 9 transmissions should not send last envelope (it's sent every 10th):
 	for (size_t i = 0; i < 9; ++i)
