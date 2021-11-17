@@ -3420,6 +3420,9 @@ template<class FloatingPoint>
 	bool
 	ADI::is_sane (xf::Socket<FloatingPoint> const& socket)
 	{
+		using std::isfinite;
+		using si::isfinite;
+
 		return socket && isfinite (*socket);
 	}
 
