@@ -27,7 +27,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/cycle.h>
-#include <xefis/core/socket_converter.h>
+#include <xefis/core/sockets/socket_converter.h>
 
 
 namespace xf {
@@ -460,7 +460,7 @@ template<class pValue>
 } // namespace xf
 
 
-#include <xefis/core/socket_traits.h>
+#include <xefis/core/sockets/socket_traits.h>
 
 
 namespace xf {

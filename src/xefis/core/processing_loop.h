@@ -29,7 +29,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/module_out.h>
+#include <xefis/core/sockets/module_out.h>
 
 
 namespace xf {

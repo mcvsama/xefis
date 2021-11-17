@@ -18,7 +18,7 @@
 #include <neutrino/test/auto_test.h>
 
 // Xefis:
-#include <xefis/core/tests/test_cycle.h>
+#include <xefis/core/sockets/tests/test_cycle.h>
 #include <xefis/modules/comm/link.h>
 
 

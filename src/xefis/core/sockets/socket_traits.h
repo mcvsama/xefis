@@ -28,7 +28,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/socket.h>
+#include <xefis/core/sockets/socket.h>
 #include <xefis/utility/blob.h>
 
 
@@ -678,7 +678,7 @@ template<class Enum>
 
 
 // Xefis:
-#include <xefis/core/assignable_socket.h>
+#include <xefis/core/sockets/assignable_socket.h>
 
 
 namespace xf::detail {

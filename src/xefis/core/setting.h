@@ -25,7 +25,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
-#include <xefis/core/module_socket_path.h>
+#include <xefis/core/sockets/module_socket_path.h>
 #include <xefis/utility/blob.h>
 
 

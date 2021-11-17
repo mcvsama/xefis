@@ -19,7 +19,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/socket.h>
+#include <xefis/core/sockets/socket.h>
 
 
 namespace xf {

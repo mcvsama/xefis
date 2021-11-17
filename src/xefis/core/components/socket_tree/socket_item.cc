@@ -19,7 +19,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/socket_converter.h>
+#include <xefis/core/sockets/socket_converter.h>
 
 // Local:
 #include "socket_item.h"

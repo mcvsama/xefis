@@ -18,7 +18,7 @@
 #include <cstddef>
 
 // Xefis:
-#include <xefis/core/socket.h>
+#include <xefis/core/sockets/socket.h>
 
 
 namespace afcs {

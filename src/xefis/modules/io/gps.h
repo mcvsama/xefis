@@ -29,8 +29,8 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
-#include <xefis/core/module_socket.h>
 #include <xefis/core/setting.h>
+#include <xefis/core/sockets/module_socket.h>
 #include <xefis/core/system.h>
 #include <xefis/support/protocols/nmea/parser.h>
 

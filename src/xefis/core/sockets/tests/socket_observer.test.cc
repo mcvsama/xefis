@@ -19,10 +19,10 @@
 
 // Xefis:
 #include <xefis/core/cycle.h>
-#include <xefis/core/socket.h>
 #include <xefis/core/module_io.h>
-#include <xefis/core/module_out.h>
-#include <xefis/core/socket_observer.h>
+#include <xefis/core/sockets/module_out.h>
+#include <xefis/core/sockets/socket.h>
+#include <xefis/core/sockets/socket_observer.h>
 
 
 namespace xf::test {

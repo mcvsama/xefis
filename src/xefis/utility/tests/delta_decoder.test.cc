@@ -19,7 +19,7 @@
 
 // Xefis:
 #include <xefis/core/module_io.h>
-#include <xefis/core/module_socket.h>
+#include <xefis/core/sockets/module_socket.h>
 #include <xefis/utility/delta_decoder.h>
 
 

@@ -22,7 +22,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/module_socket.h>
+#include <xefis/core/sockets/module_socket.h>
 #include <xefis/utility/actions.h>
 
 

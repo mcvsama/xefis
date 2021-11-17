@@ -20,8 +20,8 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
-#include <xefis/core/module_socket.h>
 #include <xefis/core/setting.h>
+#include <xefis/core/sockets/module_socket.h>
 
 
 class VirtualJoystickIO: public xf::ModuleIO

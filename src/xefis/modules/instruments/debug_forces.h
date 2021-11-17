@@ -21,7 +21,7 @@
 #include <xefis/config/all.h>
 #include <xefis/core/graphics.h>
 #include <xefis/core/instrument.h>
-#include <xefis/core/socket.h>
+#include <xefis/core/sockets/socket.h>
 #include <xefis/support/instrument/instrument_support.h>
 
 

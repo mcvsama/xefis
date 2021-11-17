@@ -24,8 +24,8 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/connectable_socket.h>
-#include <xefis/core/module_socket.h>
+#include <xefis/core/sockets/connectable_socket.h>
+#include <xefis/core/sockets/module_socket.h>
 
 
 namespace xf {

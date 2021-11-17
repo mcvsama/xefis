@@ -23,7 +23,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module_io.h>
-#include <xefis/core/socket.h>
+#include <xefis/core/sockets/socket.h>
 
 // Local:
 #include "socket_tree.h"

@@ -22,8 +22,8 @@
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
 #include <xefis/core/module_io.h>
-#include <xefis/core/module_socket_path.h>
-#include <xefis/core/socket.h>
+#include <xefis/core/sockets/module_socket_path.h>
+#include <xefis/core/sockets/socket.h>
 
 
 namespace xf {
@@ -105,8 +105,8 @@ BasicModuleSocket::BasicModuleSocket (ModuleIO* owner, std::string_view const& p
 } // namespace xf
 
 
-#include <xefis/core/module_in.h>
-#include <xefis/core/module_out.h>
+#include <xefis/core/sockets/module_in.h>
+#include <xefis/core/sockets/module_out.h>
 
 #endif
 

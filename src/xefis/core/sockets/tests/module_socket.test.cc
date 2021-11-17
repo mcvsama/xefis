@@ -23,10 +23,10 @@
 #include <neutrino/test/auto_test.h>
 
 // Xefis:
-#include <xefis/core/tests/test_cycle.h>
 #include <xefis/core/cycle.h>
 #include <xefis/core/module_io.h>
-#include <xefis/core/module_socket.h>
+#include <xefis/core/sockets/module_socket.h>
+#include <xefis/core/sockets/tests/test_cycle.h>
 
 
 namespace xf::test {
@@ -526,6 +526,8 @@ AutoTest t8 ("xf::Socket << 5; xf::Socket << \"abc\"", []{
 AutoTest t9 ("xf::Socket << std::unique_ptr<xf::Socket>", []{
 	TestEnvironment<int> env1;
 
+	// TODO Zabroń konstrukcji ConnectableSocket (5), bo przy następnym fetchu i tak się zniluje,
+	// albo zrób tak, że jest to ekwiwalent ConnectableSocket() << ConstantSource (5);
 	auto mid = std::make_unique<xf::ConnectableSocket<int>>();
 	*mid << 5;
 	auto& mid_ref = env1.in << std::move (mid);

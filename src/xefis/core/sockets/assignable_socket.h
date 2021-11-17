@@ -22,7 +22,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/socket.h>
+#include <xefis/core/sockets/socket.h>
 #include <xefis/utility/is_optional.h>
 
 
@@ -108,7 +108,7 @@ template<class pValue>
 
 
 // Xefis:
-#include <xefis/core/socket_traits.h>
+#include <xefis/core/sockets/socket_traits.h>
 
 
 namespace xf {
