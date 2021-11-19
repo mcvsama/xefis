@@ -17,6 +17,7 @@
 
 // Neutrino:
 #include <neutrino/numeric.h>
+#include <neutrino/si/utils.h>
 
 // Xefis:
 #include <xefis/config/all.h>
