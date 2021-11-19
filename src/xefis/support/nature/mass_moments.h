@@ -161,7 +161,7 @@ template<class F>
 template<class F>
 	inline
 	MassMoments<F>::MassMoments (std::initializer_list<PointMass> point_masses):
-		MassMoments (point_masses.begin(), point_masses.end())
+		MassMoments (FromPointMassRange(), point_masses.begin(), point_masses.end())
 	{ }
 
 
