@@ -108,6 +108,13 @@ class NavaidStorage
 	async_loader();
 
 	/**
+	 * Interrupts loading. After calling this, you can only destroy the navaid storage.
+	 */
+	void
+	interrupt_loading()
+		{ _destroying = true; }
+
+	/**
 	 * Return set of navaids withing the given @radius
 	 * from a @position.
 	 * \threadsafe
@@ -141,9 +148,14 @@ class NavaidStorage
 	void
 	parse_apt_dat();
 
+	bool
+	destroying();
+
   private:
 	std::atomic<bool>	_async_requested	{ false };
 	std::atomic<bool>	_loaded				{ false };
+	std::atomic<bool>	_destroying			{ false };
+	std::atomic<bool>	_logged_destroying	{ false };
 	Logger				_logger;
 	std::string			_nav_dat_file;
 	std::string			_fix_dat_file;
