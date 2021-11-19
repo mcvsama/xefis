@@ -502,6 +502,13 @@ TestInstrumentsMachine::TestInstrumentsMachine (xf::Xefis& xefis):
 }
 
 
+TestInstrumentsMachine::~TestInstrumentsMachine()
+{
+	if (_navaid_storage)
+		_navaid_storage->interrupt_loading();
+}
+
+
 std::unique_ptr<xf::Machine>
 xefis_machine (xf::Xefis& xefis)
 {

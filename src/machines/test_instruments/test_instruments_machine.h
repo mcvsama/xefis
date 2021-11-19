@@ -43,6 +43,9 @@ class TestInstrumentsMachine: public xf::Machine
 	// Ctor
 	TestInstrumentsMachine (xf::Xefis&);
 
+	// Dtor
+	~TestInstrumentsMachine();
+
   private:
 	xf::Logger											_logger;
 	std::unique_ptr<xf::NavaidStorage>					_navaid_storage;
