@@ -122,6 +122,36 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	set_forces_visible (bool visible) noexcept
 		{ _forces_visible = visible; }
 
+	/**
+	 * Return true if angular velocity are set to be visible.
+	 */
+	[[nodiscard]]
+	bool
+	angular_velocities_visible() const noexcept
+		{ return _angular_velocities_visible; }
+
+	/**
+	 * Show/hide angular velocity.
+	 */
+	void
+	set_angular_velocities_visible (bool visible) noexcept
+		{ _angular_velocities_visible = visible; }
+
+	/**
+	 * Return true if angular momentum are set to be visible.
+	 */
+	[[nodiscard]]
+	bool
+	angular_momenta_visible() const noexcept
+		{ return _angular_momenta_visible; }
+
+	/**
+	 * Show/hide angular momentum.
+	 */
+	void
+	set_angular_momenta_visible (bool visible) noexcept
+		{ _angular_momenta_visible = visible; }
+
   private:
 	void
 	setup (QOpenGLPaintDevice&);
@@ -148,10 +178,16 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	paint_body (rigid_body::Body const&);
 
 	void
-	paint_constraint (rigid_body::Constraint const& constraint);
+	paint_constraint (rigid_body::Constraint const&);
 
 	void
-	paint_forces (rigid_body::Body const& body);
+	paint_forces (rigid_body::Body const&);
+
+	void
+	paint_angular_velocity (rigid_body::Body const&);
+
+	void
+	paint_angular_momentum (rigid_body::Body const&);
 
 	void
 	draw_arrow (SpaceLength<rigid_body::WorldSpace> const& origin, SpaceLength<rigid_body::WorldSpace> const& vector, rigid_body::ShapeMaterial const& material = {});
@@ -162,15 +198,17 @@ class RigidBodyPainter: protected QOpenGLFunctions
 
   private:
 	si::PixelDensity					_pixel_density;
-	decltype (1_m / 1_kg)				_mass_scale				{ kDefaultMassScale };
+	decltype (1_m / 1_kg)				_mass_scale					{ kDefaultMassScale };
 	SpaceLength<rigid_body::WorldSpace>	_camera_position;
 	EulerAngles							_camera_angles;
-	LonLatRadius						_position_on_earth		{ 0_deg, 0_deg, 0_m };
+	LonLatRadius						_position_on_earth			{ 0_deg, 0_deg, 0_m };
 	GLSpace								_gl;
-	rigid_body::Body*					_followed_body			{ nullptr };
-	rigid_body::Body*					_planet_body			{ nullptr };
-	bool								_constraints_visible	{ false };
-	bool								_forces_visible			{ false };
+	rigid_body::Body*					_followed_body				{ nullptr };
+	rigid_body::Body*					_planet_body				{ nullptr };
+	bool								_constraints_visible		{ false };
+	bool								_forces_visible				{ false };
+	bool								_angular_velocities_visible	{ false };
+	bool								_angular_momenta_visible	{ false };
 };
 
 

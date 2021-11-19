@@ -203,18 +203,40 @@ RigidBodyViewer::display_menu()
 	QMenu menu;
 
 	// "Show constraints"
-	auto* show_constraints_action = menu.addAction ("Show &constraints", [&] {
-		_rigid_body_painter.set_constraints_visible (!_rigid_body_painter.constraints_visible());
-	});
-	show_constraints_action->setCheckable (true);
-	show_constraints_action->setChecked (_rigid_body_painter.constraints_visible());
+	{
+		auto* action = menu.addAction ("Show &constraints", [&] {
+			_rigid_body_painter.set_constraints_visible (!_rigid_body_painter.constraints_visible());
+		});
+		action->setCheckable (true);
+		action->setChecked (_rigid_body_painter.constraints_visible());
+	}
 
 	// "Show forces"
-	auto* show_forces_action = menu.addAction ("Show &forces", [&] {
-		_rigid_body_painter.set_forces_visible (!_rigid_body_painter.forces_visible());
-	});
-	show_forces_action->setCheckable (true);
-	show_forces_action->setChecked (_rigid_body_painter.forces_visible());
+	{
+		auto* action = menu.addAction ("Show &forces", [&] {
+			_rigid_body_painter.set_forces_visible (!_rigid_body_painter.forces_visible());
+		});
+		action->setCheckable (true);
+		action->setChecked (_rigid_body_painter.forces_visible());
+	}
+
+	// "Show angular velocities"
+	{
+		auto* action = menu.addAction ("Show &angular velocities", [&] {
+			_rigid_body_painter.set_angular_velocities_visible (!_rigid_body_painter.angular_velocities_visible());
+		});
+		action->setCheckable (true);
+		action->setChecked (_rigid_body_painter.angular_velocities_visible());
+	}
+
+	// "Show angular momenta"
+	{
+		auto* action = menu.addAction ("Show angular &momenta", [&] {
+			_rigid_body_painter.set_angular_momenta_visible (!_rigid_body_painter.angular_momenta_visible());
+		});
+		action->setCheckable (true);
+		action->setChecked (_rigid_body_painter.angular_momenta_visible());
+	}
 
 	return !!menu.exec (QCursor::pos());
 }

@@ -321,6 +321,14 @@ RigidBodyPainter::paint_system (rigid_body::System const& system, QOpenGLPaintDe
 		if (forces_visible())
 			for (auto const& body: system.bodies())
 				paint_forces (*body);
+
+		if (angular_velocities_visible())
+			for (auto const& body: system.bodies())
+				paint_angular_velocity (*body);
+
+		if (angular_momenta_visible())
+			for (auto const& body: system.bodies())
+				paint_angular_momentum (*body);
 	});
 }
 
@@ -410,7 +418,8 @@ RigidBodyPainter::paint_forces (rigid_body::Body const& body)
 	auto const lift_color = Qt::green;
 	auto const drag_color = Qt::red;
 	auto const torque_color = Qt::blue;
-	auto const external_color = Qt::green;
+	auto const external_force_color = Qt::green;
+	auto const external_torque_color = Qt::cyan;
 
 	auto const force_to_length = 0.1_m / 1_N; // TODO unhardcode
 	auto const torque_to_length = force_to_length / 1_m; // TODO unhardcode
@@ -421,13 +430,13 @@ RigidBodyPainter::paint_forces (rigid_body::Body const& body)
 	auto const fbp = followed_body_position();
 	auto const com = body.location().position() - fbp;
 
+	if (show_gravity)
+		draw_arrow (com, gfm.force() * force_to_length, _gl.make_material (gravity_color));
+
 	if (auto const* wing = dynamic_cast<sim::Wing const*> (&body))
 	{
 		auto const& loc = wing->location();
 		auto const at = loc.bound_transform_to_base (wing->center_of_pressure()) - fbp;
-
-		if (show_gravity)
-			draw_arrow (com, gfm.force() * force_to_length, _gl.make_material (gravity_color));
 
 		if (show_aerodynamic_forces)
 		{
@@ -436,14 +445,35 @@ RigidBodyPainter::paint_forces (rigid_body::Body const& body)
 			draw_arrow (at, loc.unbound_transform_to_base (wing->pitching_moment()) * torque_to_length, _gl.make_material (torque_color));
 		}
 	}
-	else
-	{
-		if (show_gravity)
-			draw_arrow (com, gfm.force() * force_to_length, _gl.make_material (gravity_color));
 
-		if (show_aerodynamic_forces)
-			draw_arrow (com, efm.force() * force_to_length, _gl.make_material (external_color));
-	}
+	draw_arrow (com, efm.force() * force_to_length, _gl.make_material (external_force_color));
+	draw_arrow (com, efm.torque() * torque_to_length, _gl.make_material (external_torque_color));
+}
+
+
+void
+RigidBodyPainter::paint_angular_velocity (rigid_body::Body const& body)
+{
+	auto const angular_velocity_to_length = 0.1_m / 1_radps; // TODO unhardcode
+	// TODO auto const& cache = body.frame_cache();
+	auto const com = body.location().position() - followed_body_position();
+	auto const omega = body.velocity_moments<rigid_body::WorldSpace>().angular_velocity();
+
+	draw_arrow (com, omega * angular_velocity_to_length, _gl.make_material (Qt::darkMagenta));
+}
+
+
+void
+RigidBodyPainter::paint_angular_momentum (rigid_body::Body const& body)
+{
+	auto const angular_momentum_to_length = 0.001_m / (1_kg * 1_m2 / 1_s) / 1_rad; // TODO unhardcode
+	//TODO auto const& cache = body.frame_cache();
+	auto const com = body.location().position() - followed_body_position();
+	auto const I = body.mass_moments<rigid_body::BodySpace>().moment_of_inertia();
+	auto const L = I * body.velocity_moments<rigid_body::BodySpace>().angular_velocity();
+	auto const L_world = body.location().unbound_transform_to_base (L);
+
+	draw_arrow (com, L_world * angular_momentum_to_length, _gl.make_material (Qt::darkBlue));
 }
 
 
