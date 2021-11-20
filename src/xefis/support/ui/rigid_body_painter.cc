@@ -446,7 +446,9 @@ RigidBodyPainter::paint_forces (rigid_body::Body const& body)
 		}
 	}
 
-	draw_arrow (com, efm.force() * force_to_length, _gl.make_material (external_force_color));
+	if (!show_aerodynamic_forces)
+		draw_arrow (com, efm.force() * force_to_length, _gl.make_material (external_force_color));
+
 	draw_arrow (com, efm.torque() * torque_to_length, _gl.make_material (external_torque_color));
 }
 
