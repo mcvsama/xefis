@@ -44,6 +44,14 @@ class SocketItem: public QTreeWidgetItem
 	void
 	read();
 
+	bool
+	is_dir() const
+		{ return childCount() > 0; }
+
+	// API of QTreeWidgetItem
+	bool
+	operator< (QTreeWidgetItem const&) const override;
+
   private:
 	BasicSocket* _socket;
  };

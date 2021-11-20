@@ -40,7 +40,7 @@ SocketItem::SocketItem (BasicSocket* socket, QTreeWidgetItem& parent):
 void
 SocketItem::setup_appereance()
 {
-	setIcon (0, childCount() > 0
+	setIcon (0, is_dir()
 		? resources::icons16::socket_dir()
 		: resources::icons16::socket_value());
 }
@@ -70,6 +70,21 @@ SocketItem::read()
 		setTextAlignment (SocketTree::FallbackValueColumn, Qt::AlignRight);
 		setText (SocketTree::FallbackValueColumn, "x");
 	}
+}
+
+
+bool
+SocketItem::operator< (QTreeWidgetItem const& other) const
+{
+	if (auto const* other_socket = dynamic_cast<SocketItem const*> (&other))
+	{
+		if (is_dir() && other_socket->is_dir())
+			return text (SocketTree::NameColumn) < other.text (SocketTree::NameColumn);
+		else
+			return is_dir();
+	}
+	else
+		return QTreeWidgetItem::operator< (other);
 }
 
 } // namespace xf
