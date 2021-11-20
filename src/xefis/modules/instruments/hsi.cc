@@ -1000,12 +1000,13 @@ PaintingWork::paint_speeds_and_wind()
 		_painter.rotate ((*_p.wind_from_magnetic_heading - *_p.heading_magnetic + 180_deg).in<si::Degree>());
 		_painter.setPen (_aids.get_pen (Qt::white, 1.0));
 		_painter.paint (_c.black_shadow, [&] {
-			QPointF a = QPointF (0.f, -0.7f * _c.q);
-			QPointF b = QPointF (0.f, +0.7f * _c.q);
+			auto const a = QPointF (0.f, -0.7f * _c.q);
+			auto const b = QPointF (0.f, +0.7f * _c.q);
+			auto const r = 0.15f * _c.q;
 
 			_painter.drawLine (a + QPointF (0.f, 0.05f * _c.q), b);
-			_painter.drawLine (a, a + QPointF (+_c.hmargin, +_c.vmargin));
-			_painter.drawLine (a, a + QPointF (-_c.hmargin, +_c.vmargin));
+			_painter.drawLine (a, a + QPointF (+r, +r));
+			_painter.drawLine (a, a + QPointF (-r, +r));
 		});
 	}
 }
