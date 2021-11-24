@@ -36,7 +36,7 @@ HistogramStatsWidget::HistogramStatsWidget (QWidget* parent):
 	auto* max_label = new QLabel ("Max: ", this);
 	auto* mean_label = new QLabel ("Mean: ", this);
 	auto* median_label = new QLabel ("Median: ", this);
-	auto* stddev_label = new QLabel (u8"σ: ", this);
+	auto* stddev_label = new QLabel ("σ: ", this);
 	_critical_label = new QLabel ("", this);
 
 	_num_samples_value = new QLabel (this);

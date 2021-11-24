@@ -105,7 +105,7 @@ ScreenWidget::create_performance_tab()
 		if (auto widgets_pair = _work_performer_widgets.find (work_performer);
 			widgets_pair != _work_performer_widgets.end())
 		{
-			widgets_pair->second.module_names += u8" • " + module_name;
+			widgets_pair->second.module_names += " • " + module_name;
 		}
 		else
 		{
