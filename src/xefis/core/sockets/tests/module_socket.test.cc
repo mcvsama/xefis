@@ -476,25 +476,13 @@ AutoTest t6 ("xf::Socket various behavior", for_all_types ([](auto value1, auto)
 }));
 
 
-// Primary template handles types that do not support T::operator= (T const&):
-template<class, class = std::void_t<>>
-	struct HasAssignmentOperator: public std::false_type
-	{ };
-
-
-// Specialization recognizes types that do support T::operator= (T const&):
-template<class T>
-	struct HasAssignmentOperator<T, std::void_t<decltype (std::declval<T&> = std::declval<T&>())>>: public std::true_type
-	{ };
-
-
 AutoTest t7 ("xf::Socket operator=", for_all_types ([](auto value1, auto value2) {
 	using T = decltype (value1);
 
 	ModuleIO io;
 
-	// Make sure ModuleIn<T>::operator= is forbidden as it may be misleading:
-	test_asserts::verify ("ModuleIn<T>::operator= (ModuleIn<T>) is forbidden", !HasAssignmentOperator<ModuleIn<T>>::value);
+	// Make sure ModuleIn<T>::operator= (ModuleIn<T>) is forbidden as it may be misleading:
+	test_asserts::verify ("ModuleIn<T>::operator= (ModuleIn<T>) is forbidden", !std::copyable<ModuleIn<T>>);
 
 	// Make sure operator= copies value, not the identity of ModuleOut:
 	ModuleOut<T> out1 { &io, "out1" };

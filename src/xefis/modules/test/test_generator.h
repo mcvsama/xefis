@@ -34,6 +34,13 @@ namespace si = neutrino::si;
 using namespace neutrino::si::literals;
 
 
+template<class Value>
+	concept UsefulWithRange = requires (Value const& v) {
+		xf::Range<Value> (v, v);
+		v / 1_s;
+	};
+
+
 class TestGeneratorIO: public xf::ModuleIO
 {
   public:
@@ -66,9 +73,7 @@ class TestGeneratorIO: public xf::ModuleIO
 	 * Create and manage new output socket for sockets that can be used
 	 * with xf::Range<>.
 	 */
-	template<class Value,
-			 class = std::void_t<decltype (xf::Range<Value>()),
-								 RateOfChange<Value>>>
+	template<UsefulWithRange Value>
 		xf::ModuleOut<Value>&
 		create_socket (std::string_view const& identifier,
 					   Value initial_value,
@@ -109,7 +114,7 @@ class TestGenerator: public xf::Module<TestGeneratorIO>
 };
 
 
-template<class Value, class>
+template<UsefulWithRange Value>
 	inline xf::ModuleOut<Value>&
 	TestGeneratorIO::create_socket (std::string_view const& identifier,
 									Value const initial_value,

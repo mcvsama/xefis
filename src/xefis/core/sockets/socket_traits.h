@@ -125,33 +125,19 @@ template<class Value>
 
 
 /**
+ * Checks whether given enum contains a value named "Nil".
+ */
+template<class Enum>
+	concept EnumWithNilValue = std::is_enum_v<Enum> && requires { Enum::Nil; };
+
+
+/**
  * Inherit this utility class if you want to provide generic traits for enum values.
  * Beware that MSB bit is used as nil-indicator with these traits class.
  */
 template<class Enum>
 	struct EnumSocketTraits
 	{
-	  private:
-		template<class E, class Enabler = void>
-			struct HasSpecialNilValue
-			{
-				constexpr
-				operator bool() const
-				{
-					return false;
-				};
-			};
-
-		template<class E>
-			struct HasSpecialNilValue<E, std::enable_if_t<std::is_enum_v<E> && std::is_void_v<std::void_t<decltype (E::Nil)>>>>
-			{
-				constexpr
-				operator bool() const
-				{
-					return true;
-				};
-			};
-
 	  public:
 		static constexpr bool
 		has_constant_blob_size()
@@ -163,7 +149,7 @@ template<class Enum>
 		constant_blob_size()
 		{
 			// 1 additional byte is for nil-indication:
-			if constexpr (HasSpecialNilValue<Enum>())
+			if constexpr (EnumWithNilValue<Enum>)
 				return sizeof (Enum);
 			else
 				return 1 + sizeof (Enum);
@@ -202,7 +188,7 @@ template<class Enum>
 		{
 			Blob result (constant_blob_size(), 0);
 
-			if constexpr (HasSpecialNilValue<Enum>())
+			if constexpr (EnumWithNilValue<Enum>)
 			{
 				if (socket)
 					value_to_blob (static_cast<std::underlying_type_t<Enum>> (*socket), result);
@@ -227,7 +213,7 @@ template<class Enum>
 		static inline void
 		from_blob (AssignableSocket<Enum>& module_out, BlobView blob)
 		{
-			if constexpr (HasSpecialNilValue<Enum>())
+			if constexpr (EnumWithNilValue<Enum>)
 			{
 				if (blob.size() == constant_blob_size())
 				{
