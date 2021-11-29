@@ -265,7 +265,7 @@ LinkProtocol::Signature::eat (Blob::const_iterator begin, Blob::const_iterator e
 
 	auto const hmac = xf::calculate_hmac ({ .key = _key, .message = _temp, .algorithm = xf::Hash::SHA1 });
 
-	// If HMACs differ, that's a parsing error:
+	// If HMACs differ, it's a parsing error:
 	if (!std::equal (sign_begin, sign_end, hmac.begin()))
 		throw ParseError();
 
