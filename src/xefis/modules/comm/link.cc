@@ -232,19 +232,18 @@ LinkProtocol::Signature::produce (Blob& blob)
 	Sequence::produce (_temp);
 
 	// Append nonce:
-	std::uniform_int_distribution<uint8_t> dist;
+	std::uniform_int_distribution<uint8_t> distribution;
 
 	for (unsigned int i = 0; i < _nonce_bytes; ++i)
-		_temp.push_back (dist (_rng));
+		_temp.push_back (distribution (_rng));
 
-	xf::HMAC hmac (xf::HMAC::Key (_key), _temp, xf::Hash::SHA1);
-
+	auto const hmac = xf::calculate_hmac ({ .key = _key, .message = _temp, .algorithm = xf::Hash::SHA1 });
 	// Add some of the bytes of HMAC signature:
-	size_t hmac_bytes = std::min<size_t> (_signature_bytes, neutrino::to_unsigned (std::distance (hmac.begin(), hmac.end())));
-	_temp.insert (_temp.end(), hmac.begin(), hmac.begin() + neutrino::to_signed (hmac_bytes));
+	size_t hmac_bytes = std::min<size_t> (_signature_bytes, hmac.size());
+	_temp += hmac.substr (0, hmac_bytes);
 
 	// Output:
-	blob.insert (blob.end(), _temp.begin(), _temp.end());
+	blob += _temp;
 }
 
 
@@ -264,7 +263,7 @@ LinkProtocol::Signature::eat (Blob::const_iterator begin, Blob::const_iterator e
 	_temp.resize (data_size + _nonce_bytes);
 	std::copy (begin, sign_begin, _temp.begin());
 
-	xf::HMAC hmac (xf::HMAC::Key (_key), _temp, xf::Hash::SHA1);
+	auto const hmac = xf::calculate_hmac ({ .key = _key, .message = _temp, .algorithm = xf::Hash::SHA1 });
 
 	// If HMACs differ, that's a parsing error:
 	if (!std::equal (sign_begin, sign_end, hmac.begin()))
@@ -312,7 +311,7 @@ LinkProtocol::Envelope::produce (Blob& blob)
 {
 	if (_send_pos % _send_every == _send_offset)
 	{
-		blob.insert (blob.end(), _magic.begin(), _magic.end());
+		blob += _magic;
 		Sequence::produce (blob);
 	}
 
