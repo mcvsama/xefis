@@ -38,7 +38,8 @@ template<class tValueType>
 
 	  public:
 		// Ctor
-		template<class = std::enable_if_t<std::is_default_constructible_v<ValueType>>>
+		template<class U = ValueType>
+			requires std::is_default_constructible_v<U>
 			explicit
 			Temporal() noexcept (noexcept (ValueType()))
 			{ }
