@@ -456,7 +456,10 @@ AirDataComputer::compute_mach()
 		{
 			// If Mach turned out to be > 1, try to converge subsonic_mach from the second formula.
 			// Limit iterations to 100.
-			io.speed_mach = xf::converge<double> (subsonic_mach, 1e-9, 100, [&](double M_it) {
+
+			auto const initial_mach = io.speed_mach ? *io.speed_mach : subsonic_mach;
+
+			io.speed_mach = xf::converge<double> (initial_mach, 1e-9, 100, [&](double M_it) {
 				return 0.88128485 * std::sqrt ((qc / p + 1.0) * std::pow (1.0 - 1 / (7.0 * M_it * M_it), 2.5));
 			});
 
