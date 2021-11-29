@@ -65,11 +65,11 @@ class TestScreen1: public xf::Screen
 	std::unique_ptr<LinearGaugeIO<si::Temperature>>					engine_r_temperature_io		{ std::make_unique<LinearGaugeIO<si::Temperature>>() };
 	std::unique_ptr<LinearGaugeIO<si::Acceleration>>				engine_r_vibration_io		{ std::make_unique<LinearGaugeIO<si::Acceleration>>() };
 	std::unique_ptr<LinearGaugeIO<si::Voltage>>						engine_r_voltage_io			{ std::make_unique<LinearGaugeIO<si::Voltage>>() };
-	std::unique_ptr<LabelIO>										label_thr_io				{ std::make_unique<LabelIO>() };
+	std::unique_ptr<LabelIO>										label_pwr_io				{ std::make_unique<LabelIO>() };
 	std::unique_ptr<LabelIO>										label_n1_io					{ std::make_unique<LabelIO>() };
 	std::unique_ptr<LabelIO>										label_temp_io				{ std::make_unique<LabelIO>() };
-	std::unique_ptr<LabelIO>										label_pwr_io				{ std::make_unique<LabelIO>() };
 	std::unique_ptr<LabelIO>										label_amps_io				{ std::make_unique<LabelIO>() };
+	std::unique_ptr<LabelIO>										label_thrust_io				{ std::make_unique<LabelIO>() };
 	std::unique_ptr<LabelIO>										label_vib_io				{ std::make_unique<LabelIO>() };
 	std::unique_ptr<LabelIO>										label_volts_io				{ std::make_unique<LabelIO>() };
 	std::unique_ptr<GearIO>											gear_io						{ std::make_unique<GearIO>() };

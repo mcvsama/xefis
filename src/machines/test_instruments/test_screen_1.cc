@@ -156,9 +156,9 @@ TestScreen1::TestScreen1 (xf::ScreenSpec const& spec, xf::Graphics const& graphi
 	engine_r_vibration_io->mirrored_style						= true;
 	engine_r_vibration_io->note									= "N₂";
 
-	label_thr_io->label											= "TRST";
-	label_thr_io->color											= xf::InstrumentAids::kCyan;
-	label_thr_io->font_scale									= 1.3;
+	label_pwr_io->label											= "PWR";
+	label_pwr_io->color											= xf::InstrumentAids::kCyan;
+	label_pwr_io->font_scale									= 1.3;
 
 	label_n1_io->label											= "N₁";
 	label_n1_io->color											= xf::InstrumentAids::kCyan;
@@ -168,13 +168,13 @@ TestScreen1::TestScreen1 (xf::ScreenSpec const& spec, xf::Graphics const& graphi
 	label_temp_io->color										= xf::InstrumentAids::kCyan;
 	label_temp_io->font_scale									= 1.3;
 
-	label_pwr_io->label											= "PWR";
-	label_pwr_io->color											= xf::InstrumentAids::kCyan;
-	label_pwr_io->font_scale									= 1.3;
-
 	label_amps_io->label										= "AMPS";
 	label_amps_io->color										= xf::InstrumentAids::kCyan;
 	label_amps_io->font_scale									= 1.3;
+
+	label_thrust_io->label										= "THRUST";
+	label_thrust_io->color										= xf::InstrumentAids::kCyan;
+	label_thrust_io->font_scale									= 1.3;
 
 	label_volts_io->label										= "VOLTS";
 	label_volts_io->color										= xf::InstrumentAids::kCyan;
@@ -323,7 +323,7 @@ TestScreen1::create_instruments()
 
 		// Labels
 
-		_label_thr.emplace (std::move (label_thr_io), _graphics, "eicas.label.thr");
+		_label_thr.emplace (std::move (label_pwr_io), _graphics, "eicas.label.thr");
 		register_instrument (*_label_thr, _others_work_performer);
 		set_centered (**_label_thr, { r_start_pos + 0 * r_go_down + r_go_label, label_size });
 
@@ -331,11 +331,11 @@ TestScreen1::create_instruments()
 		register_instrument (*_label_n1, _others_work_performer);
 		set_centered (**_label_n1, { r_start_pos + 1 * r_go_down + r_go_label, label_size });
 
-		_label_pwr.emplace (std::move (label_pwr_io), _graphics, "eicas.label.pwr");
+		_label_pwr.emplace (std::move (label_amps_io), _graphics, "eicas.label.amps");
 		register_instrument (*_label_pwr, _others_work_performer);
 		set_centered (**_label_pwr, { r_start_pos + 2 * r_go_down + r_go_label, label_size });
 
-		_label_amps.emplace (std::move (label_amps_io), _graphics, "eicas.label.amps");
+		_label_amps.emplace (std::move (label_thrust_io), _graphics, "eicas.label.thrust");
 		register_instrument (*_label_amps, _others_work_performer);
 		set_centered (**_label_amps, { l_start_pos + l_go_current + l_go_label, label_size });
 
