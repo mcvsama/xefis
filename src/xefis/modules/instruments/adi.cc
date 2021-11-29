@@ -3400,8 +3400,8 @@ ADI::compute_fpv()
 
 	if (io.fpv_visible.value_or (false) && !hidden && io.orientation_pitch && io.orientation_roll && io.track_vertical && heading && track_lateral)
 	{
-		si::Angle vdiff = xf::floored_mod<si::Angle> (*io.orientation_pitch - *io.track_vertical, -180_deg, +180_deg);
-		si::Angle hdiff = xf::floored_mod<si::Angle> (**heading - **track_lateral, -180_deg, +180_deg);
+		si::Angle vdiff = xf::floored_mod (*io.orientation_pitch - *io.track_vertical, -180_deg, +180_deg);
+		si::Angle hdiff = xf::floored_mod (**heading - **track_lateral, -180_deg, +180_deg);
 		si::Angle roll = *io.orientation_roll;
 
 		_computed_fpv_alpha = vdiff * si::cos (roll) + hdiff * si::sin (roll);
