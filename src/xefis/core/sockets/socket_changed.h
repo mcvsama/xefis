@@ -19,16 +19,63 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/cycle.h>
+#include <xefis/core/sockets/socket.h>
 
 
 namespace xf {
 
 /**
- * Allow checking if socket's value/serial number changed since previous
- * loop cycle.
+ * Base for change-observing objects.
+ */
+class SocketChanged
+{
+  public:
+	// Ctor
+	explicit
+	SocketChanged (BasicSocket& socket):
+		_socket (socket)
+	{ }
+
+	// Dtor
+	virtual
+	~SocketChanged() = default;
+
+	/**
+	 * Return true if socket's serial number changed since last cycle.
+	 */
+	[[nodiscard]]
+	bool
+	serial_changed (Cycle const& cycle);
+
+	[[nodiscard]]
+	BasicSocket&
+	socket() noexcept
+		{ return _socket; }
+
+	[[nodiscard]]
+	BasicSocket const&
+	socket() const noexcept
+		{ return _socket; }
+
+  protected:
+	virtual bool
+	perhaps_shift_cycles (Cycle const& cycle);
+
+  private:
+	BasicSocket&		_socket;
+	BasicSocket::Serial	_prev_serial		{ 0 };
+	BasicSocket::Serial	_curr_serial		{ 0 };
+	Cycle::Number		_prev_cycle_number	{ 0 };
+	Cycle::Number		_curr_cycle_number	{ 0 };
+};
+
+
+/**
+ * Checks if socket's value changed since the previous loop cycle.
  */
 template<class pValue>
-	class SocketChanged
+	class SocketValueChanged: public SocketChanged
 	{
 	  public:
 		using Value = pValue;
@@ -36,7 +83,10 @@ template<class pValue>
 	  public:
 		// Ctor
 		explicit
-		SocketChanged (Socket<Value>& socket);
+		SocketValueChanged (Socket<Value>& socket):
+			SocketChanged (socket),
+			_socket (socket)
+		{ }
 
 		/**
 		 * Return true if socket's value changed since last cycle.
@@ -51,50 +101,32 @@ template<class pValue>
 		[[nodiscard]]
 		bool
 		value_changed_to (std::optional<Value> const& expected_value, Cycle const& cycle)
-			{ return value_changed (cycle) && _socket->get_optional() == expected_value; }
-
-		/**
-		 * Return true if socket's serial number changed since last cycle.
-		 */
-		[[nodiscard]]
-		bool
-		serial_changed (Cycle const& cycle);
+			{ return value_changed (cycle) && _socket.get_optional() == expected_value; }
 
 		[[nodiscard]]
 		Socket<Value>&
 		socket() noexcept
-			{ return *_socket; }
+			{ return _socket; }
 
 		[[nodiscard]]
 		Socket<Value> const&
 		socket() const noexcept
-			{ return *_socket; }
+			{ return _socket; }
+
+	  protected:
+		bool
+		perhaps_shift_cycles (Cycle const& cycle) override;
 
 	  private:
-		void
-		perhaps_shift_cycles (Cycle const& cycle);
-
-	  private:
-		Socket<Value>*			_socket;
+		Socket<Value>&			_socket;
 		std::optional<Value>	_prev_value;
-		Cycle::Number			_prev_cycle_number;
-		Socket<Value>::Serial	_prev_serial;
 		std::optional<Value>	_curr_value;
-		Cycle::Number			_curr_cycle_number;
-		Socket<Value>::Serial	_curr_serial;
 	};
 
 
 template<class V>
-	inline
-	SocketChanged<V>::SocketChanged (Socket<Value>& socket):
-		_socket (&socket)
-	{ }
-
-
-template<class V>
 	inline bool
-	SocketChanged<V>::value_changed (Cycle const& cycle)
+	SocketValueChanged<V>::value_changed (Cycle const& cycle)
 	{
 		perhaps_shift_cycles (cycle);
 		return _prev_value != _curr_value;
@@ -102,25 +134,18 @@ template<class V>
 
 
 template<class V>
-	inline bool
-	SocketChanged<V>::serial_changed (Cycle const& cycle)
+	bool
+	SocketValueChanged<V>::perhaps_shift_cycles (Cycle const& cycle)
 	{
-		perhaps_shift_cycles (cycle);
-		return _prev_serial != _curr_serial;
-	}
+		auto const shifted = SocketChanged::perhaps_shift_cycles (cycle);
 
-
-template<class V>
-	void
-	SocketChanged<V>::perhaps_shift_cycles (Cycle const& cycle)
-	{
-		if (cycle.number() > _curr_cycle_number)
+		if (shifted)
 		{
 			_prev_value = _curr_value;
-			_prev_cycle_number = _curr_cycle_number;
-			_curr_value = _socket->get_optional();
-			_curr_cycle_number = cycle.number();
+			_curr_value = _socket.get_optional();
 		}
+
+		return shifted;
 	}
 
 } // namespace xf

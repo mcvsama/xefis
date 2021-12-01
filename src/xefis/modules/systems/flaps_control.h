@@ -81,14 +81,14 @@ class FlapsControl: public xf::Module<FlapsControlIO>
 	update_flap_position();
 
   private:
-	std::set<si::Angle>				_settings_list;
-	xf::Range<si::Angle>			_extents;
-	si::Angle						_setting;
-	si::Angle						_current;
-	std::unique_ptr<QTimer>			_timer;
-	xf::SocketChanged<bool>			_input_up_button	{ io.up };
-	xf::SocketChanged<bool>			_input_down_button	{ io.down };
-	xf::SocketChanged<si::Angle>	_requested_setting	{ io.requested_setting };
+	std::set<si::Angle>					_settings_list;
+	xf::Range<si::Angle>				_extents;
+	si::Angle							_setting;
+	si::Angle							_current;
+	std::unique_ptr<QTimer>				_timer;
+	xf::SocketValueChanged<bool>		_input_up_button	{ io.up };
+	xf::SocketValueChanged<bool>		_input_down_button	{ io.down };
+	xf::SocketValueChanged<si::Angle>	_requested_setting	{ io.requested_setting };
 };
 
 #endif

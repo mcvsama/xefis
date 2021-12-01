@@ -57,6 +57,7 @@ PROJECTS.xefis.files				+= xefis/core/sockets/module_socket_path.h
 PROJECTS.xefis.files				+= xefis/core/sockets/socket.h
 PROJECTS.xefis.files				+= xefis/core/sockets/socket_button.cc
 PROJECTS.xefis.files				+= xefis/core/sockets/socket_button.h
+PROJECTS.xefis.files				+= xefis/core/sockets/socket_changed.cc
 PROJECTS.xefis.files				+= xefis/core/sockets/socket_changed.h
 PROJECTS.xefis.files				+= xefis/core/sockets/socket_converter.h
 PROJECTS.xefis.files				+= xefis/core/sockets/socket_observer.cc
