@@ -29,6 +29,10 @@ struct WorldSpace;
 // Frame of reference used by bodies (center-of-mass frame):
 struct BodySpace;
 
+
+template<class T>
+	concept FrameConcept = std::is_same_v<T, WorldSpace> || std::is_same_v<T, BodySpace>;
+
 } // namespace xf::rigid_body
 
 #endif
