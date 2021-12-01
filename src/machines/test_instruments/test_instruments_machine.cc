@@ -28,6 +28,14 @@ TestInstrumentsMachine::TestInstrumentsMachine (xf::Xefis& xefis):
 	Machine (xefis),
 	_logger (xefis.logger())
 {
+	auto const angle_to_force = [](si::Angle const angle) {
+		return angle / 1_rad * 1_N;
+	};
+
+	auto const force_to_angle = [](si::Force const force) {
+		return force / 1_N * 1_rad;
+	};
+
 	_work_performer = std::make_unique<xf::WorkPerformer> (std::thread::hardware_concurrency(), _logger);
 
 	_navaid_storage = std::make_unique<xf::NavaidStorage> (_logger, "share/nav/nav.dat.gz", "share/nav/fix.dat.gz", "share/nav/apt.dat.gz");
@@ -288,7 +296,8 @@ TestInstrumentsMachine::TestInstrumentsMachine (xf::Xefis& xefis):
 	test_screen_1->hsi_io->radio_range_warning								<< test_generator_hsi_radio_range_warning;
 	test_screen_1->hsi_io->radio_range_critical								<< test_generator_hsi_radio_range_critical;
 
-	test_screen_1->engine_l_thrust_io->value								<< test_generator_io->create_socket<si::Force> ("engine/left/thrust", 0_N, { -0.3_N, 4.5_N }, 0.2_N / 1_s);
+	// Testing std::function-converters:
+	test_screen_1->engine_l_thrust_io->value								<< std::function (angle_to_force) << std::function (force_to_angle) << test_generator_io->create_socket<si::Force> ("engine/left/thrust", 0_N, { -0.3_N, 4.5_N }, 0.2_N / 1_s);
 	test_screen_1->engine_l_thrust_io->reference							<< 4.1_N;
 	test_screen_1->engine_l_thrust_io->target								<< 3.9_N;
 	test_screen_1->engine_l_thrust_io->automatic							<< test_generator_io->create_socket<si::Force> ("engine/left/thrust/automatic", 2_N, { 1.5_N, 2.5_N }, 0.1_N / 1_s);
