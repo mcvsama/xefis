@@ -26,8 +26,8 @@
 #include <xefis/core/module.h>
 #include <xefis/core/setting.h>
 #include <xefis/core/sockets/module_socket.h>
+#include <xefis/support/sockets/socket_delta_decoder.h>
 #include <xefis/utility/callback_actions.h>
-#include <xefis/utility/delta_decoder.h>
 
 // Local:
 #include "afcs_api.h"
@@ -562,30 +562,30 @@ class AFCS: public xf::Module<AFCS_IO>
 		optional_cast (std::optional<Source> const& source);
 
   private:
-	bool											_ap_on				{ false };
-	bool											_at_on				{ false };
-	bool											_yd_on				{ false };
-	ThrustMode										_thrust_mode		{ ThrustMode::None };
-	RollMode										_roll_mode			{ RollMode::None };
-	RollMode										_armed_roll_mode	{ RollMode::None };
-	PitchMode										_pitch_mode			{ PitchMode::None };
-	PitchMode										_armed_pitch_mode	{ PitchMode::None };
-	SpeedControl									_speed_control		{ SpeedControl::KIAS };
-	LateralControl									_lateral_control	{ LateralControl::Track };
-	VerticalControl									_vertical_control	{ VerticalControl::VS };
-	HeadingStep										_heading_step		{ HeadingStep::Deg1 };
-	AltitudeStep									_altitude_step		{ AltitudeStep::Ft10 };
+	bool												_ap_on				{ false };
+	bool												_at_on				{ false };
+	bool												_yd_on				{ false };
+	ThrustMode											_thrust_mode		{ ThrustMode::None };
+	RollMode											_roll_mode			{ RollMode::None };
+	RollMode											_armed_roll_mode	{ RollMode::None };
+	PitchMode											_pitch_mode			{ PitchMode::None };
+	PitchMode											_armed_pitch_mode	{ PitchMode::None };
+	SpeedControl										_speed_control		{ SpeedControl::KIAS };
+	LateralControl										_lateral_control	{ LateralControl::Track };
+	VerticalControl										_vertical_control	{ VerticalControl::VS };
+	HeadingStep											_heading_step		{ HeadingStep::Deg1 };
+	AltitudeStep										_altitude_step		{ AltitudeStep::Ft10 };
 	// *_mcp are settings to be displayed on MCP:
 	// TODO allow setting default values for _mcp_ias, _mcp_mach, _mcp_heading|track, _mcp_altitude
-	si::Velocity									_mcp_ias			{ kSpeedRange.min() };
-	double											_mcp_mach			{ 0.0 };
-	si::Angle										_mcp_heading		{ 0_deg };
-	si::Angle										_mcp_track			{ 0_deg };
-	si::Length										_mcp_altitude		{ 1000_ft };
-	std::optional<si::Velocity>						_mcp_vs;
-	std::optional<si::Angle>						_mcp_fpa;
-	std::set<std::unique_ptr<xf::CallbackAction>>	_button_actions;
-	std::set<std::unique_ptr<xf::DeltaDecoder<>>>	_rotary_decoders;
+	si::Velocity										_mcp_ias			{ kSpeedRange.min() };
+	double												_mcp_mach			{ 0.0 };
+	si::Angle											_mcp_heading		{ 0_deg };
+	si::Angle											_mcp_track			{ 0_deg };
+	si::Length											_mcp_altitude		{ 1000_ft };
+	std::optional<si::Velocity>							_mcp_vs;
+	std::optional<si::Angle>							_mcp_fpa;
+	std::set<std::unique_ptr<xf::CallbackAction>>		_button_actions;
+	std::set<std::unique_ptr<xf::SocketDeltaDecoder<>>>	_rotary_decoders;
 };
 
 #endif

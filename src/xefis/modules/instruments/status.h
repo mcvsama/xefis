@@ -31,10 +31,10 @@
 #include <xefis/core/instrument.h>
 #include <xefis/core/setting.h>
 #include <xefis/core/sockets/socket.h>
-#include <xefis/core/sockets/socket_button.h>
 #include <xefis/support/instrument/instrument_support.h>
+#include <xefis/support/sockets/socket_button.h>
+#include <xefis/support/sockets/socket_delta_decoder.h>
 #include <xefis/utility/actions.h>
-#include <xefis/utility/delta_decoder.h>
 
 
 namespace si = neutrino::si;
@@ -253,20 +253,20 @@ class Status:
 	clear();
 
   private:
-	xf::SocketButton					_button_cursor_del		{ io.button_cursor_del, [this]{ cursor_del(); } };
-	xf::SocketButton					_button_recall			{ io.button_recall, [this]{ recall(); } };
-	xf::SocketButton					_button_clear			{ io.button_clear, [this]{ clear(); } };
-	xf::SocketButton					_button_master_caution	{ io.button_master_caution, [this]{ io.master_caution = false; } };
-	xf::SocketButton					_button_master_warning	{ io.button_master_warning, [this]{ io.master_warning = false; } };
-	std::unique_ptr<xf::DeltaDecoder<>>	_input_cursor_decoder;
-	std::vector<Message>				_messages;
-	std::vector<Message*>				_hidden_messages;
-	std::vector<Message*>				_visible_messages;
-	si::Time							_last_message_timestamp;
-	std::unique_ptr<QTimer>				_blink_timer;
-	std::unique_ptr<QTimer>				_cursor_hide_timer;
-	std::atomic<bool>					_blink_show						{ false };
-	xf::Synchronized<Cache> mutable		_cache;
+	xf::SocketButton							_button_cursor_del		{ io.button_cursor_del, [this]{ cursor_del(); } };
+	xf::SocketButton							_button_recall			{ io.button_recall, [this]{ recall(); } };
+	xf::SocketButton							_button_clear			{ io.button_clear, [this]{ clear(); } };
+	xf::SocketButton							_button_master_caution	{ io.button_master_caution, [this]{ io.master_caution = false; } };
+	xf::SocketButton							_button_master_warning	{ io.button_master_warning, [this]{ io.master_warning = false; } };
+	std::unique_ptr<xf::SocketDeltaDecoder<>>	_input_cursor_decoder;
+	std::vector<Message>						_messages;
+	std::vector<Message*>						_hidden_messages;
+	std::vector<Message*>						_visible_messages;
+	si::Time									_last_message_timestamp;
+	std::unique_ptr<QTimer>						_blink_timer;
+	std::unique_ptr<QTimer>						_cursor_hide_timer;
+	std::atomic<bool>							_blink_show						{ false };
+	xf::Synchronized<Cache> mutable				_cache;
 };
 
 

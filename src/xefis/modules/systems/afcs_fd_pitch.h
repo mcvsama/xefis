@@ -22,8 +22,8 @@
 #include <xefis/core/module.h>
 #include <xefis/core/setting.h>
 #include <xefis/core/sockets/module_socket.h>
-#include <xefis/core/sockets/socket_observer.h>
 #include <xefis/support/control/pid_controller.h>
+#include <xefis/support/sockets/socket_observer.h>
 #include <xefis/utility/range_smoother.h>
 
 // Local:

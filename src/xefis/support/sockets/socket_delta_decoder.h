@@ -11,10 +11,11 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__UTILITY__DELTA_DECODER_H__INCLUDED
-#define XEFIS__UTILITY__DELTA_DECODER_H__INCLUDED
+#ifndef XEFIS__SUPPORT__SOCKETS__SOCKET_DELTA_DECODER_H__INCLUDED
+#define XEFIS__SUPPORT__SOCKETS__SOCKET_DELTA_DECODER_H__INCLUDED
 
 // Standard:
+#include <concepts>
 #include <cstddef>
 #include <functional>
 #include <optional>
@@ -28,12 +29,13 @@
 
 namespace xf {
 
-template<class pInteger = int64_t>
-	class DeltaDecoder
-	{
-		static_assert (std::is_integral<pInteger>());
-		static_assert (std::is_signed<pInteger>());
+template<class T>
+	concept DeltaDecoderValueConcept = std::signed_integral<T>;
 
+
+template<DeltaDecoderValueConcept pInteger = int64_t>
+	class SocketDeltaDecoder
+	{
 	  public:
 		using Integer	= pInteger;
 		using Callback	= std::function<void (std::optional<Integer> delta)>;
@@ -41,7 +43,7 @@ template<class pInteger = int64_t>
 	  public:
 		// Ctor
 		explicit
-		DeltaDecoder (Socket<Integer> const& socket, Callback callback, Integer initial_value = {});
+		SocketDeltaDecoder (Socket<Integer> const& socket, Callback callback, Integer initial_value = {});
 
 		/**
 		 * Signals that sockets have been updated. May call the callback.
@@ -63,18 +65,18 @@ template<class pInteger = int64_t>
 	};
 
 
-template<class I>
+template<DeltaDecoderValueConcept I>
 	inline
-	DeltaDecoder<I>::DeltaDecoder (Socket<Integer> const& socket, Callback callback, Integer initial_value):
+	SocketDeltaDecoder<I>::SocketDeltaDecoder (Socket<Integer> const& socket, Callback callback, Integer initial_value):
 		_previous (initial_value),
 		_value_socket (socket),
 		_callback (callback)
 	{ }
 
 
-template<class I>
+template<DeltaDecoderValueConcept I>
 	inline void
-	DeltaDecoder<I>::operator()()
+	SocketDeltaDecoder<I>::operator()()
 	{
 		if (_callback && _socket_changed())
 		{
@@ -90,9 +92,9 @@ template<class I>
 	}
 
 
-template<class I>
+template<DeltaDecoderValueConcept I>
 	inline void
-	DeltaDecoder<I>::force_callback (std::optional<Integer> delta) const
+	SocketDeltaDecoder<I>::force_callback (std::optional<Integer> delta) const
 	{
 		_callback (delta);
 	}

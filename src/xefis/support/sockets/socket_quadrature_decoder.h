@@ -11,10 +11,11 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__UTILITY__QUADRATURE_DECODER_H__INCLUDED
-#define XEFIS__UTILITY__QUADRATURE_DECODER_H__INCLUDED
+#ifndef XEFIS__SUPPORT__SOCKETS__SOCKET_QUADRATURE_DECODER_H__INCLUDED
+#define XEFIS__SUPPORT__SOCKETS__SOCKET_QUADRATURE_DECODER_H__INCLUDED
 
 // Standard:
+#include <concepts>
 #include <cstddef>
 #include <functional>
 #include <optional>
@@ -28,15 +29,16 @@
 
 namespace xf {
 
+template<class T>
+	concept QuadratureDecoderValueConcept = std::signed_integral<T>;
+
+
 /**
  * Takes two boolean sockets and calls 'up' or 'down' callbacks depending on how these boolean values change.
  */
-template<class pInteger = int64_t>
-	class QuadratureDecoder
+template<QuadratureDecoderValueConcept pInteger = int64_t>
+	class SocketQuadratureDecoder
 	{
-		static_assert (std::is_integral<pInteger>());
-		static_assert (std::is_signed<pInteger>());
-
 	  public:
 		using Integer	= pInteger;
 		using Callback	= std::function<void (std::optional<Integer> delta)>;
@@ -44,7 +46,7 @@ template<class pInteger = int64_t>
 	  public:
 		// Ctor
 		explicit
-		QuadratureDecoder (Socket<bool> const& socket_a, Socket<bool> const& socket_b, Callback callback);
+		SocketQuadratureDecoder (Socket<bool> const& socket_a, Socket<bool> const& socket_b, Callback callback);
 
 		/**
 		 * Signals that sockets have been updated. May call the callback.
@@ -69,39 +71,9 @@ template<class pInteger = int64_t>
 	};
 
 
-/**
- * QuadratureDecoder with internal counter.
- */
-template<class pInteger = int64_t>
-	class QuadratureCounter: public QuadratureDecoder<pInteger>
-	{
-		using typename QuadratureDecoder<pInteger>::Integer;
-		using Callback = std::function<void (std::optional<Integer> delta, Integer total)>;
-
-	  public:
-		// Ctor
-		explicit
-		QuadratureCounter (Socket<bool> const& socket_a, Socket<bool> const& socket_b, Integer initial_value, Callback callback = [](auto, auto){});
-
-		/**
-		 * Return stored counted value.
-		 */
-		Integer
-		value() const noexcept;
-
-	  private:
-		void
-		decoder_callback (std::optional<Integer> delta);
-
-	  private:
-		Integer		_total;
-		Callback	_callback;
-	};
-
-
-template<class I>
+template<QuadratureDecoderValueConcept I>
 	inline
-	QuadratureDecoder<I>::QuadratureDecoder (Socket<bool> const& socket_a, Socket<bool> const& socket_b, Callback callback):
+	SocketQuadratureDecoder<I>::SocketQuadratureDecoder (Socket<bool> const& socket_a, Socket<bool> const& socket_b, Callback callback):
 		_prev_a (socket_a.value_or (false)),
 		_prev_b (socket_b.value_or (false)),
 		_socket_a (socket_a),
@@ -110,9 +82,9 @@ template<class I>
 	{ }
 
 
-template<class I>
+template<QuadratureDecoderValueConcept I>
 	inline void
-	QuadratureDecoder<I>::operator()()
+	SocketQuadratureDecoder<I>::operator()()
 	{
 		if (_callback)
 		{
@@ -154,42 +126,11 @@ template<class I>
 	}
 
 
-template<class I>
+template<QuadratureDecoderValueConcept I>
 	inline void
-	QuadratureDecoder<I>::force_callback (std::optional<Integer> const delta) const
+	SocketQuadratureDecoder<I>::force_callback (std::optional<Integer> const delta) const
 	{
 		_callback (delta);
-	}
-
-
-template<class I>
-	inline
-	QuadratureCounter<I>::QuadratureCounter (Socket<bool> const& socket_a, Socket<bool> const& socket_b, Integer initial_value, Callback callback):
-		QuadratureDecoder<I> (socket_a, socket_b, [this] (auto delta) { decoder_callback (delta); }),
-		_total (initial_value),
-		_callback (callback)
-	{ }
-
-
-template<class I>
-	inline auto
-	QuadratureCounter<I>::value() const noexcept -> Integer
-	{
-		return _total;
-	}
-
-
-template<class I>
-	inline void
-	QuadratureCounter<I>::decoder_callback (std::optional<Integer> const delta)
-	{
-		if (delta)
-		{
-			_total += *delta;
-			_callback (delta, _total);
-		}
-		else
-			_callback (std::nullopt, _total);
 	}
 
 } // namespace xf

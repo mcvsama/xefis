@@ -24,7 +24,7 @@
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
 #include <xefis/core/sockets/module_socket.h>
-#include <xefis/core/sockets/socket_observer.h>
+#include <xefis/support/sockets/socket_observer.h>
 #include <xefis/utility/smoother.h>
 #include <xefis/utility/range_smoother.h>
 

@@ -31,9 +31,9 @@
 #include <xefis/core/instrument.h>
 #include <xefis/core/module_io.h>
 #include <xefis/core/sockets/socket.h>
-#include <xefis/core/sockets/socket_observer.h>
 #include <xefis/core/xefis.h>
 #include <xefis/support/instrument/instrument_support.h>
+#include <xefis/support/sockets/socket_observer.h>
 
 
 // TODO handle nans

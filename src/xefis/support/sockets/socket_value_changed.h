@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__CORE__SOCKETS__SOCKET_CHANGED_H__INCLUDED
-#define XEFIS__CORE__SOCKETS__SOCKET_CHANGED_H__INCLUDED
+#ifndef XEFIS__SUPPORT__SOCKETS__SOCKET_VALUE_CHANGED_H__INCLUDED
+#define XEFIS__SUPPORT__SOCKETS__SOCKET_VALUE_CHANGED_H__INCLUDED
 
 // Standard:
 #include <cstddef>
@@ -21,55 +21,10 @@
 #include <xefis/config/all.h>
 #include <xefis/core/cycle.h>
 #include <xefis/core/sockets/socket.h>
+#include <xefis/support/sockets/socket_changed.h>
 
 
 namespace xf {
-
-/**
- * Base for change-observing objects.
- */
-class SocketChanged
-{
-  public:
-	// Ctor
-	explicit
-	SocketChanged (BasicSocket& socket):
-		_socket (socket)
-	{ }
-
-	// Dtor
-	virtual
-	~SocketChanged() = default;
-
-	/**
-	 * Return true if socket's serial number changed since last cycle.
-	 */
-	[[nodiscard]]
-	bool
-	serial_changed (Cycle const& cycle);
-
-	[[nodiscard]]
-	BasicSocket&
-	socket() noexcept
-		{ return _socket; }
-
-	[[nodiscard]]
-	BasicSocket const&
-	socket() const noexcept
-		{ return _socket; }
-
-  protected:
-	virtual bool
-	perhaps_shift_cycles (Cycle const& cycle);
-
-  private:
-	BasicSocket&		_socket;
-	BasicSocket::Serial	_prev_serial		{ 0 };
-	BasicSocket::Serial	_curr_serial		{ 0 };
-	Cycle::Number		_prev_cycle_number	{ 0 };
-	Cycle::Number		_curr_cycle_number	{ 0 };
-};
-
 
 /**
  * Checks if socket's value changed since the previous loop cycle.
@@ -83,10 +38,7 @@ template<class pValue>
 	  public:
 		// Ctor
 		explicit
-		SocketValueChanged (Socket<Value>& socket):
-			SocketChanged (socket),
-			_socket (socket)
-		{ }
+		SocketValueChanged (Socket<Value>& socket);
 
 		/**
 		 * Return true if socket's value changed since last cycle.
@@ -125,6 +77,14 @@ template<class pValue>
 
 
 template<class V>
+	inline
+	SocketValueChanged<V>::SocketValueChanged (Socket<Value>& socket):
+		SocketChanged (socket),
+		_socket (socket)
+	{ }
+
+
+template<class V>
 	inline bool
 	SocketValueChanged<V>::value_changed (Cycle const& cycle)
 	{
@@ -134,7 +94,7 @@ template<class V>
 
 
 template<class V>
-	bool
+	inline bool
 	SocketValueChanged<V>::perhaps_shift_cycles (Cycle const& cycle)
 	{
 		auto const shifted = SocketChanged::perhaps_shift_cycles (cycle);

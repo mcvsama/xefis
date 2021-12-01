@@ -97,7 +97,7 @@ Status::Status (std::unique_ptr<StatusIO> module_io, xf::Graphics const& graphic
 	Instrument (std::move (module_io), instance),
 	InstrumentSupport (graphics)
 {
-	_input_cursor_decoder = std::make_unique<xf::DeltaDecoder<>> (io.cursor_value, [this] (auto delta) {
+	_input_cursor_decoder = std::make_unique<xf::SocketDeltaDecoder<>> (io.cursor_value, [this] (auto delta) {
 		if (delta > 0)
 		{
 			for (int i = 0; i < delta; ++i)

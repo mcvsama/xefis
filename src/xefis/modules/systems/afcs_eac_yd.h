@@ -22,9 +22,9 @@
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
 #include <xefis/core/module_socket.h>
-#include <xefis/core/socket_observer.h>
 #include <xefis/core/setting.h>
 #include <xefis/support/control/pid_controller.h>
+#include <xefis/support/sockets/socket_observer.h>
 
 
 class AFCS_EAC_YD_IO: public xf::ModuleIO

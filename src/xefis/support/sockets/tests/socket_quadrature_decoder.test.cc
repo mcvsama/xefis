@@ -24,7 +24,8 @@
 // Xefis:
 #include <xefis/core/module_io.h>
 #include <xefis/core/sockets/module_socket.h>
-#include <xefis/utility/quadrature_decoder.h>
+#include <xefis/support/sockets/socket_quadrature_counter.h>
+#include <xefis/support/sockets/socket_quadrature_decoder.h>
 
 
 namespace xf::test {
@@ -44,8 +45,8 @@ template<class T>
 	}
 
 
-AutoTest t1 ("QuadratureDecoder + QuadratureCounter", []{
-	// QuadratureDecoder will be tested by testing QuadratureCounter, so no need for separate tests.
+AutoTest t1 ("SocketQuadratureDecoder + SocketQuadratureCounter", []{
+	// SocketQuadratureDecoder will be tested by testing SocketQuadratureCounter, so no need for separate tests.
 
 	// Tuple is <input_a, input_b, delta, callback_expected>:
 	std::vector<std::tuple<std::optional<bool>, std::optional<bool>, std::optional<Integer>, bool>> const test_steps {
@@ -96,7 +97,7 @@ AutoTest t1 ("QuadratureDecoder + QuadratureCounter", []{
 	ModuleIO io;
 	ModuleOut<bool> socket_a (&io, "line-a");
 	ModuleOut<bool> socket_b (&io, "line-b");
-	QuadratureCounter<Integer> decoder (socket_a, socket_b, initial_value, callback);
+	SocketQuadratureCounter<Integer> decoder (socket_a, socket_b, initial_value, callback);
 	auto expected_total = initial_value;
 
 	for (auto const& step: test_steps | boost::adaptors::indexed (0))

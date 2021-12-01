@@ -26,7 +26,7 @@
 #include <xefis/core/module.h>
 #include <xefis/core/setting.h>
 #include <xefis/core/sockets/module_socket.h>
-#include <xefis/core/sockets/socket_changed.h>
+#include <xefis/support/sockets/socket_value_changed.h>
 
 
 namespace si = neutrino::si;

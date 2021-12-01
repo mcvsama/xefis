@@ -20,20 +20,20 @@
 // Xefis:
 #include <xefis/core/module_io.h>
 #include <xefis/core/sockets/module_socket.h>
-#include <xefis/utility/delta_decoder.h>
+#include <xefis/support/sockets/socket_delta_decoder.h>
 
 
 namespace xf::test {
 namespace {
 
-AutoTest t1 ("DeltaDecoder", []{
+AutoTest t1 ("SocketDeltaDecoder", []{
 	using Integer = int16_t;
 	using Callback = std::function<void (std::optional<Integer>)>;
 
 	ModuleIO io;
 	ModuleOut<Integer> socket (&io, "output");
 	Callback verifications_callback;
-	DeltaDecoder<Integer> decoder (socket, [&verifications_callback] (auto const delta) {
+	SocketDeltaDecoder<Integer> decoder (socket, [&verifications_callback] (auto const delta) {
 		verifications_callback (delta);
 	}, 5);
 

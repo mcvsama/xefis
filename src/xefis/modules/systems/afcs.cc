@@ -1076,7 +1076,7 @@ AFCS::make_button_action (xf::ModuleIn<bool>& socket, void (AFCS::* callback)())
 void
 AFCS::make_knob_action (xf::ModuleIn<int64_t>& socket, void (AFCS::* callback)(int))
 {
-	auto action = std::make_unique<xf::DeltaDecoder<>> (socket, [this,callback](auto delta) {
+	auto action = std::make_unique<xf::SocketDeltaDecoder<>> (socket, [this,callback](auto delta) {
 		try {
 			if (delta)
 				(this->*callback) (*delta);
