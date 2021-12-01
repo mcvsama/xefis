@@ -48,9 +48,9 @@ FlapsControl::FlapsControl (std::unique_ptr<FlapsControlIO> module_io, xf::Airfr
 
 
 void
-FlapsControl::process (xf::Cycle const&)
+FlapsControl::process (xf::Cycle const& cycle)
 {
-	if (_input_up_clicked())
+	if (_input_up_button.value_changed_to (true, cycle))
 	{
 		auto prev_setting = _settings_list.lower_bound (*io.requested_setting);
 
@@ -59,7 +59,7 @@ FlapsControl::process (xf::Cycle const&)
 
 		io.requested_setting = *prev_setting;
 	}
-	else if (_input_down_clicked())
+	else if (_input_down_button.value_changed_to (true, cycle))
 	{
 		auto next_setting = _settings_list.upper_bound (*io.requested_setting);
 
@@ -67,7 +67,7 @@ FlapsControl::process (xf::Cycle const&)
 			io.requested_setting = *next_setting;
 	}
 
-	if (_requested_setting_changed() && io.requested_setting)
+	if (_requested_setting.value_changed (cycle) && io.requested_setting)
 	{
 		_setting = xf::clamped<si::Angle> (*io.requested_setting, _extents);
 		_timer->start();
