@@ -19,6 +19,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/sockets/constant_source.h>
 #include <xefis/core/sockets/socket.h>
 
 

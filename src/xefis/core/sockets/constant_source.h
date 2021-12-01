@@ -11,17 +11,36 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__CORE__SOCKETS__MODULE_SOCKET_H__INCLUDED
-#define XEFIS__CORE__SOCKETS__MODULE_SOCKET_H__INCLUDED
+#ifndef XEFIS__CORE__SOCKETS__CONSTANT_SOURCE_H__INCLUDED
+#define XEFIS__CORE__SOCKETS__CONSTANT_SOURCE_H__INCLUDED
 
 // Standard:
-#include <cstddef>
+#include <variant>
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/sockets/basic_module_socket.h>
-#include <xefis/core/sockets/module_in.h>
-#include <xefis/core/sockets/module_out.h>
+
+
+namespace xf {
+
+/**
+ * Wrapper for values that are supposed to act as a constant value source for Socket objects.
+ * The value provided by this object is stored in Socket class.
+ */
+template<class Value>
+	class ConstantSource
+	{
+	  public:
+		// Ctor
+		explicit
+		ConstantSource (Value const& value):
+			value (value)
+		{ }
+
+		Value value;
+	};
+
+} // namespace xf
 
 #endif
 

@@ -11,17 +11,30 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__CORE__SOCKETS__MODULE_SOCKET_H__INCLUDED
-#define XEFIS__CORE__SOCKETS__MODULE_SOCKET_H__INCLUDED
+#ifndef XEFIS__CORE__SOCKETS__BASIC_MODULE_IN_H__INCLUDED
+#define XEFIS__CORE__SOCKETS__BASIC_MODULE_IN_H__INCLUDED
 
 // Standard:
 #include <cstddef>
+#include <cstdint>
 
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/sockets/basic_module_socket.h>
-#include <xefis/core/sockets/module_in.h>
-#include <xefis/core/sockets/module_out.h>
+
+
+namespace xf {
+
+/**
+ * Mixin base class for all ModuleIn<*>
+ */
+class BasicModuleIn: public BasicModuleSocket
+{
+  public:
+	using BasicModuleSocket::BasicModuleSocket;
+};
+
+} // namespace xf
 
 #endif
 

@@ -24,24 +24,10 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/sockets/assignable_socket.h>
-#include <xefis/core/sockets/module_socket.h>
-#include <xefis/core/sockets/socket.h>
+#include <xefis/core/sockets/basic_module_out.h>
 
 
 namespace xf {
-
-/**
- * Base class for all ModuleOut<T>
- */
-class BasicModuleOut:
-	public BasicModuleSocket,
-	virtual public BasicAssignableSocket
-{
-  public:
-	using BasicModuleSocket::BasicModuleSocket;
-	using BasicAssignableSocket::operator=;
-};
-
 
 /**
  * ModuleSocket that acts as an output from the module.

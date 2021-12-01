@@ -22,37 +22,12 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/sockets/basic_assignable_socket.h>
 #include <xefis/core/sockets/socket.h>
 #include <xefis/utility/is_optional.h>
 
 
 namespace xf {
-
-class BasicAssignableSocket: virtual public BasicSocket
-{
-  public:
-	/**
-	 * Set socket to nil-value.
-	 */
-	virtual void
-	operator= (Nil) = 0;
-
-	/**
-	 * Unserialize socket's value from string.
-	 */
-	virtual void
-	from_string (std::string_view const&, SocketConversionSettings const& = {}) = 0;
-
-	/**
-	 * Unserialize socket's value from Blob.
-	 *
-	 * \throw	InvalidBlobSize
-	 *			If blob has size not corresponding to this socket type.
-	 */
-	virtual void
-	from_blob (BlobView const&) = 0;
-};
-
 
 /**
  * A Socket to which user can assign value directly.

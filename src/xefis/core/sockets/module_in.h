@@ -17,28 +17,14 @@
 // Standard:
 #include <cstddef>
 #include <cstdint>
-#include <variant>
-
-// Neutrino:
-#include <neutrino/variant.h>
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/sockets/basic_module_in.h>
 #include <xefis/core/sockets/connectable_socket.h>
-#include <xefis/core/sockets/module_socket.h>
 
 
 namespace xf {
-
-/**
- * Mixin base class for all ModuleIn<*>
- */
-class BasicModuleIn: public BasicModuleSocket
-{
-  public:
-	using BasicModuleSocket::BasicModuleSocket;
-};
-
 
 /**
  * ModuleSocket that acts as an input to the module.
