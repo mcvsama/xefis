@@ -48,20 +48,18 @@ class Network: public Noncopyable
 	/**
 	 * Add element to the network.
 	 */
-	template<class SpecificElement, class ...Args>
+	template<ElementConcept SpecificElement, class ...Args>
 		[[nodiscard]]
 		SpecificElement&
-		add (Args&&...)
-			requires (std::is_base_of_v<Element, SpecificElement>);
+		add (Args&&...);
 
 	/**
 	 * Add element to the network.
 	 */
-	template<class SpecificElement>
+	template<ElementConcept SpecificElement>
 		[[nodiscard]]
 		SpecificElement&
-		add (std::unique_ptr<SpecificElement>&&)
-			requires (std::is_base_of_v<Element, SpecificElement>);
+		add (std::unique_ptr<SpecificElement>&&);
 
 	/**
 	 * Return list of elements in the network.
@@ -100,19 +98,17 @@ Network::make_node (std::string_view const& name)
 }
 
 
-template<class SpecificElement, class ...Args>
+template<ElementConcept SpecificElement, class ...Args>
 	inline SpecificElement&
 	Network::add (Args&& ...args)
-		requires (std::is_base_of_v<Element, SpecificElement>)
 	{
 		return add (std::make_unique<SpecificElement> (std::forward<Args> (args)...));
 	}
 
 
-template<class SpecificElement>
+template<ElementConcept SpecificElement>
 	inline SpecificElement&
 	Network::add (std::unique_ptr<SpecificElement>&& element)
-		requires (std::is_base_of_v<Element, SpecificElement>)
 	{
 		_elements.push_back (std::move (element));
 		return static_cast<SpecificElement&> (*_elements.back());

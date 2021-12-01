@@ -224,6 +224,10 @@ class Element: public Noncopyable
 };
 
 
+template<class T>
+	concept ElementConcept = std::derived_from<T, Element>;
+
+
 inline
 Element::Element (Type const type, std::string_view const& name):
 	_type (type),

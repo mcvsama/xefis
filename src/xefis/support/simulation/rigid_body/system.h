@@ -27,6 +27,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/simulation/rigid_body/body.h>
+#include <xefis/support/simulation/rigid_body/concepts.h>
 #include <xefis/support/simulation/rigid_body/constraint.h>
 #include <xefis/support/simulation/rigid_body/frame_precalculation.h>
 #include <xefis/support/simulation/rigid_body/frames.h>
@@ -57,66 +58,58 @@ class System: private Noncopyable
 	/**
 	 * Add new body to the system.
 	 */
-	template<class SpecificBody, class ...Args>
+	template<BodyConcept SpecificBody, class ...Args>
 		SpecificBody&
-		add (Args&&...)
-			requires (std::is_base_of_v<Body, SpecificBody>);
+		add (Args&&...);
 
 	/**
 	 * Add new body to the system.
 	 */
-	template<class SpecificBody>
+	template<BodyConcept SpecificBody>
 		SpecificBody&
-		add (std::unique_ptr<SpecificBody>&&)
-			requires (std::is_base_of_v<Body, SpecificBody>);
+		add (std::unique_ptr<SpecificBody>&&);
 
 	/**
 	 * Add new gravitating body to the system.
 	 */
-	template<class SpecificBody, class ...Args>
+	template<BodyConcept SpecificBody, class ...Args>
 		SpecificBody&
-		add_gravitating (Args&&...)
-			requires (std::is_base_of_v<Body, SpecificBody>);
+		add_gravitating (Args&&...);
 
 	/**
 	 * Add new gravitating body to the system.
 	 */
-	template<class SpecificBody>
+	template<BodyConcept SpecificBody>
 		SpecificBody&
-		add_gravitating (std::unique_ptr<SpecificBody>&&)
-			requires (std::is_base_of_v<Body, SpecificBody>);
+		add_gravitating (std::unique_ptr<SpecificBody>&&);
 
 	/**
 	 * Add new constraint to the system.
 	 */
-	template<class SpecificConstraint, class ...Args>
+	template<ConstraintConcept SpecificConstraint, class ...Args>
 		SpecificConstraint&
-		add (Args&&...)
-			requires (std::is_base_of_v<Constraint, SpecificConstraint>);
+		add (Args&&...);
 
 	/**
 	 * Add new constraint to the system.
 	 */
-	template<class SpecificConstraint>
+	template<ConstraintConcept SpecificConstraint>
 		SpecificConstraint&
-		add (std::unique_ptr<SpecificConstraint>&&)
-			requires (std::is_base_of_v<Constraint, SpecificConstraint>);
+		add (std::unique_ptr<SpecificConstraint>&&);
 
 	/**
 	 * Add new BasicFramePrecalculation to the system.
 	 */
-	template<class SpecificFramePrecalculation, class ...Args>
+	template<BasicFramePrecalculationConcept SpecificFramePrecalculation, class ...Args>
 		SpecificFramePrecalculation&
-		add (Args&&...)
-			requires (std::is_base_of_v<BasicFramePrecalculation, SpecificFramePrecalculation>);
+		add (Args&&...);
 
 	/**
 	 * Add new BasicFramePrecalculation to the system.
 	 */
-	template<class SpecificFramePrecalculation>
+	template<BasicFramePrecalculationConcept SpecificFramePrecalculation>
 		SpecificFramePrecalculation&
-		add (std::unique_ptr<SpecificFramePrecalculation>&&)
-			requires (std::is_base_of_v<BasicFramePrecalculation, SpecificFramePrecalculation>);
+		add (std::unique_ptr<SpecificFramePrecalculation>&&);
 
 	/**
 	 * Return atmosphere model to use by bodies or nullptr if it wasn't set.
@@ -223,19 +216,17 @@ System::System (AtmosphereModel const& atmosphere_model):
 { }
 
 
-template<class SpecificBody, class ...Args>
+template<BodyConcept SpecificBody, class ...Args>
 	inline SpecificBody&
 	System::add (Args&& ...args)
-		requires (std::is_base_of_v<Body, SpecificBody>)
 	{
 		return add (std::make_unique<SpecificBody> (std::forward<Args> (args)...));
 	}
 
 
-template<class SpecificBody>
+template<BodyConcept SpecificBody>
 	inline SpecificBody&
 	System::add (std::unique_ptr<SpecificBody>&& body)
-		requires (std::is_base_of_v<Body, SpecificBody>)
 	{
 		_bodies.push_back (std::move (body));
 		_non_gravitating_bodies.push_back (_bodies.back().get());
@@ -243,19 +234,17 @@ template<class SpecificBody>
 	}
 
 
-template<class SpecificBody, class ...Args>
+template<BodyConcept SpecificBody, class ...Args>
 	inline SpecificBody&
 	System::add_gravitating (Args&& ...args)
-		requires (std::is_base_of_v<Body, SpecificBody>)
 	{
 		return add_gravitating (std::make_unique<SpecificBody> (std::forward<Args> (args)...));
 	}
 
 
-template<class SpecificBody>
+template<BodyConcept SpecificBody>
 	inline SpecificBody&
 	System::add_gravitating (std::unique_ptr<SpecificBody>&& body)
-		requires (std::is_base_of_v<Body, SpecificBody>)
 	{
 		_bodies.push_back (std::move (body));
 		_gravitating_bodies.push_back (_bodies.back().get());
@@ -263,38 +252,34 @@ template<class SpecificBody>
 	}
 
 
-template<class SpecificConstraint, class ...Args>
+template<ConstraintConcept SpecificConstraint, class ...Args>
 	inline SpecificConstraint&
 	System::add (Args&& ...args)
-		requires (std::is_base_of_v<Constraint, SpecificConstraint>)
 	{
 		return add (std::make_unique<SpecificConstraint> (std::forward<Args> (args)...));
 	}
 
 
-template<class SpecificConstraint>
+template<ConstraintConcept SpecificConstraint>
 	inline SpecificConstraint&
 	System::add (std::unique_ptr<SpecificConstraint>&& constraint)
-		requires (std::is_base_of_v<Constraint, SpecificConstraint>)
 	{
 		_constraints.push_back (std::move (constraint));
 		return static_cast<SpecificConstraint&> (*_constraints.back());
 	}
 
 
-template<class SpecificFramePrecalculation, class ...Args>
+template<BasicFramePrecalculationConcept SpecificFramePrecalculation, class ...Args>
 	inline SpecificFramePrecalculation&
 	System::add (Args&& ...args)
-		requires (std::is_base_of_v<BasicFramePrecalculation, SpecificFramePrecalculation>)
 	{
 		return add (std::make_unique<SpecificFramePrecalculation> (std::forward<Args> (args)...));
 	}
 
 
-template<class SpecificFramePrecalculation>
+template<BasicFramePrecalculationConcept SpecificFramePrecalculation>
 	inline SpecificFramePrecalculation&
 	System::add (std::unique_ptr<SpecificFramePrecalculation>&& frame_cache)
-		requires (std::is_base_of_v<BasicFramePrecalculation, SpecificFramePrecalculation>)
 	{
 		_frame_precalculations.push_back (std::move (frame_cache));
 		return static_cast<SpecificFramePrecalculation&> (*_frame_precalculations.back());

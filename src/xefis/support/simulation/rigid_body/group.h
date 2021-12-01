@@ -24,6 +24,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/math/geometry.h>
+#include <xefis/support/simulation/rigid_body/concepts.h>
 #include <xefis/support/simulation/rigid_body/frames.h>
 
 
@@ -46,34 +47,30 @@ class Group
 	/**
 	 * Add new body to the group and the system.
 	 */
-	template<class SpecificBody, class ...Args>
+	template<BodyConcept SpecificBody, class ...Args>
 		SpecificBody&
-		add (Args&&...)
-			requires (std::is_base_of_v<Body, SpecificBody>);
+		add (Args&&...);
 
 	/**
 	 * Add new body to the group and the system.
 	 */
-	template<class SpecificBody>
+	template<BodyConcept SpecificBody>
 		SpecificBody&
-		add (std::unique_ptr<SpecificBody>&&)
-			requires (std::is_base_of_v<Body, SpecificBody>);
+		add (std::unique_ptr<SpecificBody>&&);
 
 	/**
 	 * Add new gravitating body to the group and the system.
 	 */
-	template<class SpecificBody, class ...Args>
+	template<BodyConcept SpecificBody, class ...Args>
 		SpecificBody&
-		add_gravitating (Args&&...)
-			requires (std::is_base_of_v<Body, SpecificBody>);
+		add_gravitating (Args&&...);
 
 	/**
 	 * Add new gravitating body to the group and the system.
 	 */
-	template<class SpecificBody>
+	template<BodyConcept SpecificBody>
 		SpecificBody&
-		add_gravitating (std::unique_ptr<SpecificBody>&&)
-			requires (std::is_base_of_v<Body, SpecificBody>);
+		add_gravitating (std::unique_ptr<SpecificBody>&&);
 
 	/**
 	 * Rotate the body about world space origin by provided rotation matrix.
@@ -118,19 +115,17 @@ Group::Group (System& system):
 { }
 
 
-template<class SpecificBody, class ...Args>
+template<BodyConcept SpecificBody, class ...Args>
 	inline SpecificBody&
 	Group::add (Args&& ...args)
-		requires (std::is_base_of_v<Body, SpecificBody>)
 	{
 		return add (std::make_unique<SpecificBody> (std::forward<Args> (args)...));
 	}
 
 
-template<class SpecificBody>
+template<BodyConcept SpecificBody>
 	inline SpecificBody&
 	Group::add (std::unique_ptr<SpecificBody>&& body)
-		requires (std::is_base_of_v<Body, SpecificBody>)
 	{
 		auto& added_body = _system->add (std::move (body));
 		_bodies.push_back (&added_body);
@@ -138,19 +133,17 @@ template<class SpecificBody>
 	}
 
 
-template<class SpecificBody, class ...Args>
+template<BodyConcept SpecificBody, class ...Args>
 	inline SpecificBody&
 	Group::add_gravitating (Args&& ...args)
-		requires (std::is_base_of_v<Body, SpecificBody>)
 	{
 		return add_gravitating (std::make_unique<SpecificBody> (std::forward<Args> (args)...));
 	}
 
 
-template<class SpecificBody>
+template<BodyConcept SpecificBody>
 	inline SpecificBody&
 	Group::add_gravitating (std::unique_ptr<SpecificBody>&& body)
-		requires (std::is_base_of_v<Body, SpecificBody>)
 	{
 		auto& added_body = _system->add (std::move (body));
 		_bodies.push_back (&added_body);
