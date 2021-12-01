@@ -39,9 +39,9 @@ AirDataComputer::AirDataComputer (std::unique_ptr<AirDataComputerIO> module_io, 
 {
 	_total_pressure_computer.set_callback (std::bind (&AirDataComputer::recover_total_pressure, this));
 	_total_pressure_computer.observe ({
-		&io.pressure_total,		// ← input
-		&io.sensed_cas,			// ← input
-		&io.pressure_static,	// ← input
+		&io.pressure_total,				// ← input
+		&io.sensed_cas,					// ← input
+		&io.pressure_static,			// ← input
 	});
 
 	_altitude_amsl_estimator.set_minimum_integration_time (0.2_s);
@@ -58,9 +58,9 @@ AirDataComputer::AirDataComputer (std::unique_ptr<AirDataComputerIO> module_io, 
 		&_altitude_amsl_std_smoother,
 	});
 	_altitude_computer.observe ({
-		&io.pressure_static,				// ← input
-		&io.pressure_use_std,				// ← input
-		&io.pressure_qnh,					// ← input
+		&io.pressure_static,			// ← input
+		&io.pressure_use_std,			// ← input
+		&io.pressure_qnh,				// ← input
 	});
 
 	_ias_computer.set_callback (std::bind (&AirDataComputer::compute_ias, this));
