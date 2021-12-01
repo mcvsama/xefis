@@ -16,6 +16,7 @@
 
 // Standard:
 #include <cstddef>
+#include <functional>
 #include <optional>
 
 // Qt:
@@ -30,6 +31,7 @@
 #include <xefis/core/instrument.h>
 #include <xefis/core/setting.h>
 #include <xefis/core/sockets/socket.h>
+#include <xefis/core/sockets/socket_button.h>
 #include <xefis/support/instrument/instrument_support.h>
 #include <xefis/utility/actions.h>
 #include <xefis/utility/delta_decoder.h>
@@ -245,17 +247,17 @@ class Status:
 	recall();
 
 	/**
-	 * Hide all shown messages.
+	 * Hide all shown messages except for those which aren't displayed for at least minimum display time.
 	 */
 	void
 	clear();
 
   private:
-	xf::PropChangedTo<bool>				_button_cursor_del_pressed		{ io.button_cursor_del, true };
-	xf::PropChangedTo<bool>				_button_recall_pressed			{ io.button_recall, true };
-	xf::PropChangedTo<bool>				_button_clear_pressed			{ io.button_clear, true };
-	xf::PropChangedTo<bool>				_button_master_caution_pressed	{ io.button_master_caution, true };
-	xf::PropChangedTo<bool>				_button_master_warning_pressed	{ io.button_master_warning, true };
+	xf::SocketButton					_button_cursor_del		{ io.button_cursor_del, [this]{ cursor_del(); } };
+	xf::SocketButton					_button_recall			{ io.button_recall, [this]{ recall(); } };
+	xf::SocketButton					_button_clear			{ io.button_clear, [this]{ clear(); } };
+	xf::SocketButton					_button_master_caution	{ io.button_master_caution, [this]{ io.master_caution = false; } };
+	xf::SocketButton					_button_master_warning	{ io.button_master_warning, [this]{ io.master_warning = false; } };
 	std::unique_ptr<xf::DeltaDecoder<>>	_input_cursor_decoder;
 	std::vector<Message>				_messages;
 	std::vector<Message*>				_hidden_messages;

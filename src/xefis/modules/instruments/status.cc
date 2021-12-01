@@ -147,24 +147,14 @@ Status::process (xf::Cycle const& cycle)
 {
 	(*_input_cursor_decoder)();
 
-	for (auto& m: _messages)
-		m.process (cycle.update_time());
+	for (auto& message: _messages)
+		message.process (cycle.update_time());
 
-	if (_button_cursor_del_pressed())
-		cursor_del();
-
-	if (_button_recall_pressed())
-		recall();
-
-	if (_button_clear_pressed())
-		if (xf::TimeHelper::now() - _last_message_timestamp > *io.status_minimum_display_time)
-			clear();
-
-	if (_button_master_caution_pressed())
-		io.master_caution = false;
-
-	if (_button_master_warning_pressed())
-		io.master_warning = false;
+	_button_cursor_del.process();
+	_button_recall.process();
+	_button_clear.process();
+	_button_master_caution.process();
+	_button_master_warning.process();
 
 	// Move messages that need to be shown to _visible_messages and hidden to _hidden_messages:
 
@@ -361,9 +351,12 @@ Status::recall()
 void
 Status::clear()
 {
-	_hidden_messages.insert (_hidden_messages.end(), _visible_messages.begin(), _visible_messages.end());
-	_visible_messages.clear();
-	_cache.lock()->solve_scroll_and_cursor (_visible_messages);
-	mark_dirty();
+	if (xf::TimeHelper::now() - _last_message_timestamp > *io.status_minimum_display_time)
+	{
+		_hidden_messages.insert (_hidden_messages.end(), _visible_messages.begin(), _visible_messages.end());
+		_visible_messages.clear();
+		_cache.lock()->solve_scroll_and_cursor (_visible_messages);
+		mark_dirty();
+	}
 }
 
