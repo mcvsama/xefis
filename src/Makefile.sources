@@ -446,6 +446,14 @@ PROJECTS.watchdog.files				+= xefis/watchdog.cc
 
 ################
 
+# Convenience shortcut:
+.PHONY: autotest
+autotest: $(call mktarget,$(PROJECTS.xefis_autotest.executable))
+
+# Convenience shortcut:
+.PHONY: manualtest
+manualtest: $(call mktarget,$(PROJECTS.xefis_manualtest.executable))
+
 include machines/Makefile.machines
 include $(foreach machine,$(XEFIS_MACHINES), machines/$(machine)/Makefile.sources)
 
