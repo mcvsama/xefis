@@ -41,6 +41,14 @@ template<class Value>
 	};
 
 
+class TestNilCondition
+{
+  public:
+	si::Time	nil		{ 0_s };
+	si::Time	not_nil	{ 1_s };
+};
+
+
 class TestGeneratorIO: public xf::ModuleIO
 {
   public:
@@ -60,12 +68,26 @@ class TestGeneratorIO: public xf::ModuleIO
 	class SocketGenerator
 	{
 	  public:
+		// Ctor
+		explicit
+		SocketGenerator (TestNilCondition const nil_condition):
+			_nil_condition (nil_condition)
+		{ }
+
 		// Dtor
 		virtual
 		~SocketGenerator() = default;
 
 		virtual void
 		update (si::Time update_dt) = 0;
+
+		void
+		perhaps_set_to_nil (xf::BasicAssignableSocket& socket, si::Time const dt);
+
+	  private:
+		TestNilCondition const	_nil_condition;
+		si::Time				_time_left		{ _nil_condition.not_nil };
+		bool					_is_nil_now		{ false };
 	};
 
   public:
@@ -79,7 +101,8 @@ class TestGeneratorIO: public xf::ModuleIO
 					   Value initial_value,
 					   xf::Range<Value> value_range,
 					   RateOfChange<Value> rate_of_change,
-					   BorderCondition border_condition = BorderCondition::Mirroring);
+					   BorderCondition border_condition = BorderCondition::Mirroring,
+					   TestNilCondition const nil_condition = {});
 
 	/**
 	 * Create a socket that enumerates all listed values for some period of time.
@@ -87,7 +110,8 @@ class TestGeneratorIO: public xf::ModuleIO
 	template<class Value>
 		xf::ModuleOut<Value>&
 		create_enum_socket (std::string_view const& identifier,
-							std::vector<EnumTuple<Value>> const& values_and_intervals);
+							std::vector<EnumTuple<Value>> const& values_and_intervals,
+							TestNilCondition const nil_condition = {});
 
 	/**
 	 * Update all generators.
@@ -114,13 +138,36 @@ class TestGenerator: public xf::Module<TestGeneratorIO>
 };
 
 
+inline void
+TestGeneratorIO::SocketGenerator::perhaps_set_to_nil (xf::BasicAssignableSocket& socket, si::Time const dt)
+{
+	_time_left -= dt;
+
+	if (_time_left < 0_s)
+	{
+		_is_nil_now = !_is_nil_now;
+		_time_left = _is_nil_now ? _nil_condition.nil : _nil_condition.not_nil;
+
+		if (_time_left == 0_s)
+		{
+			_is_nil_now = !_is_nil_now;
+			_time_left = _is_nil_now ? _nil_condition.nil : _nil_condition.not_nil;
+		}
+	}
+
+	if (_is_nil_now)
+		socket = xf::nil;
+}
+
+
 template<UsefulWithRange Value>
 	inline xf::ModuleOut<Value>&
 	TestGeneratorIO::create_socket (std::string_view const& identifier,
 									Value const initial_value,
 									xf::Range<Value> const value_range,
 									RateOfChange<Value> const rate_of_change,
-									BorderCondition border_condition)
+									BorderCondition border_condition,
+									TestNilCondition const nil_condition)
 	{
 		class RangeGenerator: public SocketGenerator
 		{
@@ -134,9 +181,12 @@ template<UsefulWithRange Value>
 							Value const initial_value,
 							xf::Range<Value> const value_range,
 							RateOfChange<Value> const rate_of_change,
-							BorderCondition const border_condition):
+							BorderCondition const border_condition,
+							TestNilCondition const nil_condition):
+				SocketGenerator (nil_condition),
 				socket (io, identifier),
 				_initial_value (initial_value),
+				_current_value (initial_value),
 				_value_range (value_range),
 				_rate_of_change (rate_of_change),
 				_border_condition (border_condition)
@@ -146,7 +196,7 @@ template<UsefulWithRange Value>
 			void
 			update (si::Time const update_dt) override
 			{
-				auto new_value = this->socket.value_or (_initial_value) + update_dt * _rate_of_change;
+				auto new_value = _current_value + update_dt * _rate_of_change;
 
 				if (!_value_range.includes (new_value))
 				{
@@ -174,17 +224,20 @@ template<UsefulWithRange Value>
 					}
 				}
 
-				this->socket = new_value;
+				_current_value = new_value;
+				this->socket = _current_value;
+				perhaps_set_to_nil (this->socket, update_dt);
 			}
 
 		  private:
-			Value const					_initial_value;
-			xf::Range<Value> const		_value_range;
-			RateOfChange<Value>			_rate_of_change;
-			BorderCondition const		_border_condition;
+			Value const				_initial_value;
+			Value					_current_value;
+			xf::Range<Value> const	_value_range;
+			RateOfChange<Value>		_rate_of_change;
+			BorderCondition const	_border_condition;
 		};
 
-		_generators.emplace_back (std::make_unique<RangeGenerator> (this, identifier, initial_value, value_range, rate_of_change, border_condition));
+		_generators.emplace_back (std::make_unique<RangeGenerator> (this, identifier, initial_value, value_range, rate_of_change, border_condition, nil_condition));
 		return static_cast<RangeGenerator&> (*_generators.back()).socket;
 	}
 
@@ -192,7 +245,8 @@ template<UsefulWithRange Value>
 template<class Value>
 	inline xf::ModuleOut<Value>&
 	TestGeneratorIO::create_enum_socket (std::string_view const& identifier,
-										 std::vector<EnumTuple<Value>> const& values_and_intervals)
+										 std::vector<EnumTuple<Value>> const& values_and_intervals,
+										 TestNilCondition const nil_condition)
 	{
 		class EnumGenerator: public SocketGenerator
 		{
@@ -203,7 +257,9 @@ template<class Value>
 			// Ctor
 			EnumGenerator (TestGeneratorIO* io,
 						   std::string_view const& identifier,
-						   std::vector<EnumTuple<Value>> const& values_and_intervals):
+						   std::vector<EnumTuple<Value>> const& values_and_intervals,
+						   TestNilCondition const nil_condition):
+				SocketGenerator (nil_condition),
 				socket (io, identifier),
 				_values_and_intervals (values_and_intervals)
 			{ }
@@ -230,6 +286,8 @@ template<class Value>
 						this->socket = xf::nil;
 					},
 				}, variant);
+
+				perhaps_set_to_nil (this->socket, update_dt);
 			}
 
 		  private:
@@ -238,7 +296,7 @@ template<class Value>
 			std::vector<EnumTuple<Value>> const	_values_and_intervals;
 		};
 
-		_generators.emplace_back (std::make_unique<EnumGenerator> (this, identifier, values_and_intervals));
+		_generators.emplace_back (std::make_unique<EnumGenerator> (this, identifier, values_and_intervals, nil_condition));
 		return static_cast<EnumGenerator&> (*_generators.back()).socket;
 	}
 

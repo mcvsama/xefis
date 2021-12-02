@@ -127,8 +127,7 @@ TestInstrumentsMachine::TestInstrumentsMachine (xf::Xefis& xefis):
 
 	// IO:
 	test_screen_1->adi_io->weight_on_wheels									<< test_generator_io->create_enum_socket<bool> ("adi/weight-on-wheels", { { true, 3_s }, { xf::nil, 2_s }, { false, 5_s } });
-	// TODO nil occasionally:
-	test_screen_1->adi_io->speed_ias										<< test_generator_io->create_socket<si::Velocity> ("adi/speed/ias", 0_kt, { 0_kt, 300_kt }, 10_kt / 1_s);
+	test_screen_1->adi_io->speed_ias										<< test_generator_io->create_socket<si::Velocity> ("adi/speed/ias", 0_kt, { 0_kt, 300_kt }, 10_kt / 1_s, TestGeneratorIO::BorderCondition::Mirroring, { .nil = 3_s, .not_nil = 7_s });
 	test_screen_1->adi_io->speed_ias_lookahead								<< test_generator_io->create_socket<si::Velocity> ("adi/speed/ias.lookahead", 25_kt, { 0_kt, 300_kt }, 8_kt / 1_s);
 	test_screen_1->adi_io->speed_ias_minimum								<< test_generator_io->create_socket<si::Velocity> ("adi/speed/ias.minimum", 60_kt, { 50_kt, 70_kt }, 3_kt / 1_s);
 	test_screen_1->adi_io->speed_ias_minimum_maneuver						<< test_generator_io->create_socket<si::Velocity> ("adi/speed/ias.minimum.maneuver", 65_kt, { 55_kt, 72_kt }, 3_kt / 1_s);
@@ -145,9 +144,8 @@ TestInstrumentsMachine::TestInstrumentsMachine (xf::Xefis& xefis):
 	test_screen_1->adi_io->speed_flaps_a_speed								<< 120_kt;
 	test_screen_1->adi_io->speed_flaps_b_label								<< "5";
 	test_screen_1->adi_io->speed_flaps_b_speed								<< 110_kt;
-	// TODO pitch & roll occasionally nil:
-	test_screen_1->adi_io->orientation_pitch								<< test_generator_io->create_socket<si::Angle> ("adi/orientation/pitch", 0_deg, { -90_deg, 90_deg }, 8_deg / 1_s);
-	test_screen_1->adi_io->orientation_roll									<< test_generator_io->create_socket<si::Angle> ("adi/orientation/roll", 0_deg, { -180_deg, +180_deg }, 1.5_deg / 1_s, TestGeneratorIO::BorderCondition::Periodic);
+	test_screen_1->adi_io->orientation_pitch								<< test_generator_io->create_socket<si::Angle> ("adi/orientation/pitch", 0_deg, { -90_deg, 90_deg }, 8_deg / 1_s, TestGeneratorIO::BorderCondition::Mirroring, { .nil = 3_s, .not_nil = 7_s });
+	test_screen_1->adi_io->orientation_roll									<< test_generator_io->create_socket<si::Angle> ("adi/orientation/roll", 0_deg, { -180_deg, +180_deg }, 1.5_deg / 1_s, TestGeneratorIO::BorderCondition::Periodic, { .nil = 4_s, .not_nil = 6_s });
 	test_screen_1->adi_io->orientation_heading_magnetic						<< test_generator_io->create_socket<si::Angle> ("adi/orientation/heading.magnetic", 0_deg, { 0_deg, 360_deg }, 2_deg / 1_s, TestGeneratorIO::BorderCondition::Periodic);
 	test_screen_1->adi_io->orientation_heading_true							<< test_generator_io->create_socket<si::Angle> ("adi/orientation/heading.true", 10_deg, { 0_deg, 360_deg }, 2_deg / 1_s, TestGeneratorIO::BorderCondition::Periodic);
 	test_screen_1->adi_io->orientation_heading_numbers_visible				<< true;
@@ -159,8 +157,7 @@ TestInstrumentsMachine::TestInstrumentsMachine (xf::Xefis& xefis):
 	test_screen_1->adi_io->aoa_alpha										<< test_generator_io->create_socket<si::Angle> ("adi/aoa/alpha", 0_deg, { -7_deg, 15_deg }, 1_deg / 1_s);
 	test_screen_1->adi_io->aoa_alpha_maximum								<< test_generator_io->create_socket<si::Angle> ("adi/aoa/alpha.maximum", 13_deg, { 13_deg, 15_deg }, 0.25_deg / 1_s);
 	test_screen_1->adi_io->aoa_alpha_visible								<< true;
-	// TODO nil occasionally:
-	test_screen_1->adi_io->altitude_amsl									<< test_generator_io->create_socket<si::Length> ("adi/altitude/amsl", -200_ft, { -200_ft, 2000_ft }, 2000_ft / 1_min);
+	test_screen_1->adi_io->altitude_amsl									<< test_generator_io->create_socket<si::Length> ("adi/altitude/amsl", -200_ft, { -200_ft, 2000_ft }, 2000_ft / 1_min, TestGeneratorIO::BorderCondition::Mirroring, { .nil = 4_s, .not_nil = 7_s });
 	test_screen_1->adi_io->altitude_amsl_lookahead							<< test_generator_io->create_socket<si::Length> ("adi/altitude/amsl.lookahead", 10_ft, { 0_ft, 2000_ft }, 100_ft / 1_min);
 	test_screen_1->adi_io->altitude_agl_serviceable							<< test_generator_io->create_enum_socket<bool> ("adi/altitude/agl.serviceable", { { true, 16_s }, { false, 2_s } });
 	test_screen_1->adi_io->altitude_agl										<< test_generator_io->create_socket<si::Length> ("adi/altitude/agl", -4_ft, { -4_ft, 30_m }, 100_ft / 1_min);
@@ -168,8 +165,7 @@ TestInstrumentsMachine::TestInstrumentsMachine (xf::Xefis& xefis):
 	test_screen_1->adi_io->decision_height_setting							<< 300_ft;
 	test_screen_1->adi_io->decision_height_amsl								<< 300_ft;
 	test_screen_1->adi_io->landing_amsl										<< 140_ft;
-	// TODO nil occasionally:
-	test_screen_1->adi_io->vertical_speed									<< test_generator_io->create_socket<si::Velocity> ("adi/vertical-speed/speed", 0_fpm, { -6000_fpm, +6000_fpm }, 100_fpm / 1_s);
+	test_screen_1->adi_io->vertical_speed									<< test_generator_io->create_socket<si::Velocity> ("adi/vertical-speed/speed", 0_fpm, { -6000_fpm, +6000_fpm }, 100_fpm / 1_s, TestGeneratorIO::BorderCondition::Mirroring, { .nil = 3_s, .not_nil = 8_s });
 	test_screen_1->adi_io->vertical_speed_energy_variometer					<< test_generator_io->create_socket<si::Power> ("adi/vertical-speed/energy-variometer", 0_W, { -1000_W, +1000_W }, 100_W / 1_s);
 	test_screen_1->adi_io->pressure_qnh										<< 1013_hPa;
 	test_screen_1->adi_io->pressure_display_hpa								<< test_generator_io->create_enum_socket<bool> ("adi/pressure/display-hpa", { { true, 8_s }, { false, 8_s } });
@@ -329,8 +325,7 @@ TestInstrumentsMachine::TestInstrumentsMachine (xf::Xefis& xefis):
 
 	test_screen_1->engine_r_voltage_io->value								<< test_generator_io->create_socket<si::Voltage> ("engine/right/voltage", 16.8_V, { 11.1_V, 16.8_V }, 0.073_V / 1_s);
 
-	test_screen_1->engine_r_vibration_io->value								<< test_generator_io->create_socket<si::Acceleration> ("engine/right/vibration", 0.1_g, { 0.1_g, 1.2_g }, 0.025_g / 1_s);
-																			// TODO occasional nil as value in ->created_socket
+	test_screen_1->engine_r_vibration_io->value								<< test_generator_io->create_socket<si::Acceleration> ("engine/right/vibration", 0.1_g, { 0.1_g, 1.2_g }, 0.025_g / 1_s, TestGeneratorIO::BorderCondition::Mirroring, { .nil = 2.5_s, .not_nil = 6.5_s });
 
 	test_screen_1->gear_io->requested_down									<< true;
 	test_screen_1->gear_io->nose_up											<< false;
