@@ -44,7 +44,7 @@ AutoTest t1 ("SocketDeltaDecoder", []{
 			executed = true;
 		};
 
-		decoder();
+		decoder.process();
 
 		if (callback_should_be_called)
 			test_asserts::verify ("decoder callback was called", executed);
@@ -77,9 +77,9 @@ AutoTest t1 ("SocketDeltaDecoder", []{
 	});
 
 	socket = 4;
-	decoder.force_callback (10);
+	decoder.call_action (10);
 	verify (true, [](auto const delta) {
-		test_asserts::verify ("delta is +2 after force_callback (10)", delta && *delta == 2);
+		test_asserts::verify ("delta is +2 after call_action (10)", delta && *delta == 2);
 	});
 });
 

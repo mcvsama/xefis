@@ -24,6 +24,7 @@
 // Xefis:
 #include <xefis/core/module_io.h>
 #include <xefis/core/sockets/module_socket.h>
+#include <xefis/core/sockets/tests/test_cycle.h>
 #include <xefis/support/sockets/socket_quadrature_counter.h>
 #include <xefis/support/sockets/socket_quadrature_decoder.h>
 
@@ -109,7 +110,7 @@ AutoTest t1 ("SocketQuadratureDecoder + SocketQuadratureCounter", []{
 		socket_a = std::get<0> (step.value());
 		socket_b = std::get<1> (step.value());
 		expected_total += expected_delta.value_or (0);
-		decoder();
+		decoder.process();
 
 		std::string const on_step = "on step " + std::to_string (step.index());
 

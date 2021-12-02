@@ -23,8 +23,8 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/sockets/module_socket.h>
-#include <xefis/utility/actions.h>
+#include <xefis/core/sockets/socket.h>
+#include <xefis/support/sockets/socket_value_changed.h>
 
 
 namespace xf {
@@ -38,65 +38,65 @@ template<DeltaDecoderValueConcept pInteger = int64_t>
 	{
 	  public:
 		using Integer	= pInteger;
-		using Callback	= std::function<void (std::optional<Integer> delta)>;
+		using Action	= std::function<void (std::optional<Integer> delta)>;
 
 	  public:
 		// Ctor
 		explicit
-		SocketDeltaDecoder (Socket<Integer> const& socket, Callback callback, Integer initial_value = {});
+		SocketDeltaDecoder (Socket<Integer>& socket, Action action, Integer initial_value = {});
 
 		/**
-		 * Signals that sockets have been updated. May call the callback.
+		 * Signals that sockets have been updated. May call the action.
 		 */
 		void
-		operator()();
+		process();
 
 		/**
-		 * Force callback to be called with given delta value, but don't change internal state of the decoder.
+		 * Force action to be called with given delta value, but don't change internal state of the decoder.
 		 */
 		void
-		force_callback (std::optional<Integer> delta) const;
+		call_action (std::optional<Integer> delta) const;
 
 	  private:
-		Integer					_previous;
-		Socket<Integer> const&	_value_socket;
-		PropChanged<Integer>	_socket_changed	{ _value_socket };
-		Callback				_callback;
+		Integer						_previous;
+		Socket<Integer>&			_value_socket;
+		SocketValueChanged<Integer>	_socket_value_changed	{ _value_socket };
+		Action						_action;
 	};
 
 
 template<DeltaDecoderValueConcept I>
 	inline
-	SocketDeltaDecoder<I>::SocketDeltaDecoder (Socket<Integer> const& socket, Callback callback, Integer initial_value):
+	SocketDeltaDecoder<I>::SocketDeltaDecoder (Socket<Integer>& socket, Action const action, Integer const initial_value):
 		_previous (initial_value),
 		_value_socket (socket),
-		_callback (callback)
+		_action (action)
 	{ }
 
 
 template<DeltaDecoderValueConcept I>
 	inline void
-	SocketDeltaDecoder<I>::operator()()
+	SocketDeltaDecoder<I>::process()
 	{
-		if (_callback && _socket_changed())
+		if (_action && _socket_value_changed.value_changed())
 		{
 			if (_value_socket)
 			{
 				auto const current = *_value_socket;
-				_callback (current - _previous);
+				_action (current - _previous);
 				_previous = current;
 			}
 			else
-				_callback (std::nullopt);
+				_action (std::nullopt);
 		}
 	}
 
 
 template<DeltaDecoderValueConcept I>
 	inline void
-	SocketDeltaDecoder<I>::force_callback (std::optional<Integer> delta) const
+	SocketDeltaDecoder<I>::call_action (std::optional<Integer> delta) const
 	{
-		_callback (delta);
+		_action (delta);
 	}
 
 } // namespace xf

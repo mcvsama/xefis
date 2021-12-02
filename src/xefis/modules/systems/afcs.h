@@ -27,7 +27,7 @@
 #include <xefis/core/setting.h>
 #include <xefis/core/sockets/module_socket.h>
 #include <xefis/support/sockets/socket_delta_decoder.h>
-#include <xefis/utility/callback_actions.h>
+#include <xefis/support/sockets/socket_value_changed_action.h>
 
 // Local:
 #include "afcs_api.h"
@@ -584,7 +584,7 @@ class AFCS: public xf::Module<AFCS_IO>
 	si::Length											_mcp_altitude		{ 1000_ft };
 	std::optional<si::Velocity>							_mcp_vs;
 	std::optional<si::Angle>							_mcp_fpa;
-	std::set<std::unique_ptr<xf::CallbackAction>>		_button_actions;
+	std::set<std::unique_ptr<xf::SocketAction>>			_socket_actions;
 	std::set<std::unique_ptr<xf::SocketDeltaDecoder<>>>	_rotary_decoders;
 };
 

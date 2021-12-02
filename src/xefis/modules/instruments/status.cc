@@ -110,7 +110,7 @@ Status::Status (std::unique_ptr<StatusIO> module_io, xf::Graphics const& graphic
 		}
 	});
 
-	_input_cursor_decoder->force_callback (0);
+	_input_cursor_decoder->call_action (0);
 
 	_blink_timer = std::make_unique<QTimer>();
 	_blink_timer->setInterval (200);
@@ -145,7 +145,7 @@ Status::add_message (std::string_view const& text, Severity severity)
 void
 Status::process (xf::Cycle const& cycle)
 {
-	(*_input_cursor_decoder)();
+	_input_cursor_decoder->process();
 
 	for (auto& message: _messages)
 		message.process (cycle.update_time());

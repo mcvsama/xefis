@@ -24,7 +24,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/sockets/socket.h>
-#include <xefis/utility/actions.h>
+#include <xefis/support/sockets/socket_changed.h>
 
 
 namespace xf {
@@ -41,56 +41,55 @@ template<QuadratureDecoderValueConcept pInteger = int64_t>
 	{
 	  public:
 		using Integer	= pInteger;
-		using Callback	= std::function<void (std::optional<Integer> delta)>;
+		using Action	= std::function<void (std::optional<Integer> delta)>;
 
 	  public:
 		// Ctor
 		explicit
-		SocketQuadratureDecoder (Socket<bool> const& socket_a, Socket<bool> const& socket_b, Callback callback);
+		SocketQuadratureDecoder (Socket<bool>& socket_a, Socket<bool>& socket_b, Action);
 
 		/**
 		 * Signals that sockets have been updated. May call the callback.
 		 */
 		void
-		operator()();
+		process();
 
 		/**
 		 * Force callback to be called with given delta value, but don't change the internal state of the decoder.
 		 */
 		void
-		force_callback (std::optional<Integer> delta) const;
+		call_action (std::optional<Integer> delta) const;
 
 	  private:
-		bool				_prev_a;
-		bool				_prev_b;
-		Socket<bool> const&	_socket_a;
-		Socket<bool> const&	_socket_b;
-		PropChanged<bool>	_prop_a_changed	{ _socket_a };
-		PropChanged<bool>	_prop_b_changed	{ _socket_b };
-		Callback			_callback;
+		bool			_prev_a;
+		bool			_prev_b;
+		Socket<bool>&	_socket_a;
+		Socket<bool>&	_socket_b;
+		SocketChanged	_socket_a_changed	{ _socket_a };
+		SocketChanged	_socket_b_changed	{ _socket_b };
+		Action			_action;
 	};
 
 
 template<QuadratureDecoderValueConcept I>
 	inline
-	SocketQuadratureDecoder<I>::SocketQuadratureDecoder (Socket<bool> const& socket_a, Socket<bool> const& socket_b, Callback callback):
+	SocketQuadratureDecoder<I>::SocketQuadratureDecoder (Socket<bool>& socket_a, Socket<bool>& socket_b, Action const action):
 		_prev_a (socket_a.value_or (false)),
 		_prev_b (socket_b.value_or (false)),
 		_socket_a (socket_a),
 		_socket_b (socket_b),
-		_callback (callback)
+		_action (action)
 	{ }
 
 
 template<QuadratureDecoderValueConcept I>
 	inline void
-	SocketQuadratureDecoder<I>::operator()()
+	SocketQuadratureDecoder<I>::process()
 	{
-		if (_callback)
+		if (_action)
 		{
-			// Both PropChanged need to be called, to save new state:
-			auto const a_changed = _prop_a_changed();
-			auto const b_changed = _prop_b_changed();
+			auto const a_changed = _socket_a_changed.serial_changed();
+			auto const b_changed = _socket_b_changed.serial_changed();
 
 			if (a_changed || b_changed)
 			{
@@ -109,18 +108,18 @@ template<QuadratureDecoderValueConcept I>
 					if (da == 0 || db == 0)
 					{
 						if ((da == 1 && b == 0) || (a == 1 && db == 1) || (da == -1 && b == 1) || (a == 0 && db == -1))
-							_callback (-1);
+							_action (-1);
 						else
-							_callback (+1);
+							_action (+1);
 					}
 					else
-						_callback (std::nullopt);
+						_action (std::nullopt);
 
 					_prev_a = a;
 					_prev_b = b;
 				}
 				else
-					_callback (std::nullopt);
+					_action (std::nullopt);
 			}
 		}
 	}
@@ -128,9 +127,9 @@ template<QuadratureDecoderValueConcept I>
 
 template<QuadratureDecoderValueConcept I>
 	inline void
-	SocketQuadratureDecoder<I>::force_callback (std::optional<Integer> const delta) const
+	SocketQuadratureDecoder<I>::call_action (std::optional<Integer> const delta) const
 	{
-		_callback (delta);
+		_action (delta);
 	}
 
 } // namespace xf

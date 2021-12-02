@@ -41,39 +41,6 @@ class PropAction
 };
 
 
-class SerialChanged: public PropAction
-{
-  public:
-	using Serial	= BasicSocket::Serial;
-
-  public:
-	// Ctor
-	explicit
-	SerialChanged (BasicSocket& socket):
-		_socket (socket)
-	{ }
-
-	// PropAction API
-	bool
-	operator()() override
-	{
-		auto new_serial = _socket.serial();
-
-		if (new_serial != _serial)
-		{
-			_serial = new_serial;
-			return true;
-		}
-
-		return false;
-	}
-
-  private:
-	Serial			_serial	{ 0 };
-	BasicSocket&	_socket;
-};
-
-
 /**
  * Checks whether a socket changed its value since last check.
  */
@@ -120,72 +87,6 @@ template<class pValue>
 	  private:
 		Socket const&	_socket;
 		OptionalValue	_last_value;
-	};
-
-
-/**
- * Checks whether a socket has changed and has now given value.
- */
-template<class pValue>
-	class PropChangedTo: public PropChanged<pValue>
-	{
-	  public:
-		using Value			= pValue;
-		using OptionalValue	= typename PropChanged<Value>::OptionalValue;
-		using Socket		= typename PropChanged<Value>::Socket;
-
-	  public:
-		// Ctor
-		constexpr
-		PropChangedTo (Socket const& socket, Value value):
-			PropChanged<Value> (socket),
-			_expected_value (value)
-		{ }
-
-		// PropAction API
-		bool
-		operator()() override
-		{
-			return PropChanged<Value>::operator()()
-				&& this->socket().valid()
-				&& *this->socket() == expected_value();
-		}
-
-		/**
-		 * Return the value this observer expects.
-		 */
-		constexpr Value
-		expected_value() const noexcept
-		{
-			return _expected_value;
-		}
-
-	  private:
-		Value _expected_value;
-	};
-
-
-/**
- * Checks whether a socket changed to nil.
- */
-template<class pValue>
-	class ChangedToNil: public PropChanged<pValue>
-	{
-	  public:
-		using Value			= pValue;
-		using OptionalValue	= typename PropChanged<Value>::OptionalValue;
-		using Socket		= typename PropChanged<Value>::Socket;
-
-	  public:
-		using PropChanged<Value>::PropChanged;
-
-		// PropAction API
-		bool
-		operator()() override
-		{
-			return PropChanged<Value>::operator()
-				&& this->socket().is_nil();
-		}
 	};
 
 } // namespace xf

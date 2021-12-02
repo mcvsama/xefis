@@ -19,7 +19,6 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/cycle.h>
 #include <xefis/core/sockets/socket.h>
 #include <xefis/support/sockets/socket_changed.h>
 
@@ -27,7 +26,7 @@
 namespace xf {
 
 /**
- * Checks if socket's value changed since the previous loop cycle.
+ * Checks if socket's value changed since last check.
  */
 template<class pValue>
 	class SocketValueChanged: public SocketChanged
@@ -41,19 +40,19 @@ template<class pValue>
 		SocketValueChanged (Socket<Value>& socket);
 
 		/**
-		 * Return true if socket's value changed since last cycle.
+		 * Return true if socket's value changed since last check.
 		 */
 		[[nodiscard]]
 		bool
-		value_changed (Cycle const&);
+		value_changed();
 
 		/**
-		 * Return true if socket's value changed to given value since last cycle.
+		 * Return true if socket's value changed to given value since last check.
 		 */
 		[[nodiscard]]
 		bool
-		value_changed_to (std::optional<Value> const& expected_value, Cycle const& cycle)
-			{ return value_changed (cycle) && _socket.get_optional() == expected_value; }
+		value_changed_to (std::optional<Value> const& expected_value)
+			{ return value_changed() && _socket.get_optional() == expected_value; }
 
 		[[nodiscard]]
 		Socket<Value>&
@@ -67,7 +66,7 @@ template<class pValue>
 
 	  protected:
 		bool
-		perhaps_shift_cycles (Cycle const& cycle) override;
+		perhaps_shift_cycles() override;
 
 	  private:
 		Socket<Value>&			_socket;
@@ -86,18 +85,17 @@ template<class V>
 
 template<class V>
 	inline bool
-	SocketValueChanged<V>::value_changed (Cycle const& cycle)
+	SocketValueChanged<V>::value_changed()
 	{
-		perhaps_shift_cycles (cycle);
-		return _prev_value != _curr_value;
+		return perhaps_shift_cycles() && _prev_value != _curr_value;
 	}
 
 
 template<class V>
 	inline bool
-	SocketValueChanged<V>::perhaps_shift_cycles (Cycle const& cycle)
+	SocketValueChanged<V>::perhaps_shift_cycles()
 	{
-		auto const shifted = SocketChanged::perhaps_shift_cycles (cycle);
+		auto const shifted = SocketChanged::perhaps_shift_cycles();
 
 		if (shifted)
 		{

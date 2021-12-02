@@ -77,10 +77,10 @@ AFCS::process (xf::Cycle const&)
 	// TODO recheck
 	try {
 		for (auto& r: _rotary_decoders)
-			(*r)();
+			r->process();
 
-		for (auto& a: _button_actions)
-			(*a)();
+		for (auto& a: _socket_actions)
+			a->process();
 
 		check_input();
 		check_events();
@@ -1057,19 +1057,22 @@ AFCS::transfer_airspeed_control_from_pitch_to_thrust()
 void
 AFCS::make_button_action (xf::ModuleIn<bool>& socket, void (AFCS::* callback)())
 {
-	auto action = std::make_unique<xf::PropChangedToAction<bool>> (socket, true, [this,callback] {
-		try {
-			(this->*callback)();
-			solve();
-		}
-		catch (...)
+	auto action = std::make_unique<xf::SocketValueChangedAction<bool>> (socket, [this,callback] (auto const& value) {
+		if (value.value_or (true))
 		{
-			solve();
-			throw;
+			try {
+				(this->*callback)();
+				solve();
+			}
+			catch (...)
+			{
+				solve();
+				throw;
+			}
 		}
 	});
 
-	_button_actions.insert (std::move (action));
+	_socket_actions.insert (std::move (action));
 }
 
 
@@ -1091,7 +1094,7 @@ AFCS::make_knob_action (xf::ModuleIn<int64_t>& socket, void (AFCS::* callback)(i
 	});
 
 	// Initialize:
-	action->force_callback (0);
+	action->call_action (0);
 	_rotary_decoders.insert (std::move (action));
 }
 

@@ -11,39 +11,34 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
+#ifndef XEFIS__SUPPORT__SOCKETS__SOCKET_ACTION_H__INCLUDED
+#define XEFIS__SUPPORT__SOCKETS__SOCKET_ACTION_H__INCLUDED
+
 // Standard:
 #include <cstddef>
 
 // Xefis:
 #include <xefis/config/all.h>
-
-// Local:
-#include "socket_changed.h"
+#include <xefis/core/cycle.h>
 
 
 namespace xf {
 
-bool
-SocketChanged::serial_changed()
+/**
+ * Common interface for Socket*Action classes.
+ */
+class SocketAction
 {
-	return perhaps_shift_cycles() && _prev_serial != _curr_serial;
-}
+  public:
+	// Dtor
+	virtual
+	~SocketAction() = default;
 
-
-bool
-SocketChanged::perhaps_shift_cycles()
-{
-	auto const next_serial = _socket.serial();
-
-	if (next_serial > _curr_serial)
-	{
-		_prev_serial = _curr_serial;
-		_curr_serial = next_serial;
-		return true;
-	}
-	else
-		return false;
-}
+	virtual void
+	process() = 0;
+};
 
 } // namespace xf
+
+#endif
 

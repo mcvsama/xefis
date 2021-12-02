@@ -46,7 +46,7 @@ class SocketChanged
 	 */
 	[[nodiscard]]
 	bool
-	serial_changed (Cycle const& cycle);
+	serial_changed();
 
 	[[nodiscard]]
 	BasicSocket&
@@ -60,14 +60,12 @@ class SocketChanged
 
   protected:
 	virtual bool
-	perhaps_shift_cycles (Cycle const& cycle);
+	perhaps_shift_cycles();
 
   private:
 	BasicSocket&		_socket;
-	BasicSocket::Serial	_prev_serial		{ 0 };
-	BasicSocket::Serial	_curr_serial		{ 0 };
-	Cycle::Number		_prev_cycle_number	{ 0 };
-	Cycle::Number		_curr_cycle_number	{ 0 };
+	BasicSocket::Serial	_prev_serial	{ 0 };
+	BasicSocket::Serial	_curr_serial	{ 0 };
 };
 
 } // namespace xf

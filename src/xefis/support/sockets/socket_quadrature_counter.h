@@ -42,7 +42,7 @@ template<QuadratureDecoderValueConcept pInteger = int64_t>
 	  public:
 		// Ctor
 		explicit
-		SocketQuadratureCounter (Socket<bool> const& socket_a, Socket<bool> const& socket_b, Integer initial_value, Callback callback = [](auto, auto){});
+		SocketQuadratureCounter (Socket<bool>& socket_a, Socket<bool>& socket_b, Integer initial_value, Callback callback = [](auto, auto){});
 
 		/**
 		 * Return stored counted value.
@@ -62,7 +62,7 @@ template<QuadratureDecoderValueConcept pInteger = int64_t>
 
 template<QuadratureDecoderValueConcept I>
 	inline
-	SocketQuadratureCounter<I>::SocketQuadratureCounter (Socket<bool> const& socket_a, Socket<bool> const& socket_b, Integer initial_value, Callback callback):
+	SocketQuadratureCounter<I>::SocketQuadratureCounter (Socket<bool>& socket_a, Socket<bool>& socket_b, Integer initial_value, Callback callback):
 		SocketQuadratureDecoder<I> (socket_a, socket_b, [this] (auto delta) { decoder_callback (delta); }),
 		_total (initial_value),
 		_callback (callback)
