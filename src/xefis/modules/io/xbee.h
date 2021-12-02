@@ -29,7 +29,7 @@
 #include <xefis/core/module.h>
 #include <xefis/core/setting.h>
 #include <xefis/core/sockets/module_socket.h>
-#include <xefis/utility/actions.h>
+#include <xefis/support/sockets/socket_changed.h>
 #include <xefis/utility/smoother.h>
 
 
@@ -448,7 +448,7 @@ class XBee:
 	xf::Smoother<si::Power>				_rssi_smoother			{ 200_ms };
 	si::Time							_last_rssi_time;
 	uint8_t								_at_frame_id			{ 0x00 };
-	xf::PropChanged<std::string>		_send_changed			{ io.send };
+	xf::SocketChanged					_send_changed			{ io.send };
 };
 
 

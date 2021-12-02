@@ -54,7 +54,7 @@ UDP::UDP (std::unique_ptr<UDP_IO> module_io, xf::Logger const& logger, std::stri
 void
 UDP::process (xf::Cycle const&)
 {
-	if (io.send && _send_changed())
+	if (io.send && _send_changed.serial_changed())
 	{
 		std::string const& data = *io.send;
 		QByteArray blob (data.data(), data.size());

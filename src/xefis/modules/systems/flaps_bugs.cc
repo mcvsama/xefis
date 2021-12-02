@@ -30,7 +30,7 @@ FlapsBugs::FlapsBugs (std::unique_ptr<FlapsBugsIO> module_io, xf::Flaps const& f
 void
 FlapsBugs::process (xf::Cycle const&)
 {
-	if (_flaps_setting_changed())
+	if (_flaps_setting_changed.value_changed())
 	{
 		if (io.flaps_setting)
 		{

@@ -24,7 +24,7 @@
 #include <xefis/core/setting.h>
 #include <xefis/core/sockets/module_socket.h>
 #include <xefis/support/airframe/flaps.h>
-#include <xefis/utility/actions.h>
+#include <xefis/support/sockets/socket_value_changed.h>
 
 
 namespace si = neutrino::si;
@@ -76,8 +76,8 @@ class FlapsBugs: public xf::Module<FlapsBugsIO>
 	process (xf::Cycle const&) override;
 
   private:
-	xf::Flaps const&			_flaps;
-	xf::PropChanged<si::Angle>	_flaps_setting_changed	{ io.flaps_setting };
+	xf::Flaps const&					_flaps;
+	xf::SocketValueChanged<si::Angle>	_flaps_setting_changed	{ io.flaps_setting };
 };
 
 #endif

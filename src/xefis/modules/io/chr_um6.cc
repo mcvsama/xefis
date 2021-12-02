@@ -89,7 +89,7 @@ CHRUM6::process (xf::Cycle const&)
 	{
 		// Earth acceleration = measured acceleration + centripetal acceleration.
 
-		if (_output_acceleration_x_changed() || _input_centripetal_x_changed())
+		if (_output_acceleration_x_changed.value_changed() || _input_centripetal_x_changed.value_changed())
 		{
 			si::Acceleration earth_x = 0_g;
 			if (io.acceleration_x && io.centripetal_x)
@@ -97,7 +97,7 @@ CHRUM6::process (xf::Cycle const&)
 			_sensor->write (xf::CHRUM6::ConfigurationAddress::AccelRefX, static_cast<float> (earth_x.in<si::Gravity>()));
 		}
 
-		if (_output_acceleration_y_changed() || _input_centripetal_y_changed())
+		if (_output_acceleration_y_changed.value_changed() || _input_centripetal_y_changed.value_changed())
 		{
 			si::Acceleration earth_y = 0_g;
 			if (io.acceleration_y && io.centripetal_y)
@@ -105,7 +105,7 @@ CHRUM6::process (xf::Cycle const&)
 			_sensor->write (xf::CHRUM6::ConfigurationAddress::AccelRefY, static_cast<float> (earth_y.in<si::Gravity>()));
 		}
 
-		if (_output_acceleration_z_changed() || _input_centripetal_z_changed())
+		if (_output_acceleration_z_changed.value_changed() || _input_centripetal_z_changed.value_changed())
 		{
 			si::Acceleration earth_z = 1_g;
 			if (io.acceleration_z && io.centripetal_z)

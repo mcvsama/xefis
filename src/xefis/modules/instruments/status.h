@@ -34,7 +34,6 @@
 #include <xefis/support/instrument/instrument_support.h>
 #include <xefis/support/sockets/socket_button.h>
 #include <xefis/support/sockets/socket_delta_decoder.h>
-#include <xefis/utility/actions.h>
 
 
 namespace si = neutrino::si;

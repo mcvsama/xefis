@@ -41,7 +41,7 @@
 #include <xefis/core/module_io.h>
 #include <xefis/core/setting.h>
 #include <xefis/core/sockets/module_socket.h>
-#include <xefis/utility/actions.h>
+#include <xefis/support/sockets/socket_changed.h>
 #include <xefis/utility/types.h>
 
 
@@ -631,7 +631,7 @@ class Link:
 	Blob							_input_blob;
 	Blob							_output_blob;
 	std::unique_ptr<LinkProtocol>	_protocol;
-	xf::PropChanged<std::string>	_input_changed		{ io.link_input };
+	xf::SocketChanged				_input_changed		{ io.link_input };
 };
 
 

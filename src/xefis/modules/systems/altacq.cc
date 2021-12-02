@@ -48,7 +48,7 @@ AltAcq::process (xf::Cycle const& cycle)
 
 	if (io.altitude_acquire_flag.use_count() > 0 && io.altitude_amsl && io.altitude_acquire_amsl)
 	{
-		if (_altitude_amsl_changed() || _altitude_acquire_amsl_changed())
+		if (_altitude_amsl_changed.value_changed() || _altitude_acquire_amsl_changed.value_changed())
 		{
 			si::Length diff = abs (*io.altitude_amsl - *io.altitude_acquire_amsl);
 			// Arm flag when difference beyond 'on-diff':

@@ -23,7 +23,7 @@
 #include <xefis/core/setting.h>
 #include <xefis/core/sockets/module_socket.h>
 #include <xefis/support/sockets/socket_observer.h>
-#include <xefis/utility/actions.h>
+#include <xefis/support/sockets/socket_value_changed.h>
 #include <xefis/utility/smoother.h>
 
 
@@ -76,13 +76,13 @@ class AltAcq: public xf::Module<AltAcqIO>
 	compute_altitude_acquire_distance();
 
   private:
-	bool						_flag_armed							{ false };
+	bool								_flag_armed							{ false };
 	// Note: SocketObservers depend on Smoothers, so first Smoothers must be defined,
 	// then SocketObservers, to ensure correct order of destruction.
-	xf::Smoother<si::Length>	_output_smoother					{ 2_s };
-	xf::SocketObserver			_output_computer;
-	xf::PropChanged<si::Length>	_altitude_amsl_changed				{ io.altitude_amsl };
-	xf::PropChanged<si::Length>	_altitude_acquire_amsl_changed		{ io.altitude_acquire_amsl };
+	xf::Smoother<si::Length>			_output_smoother					{ 2_s };
+	xf::SocketObserver					_output_computer;
+	xf::SocketValueChanged<si::Length>	_altitude_amsl_changed				{ io.altitude_amsl };
+	xf::SocketValueChanged<si::Length>	_altitude_acquire_amsl_changed		{ io.altitude_acquire_amsl };
 };
 
 #endif

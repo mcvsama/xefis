@@ -23,7 +23,7 @@
 #include <xefis/core/module.h>
 #include <xefis/core/setting.h>
 #include <xefis/core/socket.h>
-#include <xefis/utility/actions.h>
+#include <xefis/support/sockets/socket_value_changed.h>
 
 
 template<class Value>
@@ -78,9 +78,9 @@ template<class pValue>
 		process (xf::Cycle const&) override;
 
 	  private:
-		xf::Logger				_logger;
-		xf::PropChanged<Value>	_input_a_changed	{ io.input_a_value };
-		xf::PropChanged<Value>	_input_b_changed	{ io.input_b_value };
+		xf::Logger						_logger;
+		xf::SocketValueChanged<Value>	_input_a_changed	{ io.input_a_value };
+		xf::SocketValueChanged<Value>	_input_b_changed	{ io.input_b_value };
 	};
 
 
@@ -109,7 +109,7 @@ template<class V>
 	void
 	Mixer<V>::process (xf::Cycle const&)
 	{
-		if (_input_a_changed() || _input_b_changed())
+		if (_input_a_changed.value_changed() || _input_b_changed.value_changed())
 		{
 			auto& a = input_a_value;
 			auto& b = input_b_value;

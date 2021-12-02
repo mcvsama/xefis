@@ -25,7 +25,6 @@
 #include <xefis/config/all.h>
 #include <xefis/core/sockets/socket.h>
 #include <xefis/support/sockets/socket_quadrature_decoder.h>
-#include <xefis/utility/actions.h>
 
 
 namespace xf {

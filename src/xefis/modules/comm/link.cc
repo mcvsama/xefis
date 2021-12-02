@@ -520,7 +520,7 @@ void
 Link::process (xf::Cycle const& cycle)
 {
 	try {
-		if (io.link_input && _input_changed())
+		if (io.link_input && _input_changed.serial_changed())
 		{
 			_input_blob.insert (_input_blob.end(), io.link_input->begin(), io.link_input->end());
 			auto e = _protocol->eat (_input_blob.begin(), _input_blob.end(), &io, _reacquire_timer, _failsafe_timer, cycle.logger() + _logger);

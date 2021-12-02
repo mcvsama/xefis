@@ -32,7 +32,7 @@
 #include <xefis/core/setting.h>
 #include <xefis/core/sockets/module_socket.h>
 #include <xefis/support/devices/chr_um6.h>
-#include <xefis/utility/actions.h>
+#include <xefis/support/sockets/socket_value_changed.h>
 
 
 namespace si = neutrino::si;
@@ -261,24 +261,24 @@ class CHRUM6:
 	describe_errors (xf::CHRUM6::Request const&);
 
   private:
-	xf::Logger							_logger;
-	std::unique_ptr<QTimer>				_restart_timer;
-	std::unique_ptr<QTimer>				_alive_check_timer;
-	std::unique_ptr<QTimer>				_status_check_timer;
-	std::unique_ptr<QTimer>				_initialization_timer;
-	xf::SerialPort						_serial_port;
-	std::unique_ptr<xf::CHRUM6>			_sensor;
-	int									_failure_count						{ 0 };
-	Stage								_stage								{ Stage::Initialize };
-	xf::PropChanged<si::Acceleration>	_input_centripetal_x_changed		{ io.centripetal_x };
-	xf::PropChanged<si::Acceleration>	_input_centripetal_y_changed		{ io.centripetal_y };
-	xf::PropChanged<si::Acceleration>	_input_centripetal_z_changed		{ io.centripetal_z };
-	xf::PropChanged<si::Acceleration>	_output_acceleration_x_changed		{ io.acceleration_x };
-	xf::PropChanged<si::Acceleration>	_output_acceleration_y_changed		{ io.acceleration_y };
-	xf::PropChanged<si::Acceleration>	_output_acceleration_z_changed		{ io.acceleration_z };
+	xf::Logger									_logger;
+	std::unique_ptr<QTimer>						_restart_timer;
+	std::unique_ptr<QTimer>						_alive_check_timer;
+	std::unique_ptr<QTimer>						_status_check_timer;
+	std::unique_ptr<QTimer>						_initialization_timer;
+	xf::SerialPort								_serial_port;
+	std::unique_ptr<xf::CHRUM6>					_sensor;
+	int											_failure_count						{ 0 };
+	Stage										_stage								{ Stage::Initialize };
+	xf::SocketValueChanged<si::Acceleration>	_input_centripetal_x_changed		{ io.centripetal_x };
+	xf::SocketValueChanged<si::Acceleration>	_input_centripetal_y_changed		{ io.centripetal_y };
+	xf::SocketValueChanged<si::Acceleration>	_input_centripetal_z_changed		{ io.centripetal_z };
+	xf::SocketValueChanged<si::Acceleration>	_output_acceleration_x_changed		{ io.acceleration_x };
+	xf::SocketValueChanged<si::Acceleration>	_output_acceleration_y_changed		{ io.acceleration_y };
+	xf::SocketValueChanged<si::Acceleration>	_output_acceleration_z_changed		{ io.acceleration_z };
 	// Backup gyro bias values:
-	std::optional<uint32_t>				_gyro_bias_xy;
-	std::optional<uint32_t>				_gyro_bias_z;
+	std::optional<uint32_t>						_gyro_bias_xy;
+	std::optional<uint32_t>						_gyro_bias_z;
 };
 
 #endif

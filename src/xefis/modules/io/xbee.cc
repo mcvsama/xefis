@@ -122,7 +122,7 @@ XBee::process (xf::Cycle const&)
 	if (!_notifier)
 		return;
 
-	if (io.send && _send_changed() && configured())
+	if (io.send && _send_changed.serial_changed() && configured())
 	{
 		std::string data = _output_buffer + *io.send;
 		std::vector<std::string> packets = packetize (data, 100); // Max 100 bytes per packet according to XBee docs.

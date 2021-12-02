@@ -29,7 +29,7 @@
 #include <xefis/core/module_io.h>
 #include <xefis/core/setting.h>
 #include <xefis/core/sockets/module_socket.h>
-#include <xefis/utility/actions.h>
+#include <xefis/support/sockets/socket_changed.h>
 
 
 class UDP_IO: public xf::ModuleIO
@@ -97,7 +97,7 @@ class UDP:
 	QByteArray						_received_datagram;
 	std::unique_ptr<QUdpSocket>		_tx;
 	std::unique_ptr<QUdpSocket>		_rx;
-	xf::PropChanged<std::string>	_send_changed	{ io.send };
+	xf::SocketChanged				_send_changed	{ io.send };
 };
 
 #endif
