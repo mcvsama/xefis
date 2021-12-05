@@ -237,7 +237,7 @@ LinkProtocol::Signature::produce (Blob& blob)
 	for (unsigned int i = 0; i < _nonce_bytes; ++i)
 		_temp.push_back (distribution (_rng));
 
-	auto const hmac = xf::calculate_hmac ({ .key = _key, .data = _temp, .algorithm = xf::Hash::SHA3_256 });
+	auto const hmac = xf::calculate_hmac<xf::Hash::SHA3_256> ({ .key = _key, .data = _temp });
 	// Add some of the bytes of HMAC signature:
 	size_t hmac_bytes = std::min<size_t> (_signature_bytes, hmac.size());
 	_temp += hmac.substr (0, hmac_bytes);
@@ -263,7 +263,7 @@ LinkProtocol::Signature::eat (Blob::const_iterator begin, Blob::const_iterator e
 	_temp.resize (data_size + _nonce_bytes);
 	std::copy (begin, sign_begin, _temp.begin());
 
-	auto const hmac = xf::calculate_hmac ({ .key = _key, .data = _temp, .algorithm = xf::Hash::SHA3_256 });
+	auto const hmac = xf::calculate_hmac<xf::Hash::SHA3_256> ({ .key = _key, .data = _temp });
 
 	// If HMACs differ, it's a parsing error:
 	if (!std::equal (sign_begin, sign_end, hmac.begin()))
