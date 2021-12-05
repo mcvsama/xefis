@@ -34,6 +34,7 @@
 // Neutrino:
 #include <neutrino/bus/serial_port.h>
 #include <neutrino/qt/qdom.h>
+#include <neutrino/string.h>
 #include <neutrino/time_helper.h>
 
 // Xefis:
@@ -449,7 +450,7 @@ XBee::configure_modem (uint8_t frame_id, ATResponseStatus status, std::string_vi
 			full_at += static_cast<char> (b);
 
 		if (*io.debug)
-			debug() << "Sending AT command " << at << ": " << xf::to_hex_string (full_at) << std::endl;
+			debug() << "Sending AT command " << at << ": " << neutrino::to_hex_string (full_at) << std::endl;
 
 		int written = 0;
 		_last_at_command = full_at;
@@ -498,13 +499,13 @@ XBee::configure_modem (uint8_t frame_id, ATResponseStatus status, std::string_vi
 				break;
 
 			case ConfigurationStep::ReadHardwareVersion:
-				_logger << "Hardware version: " << xf::to_hex_string (response) << std::endl;
+				_logger << "Hardware version: " << neutrino::to_hex_string (response) << std::endl;
 
 				request_at (ConfigurationStep::ReadFirmwareVersion, "VR");
 				break;
 
 			case ConfigurationStep::ReadFirmwareVersion:
-				_logger << "Firmware version: " << xf::to_hex_string (response) << std::endl;
+				_logger << "Firmware version: " << neutrino::to_hex_string (response) << std::endl;
 
 				request_at (ConfigurationStep::ReadSerialNumberH, "SH");
 				break;
@@ -516,7 +517,7 @@ XBee::configure_modem (uint8_t frame_id, ATResponseStatus status, std::string_vi
 
 			case ConfigurationStep::ReadSerialNumberL:
 				_serial_number_bin += response;
-				_logger << "Serial number: " << xf::to_hex_string (_serial_number_bin) << std::endl;
+				_logger << "Serial number: " << neutrino::to_hex_string (_serial_number_bin) << std::endl;
 
 				request_at (ConfigurationStep::DisableSleep, "SM", { 0x00 });
 				break;
@@ -846,7 +847,7 @@ void
 XBee::process_rx64_frame (std::string_view const& frame)
 {
 	if (*io.debug)
-		debug() << ">> RX64 data: " << xf::to_hex_string (frame) << std::endl;
+		debug() << ">> RX64 data: " << neutrino::to_hex_string (frame) << std::endl;
 
 	// At least 11 bytes:
 	if (frame.size() < 11)
@@ -880,7 +881,7 @@ void
 XBee::process_rx16_frame (std::string_view const& frame)
 {
 	if (*io.debug)
-		debug() << ">> RX16 data: " << xf::to_hex_string (frame) << std::endl;
+		debug() << ">> RX16 data: " << neutrino::to_hex_string (frame) << std::endl;
 
 	// At least 5 bytes:
 	if (frame.size() < 5)
@@ -891,7 +892,7 @@ XBee::process_rx16_frame (std::string_view const& frame)
 	// Address must match our peer's address:
 	if (address != *io.remote_address)
 	{
-		_logger << "Got packet from unknown address: " << xf::to_hex_string (frame.substr (0, 2)) << ". Ignoring." << std::endl;
+		_logger << "Got packet from unknown address: " << neutrino::to_hex_string (frame.substr (0, 2)) << ". Ignoring." << std::endl;
 		return;
 	}
 
@@ -918,7 +919,7 @@ void
 XBee::process_modem_status_frame (std::string_view const& data)
 {
 	if (*io.debug)
-		debug() << ">> Modem status: " << xf::to_hex_string (data) << std::endl;
+		debug() << ">> Modem status: " << neutrino::to_hex_string (data) << std::endl;
 
 	if (data.size() < 1)
 		return;
@@ -977,7 +978,7 @@ void
 XBee::process_at_response_frame (std::string_view const& frame)
 {
 	if (*io.debug)
-		debug() << ">> AT status: " << xf::to_hex_string (frame) << std::endl;
+		debug() << ">> AT status: " << neutrino::to_hex_string (frame) << std::endl;
 
 	// Response must be at least 4 bytes long:
 	if (frame.size() < 4)
@@ -1008,7 +1009,7 @@ XBee::process_at_response_frame (std::string_view const& frame)
 			case ATResponseStatus::InvalidParameter:	log << "Invalid parameter"; break;
 			default:									log << "?"; break;
 		}
-		log << ", data: " << xf::to_hex_string (response_data) << std::endl;
+		log << ", data: " << neutrino::to_hex_string (response_data) << std::endl;
 	}
 
 	// Response data: bytes

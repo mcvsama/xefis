@@ -31,7 +31,7 @@ gcc or clang
 boost
 boost-endian
 qt-5
-mhash-0.9.9.9
+crypto++-8.5.0-2
 
 Packages required on Ubuntu 18:
 	pkg-config
