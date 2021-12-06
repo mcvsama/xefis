@@ -13,6 +13,7 @@
 
 // Standard:
 #include <cstddef>
+#include <cstring>
 
 // Neutrino:
 #include <neutrino/numeric.h>
