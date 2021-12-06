@@ -213,7 +213,7 @@ namespace KDTree
 	    typename _Dist::distance_type d = 0;
 	    for (size_t i=0; i != __k; ++i)
 	      d += _S_node_distance(i, __dist, __acc, __val, cur->_M_value);
-       d = std::sqrt(d);
+        d = std::sqrt(d);
 	    if (d <= __max)
           // ("bad candidate notes")
           // Changed: removed this test: || ( d == __max && cur < __best ))
