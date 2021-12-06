@@ -16,6 +16,7 @@
 
 // Standard:
 #include <cstddef>
+#include <cstring>
 
 // Neutrino:
 #include <neutrino/blob.h>
@@ -28,17 +29,10 @@
 namespace neutrino {
 
 inline void
-value_to_blob (float16_t value, Blob& blob)
+value_to_blob (float16_t const value, Blob& blob)
 {
-	union {
-		float16_t	value;
-		uint16_t	equivalent_int;
-		uint8_t		data[sizeof (float16_t)];
-	} u { value };
-
-	boost::endian::native_to_little (u.equivalent_int);
-	blob.resize (sizeof (u));
-	std::copy (std::begin (u.data), std::end (u.data), blob.begin());
+	blob.resize (sizeof (value));
+	std::memcpy (blob.data(), &value, sizeof (value));
 }
 
 
@@ -48,15 +42,7 @@ blob_to_value (BlobView const blob, float16_t& value)
 	if (blob.size() != sizeof (value))
 		throw InvalidBlobSize (blob.size(), sizeof (value));
 
-	union {
-		float16_t	value;
-		uint16_t	equivalent_int;
-		uint8_t		data[sizeof (float16_t)];
-	} u { 0.0_half };
-
-	std::copy (blob.cbegin(), blob.cend(), u.data);
-	boost::endian::little_to_native (u.equivalent_int);
-	value = u.value;
+	std::memcpy (&value, blob.data(), sizeof (value));
 }
 
 } // namespace neutrino

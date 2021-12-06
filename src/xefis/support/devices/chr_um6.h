@@ -16,6 +16,7 @@
 
 // Standard:
 #include <cstddef>
+#include <cstring>
 #include <functional>
 #include <queue>
 
@@ -775,8 +776,11 @@ CHRUM6::Read::value() const noexcept
 inline float
 CHRUM6::Read::value_as_float() const noexcept
 {
-	union { uint32_t i; float f; } u = { value() };
-	return u.f;
+	auto const v = value();
+	float f;
+	static_assert (sizeof (v) == sizeof (f));
+	std::memcpy (&f, &v, sizeof (v));
+	return f;
 }
 
 

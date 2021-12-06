@@ -760,7 +760,7 @@ template<uint8_t B, class V>
 		{
 			auto const size = sizeof (CastType);
 			CastType casted (src);
-			neutrino::native_to_little (casted);
+			neutrino::perhaps_native_to_little_inplace (casted);
 			uint8_t* ptr = reinterpret_cast<uint8_t*> (&casted);
 			blob.resize (blob.size() + size);
 			std::copy (ptr, ptr + size, &blob[blob.size() - size]);
@@ -779,7 +779,7 @@ template<uint8_t B, class V>
 			auto const work_end = begin + neutrino::to_signed (size);
 			CastType casted;
 			std::copy (begin, work_end, reinterpret_cast<uint8_t*> (&casted));
-			neutrino::little_to_native (casted);
+			neutrino::perhaps_little_to_native_inplace (casted);
 			src = casted;
 			return work_end;
 		}

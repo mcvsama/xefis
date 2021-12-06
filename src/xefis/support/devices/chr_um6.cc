@@ -143,10 +143,12 @@ CHRUM6::write (ConfigurationAddress address, uint32_t value, WriteCallback callb
 
 
 CHRUM6::Write
-CHRUM6::write (ConfigurationAddress address, float value, WriteCallback callback)
+CHRUM6::write (ConfigurationAddress address, float const value, WriteCallback callback)
 {
-	union { float f; uint32_t i; } u = { value };
-	return write (address, u.i, callback);
+	uint32_t i;
+	static_assert (sizeof (value) == sizeof (i));
+	std::memcpy (&i, &value, sizeof (i));
+	return write (address, i, callback);
 }
 
 
