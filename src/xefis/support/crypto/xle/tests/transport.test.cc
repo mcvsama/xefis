@@ -33,12 +33,14 @@ AutoTest t1 ("LossyCrypto: encryption and decryption", []{
 	Blob decrypted = rx.decrypt_packet (encrypted);
 
 	test_asserts::verify ("decryption (1) works", decrypted == plain_text);
+	test_asserts::verify ("data margin is declared properly (1)", encrypted.size() - plain_text.size() == tx.kDataMargin);
 
 	plain_text = value_to_blob ("some other plain text that is longer than the AES key size");
 	encrypted = tx.encrypt_packet (plain_text);
 	decrypted = rx.decrypt_packet (encrypted);
 
 	test_asserts::verify ("decryption (2) works", decrypted == plain_text);
+	test_asserts::verify ("data margin is declared properly (2)", encrypted.size() - plain_text.size() == tx.kDataMargin);
 });
 
 } // namespace

@@ -37,6 +37,9 @@ class Transport
   public:
 	using SequenceNumber = uint64_t;
 
+	// Each encrypted packed is kDataMargin bigger than original data blob:
+	static constexpr size_t kDataMargin = 20;
+
 	class DecryptionFailure: public Exception
 	{
 	  public:
