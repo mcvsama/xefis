@@ -19,6 +19,9 @@
 // Standard:
 #include <cstddef>
 
+// Boost:
+#include <boost/random/random_device.hpp>
+
 // Neutrino:
 #include <neutrino/crypto/hash.h>
 #include <neutrino/exception.h>
@@ -37,8 +40,7 @@ class Transport
   public:
 	using SequenceNumber = uint64_t;
 
-	// Each encrypted packed is kDataMargin bigger than original data blob:
-	static constexpr size_t kDataMargin = 20;
+	static constexpr size_t kDataSaltSize = 8;
 
 	class DecryptionFailure: public Exception
 	{
@@ -52,7 +54,14 @@ class Transport
   public:
 	// Ctor
 	explicit
-	Transport (BlobView ephemeral_session_key, size_t hmac_size = 12, BlobView salt = {}, BlobView hkdf_user_info = {});
+	Transport (BlobView ephemeral_session_key, size_t hmac_size = 12, BlobView key_salt = {}, BlobView hkdf_user_info = {});
+
+	/**
+	 * Return how much larger the resulting packet will be compared to plain text.
+	 */
+	size_t
+	data_margin() const
+		{ return sizeof (SequenceNumber) + _hmac_size + kDataSaltSize; }
 
   protected:
 	size_t			_hmac_size;
@@ -67,13 +76,17 @@ class Transmitter: public Transport
 {
   public:
 	// Ctor
-	using Transport::Transport;
+	explicit
+	Transmitter (boost::random::random_device&, BlobView ephemeral_session_key, size_t hmac_size = 12, BlobView key_salt = {}, BlobView hkdf_user_info = {});
 
 	/**
 	 * Return next encrypted packet.
 	 */
 	Blob
 	encrypt_packet (BlobView);
+
+  private:
+	boost::random::random_device& _random_device;
 };
 
 

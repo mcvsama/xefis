@@ -14,6 +14,9 @@
 // Standard:
 #include <cstddef>
 
+// Boost:
+#include <boost/random/random_device.hpp>
+
 // Neutrino:
 #include <neutrino/test/auto_test.h>
 
@@ -24,23 +27,24 @@
 namespace xf::test {
 namespace {
 
-AutoTest t1 ("LossyCrypto: encryption and decryption", []{
-	xf::crypto::xle::Transmitter tx (value_to_blob ("abcdefghijklmnop"));
+AutoTest t1 ("Xefis Lossy Encryption: encryption and decryption", []{
+	boost::random::random_device rnd;
+	xf::crypto::xle::Transmitter tx (rnd, value_to_blob ("abcdefghijklmnop"));
 	xf::crypto::xle::Receiver rx (value_to_blob ("abcdefghijklmnop"));
 
-	Blob plain_text = value_to_blob ("plain text");
+	Blob plain_text = value_to_blob ("");
 	Blob encrypted = tx.encrypt_packet (plain_text);
 	Blob decrypted = rx.decrypt_packet (encrypted);
 
 	test_asserts::verify ("decryption (1) works", decrypted == plain_text);
-	test_asserts::verify ("data margin is declared properly (1)", encrypted.size() - plain_text.size() == tx.kDataMargin);
+	test_asserts::verify ("data margin is declared properly (1)", encrypted.size() - plain_text.size() == tx.data_margin());
 
 	plain_text = value_to_blob ("some other plain text that is longer than the AES key size");
 	encrypted = tx.encrypt_packet (plain_text);
 	decrypted = rx.decrypt_packet (encrypted);
 
 	test_asserts::verify ("decryption (2) works", decrypted == plain_text);
-	test_asserts::verify ("data margin is declared properly (2)", encrypted.size() - plain_text.size() == tx.kDataMargin);
+	test_asserts::verify ("data margin is declared properly (2)", encrypted.size() - plain_text.size() == tx.data_margin());
 });
 
 } // namespace
