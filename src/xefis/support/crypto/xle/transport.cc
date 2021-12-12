@@ -79,6 +79,7 @@ Transmitter::encrypt_packet (BlobView const data)
 {
 	++_sequence_number;
 
+	// It's required that value_to_blob() gives little-endian encoding:
 	auto const binary_sequence_number = value_to_blob (_sequence_number);
 	auto const salt = random_blob (kDataSaltSize, _random_device);
 	auto const full_hmac = calculate_hmac<kHashAlgorithm> ({
@@ -98,8 +99,8 @@ Transmitter::encrypt_packet (BlobView const data)
 	auto const encrypted_sequence_number = aes_ctr_xor ({
 		.data = binary_sequence_number,
 		.key = _seq_num_encryption_key,
-		// Encrypted data must be at least 8 bytes, but better longer for better entropy to avoid
-		// repeating nonce ever. That's why salt is added after the HMAC.
+		// Encrypted data must be at least 8 bytes, but longer is better for better entropy to avoid
+		// repeating nonce ever. That's why data salt is added before encryption.
 		.nonce = calculate_hash<kHashAlgorithm> (encrypted_data).substr (0, 8),
 	});
 	auto const encrypted_packet = encrypted_sequence_number + encrypted_data;
