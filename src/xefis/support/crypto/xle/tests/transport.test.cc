@@ -28,9 +28,11 @@ namespace xf::test {
 namespace {
 
 AutoTest t1 ("Xefis Lossy Encryption: encryption and decryption", []{
+	Blob const key = value_to_blob ("abcdefghijklmnop");
+
 	boost::random::random_device rnd;
-	xf::crypto::xle::Transmitter tx (rnd, value_to_blob ("abcdefghijklmnop"));
-	xf::crypto::xle::Receiver rx (value_to_blob ("abcdefghijklmnop"));
+	xf::crypto::xle::Transmitter tx (rnd, key);
+	xf::crypto::xle::Receiver rx (key);
 
 	Blob plain_text = value_to_blob ("");
 	Blob encrypted = tx.encrypt_packet (plain_text);
