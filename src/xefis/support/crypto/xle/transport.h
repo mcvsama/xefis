@@ -59,6 +59,7 @@ class Transport
 	/**
 	 * Return how much larger the resulting packet will be compared to plain text.
 	 */
+	[[nodiscard]]
 	size_t
 	data_margin() const
 		{ return sizeof (SequenceNumber) + _hmac_size + kDataSaltSize; }
@@ -82,6 +83,7 @@ class Transmitter: public Transport
 	/**
 	 * Return next encrypted packet.
 	 */
+	[[nodiscard]]
 	Blob
 	encrypt_packet (BlobView);
 
@@ -99,6 +101,7 @@ class Receiver: public Transport
 	/**
 	 * Return next decrypted packet.
 	 */
+	[[nodiscard]]
 	Blob
 	decrypt_packet (BlobView data, std::optional<SequenceNumber> maximum_allowed_sequence_number = {});
 };
