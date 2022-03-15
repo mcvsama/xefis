@@ -29,8 +29,8 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/earth/air/atmosphere_model.h>
-#include <xefis/support/math/position_rotation.h>
 #include <xefis/support/math/geometry.h>
+#include <xefis/support/math/placement.h>
 #include <xefis/support/nature/acceleration_moments.h>
 #include <xefis/support/nature/force_moments.h>
 #include <xefis/support/nature/mass_moments.h>
@@ -105,7 +105,7 @@ class Body: public Noncopyable
 	 * Return location of center-of-mass.
 	 */
 	[[nodiscard]]
-	PositionRotation<WorldSpace, BodySpace> const&
+	Placement<WorldSpace, BodySpace> const&
 	location() const noexcept
 		{ return _location; }
 
@@ -113,7 +113,7 @@ class Body: public Noncopyable
 	 * Set new location of center-of-mass.
 	 */
 	void
-	set_location (PositionRotation<WorldSpace, BodySpace> const& location) noexcept
+	set_location (Placement<WorldSpace, BodySpace> const& location) noexcept
 		{ _location = location; }
 
 	/**
@@ -338,7 +338,7 @@ class Body: public Noncopyable
 	SpaceLength<BodySpace>									_saved_center_of_mass;
 	SpaceLength<BodySpace>									_origin_position;
 	// Location of center-of-mass:
-	PositionRotation<WorldSpace, BodySpace>					_location;
+	Placement<WorldSpace, BodySpace>						_location;
 	// Velocity of center-of-mass:
 	VelocityMoments<WorldSpace>								_velocity_moments;
 	mutable std::optional<VelocityMoments<BodySpace>>		_body_space_velocity_moments;

@@ -67,13 +67,13 @@ auto const kMOI4 = 0.01 * kMOI1;
 auto const kMOI5 = kMOI2;
 auto const kMOI6 = kMOI2;
 
-auto const kLocation1 = PositionRotation<rigid_body::WorldSpace, rigid_body::BodySpace> ({ 0.0_m, 0_m, 0_m }, no_rotation);
-auto const kLocation2 = PositionRotation<rigid_body::WorldSpace, rigid_body::BodySpace> ({ 0.0_m, 3_m, 0_m }, no_rotation);
-auto const kLocation3 = PositionRotation<rigid_body::WorldSpace, rigid_body::BodySpace> ({ -0.01_m, 4_m, 0_m }, no_rotation);
-auto const kLocation3z = PositionRotation<rigid_body::WorldSpace, rigid_body::BodySpace> ({ -0.01_m, 4_m, 0.5_m }, no_rotation);
-auto const kLocation4 = PositionRotation<rigid_body::WorldSpace, rigid_body::BodySpace> ({ -0.1_m, 4.5_m, 0_m }, no_rotation);
-auto const kLocation5 = PositionRotation<rigid_body::WorldSpace, rigid_body::BodySpace> ({ 3_m, 0_m, 0_m }, no_rotation);
-auto const kLocation6 = PositionRotation<rigid_body::WorldSpace, rigid_body::BodySpace> ({ 3_m, 0_m, 1_m }, no_rotation);
+auto const kLocation1 = Placement<rigid_body::WorldSpace, rigid_body::BodySpace> ({ 0.0_m, 0_m, 0_m }, no_rotation);
+auto const kLocation2 = Placement<rigid_body::WorldSpace, rigid_body::BodySpace> ({ 0.0_m, 3_m, 0_m }, no_rotation);
+auto const kLocation3 = Placement<rigid_body::WorldSpace, rigid_body::BodySpace> ({ -0.01_m, 4_m, 0_m }, no_rotation);
+auto const kLocation3z = Placement<rigid_body::WorldSpace, rigid_body::BodySpace> ({ -0.01_m, 4_m, 0.5_m }, no_rotation);
+auto const kLocation4 = Placement<rigid_body::WorldSpace, rigid_body::BodySpace> ({ -0.1_m, 4.5_m, 0_m }, no_rotation);
+auto const kLocation5 = Placement<rigid_body::WorldSpace, rigid_body::BodySpace> ({ 3_m, 0_m, 0_m }, no_rotation);
+auto const kLocation6 = Placement<rigid_body::WorldSpace, rigid_body::BodySpace> ({ 3_m, 0_m, 1_m }, no_rotation);
 
 auto const hinge1 = SpaceLength<rigid_body::BodySpace> (0.0_m, 1.5_m, 0_m);
 auto const hinge2 = SpaceLength<rigid_body::BodySpace> (0.0_m, 0.5_m, 0_m);
@@ -309,16 +309,16 @@ ManualTest t_5 ("rigid_body::System: intermediate axis of rotation", []{
 		auto const j = 1.5_m;
 
 		auto& body_00 = system.add<rigid_body::Body> (MassMoments<rigid_body::BodySpace> (20_kg, math::zero, 0.25 * kMOI1));
-		body_00.set_location (PositionRotation<rigid_body::WorldSpace, rigid_body::BodySpace> (position_offset + SpaceLength<rigid_body::WorldSpace> { 0_m, 0_m, 0_m }, no_rotation));
+		body_00.set_location (Placement<rigid_body::WorldSpace, rigid_body::BodySpace> (position_offset + SpaceLength<rigid_body::WorldSpace> { 0_m, 0_m, 0_m }, no_rotation));
 
 		auto& body_0m = system.add<rigid_body::Body> (MassMoments<rigid_body::BodySpace> (20_kg, math::zero, 0.25 * kMOI1));
-		body_0m.set_location (PositionRotation<rigid_body::WorldSpace, rigid_body::BodySpace> (position_offset + SpaceLength<rigid_body::WorldSpace> { 0_m, -j, 0_m }, no_rotation));
+		body_0m.set_location (Placement<rigid_body::WorldSpace, rigid_body::BodySpace> (position_offset + SpaceLength<rigid_body::WorldSpace> { 0_m, -j, 0_m }, no_rotation));
 
 		auto& body_0p = system.add<rigid_body::Body> (MassMoments<rigid_body::BodySpace> (20_kg, math::zero, 0.25 * kMOI1));
-		body_0p.set_location (PositionRotation<rigid_body::WorldSpace, rigid_body::BodySpace> (position_offset + SpaceLength<rigid_body::WorldSpace> { 0_m, +j, 0_m }, no_rotation));
+		body_0p.set_location (Placement<rigid_body::WorldSpace, rigid_body::BodySpace> (position_offset + SpaceLength<rigid_body::WorldSpace> { 0_m, +j, 0_m }, no_rotation));
 
 		auto& body_p0 = system.add<rigid_body::Body> (MassMoments<rigid_body::BodySpace> (20_kg, math::zero, 0.25 * kMOI1));
-		body_p0.set_location (PositionRotation<rigid_body::WorldSpace, rigid_body::BodySpace> (position_offset + SpaceLength<rigid_body::WorldSpace> { +j, 0_m, 0_m }, no_rotation));
+		body_p0.set_location (Placement<rigid_body::WorldSpace, rigid_body::BodySpace> (position_offset + SpaceLength<rigid_body::WorldSpace> { +j, 0_m, 0_m }, no_rotation));
 
 		system.add<rigid_body::FixedConstraint> (body_00, body_0m);
 		system.add<rigid_body::FixedConstraint> (body_00, body_0p);

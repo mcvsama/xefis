@@ -19,7 +19,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/support/math/position_rotation.h>
+#include <xefis/support/math/placement.h>
 #include <xefis/support/simulation/rigid_body/frames.h>
 
 
@@ -35,16 +35,16 @@ class FixedOrientationHelper
 	 *			References to connected bodies. Helper must not outlive bodys.
 	 */
 	explicit
-	FixedOrientationHelper (PositionRotation<WorldSpace, BodySpace> const& location_1,
-							PositionRotation<WorldSpace, BodySpace> const& location_2);
+	FixedOrientationHelper (Placement<WorldSpace, BodySpace> const& location_1,
+							Placement<WorldSpace, BodySpace> const& location_2);
 
 	/**
 	 * Return value to put inside location constraint matrix as the rotation values.
 	 */
 	[[nodiscard]]
 	SpaceLength<WorldSpace>
-	rotation_constraint_value (PositionRotation<WorldSpace, BodySpace> const& location_1,
-							   PositionRotation<WorldSpace, BodySpace> const& location_2) const;
+	rotation_constraint_value (Placement<WorldSpace, BodySpace> const& location_1,
+							   Placement<WorldSpace, BodySpace> const& location_2) const;
 
   private:
 	RotationMatrix<BodySpace, BodySpace> _initial_relative_rotation;
@@ -52,15 +52,15 @@ class FixedOrientationHelper
 
 
 inline
-FixedOrientationHelper::FixedOrientationHelper (PositionRotation<WorldSpace, BodySpace> const& location_1,
-												PositionRotation<WorldSpace, BodySpace> const& location_2):
+FixedOrientationHelper::FixedOrientationHelper (Placement<WorldSpace, BodySpace> const& location_1,
+												Placement<WorldSpace, BodySpace> const& location_2):
 	_initial_relative_rotation (location_1.base_to_body_rotation() * location_2.body_to_base_rotation())
 { }
 
 
 inline SpaceLength<WorldSpace>
-FixedOrientationHelper::rotation_constraint_value (PositionRotation<WorldSpace, BodySpace> const& location_1,
-												   PositionRotation<WorldSpace, BodySpace> const& location_2) const
+FixedOrientationHelper::rotation_constraint_value (Placement<WorldSpace, BodySpace> const& location_1,
+												   Placement<WorldSpace, BodySpace> const& location_2) const
 {
 	RotationMatrix<BodySpace, BodySpace> const current_relative_rotation = location_1.base_to_body_rotation() * location_2.body_to_base_rotation();
 	RotationMatrix<BodySpace, BodySpace> const body_rotation_error = ~_initial_relative_rotation * current_relative_rotation;

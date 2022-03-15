@@ -20,7 +20,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/math/geometry.h>
-#include <xefis/support/math/position_rotation.h>
+#include <xefis/support/math/placement.h>
 
 
 namespace xf {

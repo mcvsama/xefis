@@ -30,15 +30,9 @@ namespace xf {
  * inv (R) == ~R
  */
 
-// TODO Perhaps better name is needed, maybe:
-// • Arm
-// • Mount
-// • MountArm
-// • MountingArm
-// ?
-// TODO Also perhaps rename *_to_base() to *_to_world(), and maybe *_to_body() to *_to_local()?
+// TODO Perhaps rename *_to_base() to *_to_world(), and maybe *_to_body() to *_to_local()?
 template<class pBaseFrame = void, class pFrame = pBaseFrame>
-	struct PositionRotation
+	struct Placement
 	{
 	  public:
 		using BaseFrame			= pBaseFrame;
@@ -50,15 +44,15 @@ template<class pBaseFrame = void, class pFrame = pBaseFrame>
 
 	  public:
 		// Ctor
-		PositionRotation() = default;
+		Placement() = default;
 
 		// Ctor
 		template<class = void>
 			requires (!std::is_same<BaseFrame, Frame>())
-			PositionRotation (Position const&, RotationToBody const&);
+			Placement (Position const&, RotationToBody const&);
 
 		// Ctor
-		PositionRotation (Position const&, RotationToBase const&);
+		Placement (Position const&, RotationToBase const&);
 
 		/**
 		 * Body position relative to the BaseFrame frame of reference.
@@ -187,7 +181,7 @@ template<class B, class F>
 	template<class>
 		requires (!std::is_same<B, F>())
 		inline
-		PositionRotation<B, F>::PositionRotation (Position const& position, RotationToBody const& rotation):
+		Placement<B, F>::Placement (Position const& position, RotationToBody const& rotation):
 			_position (position),
 			_base_to_body_rotation (rotation),
 			_body_to_base_rotation (~rotation)
@@ -196,7 +190,7 @@ template<class B, class F>
 
 template<class B, class F>
 	inline
-	PositionRotation<B, F>::PositionRotation (Position const& position, RotationToBase const& rotation):
+	Placement<B, F>::Placement (Position const& position, RotationToBase const& rotation):
 		_position (position),
 		_base_to_body_rotation (~rotation),
 		_body_to_base_rotation (rotation)
@@ -205,7 +199,7 @@ template<class B, class F>
 
 template<class B, class F>
 	inline void
-	PositionRotation<B, F>::set_base_to_body_rotation (RotationToBody const& rotation)
+	Placement<B, F>::set_base_to_body_rotation (RotationToBody const& rotation)
 	{
 		_base_to_body_rotation = rotation;
 		_body_to_base_rotation = ~rotation;
@@ -214,7 +208,7 @@ template<class B, class F>
 
 template<class B, class F>
 	inline void
-	PositionRotation<B, F>::set_body_to_base_rotation (RotationToBase const& rotation)
+	Placement<B, F>::set_body_to_base_rotation (RotationToBase const& rotation)
 	{
 		_body_to_base_rotation = rotation;
 		_base_to_body_rotation = ~rotation;
@@ -223,7 +217,7 @@ template<class B, class F>
 
 template<class B, class F>
 	inline void
-	PositionRotation<B, F>::rotate_body_frame (RotationMatrix<BaseFrame> const& rotation_matrix)
+	Placement<B, F>::rotate_body_frame (RotationMatrix<BaseFrame> const& rotation_matrix)
 	{
 		_body_to_base_rotation = rotation_matrix * _body_to_base_rotation;
 		_base_to_body_rotation = ~_body_to_base_rotation;
@@ -232,7 +226,7 @@ template<class B, class F>
 
 template<class B, class F>
 	inline void
-	PositionRotation<B, F>::rotate_base_frame (RotationMatrix<BaseFrame> const& rotation_matrix)
+	Placement<B, F>::rotate_base_frame (RotationMatrix<BaseFrame> const& rotation_matrix)
 	{
 		_position = rotation_matrix * _position;
 		rotate_body_frame (rotation_matrix);
@@ -241,7 +235,7 @@ template<class B, class F>
 
 template<class B, class F>
 	inline void
-	PositionRotation<B, F>::rotate_base_frame_about (Position const& about_point, RotationMatrix<BaseFrame> const& rotation_matrix)
+	Placement<B, F>::rotate_base_frame_about (Position const& about_point, RotationMatrix<BaseFrame> const& rotation_matrix)
 	{
 		_position -= about_point;
 		rotate_base_frame (rotation_matrix);

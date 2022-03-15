@@ -21,7 +21,7 @@
 #include <xefis/config/all.h>
 #include <xefis/support/math/euler_angles.h>
 #include <xefis/support/math/geometry.h>
-#include <xefis/support/math/position_rotation.h>
+#include <xefis/support/math/placement.h>
 #include <xefis/support/math/transforms.h>
 
 
@@ -85,7 +85,7 @@ tait_bryan_angles (RotationMatrix<ECEFSpace, AirframeSpace> const& rotation, Spa
 
 [[nodiscard]]
 inline TaitBryanAngles
-tait_bryan_angles (PositionRotation<ECEFSpace, AirframeSpace> const& pr)
+tait_bryan_angles (Placement<ECEFSpace, AirframeSpace> const& pr)
 {
 	return tait_bryan_angles (pr.body_to_base_rotation(), polar (pr.position()));
 }

@@ -20,7 +20,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/math/geometry.h>
-#include <xefis/support/math/position_rotation.h>
+#include <xefis/support/math/placement.h>
 #include <xefis/support/nature/constants.h>
 
 
@@ -57,7 +57,7 @@ ecef_to_ned_rotation (SpaceVector<si::Length, ECEFSpace> const& position)
 
 [[nodiscard]]
 inline RotationMatrix<NEDSpace, AirframeSpace>
-airframe_to_ned_rotation (PositionRotation<ECEFSpace, AirframeSpace> const& pr)
+airframe_to_ned_rotation (Placement<ECEFSpace, AirframeSpace> const& pr)
 {
 	return ecef_to_ned_rotation (pr.position()) * pr.body_to_base_rotation();
 }
