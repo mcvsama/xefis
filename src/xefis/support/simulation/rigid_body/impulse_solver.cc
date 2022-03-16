@@ -181,8 +181,8 @@ ImpulseSolver::update_constraint_forces (si::Time const dt)
 				fc2.acceleration_moments = acceleration_moments (b2, fc2.all_force_moments());
 
 				// Recalculate velocity moments:
-				fc1.velocity_moments = velocity_moments (b1, fc1.acceleration_moments, dt);
-				fc2.velocity_moments = velocity_moments (b2, fc2.acceleration_moments, dt);
+				fc1.velocity_moments = calculate_velocity_moments (b1, fc1.acceleration_moments, dt);
+				fc2.velocity_moments = calculate_velocity_moments (b2, fc2.acceleration_moments, dt);
 			}
 		}
 	}
@@ -219,7 +219,7 @@ ImpulseSolver::update_acceleration_moments()
 
 
 VelocityMoments<WorldSpace>
-ImpulseSolver::velocity_moments (Body const& body, AccelerationMoments<WorldSpace> const& am, si::Time const dt)
+ImpulseSolver::calculate_velocity_moments (Body const& body, AccelerationMoments<WorldSpace> const& am, si::Time const dt)
 {
 	auto vm = body.velocity_moments<WorldSpace>();
 	vm.set_velocity (vm.velocity() + am.acceleration() * dt);
@@ -233,7 +233,7 @@ ImpulseSolver::update_velocity_moments (si::Time const dt)
 {
 	for (auto& body: _system.bodies())
 	{
-		auto vm = velocity_moments (*body, body->acceleration_moments<WorldSpace>(), dt);
+		auto vm = calculate_velocity_moments (*body, body->acceleration_moments<WorldSpace>(), dt);
 		apply_limits (vm);
 		body->set_velocity_moments<WorldSpace> (vm);
 	}

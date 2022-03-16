@@ -114,7 +114,7 @@ class ImpulseSolver: private Noncopyable
 	update_acceleration_moments();
 
 	static VelocityMoments<WorldSpace>
-	velocity_moments (Body const&, AccelerationMoments<WorldSpace> const&, si::Time dt);
+	calculate_velocity_moments (Body const&, AccelerationMoments<WorldSpace> const&, si::Time dt);
 
 	void
 	update_velocity_moments (si::Time dt);
