@@ -13,6 +13,7 @@
 
 // Standard:
 #include <cstddef>
+#include <set>
 
 // Boost:
 #include <boost/random/random_device.hpp>
