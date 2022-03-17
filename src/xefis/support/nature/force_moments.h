@@ -32,7 +32,7 @@ namespace xf {
  *   • 0th moment = force
  *   • 1st moment = torque (except for moments that don't change angular momentum).
  */
-template<class Frame = void>
+template<class Space = void>
 	struct ForceMoments
 	{
 	  public:
@@ -42,7 +42,7 @@ template<class Frame = void>
 
 		// Ctor
 		constexpr
-		ForceMoments (SpaceVector<si::Force, Frame> const& force, SpaceVector<si::Torque, Frame> const& torque);
+		ForceMoments (SpaceVector<si::Force, Space> const& force, SpaceVector<si::Torque, Space> const& torque);
 
 		constexpr ForceMoments&
 		operator+= (ForceMoments const& other);
@@ -51,52 +51,52 @@ template<class Frame = void>
 		operator-= (ForceMoments const& other);
 
 		[[nodiscard]]
-		constexpr SpaceVector<si::Force, Frame> const&
+		constexpr SpaceVector<si::Force, Space> const&
 		force() const noexcept
 			{ return _force; }
 
 		constexpr void
-		set_force (SpaceVector<si::Force, Frame> const& force)
+		set_force (SpaceVector<si::Force, Space> const& force)
 			{ _force = force; }
 
 		[[nodiscard]]
-		constexpr SpaceVector<si::Torque, Frame> const&
+		constexpr SpaceVector<si::Torque, Space> const&
 		torque() const noexcept
 			{ return _torque; }
 
 		constexpr void
-		set_torque (SpaceVector<si::Torque, Frame> const& torque)
+		set_torque (SpaceVector<si::Torque, Space> const& torque)
 			{ _torque = torque; }
 
 		/**
 		 * Return this ForceMoments at given point (torque will be different).
 		 * That is return resultant force as if this was a wrench with force/torque application point at -point.
 		 */
-		constexpr ForceMoments<Frame>
-		at (SpaceVector<si::Length, Frame> const& point) const;
+		constexpr ForceMoments<Space>
+		at (SpaceVector<si::Length, Space> const& point) const;
 
 	  public:
-		static ForceMoments<Frame>
+		static ForceMoments<Space>
 		zero()
-			{ return ForceMoments<Frame> (math::zero, math::zero); }
+			{ return ForceMoments<Space> (math::zero, math::zero); }
 
 	  private:
-		SpaceVector<si::Force, Frame>	_force	{ 0_N, 0_N, 0_N };
-		SpaceVector<si::Torque, Frame>	_torque	{ 0_Nm, 0_Nm, 0_Nm };
+		SpaceVector<si::Force, Space>	_force	{ 0_N, 0_N, 0_N };
+		SpaceVector<si::Torque, Space>	_torque	{ 0_Nm, 0_Nm, 0_Nm };
 	};
 
 
-template<class Frame>
+template<class Space>
 	constexpr
-	ForceMoments<Frame>::ForceMoments (SpaceVector<si::Force, Frame> const& force, SpaceVector<si::Torque, Frame> const& torque):
+	ForceMoments<Space>::ForceMoments (SpaceVector<si::Force, Space> const& force, SpaceVector<si::Torque, Space> const& torque):
 		_force (force),
 		_torque (torque)
 	{ }
 
 
-template<class Frame>
-	constexpr ForceMoments<Frame>&
-	ForceMoments<Frame>::operator+= (ForceMoments const& other)
+template<class Space>
+	constexpr ForceMoments<Space>&
+	ForceMoments<Space>::operator+= (ForceMoments const& other)
 	{
 		_force += other._force;
 		_torque += other._torque;
@@ -104,9 +104,9 @@ template<class Frame>
 	}
 
 
-template<class Frame>
-	constexpr ForceMoments<Frame>&
-	ForceMoments<Frame>::operator-= (ForceMoments const& other)
+template<class Space>
+	constexpr ForceMoments<Space>&
+	ForceMoments<Space>::operator-= (ForceMoments const& other)
 	{
 		_force -= other._force;
 		_torque -= other._torque;
@@ -114,9 +114,9 @@ template<class Frame>
 	}
 
 
-template<class Frame>
-	constexpr ForceMoments<Frame>
-	ForceMoments<Frame>::at (SpaceVector<si::Length, Frame> const& point) const
+template<class Space>
+	constexpr ForceMoments<Space>
+	ForceMoments<Space>::at (SpaceVector<si::Length, Space> const& point) const
 	{
 		auto const additional_torque = cross_product (-point, _force);
 
@@ -132,25 +132,25 @@ template<class Frame>
  */
 
 
-template<class Frame>
-	constexpr ForceMoments<Frame>
-	operator+ (ForceMoments<Frame> a)
+template<class Space>
+	constexpr ForceMoments<Space>
+	operator+ (ForceMoments<Space> a)
 	{
 		return a;
 	}
 
 
-template<class Frame>
-	constexpr ForceMoments<Frame>
-	operator+ (ForceMoments<Frame> a, ForceMoments<Frame> const& b)
+template<class Space>
+	constexpr ForceMoments<Space>
+	operator+ (ForceMoments<Space> a, ForceMoments<Space> const& b)
 	{
 		return a += b;
 	}
 
 
-template<class Frame>
-	constexpr ForceMoments<Frame>
-	operator- (ForceMoments<Frame> a)
+template<class Space>
+	constexpr ForceMoments<Space>
+	operator- (ForceMoments<Space> a)
 	{
 		return {
 			-a.force(),
@@ -159,18 +159,18 @@ template<class Frame>
 	}
 
 
-template<class Frame>
-	constexpr ForceMoments<Frame>
-	operator- (ForceMoments<Frame> a, ForceMoments<Frame> const& b)
+template<class Space>
+	constexpr ForceMoments<Space>
+	operator- (ForceMoments<Space> a, ForceMoments<Space> const& b)
 	{
 		return a -= b;
 	}
 
 
-template<class TargetFrame, class SourceFrame>
-	constexpr ForceMoments<TargetFrame>
-	operator* (RotationMatrix<TargetFrame, SourceFrame> const& transformation,
-			   ForceMoments<SourceFrame> const& force_torque)
+template<class TargetSpace, class SourceSpace>
+	constexpr ForceMoments<TargetSpace>
+	operator* (RotationMatrix<TargetSpace, SourceSpace> const& transformation,
+			   ForceMoments<SourceSpace> const& force_torque)
 	{
 		return {
 			transformation * force_torque.force(),
@@ -179,10 +179,10 @@ template<class TargetFrame, class SourceFrame>
 	}
 
 
-template<class Multiplier, class Frame>
-	constexpr ForceMoments<Frame>
+template<class Multiplier, class Space>
+	constexpr ForceMoments<Space>
 	operator* (Multiplier const& multiplier,
-			   ForceMoments<Frame> const& force_torque)
+			   ForceMoments<Space> const& force_torque)
 	{
 		return {
 			multiplier * force_torque.force(),

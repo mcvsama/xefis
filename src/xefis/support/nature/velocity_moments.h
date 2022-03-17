@@ -31,7 +31,7 @@ namespace xf {
  * VelocityMoments represents linear and angular velocity.
  * Angular velocity isn't normally called a moment, but it sounds consistent with Force- or Mass-moments.
  */
-template<class Frame = void>
+template<class Space = void>
 	struct VelocityMoments
 	{
 	  public:
@@ -41,56 +41,56 @@ template<class Frame = void>
 
 		// Ctor
 		constexpr
-		VelocityMoments (SpaceVector<si::Velocity, Frame> const& velocity,
-						 SpaceVector<si::AngularVelocity, Frame> const& angular_velocity);
+		VelocityMoments (SpaceVector<si::Velocity, Space> const& velocity,
+						 SpaceVector<si::AngularVelocity, Space> const& angular_velocity);
 
 		constexpr VelocityMoments&
-		inline_add (VelocityMoments const& other, SpaceLength<Frame> const& arm);
+		inline_add (VelocityMoments const& other, SpaceLength<Space> const& arm);
 
 		constexpr VelocityMoments&
-		inline_subtract (VelocityMoments const& other, SpaceLength<Frame> const& arm);
+		inline_subtract (VelocityMoments const& other, SpaceLength<Space> const& arm);
 
 		[[nodiscard]]
-		constexpr SpaceVector<si::Velocity, Frame> const&
+		constexpr SpaceVector<si::Velocity, Space> const&
 		velocity() const noexcept
 			{ return _velocity; }
 
 		constexpr void
-		set_velocity (SpaceVector<si::Velocity, Frame> const& velocity)
+		set_velocity (SpaceVector<si::Velocity, Space> const& velocity)
 			{ _velocity = velocity; }
 
 		[[nodiscard]]
-		constexpr SpaceVector<si::AngularVelocity, Frame> const&
+		constexpr SpaceVector<si::AngularVelocity, Space> const&
 		angular_velocity() const noexcept
 			{ return _angular_velocity; }
 
 		constexpr void
-		set_angular_velocity (SpaceVector<si::AngularVelocity, Frame> const& angular_velocity)
+		set_angular_velocity (SpaceVector<si::AngularVelocity, Space> const& angular_velocity)
 			{ _angular_velocity = angular_velocity; }
 
 	  public:
-		static VelocityMoments<Frame>
+		static VelocityMoments<Space>
 		zero()
-			{ return VelocityMoments<Frame> (math::zero, math::zero); }
+			{ return VelocityMoments<Space> (math::zero, math::zero); }
 
 	  private:
-		SpaceVector<si::Velocity, Frame>		_velocity			{ 0_mps, 0_mps, 0_mps };
-		SpaceVector<si::AngularVelocity, Frame>	_angular_velocity	{ 0_radps, 0_radps, 0_radps };
+		SpaceVector<si::Velocity, Space>		_velocity			{ 0_mps, 0_mps, 0_mps };
+		SpaceVector<si::AngularVelocity, Space>	_angular_velocity	{ 0_radps, 0_radps, 0_radps };
 	};
 
 
-template<class Frame>
+template<class Space>
 	constexpr
-	VelocityMoments<Frame>::VelocityMoments (SpaceVector<si::Velocity, Frame> const& velocity,
-											 SpaceVector<si::AngularVelocity, Frame> const& angular_velocity):
+	VelocityMoments<Space>::VelocityMoments (SpaceVector<si::Velocity, Space> const& velocity,
+											 SpaceVector<si::AngularVelocity, Space> const& angular_velocity):
 		_velocity (velocity),
 		_angular_velocity (angular_velocity)
 	{ }
 
 
-template<class Frame>
-	constexpr VelocityMoments<Frame>&
-	VelocityMoments<Frame>::inline_add (VelocityMoments const& other, SpaceLength<Frame> const& arm)
+template<class Space>
+	constexpr VelocityMoments<Space>&
+	VelocityMoments<Space>::inline_add (VelocityMoments const& other, SpaceLength<Space> const& arm)
 	{
 		_velocity += other._velocity + tangential_velocity (_angular_velocity, arm);
 		_angular_velocity += other._angular_velocity;
@@ -98,9 +98,9 @@ template<class Frame>
 	}
 
 
-template<class Frame>
-	constexpr VelocityMoments<Frame>&
-	VelocityMoments<Frame>::inline_subtract (VelocityMoments const& other, SpaceLength<Frame> const& arm)
+template<class Space>
+	constexpr VelocityMoments<Space>&
+	VelocityMoments<Space>::inline_subtract (VelocityMoments const& other, SpaceLength<Space> const& arm)
 	{
 		_velocity -= other._velocity + tangential_velocity (_angular_velocity, arm);
 		_angular_velocity -= other._angular_velocity;
@@ -113,25 +113,25 @@ template<class Frame>
  */
 
 
-template<class Frame>
-	constexpr VelocityMoments<Frame>
-	operator+ (VelocityMoments<Frame> a)
+template<class Space>
+	constexpr VelocityMoments<Space>
+	operator+ (VelocityMoments<Space> a)
 	{
 		return a;
 	}
 
 
-template<class Frame>
-	constexpr VelocityMoments<Frame>
-	add (VelocityMoments<Frame> a, VelocityMoments<Frame> const& b, SpaceLength<Frame> const& arm)
+template<class Space>
+	constexpr VelocityMoments<Space>
+	add (VelocityMoments<Space> a, VelocityMoments<Space> const& b, SpaceLength<Space> const& arm)
 	{
 		return a.inline_add (b, arm);
 	}
 
 
-template<class Frame>
-	constexpr VelocityMoments<Frame>
-	operator- (VelocityMoments<Frame> a)
+template<class Space>
+	constexpr VelocityMoments<Space>
+	operator- (VelocityMoments<Space> a)
 	{
 		return {
 			-a.velocity(),
@@ -140,18 +140,18 @@ template<class Frame>
 	}
 
 
-template<class Frame>
-	constexpr VelocityMoments<Frame>
-	subtract (VelocityMoments<Frame> a, VelocityMoments<Frame> const& b, SpaceLength<Frame> const& arm)
+template<class Space>
+	constexpr VelocityMoments<Space>
+	subtract (VelocityMoments<Space> a, VelocityMoments<Space> const& b, SpaceLength<Space> const& arm)
 	{
 		return a.inline_subtract (b, arm);
 	}
 
 
-template<class TargetFrame, class SourceFrame>
-	constexpr VelocityMoments<TargetFrame>
-	operator* (SpaceMatrix<double, TargetFrame, SourceFrame> const& transformation,
-			   VelocityMoments<SourceFrame> const& velocity_moments)
+template<class TargetSpace, class SourceSpace>
+	constexpr VelocityMoments<TargetSpace>
+	operator* (SpaceMatrix<double, TargetSpace, SourceSpace> const& transformation,
+			   VelocityMoments<SourceSpace> const& velocity_moments)
 	{
 		return {
 			transformation * velocity_moments.velocity(),

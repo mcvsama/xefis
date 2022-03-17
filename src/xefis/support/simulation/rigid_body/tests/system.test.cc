@@ -33,7 +33,7 @@
 #include <xefis/support/simulation/constraints/hinge_constraint.h>
 #include <xefis/support/simulation/constraints/linear_limits_constraint.h>
 #include <xefis/support/simulation/constraints/slider_constraint.h>
-#include <xefis/support/simulation/rigid_body/frames.h>
+#include <xefis/support/simulation/rigid_body/concepts.h>
 #include <xefis/support/simulation/rigid_body/impulse_solver.h>
 #include <xefis/support/simulation/rigid_body/utility.h>
 #include <xefis/support/simulation/rigid_body/various_shapes.h>

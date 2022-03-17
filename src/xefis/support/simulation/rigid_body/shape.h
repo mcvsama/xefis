@@ -22,7 +22,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/math/geometry.h>
-#include <xefis/support/simulation/rigid_body/frames.h>
+#include <xefis/support/simulation/rigid_body/concepts.h>
 #include <xefis/support/simulation/rigid_body/shape_vertex.h>
 
 

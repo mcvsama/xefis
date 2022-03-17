@@ -31,8 +31,8 @@
 
 namespace xf {
 
-template<class Frame = void>
-	class Wrench: public ForceMoments<Frame>
+template<class Space = void>
+	class Wrench: public ForceMoments<Space>
 	{
 	  public:
 		// Ctor
@@ -41,21 +41,21 @@ template<class Frame = void>
 
 		// Ctor
 		explicit constexpr
-		Wrench (ForceMoments<Frame> const&);
+		Wrench (ForceMoments<Space> const&);
 
 		// Ctor
 		constexpr
-		Wrench (ForceMoments<Frame> const&, SpaceVector<si::Length, Frame> const& position);
+		Wrench (ForceMoments<Space> const&, SpaceVector<si::Length, Space> const& position);
 
 		// Ctor
 		constexpr
-		Wrench (SpaceVector<si::Force, Frame> const& force, SpaceVector<si::Torque, Frame> const& torque, SpaceVector<si::Length, Frame> const& position);
+		Wrench (SpaceVector<si::Force, Space> const& force, SpaceVector<si::Torque, Space> const& torque, SpaceVector<si::Length, Space> const& position);
 
 		/**
 		 * Force's root.
 		 */
 		[[nodiscard]]
-		SpaceVector<si::Length, Frame> const&
+		SpaceVector<si::Length, Space> const&
 		position() const noexcept
 			{ return _position; }
 
@@ -63,33 +63,33 @@ template<class Frame = void>
 		 * Set force's root.
 		 */
 		void
-		set_position (SpaceVector<si::Length, Frame> const& position)
+		set_position (SpaceVector<si::Length, Space> const& position)
 			{ _position = position; }
 
 	  private:
-		SpaceVector<si::Length, Frame>	_position	{ math::zero };
+		SpaceVector<si::Length, Space>	_position	{ math::zero };
 	};
 
 
-template<class Frame>
+template<class Space>
 	constexpr
-	Wrench<Frame>::Wrench (ForceMoments<Frame> const& force_torque):
-		ForceMoments<Frame> (force_torque)
+	Wrench<Space>::Wrench (ForceMoments<Space> const& force_torque):
+		ForceMoments<Space> (force_torque)
 	{ }
 
 
-template<class Frame>
+template<class Space>
 	constexpr
-	Wrench<Frame>::Wrench (ForceMoments<Frame> const& force_torque, SpaceVector<si::Length, Frame> const& position):
-		ForceMoments<Frame> (force_torque),
+	Wrench<Space>::Wrench (ForceMoments<Space> const& force_torque, SpaceVector<si::Length, Space> const& position):
+		ForceMoments<Space> (force_torque),
 		_position (position)
 	{ }
 
 
-template<class Frame>
+template<class Space>
 	constexpr
-	Wrench<Frame>::Wrench (SpaceVector<si::Force, Frame> const& force, SpaceVector<si::Torque, Frame> const& torque, SpaceVector<si::Length, Frame> const& position):
-		ForceMoments<Frame> (force, torque),
+	Wrench<Space>::Wrench (SpaceVector<si::Force, Space> const& force, SpaceVector<si::Torque, Space> const& torque, SpaceVector<si::Length, Space> const& position):
+		ForceMoments<Space> (force, torque),
 		_position (position)
 	{ }
 
@@ -102,9 +102,9 @@ template<class Frame>
 /**
  * This changes the application position of the force/torque. Doesn't recalculate anything.
  */
-template<class Frame>
-	inline Wrench<Frame>
-	operator+ (Wrench<Frame> wrench, SpaceLength<Frame> const& offset)
+template<class Space>
+	inline Wrench<Space>
+	operator+ (Wrench<Space> wrench, SpaceLength<Space> const& offset)
 	{
 		wrench.set_position (wrench.position() + offset);
 		return wrench;
@@ -114,21 +114,21 @@ template<class Frame>
 /**
  * This changes the application position of the force/torque. Doesn't recalculate anything.
  */
-template<class Frame>
-	inline Wrench<Frame>
-	operator- (Wrench<Frame> wrench, SpaceLength<Frame> const& offset)
+template<class Space>
+	inline Wrench<Space>
+	operator- (Wrench<Space> wrench, SpaceLength<Space> const& offset)
 	{
 		wrench.set_position (wrench.position() - offset);
 		return wrench;
 	}
 
 
-template<class TargetFrame = void, class SourceFrame = TargetFrame>
-	inline Wrench<TargetFrame>
-	operator* (RotationMatrix<TargetFrame, SourceFrame> const& rotation, Wrench<SourceFrame> const& wrench)
+template<class TargetSpace = void, class SourceSpace = TargetSpace>
+	inline Wrench<TargetSpace>
+	operator* (RotationMatrix<TargetSpace, SourceSpace> const& rotation, Wrench<SourceSpace> const& wrench)
 	{
 		return {
-			rotation * static_cast<ForceMoments<SourceFrame>> (wrench),
+			rotation * static_cast<ForceMoments<SourceSpace>> (wrench),
 			rotation * wrench.position(),
 		};
 	}
@@ -140,11 +140,11 @@ template<class TargetFrame = void, class SourceFrame = TargetFrame>
  * Warning: if you have non-BodySpace Wrench, transform it first to BodySpace
  * before using resultant_force(), because space origin is assumed to be center-of-mass.
  */
-template<class Frame>
-	inline ForceMoments<Frame>
-	resultant_force (Wrench<Frame> const& wrench)
+template<class Space>
+	inline ForceMoments<Space>
+	resultant_force (Wrench<Space> const& wrench)
 	{
-		ForceMoments<Frame> result (wrench);
+		ForceMoments<Space> result (wrench);
 		result.set_torque (result.torque() + cross_product (wrench.position(), wrench.force()));
 		return result;
 	}
@@ -154,11 +154,11 @@ template<class Frame>
  * Calculate total equivalent force and torque about the origin
  * from a set of forces and torques at various points in space.
  */
-template<class Frame, class WrenchIterator>
-	inline ForceMoments<Frame>
+template<class Space, class WrenchIterator>
+	inline ForceMoments<Space>
 	resultant_force (WrenchIterator begin, WrenchIterator end)
 	{
-		ForceMoments<Frame> total;
+		ForceMoments<Space> total;
 
 		for (auto j = begin; j != end; ++j)
 		{

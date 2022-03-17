@@ -31,9 +31,9 @@
 #include <xefis/support/nature/force_moments.h>
 #include <xefis/support/nature/velocity_moments.h>
 #include <xefis/support/simulation/rigid_body/body.h>
+#include <xefis/support/simulation/rigid_body/concepts.h>
 #include <xefis/support/simulation/rigid_body/constraint.h>
 #include <xefis/support/simulation/rigid_body/frame_precalculation.h>
-#include <xefis/support/simulation/rigid_body/frames.h>
 #include <xefis/support/simulation/rigid_body/system.h>
 
 
@@ -125,13 +125,13 @@ class ImpulseSolver: private Noncopyable
 	void
 	orthonormalize_rotation_matrices();
 
-	template<class Frame>
+	template<class Space>
 		void
-		apply_limits (ForceMoments<Frame>&) const;
+		apply_limits (ForceMoments<Space>&) const;
 
-	template<class Frame>
+	template<class Space>
 		void
-		apply_limits (VelocityMoments<Frame>&) const;
+		apply_limits (VelocityMoments<Space>&) const;
 
   private:
 	System&					_system;
@@ -141,9 +141,9 @@ class ImpulseSolver: private Noncopyable
 };
 
 
-template<class Frame>
+template<class Space>
 	inline void
-	ImpulseSolver::apply_limits (ForceMoments<Frame>& force_moments) const
+	ImpulseSolver::apply_limits (ForceMoments<Space>& force_moments) const
 	{
 		if (_limits)
 		{
@@ -153,9 +153,9 @@ template<class Frame>
 	}
 
 
-template<class Frame>
+template<class Space>
 	inline void
-	ImpulseSolver::apply_limits (VelocityMoments<Frame>& velocity_moments) const
+	ImpulseSolver::apply_limits (VelocityMoments<Space>& velocity_moments) const
 	{
 		if (_limits)
 		{

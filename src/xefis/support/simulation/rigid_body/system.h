@@ -30,7 +30,6 @@
 #include <xefis/support/simulation/rigid_body/concepts.h>
 #include <xefis/support/simulation/rigid_body/constraint.h>
 #include <xefis/support/simulation/rigid_body/frame_precalculation.h>
-#include <xefis/support/simulation/rigid_body/frames.h>
 
 
 namespace xf::rigid_body {

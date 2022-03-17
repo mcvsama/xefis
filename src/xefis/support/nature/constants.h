@@ -25,11 +25,11 @@
 namespace xf {
 
 /*
- * Frames of reference
+ * Coordinate systems.
  */
 
 
-// Earth-centered, Earth-fixed frame:
+// Earth-centered, Earth-fixed coordinate system:
 struct ECEFSpace;
 
 

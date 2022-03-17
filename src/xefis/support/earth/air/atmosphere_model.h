@@ -38,11 +38,11 @@ struct Air
 /**
  * StandardAtmosphere state at some given position.
  */
-template<class Frame>
+template<class Space>
 	struct AtmosphereState
 	{
 		Air									air;
-		SpaceVector<si::Velocity, Frame>	wind;
+		SpaceVector<si::Velocity, Space>	wind;
 	};
 
 

@@ -29,6 +29,13 @@ class Constraint;
 class BasicFramePrecalculation;
 
 
+// World (aka global aka absolute) space coordinate system:
+struct WorldSpace;
+
+// Body space coordinate system:
+struct BodySpace;
+
+
 template<class T>
 	concept BodyConcept = std::derived_from<T, Body>;
 
@@ -39,6 +46,10 @@ template<class T>
 
 template<class T>
 	concept BasicFramePrecalculationConcept = std::derived_from<T, BasicFramePrecalculation>;
+
+
+template<class T>
+	concept CoordinateSystemConcept = std::is_same_v<T, WorldSpace> || std::is_same_v<T, BodySpace>;
 
 } // namespace xf::rigid_body
 

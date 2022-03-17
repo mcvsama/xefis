@@ -31,16 +31,16 @@ namespace xf {
  */
 
 // TODO Perhaps rename *_to_base() to *_to_world(), and maybe *_to_body() to *_to_local()?
-template<class pBaseFrame = void, class pFrame = pBaseFrame>
+template<class pBaseSpace = void, class pSpace = pBaseSpace>
 	struct Placement
 	{
 	  public:
-		using BaseFrame			= pBaseFrame;
-		using Frame				= pFrame;
+		using BaseSpace			= pBaseSpace;
+		using Space				= pSpace;
 
-		using Position			= SpaceVector<si::Length, BaseFrame>;
-		using RotationToBase	= RotationMatrix<BaseFrame, Frame>;
-		using RotationToBody	= RotationMatrix<Frame, BaseFrame>;
+		using Position			= SpaceVector<si::Length, BaseSpace>;
+		using RotationToBase	= RotationMatrix<BaseSpace, Space>;
+		using RotationToBody	= RotationMatrix<Space, BaseSpace>;
 
 	  public:
 		// Ctor
@@ -48,14 +48,14 @@ template<class pBaseFrame = void, class pFrame = pBaseFrame>
 
 		// Ctor
 		template<class = void>
-			requires (!std::is_same<BaseFrame, Frame>())
+			requires (!std::is_same<BaseSpace, Space>())
 			Placement (Position const&, RotationToBody const&);
 
 		// Ctor
 		Placement (Position const&, RotationToBase const&);
 
 		/**
-		 * Body position relative to the BaseFrame frame of reference.
+		 * Body position relative to the BaseSpace frame of reference.
 		 */
 		[[nodiscard]]
 		Position const&
@@ -70,7 +70,7 @@ template<class pBaseFrame = void, class pFrame = pBaseFrame>
 			{ _position = position; }
 
 		/**
-		 * Body rotation matrix transforming from BaseFrame to Frame.
+		 * Body rotation matrix transforming from BaseSpace to Space.
 		 */
 		[[nodiscard]]
 		RotationToBody const&
@@ -84,7 +84,7 @@ template<class pBaseFrame = void, class pFrame = pBaseFrame>
 		set_base_to_body_rotation (RotationToBody const&);
 
 		/**
-		 * Body rotation matrix transforming from Frame to BaseFrame.
+		 * Body rotation matrix transforming from Space to BaseSpace.
 		 */
 		[[nodiscard]]
 		RotationToBase const&
@@ -98,33 +98,33 @@ template<class pBaseFrame = void, class pFrame = pBaseFrame>
 		set_body_to_base_rotation (RotationToBase const&);
 
 		/**
-		 * Translate in-place the body by a relative vector in BaseFrame.
+		 * Translate in-place the body by a relative vector in BaseSpace.
 		 */
 		void
 		translate_frame (Position const& translation)
 			{ _position += translation; }
 
 		/**
-		 * Translate in-place the body by a relative vector in Frame.
+		 * Translate in-place the body by a relative vector in Space.
 		 */
 		template<class = void>
-			requires (!std::is_same<BaseFrame, Frame>())
+			requires (!std::is_same<BaseSpace, Space>())
 			void
-			translate_frame (SpaceVector<si::Length, Frame> const& vector)
+			translate_frame (SpaceVector<si::Length, Space> const& vector)
 				{ translate (_body_to_base_rotation * vector); }
 
 		/**
 		 * Rotate in-place the body.
 		 */
 		void
-		rotate_body_frame (RotationMatrix<BaseFrame> const& rotation_matrix);
+		rotate_body_frame (RotationMatrix<BaseSpace> const& rotation_matrix);
 
 		/**
 		 * Rotate in-place the body around the 0 point in base frame of reference.
 		 * Modifies both position vector and rotation matrix.
 		 */
 		void
-		rotate_base_frame (RotationMatrix<BaseFrame> const& rotation_matrix);
+		rotate_base_frame (RotationMatrix<BaseSpace> const& rotation_matrix);
 
 		/**
 		 * Rotate in-place the body around different point than origin.
@@ -132,7 +132,7 @@ template<class pBaseFrame = void, class pFrame = pBaseFrame>
 		 * Modifies both position vector and rotation matrix.
 		 */
 		void
-		rotate_base_frame_about (Position const& about_point, RotationMatrix<BaseFrame> const& rotation_matrix);
+		rotate_base_frame_about (Position const& about_point, RotationMatrix<BaseSpace> const& rotation_matrix);
 
 		/**
 		 * Transform bound geometrical object from base to body space.
@@ -171,9 +171,9 @@ template<class pBaseFrame = void, class pFrame = pBaseFrame>
 				{ return _body_to_base_rotation * input; }
 
 	  private:
-		SpaceVector<si::Length, BaseFrame>	_position				{ math::zero };
-		RotationMatrix<Frame, BaseFrame>	_base_to_body_rotation	{ math::unit };
-		RotationMatrix<BaseFrame, Frame>	_body_to_base_rotation	{ math::unit };
+		SpaceVector<si::Length, BaseSpace>	_position				{ math::zero };
+		RotationMatrix<Space, BaseSpace>	_base_to_body_rotation	{ math::unit };
+		RotationMatrix<BaseSpace, Space>	_body_to_base_rotation	{ math::unit };
 	};
 
 
@@ -217,7 +217,7 @@ template<class B, class F>
 
 template<class B, class F>
 	inline void
-	Placement<B, F>::rotate_body_frame (RotationMatrix<BaseFrame> const& rotation_matrix)
+	Placement<B, F>::rotate_body_frame (RotationMatrix<BaseSpace> const& rotation_matrix)
 	{
 		_body_to_base_rotation = rotation_matrix * _body_to_base_rotation;
 		_base_to_body_rotation = ~_body_to_base_rotation;
@@ -226,7 +226,7 @@ template<class B, class F>
 
 template<class B, class F>
 	inline void
-	Placement<B, F>::rotate_base_frame (RotationMatrix<BaseFrame> const& rotation_matrix)
+	Placement<B, F>::rotate_base_frame (RotationMatrix<BaseSpace> const& rotation_matrix)
 	{
 		_position = rotation_matrix * _position;
 		rotate_body_frame (rotation_matrix);
@@ -235,7 +235,7 @@ template<class B, class F>
 
 template<class B, class F>
 	inline void
-	Placement<B, F>::rotate_base_frame_about (Position const& about_point, RotationMatrix<BaseFrame> const& rotation_matrix)
+	Placement<B, F>::rotate_base_frame_about (Position const& about_point, RotationMatrix<BaseSpace> const& rotation_matrix)
 	{
 		_position -= about_point;
 		rotate_base_frame (rotation_matrix);

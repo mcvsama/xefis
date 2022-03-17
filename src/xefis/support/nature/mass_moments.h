@@ -33,19 +33,19 @@
 
 namespace xf {
 
-template<class pFrame = void>
+template<class pSpace = void>
 	class PointMass
 	{
 	  public:
-		using Frame = pFrame;
+		using Space = pSpace;
 
 	  public:
 		// Monopole moment:
 		si::Mass								mass;
 		// Dipole moment:
-		SpaceVector<si::Length, Frame>			position;
+		SpaceVector<si::Length, Space>			position;
 		// Quadrupole moment:
-		SpaceMatrix<si::MomentOfInertia, Frame>	moment_of_inertia;
+		SpaceMatrix<si::MomentOfInertia, Space>	moment_of_inertia;
 	};
 
 
@@ -62,12 +62,12 @@ class FromPointMassRange
  *  • 1st = center of mass (dipole)
  *  • 2nd = moment of inertia at the center of mass (quadrupole)
  */
-template<class pFrame = void>
+template<class pSpace = void>
 	class MassMoments
 	{
 	  public:
-		using Frame		= pFrame;
-		using PointMass	= xf::PointMass<Frame>;
+		using Space		= pSpace;
+		using PointMass	= xf::PointMass<Space>;
 
 	  public:
 		// Ctor
@@ -76,7 +76,7 @@ template<class pFrame = void>
 		// TODO construct from direct mass, COM and MOI. Calculation from point masses should be in separate (static) function.
 
 		// Ctor
-		MassMoments (si::Mass, SpaceVector<si::Length, Frame> const& center_of_mass_position, SpaceMatrix<si::MomentOfInertia, Frame> const& moment_of_inertia);
+		MassMoments (si::Mass, SpaceVector<si::Length, Space> const& center_of_mass_position, SpaceMatrix<si::MomentOfInertia, Space> const& moment_of_inertia);
 
 		// Ctor
 		MassMoments (std::initializer_list<PointMass> point_masses);
@@ -107,7 +107,7 @@ template<class pFrame = void>
 		 * Position of center of mass.
 		 */
 		[[nodiscard]]
-		SpaceVector<si::Length, Frame> const&
+		SpaceVector<si::Length, Space> const&
 		center_of_mass_position() const noexcept
 			{ return _center_of_mass_position; }
 
@@ -115,7 +115,7 @@ template<class pFrame = void>
 		 * Moment of inertia tensor about the center of mass.
 		 */
 		[[nodiscard]]
-		SpaceMatrix<si::MomentOfInertia, Frame> const&
+		SpaceMatrix<si::MomentOfInertia, Space> const&
 		moment_of_inertia() const noexcept
 		// TODO rozdziel na MOI@zero i na MOI@COM
 			{ return _moment_of_inertia; }
@@ -124,33 +124,33 @@ template<class pFrame = void>
 		 * Inversed moment of inertia.
 		 */
 		[[nodiscard]]
-		typename SpaceMatrix<si::MomentOfInertia, Frame>::InversedMatrix const&
+		typename SpaceMatrix<si::MomentOfInertia, Space>::InversedMatrix const&
 		inversed_moment_of_inertia() const noexcept
 		// TODO rozdziel na MOI@zero i na MOI@COM
 			{ return _inversed_moment_of_inertia; }
 
 	  public:
-		static MassMoments<Frame>
+		static MassMoments<Space>
 		zero()
-			{ return MassMoments<Frame> (0_kg, math::zero, math::zero); }
+			{ return MassMoments<Space> (0_kg, math::zero, math::zero); }
 
 	  private:
 		si::Mass															_mass						{ 0_kg };
-		SpaceVector<si::Length, Frame>										_center_of_mass_position	{ 0_m, 0_m, 0_m };
-		SpaceMatrix<si::MomentOfInertia, Frame>								_moment_of_inertia			{ math::zero };
-		typename SpaceMatrix<si::MomentOfInertia, Frame>::InversedMatrix	_inversed_moment_of_inertia	{ math::zero };
+		SpaceVector<si::Length, Space>										_center_of_mass_position	{ 0_m, 0_m, 0_m };
+		SpaceMatrix<si::MomentOfInertia, Space>								_moment_of_inertia			{ math::zero };
+		typename SpaceMatrix<si::MomentOfInertia, Space>::InversedMatrix	_inversed_moment_of_inertia	{ math::zero };
 	};
 
 
 // Forward
-template<class Frame>
-	SpaceMatrix<si::MomentOfInertia, Frame>
-	parallel_axis_theorem (SpaceMatrix<si::MomentOfInertia, Frame> const& moi_at_com, si::Mass mass, SpaceVector<si::Length, Frame> const& displacement);
+template<class Space>
+	SpaceMatrix<si::MomentOfInertia, Space>
+	parallel_axis_theorem (SpaceMatrix<si::MomentOfInertia, Space> const& moi_at_com, si::Mass mass, SpaceVector<si::Length, Space> const& displacement);
 
 
 template<class F>
 	inline
-	MassMoments<F>::MassMoments (si::Mass mass, SpaceVector<si::Length, Frame> const& center_of_mass_position, SpaceMatrix<si::MomentOfInertia, Frame> const& moment_of_inertia):
+	MassMoments<F>::MassMoments (si::Mass mass, SpaceVector<si::Length, Space> const& center_of_mass_position, SpaceMatrix<si::MomentOfInertia, Space> const& moment_of_inertia):
 		_mass (mass),
 		_center_of_mass_position (center_of_mass_position),
 		_moment_of_inertia (moment_of_inertia),
@@ -173,11 +173,11 @@ template<class F>
 			size_t count = 0;
 
 			// TODO what really is needed: skipping pointmasses with mass == 0_kg.
-			SpaceMatrix<double, Frame> const unit (math::unit);
+			SpaceMatrix<double, Space> const unit (math::unit);
 
 			si::Mass computed_mass = 0_kg;
-			SpaceVector<decltype (si::Length{} * si::Mass{}), Frame> computed_center (math::zero);
-			SpaceMatrix<si::MomentOfInertia, Frame> computed_moment_of_inertia (math::zero);
+			SpaceVector<decltype (si::Length{} * si::Mass{}), Space> computed_center (math::zero);
+			SpaceMatrix<si::MomentOfInertia, Space> computed_moment_of_inertia (math::zero);
 
 			// Center of mass formula: R = 1/M * Σ m[i] * r[i]; where M is total mass.
 
@@ -254,18 +254,18 @@ template<class F>
  */
 
 
-template<class Frame>
-	inline MassMoments<Frame>
-	operator+ (MassMoments<Frame> a, MassMoments<Frame> const& b)
+template<class Space>
+	inline MassMoments<Space>
+	operator+ (MassMoments<Space> a, MassMoments<Space> const& b)
 	{
 		return a += b;
 	}
 
 
-template<class TargetFrame, class SourceFrame>
-	inline MassMoments<TargetFrame>
-	operator* (SpaceMatrix<double, TargetFrame, SourceFrame> const& transformation,
-			   MassMoments<SourceFrame> const& mass_moments)
+template<class TargetSpace, class SourceSpace>
+	inline MassMoments<TargetSpace>
+	operator* (SpaceMatrix<double, TargetSpace, SourceSpace> const& transformation,
+			   MassMoments<SourceSpace> const& mass_moments)
 	{
 		return {
 			mass_moments.mass(),
@@ -275,9 +275,9 @@ template<class TargetFrame, class SourceFrame>
 	}
 
 
-template<class Frame>
-	constexpr MassMoments<Frame>
-	operator+ (MassMoments<Frame> a)
+template<class Space>
+	constexpr MassMoments<Space>
+	operator+ (MassMoments<Space> a)
 	{
 		return a;
 	}
@@ -285,10 +285,10 @@ template<class Frame>
 
 // TODO perhaps just like velocity-moments, can't use +, but need add (other, arm) to correctly add moment_of_inertia?
 // TODO and what would arm mean? Arm to center-of-mass, right?
-template<class Frame>
-	inline MassMoments<Frame>
-	operator+ (SpaceVector<si::Length, Frame> const& offset,
-			   MassMoments<Frame> const& mass_moments)
+template<class Space>
+	inline MassMoments<Space>
+	operator+ (SpaceVector<si::Length, Space> const& offset,
+			   MassMoments<Space> const& mass_moments)
 	{
 		return {
 			mass_moments.mass(),
@@ -298,28 +298,28 @@ template<class Frame>
 	}
 
 
-template<class Frame>
-	inline MassMoments<Frame>
-	operator+ (MassMoments<Frame> const& mass_moments,
-			   SpaceVector<si::Length, Frame> const& offset)
+template<class Space>
+	inline MassMoments<Space>
+	operator+ (MassMoments<Space> const& mass_moments,
+			   SpaceVector<si::Length, Space> const& offset)
 	{
 		return offset + mass_moments;
 	}
 
 
-template<class Frame>
-	inline MassMoments<Frame>
-	operator- (SpaceVector<si::Length, Frame> const& offset,
-			   MassMoments<Frame> const& mass_moments)
+template<class Space>
+	inline MassMoments<Space>
+	operator- (SpaceVector<si::Length, Space> const& offset,
+			   MassMoments<Space> const& mass_moments)
 	{
         return -offset + mass_moments;
     }
 
 
-template<class Frame>
-	inline MassMoments<Frame>
-	operator- (MassMoments<Frame> const& mass_moments,
-			   SpaceVector<si::Length, Frame> const& offset)
+template<class Space>
+	inline MassMoments<Space>
+	operator- (MassMoments<Space> const& mass_moments,
+			   SpaceVector<si::Length, Space> const& offset)
 	{
         return -offset + mass_moments;
     }
@@ -330,31 +330,31 @@ template<class Frame>
  */
 
 
-template<class Frame>
-	SpaceMatrix<si::MomentOfInertia, Frame>
-	parallel_axis_theorem_arm (si::Mass mass, SpaceVector<si::Length, Frame> const& displacement)
+template<class Space>
+	SpaceMatrix<si::MomentOfInertia, Space>
+	parallel_axis_theorem_arm (si::Mass mass, SpaceVector<si::Length, Space> const& displacement)
 	{
-		SpaceMatrix<double, Frame> const unit (math::unit);
+		SpaceMatrix<double, Space> const unit (math::unit);
 		return mass * (unit * (~displacement * displacement).scalar() - displacement * ~displacement);
 	}
 
 
-template<class Frame>
-	SpaceMatrix<si::MomentOfInertia, Frame>
-	parallel_axis_theorem (SpaceMatrix<si::MomentOfInertia, Frame> const& moi_at_com, si::Mass mass, SpaceVector<si::Length, Frame> const& displacement)
+template<class Space>
+	SpaceMatrix<si::MomentOfInertia, Space>
+	parallel_axis_theorem (SpaceMatrix<si::MomentOfInertia, Space> const& moi_at_com, si::Mass mass, SpaceVector<si::Length, Space> const& displacement)
 	{
 		return moi_at_com + parallel_axis_theorem_arm (mass, displacement);
 	}
 
 
-template<class Scalar, class Frame>
-	inline MassMoments<Frame>
-	calculate_mass_moments (std::vector<PlaneTriangle<Scalar, Frame>> const& polygon_triangulation, si::Length const chord_length, si::Length const wing_length, si::Density const material_density)
+template<class Scalar, class Space>
+	inline MassMoments<Space>
+	calculate_mass_moments (std::vector<PlaneTriangle<Scalar, Space>> const& polygon_triangulation, si::Length const chord_length, si::Length const wing_length, si::Density const material_density)
 	{
 		// Have 2D triangulation points, make two sets of them, split the virtual wing into two identical-length parts,
 		// make the points at the center of each wing part. This way we'll get correct MOI for all 3D axes.
 
-		std::vector<PointMass<Frame>> point_masses;
+		std::vector<PointMass<Space>> point_masses;
 		point_masses.reserve (2 * polygon_triangulation.size());
 
 		for (auto const& triangle: polygon_triangulation)
@@ -362,14 +362,14 @@ template<class Scalar, class Frame>
 			auto const s = chord_length;
 			auto const centroid = s * triangle_centroid (triangle);
 			auto const mass = 0.5 * wing_length * (s * s) * area_2d (triangle) * material_density;
-			auto const position_1 = SpaceLength<Frame> (centroid[0], centroid[1], 0.25 * wing_length);
-			auto const position_2 = SpaceLength<Frame> (centroid[0], centroid[1], 0.75 * wing_length);
+			auto const position_1 = SpaceLength<Space> (centroid[0], centroid[1], 0.25 * wing_length);
+			auto const position_2 = SpaceLength<Space> (centroid[0], centroid[1], 0.75 * wing_length);
 
-			point_masses.push_back (PointMass<Frame> { mass, position_1, math::zero });
-			point_masses.push_back (PointMass<Frame> { mass, position_2, math::zero });
+			point_masses.push_back (PointMass<Space> { mass, position_1, math::zero });
+			point_masses.push_back (PointMass<Space> { mass, position_2, math::zero });
 		}
 
-		return MassMoments<Frame> (FromPointMassRange(), begin (point_masses), end (point_masses));
+		return MassMoments<Space> (FromPointMassRange(), begin (point_masses), end (point_masses));
 	}
 
 } // namespace xf

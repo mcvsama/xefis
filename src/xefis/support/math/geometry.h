@@ -39,40 +39,40 @@ struct NEDSpace;
 struct AirframeSpace;
 
 
-template<class Scalar = double, class Frame = void>
-	using PlaneVector = math::Vector<Scalar, 2, Frame, void>;
+template<class Scalar = double, class Space = void>
+	using PlaneVector = math::Vector<Scalar, 2, Space, void>;
 
-template<class Scalar = double, class Frame = void>
-	using SpaceVector = math::Vector<Scalar, 3, Frame, void>;
+template<class Scalar = double, class Space = void>
+	using SpaceVector = math::Vector<Scalar, 3, Space, void>;
 
-template<class Scalar = double, class TargetFrame = void, class SourceFrame = TargetFrame>
-	using PlaneMatrix = math::Matrix<Scalar, 2, 2, TargetFrame, SourceFrame>;
+template<class Scalar = double, class TargetSpace = void, class SourceSpace = TargetSpace>
+	using PlaneMatrix = math::Matrix<Scalar, 2, 2, TargetSpace, SourceSpace>;
 
-template<class Scalar = double, class TargetFrame = void, class SourceFrame = TargetFrame>
-	using SpaceMatrix = math::Matrix<Scalar, 3, 3, TargetFrame, SourceFrame>;
+template<class Scalar = double, class TargetSpace = void, class SourceSpace = TargetSpace>
+	using SpaceMatrix = math::Matrix<Scalar, 3, 3, TargetSpace, SourceSpace>;
 
-template<class TargetFrame = void, class SourceFrame = TargetFrame>
-	using RotationMatrix = SpaceMatrix<double, TargetFrame, SourceFrame>;
+template<class TargetSpace = void, class SourceSpace = TargetSpace>
+	using RotationMatrix = SpaceMatrix<double, TargetSpace, SourceSpace>;
 
-template<class TargetFrame = void, class SourceFrame = TargetFrame>
-	RotationMatrix<TargetFrame, SourceFrame> const kNoRotation = math::unit;
+template<class TargetSpace = void, class SourceSpace = TargetSpace>
+	RotationMatrix<TargetSpace, SourceSpace> const kNoRotation = math::unit;
 
-template<class Scalar = double, class Frame = void>
-	using PlaneTriangle = std::array<PlaneVector<Scalar, Frame>, 3>;
+template<class Scalar = double, class Space = void>
+	using PlaneTriangle = std::array<PlaneVector<Scalar, Space>, 3>;
 
-template<class Scalar = double, class Frame = void>
-	using SpaceTriangle = std::array<SpaceVector<Scalar, Frame>, 3>;
+template<class Scalar = double, class Space = void>
+	using SpaceTriangle = std::array<SpaceVector<Scalar, Space>, 3>;
 
 // Typical units used in space:
 
-template<class Frame = void>
-	using SpaceLength = SpaceVector<si::Length, Frame>;
+template<class Space = void>
+	using SpaceLength = SpaceVector<si::Length, Space>;
 
-template<class Frame = void>
-	using SpaceForce = SpaceVector<si::Force, Frame>;
+template<class Space = void>
+	using SpaceForce = SpaceVector<si::Force, Space>;
 
-template<class Frame = void>
-	using SpaceTorque = SpaceVector<si::Torque, Frame>;
+template<class Space = void>
+	using SpaceTorque = SpaceVector<si::Torque, Space>;
 
 
 /**
@@ -170,10 +170,10 @@ template<class S, std::size_t C, std::size_t R, class TF, class SF>
 /**
  * Return tangential velocity for given angular velocity and arm.
  */
-template<class Frame>
+template<class Space>
 	[[nodiscard]]
-	inline SpaceVector<si::Velocity, Frame>
-	tangential_velocity (SpaceVector<si::AngularVelocity, Frame> const& w, SpaceLength<Frame> const& r)
+	inline SpaceVector<si::Velocity, Space>
+	tangential_velocity (SpaceVector<si::AngularVelocity, Space> const& w, SpaceLength<Space> const& r)
 	{
 		return cross_product (w, r) / 1_rad;
 	}
@@ -297,10 +297,10 @@ template<class T, class F>
 /**
  * Project vector "vector" onto "onto" vector.
  */
-template<class T1, class T2, class Frame>
+template<class T1, class T2, class Space>
 	[[nodiscard]]
 	constexpr auto
-	projection (SpaceVector<T1, Frame> const& vector, SpaceVector<T2, Frame> const& onto)
+	projection (SpaceVector<T1, Space> const& vector, SpaceVector<T2, Space> const& onto)
 	{
 		return (~vector * normalized (onto)).scalar() * onto;
 	}
@@ -309,10 +309,10 @@ template<class T1, class T2, class Frame>
 /**
  * This version takes normalized "onto" vector, if caller has one, to save on computing time.
  */
-template<class T1, class T2, class Frame>
+template<class T1, class T2, class Space>
 	[[nodiscard]]
 	constexpr auto
-	projection_onto_normalized (SpaceVector<T1, Frame> const& vector, SpaceVector<T2, Frame> const& normalized_onto)
+	projection_onto_normalized (SpaceVector<T1, Space> const& vector, SpaceVector<T2, Space> const& normalized_onto)
 	{
 		return (~vector * normalized_onto).scalar() * normalized_onto;
 	}
@@ -321,19 +321,19 @@ template<class T1, class T2, class Frame>
 /**
  * Find a vector that is non-colinear with given input vector.
  */
-template<class Scalar, class Frame>
+template<class Scalar, class Space>
 	[[nodiscard]]
-	constexpr SpaceVector<Scalar, Frame>
-	find_non_colinear (SpaceVector<Scalar, Frame> input)
+	constexpr SpaceVector<Scalar, Space>
+	find_non_colinear (SpaceVector<Scalar, Space> input)
 	{
 		input = normalized (input);
 
-		auto output = kXRotationPlus90<Frame, Frame> * input;
+		auto output = kXRotationPlus90<Space, Space> * input;
 
 		if (abs (cross_product (input, output)) > 0)
 			return output;
 		else
-			return kYRotationPlus90<Frame, Frame> * input;
+			return kYRotationPlus90<Space, Space> * input;
 	}
 
 

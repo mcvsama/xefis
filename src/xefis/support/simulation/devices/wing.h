@@ -21,7 +21,7 @@
 #include <xefis/config/all.h>
 #include <xefis/support/aerodynamics/airfoil.h>
 #include <xefis/support/simulation/rigid_body/body.h>
-#include <xefis/support/simulation/rigid_body/frames.h>
+#include <xefis/support/simulation/rigid_body/concepts.h>
 
 
 namespace xf::sim {

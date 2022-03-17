@@ -35,13 +35,13 @@ namespace xf {
  *			Must define a simple polygon without holes in CCW direction (assuming inside is on the left side when walking
  *			throught the points).
  */
-template<class Scalar, class Frame, class Iterator>
-	inline std::vector<PlaneTriangle<Scalar, Frame>>
+template<class Scalar, class Space, class Iterator>
+	inline std::vector<PlaneTriangle<Scalar, Space>>
 	triangulate (Iterator const vertices_begin, Iterator const vertices_end)
-		requires (std::is_same_v<std::remove_cvref_t<decltype (*std::declval<Iterator>())>, PlaneVector<Scalar, Frame>>)
+		requires (std::is_same_v<std::remove_cvref_t<decltype (*std::declval<Iterator>())>, PlaneVector<Scalar, Space>>)
 	{
-		using Vertex = PlaneVector<Scalar, Frame>;
-		using Triangle = PlaneTriangle<Scalar, Frame>;
+		using Vertex = PlaneVector<Scalar, Space>;
+		using Triangle = PlaneTriangle<Scalar, Space>;
 		using VertexList = std::list<Vertex>;
 
 		auto const circular_prev = [](typename VertexList::iterator v, VertexList& list)

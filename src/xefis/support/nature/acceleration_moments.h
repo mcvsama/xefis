@@ -32,7 +32,7 @@ namespace xf {
  *   • 0th moment = linear acceleration,
  *   • 1st moment = angular acceleration.
  */
-template<class Frame = void>
+template<class Space = void>
 	struct AccelerationMoments
 	{
 	  public:
@@ -42,8 +42,8 @@ template<class Frame = void>
 
 		// Ctor
 		constexpr
-		AccelerationMoments (SpaceVector<si::Acceleration, Frame> const& acceleration,
-							 SpaceVector<si::AngularAcceleration, Frame> const& angular_acceleration);
+		AccelerationMoments (SpaceVector<si::Acceleration, Space> const& acceleration,
+							 SpaceVector<si::AngularAcceleration, Space> const& angular_acceleration);
 
 		constexpr AccelerationMoments&
 		operator+= (AccelerationMoments const& other);
@@ -52,40 +52,40 @@ template<class Frame = void>
 		operator-= (AccelerationMoments const& other);
 
 		[[nodiscard]]
-		constexpr SpaceVector<si::Acceleration, Frame> const&
+		constexpr SpaceVector<si::Acceleration, Space> const&
 		acceleration() const noexcept
 			{ return _acceleration; }
 
 		constexpr void
-		set_acceleration (SpaceVector<si::Acceleration, Frame> const& acceleration)
+		set_acceleration (SpaceVector<si::Acceleration, Space> const& acceleration)
 			{ _acceleration = acceleration; }
 
 		[[nodiscard]]
-		constexpr SpaceVector<si::AngularAcceleration, Frame> const&
+		constexpr SpaceVector<si::AngularAcceleration, Space> const&
 		angular_acceleration() const noexcept
 			{ return _angular_acceleration; }
 
 		constexpr void
-		set_angular_acceleration (SpaceVector<si::AngularAcceleration, Frame> const& angular_acceleration)
+		set_angular_acceleration (SpaceVector<si::AngularAcceleration, Space> const& angular_acceleration)
 			{ _angular_acceleration = angular_acceleration; }
 
 	  private:
-		SpaceVector<si::Acceleration, Frame>		_acceleration			{ 0_mps2, 0_mps2, 0_mps2 };
-		SpaceVector<si::AngularAcceleration, Frame>	_angular_acceleration	{ 0_radps2, 0_radps2, 0_radps2 };
+		SpaceVector<si::Acceleration, Space>		_acceleration			{ 0_mps2, 0_mps2, 0_mps2 };
+		SpaceVector<si::AngularAcceleration, Space>	_angular_acceleration	{ 0_radps2, 0_radps2, 0_radps2 };
 	};
 
 
-template<class Frame>
+template<class Space>
 	constexpr
-	AccelerationMoments<Frame>::AccelerationMoments (SpaceVector<si::Acceleration, Frame> const& acceleration, SpaceVector<si::AngularAcceleration, Frame> const& angular_acceleration):
+	AccelerationMoments<Space>::AccelerationMoments (SpaceVector<si::Acceleration, Space> const& acceleration, SpaceVector<si::AngularAcceleration, Space> const& angular_acceleration):
 		_acceleration (acceleration),
 		_angular_acceleration (angular_acceleration)
 	{ }
 
 
-template<class Frame>
-	constexpr AccelerationMoments<Frame>&
-	AccelerationMoments<Frame>::operator+= (AccelerationMoments const& other)
+template<class Space>
+	constexpr AccelerationMoments<Space>&
+	AccelerationMoments<Space>::operator+= (AccelerationMoments const& other)
 	{
 		_acceleration += other._acceleration;
 		_angular_acceleration += other._angular_acceleration;
@@ -93,9 +93,9 @@ template<class Frame>
 	}
 
 
-template<class Frame>
-	constexpr AccelerationMoments<Frame>&
-	AccelerationMoments<Frame>::operator-= (AccelerationMoments const& other)
+template<class Space>
+	constexpr AccelerationMoments<Space>&
+	AccelerationMoments<Space>::operator-= (AccelerationMoments const& other)
 	{
 		_acceleration -= other._acceleration;
 		_angular_acceleration -= other._angular_acceleration;
@@ -108,25 +108,25 @@ template<class Frame>
  */
 
 
-template<class Frame>
-	constexpr AccelerationMoments<Frame>
-	operator+ (AccelerationMoments<Frame> a)
+template<class Space>
+	constexpr AccelerationMoments<Space>
+	operator+ (AccelerationMoments<Space> a)
 	{
 		return a;
 	}
 
 
-template<class Frame>
-	constexpr AccelerationMoments<Frame>
-	operator+ (AccelerationMoments<Frame> a, AccelerationMoments<Frame> const& b)
+template<class Space>
+	constexpr AccelerationMoments<Space>
+	operator+ (AccelerationMoments<Space> a, AccelerationMoments<Space> const& b)
 	{
 		return a += b;
 	}
 
 
-template<class Frame>
-	constexpr AccelerationMoments<Frame>
-	operator- (AccelerationMoments<Frame> a)
+template<class Space>
+	constexpr AccelerationMoments<Space>
+	operator- (AccelerationMoments<Space> a)
 	{
 		return {
 			-a.acceleration(),
@@ -135,18 +135,18 @@ template<class Frame>
 	}
 
 
-template<class Frame>
-	constexpr AccelerationMoments<Frame>
-	operator- (AccelerationMoments<Frame> a, AccelerationMoments<Frame> const& b)
+template<class Space>
+	constexpr AccelerationMoments<Space>
+	operator- (AccelerationMoments<Space> a, AccelerationMoments<Space> const& b)
 	{
 		return a -= b;
 	}
 
 
-template<class TargetFrame, class SourceFrame>
-	constexpr AccelerationMoments<TargetFrame>
-	operator* (SpaceMatrix<double, TargetFrame, SourceFrame> const& transformation,
-			   AccelerationMoments<SourceFrame> const& acceleration_moments)
+template<class TargetSpace, class SourceSpace>
+	constexpr AccelerationMoments<TargetSpace>
+	operator* (SpaceMatrix<double, TargetSpace, SourceSpace> const& transformation,
+			   AccelerationMoments<SourceSpace> const& acceleration_moments)
 	{
 		return {
 			transformation * acceleration_moments.acceleration(),
@@ -155,10 +155,10 @@ template<class TargetFrame, class SourceFrame>
 	}
 
 
-template<class Multiplier, class Frame>
-	constexpr AccelerationMoments<Frame>
+template<class Multiplier, class Space>
+	constexpr AccelerationMoments<Space>
 	operator* (Multiplier const& multiplier,
-			   AccelerationMoments<Frame> const& acceleration_moments)
+			   AccelerationMoments<Space> const& acceleration_moments)
 	{
 		return {
 			multiplier * acceleration_moments.acceleration(),

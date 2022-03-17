@@ -25,7 +25,7 @@
 #include <xefis/support/math/transforms.h>
 #include <xefis/support/nature/constants.h>
 #include <xefis/support/nature/mass_moments.h>
-#include <xefis/support/simulation/rigid_body/frames.h>
+#include <xefis/support/simulation/rigid_body/concepts.h>
 #include <xefis/support/simulation/rigid_body/impulse_solver.h>
 #include <xefis/support/simulation/rigid_body/system.h>
 #include <xefis/support/simulation/rigid_body/utility.h>

@@ -32,19 +32,19 @@ namespace xf {
 /**
  * Used for computed values by Airfoil.
  */
-template<class Frame>
+template<class Space>
 	class AerodynamicForces
 	{
 	  public:
-		SpaceForce<Frame>	lift;
-		SpaceForce<Frame>	drag;
-		SpaceTorque<Frame>	pitching_moment;
-		SpaceLength<Frame>	center_of_pressure;
+		SpaceForce<Space>	lift;
+		SpaceForce<Space>	drag;
+		SpaceTorque<Space>	pitching_moment;
+		SpaceLength<Space>	center_of_pressure;
 
 	  public:
-		Wrench<Frame>
+		Wrench<Space>
 		wrench() const
-			{ return { ForceMoments<Frame> (lift + drag, pitching_moment), center_of_pressure }; }
+			{ return { ForceMoments<Space> (lift + drag, pitching_moment), center_of_pressure }; }
 	};
 
 
@@ -187,11 +187,11 @@ template<class TF, class SF>
 	}
 
 
-template<class Frame>
-	MassMoments<Frame>
+template<class Space>
+	MassMoments<Space>
 	calculate_mass_moments (Airfoil const& airfoil, si::Density const material_density)
 	{
-		return calculate_mass_moments<Frame> (airfoil.spline(), airfoil.chord_length(), airfoil.wing_length(), material_density);
+		return calculate_mass_moments<Space> (airfoil.spline(), airfoil.chord_length(), airfoil.wing_length(), material_density);
 	}
 
 } // namespace xf
