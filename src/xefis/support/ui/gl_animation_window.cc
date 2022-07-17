@@ -85,7 +85,7 @@ GLAnimationWindow::refresh()
 			format.setDepthBufferSize (24);
 			format.setProfile (QSurfaceFormat::CoreProfile);
 			// OpenGL antialiasing:
-			format.setSamples (8);
+			format.setSamples (3);
 
 			_open_gl_context = std::make_unique<QOpenGLContext> (this);
 			_open_gl_context->setFormat (format);
