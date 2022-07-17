@@ -21,6 +21,7 @@
 #include <QTextStream>
 
 // Neutrino:
+#include <neutrino/exception.h>
 #include <neutrino/numeric.h>
 #include <neutrino/qt/qzdevice.h>
 
@@ -33,6 +34,17 @@
 
 
 namespace xf {
+
+class GzDataFileIteratorException: public Exception
+{
+  public:
+	// Ctor
+	explicit
+	GzDataFileIteratorException(std::string const& message):
+		Exception (message)
+	{ }
+};
+
 
 class GzDataFileIterator
 {
@@ -71,6 +83,8 @@ inline
 GzDataFileIterator::GzDataFileIterator (std::string_view const& path):
 	_file (QString::fromStdString (std::string (path)))
 {
+	using namespace std::string_literals;
+
 	if (_file.open (QFile::ReadOnly))
 	{
 		_decompressor = std::make_unique<QZDevice> (&_file);
@@ -82,7 +96,11 @@ GzDataFileIterator::GzDataFileIterator (std::string_view const& path):
 			operator++();
 			operator++();
 		}
+		else
+			throw GzDataFileIteratorException("could not open decompressor for file: "s + path);
 	}
+	else
+		throw GzDataFileIteratorException("could not open file: "s + path);
 }
 
 
