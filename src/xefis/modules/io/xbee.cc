@@ -1089,7 +1089,8 @@ XBee::clear_channel_result (ATResponseStatus status, std::string_view const& res
 {
 	if (status == ATResponseStatus::OK && result.size() >= 2)
 	{
-		uint16_t failures = (static_cast<uint16_t> (result[0]) >> 8) | result[1];
+		// TODO Use Blob & BlobViews instead of std::string & std::string_view
+		uint16_t failures = (static_cast<uint16_t> (static_cast<uint8_t> (result[0])) >> 8) | result[1];
 		io.cca_failures = *io.cca_failures + failures;
 	}
 }

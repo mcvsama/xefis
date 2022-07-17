@@ -142,7 +142,7 @@ make_checksum (std::string const& data)
 {
 	uint8_t sum = 0;
 	for (auto c: data)
-		sum ^= c;
+		sum ^= static_cast<uint8_t> (c);
 	return (boost::format ("%02X") % static_cast<int> (sum)).str();
 }
 

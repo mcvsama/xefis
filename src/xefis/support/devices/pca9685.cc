@@ -77,7 +77,7 @@ PCA9685::initialize()
 
 		// Set pre-scale value and thus set period time.
 		// Need to go to sleep to change prescale value.
-		uint8_t mode1_orig = _i2c_device.read_register (Register_Mode1) & ~Mode1_RestartEnabled;
+		uint8_t mode1_orig = _i2c_device.read_register (Register_Mode1) & static_cast<uint8_t> (~Mode1_RestartEnabled);
 		_i2c_device.write_register (Register_Mode1, mode1_orig | Mode1_Sleep);
 		_i2c_device.write_register (Register_Prescale, calculate_prescale_register (1.0 / _output_period));
 		_i2c_device.write_register (Register_Mode1, mode1_orig & ~Mode1_Sleep);
