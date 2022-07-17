@@ -44,7 +44,7 @@ class NavaidStorage
 		std::multimap<si::Frequency, Navaid const*>	by_frequency;
 	};
 
-	typedef std::map<Navaid::Type, Group> NavaidsByType;
+	using NavaidsByType = std::map<Navaid::Type, Group>;
 
 	enum class Fix
 	{
@@ -73,13 +73,13 @@ class NavaidStorage
 	};
 
   public:
-	typedef std::vector<Navaid> Navaids;
+	using Navaids = std::vector<Navaid>;
 
   private:
 	static si::Angle::Value
 	access_position (Navaid const& navaid, std::size_t const dimension);
 
-	typedef KDTree::KDTree<2, Navaid, std::function<si::Angle::Value (Navaid const&, std::size_t)>> NavaidsTree;
+	using NavaidsTree = KDTree::KDTree<2, Navaid, std::function<si::Angle::Value (Navaid const&, std::size_t)>>;
 
   public:
 	// Ctor
