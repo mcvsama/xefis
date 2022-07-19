@@ -27,6 +27,14 @@
 
 namespace xf {
 
+struct TaitBryanAnglesParams
+{
+	si::Angle	pitch;
+	si::Angle	roll;
+	si::Angle	yaw;
+};
+
+
 /**
  * Pitch, roll, yaw angles from the NED frame.
  */
@@ -34,6 +42,11 @@ struct TaitBryanAngles: public SpaceVector<si::Angle>
 {
 	using SpaceVector<si::Angle>::SpaceVector;
 	using SpaceVector<si::Angle>::operator=;
+
+	// Ctor
+	TaitBryanAngles (TaitBryanAnglesParams const& params):
+		SpaceVector<si::Angle> (params.pitch, params.roll, params.yaw)
+	{ }
 
 	// Ctor
 	explicit
