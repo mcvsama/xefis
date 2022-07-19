@@ -110,14 +110,40 @@ void
 RigidBodyPainter::setup_camera()
 {
 	_gl.translate (-_camera_position);
-	_gl.rotate (_camera_angles[0], 1.0, 0.0, 0.0);
-	_gl.rotate (_camera_angles[1], 0.0, 1.0, 0.0);
-	_gl.rotate (_camera_angles[2], 0.0, 0.0, 1.0);
+	apply_camera_rotations();
+}
 
-	if (_planet_body)
+
+void
+RigidBodyPainter::apply_camera_rotations()
+{
+	// Remember that in OpenGL transforms are applied in the reverse order.
+
+	_gl.rotate (_camera_angles[0], 1, 0, 0); // Pitch
+	_gl.rotate (_camera_angles[1], 0, 1, 0); // Yaw
+	_gl.rotate (_camera_angles[2], 0, 0, 1); // Roll
+
+	if (_followed_body && _following_orientation)
 	{
-		_gl.rotate (-_position_on_earth.lon() + 90_deg, 0, 0, 1);
-		_gl.rotate (+_position_on_earth.lat(), 0, 1, 0);
+		// The body is assumed to be in aircraft coordinates (X = front, Y = right, Z = down).
+		// The screen is in standard math/screen coordinates (X = right, Y = top, Z = towards the viewer).
+		// We have to rotate about axes defined by the screen to get to see the aircraft from behind.
+		_gl.rotate (-90_deg, 0, 0, 1); // About Z
+		_gl.rotate (+90_deg, 0, 1, 0); // About Y
+	}
+	else if (_planet_body)
+	{
+		// Rotate so that down on the screen is towards the center of the planet.
+		_gl.rotate (-_position_on_earth.lon() + 90_deg, 0, 0, 1); // About Z
+		_gl.rotate (+_position_on_earth.lat(), 0, 1, 0); // About Y
+	}
+
+	if (_followed_body && _following_orientation)
+	{
+		auto const body_rotation_matrix = _followed_body->location().base_to_body_rotation();
+		auto const axis = rotation_axis (body_rotation_matrix);
+		auto const angle = rotation_angle_about_matrix_axis (body_rotation_matrix, axis);
+		_gl.rotate (angle, axis[0], axis[1], axis[2]);
 	}
 }
 
@@ -531,7 +557,7 @@ RigidBodyPainter::paint_ecef_basis (QOpenGLPaintDevice& canvas)
 	auto const red = _gl.make_material (Qt::red);
 	auto const green = _gl.make_material (Qt::green);
 
-	auto const draw = [&] {
+	auto const draw_basis = [&] {
 		_gl.save_matrix ([&] {
 			glEnable (GL_LIGHT1);
 			glLightfv (GL_LIGHT1, GL_POSITION, GLArray { 0.0f, 0.0f, 0.0f, 0.5f });
@@ -540,15 +566,7 @@ RigidBodyPainter::paint_ecef_basis (QOpenGLPaintDevice& canvas)
 			glLightfv (GL_LIGHT1, GL_SPECULAR, GLArray { 0.9f, 0.9f, 0.9f, 1.0f });
 
 			_gl.translate (0_m, 0_m, -1_m);
-			_gl.rotate (_camera_angles[0], 1.0, 0.0, 0.0);
-			_gl.rotate (_camera_angles[1], 0.0, 1.0, 0.0);
-			_gl.rotate (_camera_angles[2], 0.0, 0.0, 1.0);
-
-			if (_planet_body)
-			{
-				_gl.rotate (-_position_on_earth.lon() + 90_deg, 0, 0, 1);
-				_gl.rotate (+_position_on_earth.lat(), 0, 1, 0);
-			}
+			apply_camera_rotations();
 
 			auto const kNumFaces = 12;
 
@@ -557,22 +575,22 @@ RigidBodyPainter::paint_ecef_basis (QOpenGLPaintDevice& canvas)
 			// X axis:
 			_gl.save_matrix ([&] {
 				_gl.rotate (+90_deg, 0.0, 1.0, 0.0);
-				_gl.draw (rigid_body::make_cylinder_shape (length, radius, kNumFaces, false, blue));
-				_gl.translate (0_m, 0_m, length);
-				_gl.draw (rigid_body::make_cone_shape (cone_length, cone_radius, kNumFaces, true, blue));
-			});
-			// Y axis:
-			_gl.save_matrix ([&] {
-				_gl.rotate (-90_deg, 1.0, 0.0, 0.0);
 				_gl.draw (rigid_body::make_cylinder_shape (length, radius, kNumFaces, false, red));
 				_gl.translate (0_m, 0_m, length);
 				_gl.draw (rigid_body::make_cone_shape (cone_length, cone_radius, kNumFaces, true, red));
 			});
-			// Z axis:
+			// Y axis:
 			_gl.save_matrix ([&] {
+				_gl.rotate (-90_deg, 1.0, 0.0, 0.0);
 				_gl.draw (rigid_body::make_cylinder_shape (length, radius, kNumFaces, false, green));
 				_gl.translate (0_m, 0_m, length);
 				_gl.draw (rigid_body::make_cone_shape (cone_length, cone_radius, kNumFaces, true, green));
+			});
+			// Z axis:
+			_gl.save_matrix ([&] {
+				_gl.draw (rigid_body::make_cylinder_shape (length, radius, kNumFaces, false, blue));
+				_gl.translate (0_m, 0_m, length);
+				_gl.draw (rigid_body::make_cone_shape (cone_length, cone_radius, kNumFaces, true, blue));
 			});
 
 			glDisable (GL_LIGHT1);
@@ -583,12 +601,12 @@ RigidBodyPainter::paint_ecef_basis (QOpenGLPaintDevice& canvas)
 	glDepthRange (1.0, 1.0);
 	glDepthFunc (GL_ALWAYS);
 	glDisable (GL_LIGHTING);
-	draw();
+	draw_basis();
 	// Draw again, normally. This ensures that basis is always drawn regardless of any other object positions.
 	glDepthRangef (0.0, 1.0);
 	glDepthFunc (GL_LEQUAL);
 	glEnable (GL_LIGHTING);
-	draw();
+	draw_basis();
 }
 
 
