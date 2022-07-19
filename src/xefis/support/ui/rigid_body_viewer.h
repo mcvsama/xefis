@@ -161,12 +161,12 @@ class RigidBodyViewer: public GLAnimationWindow
 	RigidBodyPainter					_rigid_body_painter;
 	Evolve								_evolve;
 	QPoint								_last_pos;
-	bool								_changing_rotation				{ false }; // TODO :1 bit in c++2a
-	bool								_changing_translation			{ false };
+	bool								_changing_rotation: 1			{ false };
+	bool								_changing_translation: 1		{ false };
 	// Right-click and move causes rotation of the view, right-click without moving opens a popup menu:
-	bool								_mouse_moved_since_press		{ true };
+	bool								_mouse_moved_since_press: 1		{ true };
 	// Prevents menu reappearing immediately when trying to close it with a right click:
-	bool								_prevent_menu_reappear			{ false };
+	bool								_prevent_menu_reappear: 1		{ false };
 	Playback							_playback						{ Playback::Paused };
 	SpaceLength<rigid_body::WorldSpace>	_position						{ kDefaultPosition };
 	si::Angle							_x_angle						{ kDefaultXAngle };
