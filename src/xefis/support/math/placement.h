@@ -170,6 +170,15 @@ template<class pBaseSpace = void, class pSpace = pBaseSpace>
 			unbound_transform_to_base (InputObject const& input) const
 				{ return _body_to_base_rotation * input; }
 
+		/**
+		 * Reframe current placement into different spaces.
+		 */
+		template<class NewBaseSpace, class NewSpace>
+			[[nodiscard]]
+			constexpr Placement<NewBaseSpace, NewSpace>
+			reframe() const
+				{ return reinterpret_cast<Placement<NewBaseSpace, NewSpace> const&> (*this); }
+
 	  private:
 		SpaceVector<si::Length, BaseSpace>	_position				{ math::zero };
 		RotationMatrix<Space, BaseSpace>	_base_to_body_rotation	{ math::unit };
