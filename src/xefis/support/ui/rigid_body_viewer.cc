@@ -16,11 +16,14 @@
 #include <functional>
 
 // Qt:
+#include <QCoreApplication>
 #include <QMenu>
 #include <QScreen>
+#include <QShortcut>
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/machine.h>
 
 // Local:
 #include "rigid_body_viewer.h"
@@ -32,12 +35,18 @@ RigidBodyViewer::RigidBodyViewer (rigid_body::System& system,
 								  QSize const window_size,
 								  RefreshRate const refresh_rate,
 								  Evolve const evolve):
-	GLAnimationWindow (window_size, refresh_rate, std::bind (&RigidBodyViewer::draw, this, std::placeholders::_1)),
+	GLAnimationWidget (window_size, refresh_rate, std::bind (&RigidBodyViewer::draw, this, std::placeholders::_1)),
 	_rigid_body_system (system),
 	_rigid_body_painter (si::PixelDensity (screen()->physicalDotsPerInch())),
 	_evolve (evolve)
 {
-	setTitle ("Xefis rigid body viewer");
+	setWindowTitle("Xefis rigid body viewer");
+
+	{
+		auto* esc = new QShortcut (this);
+		esc->setKey (Qt::Key_Escape);
+		QObject::connect (esc, &QShortcut::activated, this, &RigidBodyViewer::show_configurator);
+	}
 }
 
 
@@ -248,6 +257,14 @@ RigidBodyViewer::display_menu()
 	}
 
 	return !!menu.exec (QCursor::pos());
+}
+
+
+void
+RigidBodyViewer::show_configurator()
+{
+	if (_machine)
+		_machine->show_configurator();
 }
 
 } // namespace xf

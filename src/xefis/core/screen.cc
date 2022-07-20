@@ -98,9 +98,11 @@ Screen::Screen (ScreenSpec const& spec, Graphics const& graphics, Machine& machi
 	QObject::connect (_refresh_timer, &QTimer::timeout, this, &Screen::refresh);
 	_refresh_timer->start();
 
-	auto* esc = new QShortcut (this);
-	esc->setKey (Qt::Key_Escape);
-	QObject::connect (esc, &QShortcut::activated, this, &Screen::show_configurator);
+	{
+		auto* esc = new QShortcut (this);
+		esc->setKey (Qt::Key_Escape);
+		QObject::connect (esc, &QShortcut::activated, this, &Screen::show_configurator);
+	}
 }
 
 

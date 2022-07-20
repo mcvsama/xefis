@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__SUPPORT__UI__GL_TIMER_WINDOW_H__INCLUDED
-#define XEFIS__SUPPORT__UI__GL_TIMER_WINDOW_H__INCLUDED
+#ifndef XEFIS__SUPPORT__UI__GL_ANIMATION_WIDGET_H__INCLUDED
+#define XEFIS__SUPPORT__UI__GL_ANIMATION_WIDGET_H__INCLUDED
 
 // Standard:
 #include <cstddef>
@@ -25,7 +25,6 @@
 #include <QOpenGLWidget>
 #include <QPainter>
 #include <QTimer>
-#include <QWindow>
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -37,7 +36,7 @@ namespace xf {
  * Calls specified painting function in a loop with specified frequency.
  * The painted images are animated in a widget.
  */
-class GLAnimationWindow: public QWindow
+class GLAnimationWidget: public QOpenGLWidget
 {
   public:
 	enum FPSMode
@@ -51,7 +50,7 @@ class GLAnimationWindow: public QWindow
   public:
 	// Ctor
 	explicit
-	GLAnimationWindow (QSize size, RefreshRate, std::function<void (QOpenGLPaintDevice&)> display_function);
+	GLAnimationWidget (QSize size, RefreshRate, std::function<void (QOpenGLPaintDevice&)> display_function);
 
 	/**
 	 * Return current FPS (frames per second).
@@ -67,9 +66,13 @@ class GLAnimationWindow: public QWindow
 	void
 	set_refresh_rate (RefreshRate);
 
+	// API of QOpenGLWidget
+	void
+	paintGL();
+
   private:
 	void
-	refresh();
+	paint();
 
 	void
 	update_refresh_rate();
@@ -77,7 +80,6 @@ class GLAnimationWindow: public QWindow
   private:
 	RefreshRate									_requested_refresh_rate;
 	si::Frequency								_current_refresh_rate;
-	std::unique_ptr<QOpenGLContext>				_open_gl_context;
 	std::unique_ptr<QOpenGLPaintDevice>			_open_gl_device;
 	std::function<void (QOpenGLPaintDevice&)>	_display_function;
 	QTimer*										_refresh_timer;

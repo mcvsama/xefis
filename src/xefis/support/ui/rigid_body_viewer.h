@@ -29,22 +29,26 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/simulation/rigid_body/system.h>
-#include <xefis/support/ui/gl_animation_window.h>
+#include <xefis/support/ui/gl_animation_widget.h>
 #include <xefis/support/ui/rigid_body_painter.h>
 
 
 namespace xf {
 
+class Machine;
+
 /**
  * Window showing rigid_body::System state as animation (but the system must be evolved elsewhere).
  * Allows rotation/translation with mouse.
  */
-class RigidBodyViewer: public GLAnimationWindow
+class RigidBodyViewer: public GLAnimationWidget
 {
+	Q_OBJECT
+
   public:
 	// Evolution function called before each display frame:
 	using Evolve = std::function<void (si::Time dt)>;
-	using FPSMode = GLAnimationWindow::FPSMode;
+	using FPSMode = GLAnimationWidget::FPSMode;
 
 	enum class Playback
 	{
@@ -75,6 +79,14 @@ class RigidBodyViewer: public GLAnimationWindow
 	 *			May be nullptr.
 	 */
 	RigidBodyViewer (rigid_body::System&, QSize window_size, RefreshRate, Evolve evolve);
+
+	/**
+	 * Set related machine. Used to show configurator widget when pressing Esc.
+	 * Pass nullptr to unset.
+	 */
+	void
+	set_machine (xf::Machine* machine)
+		{ _machine = machine; }
 
 	/**
 	 * Calls set_followed() on internal RigidBodyPainter.
@@ -156,7 +168,12 @@ class RigidBodyViewer: public GLAnimationWindow
 	bool
 	display_menu();
 
+  private slots:
+	void
+	show_configurator();
+
   private:
+	Machine*							_machine						{ nullptr };
 	rigid_body::System&					_rigid_body_system;
 	RigidBodyPainter					_rigid_body_painter;
 	Evolve								_evolve;

@@ -12,7 +12,7 @@
  */
 
 // Local:
-#include "gl_animation_window.h"
+#include "gl_animation_widget.h"
 
 // Qt:
 #include <QResizeEvent>
@@ -24,27 +24,33 @@
 
 namespace xf {
 
-GLAnimationWindow::GLAnimationWindow (QSize size, RefreshRate const refresh_rate, std::function<void (QOpenGLPaintDevice&)> const display_function):
-	QWindow (static_cast<QWindow*> (nullptr)),
+GLAnimationWidget::GLAnimationWidget (QSize size, RefreshRate const refresh_rate, std::function<void (QOpenGLPaintDevice&)> const display_function):
+	QOpenGLWidget (nullptr),
 	_requested_refresh_rate (refresh_rate),
 	_display_function (display_function)
 {
-	setSurfaceType (QWindow::OpenGLSurface);
+	setWindowTitle ("Xefis");
+
+	auto format = this->format();
+	format.setDepthBufferSize (24);
+	format.setProfile (QSurfaceFormat::CoreProfile);
+	// OpenGL antialiasing:
+	format.setSamples (3);
+	setFormat (format);
 
 	_refresh_timer = new QTimer (this);
 	_refresh_timer->setSingleShot (false);
-	QObject::connect (_refresh_timer, &QTimer::timeout, this, &GLAnimationWindow::refresh);
+	QObject::connect (_refresh_timer, &QTimer::timeout, this, [&] { update(); });
 	set_refresh_rate (refresh_rate);
 	_refresh_timer->start();
 
-	setTitle ("Xefis");
 	resize (size);
 	create();
 }
 
 
 void
-GLAnimationWindow::set_refresh_rate (RefreshRate const refresh_rate)
+GLAnimationWidget::set_refresh_rate (RefreshRate const refresh_rate)
 {
 	_current_refresh_rate = std::visit (overload {
 		[](si::Frequency const fps)
@@ -75,40 +81,18 @@ GLAnimationWindow::set_refresh_rate (RefreshRate const refresh_rate)
 
 
 void
-GLAnimationWindow::refresh()
+GLAnimationWidget::paintGL()
 {
-	if (isExposed())
-	{
-		if (!_open_gl_context)
-		{
-			auto format = requestedFormat();
-			format.setDepthBufferSize (24);
-			format.setProfile (QSurfaceFormat::CoreProfile);
-			// OpenGL antialiasing:
-			format.setSamples (3);
+	if (!_open_gl_device)
+		_open_gl_device = std::make_unique<QOpenGLPaintDevice>();
 
-			_open_gl_context = std::make_unique<QOpenGLContext> (this);
-			_open_gl_context->setFormat (format);
-			_open_gl_context->create();
-		}
+	_open_gl_device->setSize (size() * devicePixelRatio());
+	_open_gl_device->setDevicePixelRatio (devicePixelRatio());
 
-		if (_open_gl_context->makeCurrent (this))
-		{
-			if (!_open_gl_device)
-				_open_gl_device = std::make_unique<QOpenGLPaintDevice>();
+	// Paint black background, reset z-buffer and stencil buffer:
+	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-			_open_gl_device->setSize (size() * devicePixelRatio());
-			_open_gl_device->setDevicePixelRatio (devicePixelRatio());
-
-			// Paint black background, reset z-buffer and stencil buffer:
-			glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
-			_display_function (*_open_gl_device);
-			_open_gl_context->swapBuffers (this);
-		}
-		else
-			std::cerr << "Could not make OpenGL context current.\n";
-	}
+	_display_function (*_open_gl_device);
 }
 
 } // namespace xf
