@@ -28,15 +28,14 @@
 VirtualPressureSensor::VirtualPressureSensor (xf::sim::FlightSimulation const& flight_simulation,
 											  Probe probe,
 											  xf::SpaceVector<si::Length, xf::AirframeFrame> const& mount_location,
-											  std::unique_ptr<VirtualPressureSensorIO> module_io,
 											  xf::Logger const& logger,
 											  std::string_view const& instance):
-	Module (std::move (module_io), instance),
+	VirtualPressureSensorIO (instance),
 	_logger (logger.with_scope (std::string (kLoggerScope) + "#" + instance)),
 	_flight_simulation (flight_simulation),
 	_probe (probe),
 	_mount_location (mount_location),
-	_noise (*io.noise)
+	_noise (*_io.noise)
 { }
 
 
@@ -46,9 +45,9 @@ VirtualPressureSensor::process (xf::Cycle const& cycle)
 	auto const atmstate = _flight_simulation.complete_atmosphere_state_at (_mount_location);
 	auto const& air = atmstate.air;
 
-	io.serviceable = true;
+	_io.serviceable = true;
 
-	if (_last_measure_time + *io.update_interval < cycle.update_time())
+	if (_last_measure_time + *_io.update_interval < cycle.update_time())
 	{
 		si::Pressure result = _noise (_random_generator) + air.pressure;
 
@@ -58,7 +57,7 @@ VirtualPressureSensor::process (xf::Cycle const& cycle)
 			result += xf::dynamic_pressure (air.density, true_airspeed);
 		}
 
-		io.pressure = xf::quantized (result, *io.resolution);
+		_io.pressure = xf::quantized (result, *_io.resolution);
 		_last_measure_time = cycle.update_time();
 	}
 }

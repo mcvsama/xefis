@@ -350,7 +350,7 @@ LinkProtocol::produce (Blob& blob, [[maybe_unused]] xf::Logger const& logger)
 
 
 Blob::const_iterator
-LinkProtocol::eat (Blob::const_iterator begin, Blob::const_iterator end, LinkIO* io, QTimer* reacquire_timer, QTimer* failsafe_timer, xf::Logger const& logger)
+LinkProtocol::eat (Blob::const_iterator begin, Blob::const_iterator end, Link* link, QTimer* reacquire_timer, QTimer* failsafe_timer, xf::Logger const& logger)
 {
 #if XEFIS_LINK_RECV_DEBUG
 	logger << "Recv: " << to_string (Blob (begin, end)) << std::endl;
@@ -365,8 +365,8 @@ LinkProtocol::eat (Blob::const_iterator begin, Blob::const_iterator end, LinkIO*
 			if (std::distance (begin, end) >= 1)
 				++begin;
 
-			if (io)
-				io->link_error_bytes = io->link_error_bytes.value_or (0) + 1;
+			if (link)
+				link->link_error_bytes = link->link_error_bytes.value_or (0) + 1;
 
 			// Since there was an error, stop the reacquire timer:
 			if (reacquire_timer)
@@ -404,8 +404,8 @@ LinkProtocol::eat (Blob::const_iterator begin, Blob::const_iterator end, LinkIO*
 					begin = e;
 				}
 
-				if (io)
-					io->link_valid_envelopes = io->link_valid_envelopes.value_or (0) + 1;
+				if (link)
+					link->link_valid_envelopes = link->link_valid_envelopes.value_or (0) + 1;
 
 				// Restart failsafe timer:
 				if (failsafe_timer)
@@ -413,8 +413,8 @@ LinkProtocol::eat (Blob::const_iterator begin, Blob::const_iterator end, LinkIO*
 
 				// If link is not valid, and we got valid envelope,
 				// start reacquire timer:
-				if (reacquire_timer && io)
-					if (!io->link_valid.value_or (false) && !reacquire_timer->isActive())
+				if (reacquire_timer && link)
+					if (!link->link_valid.value_or (false) && !reacquire_timer->isActive())
 						reacquire_timer->start();
 			}
 			catch (LinkProtocol::ParseError&)
@@ -472,44 +472,36 @@ LinkProtocol::to_string (Blob const& blob)
 }
 
 
-void
-LinkIO::verify_settings()
-{
-	if (!!send_frequency == (reacquire_after && failsafe_after))
-		throw xf::module_io::InvalidConfig ("either send_frequency or both reacquire_after and failsafe_after must be configured");
-}
-
-
-Link::Link (std::unique_ptr<LinkIO> module_io, std::unique_ptr<LinkProtocol> protocol, xf::Logger const& logger, std::string_view const& instance):
-	Module (std::move (module_io), instance),
+Link::Link (std::unique_ptr<LinkProtocol> protocol, xf::Logger const& logger, std::string_view const& instance):
+	LinkIO (instance),
 	_logger (logger.with_scope (std::string (kLoggerScope) + "#" + instance)),
 	_protocol (std::move (protocol))
 {
 	_input_blob.reserve (2 * _protocol->size());
 	_output_blob.reserve (2 * _protocol->size());
 
-	if (io.failsafe_after)
+	if (_io.failsafe_after)
 	{
 		_failsafe_timer = new QTimer (this);
 		_failsafe_timer->setSingleShot (true);
-		_failsafe_timer->setInterval (io.failsafe_after->in<si::Millisecond>());
+		_failsafe_timer->setInterval (_io.failsafe_after->in<si::Millisecond>());
 		QObject::connect (_failsafe_timer, SIGNAL (timeout()), this, SLOT (failsafe()));
 	}
 
-	if (io.reacquire_after)
+	if (_io.reacquire_after)
 	{
 		_reacquire_timer = new QTimer (this);
 		_reacquire_timer->setSingleShot (true);
-		_reacquire_timer->setInterval (io.reacquire_after->in<si::Millisecond>());
+		_reacquire_timer->setInterval (_io.reacquire_after->in<si::Millisecond>());
 		QObject::connect (_reacquire_timer, SIGNAL (timeout()), this, SLOT (reacquire()));
 	}
 
-	if (io.send_frequency)
+	if (_io.send_frequency)
 	{
 		_output_timer = new QTimer (this);
 		_output_timer->setSingleShot (false);
 		_output_timer->setTimerType (Qt::PreciseTimer);
-		_output_timer->setInterval (1000_Hz / *io.send_frequency);
+		_output_timer->setInterval (1000_Hz / *_io.send_frequency);
 		QObject::connect (_output_timer, SIGNAL (timeout()), this, SLOT (send_output()));
 		_output_timer->start();
 	}
@@ -517,15 +509,23 @@ Link::Link (std::unique_ptr<LinkIO> module_io, std::unique_ptr<LinkProtocol> pro
 
 
 void
+Link::verify_settings()
+{
+	if (!!send_frequency == (reacquire_after && failsafe_after))
+		throw neutrino::BadConfiguration ("either send_frequency or both reacquire_after and failsafe_after must be configured");
+}
+
+
+void
 Link::process (xf::Cycle const& cycle)
 {
 	try {
-		if (io.link_input && _input_changed.serial_changed())
+		if (_io.link_input && _input_changed.serial_changed())
 		{
-			_input_blob.insert (_input_blob.end(), io.link_input->begin(), io.link_input->end());
-			auto e = _protocol->eat (_input_blob.begin(), _input_blob.end(), &io, _reacquire_timer, _failsafe_timer, cycle.logger() + _logger);
+			_input_blob.insert (_input_blob.end(), _io.link_input->begin(), _io.link_input->end());
+			auto e = _protocol->eat (_input_blob.begin(), _input_blob.end(), this, _reacquire_timer, _failsafe_timer, cycle.logger() + _logger);
 			auto valid_bytes = std::distance (_input_blob.cbegin(), e);
-			io.link_valid_bytes = io.link_valid_bytes.value_or (0) + valid_bytes;
+			_io.link_valid_bytes = _io.link_valid_bytes.value_or (0) + valid_bytes;
 			_input_blob.erase (_input_blob.begin(), e);
 		}
 	}
@@ -541,15 +541,15 @@ Link::send_output()
 {
 	_output_blob.clear();
 	_protocol->produce (_output_blob, _logger);
-	io.link_output = std::string (_output_blob.begin(), _output_blob.end());
+	_io.link_output = std::string (_output_blob.begin(), _output_blob.end());
 }
 
 
 void
 Link::failsafe()
 {
-	io.link_valid = false;
-	io.link_failsafes = io.link_failsafes.value_or (0) + 1;
+	_io.link_valid = false;
+	_io.link_failsafes = _io.link_failsafes.value_or (0) + 1;
 	_protocol->failsafe();
 }
 
@@ -557,7 +557,7 @@ Link::failsafe()
 void
 Link::reacquire()
 {
-	io.link_valid = true;
-	io.link_reacquires = io.link_reacquires.value_or (0) + 1;
+	_io.link_valid = true;
+	_io.link_reacquires = _io.link_reacquires.value_or (0) + 1;
 }
 

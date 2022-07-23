@@ -24,7 +24,6 @@
 
 // Xefis:
 #include <xefis/core/cycle.h>
-#include <xefis/core/module_io.h>
 #include <xefis/core/sockets/module_socket.h>
 #include <xefis/core/sockets/tests/test_cycle.h>
 
@@ -34,7 +33,6 @@ namespace {
 
 using namespace si::units;
 using namespace std::literals;
-
 
 inline namespace test_enum {
 
@@ -114,14 +112,11 @@ xf::Logger g_null_logger;
 template<class T>
 	struct TestEnvironment
 	{
-	  private:
-		std::unique_ptr<ModuleIO>	io		{ std::make_unique<ModuleIO>() };
-
 	  public:
-		ModuleOut<T>				out		{ io.get(), "out" };
-		ModuleIn<T>					mid		{ io.get(), "mid" };
-		ModuleIn<T>					in		{ io.get(), "in" };
-		Module<ModuleIO>			module	{ std::move (io) };
+		Module						module;
+		ModuleOut<T>				out		{ &module, "out" };
+		ModuleIn<T>					mid		{ &module, "mid" };
+		ModuleIn<T>					in		{ &module, "in" };
 		TestCycle					cycle;
 	};
 
@@ -269,8 +264,8 @@ AutoTest t2 ("xf::Socket fallback values", for_all_types ([](auto value1, auto v
 	// Test fallback_value provided in ctor:
 	{
 		auto const fallback_value = value1;
-		ModuleIO io;
-		ModuleIn<T> tmp_prop (&io, "fallback-test", fallback_value);
+		Module module;
+		ModuleIn<T> tmp_prop (&module, "fallback-test", fallback_value);
 		test_asserts::verify (desc_type<T> ("fallback-value set in ctor works"), *tmp_prop == fallback_value);
 	}
 
@@ -461,17 +456,17 @@ AutoTest t5 ("xf::Socket serialization", for_all_types ([](auto value1, auto val
 AutoTest t6 ("xf::Socket various behavior", for_all_types ([](auto value1, auto) {
 	using T = decltype (value1);
 
-	ModuleIO io;
-	ModuleOut<T> out { &io, "out" };
-	ModuleIn<T> in { &io, "in" };
+	Module module;
+	ModuleOut<T> out { &module, "out" };
+	ModuleIn<T> in { &module, "in" };
 
-	in << out;
+	in << std::function ([&](std::optional<T>) -> std::optional<T> { throw std::runtime_error ("test"); }) << out;
 
 	test_asserts::verify ("nil_by_fetch_exception flag is false before first fetching",
 						  !in.nil_by_fetch_exception());
-	test_asserts::verify ("fetch() doesn't throw when no Module is assigned",
+	test_asserts::verify ("fetch() doesn't throw when a transform function throws",
 						  !Exception::catch_and_log (g_null_logger, [&]{ in.fetch (TestCycle()); }));
-	test_asserts::verify ("fetch() signals nil_by_fetch_exception flag when no Module is assigned",
+	test_asserts::verify ("fetch() signals nil_by_fetch_exception flag when a transform function throws",
 						  in.nil_by_fetch_exception());
 }));
 
@@ -479,14 +474,14 @@ AutoTest t6 ("xf::Socket various behavior", for_all_types ([](auto value1, auto)
 AutoTest t7 ("xf::Socket operator=", for_all_types ([](auto value1, auto value2) {
 	using T = decltype (value1);
 
-	ModuleIO io;
+	Module module;
 
 	// Make sure ModuleIn<T>::operator= (ModuleIn<T>) is forbidden as it may be misleading:
 	test_asserts::verify ("ModuleIn<T>::operator= (ModuleIn<T>) is forbidden", !std::copyable<ModuleIn<T>>);
 
 	// Make sure operator= copies value, not the identity of ModuleOut:
-	ModuleOut<T> out1 { &io, "out1" };
-	ModuleOut<T> out2 { &io, "out2" };
+	ModuleOut<T> out1 { &module, "out1" };
+	ModuleOut<T> out2 { &module, "out2" };
 	out1 = value1;
 	out2 = value2;
 	test_asserts::verify ("out1 has test value1", *out1 == value1);
@@ -540,10 +535,9 @@ AutoTest t10 ("xf::ConnectableSocket expression", []{
 
 
 AutoTest t11 ("xf::ConnectableSocket expression (different input/output types)", []{
-	std::unique_ptr<ModuleIO>	io		{ std::make_unique<ModuleIO>() };
-	ModuleOut<int>				out		{ io.get(), "out" };
-	ModuleIn<std::string>		in		{ io.get(), "in" };
-	Module<ModuleIO>			module	{ std::move (io) };
+	Module						module;
+	ModuleOut<int>				out		{ &module, "out" };
+	ModuleIn<std::string>		in		{ &module, "in" };
 	TestCycle					cycle;
 
 	in
@@ -559,16 +553,15 @@ AutoTest t11 ("xf::ConnectableSocket expression (different input/output types)",
 
 
 AutoTest t12 ("xf::ConnectableSocket expression (reactions to nil)", []{
-	std::unique_ptr<ModuleIO>	io		{ std::make_unique<ModuleIO>() };
-	ModuleOut<int>				out		{ io.get(), "out" };
-	ModuleIn<std::string>		in0		{ io.get(), "in0" };
-	ModuleIn<std::string>		in1		{ io.get(), "in1" };
-	ModuleIn<std::string>		in2		{ io.get(), "in2" };
-	ModuleIn<std::string>		in3		{ io.get(), "in3" };
-	ModuleIn<std::string>		in4nil	{ io.get(), "in4nil" };
-	ModuleIn<std::string>		in4str	{ io.get(), "in4str" };
-	ModuleIn<std::string>		in5		{ io.get(), "in5" };
-	Module<ModuleIO>			module	{ std::move (io) };
+	Module						module;
+	ModuleOut<int>				out		{ &module, "out" };
+	ModuleIn<std::string>		in0		{ &module, "in0" };
+	ModuleIn<std::string>		in1		{ &module, "in1" };
+	ModuleIn<std::string>		in2		{ &module, "in2" };
+	ModuleIn<std::string>		in3		{ &module, "in3" };
+	ModuleIn<std::string>		in4nil	{ &module, "in4nil" };
+	ModuleIn<std::string>		in4str	{ &module, "in4str" };
+	ModuleIn<std::string>		in5		{ &module, "in5" };
 	TestCycle					cycle;
 
 	in0 << std::function<std::string (int)>() << out;

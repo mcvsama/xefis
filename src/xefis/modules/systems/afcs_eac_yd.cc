@@ -21,16 +21,16 @@
 #include "afcs_eac_yd.h"
 
 
-AFCS_EAC_YD::AFCS_EAC_YD (std::unique_ptr<AFCS_EAC_YD_IO> module_io, std::string_view const& instance):
-	Module (std::move (module_io), instance)
+AFCS_EAC_YD::AFCS_EAC_YD (std::string_view const& instance):
+	AFCS_EAC_YD_IO (instance)
 {
 	_rudder_pid.set_integral_limit ({ -0.1_Ns, +0.1_Ns });
-	_rudder_pid.set_output_limit ({ -*io.deflection_limit, *io.deflection_limit });
+	_rudder_pid.set_output_limit ({ -*_io.deflection_limit, *_io.deflection_limit });
 
 	_rudder_computer.set_callback (std::bind (&AFCS_EAC_YD::compute, this));
 	_rudder_computer.observe ({
-		&io.enabled,
-		&io.slip_skid,
+		&_io.enabled,
+		&_io.slip_skid,
 	});
 }
 
@@ -38,8 +38,8 @@ AFCS_EAC_YD::AFCS_EAC_YD (std::unique_ptr<AFCS_EAC_YD_IO> module_io, std::string
 void
 AFCS_EAC_YD::initialize()
 {
-	_rudder_pid.set_pid (*io.rudder_pid_settings);
-	_rudder_pid.set_gain (*io.rudder_pid_gain);
+	_rudder_pid.set_pid (*_io.rudder_pid_settings);
+	_rudder_pid.set_gain (*_io.rudder_pid_gain);
 }
 
 
@@ -55,14 +55,14 @@ AFCS_EAC_YD::compute()
 {
 	si::Time dt = _rudder_computer.update_dt();
 
-	if (io.enabled.value_or (false))
+	if (_io.enabled.value_or (false))
 	{
-		if (io.slip_skid)
-			io.rudder_deflection = _rudder_pid (0.0_N, *io.slip_skid, dt);
+		if (_io.slip_skid)
+			_io.rudder_deflection = _rudder_pid (0.0_N, *_io.slip_skid, dt);
 		else
-			io.rudder_deflection = xf::nil;
+			_io.rudder_deflection = xf::nil;
 	}
 	else
-		io.rudder_deflection = 0.0_deg;
+		_io.rudder_deflection = 0.0_deg;
 }
 

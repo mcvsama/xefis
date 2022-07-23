@@ -21,14 +21,14 @@
 #include <xefis/config/all.h>
 #include <xefis/core/graphics.h>
 #include <xefis/core/instrument.h>
-#include <xefis/core/module_io.h>
+#include <xefis/core/module.h>
 #include <xefis/core/setting.h>
 #include <xefis/support/instrument/instrument_support.h>
 #include <xefis/utility/types.h>
 
 
 // TODO handle nans
-class LabelIO: public xf::ModuleIO
+class LabelIO: public xf::Instrument
 {
   public:
 	/*
@@ -39,11 +39,14 @@ class LabelIO: public xf::ModuleIO
 	xf::Setting<QString>		label		{ this, "label" };
 	xf::Setting<QColor>			color		{ this, "color", Qt::white };
 	xf::Setting<Qt::Alignment>	alignment	{ this, "alignment", Qt::AlignVCenter | Qt::AlignHCenter };
+
+  public:
+	using xf::Instrument::Instrument;
 };
 
 
 class Label:
-	public xf::Instrument<LabelIO>,
+	public LabelIO,
 	private xf::InstrumentSupport
 {
   private:
@@ -58,7 +61,7 @@ class Label:
   public:
 	// Ctor
 	explicit
-	Label (std::unique_ptr<LabelIO>, xf::Graphics const&, std::string_view const& instance = {});
+	Label (xf::Graphics const&, std::string_view const& instance = {});
 
 	// Instrument API
 	std::packaged_task<void()>
@@ -67,6 +70,9 @@ class Label:
   private:
 	void
 	async_paint (xf::PaintRequest const&, PaintingParams const&) const;
+
+  private:
+	LabelIO& _io { *this };
 };
 
 #endif

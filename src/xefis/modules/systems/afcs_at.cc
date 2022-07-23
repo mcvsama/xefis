@@ -26,8 +26,8 @@
 #include "afcs_at.h"
 
 
-AFCS_AT::AFCS_AT (std::unique_ptr<AFCS_AT_IO> module_io, std::string_view const& instance):
-	Module (std::move (module_io), instance)
+AFCS_AT::AFCS_AT (std::string_view const& instance):
+	AFCS_AT_IO (instance)
 {
 	_ias_pid.set_integral_limit ({ -5.0_m, +5.0_m });
 
@@ -37,10 +37,10 @@ AFCS_AT::AFCS_AT (std::unique_ptr<AFCS_AT_IO> module_io, std::string_view const&
 		&_ias_pid_smoother,
 	});
 	_thrust_computer.observe ({
-		&io.cmd_speed_mode,
-		&io.cmd_thrust,
-		&io.cmd_ias,
-		&io.measured_ias,
+		&_io.cmd_speed_mode,
+		&_io.cmd_thrust,
+		&_io.cmd_ias,
+		&_io.measured_ias,
 	});
 }
 
@@ -48,8 +48,8 @@ AFCS_AT::AFCS_AT (std::unique_ptr<AFCS_AT_IO> module_io, std::string_view const&
 void
 AFCS_AT::initialize()
 {
-	_ias_pid.set_pid (*io.ias_pid_settings);
-	_ias_pid.set_gain (*io.ias_pid_gain);
+	_ias_pid.set_pid (*_io.ias_pid_settings);
+	_ias_pid.set_gain (*_io.ias_pid_gain);
 }
 
 
@@ -67,25 +67,25 @@ AFCS_AT::compute_thrust()
 	si::Force computed_thrust = 0.0_N;
 	si::Time dt = _thrust_computer.update_dt();
 
-	if (io.cmd_speed_mode)
+	if (_io.cmd_speed_mode)
 	{
-		switch (*io.cmd_speed_mode)
+		switch (*_io.cmd_speed_mode)
 		{
 			case afcs::SpeedMode::Thrust:
-				if (io.cmd_thrust)
-					computed_thrust = *io.cmd_thrust;
+				if (_io.cmd_thrust)
+					computed_thrust = *_io.cmd_thrust;
 				else
 					disengage = true;
 				break;
 
 			case afcs::SpeedMode::Airspeed:
-				if (io.cmd_ias && io.measured_ias)
+				if (_io.cmd_ias && _io.measured_ias)
 				{
 					// This is more tricky, since we measure IAS, but control thrust.
 					// There's no 1:1 correlaction between them.
 					// TODO use _ias_pid.set_output_limit (...);
-					xf::Range output_extents { *io.output_thrust_minimum, *io.output_thrust_maximum };
-					computed_thrust = xf::clamped (_ias_pid_smoother (_ias_pid (*io.cmd_ias, *io.measured_ias, dt), dt),
+					xf::Range output_extents { *_io.output_thrust_minimum, *_io.output_thrust_maximum };
+					computed_thrust = xf::clamped (_ias_pid_smoother (_ias_pid (*_io.cmd_ias, *_io.measured_ias, dt), dt),
 												   output_extents);
 					// TODO make PID control the change rate of thrust, not the thrust directly. Maybe incorporate
 					// something into the PIDController object itself? Or create another function-like class.
@@ -107,10 +107,10 @@ AFCS_AT::compute_thrust()
 				break;
 		}
 
-		io.thrust = computed_thrust;
+		_io.thrust = computed_thrust;
 	}
 
-	if (disengage || !io.disengage_at)
-		io.disengage_at = disengage;
+	if (disengage || !_io.disengage_at)
+		_io.disengage_at = disengage;
 }
 

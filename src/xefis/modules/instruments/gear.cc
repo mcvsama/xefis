@@ -24,21 +24,21 @@
 #include "gear.h"
 
 
-Gear::Gear (std::unique_ptr<GearIO> module_io, xf::Graphics const& graphics, std::string_view const& instance):
-	Instrument (std::move (module_io), instance),
+Gear::Gear (xf::Graphics const& graphics, std::string_view const& instance):
+	GearIO (instance),
 	InstrumentSupport (graphics)
 {
 	_inputs_observer.set_callback ([&] {
 		mark_dirty();
 	});
 	_inputs_observer.observe ({
-		&io.requested_down,
-		&io.nose_up,
-		&io.nose_down,
-		&io.left_up,
-		&io.left_down,
-		&io.right_up,
-		&io.right_down,
+		&_io.requested_down,
+		&_io.nose_up,
+		&_io.nose_down,
+		&_io.left_up,
+		&_io.left_down,
+		&_io.right_up,
+		&_io.right_down,
 	});
 }
 
@@ -54,13 +54,13 @@ std::packaged_task<void()>
 Gear::paint (xf::PaintRequest paint_request) const
 {
 	PaintingParams params;
-	params.requested_down = io.requested_down.get_optional();
-	params.nose_up = io.nose_up.get_optional();
-	params.nose_down = io.nose_down.get_optional();
-	params.left_up = io.left_up.get_optional();
-	params.left_down = io.left_down.get_optional();
-	params.right_up = io.right_up.get_optional();
-	params.right_down = io.right_down.get_optional();
+	params.requested_down = _io.requested_down.get_optional();
+	params.nose_up = _io.nose_up.get_optional();
+	params.nose_down = _io.nose_down.get_optional();
+	params.left_up = _io.left_up.get_optional();
+	params.left_down = _io.left_down.get_optional();
+	params.right_up = _io.right_up.get_optional();
+	params.right_down = _io.right_down.get_optional();
 
 	return std::packaged_task<void()> ([this, pr = std::move (paint_request), pp = std::move (params)] {
 		async_paint (pr, pp);

@@ -37,7 +37,7 @@ namespace xf {
 
 class Screen;
 
-class BasicInstrument: public BasicModule
+class Instrument: public Module
 {
 	static constexpr std::size_t kMaxPaintingTimesBackLog = 1000;
 
@@ -50,7 +50,7 @@ class BasicInstrument: public BasicModule
 	  public:
 		// Ctor
 		explicit
-		AccountingAPI (BasicInstrument&);
+		AccountingAPI (Instrument&);
 
 		/**
 		 * Frame time of the Screen that this instrument is being painted on.
@@ -79,15 +79,15 @@ class BasicInstrument: public BasicModule
 		painting_times() const noexcept;
 
 	  private:
-		BasicInstrument& _instrument;
+		Instrument& _instrument;
 	};
 
   public:
-	using BasicModule::BasicModule;
+	using Module::Module;
 
 	// Dtor
 	virtual
-	~BasicInstrument() = default;
+	~Instrument() = default;
 
 	/**
 	 * Paint the instrument onto given canvas.
@@ -116,82 +116,49 @@ class BasicInstrument: public BasicModule
 };
 
 
-template<class IO = ModuleIO>
-	class Instrument: public BasicInstrument
-	{
-	  public:
-		/**
-		 * Ctor
-		 * Version for modules that do have their own IO class.
-		 */
-		template<class U = IO>
-			requires (!std::is_same_v<IO, ModuleIO>)
-			explicit
-			Instrument (std::unique_ptr<IO> module_io, std::string_view const& instance = {}):
-				BasicInstrument (std::move (module_io), instance),
-				io (static_cast<IO&> (*io_base()))
-			{ }
-
-		/**
-		 * Ctor
-		 * Version for modules that do not have any IO class.
-		 */
-		template<class U = IO>
-			requires (std::is_same_v<IO, ModuleIO>)
-			explicit
-			Instrument (std::string_view const& instance = {}):
-				BasicInstrument (std::make_unique<IO>(), instance),
-				io (static_cast<IO&> (*io_base()))
-			{ }
-
-	  protected:
-		IO& io;
-	};
-
-
 inline
-BasicInstrument::AccountingAPI::AccountingAPI (BasicInstrument& instrument):
+Instrument::AccountingAPI::AccountingAPI (Instrument& instrument):
 	_instrument (instrument)
 { }
 
 
 inline si::Time
-BasicInstrument::AccountingAPI::frame_time() const noexcept
+Instrument::AccountingAPI::frame_time() const noexcept
 {
 	return _instrument._frame_time;
 }
 
 
 inline void
-BasicInstrument::AccountingAPI::set_frame_time (si::Time frame_time)
+Instrument::AccountingAPI::set_frame_time (si::Time frame_time)
 {
 	_instrument._frame_time = frame_time;
 }
 
 
 inline void
-BasicInstrument::AccountingAPI::add_painting_time (si::Time time)
+Instrument::AccountingAPI::add_painting_time (si::Time time)
 {
 	_instrument._painting_times.push_back (time);
 }
 
 
 inline boost::circular_buffer<si::Time> const&
-BasicInstrument::AccountingAPI::painting_times() const noexcept
+Instrument::AccountingAPI::painting_times() const noexcept
 {
 	return _instrument._painting_times;
 }
 
 
 inline bool
-BasicInstrument::dirty_since_last_check() noexcept
+Instrument::dirty_since_last_check() noexcept
 {
 	return _dirty.exchange (false);
 }
 
 
 inline void
-BasicInstrument::mark_dirty() noexcept
+Instrument::mark_dirty() noexcept
 {
 	_dirty.store (true);
 }

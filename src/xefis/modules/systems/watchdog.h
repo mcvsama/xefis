@@ -26,10 +26,9 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
-#include <xefis/core/module_io.h>
 
 
-class Watchdog: public xf::Module<>
+class Watchdog: public xf::Module
 {
   private:
 	static constexpr char kLoggerScope[] = "mod::Watchdog";

@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__MODULES__INSTRUMENTS__BASIC_GAUGE_H__INCLUDED
-#define XEFIS__MODULES__INSTRUMENTS__BASIC_GAUGE_H__INCLUDED
+#ifndef XEFIS__MODULES__INSTRUMENTS__GAUGE_H__INCLUDED
+#define XEFIS__MODULES__INSTRUMENTS__GAUGE_H__INCLUDED
 
 // Standard:
 #include <cstddef>
@@ -28,7 +28,7 @@
 #include <xefis/core/sockets/socket.h>
 
 
-class MostBasicGaugeIO: public xf::ModuleIO
+class BasicGauge: public xf::Instrument
 {
   public:
 	/**
@@ -41,24 +41,10 @@ class MostBasicGaugeIO: public xf::ModuleIO
 	 * by n and the multipled by n again.
 	 */
 	xf::Setting<int32_t>		precision				{ this, "precision", xf::BasicSetting::Optional };
-};
 
+  public:
+	using Instrument::Instrument;
 
-template<class Value>
-	class BasicGaugeIO: public MostBasicGaugeIO
-	{
-	  public:
-		xf::Setting<Value>		value_minimum			{ this, "value_minimum" };
-		xf::Setting<Value>		value_minimum_critical	{ this, "value_minimum_critical", xf::BasicSetting::Optional };
-		xf::Setting<Value>		value_minimum_warning	{ this, "value_minimum_warning", xf::BasicSetting::Optional };
-		xf::Setting<Value>		value_maximum_warning	{ this, "value_maximum_warning", xf::BasicSetting::Optional };
-		xf::Setting<Value>		value_maximum_critical	{ this, "value_maximum_critical", xf::BasicSetting::Optional };
-		xf::Setting<Value>		value_maximum			{ this, "value_maximum" };
-	};
-
-
-class BasicGauge
-{
   protected:
 	/**
 	 * Normalized and preprocessed data trasferred to the painting object.
@@ -93,28 +79,44 @@ class BasicGauge
 };
 
 
-inline void
-BasicGauge::GaugeValues::get_from (auto const& io, auto const& range, std::optional<float128_t> floating_point_value)
-{
-	format = *io.format;
-
-	if (io.value)
+template<class Value>
+	class Gauge: public BasicGauge
 	{
-		value_str = BasicGauge::stringify (floating_point_value, *io.format, io.precision);
-		normalized_value = xf::renormalize (xf::clamped (*io.value, range), range, kNormalizedRange);
+	  public:
+		xf::Setting<Value>		value_minimum			{ this, "value_minimum" };
+		xf::Setting<Value>		value_minimum_critical	{ this, "value_minimum_critical", xf::BasicSetting::Optional };
+		xf::Setting<Value>		value_minimum_warning	{ this, "value_minimum_warning", xf::BasicSetting::Optional };
+		xf::Setting<Value>		value_maximum_warning	{ this, "value_maximum_warning", xf::BasicSetting::Optional };
+		xf::Setting<Value>		value_maximum_critical	{ this, "value_maximum_critical", xf::BasicSetting::Optional };
+		xf::Setting<Value>		value_maximum			{ this, "value_maximum" };
+
+	  public:
+		using BasicGauge::BasicGauge;
+	};
+
+
+inline void
+BasicGauge::GaugeValues::get_from (auto const& module, auto const& range, std::optional<float128_t> floating_point_value)
+{
+	format = *module.format;
+
+	if (module.value)
+	{
+		value_str = BasicGauge::stringify (floating_point_value, *module.format, module.precision);
+		normalized_value = xf::renormalize (xf::clamped (*module.value, range), range, kNormalizedRange);
 	}
 
-	if (io.value_minimum_critical)
-		normalized_minimum_critical = xf::renormalize (*io.value_minimum_critical, range, kNormalizedRange);
+	if (module.value_minimum_critical)
+		normalized_minimum_critical = xf::renormalize (*module.value_minimum_critical, range, kNormalizedRange);
 
-	if (io.value_minimum_warning)
-		normalized_minimum_warning = xf::renormalize (*io.value_minimum_warning, range, kNormalizedRange);
+	if (module.value_minimum_warning)
+		normalized_minimum_warning = xf::renormalize (*module.value_minimum_warning, range, kNormalizedRange);
 
-	if (io.value_maximum_warning)
-		normalized_maximum_warning = xf::renormalize (*io.value_maximum_warning, range, kNormalizedRange);
+	if (module.value_maximum_warning)
+		normalized_maximum_warning = xf::renormalize (*module.value_maximum_warning, range, kNormalizedRange);
 
-	if (io.value_maximum_critical)
-		normalized_maximum_critical = xf::renormalize (*io.value_maximum_critical, range, kNormalizedRange);
+	if (module.value_maximum_critical)
+		normalized_maximum_critical = xf::renormalize (*module.value_maximum_critical, range, kNormalizedRange);
 
 	if (normalized_value)
 	{

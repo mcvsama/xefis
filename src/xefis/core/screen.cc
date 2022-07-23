@@ -38,7 +38,7 @@
 namespace xf {
 namespace detail {
 
-InstrumentDetails::InstrumentDetails (BasicInstrument& instrument, WorkPerformer& work_performer):
+InstrumentDetails::InstrumentDetails (Instrument& instrument, WorkPerformer& work_performer):
 	instrument (instrument),
 	work_performer (&work_performer)
 { }
@@ -113,7 +113,7 @@ Screen::~Screen()
 
 
 void
-Screen::set (BasicInstrument const& instrument, QRectF const requested_position, QPointF const anchor_position)
+Screen::set (Instrument const& instrument, QRectF const requested_position, QPointF const anchor_position)
 {
 	for (auto& disclosure: _instrument_tracker)
 	{
@@ -129,14 +129,14 @@ Screen::set (BasicInstrument const& instrument, QRectF const requested_position,
 
 
 void
-Screen::set_centered (BasicInstrument const& instrument, QRectF const requested_position)
+Screen::set_centered (Instrument const& instrument, QRectF const requested_position)
 {
 	set (instrument, requested_position, { 0.5f, 0.5f });
 }
 
 
 void
-Screen::set_z_index (BasicInstrument const& instrument, int const new_z_index)
+Screen::set_z_index (Instrument const& instrument, int const new_z_index)
 {
 	auto found = std::find_if (_z_index_sorted_disclosures.begin(), _z_index_sorted_disclosures.end(),
 							   [&instrument](auto const* disclosure) { return &disclosure->value() == &instrument; });
@@ -256,7 +256,7 @@ Screen::update_instruments()
 					auto const perf_metrics = details.result.get();
 					// Update per-instrument metrics:
 					{
-						auto accounting_api = BasicInstrument::AccountingAPI (instrument);
+						auto accounting_api = Instrument::AccountingAPI (instrument);
 						accounting_api.set_frame_time (_frame_time);
 						accounting_api.add_painting_time (perf_metrics.painting_time);
 					}

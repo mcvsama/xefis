@@ -21,8 +21,8 @@
 #include "debug_forces.h"
 
 
-DebugForces::DebugForces (std::unique_ptr<DebugForcesIO> module_io, xf::Graphics const& graphics, std::string_view const& instance):
-	Instrument (std::move (module_io), instance),
+DebugForces::DebugForces (xf::Graphics const& graphics, std::string_view const& instance):
+	DebugForcesIO (instance),
 	InstrumentSupport (graphics)
 { }
 
@@ -38,15 +38,15 @@ std::packaged_task<void()>
 DebugForces::paint (xf::PaintRequest paint_request) const
 {
 	PaintingParams params;
-	params.orientation_pitch = io.orientation_pitch.get_optional();
-	params.orientation_roll = io.orientation_roll.get_optional();
-	params.orientation_magnetic_heading = io.orientation_magnetic_heading.get_optional();
-	params.measured_accel_x = io.measured_accel_x.get_optional();
-	params.measured_accel_y = io.measured_accel_y.get_optional();
-	params.measured_accel_z = io.measured_accel_z.get_optional();
-	params.centrifugal_accel_x = io.centrifugal_accel_x.get_optional();
-	params.centrifugal_accel_y = io.centrifugal_accel_y.get_optional();
-	params.centrifugal_accel_z = io.centrifugal_accel_z.get_optional();
+	params.orientation_pitch = _io.orientation_pitch.get_optional();
+	params.orientation_roll = _io.orientation_roll.get_optional();
+	params.orientation_magnetic_heading = _io.orientation_magnetic_heading.get_optional();
+	params.measured_accel_x = _io.measured_accel_x.get_optional();
+	params.measured_accel_y = _io.measured_accel_y.get_optional();
+	params.measured_accel_z = _io.measured_accel_z.get_optional();
+	params.centrifugal_accel_x = _io.centrifugal_accel_x.get_optional();
+	params.centrifugal_accel_y = _io.centrifugal_accel_y.get_optional();
+	params.centrifugal_accel_z = _io.centrifugal_accel_z.get_optional();
 
 	return std::packaged_task<void()> ([this, pr = std::move (paint_request), pp = std::move (params)] {
 		async_paint (pr, pp);

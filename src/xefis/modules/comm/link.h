@@ -38,7 +38,6 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
-#include <xefis/core/module_io.h>
 #include <xefis/core/setting.h>
 #include <xefis/core/sockets/module_socket.h>
 #include <xefis/support/sockets/socket_changed.h>
@@ -51,10 +50,10 @@
 
 namespace si = neutrino::si;
 
-class LinkIO;
+
+class Link;
 
 
-// This module belongs to systems rather than io
 class LinkProtocol
 {
   public:
@@ -414,7 +413,7 @@ class LinkProtocol
 	produce (Blob&, xf::Logger const&);
 
 	Blob::const_iterator
-	eat (Blob::const_iterator begin, Blob::const_iterator end, LinkIO* io, QTimer* reacquire_timer, QTimer* failsafe_timer, xf::Logger const&);
+	eat (Blob::const_iterator begin, Blob::const_iterator end, Link*, QTimer* reacquire_timer, QTimer* failsafe_timer, xf::Logger const&);
 
 	void
 	failsafe();
@@ -545,6 +544,7 @@ class LinkProtocol
 		{ return value < xf::static_pow (2U, *bits); }
 
   private:
+	Link*										_link				{ nullptr };
 	std::vector<std::shared_ptr<Envelope>>		_envelopes;
 	std::map<Blob, std::shared_ptr<Envelope>>	_envelope_magics;
 	Blob::size_type								_magic_size			{ 0 };
@@ -552,7 +552,7 @@ class LinkProtocol
 };
 
 
-class LinkIO: public xf::ModuleIO
+class LinkIO: public xf::Module
 {
   public:
 	/*
@@ -582,14 +582,13 @@ class LinkIO: public xf::ModuleIO
 	xf::ModuleOut<int64_t>		link_valid_envelopes	{ this, "valid-envelopes" };
 
   public:
-	void
-	verify_settings() override;
+	using xf::Module::Module;
 };
 
 
 class Link:
 	public QObject,
-	public xf::Module<LinkIO>
+	public LinkIO
 {
 	Q_OBJECT
 
@@ -599,7 +598,10 @@ class Link:
   public:
 	// Ctor
 	explicit
-	Link (std::unique_ptr<LinkIO>, std::unique_ptr<LinkProtocol>, xf::Logger const&, std::string_view const& instance = {});
+	Link (std::unique_ptr<LinkProtocol>, xf::Logger const&, std::string_view const& instance = {});
+
+	void
+	verify_settings() override;
 
 	void
 	process (xf::Cycle const&) override;
@@ -624,6 +626,7 @@ class Link:
 	reacquire();
 
   private:
+	LinkIO&							_io					{ *this };
 	xf::Logger						_logger;
 	QTimer*							_failsafe_timer		{ nullptr };
 	QTimer*							_reacquire_timer	{ nullptr };
@@ -631,7 +634,7 @@ class Link:
 	Blob							_input_blob;
 	Blob							_output_blob;
 	std::unique_ptr<LinkProtocol>	_protocol;
-	xf::SocketChanged				_input_changed		{ io.link_input };
+	xf::SocketChanged				_input_changed		{ link_input };
 };
 
 

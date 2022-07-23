@@ -36,10 +36,10 @@
 
 namespace xf::configurator {
 
-ModuleWidget::ModuleWidget (BasicModule& module, QWidget* parent):
+ModuleWidget::ModuleWidget (Module& module, QWidget* parent):
 	ConfigWidget (parent),
 	_module (module),
-	_instrument (dynamic_cast<BasicInstrument*> (&_module))
+	_instrument (dynamic_cast<Instrument*> (&_module))
 {
 	auto full_name_str = QString::fromStdString (identifier (module));
 
@@ -50,19 +50,16 @@ ModuleWidget::ModuleWidget (BasicModule& module, QWidget* parent):
 	auto tabs = new QTabWidget (this);
 	tabs->addTab (create_performance_tab(), "Performance");
 
-	if (auto* io_base = _module.io_base())
-	{
-		_inputs_socket_tree = new SocketTree (this);
-		_inputs_socket_tree->populate (ModuleIO::ProcessingLoopAPI (*io_base).input_sockets());
+	_inputs_socket_tree = new SocketTree (this);
+	_inputs_socket_tree->populate (Module::ModuleSocketAPI (_module).input_sockets());
 
-		_outputs_socket_tree = new SocketTree (this);
-		_outputs_socket_tree->populate (ModuleIO::ProcessingLoopAPI (*io_base).output_sockets());
+	_outputs_socket_tree = new SocketTree (this);
+	_outputs_socket_tree->populate (Module::ModuleSocketAPI (_module).output_sockets());
 
-		tabs->addTab (_inputs_socket_tree, "Data inputs");
-		tabs->addTab (_outputs_socket_tree, "Data outputs");
-	}
+	tabs->addTab (_inputs_socket_tree, "Data inputs");
+	tabs->addTab (_outputs_socket_tree, "Data outputs");
 
-	if (auto module_with_config_widget = dynamic_cast<BasicModule::HasConfiguratorWidget*> (&_module))
+	if (auto module_with_config_widget = dynamic_cast<Module::HasConfiguratorWidget*> (&_module))
 	{
 		auto module_config_widget = module_with_config_widget->configurator_widget();
 		tabs->addTab (new OwnershipBreaker (module_config_widget, this), "Module config");
@@ -89,8 +86,8 @@ ModuleWidget::refresh()
 {
 	using Milliseconds = si::Quantity<si::Millisecond>;
 
-	auto const processing_loop_api = BasicModule::ProcessingLoopAPI (_module);
-	auto const accounting_api = BasicModule::AccountingAPI (_module);
+	auto const processing_loop_api = Module::ProcessingLoopAPI (_module);
+	auto const accounting_api = Module::AccountingAPI (_module);
 
 	{
 		auto const& samples = accounting_api.communication_times();
@@ -128,7 +125,7 @@ ModuleWidget::refresh()
 
 	if (_painting_time_histogram)
 	{
-		auto const accounting_api = BasicInstrument::AccountingAPI (*_instrument);
+		auto const accounting_api = Instrument::AccountingAPI (*_instrument);
 		auto const& samples = accounting_api.painting_times();
 		auto const [range, grid_lines] = get_max_for_axis<Milliseconds> (*std::max_element (samples.begin(), samples.end()));
 		xf::Histogram<Milliseconds> histogram (samples.begin(), samples.end(), range / 100, 0.0_ms, range);

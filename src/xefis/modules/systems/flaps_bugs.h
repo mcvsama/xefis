@@ -31,7 +31,7 @@ namespace si = neutrino::si;
 using namespace neutrino::si::literals;
 
 
-class FlapsBugsIO: public xf::ModuleIO
+class FlapsBugsIO: public xf::Module
 {
   public:
 	/*
@@ -56,6 +56,9 @@ class FlapsBugsIO: public xf::ModuleIO
 	xf::ModuleOut<si::Velocity>	flaps_a_speed	{ this, "flaps-a-speed" };
 	xf::ModuleOut<std::string>	flaps_b_label	{ this, "flaps-b-label" };
 	xf::ModuleOut<si::Velocity>	flaps_b_speed	{ this, "flaps-b-speed" };
+
+  public:
+	using xf::Module::Module;
 };
 
 
@@ -63,12 +66,12 @@ class FlapsBugsIO: public xf::ModuleIO
  * Computes two speed bugs - for two adjacent flap settings - that should
  * be displayed on EFIS' speed ladder.
  */
-class FlapsBugs: public xf::Module<FlapsBugsIO>
+class FlapsBugs: public FlapsBugsIO
 {
   public:
 	// Ctor
 	explicit
-	FlapsBugs (std::unique_ptr<FlapsBugsIO>, xf::Flaps const& flaps, std::string_view const& instance = {});
+	FlapsBugs (xf::Flaps const& flaps, std::string_view const& instance = {});
 
   protected:
 	// Module API
@@ -76,8 +79,9 @@ class FlapsBugs: public xf::Module<FlapsBugsIO>
 	process (xf::Cycle const&) override;
 
   private:
+	FlapsBugsIO&						_io						{ *this };
 	xf::Flaps const&					_flaps;
-	xf::SocketValueChanged<si::Angle>	_flaps_setting_changed	{ io.flaps_setting };
+	xf::SocketValueChanged<si::Angle>	_flaps_setting_changed	{ _io.flaps_setting };
 };
 
 #endif

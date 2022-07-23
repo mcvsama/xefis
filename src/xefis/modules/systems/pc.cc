@@ -33,8 +33,8 @@
 #include "pc.h"
 
 
-PerformanceComputer::PerformanceComputer (std::unique_ptr<PerformanceComputerIO> module_io, xf::Airframe* airframe, std::string_view const& instance):
-	Module (std::move (module_io), instance),
+PerformanceComputer::PerformanceComputer (xf::Airframe* airframe, std::string_view const& instance):
+	PerformanceComputerIO (instance),
 	_airframe (airframe)
 {
 	_wind_computer.set_callback (std::bind (&PerformanceComputer::compute_wind, this));
@@ -43,17 +43,17 @@ PerformanceComputer::PerformanceComputer (std::unique_ptr<PerformanceComputerIO>
 		&_wind_speed_smoother,
 	});
 	_wind_computer.observe ({
-		&io.speed_tas,
-		&io.speed_gs,
-		&io.track_lateral_true,
-		&io.orientation_heading_true,
-		&io.magnetic_declination,
+		&_io.speed_tas,
+		&_io.speed_gs,
+		&_io.track_lateral_true,
+		&_io.orientation_heading_true,
+		&_io.magnetic_declination,
 	});
 
 	_glide_ratio_computer.set_callback (std::bind (&PerformanceComputer::compute_glide_ratio, this));
 	_glide_ratio_computer.observe ({
-		&io.speed_gs,
-		&io.vertical_speed,
+		&_io.speed_gs,
+		&_io.vertical_speed,
 	});
 
 	_total_energy_variometer_computer.set_minimum_dt (50_ms);
@@ -62,26 +62,26 @@ PerformanceComputer::PerformanceComputer (std::unique_ptr<PerformanceComputerIO>
 		&_total_energy_variometer_smoother,
 	});
 	_total_energy_variometer_computer.observe ({
-		&io.altitude_amsl_std,
-		&io.speed_ias,
+		&_io.altitude_amsl_std,
+		&_io.speed_ias,
 	});
 
 	_speeds_computer.set_callback (std::bind (&PerformanceComputer::compute_speeds, this));
 	_speeds_computer.observe ({
-		&io.density_altitude,
-		&io.air_density_static,
-		&io.aircraft_mass,
-		&io.flaps_angle,
-		&io.spoilers_angle,
-		&io.bank_angle,
+		&_io.density_altitude,
+		&_io.air_density_static,
+		&_io.aircraft_mass,
+		&_io.flaps_angle,
+		&_io.spoilers_angle,
+		&_io.bank_angle,
 	});
 
 	_aoa_computer.set_minimum_dt (1_ms);
 	_aoa_computer.set_callback (std::bind (&PerformanceComputer::compute_critical_aoa, this));
 	_aoa_computer.observe ({
-		&io.flaps_angle,
-		&io.spoilers_angle,
-		&io.aoa_alpha,
+		&_io.flaps_angle,
+		&_io.spoilers_angle,
+		&_io.aoa_alpha,
 	});
 
 	_cl_computer.set_minimum_dt (10_ms);
@@ -90,29 +90,29 @@ PerformanceComputer::PerformanceComputer (std::unique_ptr<PerformanceComputerIO>
 		&_cl_smoother,
 	});
 	_cl_computer.observe ({
-		&io.load,
-		&io.aircraft_mass,
-		&io.air_density_static,
-		&io.speed_tas,
+		&_io.load,
+		&_io.aircraft_mass,
+		&_io.air_density_static,
+		&_io.speed_tas,
 	});
 
 	_estimations_computer.set_minimum_dt (10_ms);
 	_estimations_computer.set_callback (std::bind (&PerformanceComputer::compute_estimations, this));
 	_estimations_computer.observe ({
-		&io.load,
-		&io.aircraft_mass,
-		&io.air_density_static,
-		&io.flaps_angle,
-		&io.spoilers_angle,
-		&io.speed_tas,
-		&io.aoa_alpha,
+		&_io.load,
+		&_io.aircraft_mass,
+		&_io.air_density_static,
+		&_io.flaps_angle,
+		&_io.spoilers_angle,
+		&_io.speed_tas,
+		&_io.aoa_alpha,
 	});
 
 	_slip_skid_computer.set_minimum_dt (10_ms);
 	_slip_skid_computer.set_callback (std::bind (&PerformanceComputer::compute_slip_skid, this));
 	_slip_skid_computer.observe ({
-		&io.y_acceleration,
-		&io.z_acceleration,
+		&_io.y_acceleration,
+		&_io.z_acceleration,
 	});
 }
 
@@ -139,23 +139,23 @@ PerformanceComputer::process (xf::Cycle const& cycle)
 void
 PerformanceComputer::compute_wind()
 {
-	if (io.speed_tas && io.speed_gs && io.track_lateral_true && io.orientation_heading_true && io.magnetic_declination)
+	if (_io.speed_tas && _io.speed_gs && _io.track_lateral_true && _io.orientation_heading_true && _io.magnetic_declination)
 	{
 		si::Time update_dt = _wind_computer.update_dt();
 
 		xf::WindTriangle wt;
-		wt.set_air_vector (*io.speed_tas, *io.orientation_heading_true);
-		wt.set_ground_vector (*io.speed_gs, *io.track_lateral_true);
+		wt.set_air_vector (*_io.speed_tas, *_io.orientation_heading_true);
+		wt.set_ground_vector (*_io.speed_gs, *_io.track_lateral_true);
 		wt.compute_wind_vector();
-		io.wind_from_true = xf::floored_mod (_wind_direction_smoother (wt.wind_from(), update_dt), 360_deg);
-		io.wind_from_magnetic = xf::true_to_magnetic (*io.wind_from_true, *io.magnetic_declination);
-		io.wind_tas = _wind_speed_smoother (wt.wind_speed(), update_dt);
+		_io.wind_from_true = xf::floored_mod (_wind_direction_smoother (wt.wind_from(), update_dt), 360_deg);
+		_io.wind_from_magnetic = xf::true_to_magnetic (*_io.wind_from_true, *_io.magnetic_declination);
+		_io.wind_tas = _wind_speed_smoother (wt.wind_speed(), update_dt);
 	}
 	else
 	{
-		io.wind_from_true = xf::nil;
-		io.wind_from_magnetic = xf::nil;
-		io.wind_tas = xf::nil;
+		_io.wind_from_true = xf::nil;
+		_io.wind_from_magnetic = xf::nil;
+		_io.wind_tas = xf::nil;
 		_wind_direction_smoother.invalidate();
 		_wind_speed_smoother.invalidate();
 	}
@@ -165,15 +165,15 @@ PerformanceComputer::compute_wind()
 void
 PerformanceComputer::compute_glide_ratio()
 {
-	if (io.speed_gs && io.vertical_speed)
+	if (_io.speed_gs && _io.vertical_speed)
 	{
-		si::Velocity forward_speed = *io.speed_gs;
+		si::Velocity forward_speed = *_io.speed_gs;
 		int ratio = (forward_speed > 1_kt)
-			? xf::clamped<int> (forward_speed / *io.vertical_speed, -99, +99)
+			? xf::clamped<int> (forward_speed / *_io.vertical_speed, -99, +99)
 			: 0;
-		io.glide_ratio = ratio;
+		_io.glide_ratio = ratio;
 
-		if (io.glide_ratio_string.use_count() > 0)
+		if (_io.glide_ratio_string.use_count() > 0)
 		{
 			std::string_view arr;
 
@@ -185,15 +185,15 @@ PerformanceComputer::compute_glide_ratio()
 				arr = "";
 
 			if (std::abs (ratio) > 0)
-				io.glide_ratio_string = arr + (boost::format ("%02d:1") % std::abs (ratio)).str();
+				_io.glide_ratio_string = arr + (boost::format ("%02d:1") % std::abs (ratio)).str();
 			else
-				io.glide_ratio_string = "=";
+				_io.glide_ratio_string = "=";
 		}
 	}
 	else
 	{
-		io.glide_ratio = xf::nil;
-		io.glide_ratio_string = xf::nil;
+		_io.glide_ratio = xf::nil;
+		_io.glide_ratio_string = xf::nil;
 	}
 }
 
@@ -201,22 +201,22 @@ PerformanceComputer::compute_glide_ratio()
 void
 PerformanceComputer::compute_total_energy_variometer()
 {
-	if (io.total_energy_variometer.use_count() > 0)
+	if (_io.total_energy_variometer.use_count() > 0)
 	{
 		si::Time update_dt = _total_energy_variometer_computer.update_dt();
 
-		if (io.altitude_amsl_std && io.aircraft_mass && io.speed_ias)
+		if (_io.altitude_amsl_std && _io.aircraft_mass && _io.speed_ias)
 		{
-			si::Mass const m = *io.aircraft_mass;
+			si::Mass const m = *_io.aircraft_mass;
 			si::Acceleration const g = xf::kStdGravitationalAcceleration;
-			si::Velocity const v = *io.speed_ias;
-			si::Energy const Ep = m * g * *io.altitude_amsl_std;
+			si::Velocity const v = *_io.speed_ias;
+			si::Energy const Ep = m * g * *_io.altitude_amsl_std;
 			si::Energy const Ek = m * v * v * 0.5;
 			si::Energy const total_energy = Ep + Ek;
 
 			// If total energy was nil (invalid), reset _prev_total_energy
 			// value to the current _total_energy:
-			if (io.total_energy_variometer.is_nil())
+			if (_io.total_energy_variometer.is_nil())
 				_prev_total_energy = total_energy;
 
 			si::Energy const energy_diff = total_energy - _prev_total_energy;
@@ -225,16 +225,16 @@ PerformanceComputer::compute_total_energy_variometer()
 			// If IAS not in valid range, continue computations but only set output to nil.
 			_total_energy_variometer_smoother (tev, update_dt);
 
-			if (*io.speed_ias > *io.tev_min_ias)
-				io.total_energy_variometer = _total_energy_variometer_smoother.value();
+			if (*_io.speed_ias > *_io.tev_min_ias)
+				_io.total_energy_variometer = _total_energy_variometer_smoother.value();
 			else
-				io.total_energy_variometer = xf::nil;
+				_io.total_energy_variometer = xf::nil;
 
 			_prev_total_energy = total_energy;
 		}
 		else
 		{
-			io.total_energy_variometer = xf::nil;
+			_io.total_energy_variometer = xf::nil;
 			_total_energy_variometer_smoother.invalidate();
 		}
 	}
@@ -245,33 +245,33 @@ void
 PerformanceComputer::compute_speeds()
 {
 	// Vs for load factors equivalent of banking 0_deg, 5_deg and 30_deg.
-	io.v_s_0_deg = get_stall_ias (0_deg);
-	io.v_s_5_deg = get_stall_ias (5_deg);
-	io.v_s_30_deg = get_stall_ias (30_deg);
+	_io.v_s_0_deg = get_stall_ias (0_deg);
+	_io.v_s_5_deg = get_stall_ias (5_deg);
+	_io.v_s_30_deg = get_stall_ias (30_deg);
 	// Stall speed for current bank angle:
-	io.v_s = get_stall_ias (std::min<si::Angle> (60_deg, io.bank_angle.value_or (60_deg)));
+	_io.v_s = get_stall_ias (std::min<si::Angle> (60_deg, _io.bank_angle.value_or (60_deg)));
 
 	// V_r:
-	if (io.v_s_0_deg)
-		io.v_r = 1.15 * *io.v_s_0_deg;
+	if (_io.v_s_0_deg)
+		_io.v_r = 1.15 * *_io.v_s_0_deg;
 	else
-		io.v_r = xf::nil;
+		_io.v_r = xf::nil;
 
 	// V_a; since the formula is almost identical as for V_s, use V_s_0_deg:
-	if (_airframe && io.v_s_0_deg)
+	if (_airframe && _io.v_s_0_deg)
 	{
 		xf::Range<double> lf_limits = _airframe->load_factor_limits();
 		double max_lf = std::min (lf_limits.max(), -lf_limits.min());
-		io.v_a = std::sqrt (max_lf) * *io.v_s_0_deg;
+		_io.v_a = std::sqrt (max_lf) * *_io.v_s_0_deg;
 	}
 	else
-		io.v_a = xf::nil;
+		_io.v_a = xf::nil;
 
 	// V_REF for landing:
-	if (io.v_s_0_deg)
-		io.v_approach = 1.3 * *io.v_s_0_deg;
+	if (_io.v_s_0_deg)
+		_io.v_approach = 1.3 * *_io.v_s_0_deg;
 	else
-		io.v_approach = xf::nil;
+		_io.v_approach = xf::nil;
 
 	// Rest:
 	compute_speeds_vbg();
@@ -299,10 +299,10 @@ PerformanceComputer::compute_speeds_vbg()
 	// Find AOA and IAS for which lift/drag is at maximum
 	// (equivalent to C_L/C_D).
 
-	if (_airframe && io.flaps_angle && io.spoilers_angle)
+	if (_airframe && _io.flaps_angle && _io.spoilers_angle)
 	{
-		xf::FlapsAngle flaps_angle (*io.flaps_angle);
-		xf::SpoilersAngle spoilers_angle (*io.spoilers_angle);
+		xf::FlapsAngle flaps_angle (*_io.flaps_angle);
+		xf::SpoilersAngle spoilers_angle (*_io.spoilers_angle);
 
 		xf::Range<si::Angle> aoa_range = _airframe->get_defined_aoa_range();
 
@@ -327,15 +327,15 @@ PerformanceComputer::compute_speeds_vbg()
 			auto tas = aoa_to_tas_now (*v_bg_aoa);
 
 			if (tas)
-				io.v_bg = tas_to_ias (*tas);
+				_io.v_bg = tas_to_ias (*tas);
 			else
-				io.v_bg = xf::nil;
+				_io.v_bg = xf::nil;
 		}
 		else
-			io.v_bg = xf::nil;
+			_io.v_bg = xf::nil;
 	}
 	else
-		io.v_bg = xf::nil;
+		_io.v_bg = xf::nil;
 }
 
 
@@ -347,8 +347,8 @@ PerformanceComputer::get_stall_ias (si::Angle const max_bank_angle) const
 
 	if (_airframe)
 	{
-		xf::FlapsAngle flaps_angle (io.flaps_angle.value_or (0_deg));
-		xf::SpoilersAngle spoilers_angle (io.spoilers_angle.value_or (0_deg));
+		xf::FlapsAngle flaps_angle (_io.flaps_angle.value_or (0_deg));
+		xf::SpoilersAngle spoilers_angle (_io.spoilers_angle.value_or (0_deg));
 		si::Angle max_safe_aoa = _airframe->get_max_safe_aoa (flaps_angle, spoilers_angle);
 		si::Acceleration load = 1_g / si::cos (max_bank_angle);
 
@@ -367,8 +367,8 @@ PerformanceComputer::get_stall_ias (si::Angle const max_bank_angle) const
 std::optional<si::Velocity>
 PerformanceComputer::tas_to_ias (si::Velocity const tas) const
 {
-	if (io.density_altitude)
-		return xf::indicated_airspeed (tas, *io.density_altitude);
+	if (_io.density_altitude)
+		return xf::indicated_airspeed (tas, *_io.density_altitude);
 	else
 		return { };
 }
@@ -379,20 +379,20 @@ PerformanceComputer::compute_critical_aoa()
 {
 	if (_airframe)
 	{
-		xf::FlapsAngle flaps_angle (io.flaps_angle.value_or (0_deg));
-		xf::SpoilersAngle spoilers_angle (io.spoilers_angle.value_or (0_deg));
+		xf::FlapsAngle flaps_angle (_io.flaps_angle.value_or (0_deg));
+		xf::SpoilersAngle spoilers_angle (_io.spoilers_angle.value_or (0_deg));
 
-		io.critical_aoa = _airframe->get_critical_aoa (flaps_angle, spoilers_angle);
+		_io.critical_aoa = _airframe->get_critical_aoa (flaps_angle, spoilers_angle);
 
-		if (io.aoa_alpha)
-			io.stall = *io.aoa_alpha >= *io.critical_aoa;
+		if (_io.aoa_alpha)
+			_io.stall = *_io.aoa_alpha >= *_io.critical_aoa;
 		else
-			io.stall = xf::nil;
+			_io.stall = xf::nil;
 	}
 	else
 	{
-		io.critical_aoa = xf::nil;
-		io.stall = xf::nil;
+		_io.critical_aoa = xf::nil;
+		_io.stall = xf::nil;
 	}
 }
 
@@ -407,18 +407,18 @@ PerformanceComputer::compute_C_L()
 
 	si::Time update_dt = _cl_computer.update_dt();
 
-	if (_airframe && io.load && io.aircraft_mass && io.air_density_static && io.speed_tas)
+	if (_airframe && _io.load && _io.aircraft_mass && _io.air_density_static && _io.speed_tas)
 	{
-		si::Force lift = *io.load * *io.aircraft_mass;
-		si::Velocity tas = *io.speed_tas;
+		si::Force lift = *_io.load * *_io.aircraft_mass;
+		si::Velocity tas = *_io.speed_tas;
 		si::Area wings_area = _airframe->wings_area();
-		xf::LiftCoefficient cl (lift / (0.5 * (*io.air_density_static) * tas * tas * wings_area));
+		xf::LiftCoefficient cl (lift / (0.5 * (*_io.air_density_static) * tas * tas * wings_area));
 		_cl_smoother.process (cl, update_dt);
-		io.lift_coefficient = _cl_smoother.value();
+		_io.lift_coefficient = _cl_smoother.value();
 	}
 	else
 	{
-		io.lift_coefficient = xf::nil;
+		_io.lift_coefficient = xf::nil;
 		_cl_smoother.invalidate();
 	}
 }
@@ -437,48 +437,48 @@ PerformanceComputer::compute_C_D()
 void
 PerformanceComputer::compute_estimations()
 {
-	if (_airframe && io.load && io.aircraft_mass && io.air_density_static)
+	if (_airframe && _io.load && _io.aircraft_mass && _io.air_density_static)
 	{
-		si::Force lift_force = *io.load * *io.aircraft_mass;
+		si::Force lift_force = *_io.load * *_io.aircraft_mass;
 		si::Area wings_area = _airframe->wings_area();
-		xf::FlapsAngle flaps_angle (io.flaps_angle.value_or (0_deg));
-		xf::SpoilersAngle spoilers_angle (io.spoilers_angle.value_or (0_deg));
+		xf::FlapsAngle flaps_angle (_io.flaps_angle.value_or (0_deg));
+		xf::SpoilersAngle spoilers_angle (_io.spoilers_angle.value_or (0_deg));
 
 		// Estimate IAS:
-		if (io.aoa_alpha)
+		if (_io.aoa_alpha)
 		{
-			xf::LiftCoefficient cl = _airframe->get_cl (*io.aoa_alpha, flaps_angle, spoilers_angle);
-			si::Velocity tas = sqrt (lift_force / (0.5 * (*io.air_density_static) * wings_area * cl));
-			io.estimated_ias = tas_to_ias (tas);
+			xf::LiftCoefficient cl = _airframe->get_cl (*_io.aoa_alpha, flaps_angle, spoilers_angle);
+			si::Velocity tas = sqrt (lift_force / (0.5 * (*_io.air_density_static) * wings_area * cl));
+			_io.estimated_ias = tas_to_ias (tas);
 		}
 		else
-			io.estimated_ias = xf::nil;
+			_io.estimated_ias = xf::nil;
 
 		// Estimate AOA:
-		if (io.speed_tas)
+		if (_io.speed_tas)
 		{
-			si::Velocity tas = *io.speed_tas;
-			xf::LiftCoefficient cl (lift_force / (0.5 * (*io.air_density_static) * tas * tas * wings_area));
-			io.estimated_aoa = _airframe->get_aoa_in_normal_regime (cl, flaps_angle, spoilers_angle);
+			si::Velocity tas = *_io.speed_tas;
+			xf::LiftCoefficient cl (lift_force / (0.5 * (*_io.air_density_static) * tas * tas * wings_area));
+			_io.estimated_aoa = _airframe->get_aoa_in_normal_regime (cl, flaps_angle, spoilers_angle);
 		}
 		else
-			io.estimated_aoa = xf::nil;
+			_io.estimated_aoa = xf::nil;
 
 		// Compute errors:
-		if (io.speed_ias && io.estimated_ias)
-			io.estimated_ias_error = *io.estimated_ias - *io.speed_ias;
+		if (_io.speed_ias && _io.estimated_ias)
+			_io.estimated_ias_error = *_io.estimated_ias - *_io.speed_ias;
 		else
-			io.estimated_ias_error = xf::nil;
+			_io.estimated_ias_error = xf::nil;
 
-		if (io.aoa_alpha && io.estimated_aoa)
-			io.estimated_aoa_error = *io.estimated_aoa - *io.aoa_alpha;
+		if (_io.aoa_alpha && _io.estimated_aoa)
+			_io.estimated_aoa_error = *_io.estimated_aoa - *_io.aoa_alpha;
 		else
-			io.estimated_aoa_error = xf::nil;
+			_io.estimated_aoa_error = xf::nil;
 	}
 	else
 	{
-		io.estimated_ias = xf::nil;
-		io.estimated_aoa = xf::nil;
+		_io.estimated_ias = xf::nil;
+		_io.estimated_aoa = xf::nil;
 	}
 }
 
@@ -486,26 +486,26 @@ PerformanceComputer::compute_estimations()
 void
 PerformanceComputer::compute_slip_skid()
 {
-	if (io.y_acceleration && io.z_acceleration)
-		io.slip_skid = 1_rad * si::atan2 (*io.y_acceleration, -*io.z_acceleration);
+	if (_io.y_acceleration && _io.z_acceleration)
+		_io.slip_skid = 1_rad * si::atan2 (*_io.y_acceleration, -*_io.z_acceleration);
 	else
-		io.slip_skid = xf::nil;
+		_io.slip_skid = xf::nil;
 }
 
 
 inline std::optional<si::Velocity>
 PerformanceComputer::aoa_to_tas_now (si::Angle const aoa, std::optional<si::Acceleration> const load) const
 {
-	if (_airframe && io.load && io.aircraft_mass && io.air_density_static && io.flaps_angle && io.spoilers_angle)
+	if (_airframe && _io.load && _io.aircraft_mass && _io.air_density_static && _io.flaps_angle && _io.spoilers_angle)
 	{
 		si::Area wings_area = _airframe->wings_area();
-		xf::FlapsAngle flaps_angle (*io.flaps_angle);
-		xf::SpoilersAngle spoilers_angle (*io.spoilers_angle);
+		xf::FlapsAngle flaps_angle (*_io.flaps_angle);
+		xf::SpoilersAngle spoilers_angle (*_io.spoilers_angle);
 		xf::LiftCoefficient cl = _airframe->get_cl (aoa, flaps_angle, spoilers_angle);
-		si::Acceleration xload = load ? *load : *io.load;
-		si::Force lift = xload * *io.aircraft_mass;
+		si::Acceleration xload = load ? *load : *_io.load;
+		si::Force lift = xload * *_io.aircraft_mass;
 		// Result is TAS:
-		return sqrt (lift / (0.5 * (*io.air_density_static) * wings_area * cl));
+		return sqrt (lift / (0.5 * (*_io.air_density_static) * wings_area * cl));
 	}
 	else
 		return { };

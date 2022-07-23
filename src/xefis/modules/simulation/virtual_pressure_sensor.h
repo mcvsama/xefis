@@ -29,7 +29,7 @@
 #include <xefis/support/simulation/aerodynamic.v0/flight_simulation.h>
 
 
-class VirtualPressureSensorIO: public xf::ModuleIO
+class VirtualPressureSensorIO: public xf::Module
 {
   public:
 	/*
@@ -46,10 +46,13 @@ class VirtualPressureSensorIO: public xf::ModuleIO
 
 	xf::ModuleOut<bool>								serviceable			{ this, "serviceable" };
 	xf::ModuleOut<si::Pressure>						pressure			{ this, "measured-pressure" };
+
+  public:
+	using xf::Module::Module;
 };
 
 
-class VirtualPressureSensor: public xf::Module<VirtualPressureSensorIO>
+class VirtualPressureSensor: public VirtualPressureSensorIO
 {
   private:
 	static constexpr char kLoggerScope[] { "mod::VirtualPressureSensor" };
@@ -67,7 +70,6 @@ class VirtualPressureSensor: public xf::Module<VirtualPressureSensorIO>
 	VirtualPressureSensor (xf::sim::FlightSimulation const&,
 						   Probe,
 						   xf::SpaceVector<si::Length, xf::AirframeFrame> const& mount_location,
-						   std::unique_ptr<VirtualPressureSensorIO>,
 						   xf::Logger const&,
 						   std::string_view const& instance = {});
 
@@ -76,6 +78,7 @@ class VirtualPressureSensor: public xf::Module<VirtualPressureSensorIO>
 	process (xf::Cycle const&) override;
 
   private:
+	VirtualPressureSensorIO&						_io					{ *this };
 	xf::Logger										_logger;
 	xf::sim::FlightSimulation const&				_flight_simulation;
 	Probe											_probe;

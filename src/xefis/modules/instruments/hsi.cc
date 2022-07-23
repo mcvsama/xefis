@@ -2098,8 +2098,8 @@ PaintingWork::to_px (si::Length const length) const
 } // namespace hsi_detail
 
 
-HSI::HSI (std::unique_ptr<HSI_IO> module_io, xf::Graphics const& graphics, xf::NavaidStorage const& navaid_storage, xf::Logger const& logger, std::string_view const& instance):
-	Instrument (std::move (module_io), instance),
+HSI::HSI (xf::Graphics const& graphics, xf::NavaidStorage const& navaid_storage, xf::Logger const& logger, std::string_view const& instance):
+	HSI_IO (instance),
 	_logger (logger.with_scope (std::string (kLoggerScope) + "#" + instance)),
 	_navaid_storage (navaid_storage),
 	_instrument_support (graphics)
@@ -2111,116 +2111,116 @@ HSI::process (xf::Cycle const& cycle)
 {
 	hsi_detail::Parameters params;
 	params.update_time = cycle.update_time();
-	params.display_mode = io.display_mode.value_or (hsi::DisplayMode::Expanded);
-	params.heading_mode = io.heading_mode.value_or (hsi::HeadingMode::Magnetic);
-	params.range = io.range.value_or (5_nmi);
-	params.heading_magnetic = io.orientation_heading_magnetic.get_optional();
-	params.heading_true = io.orientation_heading_true.get_optional();
-	params.ap_visible = io.cmd_visible.value_or (false);
-	params.ap_line_visible = io.cmd_line_visible.value_or (false);
-	params.ap_heading_magnetic = io.cmd_heading_magnetic.get_optional();
-	params.ap_track_magnetic = io.cmd_track_magnetic.get_optional();
-	params.ap_use_trk = io.cmd_use_trk.get_optional();
-	params.track_visible = io.track_visible.value_or (false) && io.track_lateral_magnetic;
-	params.track_magnetic = io.track_lateral_magnetic.get_optional();
-	params.course_visible = io.course_visible.value_or (false);
-	params.course_setting_magnetic = io.course_setting_magnetic.get_optional();
-	params.course_deviation = io.course_deviation.get_optional();
-	params.course_to_flag = io.course_to_flag.get_optional();
-	params.navaid_selected_reference = QString::fromStdString (io.navaid_selected_reference.value_or (""));
-	params.navaid_selected_identifier = QString::fromStdString (io.navaid_selected_identifier.value_or (""));
-	params.navaid_selected_distance = io.navaid_selected_distance.get_optional();
-	params.navaid_selected_eta = io.navaid_selected_eta.get_optional();
-	params.navaid_selected_course_magnetic = io.navaid_selected_course_magnetic.get_optional();
-	params.navaid_left_reference = QString::fromStdString (io.navaid_left_reference.value_or (""));
-	params.navaid_left_type = io.navaid_left_type.value_or (hsi::NavType::A);
-	params.navaid_left_identifier = QString::fromStdString (io.navaid_left_identifier.value_or (""));
-	params.navaid_left_distance = io.navaid_left_distance.get_optional();
-	params.navaid_left_initial_bearing_magnetic = io.navaid_left_initial_bearing_magnetic.get_optional();
-	params.navaid_right_type = io.navaid_right_type.value_or (hsi::NavType::A);
-	params.navaid_right_reference = QString::fromStdString (io.navaid_right_reference.value_or (""));
-	params.navaid_right_identifier = QString::fromStdString (io.navaid_right_identifier.value_or (""));
-	params.navaid_right_distance = io.navaid_right_distance.get_optional();
-	params.navaid_right_initial_bearing_magnetic = io.navaid_right_initial_bearing_magnetic.get_optional();
-	params.navigation_required_performance = io.navigation_required_performance.get_optional();
-	params.navigation_actual_performance = io.navigation_actual_performance.get_optional();
-	params.center_on_track = io.track_center_on_track.value_or (true);
-	params.home_track_visible = io.home_track_visible.value_or (false);
-	params.true_home_direction = io.home_true_direction.get_optional();
-	params.dist_to_home_ground = io.home_distance_ground.get_optional();
-	params.dist_to_home_vlos = io.home_distance_vlos.get_optional();
-	params.dist_to_home_vert = io.home_distance_vertical.get_optional();
+	params.display_mode = _io.display_mode.value_or (hsi::DisplayMode::Expanded);
+	params.heading_mode = _io.heading_mode.value_or (hsi::HeadingMode::Magnetic);
+	params.range = _io.range.value_or (5_nmi);
+	params.heading_magnetic = _io.orientation_heading_magnetic.get_optional();
+	params.heading_true = _io.orientation_heading_true.get_optional();
+	params.ap_visible = _io.cmd_visible.value_or (false);
+	params.ap_line_visible = _io.cmd_line_visible.value_or (false);
+	params.ap_heading_magnetic = _io.cmd_heading_magnetic.get_optional();
+	params.ap_track_magnetic = _io.cmd_track_magnetic.get_optional();
+	params.ap_use_trk = _io.cmd_use_trk.get_optional();
+	params.track_visible = _io.track_visible.value_or (false) && _io.track_lateral_magnetic;
+	params.track_magnetic = _io.track_lateral_magnetic.get_optional();
+	params.course_visible = _io.course_visible.value_or (false);
+	params.course_setting_magnetic = _io.course_setting_magnetic.get_optional();
+	params.course_deviation = _io.course_deviation.get_optional();
+	params.course_to_flag = _io.course_to_flag.get_optional();
+	params.navaid_selected_reference = QString::fromStdString (_io.navaid_selected_reference.value_or (""));
+	params.navaid_selected_identifier = QString::fromStdString (_io.navaid_selected_identifier.value_or (""));
+	params.navaid_selected_distance = _io.navaid_selected_distance.get_optional();
+	params.navaid_selected_eta = _io.navaid_selected_eta.get_optional();
+	params.navaid_selected_course_magnetic = _io.navaid_selected_course_magnetic.get_optional();
+	params.navaid_left_reference = QString::fromStdString (_io.navaid_left_reference.value_or (""));
+	params.navaid_left_type = _io.navaid_left_type.value_or (hsi::NavType::A);
+	params.navaid_left_identifier = QString::fromStdString (_io.navaid_left_identifier.value_or (""));
+	params.navaid_left_distance = _io.navaid_left_distance.get_optional();
+	params.navaid_left_initial_bearing_magnetic = _io.navaid_left_initial_bearing_magnetic.get_optional();
+	params.navaid_right_type = _io.navaid_right_type.value_or (hsi::NavType::A);
+	params.navaid_right_reference = QString::fromStdString (_io.navaid_right_reference.value_or (""));
+	params.navaid_right_identifier = QString::fromStdString (_io.navaid_right_identifier.value_or (""));
+	params.navaid_right_distance = _io.navaid_right_distance.get_optional();
+	params.navaid_right_initial_bearing_magnetic = _io.navaid_right_initial_bearing_magnetic.get_optional();
+	params.navigation_required_performance = _io.navigation_required_performance.get_optional();
+	params.navigation_actual_performance = _io.navigation_actual_performance.get_optional();
+	params.center_on_track = _io.track_center_on_track.value_or (true);
+	params.home_track_visible = _io.home_track_visible.value_or (false);
+	params.true_home_direction = _io.home_true_direction.get_optional();
+	params.dist_to_home_ground = _io.home_distance_ground.get_optional();
+	params.dist_to_home_vlos = _io.home_distance_vlos.get_optional();
+	params.dist_to_home_vert = _io.home_distance_vertical.get_optional();
 
-	if (io.home_position_longitude && io.home_position_latitude)
-		params.home = si::LonLat (*io.home_position_longitude, *io.home_position_latitude);
+	if (_io.home_position_longitude && _io.home_position_latitude)
+		params.home = si::LonLat (*_io.home_position_longitude, *_io.home_position_latitude);
 	else
 		params.home.reset();
 
-	params.ground_speed = io.speed_gs.get_optional();
-	params.true_air_speed = io.speed_tas.get_optional();
-	params.track_lateral_rotation = io.track_lateral_rotation.get_optional();
+	params.ground_speed = _io.speed_gs.get_optional();
+	params.true_air_speed = _io.speed_tas.get_optional();
+	params.track_lateral_rotation = _io.track_lateral_rotation.get_optional();
 
 	if (params.track_lateral_rotation)
 		params.track_lateral_rotation = xf::clamped<si::AngularVelocity> (*params.track_lateral_rotation, si::convert (-1_Hz), si::convert (+1_Hz));
 
-	params.altitude_reach_distance = io.target_altitude_reach_distance.get_optional();
-	params.wind_from_magnetic_heading = io.wind_from_magnetic.get_optional();
-	params.wind_tas_speed = io.wind_speed_tas.get_optional();
+	params.altitude_reach_distance = _io.target_altitude_reach_distance.get_optional();
+	params.wind_from_magnetic_heading = _io.wind_from_magnetic.get_optional();
+	params.wind_tas_speed = _io.wind_speed_tas.get_optional();
 
-	if (io.position_longitude && io.position_latitude)
-		params.position = si::LonLat (*io.position_longitude, *io.position_latitude);
+	if (_io.position_longitude && _io.position_latitude)
+		params.position = si::LonLat (*_io.position_longitude, *_io.position_latitude);
 	else
 		params.position.reset();
 
-	params.navaids_visible = io.orientation_heading_true.valid();
-	params.fix_visible = io.features_fix.value_or (false);
-	params.vor_visible = io.features_vor.value_or (false);
-	params.dme_visible = io.features_dme.value_or (false);
-	params.ndb_visible = io.features_ndb.value_or (false);
-	params.loc_visible = io.features_loc.value_or (false);
-	params.arpt_visible = io.features_arpt.value_or (false);
-	params.highlighted_loc = QString::fromStdString (io.localizer_id.value_or (""));
-	params.positioning_hint.set (io.position_source ? std::make_optional (QString::fromStdString (*io.position_source)) : std::nullopt, io.position_source.modification_timestamp());
-	params.tcas_on = io.tcas_on.get_optional();
-	params.tcas_range = io.tcas_range.get_optional();
-	params.arpt_runways_range_threshold = *io.arpt_runways_range_threshold;
-	params.arpt_map_range_threshold = *io.arpt_map_range_threshold;
-	params.arpt_runway_extension_length = *io.arpt_runway_extension_length;
-	params.trend_vector_durations = *io.trend_vector_durations;
-	params.trend_vector_min_ranges = *io.trend_vector_min_ranges;
-	params.trend_vector_max_range = *io.trend_vector_max_range;
-	params.radio_range_pattern_scale = *io.radio_range_pattern_scale;
+	params.navaids_visible = _io.orientation_heading_true.valid();
+	params.fix_visible = _io.features_fix.value_or (false);
+	params.vor_visible = _io.features_vor.value_or (false);
+	params.dme_visible = _io.features_dme.value_or (false);
+	params.ndb_visible = _io.features_ndb.value_or (false);
+	params.loc_visible = _io.features_loc.value_or (false);
+	params.arpt_visible = _io.features_arpt.value_or (false);
+	params.highlighted_loc = QString::fromStdString (_io.localizer_id.value_or (""));
+	params.positioning_hint.set (_io.position_source ? std::make_optional (QString::fromStdString (*_io.position_source)) : std::nullopt, _io.position_source.modification_timestamp());
+	params.tcas_on = _io.tcas_on.get_optional();
+	params.tcas_range = _io.tcas_range.get_optional();
+	params.arpt_runways_range_threshold = *_io.arpt_runways_range_threshold;
+	params.arpt_map_range_threshold = *_io.arpt_map_range_threshold;
+	params.arpt_runway_extension_length = *_io.arpt_runway_extension_length;
+	params.trend_vector_durations = *_io.trend_vector_durations;
+	params.trend_vector_min_ranges = *_io.trend_vector_min_ranges;
+	params.trend_vector_max_range = *_io.trend_vector_max_range;
+	params.radio_range_pattern_scale = *_io.radio_range_pattern_scale;
 	params.round_clip = false;
 
-	if (io.flight_range_warning_longitude && io.flight_range_warning_latitude && io.flight_range_warning_radius)
+	if (_io.flight_range_warning_longitude && _io.flight_range_warning_latitude && _io.flight_range_warning_radius)
 	{
 		params.flight_range_warning = {
-			si::LonLat (*io.flight_range_warning_longitude, *io.flight_range_warning_latitude),
-			*io.flight_range_warning_radius,
+			si::LonLat (*_io.flight_range_warning_longitude, *_io.flight_range_warning_latitude),
+			*_io.flight_range_warning_radius,
 		};
 	}
 	else
 		params.flight_range_warning.reset();
 
-	if (io.flight_range_critical_longitude && io.flight_range_critical_latitude && io.flight_range_critical_radius)
+	if (_io.flight_range_critical_longitude && _io.flight_range_critical_latitude && _io.flight_range_critical_radius)
 	{
 		params.flight_range_critical = {
-			si::LonLat (*io.flight_range_critical_longitude, *io.flight_range_critical_latitude),
-			*io.flight_range_critical_radius,
+			si::LonLat (*_io.flight_range_critical_longitude, *_io.flight_range_critical_latitude),
+			*_io.flight_range_critical_radius,
 		};
 	}
 	else
 		params.flight_range_critical.reset();
 
-	if (io.radio_position_longitude && io.radio_position_latitude)
-		params.radio_position = si::LonLat (*io.radio_position_longitude, *io.radio_position_latitude);
+	if (_io.radio_position_longitude && _io.radio_position_latitude)
+		params.radio_position = si::LonLat (*_io.radio_position_longitude, *_io.radio_position_latitude);
 	else
 		params.radio_position.reset();
 
 	if (params.radio_position)
 	{
-		params.radio_range_warning = io.radio_range_warning.get_optional();
-		params.radio_range_critical = io.radio_range_critical.get_optional();
+		params.radio_range_warning = _io.radio_range_warning.get_optional();
+		params.radio_range_critical = _io.radio_range_critical.get_optional();
 	}
 
 	*_parameters.lock() = params;

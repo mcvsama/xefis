@@ -50,7 +50,7 @@ class ModuleConfigurator: public QWidget
 	screen_selected (Screen&);
 
 	void
-	module_selected (BasicModule&);
+	module_selected (Module&);
 
 	void
 	none_selected();
@@ -62,7 +62,7 @@ class ModuleConfigurator: public QWidget
 	QLabel*															_no_module_selected			{ nullptr };
 	std::map<ProcessingLoop*, configurator::ProcessingLoopWidget*>	_processing_loop_widgets;
 	std::map<Screen*, configurator::ScreenWidget*>					_screen_widgets;
-	std::map<BasicModule*, configurator::ModuleWidget*>				_module_widgets;
+	std::map<Module*, configurator::ModuleWidget*>					_module_widgets;
 };
 
 } // namespace xf

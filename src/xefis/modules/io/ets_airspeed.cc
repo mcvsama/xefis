@@ -29,29 +29,29 @@
 #include "ets_airspeed.h"
 
 
-ETSAirspeed::ETSAirspeed (std::unique_ptr<ETSAirspeedIO> module_io, xf::i2c::Device&& device, xf::Logger const& logger, std::string_view const& instance):
-	Module (std::move (module_io), instance),
+ETSAirspeed::ETSAirspeed (xf::i2c::Device&& device, xf::Logger const& logger, std::string_view const& instance):
+	ETSAirspeedIO (instance),
 	_logger (logger.with_scope (std::string (kLoggerScope) + "#" + instance)),
 	_device (std::move (device))
 {
 	_calibration_data.reserve (kOffsetCalculationSamples);
 
-	io.serviceable = false;
-	io.airspeed_minimum = 10_kt;
-	io.airspeed_maximum = 290_kt;
+	_io.serviceable = false;
+	_io.airspeed_minimum = 10_kt;
+	_io.airspeed_maximum = 290_kt;
 }
 
 
 void
 ETSAirspeed::initialize()
 {
-	if (*io.read_interval < 100_ms)
+	if (*_io.read_interval < 100_ms)
 	{
 		_logger << "The setting airspeed.read-invterval is too low, setting it to 100 ms." << std::endl;
-		io.read_interval = 100_ms;
+		_io.read_interval = 100_ms;
 	}
 
-	_airspeed_smoother.set_smoothing_time (*io.smoothing_time);
+	_airspeed_smoother.set_smoothing_time (*_io.smoothing_time);
 
 	_device_initialization_timer = new QTimer (this);
 	_device_initialization_timer->setInterval (kInitializationDelay.in<si::Millisecond>());
@@ -61,7 +61,7 @@ ETSAirspeed::initialize()
 
 	_periodic_read_timer = new QTimer (this);
 	_periodic_read_timer->setTimerType (Qt::PreciseTimer);
-	_periodic_read_timer->setInterval (io.read_interval->in<si::Millisecond>());
+	_periodic_read_timer->setInterval (_io.read_interval->in<si::Millisecond>());
 	_periodic_read_timer->setSingleShot (false);
 	QObject::connect (_periodic_read_timer, SIGNAL (timeout()), this, SLOT (read()));
 }
@@ -81,8 +81,8 @@ ETSAirspeed::device_initialize()
 void
 ETSAirspeed::reinitialize()
 {
-	io.serviceable = false;
-	io.airspeed = xf::nil;
+	_io.serviceable = false;
+	_io.airspeed = xf::nil;
 	_device.close();
 	// Wait for module hardware initialization and try to read values again.
 	// There's nothing else we can do.
@@ -97,8 +97,8 @@ ETSAirspeed::read()
 		uint16_t raw_value = _device.read_register<uint16_t> (kValueRegister);
 		boost::endian::little_to_native (raw_value);
 
-		if (!io.serviceable.value_or (false))
-			io.serviceable = true;
+		if (!_io.serviceable.value_or (false))
+			_io.serviceable = true;
 
 		switch (_stage)
 		{
@@ -116,7 +116,7 @@ ETSAirspeed::read()
 				si::Velocity speed = 0_kt;
 				if (raw_value >= _offset)
 					speed = 1_mps * (kValueScale * std::sqrt (1.0f * (raw_value - _offset)));
-				io.airspeed = _airspeed_smoother (speed, *io.read_interval);
+				_io.airspeed = _airspeed_smoother (speed, *_io.read_interval);
 				break;
 		}
 	});

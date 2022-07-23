@@ -38,7 +38,7 @@ namespace si = neutrino::si;
 using namespace neutrino::si::literals;
 
 
-class ETSAirspeedIO: public xf::ModuleIO
+class ETSAirspeedIO: public xf::Module
 {
   public:
 	/*
@@ -56,6 +56,9 @@ class ETSAirspeedIO: public xf::ModuleIO
 	xf::ModuleOut<si::Velocity>	airspeed			{ this, "airspeed" };
 	xf::ModuleOut<si::Velocity>	airspeed_minimum	{ this, "airspeed.minimum" };
 	xf::ModuleOut<si::Velocity>	airspeed_maximum	{ this, "airspeed.maximum" };
+
+  public:
+	using xf::Module::Module;
 };
 
 
@@ -68,7 +71,7 @@ class ETSAirspeedIO: public xf::ModuleIO
  */
 class ETSAirspeed:
 	public QObject,
-	public xf::Module<ETSAirspeedIO>
+	public ETSAirspeedIO
 {
 	Q_OBJECT
 
@@ -89,7 +92,7 @@ class ETSAirspeed:
   public:
 	// Ctor
 	explicit
-	ETSAirspeed (std::unique_ptr<ETSAirspeedIO>, xf::i2c::Device&&, xf::Logger const&, std::string_view const& instance = {});
+	ETSAirspeed (xf::i2c::Device&&, xf::Logger const&, std::string_view const& instance = {});
 
 	// Module API
 	void
@@ -130,6 +133,7 @@ class ETSAirspeed:
 	guard (std::function<void()> guarded_code);
 
   private:
+	ETSAirspeedIO&				_io								{ *this };
 	xf::Logger					_logger;
 	xf::i2c::Device				_device;
 	Stage						_stage							{ Stage::Calibrating };

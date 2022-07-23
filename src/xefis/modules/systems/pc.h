@@ -32,7 +32,7 @@ namespace si = neutrino::si;
 using namespace neutrino::si::literals;
 
 
-class PerformanceComputerIO: public xf::ModuleIO
+class PerformanceComputerIO: public xf::Module
 {
   public:
 	/*
@@ -112,15 +112,18 @@ class PerformanceComputerIO: public xf::ModuleIO
 	xf::ModuleOut<si::Angle>		estimated_aoa				{ this, "estimated.aoa" };
 	xf::ModuleOut<si::Angle>		estimated_aoa_error			{ this, "estimated.aoa-error" };
 	xf::ModuleOut<si::Angle>		slip_skid					{ this, "slip-skid" };
+
+  public:
+	using xf::Module::Module;
 };
 
 
-class PerformanceComputer: public xf::Module<PerformanceComputerIO>
+class PerformanceComputer: public PerformanceComputerIO
 {
   public:
 	// Ctor
 	explicit
-	PerformanceComputer (std::unique_ptr<PerformanceComputerIO>, xf::Airframe*, std::string_view const& instance = {});
+	PerformanceComputer (xf::Airframe*, std::string_view const& instance = {});
 
   protected:
 	void
@@ -173,8 +176,9 @@ class PerformanceComputer: public xf::Module<PerformanceComputerIO>
 	aoa_to_tas_now (si::Angle aoa, std::optional<si::Acceleration> load = {}) const;
 
   private:
+	PerformanceComputerIO&			_io									{ *this };
 	xf::Airframe*					_airframe;
-	si::Energy						_prev_total_energy					= 0_J;
+	si::Energy						_prev_total_energy					{ 0_J };
 	// Note: SocketObservers depend on Smoothers, so first Smoothers must be defined,
 	// then SocketObservers, to ensure correct order of destruction.
 	xf::RangeSmoother<si::Angle>	_wind_direction_smoother			{ { 0.0_deg, 360.0_deg }, 5_s };

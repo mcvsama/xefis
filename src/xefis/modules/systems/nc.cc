@@ -31,8 +31,8 @@
 #include "nc.h"
 
 
-NavigationComputer::NavigationComputer (std::unique_ptr<NavigationComputerIO> module_io, std::string_view const& instance):
-	Module (std::move (module_io), instance)
+NavigationComputer::NavigationComputer (std::string_view const& instance):
+	NavigationComputerIO (instance)
 {
 	// Initialize _positions* with invalid vals, to get them non-empty:
 	for (Positions* positions: { &_positions, &_positions_accurate_2_times, &_positions_accurate_9_times })
@@ -41,19 +41,19 @@ NavigationComputer::NavigationComputer (std::unique_ptr<NavigationComputerIO> mo
 
 	_position_computer.set_callback (std::bind (&NavigationComputer::compute_position, this));
 	_position_computer.observe ({
-		&io.input_position_longitude,
-		&io.input_position_latitude,
-		&io.input_position_altitude_amsl,
-		&io.input_position_lateral_stddev,
-		&io.input_position_vertical_stddev,
-		&io.input_position_source,
+		&_io.input_position_longitude,
+		&_io.input_position_latitude,
+		&_io.input_position_altitude_amsl,
+		&_io.input_position_lateral_stddev,
+		&_io.input_position_vertical_stddev,
+		&_io.input_position_source,
 	});
 
 	_magnetic_variation_computer.set_callback (std::bind (&NavigationComputer::compute_magnetic_variation, this));
 	_magnetic_variation_computer.observe ({
-		&io.position_longitude,
-		&io.position_latitude,
-		&io.position_altitude_amsl
+		&_io.position_longitude,
+		&_io.position_latitude,
+		&_io.position_altitude_amsl
 	});
 
 	_headings_computer.set_callback (std::bind (&NavigationComputer::compute_headings, this));
@@ -63,10 +63,10 @@ NavigationComputer::NavigationComputer (std::unique_ptr<NavigationComputerIO> mo
 		&_orientation_roll_smoother,
 	});
 	_headings_computer.observe ({
-		&io.input_orientation_heading_magnetic,
-		&io.input_orientation_pitch,
-		&io.input_orientation_roll,
-		&io.magnetic_declination,
+		&_io.input_orientation_heading_magnetic,
+		&_io.input_orientation_pitch,
+		&_io.input_orientation_roll,
+		&_io.magnetic_declination,
 	});
 
 	_track_computer.set_callback (std::bind (&NavigationComputer::compute_track, this));
@@ -77,7 +77,7 @@ NavigationComputer::NavigationComputer (std::unique_ptr<NavigationComputerIO> mo
 	});
 	_track_computer.observe ({
 		&_position_computer,
-		&io.magnetic_declination,
+		&_io.magnetic_declination,
 	});
 
 	_ground_speed_computer.set_callback (std::bind (&NavigationComputer::compute_ground_speed, this));
@@ -113,24 +113,24 @@ NavigationComputer::compute_position()
 	si::Time update_time = _position_computer.update_time();
 
 	// Larger of the two:
-	if (io.position_lateral_stddev && io.position_vertical_stddev)
-		io.position_stddev = std::max (*io.position_lateral_stddev, *io.position_vertical_stddev);
+	if (_io.position_lateral_stddev && _io.position_vertical_stddev)
+		_io.position_stddev = std::max (*_io.position_lateral_stddev, *_io.position_vertical_stddev);
 	else
-		io.position_stddev = xf::nil;
+		_io.position_stddev = xf::nil;
 
 	si::Length const failed_accuracy = 100_nmi;
 
 	Position position;
-	position.lateral_position = si::LonLat (*io.position_longitude, *io.position_latitude);
-	position.lateral_position_stddev = io.position_lateral_stddev.value_or (failed_accuracy);
-	position.altitude = io.position_altitude_amsl.value_or (0.0_ft);
-	position.altitude_stddev = io.position_vertical_stddev.value_or (failed_accuracy);
+	position.lateral_position = si::LonLat (*_io.position_longitude, *_io.position_latitude);
+	position.lateral_position_stddev = _io.position_lateral_stddev.value_or (failed_accuracy);
+	position.altitude = _io.position_altitude_amsl.value_or (0.0_ft);
+	position.altitude_stddev = _io.position_vertical_stddev.value_or (failed_accuracy);
 	position.time = update_time;
-	position.valid = io.position_longitude &&
-					 io.position_latitude &&
-					 io.position_altitude_amsl &&
-					 io.position_lateral_stddev &&
-					 io.position_vertical_stddev;
+	position.valid = _io.position_longitude &&
+					 _io.position_latitude &&
+					 _io.position_altitude_amsl &&
+					 _io.position_lateral_stddev &&
+					 _io.position_vertical_stddev;
 	_positions.push_back (position);
 
 	// Delayed positioning (after enough distance has been traveled):
@@ -163,24 +163,24 @@ NavigationComputer::compute_position()
 void
 NavigationComputer::compute_magnetic_variation()
 {
-	if (io.position_longitude && io.position_latitude)
+	if (_io.position_longitude && _io.position_latitude)
 	{
 		xf::MagneticVariation mv;
-		mv.set_position (si::LonLat (*io.position_longitude, *io.position_latitude));
-		if (io.position_altitude_amsl)
-			mv.set_altitude_amsl (*io.position_altitude_amsl);
+		mv.set_position (si::LonLat (*_io.position_longitude, *_io.position_latitude));
+		if (_io.position_altitude_amsl)
+			mv.set_altitude_amsl (*_io.position_altitude_amsl);
 		else
 			mv.set_altitude_amsl (0_ft);
 		QDate today = QDateTime::fromTime_t (xf::TimeHelper::now().in<si::Second>()).date();
 		mv.set_date (today.year(), today.month(), today.day());
 		mv.update();
-		io.magnetic_declination = mv.magnetic_declination();
-		io.magnetic_inclination = mv.magnetic_inclination();
+		_io.magnetic_declination = mv.magnetic_declination();
+		_io.magnetic_inclination = mv.magnetic_inclination();
 	}
 	else
 	{
-		io.magnetic_declination = xf::nil;
-		io.magnetic_inclination = xf::nil;
+		_io.magnetic_declination = xf::nil;
+		_io.magnetic_inclination = xf::nil;
 	}
 }
 
@@ -190,37 +190,37 @@ NavigationComputer::compute_headings()
 {
 	si::Time update_dt = _headings_computer.update_dt();
 
-	if (io.input_orientation_heading_magnetic)
+	if (_io.input_orientation_heading_magnetic)
 	{
-		io.orientation_heading_magnetic = _orientation_heading_magnetic_smoother (*io.input_orientation_heading_magnetic, update_dt);
+		_io.orientation_heading_magnetic = _orientation_heading_magnetic_smoother (*_io.input_orientation_heading_magnetic, update_dt);
 
-		if (io.magnetic_declination)
-			io.orientation_heading_true = xf::magnetic_to_true (*io.orientation_heading_magnetic, *io.magnetic_declination);
+		if (_io.magnetic_declination)
+			_io.orientation_heading_true = xf::magnetic_to_true (*_io.orientation_heading_magnetic, *_io.magnetic_declination);
 		else
-			io.orientation_heading_true = xf::nil;
+			_io.orientation_heading_true = xf::nil;
 	}
 	else
 	{
-		io.orientation_heading_magnetic = xf::nil;
-		io.orientation_heading_true = xf::nil;
+		_io.orientation_heading_magnetic = xf::nil;
+		_io.orientation_heading_true = xf::nil;
 		_orientation_heading_magnetic_smoother.invalidate();
 	}
 
 	// Smoothed pitch:
-	if (io.input_orientation_pitch)
-		io.orientation_pitch = _orientation_pitch_smoother (*io.input_orientation_pitch, update_dt);
+	if (_io.input_orientation_pitch)
+		_io.orientation_pitch = _orientation_pitch_smoother (*_io.input_orientation_pitch, update_dt);
 	else
 	{
-		io.orientation_pitch = xf::nil;
+		_io.orientation_pitch = xf::nil;
 		_orientation_pitch_smoother.invalidate();
 	}
 
 	// Smoothed roll:
-	if (io.input_orientation_roll)
-		io.orientation_roll = _orientation_roll_smoother (*io.input_orientation_roll, update_dt);
+	if (_io.input_orientation_roll)
+		_io.orientation_roll = _orientation_roll_smoother (*_io.input_orientation_roll, update_dt);
 	else
 	{
-		io.orientation_roll = xf::nil;
+		_io.orientation_roll = xf::nil;
 		_orientation_roll_smoother.invalidate();
 	}
 }
@@ -242,32 +242,32 @@ NavigationComputer::compute_track()
 		if (distance > 2.0 * pos_last.lateral_position_stddev)
 		{
 			si::Length altitude_diff = pos_last.altitude - pos_prev.altitude;
-			io.track_vertical = _track_vertical_smoother (1_rad * std::atan (altitude_diff / distance), update_dt);
+			_io.track_vertical = _track_vertical_smoother (1_rad * std::atan (altitude_diff / distance), update_dt);
 
 			si::Angle initial_true_heading = xf::initial_bearing (pos_last.lateral_position, pos_prev.lateral_position);
 			si::Angle true_heading = xf::floored_mod (initial_true_heading + 180_deg, 360_deg);
-			io.track_lateral_true = _track_lateral_true_smoother (true_heading, update_dt);
+			_io.track_lateral_true = _track_lateral_true_smoother (true_heading, update_dt);
 
-			if (io.magnetic_declination)
-				io.track_lateral_magnetic = xf::true_to_magnetic (*io.track_lateral_true, *io.magnetic_declination);
+			if (_io.magnetic_declination)
+				_io.track_lateral_magnetic = xf::true_to_magnetic (*_io.track_lateral_true, *_io.magnetic_declination);
 			else
-				io.track_lateral_magnetic = xf::nil;
+				_io.track_lateral_magnetic = xf::nil;
 		}
 		else
 		{
-			io.track_vertical = xf::nil;
-			io.track_lateral_true = xf::nil;
-			io.track_lateral_magnetic = xf::nil;
+			_io.track_vertical = xf::nil;
+			_io.track_lateral_true = xf::nil;
+			_io.track_lateral_magnetic = xf::nil;
 			_track_vertical_smoother.invalidate();
 			_track_lateral_true_smoother.invalidate();
 		}
 	}
 	else
 	{
-		_track_lateral_true_smoother.reset (*io.orientation_heading_true);
-		io.track_vertical = xf::nil;
-		io.track_lateral_true = xf::nil;
-		io.track_lateral_magnetic = xf::nil;
+		_track_lateral_true_smoother.reset (*_io.orientation_heading_true);
+		_io.track_vertical = xf::nil;
+		_io.track_lateral_true = xf::nil;
+		_io.track_lateral_magnetic = xf::nil;
 	}
 
 	std::optional<si::AngularVelocity> result_rotation_speed;
@@ -276,7 +276,7 @@ NavigationComputer::compute_track()
 	{
 		si::Length len_from_prev = xf::haversine_earth (pos_prev.lateral_position, pos_last.lateral_position);
 
-		if (len_from_prev >= *io.position_lateral_stddev)
+		if (len_from_prev >= *_io.position_lateral_stddev)
 		{
 			si::Time dt = pos_last.time - pos_prev.time;
 			si::Angle alpha = -180.0_deg + xf::great_arcs_angle (pos_prev_prev.lateral_position,
@@ -297,7 +297,7 @@ NavigationComputer::compute_track()
 	else
 		_track_lateral_rotation_smoother.invalidate();
 
-	io.track_lateral_rotation = result_rotation_speed;
+	_io.track_lateral_rotation = result_rotation_speed;
 }
 
 
@@ -313,11 +313,11 @@ NavigationComputer::compute_ground_speed()
 
 		si::Time dt = pos_last.time - pos_prev.time;
 		si::Length dl = xf::haversine_earth (pos_last.lateral_position, pos_prev.lateral_position);
-		io.track_ground_speed = _track_ground_speed_smoother (dl / dt, update_dt);
+		_io.track_ground_speed = _track_ground_speed_smoother (dl / dt, update_dt);
 	}
 	else
 	{
-		io.track_ground_speed = xf::nil;
+		_io.track_ground_speed = xf::nil;
 		_track_ground_speed_smoother.invalidate();
 	}
 }

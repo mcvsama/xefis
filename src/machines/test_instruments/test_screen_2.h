@@ -45,21 +45,15 @@ class TestScreen2: public xf::Screen
 	explicit
 	TestScreen2 (xf::ScreenSpec const&, xf::Graphics const&, xf::NavaidStorage const&, xf::Machine&, xf::Logger const& logger);
 
-	void
-	create_instruments();
+  private:
+	xf::Logger					_logger;
+	xf::Graphics const&			_graphics;
+	xf::NavaidStorage const&	_navaid_storage;
+	xf::WorkPerformer			_hsi_work_performer;
 
   public:
-	std::unique_ptr<HSI_IO>				hsi_1_io { std::make_unique<HSI_IO>() };
-	std::unique_ptr<HSI_IO>				hsi_2_io { std::make_unique<HSI_IO>() };
-
-  private:
-	xf::Logger							_logger;
-	xf::Graphics const&					_graphics;
-	xf::NavaidStorage const&			_navaid_storage;
-	xf::WorkPerformer					_hsi_work_performer;
-	// Instruments:
-	std::optional<xf::Registrant<HSI>>	_hsi_1;
-	std::optional<xf::Registrant<HSI>>	_hsi_2;
+	xf::Registrant<HSI>			hsi_1;
+	xf::Registrant<HSI>			hsi_2;
 };
 
 #endif

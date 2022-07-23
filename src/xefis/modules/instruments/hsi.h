@@ -172,101 +172,6 @@ parse (std::string_view const& str, NavType& nav_type)
 } // namespace hsi
 
 
-class HSI_IO: public xf::ModuleIO
-{
-  public:
-	/*
-	 * Settings
-	 */
-
-	// At what ranve setting to start drawing airport circles:
-	xf::Setting<si::Length>					arpt_runways_range_threshold			{ this, "arpt_runways_range_threshold" };
-	// At what range setting to start drawing runways instead of circles:
-	xf::Setting<si::Length>					arpt_map_range_threshold				{ this, "arpt_map_range_threshold" };
-	// Length of the runway extension line on the map:
-	xf::Setting<si::Length>					arpt_runway_extension_length			{ this, "arpt_runway_extension_length" };
-	xf::Setting<std::array<si::Time, 3>>	trend_vector_durations					{ this, "trend_vector_durations", { 30_s, 60_s, 90_s } };
-	xf::Setting<std::array<si::Length, 3>>	trend_vector_min_ranges					{ this, "trend_vector_min_ranges", { 5_nmi, 10_nmi, 15_nmi } };
-	xf::Setting<si::Length>					trend_vector_max_range					{ this, "trend_vector_max_range", 30_nmi };
-	// How big should be dots on the radio range heat map? 1.0 means 1x1 hardware pixel. Value 2…3 is recommended.
-	xf::Setting<double>						radio_range_pattern_scale				{ this, "radio_range_pattern_scale", 2.5 };
-
-	/*
-	 * Input
-	 */
-
-	xf::ModuleIn<hsi::DisplayMode>			display_mode							{ this, "display-mode", hsi::DisplayMode::Expanded };
-	xf::ModuleIn<si::Length>				range									{ this, "range", 5_nmi };
-	xf::ModuleIn<si::Velocity>				speed_gs								{ this, "speeds/gs" };
-	xf::ModuleIn<si::Velocity>				speed_tas								{ this, "speeds/tas" };
-	xf::ModuleIn<bool>						cmd_visible								{ this, "cmd/visible" };
-	xf::ModuleIn<bool>						cmd_line_visible						{ this, "cmd/line-visible" };
-	xf::ModuleIn<si::Angle>					cmd_heading_magnetic					{ this, "cmd/heading-magnetic" };
-	xf::ModuleIn<si::Angle>					cmd_track_magnetic						{ this, "cmd/track-magnetic" };
-	xf::ModuleIn<bool>						cmd_use_trk								{ this, "cmd/use-trk" };
-	xf::ModuleIn<si::Length>				target_altitude_reach_distance			{ this, "target-altitude-reach-distance" };
-	xf::ModuleIn<si::Angle>					orientation_heading_magnetic			{ this, "orientation/heading-magnetic" };
-	xf::ModuleIn<si::Angle>					orientation_heading_true				{ this, "orientation/heading-true" };
-	xf::ModuleIn<hsi::HeadingMode>			heading_mode							{ this, "heading-mode" };
-	xf::ModuleIn<si::Angle>					home_true_direction						{ this, "home/true-direction" };
-	xf::ModuleIn<bool>						home_track_visible						{ this, "home/track-visible" };
-	xf::ModuleIn<si::Length>				home_distance_vlos						{ this, "home/distance/vlos" };
-	xf::ModuleIn<si::Length>				home_distance_ground					{ this, "home/distance/ground" };
-	xf::ModuleIn<si::Length>				home_distance_vertical					{ this, "home/distance/vertical" };
-	xf::ModuleIn<si::Angle>					home_position_longitude					{ this, "home/position/longitude" };
-	xf::ModuleIn<si::Angle>					home_position_latitude					{ this, "home/position/latitude" };
-	xf::ModuleIn<si::Angle>					position_longitude						{ this, "position/longitude" };
-	xf::ModuleIn<si::Angle>					position_latitude						{ this, "position/latitude" };
-	xf::ModuleIn<std::string>				position_source							{ this, "position/source" };
-	xf::ModuleIn<bool>						track_visible							{ this, "track/visible" };
-	xf::ModuleIn<si::Angle>					track_lateral_magnetic					{ this, "track/lateral-magnetic" };
-	xf::ModuleIn<si::AngularVelocity>		track_lateral_rotation					{ this, "track/lateral-rotation" };
-	xf::ModuleIn<bool>						track_center_on_track					{ this, "track/center-on-track" };
-	xf::ModuleIn<bool>						course_visible							{ this, "course/visible" };
-	xf::ModuleIn<si::Angle>					course_setting_magnetic					{ this, "course/setting-magnetic" };
-	xf::ModuleIn<si::Angle>					course_deviation						{ this, "course/deviation" };
-	xf::ModuleIn<bool>						course_to_flag							{ this, "course/to-flag" };
-	xf::ModuleIn<std::string>				navaid_selected_reference				{ this, "navaid/selected/reference" };
-	xf::ModuleIn<std::string>				navaid_selected_identifier				{ this, "navaid/selected/identifier" };
-	xf::ModuleIn<si::Length>				navaid_selected_distance				{ this, "navaid/selected/distance" };
-	xf::ModuleIn<si::Time>					navaid_selected_eta						{ this, "navaid/selected/eta" };
-	xf::ModuleIn<si::Angle>					navaid_selected_course_magnetic			{ this, "navaid/selected/course-magnetic" };
-	xf::ModuleIn<hsi::NavType>				navaid_left_type						{ this, "navaid/left/type" };
-	xf::ModuleIn<std::string>				navaid_left_reference					{ this, "navaid/left/reference" };
-	xf::ModuleIn<std::string>				navaid_left_identifier					{ this, "navaid/left/identifier" };
-	xf::ModuleIn<si::Length>				navaid_left_distance					{ this, "navaid/left/distance" };
-	xf::ModuleIn<si::Angle>					navaid_left_initial_bearing_magnetic	{ this, "navaid/left/initial-bearing-magnetic" };
-	xf::ModuleIn<hsi::NavType>				navaid_right_type						{ this, "navaid/right/type" };
-	xf::ModuleIn<std::string>				navaid_right_reference					{ this, "navaid/right/reference" };
-	xf::ModuleIn<std::string>				navaid_right_identifier					{ this, "navaid/right/identifier" };
-	xf::ModuleIn<si::Length>				navaid_right_distance					{ this, "navaid/right/distance" };
-	xf::ModuleIn<si::Angle>					navaid_right_initial_bearing_magnetic	{ this, "navaid/right/initial-bearing-magnetic" };
-	xf::ModuleIn<si::Length>				navigation_required_performance			{ this, "navigation/required-performance" };
-	xf::ModuleIn<si::Length>				navigation_actual_performance			{ this, "navigation/actual-performance" };
-	xf::ModuleIn<si::Angle>					wind_from_magnetic						{ this, "wind/from-magnetic" };
-	xf::ModuleIn<si::Velocity>				wind_speed_tas							{ this, "wind/speed-tas" };
-	xf::ModuleIn<std::string>				localizer_id							{ this, "localizer-id" };
-	xf::ModuleIn<bool>						tcas_on									{ this, "tcas/on" };
-	xf::ModuleIn<si::Length>				tcas_range								{ this, "tcas/range" };
-	xf::ModuleIn<bool>						features_fix							{ this, "features/fix" };
-	xf::ModuleIn<bool>						features_vor							{ this, "features/vor" };
-	xf::ModuleIn<bool>						features_dme							{ this, "features/dme" };
-	xf::ModuleIn<bool>						features_ndb							{ this, "features/ndb" };
-	xf::ModuleIn<bool>						features_loc							{ this, "features/loc" };
-	xf::ModuleIn<bool>						features_arpt							{ this, "features/arpt" };
-	xf::ModuleIn<si::Angle>					flight_range_warning_longitude			{ this, "range/warning/longitude" };
-	xf::ModuleIn<si::Angle>					flight_range_warning_latitude			{ this, "range/warning/latitude" };
-	xf::ModuleIn<si::Length>				flight_range_warning_radius				{ this, "range/warning/radius" };
-	xf::ModuleIn<si::Angle>					flight_range_critical_longitude			{ this, "range/critical/longitude" };
-	xf::ModuleIn<si::Angle>					flight_range_critical_latitude			{ this, "range/critical/latitude" };
-	xf::ModuleIn<si::Length>				flight_range_critical_radius			{ this, "range/critical/radius" };
-	xf::ModuleIn<si::Angle>					radio_position_longitude				{ this, "radio-range/position/longitude" };
-	xf::ModuleIn<si::Angle>					radio_position_latitude					{ this, "radio-range/position/latitude" };
-	xf::ModuleIn<si::Length>				radio_range_warning						{ this, "radio-range/radius.warning" };
-	xf::ModuleIn<si::Length>				radio_range_critical					{ this, "radio-range/radius.critical" };
-};
-
-
 namespace hsi_detail {
 
 class CircularArea
@@ -574,14 +479,112 @@ class PaintingWork
 } // namespace hsi_detail
 
 
-class HSI: public xf::Instrument<HSI_IO>
+class HSI_IO: public xf::Instrument
+{
+  public:
+	/*
+	 * Settings
+	 */
+
+	// At what ranve setting to start drawing airport circles:
+	xf::Setting<si::Length>					arpt_runways_range_threshold			{ this, "arpt_runways_range_threshold" };
+	// At what range setting to start drawing runways instead of circles:
+	xf::Setting<si::Length>					arpt_map_range_threshold				{ this, "arpt_map_range_threshold" };
+	// Length of the runway extension line on the map:
+	xf::Setting<si::Length>					arpt_runway_extension_length			{ this, "arpt_runway_extension_length" };
+	xf::Setting<std::array<si::Time, 3>>	trend_vector_durations					{ this, "trend_vector_durations", { 30_s, 60_s, 90_s } };
+	xf::Setting<std::array<si::Length, 3>>	trend_vector_min_ranges					{ this, "trend_vector_min_ranges", { 5_nmi, 10_nmi, 15_nmi } };
+	xf::Setting<si::Length>					trend_vector_max_range					{ this, "trend_vector_max_range", 30_nmi };
+	// How big should be dots on the radio range heat map? 1.0 means 1x1 hardware pixel. Value 2…3 is recommended.
+	xf::Setting<double>						radio_range_pattern_scale				{ this, "radio_range_pattern_scale", 2.5 };
+
+	/*
+	 * Input
+	 */
+
+	xf::ModuleIn<hsi::DisplayMode>			display_mode							{ this, "display-mode", hsi::DisplayMode::Expanded };
+	xf::ModuleIn<si::Length>				range									{ this, "range", 5_nmi };
+	xf::ModuleIn<si::Velocity>				speed_gs								{ this, "speeds/gs" };
+	xf::ModuleIn<si::Velocity>				speed_tas								{ this, "speeds/tas" };
+	xf::ModuleIn<bool>						cmd_visible								{ this, "cmd/visible" };
+	xf::ModuleIn<bool>						cmd_line_visible						{ this, "cmd/line-visible" };
+	xf::ModuleIn<si::Angle>					cmd_heading_magnetic					{ this, "cmd/heading-magnetic" };
+	xf::ModuleIn<si::Angle>					cmd_track_magnetic						{ this, "cmd/track-magnetic" };
+	xf::ModuleIn<bool>						cmd_use_trk								{ this, "cmd/use-trk" };
+	xf::ModuleIn<si::Length>				target_altitude_reach_distance			{ this, "target-altitude-reach-distance" };
+	xf::ModuleIn<si::Angle>					orientation_heading_magnetic			{ this, "orientation/heading-magnetic" };
+	xf::ModuleIn<si::Angle>					orientation_heading_true				{ this, "orientation/heading-true" };
+	xf::ModuleIn<hsi::HeadingMode>			heading_mode							{ this, "heading-mode" };
+	xf::ModuleIn<si::Angle>					home_true_direction						{ this, "home/true-direction" };
+	xf::ModuleIn<bool>						home_track_visible						{ this, "home/track-visible" };
+	xf::ModuleIn<si::Length>				home_distance_vlos						{ this, "home/distance/vlos" };
+	xf::ModuleIn<si::Length>				home_distance_ground					{ this, "home/distance/ground" };
+	xf::ModuleIn<si::Length>				home_distance_vertical					{ this, "home/distance/vertical" };
+	xf::ModuleIn<si::Angle>					home_position_longitude					{ this, "home/position/longitude" };
+	xf::ModuleIn<si::Angle>					home_position_latitude					{ this, "home/position/latitude" };
+	xf::ModuleIn<si::Angle>					position_longitude						{ this, "position/longitude" };
+	xf::ModuleIn<si::Angle>					position_latitude						{ this, "position/latitude" };
+	xf::ModuleIn<std::string>				position_source							{ this, "position/source" };
+	xf::ModuleIn<bool>						track_visible							{ this, "track/visible" };
+	xf::ModuleIn<si::Angle>					track_lateral_magnetic					{ this, "track/lateral-magnetic" };
+	xf::ModuleIn<si::AngularVelocity>		track_lateral_rotation					{ this, "track/lateral-rotation" };
+	xf::ModuleIn<bool>						track_center_on_track					{ this, "track/center-on-track" };
+	xf::ModuleIn<bool>						course_visible							{ this, "course/visible" };
+	xf::ModuleIn<si::Angle>					course_setting_magnetic					{ this, "course/setting-magnetic" };
+	xf::ModuleIn<si::Angle>					course_deviation						{ this, "course/deviation" };
+	xf::ModuleIn<bool>						course_to_flag							{ this, "course/to-flag" };
+	xf::ModuleIn<std::string>				navaid_selected_reference				{ this, "navaid/selected/reference" };
+	xf::ModuleIn<std::string>				navaid_selected_identifier				{ this, "navaid/selected/identifier" };
+	xf::ModuleIn<si::Length>				navaid_selected_distance				{ this, "navaid/selected/distance" };
+	xf::ModuleIn<si::Time>					navaid_selected_eta						{ this, "navaid/selected/eta" };
+	xf::ModuleIn<si::Angle>					navaid_selected_course_magnetic			{ this, "navaid/selected/course-magnetic" };
+	xf::ModuleIn<hsi::NavType>				navaid_left_type						{ this, "navaid/left/type" };
+	xf::ModuleIn<std::string>				navaid_left_reference					{ this, "navaid/left/reference" };
+	xf::ModuleIn<std::string>				navaid_left_identifier					{ this, "navaid/left/identifier" };
+	xf::ModuleIn<si::Length>				navaid_left_distance					{ this, "navaid/left/distance" };
+	xf::ModuleIn<si::Angle>					navaid_left_initial_bearing_magnetic	{ this, "navaid/left/initial-bearing-magnetic" };
+	xf::ModuleIn<hsi::NavType>				navaid_right_type						{ this, "navaid/right/type" };
+	xf::ModuleIn<std::string>				navaid_right_reference					{ this, "navaid/right/reference" };
+	xf::ModuleIn<std::string>				navaid_right_identifier					{ this, "navaid/right/identifier" };
+	xf::ModuleIn<si::Length>				navaid_right_distance					{ this, "navaid/right/distance" };
+	xf::ModuleIn<si::Angle>					navaid_right_initial_bearing_magnetic	{ this, "navaid/right/initial-bearing-magnetic" };
+	xf::ModuleIn<si::Length>				navigation_required_performance			{ this, "navigation/required-performance" };
+	xf::ModuleIn<si::Length>				navigation_actual_performance			{ this, "navigation/actual-performance" };
+	xf::ModuleIn<si::Angle>					wind_from_magnetic						{ this, "wind/from-magnetic" };
+	xf::ModuleIn<si::Velocity>				wind_speed_tas							{ this, "wind/speed-tas" };
+	xf::ModuleIn<std::string>				localizer_id							{ this, "localizer-id" };
+	xf::ModuleIn<bool>						tcas_on									{ this, "tcas/on" };
+	xf::ModuleIn<si::Length>				tcas_range								{ this, "tcas/range" };
+	xf::ModuleIn<bool>						features_fix							{ this, "features/fix" };
+	xf::ModuleIn<bool>						features_vor							{ this, "features/vor" };
+	xf::ModuleIn<bool>						features_dme							{ this, "features/dme" };
+	xf::ModuleIn<bool>						features_ndb							{ this, "features/ndb" };
+	xf::ModuleIn<bool>						features_loc							{ this, "features/loc" };
+	xf::ModuleIn<bool>						features_arpt							{ this, "features/arpt" };
+	xf::ModuleIn<si::Angle>					flight_range_warning_longitude			{ this, "range/warning/longitude" };
+	xf::ModuleIn<si::Angle>					flight_range_warning_latitude			{ this, "range/warning/latitude" };
+	xf::ModuleIn<si::Length>				flight_range_warning_radius				{ this, "range/warning/radius" };
+	xf::ModuleIn<si::Angle>					flight_range_critical_longitude			{ this, "range/critical/longitude" };
+	xf::ModuleIn<si::Angle>					flight_range_critical_latitude			{ this, "range/critical/latitude" };
+	xf::ModuleIn<si::Length>				flight_range_critical_radius			{ this, "range/critical/radius" };
+	xf::ModuleIn<si::Angle>					radio_position_longitude				{ this, "radio-range/position/longitude" };
+	xf::ModuleIn<si::Angle>					radio_position_latitude					{ this, "radio-range/position/latitude" };
+	xf::ModuleIn<si::Length>				radio_range_warning						{ this, "radio-range/radius.warning" };
+	xf::ModuleIn<si::Length>				radio_range_critical					{ this, "radio-range/radius.critical" };
+
+  public:
+	using xf::Instrument::Instrument;
+};
+
+
+class HSI: public HSI_IO
 {
   private:
 	static constexpr char kLoggerScope[] = "mod::AirDataComputer";
 
   public:
 	// Ctor
-	HSI (std::unique_ptr<HSI_IO>, xf::Graphics const&, xf::NavaidStorage const&, xf::Logger const&, std::string_view const& instance = {});
+	HSI (xf::Graphics const&, xf::NavaidStorage const&, xf::Logger const&, std::string_view const& instance = {});
 
 	// Module API
 	void
@@ -592,6 +595,7 @@ class HSI: public xf::Instrument<HSI_IO>
 	paint (xf::PaintRequest) const override;
 
   private:
+	HSI_IO&													_io { *this };
 	xf::Logger												_logger;
 	xf::NavaidStorage const&								_navaid_storage;
 	xf::InstrumentSupport									_instrument_support;

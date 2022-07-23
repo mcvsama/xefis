@@ -22,9 +22,14 @@
 #include <xefis/core/module.h>
 #include <xefis/core/setting.h>
 #include <xefis/core/sockets/module_socket.h>
+#include <xefis/support/ui/widget.h>
 
 
-class VirtualJoystickIO: public xf::ModuleIO
+class VirtualJoystickWidget;
+class VirtualLinearWidget;
+
+
+class VirtualJoystickIO: public xf::Module
 {
   public:
 	/*
@@ -33,21 +38,20 @@ class VirtualJoystickIO: public xf::ModuleIO
 
 	xf::ModuleOut<double>	x_axis		{ this, "axis/x" };
 	xf::ModuleOut<double>	y_axis		{ this, "axis/y" };
-	xf::ModuleOut<double>	throttle	{ this, "throttle" };
 	xf::ModuleOut<double>	rudder		{ this, "rudder" };
+	xf::ModuleOut<double>	throttle	{ this, "throttle" };
+
+  public:
+	using xf::Module::Module;
 };
 
 
-class VirtualJoystickWidget;
-class VirtualLinearWidget;
-
-
-class VirtualJoystick: public xf::Module<VirtualJoystickIO>
+class VirtualJoystick: public VirtualJoystickIO
 {
   public:
 	// Ctor
 	explicit
-	VirtualJoystick (std::unique_ptr<VirtualJoystickIO>, std::string_view const& instance = {});
+	VirtualJoystick (std::string_view const& instance = {});
 
 	QWidget*
 	widget() const noexcept;
@@ -58,6 +62,7 @@ class VirtualJoystick: public xf::Module<VirtualJoystickIO>
 	process (xf::Cycle const&) override;
 
   private:
+	VirtualJoystickIO&		_io { *this };
 	xf::Widget*				_widget;
 	VirtualJoystickWidget*	_joystick_widget;
 	VirtualLinearWidget*	_throttle_widget;

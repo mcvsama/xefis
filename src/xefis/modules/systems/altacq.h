@@ -31,7 +31,7 @@ namespace si = neutrino::si;
 using namespace neutrino::si::literals;
 
 
-class AltAcqIO: public xf::ModuleIO
+class AltAcqIO: public xf::Module
 {
   public:
 	/*
@@ -57,15 +57,18 @@ class AltAcqIO: public xf::ModuleIO
 
 	xf::ModuleOut<si::Length>	altitude_acquire_distance	{ this, "acquire-distance" };
 	xf::ModuleOut<bool>			altitude_acquire_flag		{ this, "acquire-flag" };
+
+  public:
+	using xf::Module::Module;
 };
 
 
-class AltAcq: public xf::Module<AltAcqIO>
+class AltAcq: public AltAcqIO
 {
   public:
 	// Ctor
 	explicit
-	AltAcq (std::unique_ptr<AltAcqIO>, std::string_view const& instance = {});
+	AltAcq (std::string_view const& instance = {});
 
   protected:
 	// Module API
@@ -76,13 +79,14 @@ class AltAcq: public xf::Module<AltAcqIO>
 	compute_altitude_acquire_distance();
 
   private:
+	AltAcqIO&							_io									{ *this };
 	bool								_flag_armed							{ false };
 	// Note: SocketObservers depend on Smoothers, so first Smoothers must be defined,
 	// then SocketObservers, to ensure correct order of destruction.
 	xf::Smoother<si::Length>			_output_smoother					{ 2_s };
 	xf::SocketObserver					_output_computer;
-	xf::SocketValueChanged<si::Length>	_altitude_amsl_changed				{ io.altitude_amsl };
-	xf::SocketValueChanged<si::Length>	_altitude_acquire_amsl_changed		{ io.altitude_acquire_amsl };
+	xf::SocketValueChanged<si::Length>	_altitude_amsl_changed				{ _io.altitude_amsl };
+	xf::SocketValueChanged<si::Length>	_altitude_acquire_amsl_changed		{ _io.altitude_acquire_amsl };
 };
 
 #endif

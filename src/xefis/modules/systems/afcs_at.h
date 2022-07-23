@@ -35,7 +35,7 @@ namespace si = neutrino::si;
 using namespace neutrino::si::literals;
 
 
-class AFCS_AT_IO: public xf::ModuleIO
+class AFCS_AT_IO: public xf::Module
 {
   public:
 	/*
@@ -68,15 +68,18 @@ class AFCS_AT_IO: public xf::ModuleIO
 	 */
 
 	xf::ModuleOut<bool>				disengage_at			{ this, "disengage-at" };
+
+  public:
+	using xf::Module::Module;
 };
 
 
-class AFCS_AT: public xf::Module<AFCS_AT_IO>
+class AFCS_AT: public AFCS_AT_IO
 {
   public:
 	// Ctor
 	explicit
-	AFCS_AT (std::unique_ptr<AFCS_AT_IO>, std::string_view const& instance = {});
+	AFCS_AT (std::string_view const& instance = {});
 
   protected:
 	// Module API
@@ -98,8 +101,9 @@ class AFCS_AT: public xf::Module<AFCS_AT_IO>
 	clamp_speed_mode();
 
   private:
+	AFCS_AT_IO&									_io					{ *this };
 	xf::PIDController<si::Velocity, si::Force>	_ias_pid;
-	xf::Smoother<si::Force>						_ias_pid_smoother		{ 250_ms };
+	xf::Smoother<si::Force>						_ias_pid_smoother	{ 250_ms };
 	xf::SocketObserver							_thrust_computer;
 };
 

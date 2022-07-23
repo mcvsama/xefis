@@ -34,7 +34,7 @@ namespace si = neutrino::si;
 using namespace neutrino::si::literals;
 
 
-class AFCS_FD_Roll_IO: public xf::ModuleIO
+class AFCS_FD_Roll_IO: public xf::Module
 {
   public:
 	using DirectionPID = xf::PIDController<si::Angle, si::Angle>;
@@ -65,6 +65,9 @@ class AFCS_FD_Roll_IO: public xf::ModuleIO
 
 	xf::ModuleOut<si::Angle>			roll					{ this, "output-roll" };
 	xf::ModuleOut<bool>					operative				{ this, "operative" };
+
+  public:
+	using xf::Module::Module;
 };
 
 
@@ -75,7 +78,7 @@ class AFCS_FD_Roll_IO: public xf::ModuleIO
 // TODO disengage if outside safe limits, unless autonomous flag is set
 // (autonomous flag tells whether user has still possibility to control the airplane,
 // that is he is in the range of radio communication).
-class AFCS_FD_Roll: public xf::Module<AFCS_FD_Roll_IO>
+class AFCS_FD_Roll: public AFCS_FD_Roll_IO
 {
   private:
 	static constexpr char	kLoggerScope[]	= "mod::AFCS_FD_Roll";
@@ -85,7 +88,7 @@ class AFCS_FD_Roll: public xf::Module<AFCS_FD_Roll_IO>
   public:
 	// Ctor
 	explicit
-	AFCS_FD_Roll (std::unique_ptr<AFCS_FD_Roll_IO>, xf::Logger const&, std::string_view const& instance = {});
+	AFCS_FD_Roll (xf::Logger const&, std::string_view const& instance = {});
 
   protected:
 	// Module API
@@ -123,6 +126,7 @@ class AFCS_FD_Roll: public xf::Module<AFCS_FD_Roll_IO>
 	check_autonomous();
 
   private:
+	AFCS_FD_Roll_IO&				_io						{ *this };
 	xf::Logger						_logger;
 	DirectionPID					_magnetic_hdg_pid;
 	DirectionPID					_magnetic_trk_pid;

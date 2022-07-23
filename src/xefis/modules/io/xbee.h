@@ -37,7 +37,7 @@ namespace si = neutrino::si;
 using namespace neutrino::si::literals;
 
 
-class XBeeIO: public xf::ModuleIO
+class XBeeIO: public xf::Module
 {
   public:
 	/*
@@ -69,6 +69,9 @@ class XBeeIO: public xf::ModuleIO
 	xf::ModuleOut<int64_t>			failures		{ this, "failures" };
 	xf::ModuleOut<int64_t>			cca_failures	{ this, "clear-channel-failures" };
 	xf::ModuleOut<si::Power>		rssi			{ this, "rssi" };
+
+  public:
+	using xf::Module::Module;
 };
 
 
@@ -80,7 +83,7 @@ class XBeeIO: public xf::ModuleIO
  */
 class XBee:
 	public QObject,
-	public xf::Module<XBeeIO>
+	public XBeeIO
 {
 	Q_OBJECT
 
@@ -175,7 +178,7 @@ class XBee:
 
   public:
 	// Ctor
-	XBee (std::unique_ptr<XBeeIO>, xf::Logger const&, std::string_view const& instance = {});
+	XBee (xf::Logger const&, std::string_view const& instance = {});
 
 	// Dtor
 	~XBee();
@@ -428,27 +431,28 @@ class XBee:
 	debug() const;
 
   private:
+	XBeeIO&								_io						{ *this };
 	xf::Logger							_logger;
 	std::unique_ptr<QSocketNotifier>	_notifier;
-	int									_device					= 0;
-	QTimer*								_restart_timer			= nullptr;
-	QTimer*								_pong_timer				= nullptr;
-	QTimer*								_periodic_ping_timer	= nullptr;
-	QTimer*								_periodic_pong_timer	= nullptr;
-	QTimer*								_clear_channel_timer	= nullptr;
-	QTimer*								_after_reset_timer		= nullptr;
-	QTimer*								_rssi_timer				= nullptr;
+	int									_device					{ 0 };
+	QTimer*								_restart_timer			{ nullptr };
+	QTimer*								_pong_timer				{ nullptr };
+	QTimer*								_periodic_ping_timer	{ nullptr };
+	QTimer*								_periodic_pong_timer	{ nullptr };
+	QTimer*								_clear_channel_timer	{ nullptr };
+	QTimer*								_after_reset_timer		{ nullptr };
+	QTimer*								_rssi_timer				{ nullptr };
 	std::string							_serial_number_bin;
-	ConfigurationStep					_configuration_step		= ConfigurationStep::Unconfigured;
-	int									_read_failure_count		= 0;
-	int									_write_failure_count	= 0;
+	ConfigurationStep					_configuration_step		{ ConfigurationStep::Unconfigured };
+	int									_read_failure_count		{ 0 };
+	int									_write_failure_count	{ 0 };
 	std::string							_input_buffer;
 	std::string							_output_buffer;
 	std::string							_last_at_command;
 	xf::Smoother<si::Power>				_rssi_smoother			{ 200_ms };
 	si::Time							_last_rssi_time;
 	uint8_t								_at_frame_id			{ 0x00 };
-	xf::SocketChanged					_send_changed			{ io.send };
+	xf::SocketChanged					_send_changed			{ _io.send };
 };
 
 

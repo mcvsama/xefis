@@ -49,12 +49,12 @@ class ModuleWidget: public ConfigWidget
   public:
 	// Ctor
 	explicit
-	ModuleWidget (BasicModule&, QWidget* parent);
+	ModuleWidget (Module&, QWidget* parent);
 
 	/**
 	 * Return module.
 	 */
-	BasicModule&
+	Module&
 	module() const noexcept;
 
   private:
@@ -65,8 +65,8 @@ class ModuleWidget: public ConfigWidget
 	create_performance_tab();
 
   private:
-	BasicModule&				_module;
-	BasicInstrument*			_instrument						{ nullptr };
+	Module&						_module;
+	Instrument*					_instrument						{ nullptr };
 	SocketTree*					_inputs_socket_tree;
 	SocketTree*					_outputs_socket_tree;
 	QWidget*					_communication_time_group		{ nullptr };
@@ -81,7 +81,7 @@ class ModuleWidget: public ConfigWidget
 };
 
 
-inline BasicModule&
+inline Module&
 ModuleWidget::module() const noexcept
 {
 	return _module;

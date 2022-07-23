@@ -21,6 +21,7 @@
 #include <xefis/config/all.h>
 #include <xefis/core/graphics.h>
 #include <xefis/core/instrument.h>
+#include <xefis/core/module.h>
 #include <xefis/core/setting.h>
 #include <xefis/core/sockets/socket.h>
 #include <xefis/support/instrument/instrument_support.h>
@@ -28,7 +29,7 @@
 
 
 // TODO handle nans
-class HorizontalTrimIO: public xf::ModuleIO
+class HorizontalTrimIO: public xf::Instrument
 {
   public:
 	/*
@@ -47,11 +48,14 @@ class HorizontalTrimIO: public xf::ModuleIO
 	xf::ModuleIn<double>	trim_reference			{ this, "trim/reference" };
 	xf::ModuleIn<double>	trim_reference_minimum	{ this, "trim/reference.minimum" };
 	xf::ModuleIn<double>	trim_reference_maximum	{ this, "trim/reference.maximum" };
+
+  public:
+	using xf::Instrument::Instrument;
 };
 
 
 class HorizontalTrim:
-	public xf::Instrument<HorizontalTrimIO>,
+	public HorizontalTrimIO,
 	private xf::InstrumentSupport
 {
   private:
@@ -69,7 +73,7 @@ class HorizontalTrim:
   public:
 	// Ctor
 	explicit
-	HorizontalTrim (std::unique_ptr<HorizontalTrimIO>, xf::Graphics const&, std::string_view const& instance = {});
+	HorizontalTrim (xf::Graphics const&, std::string_view const& instance = {});
 
 	// Module API
 	void
@@ -87,7 +91,8 @@ class HorizontalTrim:
 	stringify (double value);
 
   private:
-	xf::SocketObserver _inputs_observer;
+	HorizontalTrimIO&	_io { *this };
+	xf::SocketObserver	_inputs_observer;
 };
 
 #endif

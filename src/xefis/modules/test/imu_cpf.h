@@ -28,7 +28,7 @@ namespace si = neutrino::si;
 using namespace neutrino::si::literals;
 
 
-class IMU_CPF_IO: public xf::ModuleIO
+class IMU_CPF_IO: public xf::Module
 {
   public:
 	/*
@@ -53,13 +53,16 @@ class IMU_CPF_IO: public xf::ModuleIO
 	xf::ModuleOut<si::Force>			centripetal_force_x			{ this, "force/x" };
 	xf::ModuleOut<si::Force>			centripetal_force_y			{ this, "force/y" };
 	xf::ModuleOut<si::Force>			centripetal_force_z			{ this, "force/z" };
+
+  public:
+	using xf::Module::Module;
 };
 
 
 /**
  * Compute centripetal force from IAS and gyro information.
  */
-class IMU_CPF: public xf::Module<IMU_CPF_IO>
+class IMU_CPF: public IMU_CPF_IO
 {
   private:
 	static constexpr si::Time kSmoothingTime = 1_s;
@@ -67,7 +70,7 @@ class IMU_CPF: public xf::Module<IMU_CPF_IO>
   public:
 	// Ctor
 	explicit
-	IMU_CPF (std::unique_ptr<IMU_CPF_IO>, std::string_view const& instance = {});
+	IMU_CPF (std::string_view const& instance = {});
 
   protected:
 	void
@@ -77,6 +80,7 @@ class IMU_CPF: public xf::Module<IMU_CPF_IO>
 	compute_centripetal();
 
   private:
+	IMU_CPF_IO&						_io						{ *this };
 	xf::Smoother<si::Acceleration>	_smooth_accel_x			{ kSmoothingTime };
 	xf::Smoother<si::Acceleration>	_smooth_accel_y			{ kSmoothingTime };
 	xf::Smoother<si::Acceleration>	_smooth_accel_z			{ kSmoothingTime };

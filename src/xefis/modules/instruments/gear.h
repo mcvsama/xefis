@@ -21,14 +21,13 @@
 #include <xefis/config/all.h>
 #include <xefis/core/graphics.h>
 #include <xefis/core/instrument.h>
-#include <xefis/core/module_io.h>
+#include <xefis/core/module.h>
 #include <xefis/core/sockets/socket.h>
 #include <xefis/support/instrument/instrument_support.h>
 #include <xefis/support/sockets/socket_observer.h>
 
 
-// TODO handle nans
-class GearIO: public xf::ModuleIO
+class GearIO: public xf::Instrument
 {
   public:
 	/*
@@ -42,11 +41,14 @@ class GearIO: public xf::ModuleIO
 	xf::ModuleIn<bool>	left_down		{ this, "left-down" };
 	xf::ModuleIn<bool>	right_up		{ this, "right-up" };
 	xf::ModuleIn<bool>	right_down		{ this, "right-down" };
+
+  public:
+	using xf::Instrument::Instrument;
 };
 
 
 class Gear:
-	public xf::Instrument<GearIO>,
+	public GearIO,
 	private xf::InstrumentSupport
 {
   private:
@@ -64,7 +66,7 @@ class Gear:
   public:
 	// Ctor
 	explicit
-	Gear (std::unique_ptr<GearIO>, xf::Graphics const&, std::string_view const& instance = {});
+	Gear (xf::Graphics const&, std::string_view const& instance = {});
 
 	// Module API
 	void
@@ -79,7 +81,8 @@ class Gear:
 	async_paint (xf::PaintRequest const&, PaintingParams const&) const;
 
   private:
-	xf::SocketObserver _inputs_observer;
+	GearIO&				_io { *this };
+	xf::SocketObserver	_inputs_observer;
 };
 
 #endif

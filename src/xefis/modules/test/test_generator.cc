@@ -22,21 +22,21 @@
 
 
 void
-TestGeneratorIO::update_all (si::Time const update_dt)
+TestGenerator::update_all (si::Time const update_dt)
 {
 	for (auto& generator: _generators)
 		generator->update (update_dt);
 }
 
 
-TestGenerator::TestGenerator (std::unique_ptr<TestGeneratorIO> module_io, std::string_view const& instance):
-	Module (std::move (module_io), instance)
+TestGenerator::TestGenerator (std::string_view const& instance):
+	Module (instance)
 { }
 
 
 void
 TestGenerator::process (xf::Cycle const& cycle)
 {
-	io.update_all (cycle.update_dt());
+	update_all (cycle.update_dt());
 }
 

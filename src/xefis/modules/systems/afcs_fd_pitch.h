@@ -34,7 +34,7 @@ namespace si = neutrino::si;
 using namespace neutrino::si::literals;
 
 
-class AFCS_FD_Pitch_IO: public xf::ModuleIO
+class AFCS_FD_Pitch_IO: public xf::Module
 {
   public:
 	using IAS_PID		= xf::PIDController<si::Velocity, si::Angle>;
@@ -78,6 +78,9 @@ class AFCS_FD_Pitch_IO: public xf::ModuleIO
 
 	xf::ModuleOut<si::Angle>			pitch					{ this, "output-pitch" };
 	xf::ModuleOut<bool>					operative				{ this, "operative" };
+
+  public:
+	using xf::Module::Module;
 };
 
 
@@ -88,7 +91,7 @@ class AFCS_FD_Pitch_IO: public xf::ModuleIO
 // TODO disengage if outside safe limits, unless autonomous flag is set
 // (autonomous flag tells whether user has still possibility to control the airplane,
 // that is he is in the range of radio communication).
-class AFCS_FD_Pitch: public xf::Module<AFCS_FD_Pitch_IO>
+class AFCS_FD_Pitch: public AFCS_FD_Pitch_IO
 {
   private:
 	static constexpr char	kLoggerScope[]	= "mod::AFCS_FD_Pitch";
@@ -103,7 +106,7 @@ class AFCS_FD_Pitch: public xf::Module<AFCS_FD_Pitch_IO>
   public:
 	// Ctor
 	explicit
-	AFCS_FD_Pitch (std::unique_ptr<AFCS_FD_Pitch_IO>, xf::Logger const&, std::string_view const& instance = {});
+	AFCS_FD_Pitch (xf::Logger const&, std::string_view const& instance = {});
 
   protected:
 	// Module API
@@ -142,6 +145,7 @@ class AFCS_FD_Pitch: public xf::Module<AFCS_FD_Pitch_IO>
 	check_autonomous();
 
   private:
+	AFCS_FD_Pitch_IO&				_io						{ *this };
 	xf::Logger						_logger;
 	IAS_PID							_ias_pid;
 	MachPID							_mach_pid;

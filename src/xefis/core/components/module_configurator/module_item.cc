@@ -31,7 +31,7 @@
 
 namespace xf::configurator {
 
-ModuleItem::ModuleItem (BasicModule& module, QTreeWidgetItem& parent):
+ModuleItem::ModuleItem (Module& module, QTreeWidgetItem& parent):
 	QTreeWidgetItem (&parent, { "", "", "" }),
 	_module (module)
 {

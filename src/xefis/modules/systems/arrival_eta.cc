@@ -25,8 +25,8 @@
 #include "arrival_eta.h"
 
 
-ArrivalETA::ArrivalETA (std::unique_ptr<ArrivalETA_IO> module_io, std::string_view const& instance):
-	Module (std::move (module_io), instance)
+ArrivalETA::ArrivalETA (std::string_view const& instance):
+	ArrivalETA_IO (instance)
 {
 	_eta_computer.set_minimum_dt (1_s);
 	_eta_computer.set_callback (std::bind (&ArrivalETA::compute, this));
@@ -34,10 +34,10 @@ ArrivalETA::ArrivalETA (std::unique_ptr<ArrivalETA_IO> module_io, std::string_vi
 		&_smoother,
 	});
 	_eta_computer.observe ({
-		&io.station_latitude,
-		&io.station_longitude,
-		&io.aircraft_latitude,
-		&io.aircraft_longitude,
+		&_io.station_latitude,
+		&_io.station_longitude,
+		&_io.aircraft_latitude,
+		&_io.aircraft_longitude,
 	});
 }
 
@@ -65,19 +65,19 @@ ArrivalETA::compute()
 	si::Length distance;
 
 	try {
-		if (!io.station_latitude || !io.station_longitude ||
-			!io.aircraft_latitude || !io.aircraft_longitude ||
-			!io.track_lateral_true)
+		if (!_io.station_latitude || !_io.station_longitude ||
+			!_io.aircraft_latitude || !_io.aircraft_longitude ||
+			!_io.track_lateral_true)
 		{
 			throw SetNil (true);
 		}
 
-		si::LonLat station (*io.station_longitude, *io.station_latitude);
-		si::LonLat aircraft (*io.aircraft_longitude, *io.aircraft_latitude);
+		si::LonLat station (*_io.station_longitude, *_io.station_latitude);
+		si::LonLat aircraft (*_io.aircraft_longitude, *_io.aircraft_latitude);
 		distance = xf::haversine_earth (station, aircraft);
 
 		si::Angle station_bearing = xf::floored_mod<si::Angle> (xf::initial_bearing (aircraft, station), 0_deg, 360_deg);
-		si::Angle angle_diff = xf::floored_mod<si::Angle> (station_bearing - *io.track_lateral_true, -180_deg, +180_deg);
+		si::Angle angle_diff = xf::floored_mod<si::Angle> (station_bearing - *_io.track_lateral_true, -180_deg, +180_deg);
 
 		if (abs (angle_diff) > 30_deg)
 			throw SetNil (true);
@@ -92,10 +92,10 @@ ArrivalETA::compute()
 				throw SetNil (false);
 			}
 
-			io.eta = _smoother (dt * (-distance / distance_diff), dt);
+			_io.eta = _smoother (dt * (-distance / distance_diff), dt);
 		}
 		else
-			io.eta = xf::nil;
+			_io.eta = xf::nil;
 
 		_prev_distance = distance;
 	}
@@ -104,7 +104,7 @@ ArrivalETA::compute()
 		if (set_nil.reset_prev_distance)
 			_prev_distance.reset();
 
-		io.eta = xf::nil;
+		_io.eta = xf::nil;
 	}
 }
 

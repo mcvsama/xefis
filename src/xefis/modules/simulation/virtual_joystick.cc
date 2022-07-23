@@ -416,8 +416,8 @@ VirtualLinearWidget::mouseMoveEvent (QMouseEvent* event)
 }
 
 
-VirtualJoystick::VirtualJoystick (std::unique_ptr<VirtualJoystickIO> module_io, std::string_view const& instance):
-	Module (std::move (module_io), instance)
+VirtualJoystick::VirtualJoystick (std::string_view const& instance):
+	VirtualJoystickIO (instance)
 {
 	using namespace std::literals;
 
@@ -449,9 +449,9 @@ void
 VirtualJoystick::process (xf::Cycle const&)
 {
 	auto const jpos = _joystick_widget->position();
-	io.x_axis = jpos.x();
-	io.y_axis = jpos.y();
-	io.throttle = _throttle_widget->value();
-	io.rudder = _rudder_widget->value();
+	_io.x_axis = jpos.x();
+	_io.y_axis = jpos.y();
+	_io.throttle = _throttle_widget->value();
+	_io.rudder = _rudder_widget->value();
 }
 

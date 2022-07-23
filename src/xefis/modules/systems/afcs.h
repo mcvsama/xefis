@@ -37,7 +37,7 @@ namespace si = neutrino::si;
 using namespace neutrino::si::literals;
 
 
-class AFCS_IO: public xf::ModuleIO
+class AFCS_IO: public xf::Module
 {
   public:
 	/*
@@ -174,6 +174,9 @@ class AFCS_IO: public xf::ModuleIO
 	xf::ModuleOut<std::string>	fma_roll_armed_hint			{ this, "fma/roll-armed-hint" };
 	xf::ModuleOut<std::string>	fma_pitch_hint				{ this, "fma/pitch-hint" };
 	xf::ModuleOut<std::string>	fma_pitch_armed_hint		{ this, "fma/pitch-armed-hint" };
+
+  public:
+	using xf::Module::Module;
 };
 
 
@@ -181,7 +184,7 @@ class AFCS_IO: public xf::ModuleIO
  * Controls AFCS logic. Gets input from Mode Control Panel,
  * makes outputs for displays, LEDs, annunciators, also for commanded values (altitude, speed, etc).
  */
-class AFCS: public xf::Module<AFCS_IO>
+class AFCS: public AFCS_IO
 {
   private:
 	static constexpr xf::Range<si::Velocity>	kSpeedRange		{ 10_kt, 300_kt };
@@ -277,7 +280,7 @@ class AFCS: public xf::Module<AFCS_IO>
   public:
 	// Ctor
 	explicit
-	AFCS (std::unique_ptr<AFCS_IO>, std::string_view const& instance = {});
+	AFCS (std::string_view const& instance = {});
 
   protected:
 	// Module API
@@ -562,6 +565,7 @@ class AFCS: public xf::Module<AFCS_IO>
 		optional_cast (std::optional<Source> const& source);
 
   private:
+	AFCS_IO&											_io					{ *this };
 	bool												_ap_on				{ false };
 	bool												_at_on				{ false };
 	bool												_yd_on				{ false };

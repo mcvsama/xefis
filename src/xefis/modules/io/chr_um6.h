@@ -39,27 +39,18 @@ namespace si = neutrino::si;
 using namespace neutrino::si::literals;
 
 
-class CHRUM6_IO: public xf::ModuleIO
+class CHRUM6_IO: public xf::Module
 {
   public:
-	/*
-	 * Settings
-	 */
+	using xf::Module::Module;
 
+  public:
 	xf::Setting<si::Frequency>			sample_rate						{ this, "sample_rate", 20_Hz };
 	xf::Setting<float>					ekf_process_variance			{ this, "ekf_process_variance", 0.5f };
-
-	/*
-	 * Input
-	 */
 
 	xf::ModuleIn<si::Acceleration>		centripetal_x					{ this, "centripetal-acceleration/x" };
 	xf::ModuleIn<si::Acceleration>		centripetal_y					{ this, "centripetal-acceleration/y" };
 	xf::ModuleIn<si::Acceleration>		centripetal_z					{ this, "centripetal-acceleration/z" };
-
-	/*
-	 * Output
-	 */
 
 	xf::ModuleOut<bool>					serviceable						{ this, "serviceable" };
 	xf::ModuleOut<bool>					caution							{ this, "caution" };
@@ -90,7 +81,7 @@ class CHRUM6_IO: public xf::ModuleIO
  */
 class CHRUM6:
 	public QObject,
-	public xf::Module<CHRUM6_IO>
+	public CHRUM6_IO
 {
 	Q_OBJECT
 
@@ -116,7 +107,7 @@ class CHRUM6:
   public:
 	// Ctor
 	explicit
-	CHRUM6 (std::unique_ptr<CHRUM6_IO>, xf::SerialPort&& serial_port, xf::Logger const&, std::string_view const& instance = {});
+	CHRUM6 (xf::SerialPort&& serial_port, xf::Logger const&, std::string_view const& instance = {});
 
 	// Module API
 	void
@@ -261,6 +252,7 @@ class CHRUM6:
 	describe_errors (xf::CHRUM6::Request const&);
 
   private:
+	CHRUM6_IO&									_io									{ *this };
 	xf::Logger									_logger;
 	std::unique_ptr<QTimer>						_restart_timer;
 	std::unique_ptr<QTimer>						_alive_check_timer;
@@ -270,12 +262,12 @@ class CHRUM6:
 	std::unique_ptr<xf::CHRUM6>					_sensor;
 	int											_failure_count						{ 0 };
 	Stage										_stage								{ Stage::Initialize };
-	xf::SocketValueChanged<si::Acceleration>	_input_centripetal_x_changed		{ io.centripetal_x };
-	xf::SocketValueChanged<si::Acceleration>	_input_centripetal_y_changed		{ io.centripetal_y };
-	xf::SocketValueChanged<si::Acceleration>	_input_centripetal_z_changed		{ io.centripetal_z };
-	xf::SocketValueChanged<si::Acceleration>	_output_acceleration_x_changed		{ io.acceleration_x };
-	xf::SocketValueChanged<si::Acceleration>	_output_acceleration_y_changed		{ io.acceleration_y };
-	xf::SocketValueChanged<si::Acceleration>	_output_acceleration_z_changed		{ io.acceleration_z };
+	xf::SocketValueChanged<si::Acceleration>	_input_centripetal_x_changed		{ _io.centripetal_x };
+	xf::SocketValueChanged<si::Acceleration>	_input_centripetal_y_changed		{ _io.centripetal_y };
+	xf::SocketValueChanged<si::Acceleration>	_input_centripetal_z_changed		{ _io.centripetal_z };
+	xf::SocketValueChanged<si::Acceleration>	_output_acceleration_x_changed		{ _io.acceleration_x };
+	xf::SocketValueChanged<si::Acceleration>	_output_acceleration_y_changed		{ _io.acceleration_y };
+	xf::SocketValueChanged<si::Acceleration>	_output_acceleration_z_changed		{ _io.acceleration_z };
 	// Backup gyro bias values:
 	std::optional<uint32_t>						_gyro_bias_xy;
 	std::optional<uint32_t>						_gyro_bias_z;

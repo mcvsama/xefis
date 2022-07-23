@@ -28,7 +28,7 @@ namespace si = neutrino::si;
 using namespace neutrino::si::literals;
 
 
-class SpeedsIO: public xf::ModuleIO
+class SpeedsIO: public xf::Module
 {
   public:
 	/*
@@ -46,15 +46,18 @@ class SpeedsIO: public xf::ModuleIO
 	xf::ModuleOut<si::Velocity>	speed_minimum_maneuver	{ this, "speed.minimum-maneuver" };
 	xf::ModuleOut<si::Velocity>	speed_maximum_maneuver	{ this, "speed.maximum-maneuver" };
 	xf::ModuleOut<si::Velocity>	speed_maximum			{ this, "speed.maximum" };
+
+  public:
+	using xf::Module::Module;
 };
 
 
-class Speeds: public xf::Module<SpeedsIO>
+class Speeds: public SpeedsIO
 {
   public:
 	// Ctor
 	explicit
-	Speeds (std::unique_ptr<SpeedsIO>, xf::Airframe*, std::string_view const& instance = {});
+	Speeds (xf::Airframe*, std::string_view const& instance = {});
 
 	// Module API
 	void
@@ -73,6 +76,7 @@ class Speeds: public xf::Module<SpeedsIO>
 		min (std::optional<T>, T);
 
   private:
+	SpeedsIO&			_io { *this };
 	xf::Airframe*		_airframe;
 	xf::SocketObserver	_speeds_computer;
 };

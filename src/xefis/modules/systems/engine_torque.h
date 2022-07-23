@@ -33,7 +33,7 @@ namespace si = neutrino::si;
 using namespace neutrino::si::literals;
 
 
-class EngineTorqueIO: public xf::ModuleIO
+class EngineTorqueIO: public xf::Module
 {
   public:
 	using EfficiencyField	= xf::Field<si::AngularVelocity, double>;
@@ -60,6 +60,9 @@ class EngineTorqueIO: public xf::ModuleIO
 	 */
 
 	xf::ModuleOut<si::Torque>			engine_torque		{ this, "engine-torque" };
+
+  public:
+	using xf::Module::Module;
 };
 
 
@@ -71,7 +74,7 @@ class EngineTorqueIO: public xf::ModuleIO
  * So Kv of the motor is needed as a setting. Also engine efficiency is needed either as a constant or a Field,
  * as a function of motor rotational speed.
  */
-class EngineTorque: public xf::Module<EngineTorqueIO>
+class EngineTorque: public EngineTorqueIO
 {
   private:
 	using EfficiencyField = EngineTorqueIO::EfficiencyField;
@@ -79,7 +82,7 @@ class EngineTorque: public xf::Module<EngineTorqueIO>
   public:
 	// Ctor
 	explicit
-	EngineTorque (std::unique_ptr<EngineTorqueIO>, std::string_view const& instance = {});
+	EngineTorque (std::string_view const& instance = {});
 
   protected:
 	// Module API
@@ -92,6 +95,9 @@ class EngineTorque: public xf::Module<EngineTorqueIO>
 
 	void
 	compute_torque (EfficiencyField const& motor_efficiency);
+
+  private:
+	EngineTorqueIO& _io { *this };
 };
 
 #endif

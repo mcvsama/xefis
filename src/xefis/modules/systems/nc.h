@@ -33,7 +33,7 @@ namespace si = neutrino::si;
 using namespace neutrino::si::literals;
 
 
-class NavigationComputerIO: public xf::ModuleIO
+class NavigationComputerIO: public xf::Module
 {
   public:
 	/*
@@ -72,10 +72,13 @@ class NavigationComputerIO: public xf::ModuleIO
 	xf::ModuleOut<si::Velocity>			track_ground_speed					{ this, "track/ground-speed" };
 	xf::ModuleOut<si::Angle>			magnetic_declination				{ this, "magnetic-declination" };
 	xf::ModuleOut<si::Angle>			magnetic_inclination				{ this, "magnetic-inclination" };
+
+  public:
+	using xf::Module::Module;
 };
 
 
-class NavigationComputer: public xf::Module<NavigationComputerIO>
+class NavigationComputer: public NavigationComputerIO
 {
   private:
 	struct Position
@@ -93,7 +96,7 @@ class NavigationComputer: public xf::Module<NavigationComputerIO>
   public:
 	// Ctor
 	explicit
-	NavigationComputer (std::unique_ptr<NavigationComputerIO>, std::string_view const& instance);
+	NavigationComputer (std::string_view const& instance);
 
   protected:
 	// Module API
@@ -116,6 +119,7 @@ class NavigationComputer: public xf::Module<NavigationComputerIO>
 	compute_ground_speed();
 
   private:
+	NavigationComputerIO&				_io										{ *this };
 	Positions							_positions								{ 3 };
 	Positions							_positions_accurate_2_times				{ 3 };
 	Positions							_positions_accurate_9_times				{ 3 };

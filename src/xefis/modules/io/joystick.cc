@@ -173,19 +173,19 @@ JoystickInput::Axis::set_value (float value)
 }
 
 
-JoystickInput::JoystickInput (std::unique_ptr<JoystickInputIO> module_io, QDomElement const& config, xf::Logger const& logger, std::string_view const& instance):
-	Module (std::move (module_io), instance),
+JoystickInput::JoystickInput (QDomElement const& config, xf::Logger const& logger, std::string_view const& instance):
+	JoystickInputIO (instance),
 	_logger (logger.with_scope (std::string (kLoggerScope) + "#" + instance))
 {
 	for (std::size_t handler_id = 0; handler_id < kMaxEventID; ++handler_id)
-		_button_sockets[handler_id] = std::make_unique<xf::ModuleOut<bool>> (&io, "buttons/" + std::to_string (handler_id));
+		_button_sockets[handler_id] = std::make_unique<xf::ModuleOut<bool>> (&_io, "buttons/" + std::to_string (handler_id));
 
 	for (std::size_t handler_id = 0; handler_id < kMaxEventID; ++handler_id)
-		_axis_sockets[handler_id] = std::make_unique<xf::ModuleOut<double>> (&io, "axes/" + std::to_string (handler_id));
+		_axis_sockets[handler_id] = std::make_unique<xf::ModuleOut<double>> (&_io, "axes/" + std::to_string (handler_id));
 
 	for (std::size_t handler_id = 0; handler_id < kMaxEventID; ++handler_id)
 	{
-		_angle_axis_sockets[handler_id] = std::make_unique<xf::ModuleOut<si::Angle>> (&io, "axes(angle)/" + std::to_string (handler_id));
+		_angle_axis_sockets[handler_id] = std::make_unique<xf::ModuleOut<si::Angle>> (&_io, "axes(angle)/" + std::to_string (handler_id));
 		_angle_axis_ranges[handler_id] = { -45_deg, +45_deg };
 	}
 
@@ -306,7 +306,7 @@ JoystickInput::failure()
 void
 JoystickInput::restart()
 {
-	if (io.restart_on_failure)
+	if (_io.restart_on_failure)
 		_reopen_timer->start();
 }
 

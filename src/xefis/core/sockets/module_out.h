@@ -46,10 +46,10 @@ template<class pValue>
 		using AssignableSocket<pValue>::operator=;
 
 		/**
-		 * Create ModuleOut that's coupled to a ModuleIO and set the module as data source.
+		 * Create ModuleOut that's coupled to a Module and set the module as data source.
 		 */
 		explicit
-		ModuleOut (ModuleIO* owner_and_data_source, std::string_view const& path);
+		ModuleOut (Module* owner_and_data_source, std::string_view const& path);
 
 		// Dtor
 		~ModuleOut();
@@ -64,24 +64,27 @@ template<class pValue>
 
 	  private:
 		/**
-		 * Made private to hide it from user (ModuleOut should always belong to a ModuleIO).
+		 * Made private to hide it from user (ModuleOut should always belong to a Module).
 		 */
 		void
 		operator<< (NoDataSource)
 		{ }
 
 	  private:
-		ModuleIO* _module_io;
+		Module* _module;
 	};
 
 
 template<class V>
 	inline
-	ModuleOut<V>::ModuleOut (ModuleIO* owner_and_data_source, std::string_view const& path):
+	ModuleOut<V>::ModuleOut (Module* owner_and_data_source, std::string_view const& path):
 		BasicModuleOut (owner_and_data_source, path)
 	{
-		_module_io = owner_and_data_source;
-		ModuleIO::ProcessingLoopAPI (*this->io()).register_output_socket (*this);
+		if (!owner_and_data_source)
+			throw xf::InvalidArgument ("ModuleOut requires non-null module pointer");
+
+		_module = owner_and_data_source;
+		Module::ModuleSocketAPI (*_module).register_output_socket (*this);
 	}
 
 
@@ -99,8 +102,8 @@ template<class V>
 	inline void
 	ModuleOut<V>::do_fetch (Cycle const& cycle)
 	{
-		if (_module_io)
-			BasicModule::ProcessingLoopAPI (_module_io->module()).fetch_and_process (cycle);
+		if (_module)
+			Module::ProcessingLoopAPI (*_module).fetch_and_process (cycle);
 		else
 			this->protected_set_nil();
 	}
@@ -110,12 +113,12 @@ template<class V>
 	inline void
 	ModuleOut<V>::deregister()
 	{
-		if (this->io())
-			ModuleIO::ProcessingLoopAPI (*this->io()).unregister_output_socket (*this);
+		if (_module)
+			Module::ModuleSocketAPI (*_module).unregister_output_socket (*this);
 
 		// Order is important:
 		(*this) << no_data_source;
-		this->_owner = nullptr;
+		this->_module = nullptr;
 	}
 
 } // namespace xf

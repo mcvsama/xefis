@@ -62,7 +62,7 @@ class PaintPerformanceMetrics
 class InstrumentDetails
 {
   public:
-	BasicInstrument&						instrument;
+	Instrument&								instrument;
 	QRectF									requested_position;
 	QPointF									anchor_position;
 	std::optional<QRect>					computed_position;
@@ -79,7 +79,7 @@ class InstrumentDetails
   public:
 	// Ctor
 	explicit
-	InstrumentDetails (BasicInstrument&, WorkPerformer& work_performer);
+	InstrumentDetails (Instrument&, WorkPerformer& work_performer);
 
 	/**
 	 * Compute position of this instrument on canvas.
@@ -121,7 +121,7 @@ class Screen:
 	Q_OBJECT
 
   private:
-	using InstrumentTracker = Tracker<BasicInstrument, detail::InstrumentDetails>;
+	using InstrumentTracker = Tracker<Instrument, detail::InstrumentDetails>;
 
   public:
 	// Ctor
@@ -143,19 +143,19 @@ class Screen:
 	 * Values are factors, { 0, 0 } is top-left, { 1, 1 } is bottom-right.
 	 */
 	void
-	set (BasicInstrument const&, QRectF requested_position, QPointF const anchor_position = { 0.0f, 0.0f });
+	set (Instrument const&, QRectF requested_position, QPointF const anchor_position = { 0.0f, 0.0f });
 
 	/**
 	 * Set position and size of an instrument.
 	 */
 	void
-	set_centered (BasicInstrument const&, QRectF requested_position);
+	set_centered (Instrument const&, QRectF requested_position);
 
 	/**
 	 * Set z-index for an instrument
 	 */
 	void
-	set_z_index (BasicInstrument const&, int z_index);
+	set_z_index (Instrument const&, int z_index);
 
 	/**
 	 * Enable/disable debug bounding boxes of instruments.

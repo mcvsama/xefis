@@ -29,7 +29,7 @@ namespace si = neutrino::si;
 using namespace neutrino::si::literals;
 
 
-class ArrivalETA_IO: public xf::ModuleIO
+class ArrivalETA_IO: public xf::Module
 {
   public:
 	/*
@@ -47,15 +47,18 @@ class ArrivalETA_IO: public xf::ModuleIO
 	 */
 
 	xf::ModuleOut<si::Time>	eta					{ this, "eta" };
+
+  public:
+	using xf::Module::Module;
 };
 
 
-class ArrivalETA: public xf::Module<ArrivalETA_IO>
+class ArrivalETA: public ArrivalETA_IO
 {
   public:
 	// Ctor
 	explicit
-	ArrivalETA (std::unique_ptr<ArrivalETA_IO>, std::string_view const& instance = {});
+	ArrivalETA (std::string_view const& instance = {});
 
   protected:
 	// Module API
@@ -66,7 +69,8 @@ class ArrivalETA: public xf::Module<ArrivalETA_IO>
 	compute();
 
   private:
-	xf::Smoother<si::Time>		_smoother { 3_s };
+	ArrivalETA_IO&				_io					{ *this };
+	xf::Smoother<si::Time>		_smoother			{ 3_s };
 	std::optional<si::Length>	_prev_distance;
 	xf::SocketObserver			_eta_computer;
 };

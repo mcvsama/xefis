@@ -27,8 +27,8 @@
 #include "flaps_control.h"
 
 
-FlapsControl::FlapsControl (std::unique_ptr<FlapsControlIO> module_io, xf::Airframe& airframe, std::string_view const& instance):
-	Module (std::move (module_io), instance)
+FlapsControl::FlapsControl (xf::Airframe& airframe, std::string_view const& instance):
+	FlapsControlIO (instance)
 {
 	for (auto s: airframe.flaps().settings())
 		_settings_list.insert (s.second.angle());
@@ -52,24 +52,24 @@ FlapsControl::process (xf::Cycle const&)
 {
 	if (_input_up_button.value_changed_to (true))
 	{
-		auto prev_setting = _settings_list.lower_bound (*io.requested_setting);
+		auto prev_setting = _settings_list.lower_bound (*_io.requested_setting);
 
 		if (prev_setting != _settings_list.begin())
 			prev_setting--;
 
-		io.requested_setting = *prev_setting;
+		_io.requested_setting = *prev_setting;
 	}
 	else if (_input_down_button.value_changed_to (true))
 	{
-		auto next_setting = _settings_list.upper_bound (*io.requested_setting);
+		auto next_setting = _settings_list.upper_bound (*_io.requested_setting);
 
 		if (next_setting != _settings_list.end())
-			io.requested_setting = *next_setting;
+			_io.requested_setting = *next_setting;
 	}
 
-	if (_requested_setting.value_changed() && io.requested_setting)
+	if (_requested_setting.value_changed() && _io.requested_setting)
 	{
-		_setting = xf::clamped<si::Angle> (*io.requested_setting, _extents);
+		_setting = xf::clamped<si::Angle> (*_io.requested_setting, _extents);
 		_timer->start();
 	}
 }
@@ -82,7 +82,7 @@ FlapsControl::update_flap_position()
 
 	si::Angle difference = _setting - _current;
 	double sgn = xf::sgn (difference.in<si::Degree>());
-	si::Angle delta = kUpdateInterval * *io.angular_velocity;
+	si::Angle delta = kUpdateInterval * *_io.angular_velocity;
 
 	if (abs (difference) > delta)
 	{
@@ -97,7 +97,7 @@ FlapsControl::update_flap_position()
 		_timer->stop();
 	}
 
-	io.current = _current;
-	io.control = xf::renormalize (_current, _extents, *io.control_extents);
+	_io.current = _current;
+	_io.control = xf::renormalize (_current, _extents, *_io.control_extents);
 }
 

@@ -38,19 +38,14 @@ class Machine;
 class Xefis;
 
 
-class ProcessingLoopIO: public ModuleIO
+class ProcessingLoopIO: public Module
 {
-  private:
-	std::string const			_loop_name;
-
   public:
 	ModuleOut<si::Frequency>	actual_frequency	{ this, "actual_frequency" };
 	ModuleOut<si::Time>			latency				{ this, "latency" };
 
   public:
-	ProcessingLoopIO (std::string_view const& loop_name):
-		_loop_name (loop_name)
-	{ }
+	using xf::Module::Module;
 };
 
 
@@ -59,7 +54,7 @@ class ProcessingLoopIO: public ModuleIO
  */
 class ProcessingLoop:
 	public QObject,
-	public Module<ProcessingLoopIO>,
+	public ProcessingLoopIO,
 	public LoggerTagProvider
 {
 	Q_OBJECT
@@ -73,16 +68,16 @@ class ProcessingLoop:
 	  public:
 		// Ctor
 		explicit
-		ModuleDetails (BasicModule&);
+		ModuleDetails (Module&);
 
-		BasicModule&
+		Module&
 		module() noexcept;
 
-		BasicModule const&
+		Module const&
 		module() const noexcept;
 
 	  private:
-		BasicModule* _module;
+		Module* _module;
 	};
 
 	using ModuleDetailsList = std::vector<ModuleDetails>;
@@ -189,14 +184,15 @@ class ProcessingLoop:
 	logger_tag() const override;
 
   private:
+	ProcessingLoopIO&					_io						{ *this };
 	Machine&							_machine;
 	Xefis&								_xefis;
 	QTimer*								_loop_timer;
 	si::Time							_loop_period;
 	std::optional<Timestamp>			_previous_timestamp;
-	std::vector<BasicModule*>			_uninitialized_modules;
+	std::vector<Module*>				_uninitialized_modules;
 	std::optional<Cycle>				_current_cycle;
-	Tracker<BasicModule>				_modules_tracker;
+	Tracker<Module>						_modules_tracker;
 	ModuleDetailsList					_module_details_list;
 	boost::circular_buffer<si::Time>	_communication_times	{ kMaxProcessingTimesBackLog };
 	boost::circular_buffer<si::Time>	_processing_times		{ kMaxProcessingTimesBackLog };
@@ -217,19 +213,19 @@ template<class Compatible>
 
 
 inline
-ProcessingLoop::ModuleDetails::ModuleDetails (BasicModule& module):
+ProcessingLoop::ModuleDetails::ModuleDetails (Module& module):
 	_module (&module)
 { }
 
 
-inline BasicModule&
+inline Module&
 ProcessingLoop::ModuleDetails::module() noexcept
 {
 	return *_module;
 }
 
 
-inline BasicModule const&
+inline Module const&
 ProcessingLoop::ModuleDetails::module() const noexcept
 {
 	return *_module;

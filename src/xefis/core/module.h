@@ -27,11 +27,11 @@
 
 // Neutrino:
 #include <neutrino/noncopyable.h>
+#include <neutrino/sequence.h>
 
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/cycle.h>
-#include <xefis/core/module_io.h>
 #include <xefis/utility/named_instance.h>
 
 
@@ -40,13 +40,27 @@ class QWidget;
 namespace xf {
 
 class BasicSetting;
+class BasicModuleIn;
+class BasicModuleOut;
 
 
 /**
- * Type-tag used to indicate that Module<> doesn't have any ModuleIO class.
+ * Exception thrown when some settings in a module have not been initialized as required.
  */
-class NoModuleIO: public ModuleIO
-{ };
+class UninitializedSettings: public FastException
+{
+  public:
+	// Ctor
+	explicit
+	UninitializedSettings (std::vector<BasicSetting*>);
+
+  private:
+	/**
+	 * Create a message for the exception.
+	 */
+	std::string
+	make_message (std::vector<BasicSetting*>);
+};
 
 
 /**
@@ -57,13 +71,95 @@ class NoModuleIO: public ModuleIO
  * Public method that computes the result is fetch_and_process(). It calls implementation-defined
  * process().
  */
-class BasicModule:
+class Module:
 	public NamedInstance,
 	private Noncopyable
 {
 	static constexpr std::size_t kMaxProcessingTimesBackLog = 1000;
 
   public:
+	/**
+	 * A set of methods for module socket to use on the module.
+	 */
+	class ModuleSocketAPI
+	{
+	  public:
+		// Ctor
+		explicit
+		ModuleSocketAPI (Module& module):
+			_module (module)
+		{ }
+
+		// Dtor
+		virtual
+		~ModuleSocketAPI() = default;
+
+		/**
+		 * Set reference to the module object.
+		 */
+		void
+		set_module (Module&);
+
+		/**
+		 * Iterate through registered settings and check that ones without default value have been initialized by user.
+		 * If uninitialized settings are found, UninitializedSettings is thrown.
+		 * Also call virtual Module::verify_settings().
+		 */
+		virtual void
+		verify_settings();
+
+		/**
+		 * Register setting.
+		 */
+		void
+		register_setting (BasicSetting&);
+
+		/**
+		 * Register an input socket with this module.
+		 */
+		void
+		register_input_socket (BasicModuleIn&);
+
+		/**
+		 * Unregister an input socket.
+		 */
+		void
+		unregister_input_socket (BasicModuleIn&);
+
+		/**
+		 * Register an output socket with this module.
+		 */
+		void
+		register_output_socket (BasicModuleOut&);
+
+		/**
+		 * Unregister an output socket.
+		 */
+		void
+		unregister_output_socket (BasicModuleOut&);
+
+		/**
+		 * Return registered settings.
+		 */
+		Sequence<std::vector<BasicSetting*>::const_iterator>
+		settings() const noexcept;
+
+		/**
+		 * Return registered input sockets.
+		 */
+		Sequence<std::vector<BasicModuleIn*>::const_iterator>
+		input_sockets() const noexcept;
+
+		/**
+		 * Return registered output sockets.
+		 */
+		Sequence<std::vector<BasicModuleOut*>::const_iterator>
+		output_sockets() const noexcept;
+
+	  private:
+		Module& _module;
+	};
+
 	/**
 	 * A set of methods for the processing loop to use on the module.
 	 */
@@ -72,7 +168,7 @@ class BasicModule:
 	  public:
 		// Ctor
 		explicit
-		ProcessingLoopAPI (BasicModule&);
+		ProcessingLoopAPI (Module&);
 
 		/**
 		 * True if module implements its own communicate() method.
@@ -119,7 +215,7 @@ class BasicModule:
 		handle_exception (Cycle const&, std::string_view const& context_info);
 
 	  private:
-		BasicModule& _module;
+		Module& _module;
 	};
 
 	/**
@@ -130,7 +226,7 @@ class BasicModule:
 	  public:
 		// Ctor
 		explicit
-		AccountingAPI (BasicModule&);
+		AccountingAPI (Module&);
 
 		/**
 		 * Cycle time of the ProcessingLoop that this module is being processed in.
@@ -172,12 +268,12 @@ class BasicModule:
 		processing_times() const noexcept;
 
 	  private:
-		BasicModule& _module;
+		Module& _module;
 	};
 
 	/**
 	 * Defines method for accessing configuration widget if a module decides to implement one.
-	 * This class should be inherited by the same class that inherits the BasicModule class.
+	 * This class should be inherited by the same class that inherits the Module class.
 	 */
 	class HasConfiguratorWidget
 	{
@@ -194,23 +290,15 @@ class BasicModule:
 	/**
 	 * Ctor
 	 *
-	 * \param	module_io
-	 *			Object that storess all Settings, ModuleIns and ModuleOuts.
 	 * \param	instance
 	 *			Instance name for GUI identification and debugging purposes.
 	 */
 	explicit
-	BasicModule (std::unique_ptr<ModuleIO>, std::string_view const& instance = {});
+	Module (std::string_view const& instance = {});
 
 	// Dtor
 	virtual
-	~BasicModule() = default;
-
-	/**
-	 * Return the IO object of this module.
-	 */
-	ModuleIO*
-	io_base() const noexcept;
+	~Module();
 
 	/**
 	 * Initialize before starting the loop.
@@ -218,6 +306,13 @@ class BasicModule:
 	 */
 	virtual void
 	initialize();
+
+	/**
+	 * User-provided settings verification procedure.
+	 */
+	virtual void
+	verify_settings()
+	{ }
 
   protected:
 	/**
@@ -253,134 +348,96 @@ class BasicModule:
 	set_nil_on_exception (bool enable) noexcept;
 
   private:
-	bool								_did_not_communicate	{ false };
-	bool								_did_not_process		{ false };
-	bool								_cached					{ false };
-	bool								_set_nil_on_exception	{ true };
-	std::unique_ptr<ModuleIO>			_io;
-	boost::circular_buffer<si::Time>	_communication_times	{ kMaxProcessingTimesBackLog };
-	boost::circular_buffer<si::Time>	_processing_times		{ kMaxProcessingTimesBackLog };
-	si::Time							_cycle_time				{ 0_s };
+	std::vector<BasicSetting*>			_registered_settings;
+	std::vector<BasicModuleIn*>			_registered_input_sockets;
+	std::vector<BasicModuleOut*>		_registered_output_sockets;
+	bool								_did_not_communicate: 1		{ false };
+	bool								_did_not_process: 1			{ false };
+	bool								_cached: 1					{ false };
+	bool								_set_nil_on_exception: 1	{ true };
+	boost::circular_buffer<si::Time>	_communication_times		{ kMaxProcessingTimesBackLog };
+	boost::circular_buffer<si::Time>	_processing_times			{ kMaxProcessingTimesBackLog };
+	si::Time							_cycle_time					{ 0_s };
 };
 
 
-template<class IO = NoModuleIO>
-	class Module: public BasicModule
-	{
-	  public:
-		/**
-		 * Ctor
-		 * Version for modules that do have their own IO class.
-		 */
-		template<class U = IO>
-			requires (!std::is_same_v<U, NoModuleIO>)
-			explicit
-			Module (std::unique_ptr<IO> module_io, std::string_view const& instance = {}):
-				BasicModule (std::move (module_io), instance),
-				io (static_cast<IO&> (*io_base()))
-			{ }
-
-		/**
-		 * Ctor
-		 * Version for modules that do not have any IO class.
-		 */
-		template<class U = IO>
-			requires (std::is_same_v<U, NoModuleIO>)
-			explicit
-			Module (std::string_view const& instance = {}):
-				BasicModule (std::make_unique<IO>(), instance),
-				io (static_cast<IO&> (*io_base()))
-			{ }
-
-	  protected:
-		IO& io;
-	};
-
-
 inline
-BasicModule::ProcessingLoopAPI::ProcessingLoopAPI (BasicModule& module):
+Module::ProcessingLoopAPI::ProcessingLoopAPI (Module& module):
 	_module (module)
 { }
 
 
 inline bool
-BasicModule::ProcessingLoopAPI::implements_communicate_method() const noexcept
+Module::ProcessingLoopAPI::implements_communicate_method() const noexcept
 {
 	return !_module._did_not_communicate;
 }
 
 
 inline bool
-BasicModule::ProcessingLoopAPI::implements_process_method() const noexcept
+Module::ProcessingLoopAPI::implements_process_method() const noexcept
 {
 	return !_module._did_not_process;
 }
 
 
 inline void
-BasicModule::ProcessingLoopAPI::reset_cache()
+Module::ProcessingLoopAPI::reset_cache()
 {
 	_module._cached = false;
 }
 
 
 inline
-BasicModule::AccountingAPI::AccountingAPI (BasicModule& module):
+Module::AccountingAPI::AccountingAPI (Module& module):
 	_module (module)
 { }
 
 
 inline si::Time
-BasicModule::AccountingAPI::cycle_time() const noexcept
+Module::AccountingAPI::cycle_time() const noexcept
 {
 	return _module._cycle_time;
 }
 
 
 inline void
-BasicModule::AccountingAPI::set_cycle_time (si::Time cycle_time)
+Module::AccountingAPI::set_cycle_time (si::Time cycle_time)
 {
 	_module._cycle_time = cycle_time;
 }
 
 
 inline void
-BasicModule::AccountingAPI::add_communication_time (si::Time t)
+Module::AccountingAPI::add_communication_time (si::Time t)
 {
 	_module._communication_times.push_back (t);
 }
 
 
 inline void
-BasicModule::AccountingAPI::add_processing_time (si::Time t)
+Module::AccountingAPI::add_processing_time (si::Time t)
 {
 	_module._processing_times.push_back (t);
 }
 
 
 inline boost::circular_buffer<si::Time> const&
-BasicModule::AccountingAPI::communication_times() const noexcept
+Module::AccountingAPI::communication_times() const noexcept
 {
 	return _module._communication_times;
 }
 
 
 inline boost::circular_buffer<si::Time> const&
-BasicModule::AccountingAPI::processing_times() const noexcept
+Module::AccountingAPI::processing_times() const noexcept
 {
 	return _module._processing_times;
 }
 
 
-inline ModuleIO*
-BasicModule::io_base() const noexcept
-{
-	return _io.get();
-}
-
-
 inline void
-BasicModule::set_nil_on_exception (bool enable) noexcept
+Module::set_nil_on_exception (bool enable) noexcept
 {
 	_set_nil_on_exception = enable;
 }
@@ -395,13 +452,13 @@ BasicModule::set_nil_on_exception (bool enable) noexcept
  * Return string identifying module and its instance.
  */
 std::string
-identifier (BasicModule const&);
+identifier (Module const&);
 
 /**
- * Same as identifier (BasicModule&).
+ * Same as identifier (Module&).
  */
 std::string
-identifier (BasicModule const*);
+identifier (Module const*);
 
 } // namespace xf
 

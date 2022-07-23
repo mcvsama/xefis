@@ -27,7 +27,7 @@
 
 
 template<class Value>
-	class MixerIO: public xf::ModuleIO
+	class MixerIO: public xf::Module
 	{
 	  public:
 		/*
@@ -51,11 +51,14 @@ template<class Value>
 		 */
 
 		xf::ModuleOut<Value>	output_value	{ this, "value" };
+
+	  public:
+		using xf::Module::Module;
 	};
 
 
 template<class pValue>
-	class Mixer: public xf::Module<MixerIO<pValue>>
+	class Mixer: public MixerIO<pValue>
 	{
 	  private:
 		static constexpr char kLoggerScope[] = "mod::Mixer";
@@ -66,7 +69,7 @@ template<class pValue>
 	  public:
 		// Ctor
 		explicit
-		Mixer (std::unique_ptr<MixerIO>, xf::Logger const&, std::string_view const& instance = {});
+		Mixer (xf::Logger const&, std::string_view const& instance = {});
 
 	  protected:
 		// Module API
@@ -78,9 +81,10 @@ template<class pValue>
 		process (xf::Cycle const&) override;
 
 	  private:
+		MixerIO&						_io					{ *this };
 		xf::Logger						_logger;
-		xf::SocketValueChanged<Value>	_input_a_changed	{ io.input_a_value };
-		xf::SocketValueChanged<Value>	_input_b_changed	{ io.input_b_value };
+		xf::SocketValueChanged<Value>	_input_a_changed	{ _io.input_a_value };
+		xf::SocketValueChanged<Value>	_input_b_changed	{ _io.input_b_value };
 	};
 
 
@@ -90,8 +94,8 @@ template<class pValue>
 
 
 template<class V>
-	Mixer<V>::Mixer (std::unique_ptr<MixerIO> module_io, xf::Logger const& logger, std::string const& instance):
-		Module (std::move (module_io), instance),
+	Mixer<V>::Mixer (xf::Logger const& logger, std::string const& instance):
+		MixerIO<V> (instance),
 		_logger (logger.with_scope (std::string (kLoggerScope) + "#" + instance))
 	{ }
 
@@ -100,7 +104,7 @@ template<class V>
 	void
 	Mixer<V>::initialize()
 	{
-		if (io.setting_output_minimum && io.setting_output_maximum && *io.setting_output_minimum > *io.setting_output_maximum)
+		if (_io.setting_output_minimum && _io.setting_output_maximum && *_io.setting_output_minimum > *_io.setting_output_maximum)
 			_logger << "Settings error: maximum value is less than the minimum value." << std::endl;
 	}
 
@@ -119,14 +123,14 @@ template<class V>
 				Value sum{};
 
 				if (a)
-					sum += *io.setting_input_a_factor * *a;
+					sum += *_io.setting_input_a_factor * *a;
 				if (b)
-					sum += *io.setting_input_b_factor * *b;
+					sum += *_io.setting_input_b_factor * *b;
 
-				if (io.setting_output_minimum && sum < *io.setting_output_minimum)
+				if (_io.setting_output_minimum && sum < *_io.setting_output_minimum)
 					sum = *setting_output_minimum;
 
-				if (io.setting_output_maximum && sum > *io.setting_output_maximum)
+				if (_io.setting_output_maximum && sum > *_io.setting_output_maximum)
 					sum = *setting_output_maximum;
 
 				output_value = sum;

@@ -35,20 +35,20 @@ class ModuleItem: public QTreeWidgetItem
   public:
 	// Ctor
 	explicit
-	ModuleItem (BasicModule& module, QTreeWidgetItem& parent);
+	ModuleItem (Module& module, QTreeWidgetItem& parent);
 
 	/**
 	 * Return Module* associated with this item.
 	 */
-	BasicModule&
+	Module&
 	module() const noexcept;
 
   private:
-	BasicModule& _module;
+	Module& _module;
 };
 
 
-inline BasicModule&
+inline Module&
 ModuleItem::module() const noexcept
 {
 	return _module;

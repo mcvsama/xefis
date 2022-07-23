@@ -31,7 +31,7 @@
 
 namespace xf {
 
-class ModuleIO;
+class Module;
 
 
 /**
@@ -52,14 +52,14 @@ class BasicSetting
 	 * Stores pointer to owning module.
 	 */
 	explicit
-	BasicSetting (ModuleIO* owner, std::string const& name);
+	BasicSetting (Module* owner, std::string const& name);
 
 	/**
 	 * Ctor
 	 * Stores pointer to owning module.
 	 */
 	explicit
-	BasicSetting (ModuleIO* owner, std::string const& name, OptionalTag);
+	BasicSetting (Module* owner, std::string const& name, OptionalTag);
 
 	// Dtor
 	virtual
@@ -68,8 +68,9 @@ class BasicSetting
 	/**
 	 * Return owning module.
 	 */
-	ModuleIO*
-	io() const noexcept;
+	Module*
+	module() const noexcept
+		{ return _module; }
 
 	/**
 	 * Return true if setting has a value.
@@ -81,16 +82,18 @@ class BasicSetting
 	 * Return setting name.
 	 */
 	std::string const&
-	name() const noexcept;
+	name() const noexcept
+		{ return _name; }
 
 	/**
 	 * Return true if setting is required to have a value.
 	 */
 	bool
-	required() const noexcept;
+	required() const noexcept
+		{ return _required; }
 
   private:
-	ModuleIO*	_owner;
+	Module*		_module;
 	std::string	_name;
 	bool		_required;
 };
@@ -115,19 +118,19 @@ template<class pValue>
 		 * Create a setting object that requires explicit setting of a value.
 		 */
 		explicit
-		Setting (ModuleIO* owner, std::string const& name);
+		Setting (Module* owner, std::string const& name);
 
 		/**
 		 * Creates a setting object that has an initial value.
 		 */
 		explicit
-		Setting (ModuleIO* owner, std::string const& name, Value const& initial_value);
+		Setting (Module* owner, std::string const& name, Value const& initial_value);
 
 		/**
 		 * Creates a setting that doesn't have and doesn't require any value.
 		 */
 		explicit
-		Setting (ModuleIO* owner, std::string const& name, OptionalTag);
+		Setting (Module* owner, std::string const& name, OptionalTag);
 
 		/**
 		 * Copy-assignment operator.
@@ -162,67 +165,46 @@ template<class pValue>
 
 
 inline
-BasicSetting::BasicSetting (ModuleIO* owner, std::string const& name):
-	_owner (owner),
+BasicSetting::BasicSetting (Module* owner, std::string const& name):
+	_module (owner),
 	_name (name),
 	_required (true)
 { }
 
 
 inline
-BasicSetting::BasicSetting (ModuleIO* owner, std::string const& name, OptionalTag):
-	_owner (owner),
+BasicSetting::BasicSetting (Module* owner, std::string const& name, OptionalTag):
+	_module (owner),
 	_name (name),
 	_required (false)
 { }
 
 
-inline ModuleIO*
-BasicSetting::io() const noexcept
-{
-	return _owner;
-}
-
-
-inline std::string const&
-BasicSetting::name() const noexcept
-{
-	return _name;
-}
-
-
-inline bool
-BasicSetting::required() const noexcept
-{
-	return _required;
-}
-
-
 template<class V>
 	inline
-	Setting<V>::Setting (ModuleIO* owner, std::string const& name):
+	Setting<V>::Setting (Module* owner, std::string const& name):
 		BasicSetting (owner, name)
 	{
-		ModuleIO::ProcessingLoopAPI (*owner).register_setting (*this);
+		Module::ModuleSocketAPI (*owner).register_setting (*this);
 	}
 
 
 template<class V>
 	inline
-	Setting<V>::Setting (ModuleIO* owner, std::string const& name, Value const& initial_value):
+	Setting<V>::Setting (Module* owner, std::string const& name, Value const& initial_value):
 		BasicSetting (owner, name),
 		_value (initial_value)
 	{
-		ModuleIO::ProcessingLoopAPI (*owner).register_setting (*this);
+		Module::ModuleSocketAPI (*owner).register_setting (*this);
 	}
 
 
 template<class V>
 	inline
-	Setting<V>::Setting (ModuleIO* owner, std::string const& name, OptionalTag optional_tag):
+	Setting<V>::Setting (Module* owner, std::string const& name, OptionalTag optional_tag):
 		BasicSetting (owner, name, optional_tag)
 	{
-		ModuleIO::ProcessingLoopAPI (*owner).register_setting (*this);
+		Module::ModuleSocketAPI (*owner).register_setting (*this);
 	}
 
 

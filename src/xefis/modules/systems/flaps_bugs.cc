@@ -21,8 +21,8 @@
 #include "flaps_bugs.h"
 
 
-FlapsBugs::FlapsBugs (std::unique_ptr<FlapsBugsIO> module_io, xf::Flaps const& flaps, std::string_view const& instance):
-	Module (std::move (module_io), instance),
+FlapsBugs::FlapsBugs (xf::Flaps const& flaps, std::string_view const& instance):
+	FlapsBugsIO (instance),
 	_flaps (flaps)
 { }
 
@@ -32,39 +32,39 @@ FlapsBugs::process (xf::Cycle const&)
 {
 	if (_flaps_setting_changed.value_changed())
 	{
-		if (io.flaps_setting)
+		if (_io.flaps_setting)
 		{
-			io.flaps_up_label = "UP";
-			io.flaps_up_speed = *io.margin_factor * _flaps.find_setting (0_deg).speed_range().min();
+			_io.flaps_up_label = "UP";
+			_io.flaps_up_speed = *_io.margin_factor * _flaps.find_setting (0_deg).speed_range().min();
 
 			std::optional<std::string> label_a;
 			std::optional<si::Velocity> speed_a;
 			std::optional<std::string> label_b;
 			std::optional<si::Velocity> speed_b;
 
-			auto sett_b = _flaps.find_setting (*io.flaps_setting);
+			auto sett_b = _flaps.find_setting (*_io.flaps_setting);
 			auto sett_a = sett_b.prev();
 
 			label_b = sett_b.label().toStdString();
-			speed_b = *io.margin_factor * sett_b.speed_range().min();
+			speed_b = *_io.margin_factor * sett_b.speed_range().min();
 
 			if (sett_a)
 			{
 				label_a = sett_a->label().toStdString();
-				speed_a = *io.margin_factor * sett_a->speed_range().min();
+				speed_a = *_io.margin_factor * sett_a->speed_range().min();
 			}
 
-			io.flaps_a_label = label_a;
-			io.flaps_a_speed = speed_a;
-			io.flaps_b_label = label_b;
-			io.flaps_b_speed = speed_b;
+			_io.flaps_a_label = label_a;
+			_io.flaps_a_speed = speed_a;
+			_io.flaps_b_label = label_b;
+			_io.flaps_b_speed = speed_b;
 		}
 		else
 		{
-			io.flaps_a_label = xf::nil;
-			io.flaps_a_speed = xf::nil;
-			io.flaps_b_label = xf::nil;
-			io.flaps_b_speed = xf::nil;
+			_io.flaps_a_label = xf::nil;
+			_io.flaps_a_speed = xf::nil;
+			_io.flaps_b_label = xf::nil;
+			_io.flaps_b_speed = xf::nil;
 		}
 	}
 }

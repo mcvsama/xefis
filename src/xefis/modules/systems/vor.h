@@ -29,7 +29,7 @@ namespace si = neutrino::si;
 using namespace neutrino::si::literals;
 
 
-class VOR_IO: public xf::ModuleIO
+class VOR_IO: public xf::Module
 {
   public:
 	/*
@@ -53,6 +53,9 @@ class VOR_IO: public xf::ModuleIO
 	xf::ModuleOut<si::Angle>	output_deviation				{ this, "deviation" };
 	xf::ModuleOut<bool>			output_to_flag					{ this, "to-flag" };
 	xf::ModuleOut<si::Length>	output_distance					{ this, "distance" };
+
+  public:
+	using xf::Module::Module;
 };
 
 
@@ -60,12 +63,12 @@ class VOR_IO: public xf::ModuleIO
  * Computes information for VOR display (radials, TO/FROM flag, deviation, etc)
  * from actual VOR's coordinates and aircraft coordinates.
  */
-class VOR: public xf::Module<VOR_IO>
+class VOR: public VOR_IO
 {
   public:
 	// Ctor
 	explicit
-	VOR (std::unique_ptr<VOR_IO>, std::string_view const& instance = {});
+	VOR (std::string_view const& instance = {});
 
 	// Module API
 	void
@@ -91,6 +94,7 @@ class VOR: public xf::Module<VOR_IO>
 	denormalize (si::Angle);
 
   private:
+	VOR_IO&					_io					{ *this };
 	xf::Smoother<si::Angle>	_deviation_smoother	{ 500_ms };
 	xf::SocketObserver		_vor_computer;
 };

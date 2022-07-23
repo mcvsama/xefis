@@ -30,7 +30,7 @@ xf::Logger g_logger (g_logger_output);
 
 
 template<template<class> class SocketType>
-	class GCS2AircraftLinkIO: public LinkIO
+	class GCS2AircraftLink: public Module
 	{
 	  public:
 		SocketType<si::Angle>		nil_si_prop				{ this, "nil" };
@@ -75,8 +75,8 @@ template<template<class> class SocketType>
 	};
 
 
-using GCS_Tx_LinkIO = GCS2AircraftLinkIO<xf::ModuleIn>;
-using Aircraft_Rx_LinkIO = GCS2AircraftLinkIO<xf::ModuleOut>;
+using GCS_Tx_Link = GCS2AircraftLink<xf::ModuleIn>;
+using Aircraft_Rx_Link = GCS2AircraftLink<xf::ModuleOut>;
 
 
 constexpr auto kFallbackBool	= true;
@@ -150,121 +150,121 @@ void transmit (LinkProtocol& tx_protocol, LinkProtocol& rx_protocol)
 
 
 AutoTest t1 ("modules/io/link: protocol: valid data transmission", []{
-	GCS_Tx_LinkIO tx_io;
-	Aircraft_Rx_LinkIO rx_io;
-	GCS_Tx_LinkProtocol tx_protocol (&tx_io);
-	GCS_Tx_LinkProtocol rx_protocol (&rx_io);
+	GCS_Tx_Link tx;
+	Aircraft_Rx_Link rx;
+	GCS_Tx_LinkProtocol tx_protocol (&tx);
+	GCS_Tx_LinkProtocol rx_protocol (&rx);
 	TestCycle cycle;
 
 	auto test = [&] {
 		cycle += 1_s;
-		tx_io.fetch_all (cycle);
+		tx.fetch_all (cycle);
 		transmit (tx_protocol, rx_protocol);
-		test_asserts::verify ("nil_si_prop transmitted properly", rx_io.nil_si_prop == tx_io.nil_si_prop);
-		test_asserts::verify ("angle_prop transmitted properly (optional() version)", rx_io.angle_prop == tx_io.angle_prop);
-		test_asserts::verify ("angle_prop transmitted properly", *rx_io.angle_prop == *tx_io.angle_prop);
-		test_asserts::verify_equal_with_epsilon ("velocity transmitted properly", *rx_io.velocity_prop, *tx_io.velocity_prop, 0.1_kph);
-		test_asserts::verify_equal_with_epsilon ("velocity prop with offset transmitted properly", *rx_io.velocity_prop_offset, *tx_io.velocity_prop_offset, 0.1_mps);
-		test_asserts::verify ("bool_prop transmitted properly", *rx_io.bool_prop == *tx_io.bool_prop);
-		test_asserts::verify ("int_prop transmitted properly", *rx_io.int_prop == *tx_io.int_prop);
-		test_asserts::verify ("uint_prop transmitted properly", *rx_io.uint_prop == *tx_io.uint_prop);
+		test_asserts::verify ("nil_si_prop transmitted properly", rx.nil_si_prop == tx.nil_si_prop);
+		test_asserts::verify ("angle_prop transmitted properly (optional() version)", rx.angle_prop == tx.angle_prop);
+		test_asserts::verify ("angle_prop transmitted properly", *rx.angle_prop == *tx.angle_prop);
+		test_asserts::verify_equal_with_epsilon ("velocity transmitted properly", *rx.velocity_prop, *tx.velocity_prop, 0.1_kph);
+		test_asserts::verify_equal_with_epsilon ("velocity prop with offset transmitted properly", *rx.velocity_prop_offset, *tx.velocity_prop_offset, 0.1_mps);
+		test_asserts::verify ("bool_prop transmitted properly", *rx.bool_prop == *tx.bool_prop);
+		test_asserts::verify ("int_prop transmitted properly", *rx.int_prop == *tx.int_prop);
+		test_asserts::verify ("uint_prop transmitted properly", *rx.uint_prop == *tx.uint_prop);
 	};
 
-	tx_io.angle_prop << 1.99_rad;
-	tx_io.velocity_prop << 101_kph;
-	tx_io.velocity_prop_offset << 101_kph;
-	tx_io.bool_prop << true;
-	tx_io.int_prop << -2;
-	tx_io.uint_prop << 3u;
+	tx.angle_prop << 1.99_rad;
+	tx.velocity_prop << 101_kph;
+	tx.velocity_prop_offset << 101_kph;
+	tx.bool_prop << true;
+	tx.int_prop << -2;
+	tx.uint_prop << 3u;
 	test();
 
 	for (auto const& angle: { -12_rad, 0_rad, 0.99_rad, 1.59_rad, 300_rad })
 	{
-		tx_io.angle_prop << angle;
+		tx.angle_prop << angle;
 		test();
 	}
 
 	for (auto b: { false, true })
 	{
-		tx_io.bool_prop << b;
+		tx.bool_prop << b;
 		test();
 	}
 
 	for (auto i: { -9, -7, -5, -3, -2, -1, 0, 1, 2, 3, 5, 7, 9 })
 	{
-		tx_io.int_prop << i;
+		tx.int_prop << i;
 		test();
 	}
 
 	for (unsigned int i: { 0u, 1u, 2u, 3u, 4u, 5u, 6u, 7u, 8u, 9u, 10u, 11u, 12u, 13u, 14u, 15u })
 	{
-		tx_io.uint_prop << i;
+		tx.uint_prop << i;
 		test();
 	}
 });
 
 
 AutoTest t2 ("modules/io/link: protocol: nils and out-of range values transmission", []{
-	GCS_Tx_LinkIO tx_io;
-	Aircraft_Rx_LinkIO rx_io;
-	GCS_Tx_LinkProtocol tx_protocol (&tx_io);
-	GCS_Tx_LinkProtocol rx_protocol (&rx_io);
+	GCS_Tx_Link tx;
+	Aircraft_Rx_Link rx;
+	GCS_Tx_LinkProtocol tx_protocol (&tx);
+	GCS_Tx_LinkProtocol rx_protocol (&rx);
 	TestCycle cycle;
 
 	// Test bit-bool:
 
-	tx_io.bool_prop << true;
-	tx_io.fetch_all (cycle += 1_s);
+	tx.bool_prop << true;
+	tx.fetch_all (cycle += 1_s);
 	transmit (tx_protocol, rx_protocol);
-	test_asserts::verify ("bit-bool 1 is transmitted properly", *rx_io.bool_prop == *tx_io.bool_prop);
+	test_asserts::verify ("bit-bool 1 is transmitted properly", *rx.bool_prop == *tx.bool_prop);
 
-	tx_io.bool_prop << false;
-	tx_io.fetch_all (cycle += 1_s);
+	tx.bool_prop << false;
+	tx.fetch_all (cycle += 1_s);
 	transmit (tx_protocol, rx_protocol);
-	test_asserts::verify ("bit-bool 0 is transmitted properly", *rx_io.bool_prop == *tx_io.bool_prop);
+	test_asserts::verify ("bit-bool 0 is transmitted properly", *rx.bool_prop == *tx.bool_prop);
 
-	tx_io.bool_prop << xf::no_data_source;
-	tx_io.fetch_all (cycle += 1_s);
+	tx.bool_prop << xf::no_data_source;
+	tx.fetch_all (cycle += 1_s);
 	transmit (tx_protocol, rx_protocol);
-	test_asserts::verify ("nil bit-bool set to fall-back value", *rx_io.bool_prop == kFallbackBool);
+	test_asserts::verify ("nil bit-bool set to fall-back value", *rx.bool_prop == kFallbackBool);
 
 	// Test bit-int:
 
-	tx_io.uint_prop << 11u;
-	tx_io.fetch_all (cycle += 1_s);
+	tx.uint_prop << 11u;
+	tx.fetch_all (cycle += 1_s);
 	transmit (tx_protocol, rx_protocol);
-	test_asserts::verify ("bit-int 11 transmitted properly", *rx_io.uint_prop == *tx_io.uint_prop);
+	test_asserts::verify ("bit-int 11 transmitted properly", *rx.uint_prop == *tx.uint_prop);
 
-	tx_io.uint_prop << 17u;
-	tx_io.fetch_all (cycle += 1_s);
+	tx.uint_prop << 17u;
+	tx.fetch_all (cycle += 1_s);
 	transmit (tx_protocol, rx_protocol);
-	test_asserts::verify ("out-of-range bit-int set to fall-back value", *rx_io.uint_prop == kFallbackInt);
+	test_asserts::verify ("out-of-range bit-int set to fall-back value", *rx.uint_prop == kFallbackInt);
 
-	tx_io.uint_prop << 15u;
-	tx_io.fetch_all (cycle += 1_s);
+	tx.uint_prop << 15u;
+	tx.fetch_all (cycle += 1_s);
 	transmit (tx_protocol, rx_protocol);
-	test_asserts::verify ("bit-int 15 transmitted properly", *rx_io.uint_prop == *tx_io.uint_prop);
+	test_asserts::verify ("bit-int 15 transmitted properly", *rx.uint_prop == *tx.uint_prop);
 
-	tx_io.uint_prop << xf::no_data_source;
-	tx_io.fetch_all (cycle += 1_s);
+	tx.uint_prop << xf::no_data_source;
+	tx.fetch_all (cycle += 1_s);
 	transmit (tx_protocol, rx_protocol);
-	test_asserts::verify ("nil bit-int set to fall-back value", *rx_io.uint_prop == kFallbackInt);
+	test_asserts::verify ("nil bit-int set to fall-back value", *rx.uint_prop == kFallbackInt);
 });
 
 
 AutoTest t3 ("modules/io/link: protocol: offsets increase precision", []{
-	GCS_Tx_LinkIO tx_io;
-	Aircraft_Rx_LinkIO rx_io;
-	GCS_Tx_LinkProtocol tx_protocol (&tx_io);
-	GCS_Tx_LinkProtocol rx_protocol (&rx_io);
+	GCS_Tx_Link tx;
+	Aircraft_Rx_Link rx;
+	GCS_Tx_LinkProtocol tx_protocol (&tx);
+	GCS_Tx_LinkProtocol rx_protocol (&rx);
 	TestCycle cycle;
 
-	tx_io.velocity_prop << 1001_kph;
-	tx_io.velocity_prop_offset << 1001_kph;
-	tx_io.fetch_all (cycle += 1_s);
+	tx.velocity_prop << 1001_kph;
+	tx.velocity_prop_offset << 1001_kph;
+	tx.fetch_all (cycle += 1_s);
 	transmit (tx_protocol, rx_protocol);
-	auto delta = si::abs (*rx_io.velocity_prop - *tx_io.velocity_prop);
-	auto delta_with_offset = si::abs (*rx_io.velocity_prop_offset - *tx_io.velocity_prop_offset);
+	auto delta = si::abs (*rx.velocity_prop - *tx.velocity_prop);
+	auto delta_with_offset = si::abs (*rx.velocity_prop_offset - *tx.velocity_prop_offset);
 	test_asserts::verify ("offsets increase precision", delta_with_offset < delta);
 });
 
@@ -272,47 +272,47 @@ AutoTest t3 ("modules/io/link: protocol: offsets increase precision", []{
 AutoTest t4 ("modules/io/link: protocol: invalid data transmission (wrong signature)", []{
 	// This tests signature verification and checks if values are retained or not, according to the protocol.
 
-	GCS_Tx_LinkIO tx_io;
-	Aircraft_Rx_LinkIO rx_io;
-	GCS_Tx_LinkProtocol tx_protocol (&tx_io);
-	GCS_Tx_LinkProtocol rx_protocol (&rx_io);
+	GCS_Tx_Link tx;
+	Aircraft_Rx_Link rx;
+	GCS_Tx_LinkProtocol tx_protocol (&tx);
+	GCS_Tx_LinkProtocol rx_protocol (&rx);
 	TestCycle cycle;
 
 	// Transmit correctly first:
-	tx_io.nil_si_prop << xf::no_data_source;
-	tx_io.angle_prop << 15_rad;
-	tx_io.angle_prop_r << 15_rad;
-	tx_io.velocity_prop << 100_mps;
-	tx_io.velocity_prop_r << 100_mps;
-	tx_io.velocity_prop_offset << 102_mps;
-	tx_io.velocity_prop_offset_r << 102_mps;
-	tx_io.bool_prop << false;
-	tx_io.bool_prop_r << false;
-	tx_io.int_prop << -5;
-	tx_io.int_prop_r << -5;
-	tx_io.uint_prop << 15u;
-	tx_io.uint_prop_r << 15u;
-	tx_io.fetch_all (cycle += 1_s);
+	tx.nil_si_prop << xf::no_data_source;
+	tx.angle_prop << 15_rad;
+	tx.angle_prop_r << 15_rad;
+	tx.velocity_prop << 100_mps;
+	tx.velocity_prop_r << 100_mps;
+	tx.velocity_prop_offset << 102_mps;
+	tx.velocity_prop_offset_r << 102_mps;
+	tx.bool_prop << false;
+	tx.bool_prop_r << false;
+	tx.int_prop << -5;
+	tx.int_prop_r << -5;
+	tx.uint_prop << 15u;
+	tx.uint_prop_r << 15u;
+	tx.fetch_all (cycle += 1_s);
 
 	Blob blob;
 	tx_protocol.produce (blob, g_logger);
 	rx_protocol.eat (blob.begin(), blob.end(), nullptr, nullptr, nullptr, g_logger);
 
 	// Transmit invalid data:
-	tx_io.nil_si_prop << 1_rad;
-	tx_io.angle_prop << 16_rad;
-	tx_io.angle_prop_r << 16_rad;
-	tx_io.velocity_prop << 101_mps;
-	tx_io.velocity_prop_r << 101_mps;
-	tx_io.velocity_prop_offset << 103_mps;
-	tx_io.velocity_prop_offset_r << 103_mps;
-	tx_io.bool_prop << true;
-	tx_io.bool_prop_r << true;
-	tx_io.int_prop << -3;
-	tx_io.int_prop_r << -3;
-	tx_io.uint_prop << 12u;
-	tx_io.uint_prop_r << 12u;
-	tx_io.fetch_all (cycle += 1_s);
+	tx.nil_si_prop << 1_rad;
+	tx.angle_prop << 16_rad;
+	tx.angle_prop_r << 16_rad;
+	tx.velocity_prop << 101_mps;
+	tx.velocity_prop_r << 101_mps;
+	tx.velocity_prop_offset << 103_mps;
+	tx.velocity_prop_offset_r << 103_mps;
+	tx.bool_prop << true;
+	tx.bool_prop_r << true;
+	tx.int_prop << -3;
+	tx.int_prop_r << -3;
+	tx.uint_prop << 12u;
+	tx.uint_prop_r << 12u;
+	tx.fetch_all (cycle += 1_s);
 
 	blob.clear();
 	tx_protocol.produce (blob, g_logger);
@@ -329,71 +329,71 @@ AutoTest t4 ("modules/io/link: protocol: invalid data transmission (wrong signat
 	rx_protocol.eat (blob.begin(), blob.end(), nullptr, nullptr, nullptr, g_logger);
 
 	// Test that values weren't changed during last invalid transmission:
-	test_asserts::verify ("nil_si_prop didn't change", !rx_io.nil_si_prop);
-	test_asserts::verify ("angle_prop is didn't change", *rx_io.angle_prop == 15_rad);
-	test_asserts::verify_equal_with_epsilon ("velocity_prop didn't change", *rx_io.velocity_prop, 100_mps, 0.1_mps);
-	test_asserts::verify_equal_with_epsilon ("velocity_prop_offset didn't change", *rx_io.velocity_prop_offset, 102_mps, 0.1_mps);
-	test_asserts::verify ("int_prop didn't change", *rx_io.int_prop == -5);
-	test_asserts::verify ("bool_prop didn't change", *rx_io.bool_prop == false);
-	test_asserts::verify ("uint_prop didn't change", *rx_io.uint_prop == 15u);
+	test_asserts::verify ("nil_si_prop didn't change", !rx.nil_si_prop);
+	test_asserts::verify ("angle_prop is didn't change", *rx.angle_prop == 15_rad);
+	test_asserts::verify_equal_with_epsilon ("velocity_prop didn't change", *rx.velocity_prop, 100_mps, 0.1_mps);
+	test_asserts::verify_equal_with_epsilon ("velocity_prop_offset didn't change", *rx.velocity_prop_offset, 102_mps, 0.1_mps);
+	test_asserts::verify ("int_prop didn't change", *rx.int_prop == -5);
+	test_asserts::verify ("bool_prop didn't change", *rx.bool_prop == false);
+	test_asserts::verify ("uint_prop didn't change", *rx.uint_prop == 15u);
 
 	// Test fail-safe and retaining of original values:
 	rx_protocol.failsafe();
-	test_asserts::verify ("nil_si_prop is nil", !rx_io.nil_si_prop);
-	test_asserts::verify ("angle_prop is nil", !rx_io.angle_prop);
-	test_asserts::verify ("angle_prop_r is retained", *rx_io.angle_prop_r == 15_rad);
-	test_asserts::verify ("velocity_prop is nil", !rx_io.velocity_prop);
-	test_asserts::verify_equal_with_epsilon ("velocity_prop_r is retained", *rx_io.velocity_prop_r, 100_mps, 0.1_mps);
-	test_asserts::verify ("velocity_prop_offset is nil", !rx_io.velocity_prop_offset);
-	test_asserts::verify_equal_with_epsilon ("velocity_prop_offset_r is retained", *rx_io.velocity_prop_offset_r, 102_mps, 0.1_mps);
-	test_asserts::verify ("bool_prop is nil", !rx_io.bool_prop);
-	test_asserts::verify ("bool_prop_r is retained", *rx_io.bool_prop_r == false);
-	test_asserts::verify ("int_prop is nil", !rx_io.int_prop);
-	test_asserts::verify ("int_prop_r is retained", *rx_io.int_prop_r == -5);
-	test_asserts::verify ("uint_prop is nil", !!rx_io.uint_prop);
-	test_asserts::verify ("uint_prop_r is retained", *rx_io.uint_prop_r == 15u);
+	test_asserts::verify ("nil_si_prop is nil", !rx.nil_si_prop);
+	test_asserts::verify ("angle_prop is nil", !rx.angle_prop);
+	test_asserts::verify ("angle_prop_r is retained", *rx.angle_prop_r == 15_rad);
+	test_asserts::verify ("velocity_prop is nil", !rx.velocity_prop);
+	test_asserts::verify_equal_with_epsilon ("velocity_prop_r is retained", *rx.velocity_prop_r, 100_mps, 0.1_mps);
+	test_asserts::verify ("velocity_prop_offset is nil", !rx.velocity_prop_offset);
+	test_asserts::verify_equal_with_epsilon ("velocity_prop_offset_r is retained", *rx.velocity_prop_offset_r, 102_mps, 0.1_mps);
+	test_asserts::verify ("bool_prop is nil", !rx.bool_prop);
+	test_asserts::verify ("bool_prop_r is retained", *rx.bool_prop_r == false);
+	test_asserts::verify ("int_prop is nil", !rx.int_prop);
+	test_asserts::verify ("int_prop_r is retained", *rx.int_prop_r == -5);
+	test_asserts::verify ("uint_prop is nil", !!rx.uint_prop);
+	test_asserts::verify ("uint_prop_r is retained", *rx.uint_prop_r == 15u);
 });
 
 
 AutoTest t5 ("modules/io/link: protocol: send-every/send-offset", []{
 	// The third envelope should be sent every two packets, starting from packet with index 1.
 
-	GCS_Tx_LinkIO tx_io;
-	Aircraft_Rx_LinkIO rx_io;
-	GCS_Tx_LinkProtocol tx_protocol (&tx_io);
-	GCS_Tx_LinkProtocol rx_protocol (&rx_io);
+	GCS_Tx_Link tx;
+	Aircraft_Rx_Link rx;
+	GCS_Tx_LinkProtocol tx_protocol (&tx);
+	GCS_Tx_LinkProtocol rx_protocol (&rx);
 	TestCycle cycle;
 
 	constexpr int64_t kFirstInt = 11223344;
 	constexpr int64_t kSecondInt = 66775544;
 
-	tx_io.dummy << kFirstInt;
-	tx_io.fetch_all (cycle += 1_s);
+	tx.dummy << kFirstInt;
+	tx.fetch_all (cycle += 1_s);
 	// According to envelope settings, one need to transmit 7 times before the envelope will be
 	// actually sent:
 	for (size_t i = 0; i < 8; ++i)
 	{
 		transmit (tx_protocol, rx_protocol);
-		test_asserts::verify ("last envelope not sent in " + std::to_string (i) + "-th transmission", !rx_io.dummy);
+		test_asserts::verify ("last envelope not sent in " + std::to_string (i) + "-th transmission", !rx.dummy);
 	}
 
 	// 8th transmission (every 10th envelope is sent, but offset is 8 and this is the first time):
 	transmit (tx_protocol, rx_protocol);
-	test_asserts::verify ("last envelope sent for the first time", *rx_io.dummy == *tx_io.dummy);
+	test_asserts::verify ("last envelope sent for the first time", *rx.dummy == *tx.dummy);
 
-	tx_io.dummy << kSecondInt;
-	tx_io.fetch_all (cycle += 1_s);
+	tx.dummy << kSecondInt;
+	tx.fetch_all (cycle += 1_s);
 
 	// Next 9 transmissions should not send last envelope (it's sent every 10th):
 	for (size_t i = 0; i < 9; ++i)
 	{
 		transmit (tx_protocol, rx_protocol);
-		test_asserts::verify ("last envelope not sent in subsequent transmissions", *rx_io.dummy == kFirstInt);
+		test_asserts::verify ("last envelope not sent in subsequent transmissions", *rx.dummy == kFirstInt);
 	}
 
 	// 10th transmission updates the socket:
 	transmit (tx_protocol, rx_protocol);
-	test_asserts::verify ("last envelope sent for the second time", *rx_io.dummy == kSecondInt);
+	test_asserts::verify ("last envelope sent for the second time", *rx.dummy == kSecondInt);
 });
 
 } // namespace

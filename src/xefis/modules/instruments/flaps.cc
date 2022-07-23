@@ -27,16 +27,16 @@
 using namespace neutrino::si::literals;
 
 
-Flaps::Flaps (std::unique_ptr<FlapsIO> module_io, xf::Graphics const& graphics, std::string_view const& instance):
-	Instrument (std::move (module_io), instance),
+Flaps::Flaps (xf::Graphics const& graphics, std::string_view const& instance):
+	FlapsIO (instance),
 	InstrumentSupport (graphics)
 {
 	_inputs_observer.set_callback ([&]{
 		mark_dirty();
 	});
 	_inputs_observer.observe ({
-		&io.current_angle,
-		&io.set_angle,
+		&_io.current_angle,
+		&_io.set_angle,
 	});
 }
 
@@ -52,10 +52,10 @@ std::packaged_task<void()>
 Flaps::paint (xf::PaintRequest paint_request) const
 {
 	PaintingParams params;
-	params.maximum_angle = *io.maximum_angle;
-	params.hide_retracted = *io.hide_retracted;
-	params.current_angle = io.current_angle.get_optional();
-	params.set_angle = io.set_angle.get_optional();
+	params.maximum_angle = *_io.maximum_angle;
+	params.hide_retracted = *_io.hide_retracted;
+	params.current_angle = _io.current_angle.get_optional();
+	params.set_angle = _io.set_angle.get_optional();
 
 	return std::packaged_task<void()> ([this, pr = std::move (paint_request), pp = std::move (params)] {
 		async_paint (pr, pp);

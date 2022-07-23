@@ -24,8 +24,8 @@
 #include "altacq.h"
 
 
-AltAcq::AltAcq (std::unique_ptr<AltAcqIO> module_io, std::string_view const& instance):
-	Module (std::move (module_io), instance)
+AltAcq::AltAcq (std::string_view const& instance):
+	AltAcqIO (instance)
 {
 	_output_computer.set_minimum_dt (100_ms);
 	_output_computer.set_callback (std::bind (&AltAcq::compute_altitude_acquire_distance, this));
@@ -33,10 +33,10 @@ AltAcq::AltAcq (std::unique_ptr<AltAcqIO> module_io, std::string_view const& ins
 		&_output_smoother,
 	});
 	_output_computer.observe ({
-		&io.altitude_acquire_amsl,
-		&io.altitude_amsl,
-		&io.vertical_speed,
-		&io.ground_speed,
+		&_io.altitude_acquire_amsl,
+		&_io.altitude_amsl,
+		&_io.vertical_speed,
+		&_io.ground_speed,
 	});
 }
 
@@ -46,28 +46,28 @@ AltAcq::process (xf::Cycle const& cycle)
 {
 	_output_computer.process (cycle.update_time());
 
-	if (io.altitude_acquire_flag.use_count() > 0 && io.altitude_amsl && io.altitude_acquire_amsl)
+	if (_io.altitude_acquire_flag.use_count() > 0 && _io.altitude_amsl && _io.altitude_acquire_amsl)
 	{
 		if (_altitude_amsl_changed.value_changed() || _altitude_acquire_amsl_changed.value_changed())
 		{
-			si::Length diff = abs (*io.altitude_amsl - *io.altitude_acquire_amsl);
+			si::Length diff = abs (*_io.altitude_amsl - *_io.altitude_acquire_amsl);
 			// Arm flag when difference beyond 'on-diff':
-			if (diff > *io.flag_diff_on)
+			if (diff > *_io.flag_diff_on)
 				_flag_armed = true;
 			// But don't allow arming if alt setting was changed recently:
-			if (io.altitude_acquire_amsl.valid_age() < 1_s)
+			if (_io.altitude_acquire_amsl.valid_age() < 1_s)
 				_flag_armed = false;
 			// Disarm and disable when approaching commanded altitude,
 			// so that it doesn't engage again when the craft is on the
 			// other side of commanded alt:
-			if (diff < *io.flag_diff_off)
+			if (diff < *_io.flag_diff_off)
 				_flag_armed = false;
 
-			io.altitude_acquire_flag = _flag_armed && *io.flag_diff_off <= diff && diff <= *io.flag_diff_on;
+			_io.altitude_acquire_flag = _flag_armed && *_io.flag_diff_off <= diff && diff <= *_io.flag_diff_on;
 		}
 	}
 	else
-		io.altitude_acquire_flag = xf::nil;
+		_io.altitude_acquire_flag = xf::nil;
 }
 
 
@@ -76,22 +76,22 @@ AltAcq::compute_altitude_acquire_distance()
 {
 	si::Time update_dt = _output_computer.update_dt();
 
-	if (io.altitude_acquire_amsl &&
-		io.altitude_amsl &&
-		io.vertical_speed &&
-		io.ground_speed)
+	if (_io.altitude_acquire_amsl &&
+		_io.altitude_amsl &&
+		_io.vertical_speed &&
+		_io.ground_speed)
 	{
-		si::Length const alt_diff = *io.altitude_acquire_amsl - *io.altitude_amsl;
-		si::Length const distance = *io.ground_speed * (alt_diff / *io.vertical_speed);
+		si::Length const alt_diff = *_io.altitude_acquire_amsl - *_io.altitude_amsl;
+		si::Length const distance = *_io.ground_speed * (alt_diff / *_io.vertical_speed);
 
-		if (!io.minimum_altitude_difference || abs (alt_diff) >= *io.minimum_altitude_difference)
-			io.altitude_acquire_distance = _output_smoother (distance, update_dt);
+		if (!_io.minimum_altitude_difference || abs (alt_diff) >= *_io.minimum_altitude_difference)
+			_io.altitude_acquire_distance = _output_smoother (distance, update_dt);
 		else
-			io.altitude_acquire_distance = xf::nil;
+			_io.altitude_acquire_distance = xf::nil;
 	}
 	else
 	{
-		io.altitude_acquire_distance = xf::nil;
+		_io.altitude_acquire_distance = xf::nil;
 		_output_smoother.invalidate();
 	}
 }

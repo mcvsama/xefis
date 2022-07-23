@@ -27,7 +27,7 @@
 #include <xefis/support/sockets/socket_observer.h>
 
 
-class AFCS_EAC_YD_IO: public xf::ModuleIO
+class AFCS_EAC_YD_IO: public xf::Module
 {
   public:
 	/*
@@ -50,18 +50,21 @@ class AFCS_EAC_YD_IO: public xf::ModuleIO
 	 */
 
 	xf::ModuleOut<si::Angle>		rudder_deflection	{ this, "rudder-deflection" };
+
+  public:
+	using xf::Module::Module;
 };
 
 
 /**
  * Controls rudder to obtain zero slip-skid value.
  */
-class AFCS_EAC_YD: public xf::Module<AFCS_EAC_YD_IO>
+class AFCS_EAC_YD: public AFCS_EAC_YD_IO
 {
   public:
 	// Ctor
 	explicit
-	AFCS_EAC_YD (std::unique_ptr<AFCS_EAC_YD_IO>, std::string_view const& instance = {});
+	AFCS_EAC_YD (std::string_view const& instance = {});
 
   private:
 	// Module API
@@ -79,6 +82,7 @@ class AFCS_EAC_YD: public xf::Module<AFCS_EAC_YD_IO>
 	compute();
 
   private:
+	AFCS_EAC_YD_IO&							_io { *this };
 	xf::PIDController<si::Force, si::Angle>	_rudder_pid;
 	xf::SocketObserver						_rudder_computer;
 };

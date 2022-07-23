@@ -31,7 +31,7 @@ namespace si = neutrino::si;
 using namespace neutrino::si::literals;
 
 
-class RemoteControlManagementSystemIO: public xf::ModuleIO
+class RemoteControlManagementSystemIO: public xf::Module
 {
   public:
 	/*
@@ -55,6 +55,9 @@ class RemoteControlManagementSystemIO: public xf::ModuleIO
 	xf::ModuleOut<si::Length>	distance_ground			{ this, "distance/ground" };
 	xf::ModuleOut<si::Length>	distance_vertical		{ this, "distance/vertical" };
 	xf::ModuleOut<si::Angle>	true_home_direction		{ this, "home-direction.true" };
+
+  public:
+	using xf::Module::Module;
 };
 
 
@@ -62,12 +65,12 @@ class RemoteControlManagementSystemIO: public xf::ModuleIO
  * Computes VLOS/ground distances and direction to the "home" (base station or whatever
  * configured) from actual basestation and aircraft coordinates.
  */
-class RemoteControlManagementSystem: public xf::Module<RemoteControlManagementSystemIO>
+class RemoteControlManagementSystem: public RemoteControlManagementSystemIO
 {
   public:
 	// Ctor
 	explicit
-	RemoteControlManagementSystem (std::unique_ptr<RemoteControlManagementSystemIO>, std::string_view const& instance = {});
+	RemoteControlManagementSystem (std::string_view const& instance = {});
 
 	// Module API
 	void
@@ -87,7 +90,8 @@ class RemoteControlManagementSystem: public xf::Module<RemoteControlManagementSy
 	compute_true_home_direction();
 
   private:
-	xf::SocketObserver _distance_computer;
+	RemoteControlManagementSystemIO&	_io { *this };
+	xf::SocketObserver					_distance_computer;
 };
 
 #endif

@@ -24,8 +24,8 @@
 #include "imu_cpf.h"
 
 
-IMU_CPF::IMU_CPF (std::unique_ptr<IMU_CPF_IO> module_io, std::string_view const& instance):
-	Module (std::move (module_io), instance)
+IMU_CPF::IMU_CPF (std::string_view const& instance):
+	IMU_CPF_IO (instance)
 {
 	_centripetal_computer.set_callback (std::bind (&IMU_CPF::compute_centripetal, this));
 	_centripetal_computer.add_depending_smoothers ({
@@ -34,12 +34,12 @@ IMU_CPF::IMU_CPF (std::unique_ptr<IMU_CPF_IO> module_io, std::string_view const&
 		&_smooth_accel_z,
 	});
 	_centripetal_computer.observe ({
-		&io.angular_velocity_x,
-		&io.angular_velocity_y,
-		&io.angular_velocity_z,
-		&io.tas_x,
-		&io.tas_y,
-		&io.tas_z,
+		&_io.angular_velocity_x,
+		&_io.angular_velocity_y,
+		&_io.angular_velocity_z,
+		&_io.tas_x,
+		&_io.tas_y,
+		&_io.tas_z,
 	});
 }
 
@@ -70,53 +70,53 @@ IMU_CPF::compute_centripetal()
 	 *   a[z] = v[x] * (2 * pi * +f[y])
 	 */
 
-	if (io.angular_velocity_x && io.angular_velocity_y && io.angular_velocity_z &&
-		io.tas_x && io.tas_y && io.tas_z)
+	if (_io.angular_velocity_x && _io.angular_velocity_y && _io.angular_velocity_z &&
+		_io.tas_x && _io.tas_y && _io.tas_z)
 	{
 		using namespace neutrino;
 
 		si::Time dt = _centripetal_computer.update_dt();
 
 		math::Vector<si::Velocity, 3> vec_v {
-			*io.tas_x,
-			*io.tas_y,
-			*io.tas_z,
+			*_io.tas_x,
+			*_io.tas_y,
+			*_io.tas_z,
 		};
 
 		math::Vector<si::AngularVelocity, 3> vec_w {
-			*io.angular_velocity_x,
-			*io.angular_velocity_y,
-			*io.angular_velocity_z,
+			*_io.angular_velocity_x,
+			*_io.angular_velocity_y,
+			*_io.angular_velocity_z,
 		};
 
 		auto acceleration = math::cross_product (vec_v, vec_w);
 
-		io.centripetal_acceleration_x = _smooth_accel_x (si::convert (acceleration[0]), dt);
-		io.centripetal_acceleration_y = _smooth_accel_y (si::convert (acceleration[1]), dt);
-		io.centripetal_acceleration_z = _smooth_accel_z (si::convert (acceleration[2]), dt);
+		_io.centripetal_acceleration_x = _smooth_accel_x (si::convert (acceleration[0]), dt);
+		_io.centripetal_acceleration_y = _smooth_accel_y (si::convert (acceleration[1]), dt);
+		_io.centripetal_acceleration_z = _smooth_accel_z (si::convert (acceleration[2]), dt);
 
-		if (io.mass)
+		if (_io.mass)
 		{
-			io.centripetal_force_x = *io.mass * *io.centripetal_acceleration_x;
-			io.centripetal_force_y = *io.mass * *io.centripetal_acceleration_y;
-			io.centripetal_force_z = *io.mass * *io.centripetal_acceleration_z;
+			_io.centripetal_force_x = *_io.mass * *_io.centripetal_acceleration_x;
+			_io.centripetal_force_y = *_io.mass * *_io.centripetal_acceleration_y;
+			_io.centripetal_force_z = *_io.mass * *_io.centripetal_acceleration_z;
 		}
 		else
 		{
-			io.centripetal_force_x = xf::nil;
-			io.centripetal_force_y = xf::nil;
-			io.centripetal_force_z = xf::nil;
+			_io.centripetal_force_x = xf::nil;
+			_io.centripetal_force_y = xf::nil;
+			_io.centripetal_force_z = xf::nil;
 		}
 	}
 	else
 	{
-		io.centripetal_force_x = xf::nil;
-		io.centripetal_force_y = xf::nil;
-		io.centripetal_force_z = xf::nil;
+		_io.centripetal_force_x = xf::nil;
+		_io.centripetal_force_y = xf::nil;
+		_io.centripetal_force_z = xf::nil;
 
-		io.centripetal_acceleration_x = xf::nil;
-		io.centripetal_acceleration_y = xf::nil;
-		io.centripetal_acceleration_z = xf::nil;
+		_io.centripetal_acceleration_x = xf::nil;
+		_io.centripetal_acceleration_y = xf::nil;
+		_io.centripetal_acceleration_z = xf::nil;
 	}
 }
 

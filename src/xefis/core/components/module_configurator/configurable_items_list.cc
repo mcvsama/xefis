@@ -153,11 +153,11 @@ ConfigurableItemsList::read()
 				auto& module = module_details.module();
 
 				// Don't add Instruments. They will be children of Screen items.
-				if (!dynamic_cast<BasicInstrument*> (&module))
+				if (!dynamic_cast<Instrument*> (&module))
 					_tmp_module_ptrs.push_back (&module);
 			}
 
-			populate_subtree (*pli, _tmp_module_ptrs, [](auto* item) -> BasicModule* {
+			populate_subtree (*pli, _tmp_module_ptrs, [](auto* item) -> Module* {
 				if (auto* mi = dynamic_cast<ModuleItem*> (item))
 					return &mi->module();
 				else
@@ -178,7 +178,7 @@ ConfigurableItemsList::read()
 			for (auto& disclosure: screen.instrument_tracker())
 				_tmp_module_ptrs.push_back (&*disclosure.registrant());
 
-			populate_subtree (*si, _tmp_module_ptrs, [](auto* item) -> BasicModule* {
+			populate_subtree (*si, _tmp_module_ptrs, [](auto* item) -> Module* {
 				if (auto* mi = dynamic_cast<ModuleItem*> (item))
 					return &mi->module();
 				else

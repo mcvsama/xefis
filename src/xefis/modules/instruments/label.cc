@@ -24,8 +24,8 @@
 #include "label.h"
 
 
-Label::Label (std::unique_ptr<LabelIO> module_io, xf::Graphics const& graphics, std::string_view const& instance):
-	Instrument (std::move (module_io), instance),
+Label::Label (xf::Graphics const& graphics, std::string_view const& instance):
+	LabelIO (instance),
 	InstrumentSupport (graphics)
 { }
 
@@ -34,10 +34,10 @@ std::packaged_task<void()>
 Label::paint (xf::PaintRequest paint_request) const
 {
 	PaintingParams params;
-	params.font_scale = *io.font_scale;
-	params.label = *io.label;
-	params.color = *io.color;
-	params.alignment = *io.alignment;
+	params.font_scale = *_io.font_scale;
+	params.label = *_io.label;
+	params.color = *_io.color;
+	params.alignment = *_io.alignment;
 
 	return std::packaged_task<void()> ([this, pr = std::move (paint_request), pp = std::move (params)] {
 		async_paint (pr, pp);

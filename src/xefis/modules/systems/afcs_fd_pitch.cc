@@ -26,8 +26,8 @@
 #include "afcs_api.h"
 
 
-AFCS_FD_Pitch::AFCS_FD_Pitch (std::unique_ptr<AFCS_FD_Pitch_IO> module_io, xf::Logger const& logger, std::string_view const& instance):
-	Module (std::move (module_io), instance),
+AFCS_FD_Pitch::AFCS_FD_Pitch (xf::Logger const& logger, std::string_view const& instance):
+	AFCS_FD_Pitch_IO (instance),
 	_logger (logger.with_scope (std::string (kLoggerScope) + "#" + instance))
 {
 	constexpr auto sec = 1.0_s;
@@ -44,19 +44,19 @@ AFCS_FD_Pitch::AFCS_FD_Pitch (std::unique_ptr<AFCS_FD_Pitch_IO> module_io, xf::L
 		&_output_pitch_smoother,
 	});
 	_pitch_computer.observe ({
-		&io.autonomous,
-		&io.pitch_limits,
-		&io.cmd_pitch_mode,
-		&io.cmd_ias,
-		&io.cmd_mach,
-		&io.cmd_alt,
-		&io.cmd_vs,
-		&io.cmd_fpa,
-		&io.measured_ias,
-		&io.measured_mach,
-		&io.measured_alt,
-		&io.measured_vs,
-		&io.measured_fpa,
+		&_io.autonomous,
+		&_io.pitch_limits,
+		&_io.cmd_pitch_mode,
+		&_io.cmd_ias,
+		&_io.cmd_mach,
+		&_io.cmd_alt,
+		&_io.cmd_vs,
+		&_io.cmd_fpa,
+		&_io.measured_ias,
+		&_io.measured_mach,
+		&_io.measured_alt,
+		&_io.measured_vs,
+		&_io.measured_fpa,
 	});
 }
 
@@ -64,11 +64,11 @@ AFCS_FD_Pitch::AFCS_FD_Pitch (std::unique_ptr<AFCS_FD_Pitch_IO> module_io, xf::L
 void
 AFCS_FD_Pitch::initialize()
 {
-	_ias_pid.set_pid (*io.ias_pid_settings);
-	_mach_pid.set_pid (*io.mach_pid_settings);
-	_altitude_pid.set_pid (*io.altitude_pid_settings);
-	_vs_pid.set_pid (*io.vs_pid_settings);
-	_fpa_pid.set_pid (*io.fpa_pid_settings);
+	_ias_pid.set_pid (*_io.ias_pid_settings);
+	_mach_pid.set_pid (*_io.mach_pid_settings);
+	_altitude_pid.set_pid (*_io.altitude_pid_settings);
+	_vs_pid.set_pid (*_io.vs_pid_settings);
+	_fpa_pid.set_pid (*_io.fpa_pid_settings);
 }
 
 
@@ -85,8 +85,8 @@ AFCS_FD_Pitch::rescue (xf::Cycle const& cycle, std::exception_ptr eptr)
 {
 	using namespace xf::exception_ops;
 
-	if (!io.autonomous.value_or (true))
-		io.operative = false;
+	if (!_io.autonomous.value_or (true))
+		_io.operative = false;
 
 	check_autonomous();
 	(cycle.logger() + _logger) << "" << eptr << std::endl;
@@ -103,11 +103,11 @@ AFCS_FD_Pitch::compute_pitch()
 	// Always compute all PIDs. Use their output only when it's needed.
 
 	// TODO Change all Ranges here to settings.
-	std::optional<si::Angle> pitch_for_ias = compute_pitch (_ias_pid, io.cmd_ias, io.measured_ias, update_dt);
-	std::optional<si::Angle> pitch_for_mach = compute_pitch (_mach_pid, io.cmd_mach, io.measured_mach, update_dt);
-	std::optional<si::Angle> pitch_for_alt = compute_pitch (_altitude_pid, io.cmd_alt, io.measured_alt, update_dt);
-	std::optional<si::Angle> pitch_for_vs = compute_pitch (_vs_pid, io.cmd_vs, io.measured_vs, update_dt);
-	std::optional<si::Angle> pitch_for_fpa = compute_pitch (_fpa_pid, io.cmd_fpa, io.measured_fpa, update_dt);
+	std::optional<si::Angle> pitch_for_ias = compute_pitch (_ias_pid, _io.cmd_ias, _io.measured_ias, update_dt);
+	std::optional<si::Angle> pitch_for_mach = compute_pitch (_mach_pid, _io.cmd_mach, _io.measured_mach, update_dt);
+	std::optional<si::Angle> pitch_for_alt = compute_pitch (_altitude_pid, _io.cmd_alt, _io.measured_alt, update_dt);
+	std::optional<si::Angle> pitch_for_vs = compute_pitch (_vs_pid, _io.cmd_vs, _io.measured_vs, update_dt);
+	std::optional<si::Angle> pitch_for_fpa = compute_pitch (_fpa_pid, _io.cmd_fpa, _io.measured_fpa, update_dt);
 	std::optional<si::Angle> pitch_for_vnavpath;//TODO
 	std::optional<si::Angle> pitch_for_gs;//TODO
 	std::optional<si::Angle> pitch_for_flare;//TODO
@@ -123,7 +123,7 @@ AFCS_FD_Pitch::compute_pitch()
 
 	using afcs::PitchMode;
 
-	switch (*io.cmd_pitch_mode)
+	switch (*_io.cmd_pitch_mode)
 	{
 		case PitchMode::None:
 			pitch.reset();
@@ -168,15 +168,15 @@ AFCS_FD_Pitch::compute_pitch()
 	}
 
 	if (pitch)
-		io.pitch = _output_pitch_smoother (*pitch, update_dt);
+		_io.pitch = _output_pitch_smoother (*pitch, update_dt);
 	else
 	{
-		io.pitch = xf::nil;
+		_io.pitch = xf::nil;
 		_output_pitch_smoother.reset();
 	}
 
-	if (disengage || io.operative.is_nil())
-		io.operative = !disengage;
+	if (disengage || _io.operative.is_nil())
+		_io.operative = !disengage;
 
 	check_autonomous();
 }
@@ -189,7 +189,7 @@ template<class Input, class Control>
 								  xf::ModuleIn<Input> const& measured_param,
 								  si::Time update_dt) const
 	{
-		xf::Range pitch_limits { -*io.pitch_limits, +*io.pitch_limits };
+		xf::Range pitch_limits { -*_io.pitch_limits, +*_io.pitch_limits };
 
 		if (cmd_param && measured_param)
 			return xf::clamped (pid (*cmd_param, *measured_param, update_dt), pitch_limits);
@@ -204,7 +204,7 @@ template<class Input, class Control>
 void
 AFCS_FD_Pitch::check_autonomous()
 {
-	if (io.autonomous.value_or (true))
-		io.operative = true;
+	if (_io.autonomous.value_or (true))
+		_io.operative = true;
 }
 

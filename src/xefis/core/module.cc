@@ -30,8 +30,111 @@
 
 namespace xf {
 
+UninitializedSettings::UninitializedSettings (std::vector<BasicSetting*> settings):
+	FastException (make_message (settings))
+{ }
+
+
+std::string
+UninitializedSettings::make_message (std::vector<BasicSetting*> settings)
+{
+	if (settings.empty())
+		return "uninitialized settings in a module";
+	else
+	{
+		std::string result = "uninitialized setting(s) found for module " + identifier (*settings[0]->module()) + ": ";
+
+		for (std::size_t i = 0; i < settings.size(); ++i)
+		{
+			result += settings[i]->name();
+
+			if (i != settings.size() - 1)
+				result += ", ";
+		}
+
+		return result;
+	}
+}
+
+
 void
-BasicModule::ProcessingLoopAPI::communicate (Cycle const& cycle)
+Module::ModuleSocketAPI::verify_settings()
+{
+	std::vector<BasicSetting*> uninitialized_settings;
+
+	for (auto* setting: _module._registered_settings)
+	{
+		if (setting->required() && !*setting)
+			uninitialized_settings.push_back (setting);
+	}
+
+	if (!uninitialized_settings.empty())
+		throw UninitializedSettings (uninitialized_settings);
+
+	_module.verify_settings();
+}
+
+
+void
+Module::ModuleSocketAPI::register_setting (BasicSetting& setting)
+{
+	_module._registered_settings.push_back (&setting);
+}
+
+
+void
+Module::ModuleSocketAPI::register_input_socket (BasicModuleIn& socket)
+{
+	_module._registered_input_sockets.push_back (&socket);
+}
+
+
+void
+Module::ModuleSocketAPI::unregister_input_socket (BasicModuleIn& socket)
+{
+	auto new_end = std::remove (_module._registered_input_sockets.begin(), _module._registered_input_sockets.end(), &socket);
+	_module._registered_input_sockets.resize (neutrino::to_unsigned (std::distance (_module._registered_input_sockets.begin(), new_end)));
+}
+
+
+void
+Module::ModuleSocketAPI::register_output_socket (BasicModuleOut& socket)
+{
+	_module._registered_output_sockets.push_back (&socket);
+}
+
+
+void
+Module::ModuleSocketAPI::unregister_output_socket (BasicModuleOut& socket)
+{
+	auto new_end = std::remove (_module._registered_output_sockets.begin(), _module._registered_output_sockets.end(), &socket);
+	_module._registered_output_sockets.resize (neutrino::to_unsigned (std::distance (_module._registered_output_sockets.begin(), new_end)));
+}
+
+
+Sequence<std::vector<BasicSetting*>::const_iterator>
+Module::ModuleSocketAPI::settings() const noexcept
+{
+	return { _module._registered_settings.begin(), _module._registered_settings.end() };
+}
+
+
+Sequence<std::vector<BasicModuleIn*>::const_iterator>
+Module::ModuleSocketAPI::input_sockets() const noexcept
+{
+	return { _module._registered_input_sockets.begin(), _module._registered_input_sockets.end() };
+}
+
+
+Sequence<std::vector<BasicModuleOut*>::const_iterator>
+Module::ModuleSocketAPI::output_sockets() const noexcept
+{
+	return { _module._registered_output_sockets.begin(), _module._registered_output_sockets.end() };
+}
+
+
+void
+Module::ProcessingLoopAPI::communicate (Cycle const& cycle)
 {
 	try {
 		auto communication_time = TimeHelper::measure ([&] {
@@ -39,7 +142,7 @@ BasicModule::ProcessingLoopAPI::communicate (Cycle const& cycle)
 		});
 
 		if (implements_communicate_method())
-			BasicModule::AccountingAPI (_module).add_communication_time (communication_time);
+			Module::AccountingAPI (_module).add_communication_time (communication_time);
 	}
 	catch (...)
 	{
@@ -49,14 +152,14 @@ BasicModule::ProcessingLoopAPI::communicate (Cycle const& cycle)
 
 
 void
-BasicModule::ProcessingLoopAPI::fetch_and_process (Cycle const& cycle)
+Module::ProcessingLoopAPI::fetch_and_process (Cycle const& cycle)
 {
 	try {
 		if (!_module._cached)
 		{
 			_module._cached = true;
 
-			for (auto* socket: _module.io_base()->_registered_input_sockets)
+			for (auto* socket: _module._registered_input_sockets)
 				socket->fetch (cycle);
 
 			auto processing_time = TimeHelper::measure ([&] {
@@ -64,7 +167,7 @@ BasicModule::ProcessingLoopAPI::fetch_and_process (Cycle const& cycle)
 			});
 
 			if (implements_process_method())
-				BasicModule::AccountingAPI (_module).add_processing_time (processing_time);
+				Module::AccountingAPI (_module).add_processing_time (processing_time);
 		}
 	}
 	catch (...)
@@ -75,14 +178,14 @@ BasicModule::ProcessingLoopAPI::fetch_and_process (Cycle const& cycle)
 
 
 void
-BasicModule::ProcessingLoopAPI::handle_exception (Cycle const& cycle, std::string_view const& context_info)
+Module::ProcessingLoopAPI::handle_exception (Cycle const& cycle, std::string_view const& context_info)
 {
 	try {
 		_module.rescue (cycle, std::current_exception());
 
 		// Set all output sockets to nil.
 		if (_module._set_nil_on_exception)
-			for (auto* socket: _module._io->_registered_output_sockets)
+			for (auto* socket: _module._registered_output_sockets)
 				*socket = xf::nil;
 	}
 	catch (...)
@@ -92,44 +195,53 @@ BasicModule::ProcessingLoopAPI::handle_exception (Cycle const& cycle, std::strin
 }
 
 
-BasicModule::BasicModule (std::unique_ptr<ModuleIO> io, std::string_view const& instance):
-	NamedInstance (instance),
-	_io (std::move (io))
+Module::Module (std::string_view const& instance):
+	NamedInstance (instance)
 {
-	auto api = ModuleIO::ProcessingLoopAPI (*_io.get());
-	api.set_module (*this);
-	api.verify_settings();
+	ModuleSocketAPI (*this).verify_settings();
+}
+
+
+Module::~Module()
+{
+	// Operate on a copy since the deregister() method modifies vectors in this class.
+	for (auto* socket: clone (_registered_input_sockets))
+		socket->deregister();
+
+	// Operate on copies since the deregister() method modifies vectors in this class.
+	for (auto* socket: clone (_registered_output_sockets))
+		socket->deregister();
 }
 
 
 void
-BasicModule::initialize()
+Module::initialize()
 { }
 
 
 void
-BasicModule::communicate (xf::Cycle const&)
+Module::communicate (xf::Cycle const&)
 {
 	_did_not_communicate = true;
 }
 
 
 void
-BasicModule::process (xf::Cycle const&)
+Module::process (xf::Cycle const&)
 {
 	_did_not_process = true;
 }
 
 
 void
-BasicModule::rescue (Cycle const& cycle, std::exception_ptr eptr)
+Module::rescue (Cycle const& cycle, std::exception_ptr eptr)
 {
 	cycle.logger() << "Unhandled exception '" << xf::describe_exception (eptr) << "' during processing of module " << identifier (*this) << "\n";
 }
 
 
 std::string
-identifier (BasicModule const& module)
+identifier (Module const& module)
 {
 	auto s = demangle (typeid (module));
 	return s.substr (0, s.find ("<")) + "#" + module.instance();
@@ -137,7 +249,7 @@ identifier (BasicModule const& module)
 
 
 std::string
-identifier (BasicModule const* module)
+identifier (Module const* module)
 {
 	return module ? identifier (*module) : "(nullptr)";
 }

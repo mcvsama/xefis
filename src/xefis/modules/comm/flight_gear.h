@@ -34,7 +34,7 @@ namespace si = neutrino::si;
 using namespace neutrino::si::literals;
 
 
-class FlightGearIO: public xf::ModuleIO
+class FlightGearIO: public xf::Module
 {
   public:
 	/*
@@ -138,19 +138,22 @@ class FlightGearIO: public xf::ModuleIO
 	xf::ModuleOut<bool>					gear_left_down					{ this, "gear/left-down" };
 	xf::ModuleOut<bool>					gear_right_up					{ this, "gear/right-up" };
 	xf::ModuleOut<bool>					gear_right_down					{ this, "gear/right-down" };
+
+  public:
+	using xf::Module::Module;
 };
 
 
 class FlightGear:
 	public QObject,
-	public xf::Module<FlightGearIO>
+	public FlightGearIO
 {
 	Q_OBJECT
 
   public:
 	// Ctor
 	explicit
-	FlightGear (std::unique_ptr<FlightGearIO>, std::string_view const& instance = {});
+	FlightGear (std::string_view const& instance = {});
 
 	// Module API
 	void
@@ -183,6 +186,7 @@ class FlightGear:
 	write_output();
 
   private:
+	FlightGearIO&						_io { *this };
 	std::unique_ptr<QTimer>				_timeout_timer;
 	QHostAddress						_input_address;
 	std::unique_ptr<QUdpSocket>			_input;

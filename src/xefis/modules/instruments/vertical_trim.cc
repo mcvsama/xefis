@@ -27,14 +27,14 @@
 #include "vertical_trim.h"
 
 
-VerticalTrim::VerticalTrim (std::unique_ptr<VerticalTrimIO> module_io, xf::Graphics const& graphics, std::string_view const& instance):
-	Instrument (std::move (module_io), instance),
+VerticalTrim::VerticalTrim (xf::Graphics const& graphics, std::string_view const& instance):
+	VerticalTrimIO (instance),
 	InstrumentSupport (graphics)
 {
 	_inputs_observer.set_callback ([&]{
 		mark_dirty();
 	});
-	_inputs_observer.observe (io.trim_value);
+	_inputs_observer.observe (_io.trim_value);
 }
 
 
@@ -49,11 +49,11 @@ std::packaged_task<void()>
 VerticalTrim::paint (xf::PaintRequest paint_request) const
 {
 	PaintingParams params;
-	params.label = *io.label;
-	params.trim_value = io.trim_value.get_optional();
-	params.trim_reference = io.trim_reference.get_optional();
-	params.trim_reference_minimum = io.trim_reference_minimum.get_optional();
-	params.trim_reference_maximum = io.trim_reference_maximum.get_optional();
+	params.label = *_io.label;
+	params.trim_value = _io.trim_value.get_optional();
+	params.trim_reference = _io.trim_reference.get_optional();
+	params.trim_reference_minimum = _io.trim_reference_minimum.get_optional();
+	params.trim_reference_maximum = _io.trim_reference_maximum.get_optional();
 
 	return std::packaged_task<void()> ([this, pr = std::move (paint_request), pp = std::move (params)] {
 		async_paint (pr, pp);
@@ -124,7 +124,7 @@ VerticalTrim::async_paint (xf::PaintRequest const& paint_request, PaintingParams
 	// Cyan vertical text:
 	painter.setFont (label_font);
 	painter.setPen (cyan);
-	painter.fast_draw_vertical_text (QPointF (1.5 * h, 0.0), Qt::AlignVCenter | Qt::AlignLeft, *io.label);
+	painter.fast_draw_vertical_text (QPointF (1.5 * h, 0.0), Qt::AlignVCenter | Qt::AlignLeft, *_io.label);
 
 	// Pointer:
 	if (trim)

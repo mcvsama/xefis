@@ -28,7 +28,7 @@
 
 
 // TODO handle nans
-class VerticalTrimIO: public xf::ModuleIO
+class VerticalTrimIO: public xf::Instrument
 {
   public:
 	/*
@@ -45,11 +45,14 @@ class VerticalTrimIO: public xf::ModuleIO
 	xf::ModuleIn<double>	trim_reference			{ this, "trim/reference" };
 	xf::ModuleIn<double>	trim_reference_minimum	{ this, "trim/reference.minimum" };
 	xf::ModuleIn<double>	trim_reference_maximum	{ this, "trim/reference.maximum" };
+
+  public:
+	using xf::Instrument::Instrument;
 };
 
 
 class VerticalTrim:
-	public xf::Instrument<VerticalTrimIO>,
+	public VerticalTrimIO,
 	private xf::InstrumentSupport
 {
   private:
@@ -65,7 +68,7 @@ class VerticalTrim:
   public:
 	// Ctor
 	explicit
-	VerticalTrim (std::unique_ptr<VerticalTrimIO>, xf::Graphics const&, std::string_view const& instance = {});
+	VerticalTrim (xf::Graphics const&, std::string_view const& instance = {});
 
 	// Module API
 	void
@@ -83,7 +86,8 @@ class VerticalTrim:
 	stringify (double value);
 
   private:
-	xf::SocketObserver _inputs_observer;
+	VerticalTrimIO&		_io { *this };
+	xf::SocketObserver	_inputs_observer;
 };
 
 #endif

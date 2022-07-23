@@ -32,19 +32,19 @@
 #include "udp.h"
 
 
-UDP::UDP (std::unique_ptr<UDP_IO> module_io, xf::Logger const& logger, std::string_view const& instance):
-	Module (std::move (module_io), instance),
+UDP::UDP (xf::Logger const& logger, std::string_view const& instance):
+	UDP_IO (instance),
 	_logger (logger.with_scope (std::string (kLoggerScope) + "#" + instance))
 {
-	if (io.tx_udp_host && io.tx_udp_port)
+	if (_io.tx_udp_host && _io.tx_udp_port)
 		_tx = std::make_unique<QUdpSocket>();
 
-	if (io.rx_udp_host && io.rx_udp_port)
+	if (_io.rx_udp_host && _io.rx_udp_port)
 	{
 		_rx = std::make_unique<QUdpSocket>();
 
-		if (!_rx->bind (QHostAddress (*io.rx_udp_host), *io.rx_udp_port, QUdpSocket::ShareAddress))
-			_logger << "Failed to bind to address " << io.rx_udp_host->toStdString() << ":" << *io.rx_udp_port << std::endl;
+		if (!_rx->bind (QHostAddress (*_io.rx_udp_host), *_io.rx_udp_port, QUdpSocket::ShareAddress))
+			_logger << "Failed to bind to address " << _io.rx_udp_host->toStdString() << ":" << *_io.rx_udp_port << std::endl;
 
 		QObject::connect (_rx.get(), SIGNAL (readyRead()), this, SLOT (got_udp_packet()));
 	}
@@ -54,16 +54,16 @@ UDP::UDP (std::unique_ptr<UDP_IO> module_io, xf::Logger const& logger, std::stri
 void
 UDP::process (xf::Cycle const&)
 {
-	if (io.send && _send_changed.serial_changed())
+	if (_io.send && _send_changed.serial_changed())
 	{
-		std::string const& data = *io.send;
+		std::string const& data = *_io.send;
 		QByteArray blob (data.data(), data.size());
 
-		if (io.tx_interference)
+		if (_io.tx_interference)
 			interfere (blob);
 
-		if (_tx && io.tx_udp_host && io.tx_udp_port)
-			_tx->writeDatagram (blob.data(), blob.size(), QHostAddress (*io.tx_udp_host), *io.tx_udp_port);
+		if (_tx && _io.tx_udp_host && _io.tx_udp_port)
+			_tx->writeDatagram (blob.data(), blob.size(), QHostAddress (*_io.tx_udp_host), *_io.tx_udp_port);
 	}
 }
 
@@ -81,10 +81,10 @@ UDP::got_udp_packet()
 		_rx->readDatagram (_received_datagram.data(), datagram_size, nullptr, nullptr);
 	}
 
-	if (io.rx_interference)
+	if (_io.rx_interference)
 		interfere (_received_datagram);
 
-	io.receive = std::string (_received_datagram.data(), neutrino::to_unsigned (_received_datagram.size()));
+	_io.receive = std::string (_received_datagram.data(), neutrino::to_unsigned (_received_datagram.size()));
 }
 
 

@@ -28,7 +28,7 @@ namespace si = neutrino::si;
 using namespace neutrino::si::literals;
 
 
-class AFCS_RollAutotrim_IO: public xf::ModuleIO
+class AFCS_RollAutotrim_IO: public xf::Module
 {
   public:
 	/*
@@ -51,6 +51,9 @@ class AFCS_RollAutotrim_IO: public xf::ModuleIO
 	 */
 
 	xf::ModuleOut<si::Angle>	ailerons_correction			{ this, "ailerons-correction" };
+
+  public:
+	using xf::Module::Module;
 };
 
 
@@ -60,17 +63,20 @@ class AFCS_RollAutotrim_IO: public xf::ModuleIO
  *
  * Works only for air speeds well below Mach 1.
  */
-class AFCS_RollAutotrim: public xf::Module<AFCS_RollAutotrim_IO>
+class AFCS_RollAutotrim: public AFCS_RollAutotrim_IO
 {
   public:
 	// Ctor
 	explicit
-	AFCS_RollAutotrim (std::unique_ptr<AFCS_RollAutotrim_IO>, std::string_view const& instance = {});
+	AFCS_RollAutotrim (std::string_view const& instance = {});
 
   protected:
 	// Module API
 	void
 	process (xf::Cycle const&) override;
+
+  private:
+	AFCS_RollAutotrim_IO& _io { *this };
 };
 
 #endif

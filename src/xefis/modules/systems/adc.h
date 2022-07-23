@@ -36,7 +36,7 @@ namespace si = neutrino::si;
 using namespace neutrino::si::literals;
 
 
-class AirDataComputerIO: public xf::ModuleIO
+class AirDataComputerIO: public xf::Module
 {
   public:
 	/*
@@ -83,13 +83,16 @@ class AirDataComputerIO: public xf::ModuleIO
 	xf::ModuleOut<si::Temperature>		static_air_temperature		{ this, "air-temperature/static" };
 	xf::ModuleOut<si::DynamicViscosity>	dynamic_viscosity			{ this, "viscosity/dynamic" };
 	xf::ModuleOut<double>				reynolds_number				{ this, "reynolds-number" };
+
+  public:
+	using xf::Module::Module;
 };
 
 
 /**
  * Computations are reliable up to 36,000 ft of altitude and up to about speed of Mach 0.3.
  */
-class AirDataComputer: public xf::Module<AirDataComputerIO>
+class AirDataComputer: public AirDataComputerIO
 {
   private:
 	static constexpr char kLoggerScope[] = "mod::AirDataComputer";
@@ -97,7 +100,7 @@ class AirDataComputer: public xf::Module<AirDataComputerIO>
   public:
 	// Ctor
 	explicit
-	AirDataComputer (std::unique_ptr<AirDataComputerIO>, xf::Airframe*, xf::Logger const&, std::string_view const& instance = {});
+	AirDataComputer (xf::Airframe*, xf::Logger const&, std::string_view const& instance = {});
 
   protected:
 	// Module API
@@ -151,13 +154,14 @@ class AirDataComputer: public xf::Module<AirDataComputerIO>
 	recover_total_pressure();
 
   private:
+	AirDataComputerIO&			_io									{ *this };
 	xf::Logger					_logger;
-	bool						_ias_in_valid_range					= false;
-	bool						_cas_in_valid_range					= false;
-	bool						_prev_use_standard_pressure			= false;
-	si::Time					_hide_alt_lookahead_until			= 0_s;
-	si::Length					_prev_altitude_amsl					= 0_ft;
-	xf::Airframe*				_airframe							= nullptr;
+	bool						_ias_in_valid_range					{ false };
+	bool						_cas_in_valid_range					{ false };
+	bool						_prev_use_standard_pressure			{ false };
+	si::Time					_hide_alt_lookahead_until			{ 0_s };
+	si::Length					_prev_altitude_amsl					{ 0_ft };
+	xf::Airframe*				_airframe							{ nullptr };
 	// Note: SocketObservers depend on Smoothers, so first Smoothers must be defined,
 	// then SocketObservers, to ensure correct order of destruction.
 	xf::Smoother<si::Velocity>	_vertical_speed_smoother			{ 1_s };

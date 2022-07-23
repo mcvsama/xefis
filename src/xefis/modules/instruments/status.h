@@ -29,6 +29,7 @@
 #include <xefis/config/all.h>
 #include <xefis/core/graphics.h>
 #include <xefis/core/instrument.h>
+#include <xefis/core/module.h>
 #include <xefis/core/setting.h>
 #include <xefis/core/sockets/socket.h>
 #include <xefis/support/instrument/instrument_support.h>
@@ -40,7 +41,10 @@ namespace si = neutrino::si;
 using namespace neutrino::si::literals;
 
 
-class StatusIO: public xf::ModuleIO
+/**
+ * Widget showing status messages.
+ */
+class StatusIO: public xf::Instrument
 {
   public:
 	/*
@@ -66,6 +70,9 @@ class StatusIO: public xf::ModuleIO
 
 	xf::ModuleOut<bool>		master_caution			{ this, "master-caution" };
 	xf::ModuleOut<bool>		master_warning			{ this, "master-warning" };
+
+  public:
+	using xf::Instrument::Instrument;
 };
 
 
@@ -73,7 +80,7 @@ class StatusIO: public xf::ModuleIO
  * Widget showing status messages.
  */
 class Status:
-	public xf::Instrument<StatusIO>,
+	public StatusIO,
 	private xf::InstrumentSupport
 {
   public:
@@ -200,7 +207,7 @@ class Status:
   public:
 	// Ctor
 	explicit
-	Status (std::unique_ptr<StatusIO>, xf::Graphics const&, std::string_view const& instance = {});
+	Status (xf::Graphics const&, std::string_view const& instance = {});
 
 	/**
 	 * Configure new message.
@@ -252,11 +259,12 @@ class Status:
 	clear();
 
   private:
-	xf::SocketButton							_button_cursor_del		{ io.button_cursor_del, [this]{ cursor_del(); } };
-	xf::SocketButton							_button_recall			{ io.button_recall, [this]{ recall(); } };
-	xf::SocketButton							_button_clear			{ io.button_clear, [this]{ clear(); } };
-	xf::SocketButton							_button_master_caution	{ io.button_master_caution, [this]{ io.master_caution = false; } };
-	xf::SocketButton							_button_master_warning	{ io.button_master_warning, [this]{ io.master_warning = false; } };
+	StatusIO&									_io						{ *this };
+	xf::SocketButton							_button_cursor_del		{ _io.button_cursor_del, [this]{ cursor_del(); } };
+	xf::SocketButton							_button_recall			{ _io.button_recall, [this]{ recall(); } };
+	xf::SocketButton							_button_clear			{ _io.button_clear, [this]{ clear(); } };
+	xf::SocketButton							_button_master_caution	{ _io.button_master_caution, [this]{ _io.master_caution = false; } };
+	xf::SocketButton							_button_master_warning	{ _io.button_master_warning, [this]{ _io.master_warning = false; } };
 	std::unique_ptr<xf::SocketDeltaDecoder<>>	_input_cursor_decoder;
 	std::vector<Message>						_messages;
 	std::vector<Message*>						_hidden_messages;

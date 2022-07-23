@@ -29,7 +29,6 @@
 #include <xefis/config/all.h>
 #include <xefis/core/graphics.h>
 #include <xefis/core/instrument.h>
-#include <xefis/core/module_io.h>
 #include <xefis/core/sockets/socket.h>
 #include <xefis/core/xefis.h>
 #include <xefis/support/instrument/instrument_support.h>
@@ -38,7 +37,7 @@
 
 // TODO handle nans
 class Datatable:
-	public xf::Instrument<xf::ModuleIO>,
+	public xf::Instrument,
 	private xf::InstrumentSupport
 {
 	class Line

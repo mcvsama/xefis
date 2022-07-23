@@ -63,7 +63,7 @@ class ConfigurableItemsList: public QWidget
 	 * Emitted when user selects a Module (also Instrument) item.
 	 */
 	void
-	module_selected (BasicModule&);
+	module_selected (Module&);
 
 	/**
 	 * Emitted when user selects a Screen item.
@@ -101,7 +101,7 @@ class ConfigurableItemsList: public QWidget
 	QTimer*							_refresh_timer	= nullptr;
 	std::vector<ProcessingLoop*>	_tmp_processing_loop_ptrs;
 	std::vector<Screen*>			_tmp_screen_ptrs;
-	std::vector<BasicModule*>		_tmp_module_ptrs;
+	std::vector<Module*>			_tmp_module_ptrs;
 };
 
 } // namespce configurator

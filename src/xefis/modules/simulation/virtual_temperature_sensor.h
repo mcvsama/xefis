@@ -29,7 +29,7 @@
 #include <xefis/support/simulation/aerodynamic.v0/flight_simulation.h>
 
 
-class VirtualTemperatureSensorIO: public xf::ModuleIO
+class VirtualTemperatureSensorIO: public xf::Module
 {
   public:
 	/*
@@ -46,10 +46,13 @@ class VirtualTemperatureSensorIO: public xf::ModuleIO
 
 	xf::ModuleOut<bool>									serviceable			{ this, "serviceable" };
 	xf::ModuleOut<si::Temperature>						temperature			{ this, "measured-temperature" };
+
+  public:
+	using xf::Module::Module;
 };
 
 
-class VirtualTemperatureSensor: public xf::Module<VirtualTemperatureSensorIO>
+class VirtualTemperatureSensor: public VirtualTemperatureSensorIO
 {
   private:
 	static constexpr char kLoggerScope[] { "mod::VirtualTemperatureSensor" };
@@ -59,7 +62,6 @@ class VirtualTemperatureSensor: public xf::Module<VirtualTemperatureSensorIO>
 	explicit
 	VirtualTemperatureSensor (xf::sim::FlightSimulation const&,
 							  xf::SpaceVector<si::Length, xf::AirframeFrame> const& mount_location,
-							  std::unique_ptr<VirtualTemperatureSensorIO>,
 							  xf::Logger const&,
 							  std::string_view const& instance = {});
 
@@ -68,6 +70,7 @@ class VirtualTemperatureSensor: public xf::Module<VirtualTemperatureSensorIO>
 	process (xf::Cycle const&) override;
 
   private:
+	VirtualTemperatureSensorIO&						_io					{ *this };
 	xf::Logger										_logger;
 	xf::sim::FlightSimulation const&				_flight_simulation;
 	xf::SpaceVector<si::Length, xf::AirframeFrame>	_mount_location;

@@ -21,7 +21,6 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
-#include <xefis/core/module_io.h>
 #include <xefis/core/sockets/basic_socket.h>
 #include <xefis/core/sockets/module_socket_path.h>
 
@@ -30,7 +29,7 @@ namespace xf {
 
 /**
  * Base class for all ModuleSocket* types.
- * ModuleIn and ModuleOut belong to ModuleIO, allow ModuleIO to be aware of those sockets.
+ * ModuleIn and ModuleOut belong to Module and allow Module to be aware of those sockets.
  */
 class BasicModuleSocket: virtual public BasicSocket
 {
@@ -42,13 +41,13 @@ class BasicModuleSocket: virtual public BasicSocket
 	BasicModuleSocket (std::string_view const& path);
 
 	/**
-	 * Create ModuleSocket that's coupled by a ModuleIO.
+	 * Create ModuleSocket that's coupled by a Module.
 	 *
 	 * \param	owner
 	 *			Owner object for this socket. May be nullptr.
 	 */
 	explicit
-	BasicModuleSocket (ModuleIO* owner, std::string_view const& path);
+	BasicModuleSocket (Module* owner, std::string_view const& path);
 
   public:
 	// Dtor
@@ -56,12 +55,12 @@ class BasicModuleSocket: virtual public BasicSocket
 	~BasicModuleSocket() = default;
 
 	/**
-	 * Return socket owner (an ModuleIO object). May be nullptr.
+	 * Return socket owner (a Module object). May be nullptr.
 	 */
 	[[nodiscard]]
-	ModuleIO*
-	io() const noexcept
-		{ return _owner; }
+	Module*
+	module() const noexcept
+		{ return _module; }
 
 	/**
 	 * Return socket path.
@@ -72,15 +71,15 @@ class BasicModuleSocket: virtual public BasicSocket
 		{ return _path; }
 
 	/**
-	 * Deregisters socket from ModuleIO: resets pointer to IO owner and makes it impossible
+	 * Deregisters socket from Module: resets pointer to owner module and makes it impossible
 	 * to use this socket again. Use in preparation for destroy in non-standard order
-	 * (eg. when ModuleIO has to be destroyed first).
+	 * (eg. when Module has to be destroyed first).
 	 */
 	virtual void
 	deregister() = 0;
 
   protected:
-	ModuleIO*			_owner { nullptr };
+	Module*				_module { nullptr };
 	ModuleSocketPath	_path;
 };
 
@@ -97,8 +96,8 @@ BasicModuleSocket::BasicModuleSocket (std::string_view const& path):
 
 
 inline
-BasicModuleSocket::BasicModuleSocket (ModuleIO* owner, std::string_view const& path):
-	_owner (owner),
+BasicModuleSocket::BasicModuleSocket (Module* owner, std::string_view const& path):
+	_module (owner),
 	_path (path)
 { }
 

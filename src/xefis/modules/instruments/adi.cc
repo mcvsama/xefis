@@ -3046,21 +3046,21 @@ PaintingWork::paint_radar_altimeter_failure (AdiPaintRequest& pr) const
 } // namespace adi_detail
 
 
-ADI::ADI (std::unique_ptr<ADI_IO> module_io, xf::Graphics const& graphics, std::string_view const& instance):
-	Instrument (std::move (module_io), instance),
+ADI::ADI (xf::Graphics const& graphics, std::string_view const& instance):
+	ADI_IO (instance),
 	_painting_work (graphics)
 {
 	_fpv_computer.set_callback (std::bind (&ADI::compute_fpv, this));
 	_fpv_computer.observe ({
-		&io.orientation_heading_magnetic,
-		&io.orientation_heading_true,
-		&io.orientation_pitch,
-		&io.orientation_roll,
-		&io.track_lateral_magnetic,
-		&io.track_lateral_true,
-		&io.track_vertical,
-		&io.fpv_visible,
-		&io.weight_on_wheels,
+		&_io.orientation_heading_magnetic,
+		&_io.orientation_heading_true,
+		&_io.orientation_pitch,
+		&_io.orientation_roll,
+		&_io.track_lateral_magnetic,
+		&_io.track_lateral_true,
+		&_io.track_vertical,
+		&_io.fpv_visible,
+		&_io.weight_on_wheels,
 	});
 }
 
@@ -3072,172 +3072,172 @@ ADI::process (xf::Cycle const& cycle)
 
 	adi_detail::Parameters params;
 	params.timestamp = cycle.update_time();
-	params.fov = *io.field_of_view;
-	params.show_vertical_speed_ladder = *io.show_vertical_speed_ladder;
-	params.focus_duration = *io.focus_duration;
-	params.focus_short_duration = *io.focus_short_duration;
-	params.old_style = io.style_old.value_or (false);
-	params.show_metric = io.style_show_metric.value_or (false);
+	params.fov = *_io.field_of_view;
+	params.show_vertical_speed_ladder = *_io.show_vertical_speed_ladder;
+	params.focus_duration = *_io.focus_duration;
+	params.focus_short_duration = *_io.focus_short_duration;
+	params.old_style = _io.style_old.value_or (false);
+	params.show_metric = _io.style_show_metric.value_or (false);
 	// Speed
-	params.speed_failure = !is_sane (io.speed_ias, { 0_mps, 1000_mps });
+	params.speed_failure = !is_sane (_io.speed_ias, { 0_mps, 1000_mps });
 	_speed_failure_timestamp.update (cycle.update_time(), [&] {
 		return params.speed_failure;
 	});
-	params.speed_failure_focus = _speed_failure_timestamp.shorter_than (*io.focus_duration);
-	params.speed = io.speed_ias.get_optional();
-	params.speed_lookahead = io.speed_ias_lookahead.get_optional();
+	params.speed_failure_focus = _speed_failure_timestamp.shorter_than (*_io.focus_duration);
+	params.speed = _io.speed_ias.get_optional();
+	params.speed_lookahead = _io.speed_ias_lookahead.get_optional();
 
-	if (*io.show_minimum_speeds_only_if_no_weight_on_wheels)
+	if (*_io.show_minimum_speeds_only_if_no_weight_on_wheels)
 	{
-		if (io.weight_on_wheels.value_or (false))
+		if (_io.weight_on_wheels.value_or (false))
 		{
 			params.speed_minimum.reset();
 			params.speed_minimum_maneuver.reset();
 		}
 		else
 		{
-			params.speed_minimum = io.speed_ias_minimum.get_optional();
-			params.speed_minimum_maneuver = io.speed_ias_minimum_maneuver.get_optional();
+			params.speed_minimum = _io.speed_ias_minimum.get_optional();
+			params.speed_minimum_maneuver = _io.speed_ias_minimum_maneuver.get_optional();
 		}
 	}
 
-	params.speed_maximum_maneuver = io.speed_ias_maximum_maneuver.get_optional();
-	params.speed_maximum = io.speed_ias_maximum.get_optional();
+	params.speed_maximum_maneuver = _io.speed_ias_maximum_maneuver.get_optional();
+	params.speed_maximum = _io.speed_ias_maximum.get_optional();
 	params.speed_mach =
-		io.speed_mach && *io.speed_mach > *io.show_mach_above
-			? io.speed_mach.get_optional()
+		_io.speed_mach && *_io.speed_mach > *_io.show_mach_above
+			? _io.speed_mach.get_optional()
 			: std::nullopt;
-	params.speed_ground = io.speed_ground.get_optional();
+	params.speed_ground = _io.speed_ground.get_optional();
 
 	// V1
-	if (io.speed_v1)
-		params.speed_bugs["V1"] = *io.speed_v1;
+	if (_io.speed_v1)
+		params.speed_bugs["V1"] = *_io.speed_v1;
 	else
 		params.speed_bugs.erase ("V1");
 
 	// Vr
-	if (io.speed_vr)
-		params.speed_bugs["VR"] = *io.speed_vr;
+	if (_io.speed_vr)
+		params.speed_bugs["VR"] = *_io.speed_vr;
 	else
 		params.speed_bugs.erase ("VR");
 
 	// Vref
-	if (io.speed_vref)
-		params.speed_bugs["REF"] = *io.speed_vref;
+	if (_io.speed_vref)
+		params.speed_bugs["REF"] = *_io.speed_vref;
 	else
 		params.speed_bugs.erase ("REF");
 
 	// Flaps UP bug:
-	if (io.speed_flaps_up_speed && io.speed_flaps_up_label)
+	if (_io.speed_flaps_up_speed && _io.speed_flaps_up_label)
 	{
-		_speed_flaps_up_current_label = QString::fromStdString (*io.speed_flaps_up_label);
-		params.speed_bugs[_speed_flaps_up_current_label] = *io.speed_flaps_up_speed;
+		_speed_flaps_up_current_label = QString::fromStdString (*_io.speed_flaps_up_label);
+		params.speed_bugs[_speed_flaps_up_current_label] = *_io.speed_flaps_up_speed;
 	}
 	else
 		params.speed_bugs.erase (_speed_flaps_up_current_label);
 
 	// Flaps "a" bug:
-	if (io.speed_flaps_a_speed && io.speed_flaps_a_label)
+	if (_io.speed_flaps_a_speed && _io.speed_flaps_a_label)
 	{
-		_speed_flaps_a_current_label = QString::fromStdString (*io.speed_flaps_a_label);
-		params.speed_bugs[_speed_flaps_a_current_label] = *io.speed_flaps_a_speed;
+		_speed_flaps_a_current_label = QString::fromStdString (*_io.speed_flaps_a_label);
+		params.speed_bugs[_speed_flaps_a_current_label] = *_io.speed_flaps_a_speed;
 	}
 	else
 		params.speed_bugs.erase (_speed_flaps_a_current_label);
 
 	// Flaps "b" bug:
-	if (io.speed_flaps_b_speed && io.speed_flaps_b_label)
+	if (_io.speed_flaps_b_speed && _io.speed_flaps_b_label)
 	{
-		_speed_flaps_b_current_label = QString::fromStdString (*io.speed_flaps_b_label);
-		params.speed_bugs[_speed_flaps_b_current_label] = *io.speed_flaps_b_speed;
+		_speed_flaps_b_current_label = QString::fromStdString (*_io.speed_flaps_b_label);
+		params.speed_bugs[_speed_flaps_b_current_label] = *_io.speed_flaps_b_speed;
 	}
 	else
 		params.speed_bugs.erase (_speed_flaps_b_current_label);
 
 	// Orientation
-	params.orientation_failure = !is_sane (io.orientation_pitch) || !is_sane (io.orientation_roll);
+	params.orientation_failure = !is_sane (_io.orientation_pitch) || !is_sane (_io.orientation_roll);
 	_orientation_failure_timestamp.update (cycle.update_time(), [&] {
 		return params.orientation_failure;
 	});
-	params.orientation_failure_focus = _orientation_failure_timestamp.shorter_than (*io.focus_duration);
-	params.orientation_pitch = io.orientation_pitch.get_optional();
-	params.orientation_roll = io.orientation_roll.get_optional();
-	params.orientation_heading = io.orientation_heading_magnetic.get_optional();
-	params.orientation_heading_numbers_visible = io.orientation_heading_numbers_visible.value_or (false);
+	params.orientation_failure_focus = _orientation_failure_timestamp.shorter_than (*_io.focus_duration);
+	params.orientation_pitch = _io.orientation_pitch.get_optional();
+	params.orientation_roll = _io.orientation_roll.get_optional();
+	params.orientation_heading = _io.orientation_heading_magnetic.get_optional();
+	params.orientation_heading_numbers_visible = _io.orientation_heading_numbers_visible.value_or (false);
 	// Slip-skid
-	params.slip_skid = io.slip_skid.get_optional();
+	params.slip_skid = _io.slip_skid.get_optional();
 	// Flight path vector:
 	params.flight_path_marker_failure = _computed_fpv_failure;
 	_flight_path_marker_failure_timestamp.update (cycle.update_time(), [&] {
 		return params.flight_path_marker_failure;
 	});
-	params.flight_path_marker_failure_focus = _flight_path_marker_failure_timestamp.shorter_than (*io.focus_duration);
+	params.flight_path_marker_failure_focus = _flight_path_marker_failure_timestamp.shorter_than (*_io.focus_duration);
 	params.flight_path_alpha = _computed_fpv_alpha;
 	params.flight_path_beta = _computed_fpv_beta;
 	// AOA limit
-	params.aoa_alpha = io.aoa_alpha.get_optional();
+	params.aoa_alpha = _io.aoa_alpha.get_optional();
 	params.critical_aoa =
-		io.aoa_alpha_visible.value_or (false) && io.aoa_alpha_maximum && (*io.aoa_alpha_maximum - *io.aoa_alpha <= *io.aoa_visibility_threshold)
-			? io.aoa_alpha_maximum.get_optional()
+		_io.aoa_alpha_visible.value_or (false) && _io.aoa_alpha_maximum && (*_io.aoa_alpha_maximum - *_io.aoa_alpha <= *_io.aoa_visibility_threshold)
+			? _io.aoa_alpha_maximum.get_optional()
 			: std::nullopt;
 	// Altitude
-	params.altitude_failure = !is_sane (io.altitude_amsl);
+	params.altitude_failure = !is_sane (_io.altitude_amsl);
 	_altitude_failure_timestamp.update (cycle.update_time(), [&] {
 		return params.altitude_failure;
 	});
-	params.altitude_failure_focus = _altitude_failure_timestamp.shorter_than (*io.focus_duration);
-	params.altitude_amsl = io.altitude_amsl.get_optional();
-	params.altitude_lookahead = io.altitude_amsl_lookahead.get_optional();
-	params.altitude_agl_failure = !io.altitude_agl_serviceable.value_or (true) || !is_sane (io.altitude_agl);
+	params.altitude_failure_focus = _altitude_failure_timestamp.shorter_than (*_io.focus_duration);
+	params.altitude_amsl = _io.altitude_amsl.get_optional();
+	params.altitude_lookahead = _io.altitude_amsl_lookahead.get_optional();
+	params.altitude_agl_failure = !_io.altitude_agl_serviceable.value_or (true) || !is_sane (_io.altitude_agl);
 	_altitude_agl_failure_timestamp.update (cycle.update_time(), [&] {
 		return params.altitude_agl_failure;
 	});
-	params.altitude_agl_failure_focus = _altitude_agl_failure_timestamp.shorter_than (*io.focus_duration);
-	params.altitude_agl = io.altitude_agl.get_optional();
+	params.altitude_agl_failure_focus = _altitude_agl_failure_timestamp.shorter_than (*_io.focus_duration);
+	params.altitude_agl = _io.altitude_agl.get_optional();
 	_altitude_agl_became_visible.update (cycle.update_time(), [&] {
-		return io.altitude_agl_serviceable && *io.altitude_agl_serviceable && io.altitude_agl;
+		return _io.altitude_agl_serviceable && *_io.altitude_agl_serviceable && _io.altitude_agl;
 	});
-	params.altitude_agl_focus = _altitude_agl_became_visible.shorter_than (*io.focus_duration);
-	params.altitude_landing_warning_hi = *io.altitude_landing_warning_hi;
-	params.altitude_landing_warning_lo = *io.altitude_landing_warning_lo;
+	params.altitude_agl_focus = _altitude_agl_became_visible.shorter_than (*_io.focus_duration);
+	params.altitude_landing_warning_hi = *_io.altitude_landing_warning_hi;
+	params.altitude_landing_warning_lo = *_io.altitude_landing_warning_lo;
 	// Decision height
-	params.decision_height_type = QString::fromStdString (io.decision_height_type.value_or (""));
+	params.decision_height_type = QString::fromStdString (_io.decision_height_type.value_or (""));
 	params.decision_height_amsl =
-		io.decision_height_setting
-			? io.decision_height_amsl.get_optional()
+		_io.decision_height_setting
+			? _io.decision_height_amsl.get_optional()
 			: std::nullopt;
 	_decision_height_became_visible.update (cycle.update_time(), [&] {
-		return io.altitude_amsl && io.decision_height_amsl &&
-			   *io.altitude_amsl < *io.decision_height_amsl;
+		return _io.altitude_amsl && _io.decision_height_amsl &&
+			   *_io.altitude_amsl < *_io.decision_height_amsl;
 	});
-	params.decision_height_focus = _decision_height_became_visible.shorter_than (*io.focus_duration);
-	params.decision_height_focus_short = _decision_height_became_visible.shorter_than (*io.focus_short_duration);
-	params.decision_height_setting = io.decision_height_setting.value_or (0_ft);
+	params.decision_height_focus = _decision_height_became_visible.shorter_than (*_io.focus_duration);
+	params.decision_height_focus_short = _decision_height_became_visible.shorter_than (*_io.focus_short_duration);
+	params.decision_height_setting = _io.decision_height_setting.value_or (0_ft);
 	// Landing altitude:
-	params.landing_amsl = io.landing_amsl.get_optional();
+	params.landing_amsl = _io.landing_amsl.get_optional();
 	// Vertical speed
-	params.vertical_speed_failure = !is_sane (io.vertical_speed);
+	params.vertical_speed_failure = !is_sane (_io.vertical_speed);
 	_vertical_speed_failure_timestamp.update (cycle.update_time(), [&] {
 		return params.vertical_speed_failure;
 	});
-	params.vertical_speed_failure_focus = _vertical_speed_failure_timestamp.shorter_than (*io.focus_duration);
-	params.vertical_speed = io.vertical_speed.get_optional();
-	params.energy_variometer_rate = io.vertical_speed_energy_variometer.get_optional();
-	params.energy_variometer_1000_fpm_power = *io.power_eq_1000_fpm;
+	params.vertical_speed_failure_focus = _vertical_speed_failure_timestamp.shorter_than (*_io.focus_duration);
+	params.vertical_speed = _io.vertical_speed.get_optional();
+	params.energy_variometer_rate = _io.vertical_speed_energy_variometer.get_optional();
+	params.energy_variometer_1000_fpm_power = *_io.power_eq_1000_fpm;
 	// Pressure settings
-	params.pressure_qnh = io.pressure_qnh.get_optional();
-	params.pressure_display_hpa = io.pressure_display_hpa.value_or (false);
-	params.use_standard_pressure = io.pressure_use_std.value_or (false);
+	params.pressure_qnh = _io.pressure_qnh.get_optional();
+	params.pressure_display_hpa = _io.pressure_display_hpa.value_or (false);
+	params.use_standard_pressure = _io.pressure_use_std.value_or (false);
 	// Command settings
-	bool cmd_visible = io.flight_director_cmd_visible.value_or (false);
+	bool cmd_visible = _io.flight_director_cmd_visible.value_or (false);
 
 	if (cmd_visible)
 	{
-		params.cmd_speed = io.flight_director_cmd_ias.get_optional();
-		params.cmd_mach = io.flight_director_cmd_mach.get_optional();
-		params.cmd_altitude = io.flight_director_cmd_altitude.get_optional();
-		params.cmd_vertical_speed = io.flight_director_cmd_vertical_speed.get_optional();
-		params.cmd_fpa = io.flight_director_cmd_fpa.get_optional();
+		params.cmd_speed = _io.flight_director_cmd_ias.get_optional();
+		params.cmd_mach = _io.flight_director_cmd_mach.get_optional();
+		params.cmd_altitude = _io.flight_director_cmd_altitude.get_optional();
+		params.cmd_vertical_speed = _io.flight_director_cmd_vertical_speed.get_optional();
+		params.cmd_fpa = _io.flight_director_cmd_fpa.get_optional();
 	}
 	else
 	{
@@ -3248,121 +3248,121 @@ ADI::process (xf::Cycle const& cycle)
 		params.cmd_fpa.reset();
 	}
 
-	params.cmd_altitude_acquired = io.flight_director_cmd_altitude_acquired.value_or (false);
+	params.cmd_altitude_acquired = _io.flight_director_cmd_altitude_acquired.value_or (false);
 	// Flight director
-	bool guidance_visible = io.flight_director_guidance_visible.value_or (false);
+	bool guidance_visible = _io.flight_director_guidance_visible.value_or (false);
 	params.flight_director_guidance_visible = guidance_visible;
-	params.flight_director_active_name = io.flight_director_active_name.get_optional();
+	params.flight_director_active_name = _io.flight_director_active_name.get_optional();
 	params.flight_director_failure =
 		guidance_visible &&
-		(!io.flight_director_serviceable.value_or (true) ||
-		 !is_sane (io.flight_director_cmd_altitude) ||
-		 !is_sane (io.flight_director_cmd_ias) ||
-		 !is_sane (io.flight_director_cmd_mach) ||
-		 !is_sane (io.flight_director_cmd_vertical_speed) ||
-		 !is_sane (io.flight_director_cmd_fpa) ||
-		 (!is_sane (io.flight_director_guidance_pitch) || !is_sane (io.flight_director_guidance_roll)));
+		(!_io.flight_director_serviceable.value_or (true) ||
+		 !is_sane (_io.flight_director_cmd_altitude) ||
+		 !is_sane (_io.flight_director_cmd_ias) ||
+		 !is_sane (_io.flight_director_cmd_mach) ||
+		 !is_sane (_io.flight_director_cmd_vertical_speed) ||
+		 !is_sane (_io.flight_director_cmd_fpa) ||
+		 (!is_sane (_io.flight_director_guidance_pitch) || !is_sane (_io.flight_director_guidance_roll)));
 	_flight_director_failure_timestamp.update (cycle.update_time(), [&] {
 		return params.flight_director_failure;
 	});
-	params.flight_director_failure_focus = _flight_director_failure_timestamp.shorter_than (*io.focus_duration);
-	params.flight_director_pitch = io.flight_director_guidance_pitch.get_optional();
-	params.flight_director_roll = io.flight_director_guidance_roll.get_optional();
+	params.flight_director_failure_focus = _flight_director_failure_timestamp.shorter_than (*_io.focus_duration);
+	params.flight_director_pitch = _io.flight_director_guidance_pitch.get_optional();
+	params.flight_director_roll = _io.flight_director_guidance_roll.get_optional();
 	// Control stick
-	params.control_surfaces_visible = io.control_surfaces_visible.value_or (false) && io.control_surfaces_elevator && io.control_surfaces_ailerons;
-	params.control_surfaces_elevator = io.control_surfaces_elevator.value_or (0.0f);
-	params.control_surfaces_ailerons = io.control_surfaces_ailerons.value_or (0.0f);
+	params.control_surfaces_visible = _io.control_surfaces_visible.value_or (false) && _io.control_surfaces_elevator && _io.control_surfaces_ailerons;
+	params.control_surfaces_elevator = _io.control_surfaces_elevator.value_or (0.0f);
+	params.control_surfaces_ailerons = _io.control_surfaces_ailerons.value_or (0.0f);
 	// Approach/navaid reference
-	params.navaid_reference_visible = io.navaid_reference_visible.value_or (false);
-	params.navaid_course_magnetic = io.navaid_course_magnetic.get_optional();
-	params.navaid_distance = io.navaid_distance.get_optional();
-	params.navaid_hint = QString::fromStdString (io.navaid_type_hint.value_or (""));
-	params.navaid_identifier = QString::fromStdString (io.navaid_identifier.value_or (""));
+	params.navaid_reference_visible = _io.navaid_reference_visible.value_or (false);
+	params.navaid_course_magnetic = _io.navaid_course_magnetic.get_optional();
+	params.navaid_distance = _io.navaid_distance.get_optional();
+	params.navaid_hint = QString::fromStdString (_io.navaid_type_hint.value_or (""));
+	params.navaid_identifier = QString::fromStdString (_io.navaid_identifier.value_or (""));
 	// Approach, flight path deviations
 	params.deviation_vertical_failure =
-		!io.flight_path_deviation_vertical_serviceable.value_or (true) ||
-		!is_sane (io.flight_path_deviation_vertical) ||
-		!is_sane (io.flight_path_deviation_vertical_approach) ||
-		!is_sane (io.flight_path_deviation_vertical_flight_path);
+		!_io.flight_path_deviation_vertical_serviceable.value_or (true) ||
+		!is_sane (_io.flight_path_deviation_vertical) ||
+		!is_sane (_io.flight_path_deviation_vertical_approach) ||
+		!is_sane (_io.flight_path_deviation_vertical_flight_path);
 	_deviation_vertical_failure_timestamp.update (cycle.update_time(), [&] {
 		return params.deviation_vertical_failure;
 	});
-	params.deviation_vertical_failure_focus = _deviation_vertical_failure_timestamp.shorter_than (*io.focus_duration);
-	params.deviation_vertical_approach = io.flight_path_deviation_vertical_approach.get_optional();
-	params.deviation_vertical_flight_path = io.flight_path_deviation_vertical_flight_path.get_optional();
+	params.deviation_vertical_failure_focus = _deviation_vertical_failure_timestamp.shorter_than (*_io.focus_duration);
+	params.deviation_vertical_approach = _io.flight_path_deviation_vertical_approach.get_optional();
+	params.deviation_vertical_flight_path = _io.flight_path_deviation_vertical_flight_path.get_optional();
 	params.deviation_lateral_failure =
-		!io.flight_path_deviation_lateral_serviceable.value_or (true) ||
-		!is_sane (io.flight_path_deviation_lateral_approach) ||
-		!is_sane (io.flight_path_deviation_lateral_flight_path);
+		!_io.flight_path_deviation_lateral_serviceable.value_or (true) ||
+		!is_sane (_io.flight_path_deviation_lateral_approach) ||
+		!is_sane (_io.flight_path_deviation_lateral_flight_path);
 	_deviation_lateral_failure_timestamp.update (cycle.update_time(), [&] {
 		return params.deviation_lateral_failure;
 	});
-	params.deviation_lateral_failure_focus = _deviation_lateral_failure_timestamp.shorter_than (*io.focus_duration);
-	params.deviation_lateral_approach = io.flight_path_deviation_lateral_approach.get_optional();
-	params.deviation_lateral_flight_path = io.flight_path_deviation_lateral_flight_path.get_optional();
-	params.deviation_mixed_mode = io.flight_path_deviation_mixed_mode.value_or (false);
+	params.deviation_lateral_failure_focus = _deviation_lateral_failure_timestamp.shorter_than (*_io.focus_duration);
+	params.deviation_lateral_approach = _io.flight_path_deviation_lateral_approach.get_optional();
+	params.deviation_lateral_flight_path = _io.flight_path_deviation_lateral_flight_path.get_optional();
+	params.deviation_mixed_mode = _io.flight_path_deviation_mixed_mode.value_or (false);
 	// Raising runway
-	if (*io.enable_raising_runway && io.navaid_reference_visible.value_or (false) && io.altitude_agl &&
-		io.flight_path_deviation_lateral_approach && *io.altitude_agl <= *io.raising_runway_visibility)
+	if (*_io.enable_raising_runway && _io.navaid_reference_visible.value_or (false) && _io.altitude_agl &&
+		_io.flight_path_deviation_lateral_approach && *_io.altitude_agl <= *_io.raising_runway_visibility)
 	{
-		params.raising_runway_position = xf::clamped<si::Length> (io.altitude_agl.value_or (0_ft), 0_ft, *io.raising_runway_threshold) / *io.raising_runway_threshold * 25_deg;
+		params.raising_runway_position = xf::clamped<si::Length> (_io.altitude_agl.value_or (0_ft), 0_ft, *_io.raising_runway_threshold) / *_io.raising_runway_threshold * 25_deg;
 	}
 	else
 		params.raising_runway_position.reset();
 	// Control hint
-	if (io.flight_mode_hint_visible.value_or (false))
-		params.control_hint = QString::fromStdString (io.flight_mode_hint.value_or (""));
+	if (_io.flight_mode_hint_visible.value_or (false))
+		params.control_hint = QString::fromStdString (_io.flight_mode_hint.value_or (""));
 	else
 		params.control_hint.reset();
 
-	params.control_hint_focus = io.flight_mode_hint_visible.modification_age() < *io.focus_duration || io.flight_mode_hint.modification_age() < *io.focus_duration;
+	params.control_hint_focus = _io.flight_mode_hint_visible.modification_age() < *_io.focus_duration || _io.flight_mode_hint.modification_age() < *_io.focus_duration;
 	// FMA
-	params.fma_visible = io.flight_mode_fma_visible.value_or (false);
-	params.fma_speed_hint = QString::fromStdString (io.flight_mode_fma_speed_hint.value_or (""));
-	params.fma_speed_focus = io.flight_mode_fma_speed_hint.modification_age() < *io.focus_duration;
-	params.fma_speed_armed_hint = QString::fromStdString (io.flight_mode_fma_speed_armed_hint.value_or (""));
-	params.fma_speed_armed_focus = io.flight_mode_fma_speed_armed_hint.modification_age() < *io.focus_duration;
-	params.fma_lateral_hint = QString::fromStdString (io.flight_mode_fma_lateral_hint.value_or (""));
-	params.fma_lateral_focus = io.flight_mode_fma_lateral_hint.modification_age() < *io.focus_duration;
-	params.fma_lateral_armed_hint = QString::fromStdString (io.flight_mode_fma_lateral_armed_hint.value_or (""));
-	params.fma_lateral_armed_focus = io.flight_mode_fma_lateral_armed_hint.modification_age() < *io.focus_duration;
-	params.fma_vertical_hint = QString::fromStdString (io.flight_mode_fma_vertical_hint.value_or (""));
-	params.fma_vertical_focus = io.flight_mode_fma_vertical_hint.modification_age() < *io.focus_duration;
-	params.fma_vertical_armed_hint = QString::fromStdString (io.flight_mode_fma_vertical_armed_hint.value_or (""));
-	params.fma_vertical_armed_focus = io.flight_mode_fma_vertical_armed_hint.modification_age() < *io.focus_duration;
+	params.fma_visible = _io.flight_mode_fma_visible.value_or (false);
+	params.fma_speed_hint = QString::fromStdString (_io.flight_mode_fma_speed_hint.value_or (""));
+	params.fma_speed_focus = _io.flight_mode_fma_speed_hint.modification_age() < *_io.focus_duration;
+	params.fma_speed_armed_hint = QString::fromStdString (_io.flight_mode_fma_speed_armed_hint.value_or (""));
+	params.fma_speed_armed_focus = _io.flight_mode_fma_speed_armed_hint.modification_age() < *_io.focus_duration;
+	params.fma_lateral_hint = QString::fromStdString (_io.flight_mode_fma_lateral_hint.value_or (""));
+	params.fma_lateral_focus = _io.flight_mode_fma_lateral_hint.modification_age() < *_io.focus_duration;
+	params.fma_lateral_armed_hint = QString::fromStdString (_io.flight_mode_fma_lateral_armed_hint.value_or (""));
+	params.fma_lateral_armed_focus = _io.flight_mode_fma_lateral_armed_hint.modification_age() < *_io.focus_duration;
+	params.fma_vertical_hint = QString::fromStdString (_io.flight_mode_fma_vertical_hint.value_or (""));
+	params.fma_vertical_focus = _io.flight_mode_fma_vertical_hint.modification_age() < *_io.focus_duration;
+	params.fma_vertical_armed_hint = QString::fromStdString (_io.flight_mode_fma_vertical_armed_hint.value_or (""));
+	params.fma_vertical_armed_focus = _io.flight_mode_fma_vertical_armed_hint.modification_age() < *_io.focus_duration;
 	// TCAS
-	params.tcas_ra_pitch_minimum = io.tcas_resolution_advisory_pitch_minimum.get_optional();
-	params.tcas_ra_pitch_maximum = io.tcas_resolution_advisory_pitch_maximum.get_optional();
-	params.tcas_ra_vertical_speed_minimum = io.tcas_resolution_advisory_vertical_speed_minimum.get_optional();
-	params.tcas_ra_vertical_speed_maximum = io.tcas_resolution_advisory_vertical_speed_maximum.get_optional();
+	params.tcas_ra_pitch_minimum = _io.tcas_resolution_advisory_pitch_minimum.get_optional();
+	params.tcas_ra_pitch_maximum = _io.tcas_resolution_advisory_pitch_maximum.get_optional();
+	params.tcas_ra_vertical_speed_minimum = _io.tcas_resolution_advisory_vertical_speed_minimum.get_optional();
+	params.tcas_ra_vertical_speed_maximum = _io.tcas_resolution_advisory_vertical_speed_maximum.get_optional();
 	// Warning flags
-	params.novspd_flag = io.warning_novspd_flag.value_or (false);
-	params.ldgalt_flag = io.warning_ldgalt_flag.value_or (false);
-	params.pitch_disagree = io.warning_pitch_disagree.value_or (false);
+	params.novspd_flag = _io.warning_novspd_flag.value_or (false);
+	params.ldgalt_flag = _io.warning_ldgalt_flag.value_or (false);
+	params.pitch_disagree = _io.warning_pitch_disagree.value_or (false);
 	_pitch_disagree_timestamp.update (cycle.update_time(), [&] {
 		return params.pitch_disagree;
 	});
-	params.pitch_disagree_focus = _pitch_disagree_timestamp.shorter_than (*io.focus_duration);
-	params.roll_disagree = io.warning_roll_disagree.value_or (false);
+	params.pitch_disagree_focus = _pitch_disagree_timestamp.shorter_than (*_io.focus_duration);
+	params.roll_disagree = _io.warning_roll_disagree.value_or (false);
 	_roll_disagree_timestamp.update (cycle.update_time(), [&] {
 		return params.roll_disagree;
 	});
-	params.roll_disagree_focus = _roll_disagree_timestamp.shorter_than (*io.focus_duration);
-	params.ias_disagree = io.warning_ias_disagree.value_or (false);
-	params.altitude_disagree = io.warning_altitude_disagree.value_or (false);
-	params.roll_warning = io.warning_roll.value_or (false);
-	params.slip_skid_warning = io.warning_slip_skid.value_or (false);
+	params.roll_disagree_focus = _roll_disagree_timestamp.shorter_than (*_io.focus_duration);
+	params.ias_disagree = _io.warning_ias_disagree.value_or (false);
+	params.altitude_disagree = _io.warning_altitude_disagree.value_or (false);
+	params.roll_warning = _io.warning_roll.value_or (false);
+	params.slip_skid_warning = _io.warning_slip_skid.value_or (false);
 	// Settings:
-	params.vl_extent = 1_kt * *io.speed_ladder_extent;
-	params.vl_minimum = *io.speed_ladder_minimum;
-	params.vl_maximum = *io.speed_ladder_maximum;
-	params.vl_line_every = *io.speed_ladder_line_every;
-	params.vl_number_every = *io.speed_ladder_number_every;
-	params.al_extent = 1_ft * *io.altitude_ladder_extent;
-	params.al_emphasis_every = *io.altitude_ladder_emphasis_every;
-	params.al_bold_every = *io.altitude_ladder_bold_every;
-	params.al_line_every = *io.altitude_ladder_line_every;
-	params.al_number_every = *io.altitude_ladder_number_every;
+	params.vl_extent = 1_kt * *_io.speed_ladder_extent;
+	params.vl_minimum = *_io.speed_ladder_minimum;
+	params.vl_maximum = *_io.speed_ladder_maximum;
+	params.vl_line_every = *_io.speed_ladder_line_every;
+	params.vl_number_every = *_io.speed_ladder_number_every;
+	params.al_extent = 1_ft * *_io.altitude_ladder_extent;
+	params.al_emphasis_every = *_io.altitude_ladder_emphasis_every;
+	params.al_bold_every = *_io.altitude_ladder_bold_every;
+	params.al_line_every = *_io.altitude_ladder_line_every;
+	params.al_number_every = *_io.altitude_ladder_number_every;
 
 	*_parameters.lock() = params;
 	mark_dirty();
@@ -3384,25 +3384,25 @@ ADI::compute_fpv()
 	xf::ModuleIn<si::Angle>* heading = nullptr;
 	xf::ModuleIn<si::Angle>* track_lateral = nullptr;
 
-	if (io.orientation_heading_magnetic && io.track_lateral_magnetic)
+	if (_io.orientation_heading_magnetic && _io.track_lateral_magnetic)
 	{
-		heading = &io.orientation_heading_magnetic;
-		track_lateral = &io.track_lateral_magnetic;
+		heading = &_io.orientation_heading_magnetic;
+		track_lateral = &_io.track_lateral_magnetic;
 	}
-	else if (io.orientation_heading_true && io.track_lateral_true)
+	else if (_io.orientation_heading_true && _io.track_lateral_true)
 	{
-		heading = &io.orientation_heading_true;
-		track_lateral = &io.track_lateral_true;
+		heading = &_io.orientation_heading_true;
+		track_lateral = &_io.track_lateral_true;
 	}
 
 	// Hide FPV if weight-on-wheels:
-	bool const hidden = io.weight_on_wheels.value_or (false);
+	bool const hidden = _io.weight_on_wheels.value_or (false);
 
-	if (io.fpv_visible.value_or (false) && !hidden && io.orientation_pitch && io.orientation_roll && io.track_vertical && heading && track_lateral)
+	if (_io.fpv_visible.value_or (false) && !hidden && _io.orientation_pitch && _io.orientation_roll && _io.track_vertical && heading && track_lateral)
 	{
-		si::Angle vdiff = xf::floored_mod (*io.orientation_pitch - *io.track_vertical, -180_deg, +180_deg);
+		si::Angle vdiff = xf::floored_mod (*_io.orientation_pitch - *_io.track_vertical, -180_deg, +180_deg);
 		si::Angle hdiff = xf::floored_mod (**heading - **track_lateral, -180_deg, +180_deg);
-		si::Angle roll = *io.orientation_roll;
+		si::Angle roll = *_io.orientation_roll;
 
 		_computed_fpv_alpha = vdiff * si::cos (roll) + hdiff * si::sin (roll);
 		_computed_fpv_beta = -vdiff * si::sin (roll) + hdiff * si::cos (roll);

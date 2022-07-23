@@ -29,7 +29,7 @@
 #include <xefis/support/sockets/socket_observer.h>
 
 
-class TrimControlIO: public xf::ModuleIO
+class TrimControlIO: public xf::Module
 {
   public:
 	/*
@@ -52,6 +52,9 @@ class TrimControlIO: public xf::ModuleIO
 	 */
 
 	xf::ModuleOut<double>	output_trim_value	{ this, "trim-value" };
+
+  public:
+	using xf::Module::Module;
 };
 
 
@@ -59,12 +62,12 @@ class TrimControlIO: public xf::ModuleIO
  * Controls trim value with two buttons or axis.
  * Generates appropriate trimming sound.
  */
-class TrimControl: public xf::Module<TrimControlIO>
+class TrimControl: public TrimControlIO
 {
   public:
 	// Ctor
 	explicit
-	TrimControl (std::unique_ptr<TrimControlIO>, xf::SoundManager*, std::string_view const& instance = {});
+	TrimControl (xf::SoundManager*, std::string_view const& instance = {});
 
 	// Module API
 	void
@@ -99,6 +102,7 @@ class TrimControl: public xf::Module<TrimControlIO>
 	moved_down (xf::Socket<double> const&);
 
   private:
+	TrimControlIO&			_io				{ *this };
 	xf::SoundManager*		_sound_manager	{ nullptr };
 	double					_trim_value		{ 0.0 };
 	bool					_trimming_up	{ false };

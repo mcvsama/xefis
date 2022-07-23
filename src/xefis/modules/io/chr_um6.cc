@@ -40,8 +40,8 @@
 #include "chr_um6.h"
 
 
-CHRUM6::CHRUM6 (std::unique_ptr<CHRUM6_IO> module_io, xf::SerialPort&& serial_port, xf::Logger const& logger, std::string_view const& instance):
-	Module (std::move (module_io), instance),
+CHRUM6::CHRUM6 (xf::SerialPort&& serial_port, xf::Logger const& logger, std::string_view const& instance):
+	CHRUM6_IO (instance),
 	_logger (logger.with_scope (std::string (kLoggerScope) + "#" + instance)),
 	_serial_port (std::move (serial_port))
 {
@@ -74,9 +74,9 @@ CHRUM6::CHRUM6 (std::unique_ptr<CHRUM6_IO> module_io, xf::SerialPort&& serial_po
 	_sensor->set_incoming_messages_callback (std::bind (&CHRUM6::process_message, this, std::placeholders::_1));
 	_sensor->set_auto_retry (true);
 
-	io.serviceable = false;
-	io.caution = false;
-	io.failures = 0;
+	_io.serviceable = false;
+	_io.caution = false;
+	_io.failures = 0;
 
 	open_device();
 }
@@ -92,24 +92,24 @@ CHRUM6::process (xf::Cycle const&)
 		if (_output_acceleration_x_changed.value_changed() || _input_centripetal_x_changed.value_changed())
 		{
 			si::Acceleration earth_x = 0_g;
-			if (io.acceleration_x && io.centripetal_x)
-				earth_x = *io.acceleration_x + *io.centripetal_x;
+			if (_io.acceleration_x && _io.centripetal_x)
+				earth_x = *_io.acceleration_x + *_io.centripetal_x;
 			_sensor->write (xf::CHRUM6::ConfigurationAddress::AccelRefX, static_cast<float> (earth_x.in<si::Gravity>()));
 		}
 
 		if (_output_acceleration_y_changed.value_changed() || _input_centripetal_y_changed.value_changed())
 		{
 			si::Acceleration earth_y = 0_g;
-			if (io.acceleration_y && io.centripetal_y)
-				earth_y = *io.acceleration_y + *io.centripetal_y;
+			if (_io.acceleration_y && _io.centripetal_y)
+				earth_y = *_io.acceleration_y + *_io.centripetal_y;
 			_sensor->write (xf::CHRUM6::ConfigurationAddress::AccelRefY, static_cast<float> (earth_y.in<si::Gravity>()));
 		}
 
 		if (_output_acceleration_z_changed.value_changed() || _input_centripetal_z_changed.value_changed())
 		{
 			si::Acceleration earth_z = 1_g;
-			if (io.acceleration_z && io.centripetal_z)
-				earth_z = *io.acceleration_z + *io.centripetal_z;
+			if (_io.acceleration_z && _io.centripetal_z)
+				earth_z = *_io.acceleration_z + *_io.centripetal_z;
 			_sensor->write (xf::CHRUM6::ConfigurationAddress::AccelRefZ, static_cast<float> (earth_z.in<si::Gravity>()));
 		}
 	}
@@ -138,7 +138,7 @@ void
 CHRUM6::failure (std::string const& reason)
 {
 	_logger << "Fatal: failure detected" << (reason.empty() ? "" : ": " + reason) << ", closing device " << _serial_port.configuration().device_path() << std::endl;
-	io.failures = *io.failures + 1;
+	_io.failures = *_io.failures + 1;
 	_alive_check_timer->stop();
 	_status_check_timer->stop();
 	_failure_count++;
@@ -199,7 +199,7 @@ CHRUM6::setup_communication()
 	data |= static_cast<uint32_t> (xf::CHRUM6::CommunicationRegister::MP);
 	data |= static_cast<uint32_t> (xf::CHRUM6::CommunicationRegister::TMP);
 	data |= xf::CHRUM6::bits_for_baud_rate (_serial_port.configuration().baud_rate()) << 8;
-	data |= xf::CHRUM6::sample_rate_setting (*io.sample_rate);
+	data |= xf::CHRUM6::sample_rate_setting (*_io.sample_rate);
 
 	_sensor->write (ConfigurationAddress::Communication, data, [this] (xf::CHRUM6::Write req) {
 		describe_errors (req);
@@ -243,7 +243,7 @@ CHRUM6::log_firmware_version()
 void
 CHRUM6::set_ekf_process_variance()
 {
-	_sensor->write (ConfigurationAddress::EKFProcessVariance, *io.ekf_process_variance, [this] (xf::CHRUM6::Write req) {
+	_sensor->write (ConfigurationAddress::EKFProcessVariance, *_io.ekf_process_variance, [this] (xf::CHRUM6::Write req) {
 		describe_errors (req);
 		if (req.success())
 			reset_ekf();
@@ -318,7 +318,7 @@ CHRUM6::initialization_complete()
 	_logger << "Initialization complete." << std::endl;
 	_stage = Stage::Run;
 	_initialization_timer->stop();
-	io.serviceable = true;
+	_io.serviceable = true;
 	_status_check_timer->start();
 }
 
@@ -326,19 +326,19 @@ CHRUM6::initialization_complete()
 void
 CHRUM6::reset()
 {
-	io.serviceable = false;
-	io.orientation_pitch = xf::nil;
-	io.orientation_roll = xf::nil;
-	io.orientation_heading_magnetic = xf::nil;
-	io.acceleration_x = xf::nil;
-	io.acceleration_y = xf::nil;
-	io.acceleration_z = xf::nil;
-	io.rotation_x = xf::nil;
-	io.rotation_y = xf::nil;
-	io.rotation_z = xf::nil;
-	io.magnetic_x = xf::nil;
-	io.magnetic_y = xf::nil;
-	io.magnetic_z = xf::nil;
+	_io.serviceable = false;
+	_io.orientation_pitch = xf::nil;
+	_io.orientation_roll = xf::nil;
+	_io.orientation_heading_magnetic = xf::nil;
+	_io.acceleration_x = xf::nil;
+	_io.acceleration_y = xf::nil;
+	_io.acceleration_z = xf::nil;
+	_io.rotation_x = xf::nil;
+	_io.rotation_y = xf::nil;
+	_io.rotation_z = xf::nil;
+	_io.magnetic_x = xf::nil;
+	_io.magnetic_y = xf::nil;
+	_io.magnetic_z = xf::nil;
 
 	_stage = Stage::Initialize;
 }
@@ -366,27 +366,27 @@ CHRUM6::process_message (xf::CHRUM6::Read req)
 		case static_cast<uint32_t> (DataAddress::Temperature):
 		{
 			if (req.success())
-				io.internal_temperature = si::Quantity<si::Celsius> (req.value_as_float());
+				_io.internal_temperature = si::Quantity<si::Celsius> (req.value_as_float());
 			break;
 		}
 
 		case static_cast<uint32_t> (DataAddress::EulerPhiTheta):
 		{
-			if (req.success() && io.serviceable.value_or (false))
+			if (req.success() && _io.serviceable.value_or (false))
 			{
 				si::Angle const factor = 0.0109863_deg;
-				io.orientation_roll = factor * req.value_upper16();
-				io.orientation_pitch = factor * req.value_lower16();
+				_io.orientation_roll = factor * req.value_upper16();
+				_io.orientation_pitch = factor * req.value_lower16();
 			}
 			break;
 		}
 
 		case static_cast<uint32_t> (DataAddress::EulerPsi):
 		{
-			if (req.success() && io.serviceable.value_or (false))
+			if (req.success() && _io.serviceable.value_or (false))
 			{
 				si::Angle const factor = 0.0109863_deg;
-				io.orientation_heading_magnetic = xf::floored_mod<si::Angle> (factor * req.value_upper16(), 0_deg, 360_deg);
+				_io.orientation_heading_magnetic = xf::floored_mod<si::Angle> (factor * req.value_upper16(), 0_deg, 360_deg);
 			}
 			break;
 		}
@@ -396,8 +396,8 @@ CHRUM6::process_message (xf::CHRUM6::Read req)
 			if (req.success())
 			{
 				si::Acceleration const factor = 0.000183105_g;
-				io.acceleration_x = factor * req.value_upper16();
-				io.acceleration_y = factor * req.value_lower16();
+				_io.acceleration_x = factor * req.value_upper16();
+				_io.acceleration_y = factor * req.value_lower16();
 			}
 			break;
 		}
@@ -407,7 +407,7 @@ CHRUM6::process_message (xf::CHRUM6::Read req)
 			if (req.success())
 			{
 				si::Acceleration const factor = 0.000183105_g;
-				io.acceleration_z = factor * req.value_upper16();
+				_io.acceleration_z = factor * req.value_upper16();
 			}
 			break;
 		}
@@ -417,8 +417,8 @@ CHRUM6::process_message (xf::CHRUM6::Read req)
 			if (req.success())
 			{
 				si::AngularVelocity const factor = 0.0610352_deg / 1_s;
-				io.rotation_x = factor * req.value_upper16();
-				io.rotation_y = factor * req.value_lower16();
+				_io.rotation_x = factor * req.value_upper16();
+				_io.rotation_y = factor * req.value_lower16();
 			}
 			break;
 		}
@@ -428,7 +428,7 @@ CHRUM6::process_message (xf::CHRUM6::Read req)
 			if (req.success())
 			{
 				si::AngularVelocity const factor = 0.0610352_deg / 1_s;
-				io.rotation_z = factor * req.value_upper16();
+				_io.rotation_z = factor * req.value_upper16();
 			}
 			break;
 		}
@@ -439,8 +439,8 @@ CHRUM6::process_message (xf::CHRUM6::Read req)
 			{
 				// Assume values are expressed in Teslas (it's not specified in the documentation):
 				si::MagneticField const factor = 0.000305176_T;
-				io.magnetic_x = factor * req.value_upper16();
-				io.magnetic_y = factor * req.value_lower16();
+				_io.magnetic_x = factor * req.value_upper16();
+				_io.magnetic_y = factor * req.value_lower16();
 			}
 			break;
 		}
@@ -450,7 +450,7 @@ CHRUM6::process_message (xf::CHRUM6::Read req)
 			if (req.success())
 			{
 				si::MagneticField const factor = 0.000305176_T;
-				io.magnetic_z = factor * req.value_upper16();
+				_io.magnetic_z = factor * req.value_upper16();
 			}
 			break;
 		}
@@ -635,10 +635,10 @@ CHRUM6::status_verify (xf::CHRUM6::Read req)
 	}
 
 	if (!serviceable)
-		io.serviceable = false;
+		_io.serviceable = false;
 
 	if (caution)
-		io.caution = true;
+		_io.caution = true;
 }
 
 

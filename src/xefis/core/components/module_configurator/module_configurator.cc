@@ -86,7 +86,7 @@ ModuleConfigurator::screen_selected (Screen& screen)
 
 
 void
-ModuleConfigurator::module_selected (BasicModule& module)
+ModuleConfigurator::module_selected (Module& module)
 {
 	auto gmw = _module_widgets.find (&module);
 
