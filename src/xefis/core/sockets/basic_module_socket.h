@@ -35,12 +35,6 @@ class BasicModuleSocket: virtual public BasicSocket
 {
   protected:
 	/**
-	 * Create ModuleSocket that doesn't have any data-source yet and is not coupled to any module.
-	 */
-	explicit
-	BasicModuleSocket (std::string_view const& path);
-
-	/**
 	 * Create ModuleSocket that's coupled by a Module.
 	 *
 	 * \param	owner
@@ -58,9 +52,9 @@ class BasicModuleSocket: virtual public BasicSocket
 	 * Return socket owner (a Module object). May be nullptr.
 	 */
 	[[nodiscard]]
-	Module*
+	Module&
 	module() const noexcept
-		{ return _module; }
+		{ return *_module; }
 
 	/**
 	 * Return socket path.
@@ -79,7 +73,7 @@ class BasicModuleSocket: virtual public BasicSocket
 	deregister() = 0;
 
   protected:
-	Module*				_module { nullptr };
+	Module*				_module;
 	ModuleSocketPath	_path;
 };
 
@@ -87,12 +81,6 @@ class BasicModuleSocket: virtual public BasicSocket
 /*
  * BasicModuleSocket
  */
-
-
-inline
-BasicModuleSocket::BasicModuleSocket (std::string_view const& path):
-	_path (path)
-{ }
 
 
 inline
