@@ -54,5 +54,13 @@ System::translate (SpaceLength<WorldSpace> const& translation)
 		body->translate (translation);
 }
 
+
+void
+System::set_baumgarte_factor (double factor) noexcept
+{
+	for (auto& c: _constraints)
+		c->set_baumgarte_factor (factor);
+}
+
 } // namespace xf::rigid_body
 

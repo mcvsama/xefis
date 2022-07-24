@@ -72,12 +72,6 @@ class ImpulseSolver: private Noncopyable
 	evolve (si::Time dt);
 
 	/**
-	 * Apply given Baumgarte stabilization factor to all constraints.
-	 */
-	void
-	set_baumgarte_factor (double factor) noexcept;
-
-	/**
 	 * Set limits applied during evolution.
 	 */
 	void

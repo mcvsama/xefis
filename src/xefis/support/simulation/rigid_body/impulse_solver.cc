@@ -64,14 +64,6 @@ ImpulseSolver::evolve (si::Time const dt)
 
 
 void
-ImpulseSolver::set_baumgarte_factor (double factor) noexcept
-{
-	for (auto& c: _system.constraints())
-		c->set_baumgarte_factor (factor);
-}
-
-
-void
 ImpulseSolver::update_mass_moments()
 {
 	for (auto& body: _system.bodies())

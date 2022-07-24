@@ -191,6 +191,12 @@ class System: private Noncopyable
 	void
 	translate (SpaceLength<WorldSpace> const&);
 
+	/**
+	 * Apply given Baumgarte stabilization factor to all constraints.
+	 */
+	void
+	set_baumgarte_factor (double factor) noexcept;
+
   private:
 	FramePrecalculations	_frame_precalculations;
 	Bodies					_bodies;
