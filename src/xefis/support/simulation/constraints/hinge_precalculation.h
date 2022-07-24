@@ -60,7 +60,7 @@ class HingePrecalculation: public FramePrecalculation<HingePrecalculationData>
   public:
 	/**
 	 * Create a hinge between two bodies.
-	 * Hinge vector is given relative to the first body.
+	 * Hinge vector/axis is given relative to the first body.
 	 */
 	explicit
 	HingePrecalculation (SpaceLength<BodySpace> const& anchor_point_1,
@@ -70,7 +70,7 @@ class HingePrecalculation: public FramePrecalculation<HingePrecalculationData>
 
 	/**
 	 * Create a hinge between two bodies.
-	 * Hinge vector is given relative to the second body.
+	 * Hinge vector/axis is given relative to the second body.
 	 */
 	explicit
 	HingePrecalculation (Body& body_1,
@@ -80,7 +80,7 @@ class HingePrecalculation: public FramePrecalculation<HingePrecalculationData>
 
 	/**
 	 * Create a hinge between two bodies.
-	 * Hinge vector is given in world space coordinates.
+	 * Hinge vector/axis is given in world space coordinates.
 	 */
 	explicit
 	HingePrecalculation (Body& body_1,
