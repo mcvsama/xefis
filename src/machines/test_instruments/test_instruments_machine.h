@@ -25,10 +25,10 @@
 #include <neutrino/work_performer.h>
 
 // Xefis:
+#include <xefis/app/xefis.h>
 #include <xefis/config/all.h>
 #include <xefis/core/machine.h>
 #include <xefis/core/processing_loop.h>
-#include <xefis/core/xefis.h>
 #include <xefis/modules/test/test_generator.h>
 #include <xefis/support/earth/navigation/navaid_storage.h>
 

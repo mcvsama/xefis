@@ -14,12 +14,14 @@
 // Standard:
 #include <cstddef>
 
+// Qt:
+#include <QTimer>
+
 // Neutrino:
 #include <neutrino/numeric.h>
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/xefis.h>
 #include <xefis/support/airframe/airframe.h>
 #include <xefis/support/airframe/flaps.h>
 

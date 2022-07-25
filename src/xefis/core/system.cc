@@ -21,8 +21,8 @@
 #include <string.h>
 
 // Xefis:
+#include <xefis/app/xefis.h>
 #include <xefis/config/all.h>
-#include <xefis/core/xefis.h>
 
 // Local:
 #include "system.h"

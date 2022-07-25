@@ -1,6 +1,6 @@
 /* vim:ts=4
  *
- * Copyleft 2012…2016  Michał Gawron
+ * Copyleft 2012…2022  Michał Gawron
  * Marduk Unix Labs, http://mulabs.org/
  *
  * This program is free software: you can redistribute it and/or modify
@@ -35,6 +35,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/components/configurator/configurator_widget.h>
+#include <xefis/core/executable.h>
 #include <xefis/core/system.h>
 #include <xefis/core/licenses.h>
 #include <xefis/support/airframe/airframe.h>

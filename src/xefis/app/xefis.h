@@ -1,6 +1,6 @@
 /* vim:ts=4
  *
- * Copyleft 2012…2016  Michał Gawron
+ * Copyleft 2012…2022  Michał Gawron
  * Marduk Unix Labs, http://mulabs.org/
  *
  * This program is free software: you can redistribute it and/or modify
@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__CORE__XEFIS_H__INCLUDED
-#define XEFIS__CORE__XEFIS_H__INCLUDED
+#ifndef XEFIS__APP__XEFIS_H__INCLUDED
+#define XEFIS__APP__XEFIS_H__INCLUDED
 
 // Standard:
 #include <cstddef>
@@ -87,8 +87,6 @@ class Xefis: public QApplication
 		std::optional<int>	watchdog_write_fd;
 		std::optional<int>	watchdog_read_fd;
 	};
-
-	class QuitInstruction { };
 
   public:
 	// Ctor

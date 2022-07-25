@@ -31,7 +31,6 @@
 #include <xefis/core/instrument.h>
 #include <xefis/core/setting.h>
 #include <xefis/core/sockets/socket.h>
-#include <xefis/core/xefis.h>
 #include <xefis/support/instrument/instrument_support.h>
 #include <xefis/support/sockets/socket_observer.h>
 #include <xefis/utility/event_timestamper.h>

@@ -17,6 +17,9 @@
 #include <string>
 #include <ctime>
 
+// Qt:
+#include <QTimer>
+
 // Neutrino:
 #include <neutrino/bus/serial_port.h>
 #include <neutrino/stdexcept.h>
@@ -24,7 +27,6 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/xefis.h>
 #include <xefis/support/protocols/nmea/parser.h>
 #include <xefis/support/protocols/nmea/mtk.h>
 

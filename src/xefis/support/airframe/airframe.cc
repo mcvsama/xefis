@@ -21,7 +21,6 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/xefis.h>
 
 // Local:
 #include "airframe.h"

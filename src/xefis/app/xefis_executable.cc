@@ -11,21 +11,20 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__XEFIS_MACHINE_H__INCLUDED
-#define XEFIS__XEFIS_MACHINE_H__INCLUDED
-
-// Standard:
-#include <cstddef>
-#include <memory>
-
 // Xefis:
 #include <xefis/app/xefis.h>
 #include <xefis/config/all.h>
-#include <xefis/core/machine.h>
+#include <xefis/core/executable.h>
+
+// Standard:
+#include <cstddef>
 
 
-extern std::unique_ptr<xf::Machine>
-xefis_machine (xf::Xefis&);
-
-#endif
+int main (int argc, char** argv, char**)
+{
+	return xf::setup_xefis_executable(argc, argv, [&argc, &argv] {
+		auto app = std::make_unique<xf::Xefis> (argc, argv);
+		app->exec();
+	});
+}
 

@@ -25,7 +25,6 @@
 #include <xefis/core/module.h>
 #include <xefis/core/setting.h>
 #include <xefis/core/sockets/module_socket.h>
-#include <xefis/core/xefis.h>
 #include <xefis/support/sockets/socket_observer.h>
 
 

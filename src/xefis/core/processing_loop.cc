@@ -23,10 +23,10 @@
 #include <neutrino/time_helper.h>
 
 // Xefis:
+#include <xefis/app/xefis.h>
 #include <xefis/config/all.h>
 #include <xefis/core/machine.h>
 #include <xefis/core/module.h>
-#include <xefis/core/xefis.h>
 
 // Local:
 #include "processing_loop.h"

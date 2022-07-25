@@ -19,8 +19,8 @@
 #include <sys/fcntl.h>
 
 // Xefis:
+#include <xefis/app/xefis.h>
 #include <xefis/config/all.h>
-#include <xefis/core/xefis.h>
 
 // Local:
 #include "watchdog.h"

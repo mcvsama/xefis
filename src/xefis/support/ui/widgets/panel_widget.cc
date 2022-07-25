@@ -17,7 +17,6 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/panel.h>
-#include <xefis/core/xefis.h>
 
 // Local:
 #include "panel_widget.h"
