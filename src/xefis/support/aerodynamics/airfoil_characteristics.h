@@ -38,6 +38,7 @@ class AirfoilCharacteristics
 {
   public:
 	// All fields must be defined for angle of attack range [-180°…180°].
+	// They map Reynolds number and angle of attack to a result coefficient:
 	using LiftField						= Field<double, si::Angle, double>;
 	using DragField						= Field<double, si::Angle, double>;
 	using PitchingMomentField			= Field<double, si::Angle, double>;
