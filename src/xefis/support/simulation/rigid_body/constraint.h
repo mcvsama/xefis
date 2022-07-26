@@ -14,18 +14,18 @@
 #ifndef XEFIS__SUPPORT__SIMULATION__RIGID_BODY__CONSTRAINT_H__INCLUDED
 #define XEFIS__SUPPORT__SIMULATION__RIGID_BODY__CONSTRAINT_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <optional>
-
-// Neutrino:
-#include <neutrino/logger.h>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/nature/force_moments.h>
 #include <xefis/support/simulation/rigid_body/body.h>
 #include <xefis/support/simulation/rigid_body/connected_bodies.h>
+
+// Neutrino:
+#include <neutrino/logger.h>
+
+// Standard:
+#include <cstddef>
+#include <optional>
 
 
 namespace xf::rigid_body {

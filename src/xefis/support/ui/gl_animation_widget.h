@@ -14,9 +14,8 @@
 #ifndef XEFIS__SUPPORT__UI__GL_ANIMATION_WIDGET_H__INCLUDED
 #define XEFIS__SUPPORT__UI__GL_ANIMATION_WIDGET_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <variant>
+// Xefis:
+#include <xefis/config/all.h>
 
 // Qt:
 #include <QApplication>
@@ -26,8 +25,9 @@
 #include <QPainter>
 #include <QTimer>
 
-// Xefis:
-#include <xefis/config/all.h>
+// Standard:
+#include <cstddef>
+#include <variant>
 
 
 namespace xf {

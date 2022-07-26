@@ -14,18 +14,18 @@
 #ifndef XEFIS__SUPPORT__UI__WIDGETS__PANEL_NUMERIC_DISPLAY_H__INCLUDED
 #define XEFIS__SUPPORT__UI__WIDGETS__PANEL_NUMERIC_DISPLAY_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <array>
+// Xefis:
+#include <xefis/config/all.h>
+#include <xefis/core/v1/socket.h>
+#include <xefis/support/ui/widgets/panel_widget.h>
 
 // Qt:
 #include <QtWidgets/QDial>
 #include <QtGui/QPixmap>
 
-// Xefis:
-#include <xefis/config/all.h>
-#include <xefis/core/v1/socket.h>
-#include <xefis/support/ui/widgets/panel_widget.h>
+// Standard:
+#include <cstddef>
+#include <array>
 
 
 namespace xf {

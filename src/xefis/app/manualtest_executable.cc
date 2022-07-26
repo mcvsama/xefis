@@ -11,14 +11,14 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
+// Xefis:
+#include <xefis/config/all.h>
 
 // Neutrino:
 #include <neutrino/test/manual_test.h>
 
-// Xefis:
-#include <xefis/config/all.h>
+// Standard:
+#include <cstddef>
 
 
 int

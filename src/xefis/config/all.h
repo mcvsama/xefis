@@ -11,14 +11,15 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
+// Local:
+#include "resources.h"
+#include "core_types.h"
+
 // Neutrino:
 #include <neutrino/core.h>
 #include <neutrino/si/si.h>
 #include <neutrino/math/debug_prints.h>
 
-// Local:
-#include "resources.h"
-#include "core_types.h"
 
 namespace xf {
 

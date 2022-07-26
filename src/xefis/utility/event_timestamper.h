@@ -14,13 +14,13 @@
 #ifndef XEFIS__UTILITY__EVENT_TIMESTAMPER_H__INCLUDED
 #define XEFIS__UTILITY__EVENT_TIMESTAMPER_H__INCLUDED
 
+// Xefis:
+#include <xefis/config/all.h>
+
 // Standard:
 #include <cstddef>
 #include <optional>
 #include <functional>
-
-// Xefis:
-#include <xefis/config/all.h>
 
 
 namespace xf {

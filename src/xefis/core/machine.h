@@ -14,19 +14,19 @@
 #ifndef XEFIS__CORE__MACHINE_H__INCLUDED
 #define XEFIS__CORE__MACHINE_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <vector>
+// Xefis:
+#include <xefis/config/all.h>
+#include <xefis/core/screen.h>
+#include <xefis/core/processing_loop.h>
 
 // Neutrino:
 #include <neutrino/noncopyable.h>
 #include <neutrino/sequence.h>
 #include <neutrino/tracker.h>
 
-// Xefis:
-#include <xefis/config/all.h>
-#include <xefis/core/screen.h>
-#include <xefis/core/processing_loop.h>
+// Standard:
+#include <cstddef>
+#include <vector>
 
 
 namespace xf {

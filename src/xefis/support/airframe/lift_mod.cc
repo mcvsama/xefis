@@ -11,8 +11,11 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
+// Local:
+#include "lift_mod.h"
+
+// Xefis:
+#include <xefis/config/all.h>
 
 // Neutrino:
 #include <neutrino/numeric.h>
@@ -21,11 +24,8 @@
 #include <neutrino/sequence_utils.h>
 #include <neutrino/stdexcept.h>
 
-// Xefis:
-#include <xefis/config/all.h>
-
-// Local:
-#include "lift_mod.h"
+// Standard:
+#include <cstddef>
 
 
 namespace xf {

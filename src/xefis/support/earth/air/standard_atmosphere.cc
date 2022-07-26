@@ -11,18 +11,18 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-
-// Neutrino:
-#include <neutrino/math/field.h>
+// Local:
+#include "standard_atmosphere.h"
 
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/nature/constants.h>
 
-// Local:
-#include "standard_atmosphere.h"
+// Neutrino:
+#include <neutrino/math/field.h>
+
+// Standard:
+#include <cstddef>
 
 
 namespace xf {

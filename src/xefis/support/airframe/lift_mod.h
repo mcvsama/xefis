@@ -14,15 +14,18 @@
 #ifndef XEFIS__SUPPORT__AIRFRAME__LIFT_MOD_H__INCLUDED
 #define XEFIS__SUPPORT__AIRFRAME__LIFT_MOD_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <map>
+// Xefis:
+#include <xefis/config/all.h>
 
 // Neutrino:
 #include <neutrino/range.h>
 
-// Xefis:
-#include <xefis/config/all.h>
+// Qt:
+#include <QDomElement>
+
+// Standard:
+#include <cstddef>
+#include <map>
 
 
 namespace xf {

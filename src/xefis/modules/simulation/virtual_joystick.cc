@@ -11,18 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-
-// Lib:
-#include <QBoxLayout>
-#include <QMouseEvent>
-#include <QPainter>
-#include <QWidget>
-
-// Neutrino:
-#include <neutrino/numeric.h>
-#include <neutrino/range.h>
+// Local:
+#include "virtual_joystick.h"
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -30,8 +20,18 @@
 #include <xefis/support/ui/widget.h>
 #include <xefis/utility/kde.h>
 
-// Local:
-#include "virtual_joystick.h"
+// Neutrino:
+#include <neutrino/numeric.h>
+#include <neutrino/range.h>
+
+// Lib:
+#include <QBoxLayout>
+#include <QMouseEvent>
+#include <QPainter>
+#include <QWidget>
+
+// Standard:
+#include <cstddef>
 
 
 static constexpr auto kTransparentStyleSheet =

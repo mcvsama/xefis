@@ -11,20 +11,20 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
+// Local:
+#include "config_widget.h"
+
+// Xefis:
+#include <xefis/config/all.h>
+#include <xefis/support/ui/paint_helper.h>
 
 // Qt:
 #include <QBoxLayout>
 #include <QGroupBox>
 #include <QMargins>
 
-// Xefis:
-#include <xefis/config/all.h>
-#include <xefis/support/ui/paint_helper.h>
-
-// Local:
-#include "config_widget.h"
+// Standard:
+#include <cstddef>
 
 
 namespace xf::configurator {

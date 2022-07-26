@@ -14,9 +14,6 @@
 #ifndef XEFIS__MODULES__INSTRUMENTS__LABEL_H__INCLUDED
 #define XEFIS__MODULES__INSTRUMENTS__LABEL_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/graphics.h>
@@ -25,6 +22,9 @@
 #include <xefis/core/setting.h>
 #include <xefis/support/instrument/instrument_support.h>
 #include <xefis/utility/types.h>
+
+// Standard:
+#include <cstddef>
 
 
 // TODO handle nans

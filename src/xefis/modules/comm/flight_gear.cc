@@ -11,19 +11,19 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-#include <cstring>
+// Local:
+#include "flight_gear.h"
+
+// Xefis:
+#include <xefis/config/all.h>
 
 // Neutrino:
 #include <neutrino/numeric.h>
 #include <neutrino/qt/qdom.h>
 
-// Xefis:
-#include <xefis/config/all.h>
-
-// Local:
-#include "flight_gear.h"
+// Standard:
+#include <cstddef>
+#include <cstring>
 
 
 typedef float		FGFloat;

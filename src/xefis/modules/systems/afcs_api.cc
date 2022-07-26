@@ -11,14 +11,14 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
+// Local:
+#include "afcs_api.h"
 
 // Xefis:
 #include <xefis/config/all.h>
 
-// Local:
-#include "afcs_api.h"
+// Standard:
+#include <cstddef>
 
 
 namespace afcs {

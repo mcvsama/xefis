@@ -14,17 +14,6 @@
 #ifndef XEFIS__SUPPORT__SIMULATION__RIGID_BODY__IMPULSE_SOLVER_H__INCLUDED
 #define XEFIS__SUPPORT__SIMULATION__RIGID_BODY__IMPULSE_SOLVER_H__INCLUDED
 
-// Standard:
-#include <algorithm>
-#include <cstddef>
-#include <memory>
-#include <type_traits>
-#include <vector>
-
-// Neutrino:
-#include <neutrino/noncopyable.h>
-#include <neutrino/sequence.h>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/nature/acceleration_moments.h>
@@ -35,6 +24,17 @@
 #include <xefis/support/simulation/rigid_body/constraint.h>
 #include <xefis/support/simulation/rigid_body/frame_precalculation.h>
 #include <xefis/support/simulation/rigid_body/system.h>
+
+// Neutrino:
+#include <neutrino/noncopyable.h>
+#include <neutrino/sequence.h>
+
+// Standard:
+#include <algorithm>
+#include <cstddef>
+#include <memory>
+#include <type_traits>
+#include <vector>
 
 
 namespace xf::rigid_body {

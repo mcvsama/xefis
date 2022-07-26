@@ -14,10 +14,10 @@
 #ifndef XEFIS__SUPPORT__INSTRUMENT__TEXT_LAYOUT_H__INCLUDED
 #define XEFIS__SUPPORT__INSTRUMENT__TEXT_LAYOUT_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <optional>
-#include <vector>
+// Xefis:
+#include <xefis/config/all.h>
+#include <xefis/support/instrument/shadow.h>
+#include <xefis/support/instrument/text_painter.h>
 
 // Qt:
 #include <QtCore/QString>
@@ -25,10 +25,10 @@
 #include <QtGui/QFontMetrics>
 #include <QtGui/QColor>
 
-// Xefis:
-#include <xefis/config/all.h>
-#include <xefis/support/instrument/shadow.h>
-#include <xefis/support/instrument/text_painter.h>
+// Standard:
+#include <cstddef>
+#include <optional>
+#include <vector>
 
 
 namespace xf {

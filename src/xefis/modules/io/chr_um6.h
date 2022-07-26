@@ -14,18 +14,6 @@
 #ifndef XEFIS__MODULES__IO__CHR_UM6_H__INCLUDED
 #define XEFIS__MODULES__IO__CHR_UM6_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <string>
-#include <memory>
-
-// Qt:
-#include <QTimer>
-
-// Neutrino:
-#include <neutrino/bus/serial_port.h>
-#include <neutrino/logger.h>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
@@ -33,6 +21,18 @@
 #include <xefis/core/sockets/module_socket.h>
 #include <xefis/support/devices/chr_um6.h>
 #include <xefis/support/sockets/socket_value_changed.h>
+
+// Neutrino:
+#include <neutrino/bus/serial_port.h>
+#include <neutrino/logger.h>
+
+// Qt:
+#include <QTimer>
+
+// Standard:
+#include <cstddef>
+#include <string>
+#include <memory>
 
 
 namespace si = neutrino::si;

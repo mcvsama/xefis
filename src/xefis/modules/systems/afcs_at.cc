@@ -11,19 +11,19 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
+// Local:
+#include "afcs_at.h"
+
+// Xefis:
+#include <xefis/config/all.h>
 
 // Neutrino:
 #include <neutrino/numeric.h>
 #include <neutrino/qt/qdom.h>
 #include <neutrino/range.h>
 
-// Xefis:
-#include <xefis/config/all.h>
-
-// Local:
-#include "afcs_at.h"
+// Standard:
+#include <cstddef>
 
 
 AFCS_AT::AFCS_AT (std::string_view const& instance):

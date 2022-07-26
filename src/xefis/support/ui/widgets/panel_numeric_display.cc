@@ -11,17 +11,17 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-
-// Qt:
-#include <QtGui/QPainter>
+// Local:
+#include "panel_numeric_display.h"
 
 // Xefis:
 #include <xefis/config/all.h>
 
-// Local:
-#include "panel_numeric_display.h"
+// Qt:
+#include <QtGui/QPainter>
+
+// Standard:
+#include <cstddef>
 
 
 namespace xf {

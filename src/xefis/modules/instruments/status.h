@@ -14,17 +14,6 @@
 #ifndef XEFIS__MODULES__INSTRUMENTS__STATUS_H__INCLUDED
 #define XEFIS__MODULES__INSTRUMENTS__STATUS_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <functional>
-#include <optional>
-
-// Qt:
-#include <QtCore/QTimer>
-
-// Neutrino:
-#include <neutrino/synchronized.h>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/graphics.h>
@@ -35,6 +24,17 @@
 #include <xefis/support/instrument/instrument_support.h>
 #include <xefis/support/sockets/socket_button.h>
 #include <xefis/support/sockets/socket_delta_decoder.h>
+
+// Neutrino:
+#include <neutrino/synchronized.h>
+
+// Qt:
+#include <QtCore/QTimer>
+
+// Standard:
+#include <cstddef>
+#include <functional>
+#include <optional>
 
 
 namespace si = neutrino::si;

@@ -14,14 +14,14 @@
 #ifndef XEFIS__SUPPORT__SOCKETS__SOCKET_BUTTON_H__INCLUDED
 #define XEFIS__SUPPORT__SOCKETS__SOCKET_BUTTON_H__INCLUDED
 
+// Xefis:
+#include <xefis/config/all.h>
+#include <xefis/core/sockets/socket.h>
+
 // Standard:
 #include <cstddef>
 #include <functional>
 #include <variant>
-
-// Xefis:
-#include <xefis/config/all.h>
-#include <xefis/core/sockets/socket.h>
 
 
 namespace xf {

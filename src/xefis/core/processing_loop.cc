@@ -11,16 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-#include <functional>
-
-// Lib:
-#include <boost/circular_buffer.hpp>
-#include <boost/format.hpp>
-
-// Neutrino:
-#include <neutrino/time_helper.h>
+// Local:
+#include "processing_loop.h"
 
 // Xefis:
 #include <xefis/app/xefis.h>
@@ -28,8 +20,16 @@
 #include <xefis/core/machine.h>
 #include <xefis/core/module.h>
 
-// Local:
-#include "processing_loop.h"
+// Neutrino:
+#include <neutrino/time_helper.h>
+
+// Lib:
+#include <boost/circular_buffer.hpp>
+#include <boost/format.hpp>
+
+// Standard:
+#include <cstddef>
+#include <functional>
 
 
 namespace xf {

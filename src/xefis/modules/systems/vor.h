@@ -14,15 +14,15 @@
 #ifndef XEFIS__MODULES__SYSTEMS__VOR_H__INCLUDED
 #define XEFIS__MODULES__SYSTEMS__VOR_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
 #include <xefis/core/sockets/module_socket.h>
 #include <xefis/support/sockets/socket_observer.h>
 #include <xefis/utility/smoother.h>
+
+// Standard:
+#include <cstddef>
 
 
 namespace si = neutrino::si;

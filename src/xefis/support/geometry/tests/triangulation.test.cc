@@ -11,12 +11,11 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-
-// Lib:
-#include <QPainter>
-#include <QWidget>
+// Xefis:
+#include <xefis/config/all.h>
+#include <xefis/support/aerodynamics/airfoil_spline.h>
+#include <xefis/support/geometry/triangulation.h>
+#include <xefis/support/geometry/triangle.h>
 
 // Neutrino:
 #include <neutrino/qt/qutils.h>
@@ -24,11 +23,12 @@
 #include <neutrino/test/manual_test.h>
 #include <neutrino/test/test_widget.h>
 
-// Xefis:
-#include <xefis/config/all.h>
-#include <xefis/support/aerodynamics/airfoil_spline.h>
-#include <xefis/support/geometry/triangulation.h>
-#include <xefis/support/geometry/triangle.h>
+// Lib:
+#include <QPainter>
+#include <QWidget>
+
+// Standard:
+#include <cstddef>
 
 
 namespace xf::test {

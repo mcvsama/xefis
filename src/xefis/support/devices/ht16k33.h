@@ -14,24 +14,24 @@
 #ifndef XEFIS__SUPPORT__DEVICES__HT16K33_H__INCLUDED
 #define XEFIS__SUPPORT__DEVICES__HT16K33_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <array>
-#include <memory>
-#include <functional>
-
-// Qt:
-#include <QtCore/QObject>
-#include <QtCore/QTimer>
+// Xefis:
+#include <xefis/config/all.h>
+#include <xefis/core/sockets/module_socket.h>
 
 // Neutrino:
 #include <neutrino/bus/i2c.h>
 #include <neutrino/logger.h>
 #include <neutrino/numeric.h>
 
-// Xefis:
-#include <xefis/config/all.h>
-#include <xefis/core/sockets/module_socket.h>
+// Qt:
+#include <QtCore/QObject>
+#include <QtCore/QTimer>
+
+// Standard:
+#include <cstddef>
+#include <array>
+#include <memory>
+#include <functional>
 
 
 namespace xf {

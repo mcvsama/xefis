@@ -14,15 +14,15 @@
 #ifndef XEFIS__CORE__COMPONENTS__MODULE_CONFIGURATOR__SCREEN_ITEM_H__INCLUDED
 #define XEFIS__CORE__COMPONENTS__MODULE_CONFIGURATOR__SCREEN_ITEM_H__INCLUDED
 
-// Standard:
-#include <cstddef>
+// Xefis:
+#include <xefis/config/all.h>
+#include <xefis/core/screen.h>
 
 // Qt:
 #include <QtWidgets/QTreeWidgetItem>
 
-// Xefis:
-#include <xefis/config/all.h>
-#include <xefis/core/screen.h>
+// Standard:
+#include <cstddef>
 
 
 namespace xf::configurator {

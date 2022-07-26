@@ -11,20 +11,20 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-#include <algorithm>
-
-// Neutrino:
-#include <neutrino/numeric.h>
-#include <neutrino/si/utils.h>
+// Local:
+#include "adi.h"
 
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/instrument/text_layout.h>
 
-// Local:
-#include "adi.h"
+// Neutrino:
+#include <neutrino/numeric.h>
+#include <neutrino/si/utils.h>
+
+// Standard:
+#include <cstddef>
+#include <algorithm>
 
 
 namespace adi_detail {

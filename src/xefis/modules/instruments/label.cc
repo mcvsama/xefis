@@ -11,17 +11,17 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-
-// Qt:
-#include <QtWidgets/QLayout>
+// Local:
+#include "label.h"
 
 // Xefis:
 #include <xefis/config/all.h>
 
-// Local:
-#include "label.h"
+// Qt:
+#include <QtWidgets/QLayout>
+
+// Standard:
+#include <cstddef>
 
 
 Label::Label (xf::Graphics const& graphics, std::string_view const& instance):

@@ -14,14 +14,14 @@
 #ifndef XEFIS__CORE__SOCKETS__MODULE_IN_H__INCLUDED
 #define XEFIS__CORE__SOCKETS__MODULE_IN_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <cstdint>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/sockets/basic_module_in.h>
 #include <xefis/core/sockets/connectable_socket.h>
+
+// Standard:
+#include <cstddef>
+#include <cstdint>
 
 
 namespace xf {

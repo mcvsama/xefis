@@ -11,18 +11,18 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-
-// Neutrino:
-#include <neutrino/numeric.h>
+// Local:
+#include "vor.h"
 
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/earth/earth.h>
 
-// Local:
-#include "vor.h"
+// Neutrino:
+#include <neutrino/numeric.h>
+
+// Standard:
+#include <cstddef>
 
 
 VOR::VOR (std::string_view const& instance):

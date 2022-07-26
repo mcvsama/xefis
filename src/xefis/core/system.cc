@@ -11,8 +11,12 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
+// Local:
+#include "system.h"
+
+// Xefis:
+#include <xefis/app/xefis.h>
+#include <xefis/config/all.h>
 
 // System:
 #include <sys/types.h>
@@ -20,12 +24,8 @@
 #include <errno.h>
 #include <string.h>
 
-// Xefis:
-#include <xefis/app/xefis.h>
-#include <xefis/config/all.h>
-
-// Local:
-#include "system.h"
+// Standard:
+#include <cstddef>
 
 
 namespace xf {

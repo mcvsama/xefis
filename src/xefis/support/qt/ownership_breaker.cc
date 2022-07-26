@@ -11,14 +11,14 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
+// Local:
+#include "ownership_breaker.h"
 
 // Qt:
 #include <QtWidgets/QLayout>
 
-// Local:
-#include "ownership_breaker.h"
+// Standard:
+#include <cstddef>
 
 
 namespace xf {

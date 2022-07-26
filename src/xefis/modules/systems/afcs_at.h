@@ -14,9 +14,8 @@
 #ifndef XEFIS__MODULES__SYSTEMS__AFCS_AT_H__INCLUDED
 #define XEFIS__MODULES__SYSTEMS__AFCS_AT_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <utility>
+// Local:
+#include "afcs_api.h"
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -27,8 +26,9 @@
 #include <xefis/support/sockets/socket_observer.h>
 #include <xefis/utility/smoother.h>
 
-// Local:
-#include "afcs_api.h"
+// Standard:
+#include <cstddef>
+#include <utility>
 
 
 namespace si = neutrino::si;

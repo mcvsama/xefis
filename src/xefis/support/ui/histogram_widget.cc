@@ -11,22 +11,22 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-
-// Lib:
-#include <boost/range/adaptor/indexed.hpp>
-
-// Qt:
-#include <QPainter>
-#include <QPen>
+// Local:
+#include "histogram_widget.h"
 
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/ui/paint_helper.h>
 
-// Local:
-#include "histogram_widget.h"
+// Qt:
+#include <QPainter>
+#include <QPen>
+
+// Lib:
+#include <boost/range/adaptor/indexed.hpp>
+
+// Standard:
+#include <cstddef>
 
 
 namespace xf {

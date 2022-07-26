@@ -11,22 +11,22 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-
-// Qt:
-#include <QTimer>
-
-// Neutrino:
-#include <neutrino/numeric.h>
+// Local:
+#include "flaps_control.h"
 
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/airframe/airframe.h>
 #include <xefis/support/airframe/flaps.h>
 
-// Local:
-#include "flaps_control.h"
+// Neutrino:
+#include <neutrino/numeric.h>
+
+// Qt:
+#include <QTimer>
+
+// Standard:
+#include <cstddef>
 
 
 FlapsControl::FlapsControl (xf::Airframe& airframe, std::string_view const& instance):

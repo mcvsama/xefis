@@ -11,15 +11,15 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cmath>
+// Xefis:
+#include <xefis/config/all.h>
+#include <xefis/support/simulation/failure/sigmoidal_temperature_failure.h>
 
 // Neutrino:
 #include <neutrino/test/auto_test.h>
 
-// Xefis:
-#include <xefis/config/all.h>
-#include <xefis/support/simulation/failure/sigmoidal_temperature_failure.h>
+// Standard:
+#include <cmath>
 
 
 namespace xf::test {

@@ -14,15 +14,15 @@
 #ifndef XEFIS__CONFIG__CORE_TYPES_H__INCLUDED
 #define XEFIS__CONFIG__CORE_TYPES_H__INCLUDED
 
-// Standard:
-#include <cstddef>
+// Lib:
+#include <lib/half/half.hpp>
+#include <type_safe/integer.hpp>
 
 // Neutrino:
 #include <neutrino/core_types.h>
 
-// Lib:
-#include <lib/half/half.hpp>
-#include <type_safe/integer.hpp>
+// Standard:
+#include <cstddef>
 
 
 namespace ts = type_safe;

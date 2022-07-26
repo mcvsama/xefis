@@ -14,16 +14,16 @@
 #ifndef XEFIS__SUPPORT__UI__WIDGETS__GROUP_BOX_H__INCLUDED
 #define XEFIS__SUPPORT__UI__WIDGETS__GROUP_BOX_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <array>
+// Xefis:
+#include <xefis/config/all.h>
+#include <xefis/core/instrument_aids.h>
 
 // Qt:
 #include <QtWidgets/QWidget>
 
-// Xefis:
-#include <xefis/config/all.h>
-#include <xefis/core/instrument_aids.h>
+// Standard:
+#include <cstddef>
+#include <array>
 
 
 namespace xf {

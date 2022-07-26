@@ -14,21 +14,21 @@
 #ifndef XEFIS__SUPPORT__SIMULATION__N_BODY__MASS_H__INCLUDED
 #define XEFIS__SUPPORT__SIMULATION__N_BODY__MASS_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <initializer_list>
-
-// Lib:
-#include <boost/range.hpp>
-
-// Neutrino:
-#include <neutrino/math/math.h>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/math/geometry.h>
 #include <xefis/support/math/placement.h>
 #include <xefis/support/geometry/triangle.h>
+
+// Neutrino:
+#include <neutrino/math/math.h>
+
+// Lib:
+#include <boost/range.hpp>
+
+// Standard:
+#include <cstddef>
+#include <initializer_list>
 
 
 namespace xf {

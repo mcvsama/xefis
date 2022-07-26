@@ -14,15 +14,15 @@
 #ifndef XEFIS__SUPPORT__SIMULATION__FAILURE__SIGMOIDAL_TEMPERATURE_FAILURE_H__INCLUDED
 #define XEFIS__SUPPORT__SIMULATION__FAILURE__SIGMOIDAL_TEMPERATURE_FAILURE_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <random>
+// Xefis:
+#include <xefis/config/all.h>
 
 // Neutrino:
 #include <neutrino/noncopyable.h>
 
-// Xefis:
-#include <xefis/config/all.h>
+// Standard:
+#include <cstddef>
+#include <random>
 
 
 namespace xf {

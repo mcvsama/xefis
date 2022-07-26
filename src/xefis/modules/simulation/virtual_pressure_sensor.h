@@ -14,19 +14,19 @@
 #ifndef XEFIS__MODULES__SIMULATION__VIRTUAL_PRESSURE_SENSOR_H__INCLUDED
 #define XEFIS__MODULES__SIMULATION__VIRTUAL_PRESSURE_SENSOR_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <random>
-
-// Neutrino:
-#include <neutrino/math/normal_distribution.h>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
 #include <xefis/core/setting.h>
 #include <xefis/core/socket.h>
 #include <xefis/support/simulation/aerodynamic.v0/flight_simulation.h>
+
+// Neutrino:
+#include <neutrino/math/normal_distribution.h>
+
+// Standard:
+#include <cstddef>
+#include <random>
 
 
 class VirtualPressureSensorIO: public xf::Module

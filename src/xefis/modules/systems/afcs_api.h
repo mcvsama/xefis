@@ -14,11 +14,11 @@
 #ifndef XEFIS__MODULES__SYSTEMS__AFCS_API_H__INCLUDED
 #define XEFIS__MODULES__SYSTEMS__AFCS_API_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-
 // Xefis:
 #include <xefis/core/sockets/socket.h>
+
+// Standard:
+#include <cstddef>
 
 
 namespace afcs {

@@ -14,16 +14,16 @@
 #ifndef XEFIS__SUPPORT__AIRFRAME__FLAPS_H__INCLUDED
 #define XEFIS__SUPPORT__AIRFRAME__FLAPS_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <map>
+// Xefis:
+#include <xefis/config/all.h>
+#include <xefis/support/airframe/lift_mod.h>
 
 // Neutrino:
 #include <neutrino/range.h>
 
-// Xefis:
-#include <xefis/config/all.h>
-#include <xefis/support/airframe/lift_mod.h>
+// Standard:
+#include <cstddef>
+#include <map>
 
 
 namespace xf {

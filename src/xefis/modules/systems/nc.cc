@@ -11,24 +11,24 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-
-// Qt:
-#include <QtCore/QDate>
-#include <QtCore/QDateTime>
-
-// Neutrino:
-#include <neutrino/exception.h>
-#include <neutrino/time_helper.h>
+// Local:
+#include "nc.h"
 
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/earth/earth.h>
 #include <xefis/support/earth/navigation/magnetic_variation.h>
 
-// Local:
-#include "nc.h"
+// Neutrino:
+#include <neutrino/exception.h>
+#include <neutrino/time_helper.h>
+
+// Qt:
+#include <QtCore/QDate>
+#include <QtCore/QDateTime>
+
+// Standard:
+#include <cstddef>
 
 
 NavigationComputer::NavigationComputer (std::string_view const& instance):

@@ -11,15 +11,15 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-#include <limits>
+// Local:
+#include "airfoil_spline.h"
 
 // Xefis:
 #include <xefis/config/all.h>
 
-// Local:
-#include "airfoil_spline.h"
+// Standard:
+#include <cstddef>
+#include <limits>
 
 
 namespace xf {

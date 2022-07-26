@@ -14,17 +14,17 @@
 #ifndef XEFIS__SUPPORT__MATH__GEOMETRY_H__INCLUDED
 #define XEFIS__SUPPORT__MATH__GEOMETRY_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <cmath>
+// Xefis:
+#include <xefis/config/all.h>
+#include <xefis/support/math/lonlat_radius.h>
 
 // Neutrino:
 #include <neutrino/math/math.h>
 #include <neutrino/numeric.h>
 
-// Xefis:
-#include <xefis/config/all.h>
-#include <xefis/support/math/lonlat_radius.h>
+// Standard:
+#include <cstddef>
+#include <cmath>
 
 
 namespace xf {

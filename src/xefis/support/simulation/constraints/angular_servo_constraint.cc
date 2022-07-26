@@ -11,20 +11,20 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-#include <array>
-
-// Neutrino:
-#include <neutrino/numeric.h>
-#include <neutrino/variant.h>
+// Local:
+#include "angular_servo_constraint.h"
 
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/math/geometry.h>
 
-// Local:
-#include "angular_servo_constraint.h"
+// Neutrino:
+#include <neutrino/numeric.h>
+#include <neutrino/variant.h>
+
+// Standard:
+#include <cstddef>
+#include <array>
 
 
 namespace xf::rigid_body {

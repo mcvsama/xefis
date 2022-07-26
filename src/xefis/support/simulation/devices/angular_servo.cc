@@ -11,19 +11,19 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-#include <array>
-
-// Neutrino:
-#include <neutrino/numeric.h>
+// Local:
+#include "angular_servo.h"
 
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/math/geometry.h>
 
-// Local:
-#include "angular_servo.h"
+// Neutrino:
+#include <neutrino/numeric.h>
+
+// Standard:
+#include <cstddef>
+#include <array>
 
 
 namespace xf::sim {

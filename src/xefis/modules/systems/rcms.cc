@@ -11,20 +11,20 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
+// Local:
+#include "rcms.h"
+
+// Xefis:
+#include <xefis/config/all.h>
+#include <xefis/support/earth/earth.h>
 
 // Qt:
 #include <QtXml/QDomElement>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QGridLayout>
 
-// Xefis:
-#include <xefis/config/all.h>
-#include <xefis/support/earth/earth.h>
-
-// Local:
-#include "rcms.h"
+// Standard:
+#include <cstddef>
 
 
 RemoteControlManagementSystem::RemoteControlManagementSystem (std::string_view const& instance):

@@ -14,23 +14,23 @@
 #ifndef XEFIS__SUPPORT__INSTRUMENT__INSTRUMENT_SUPPORT_H__INCLUDED
 #define XEFIS__SUPPORT__INSTRUMENT__INSTRUMENT_SUPPORT_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <memory>
-#include <optional>
-
-// Qt:
-#include <QtGui/QPainter>
-
-// Neutrino:
-#include <neutrino/synchronized.h>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/graphics.h>
 #include <xefis/support/instrument/instrument_aids.h>
 #include <xefis/support/instrument/instrument_painter.h>
 #include <xefis/support/instrument/text_painter.h>
+
+// Neutrino:
+#include <neutrino/synchronized.h>
+
+// Qt:
+#include <QtGui/QPainter>
+
+// Standard:
+#include <cstddef>
+#include <memory>
+#include <optional>
 
 
 namespace xf {

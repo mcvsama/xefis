@@ -11,15 +11,15 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/earth/earth.h>
 #include <xefis/support/math/geometry.h>
 #include <xefis/support/math/north_east_down.h>
 #include <xefis/support/math/tait_bryan_angles.h>
+
+// Standard:
+#include <cstddef>
 
 
 namespace xf {

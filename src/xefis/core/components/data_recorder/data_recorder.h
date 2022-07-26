@@ -14,18 +14,18 @@
 #ifndef XEFIS__CORE__COMPONENTS__DATA_RECORDER__DATA_RECORDER_H__INCLUDED
 #define XEFIS__CORE__COMPONENTS__DATA_RECORDER__DATA_RECORDER_H__INCLUDED
 
-// Standard:
-#include <cstddef>
+// Local:
+#include "graphs_stack.h"
+
+// Xefis:
+#include <xefis/config/all.h>
 
 // Qt:
 #include <QtWidgets/QWidget>
 #include <QtWidgets/QScrollArea>
 
-// Xefis:
-#include <xefis/config/all.h>
-
-// Local:
-#include "graphs_stack.h"
+// Standard:
+#include <cstddef>
 
 
 namespace xf {

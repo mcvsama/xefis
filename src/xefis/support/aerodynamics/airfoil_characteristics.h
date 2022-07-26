@@ -14,16 +14,16 @@
 #ifndef XEFIS__SUPPORT__AERODYNAMICS__AIRFOIL_CHARACTERISTICS_H__INCLUDED
 #define XEFIS__SUPPORT__AERODYNAMICS__AIRFOIL_CHARACTERISTICS_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-
-// Neutrino:
-#include <neutrino/math/field.h>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/aerodynamics/airfoil_spline.h>
 #include <xefis/support/aerodynamics/angle_of_attack.h>
+
+// Neutrino:
+#include <neutrino/math/field.h>
+
+// Standard:
+#include <cstddef>
 
 
 namespace xf {

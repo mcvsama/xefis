@@ -14,15 +14,9 @@
 #ifndef XEFIS__MACHINES__TEST_INSTRUMENTS__TEST_INSTRUMENTS_MACHINE_H__INCLUDED
 #define XEFIS__MACHINES__TEST_INSTRUMENTS__TEST_INSTRUMENTS_MACHINE_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <optional>
-#include <memory>
-
-// Neutrino:
-#include <neutrino/logger.h>
-#include <neutrino/tracker.h>
-#include <neutrino/work_performer.h>
+// Local:
+#include "test_screen_1.h"
+#include "test_screen_2.h"
 
 // Xefis:
 #include <xefis/app/xefis.h>
@@ -32,9 +26,15 @@
 #include <xefis/modules/test/test_generator.h>
 #include <xefis/support/earth/navigation/navaid_storage.h>
 
-// Local:
-#include "test_screen_1.h"
-#include "test_screen_2.h"
+// Neutrino:
+#include <neutrino/logger.h>
+#include <neutrino/tracker.h>
+#include <neutrino/work_performer.h>
+
+// Standard:
+#include <cstddef>
+#include <optional>
+#include <memory>
 
 
 class TestInstrumentsMachine: public xf::Machine

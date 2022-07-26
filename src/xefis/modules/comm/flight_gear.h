@@ -14,20 +14,20 @@
 #ifndef XEFIS__MODULES__COMM__FLIGHT_GEAR_H__INCLUDED
 #define XEFIS__MODULES__COMM__FLIGHT_GEAR_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <map>
+// Xefis:
+#include <xefis/config/all.h>
+#include <xefis/core/module.h>
+#include <xefis/core/setting.h>
+#include <xefis/core/sockets/module_socket.h>
 
 // Qt:
 #include <QtCore/QTimer>
 #include <QtCore/QObject>
 #include <QtNetwork/QUdpSocket>
 
-// Xefis:
-#include <xefis/config/all.h>
-#include <xefis/core/module.h>
-#include <xefis/core/setting.h>
-#include <xefis/core/sockets/module_socket.h>
+// Standard:
+#include <cstddef>
+#include <map>
 
 
 namespace si = neutrino::si;

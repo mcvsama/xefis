@@ -11,14 +11,14 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
+// Local:
+#include "instrument_aids.h"
 
 // Xefis:
 #include <xefis/config/all.h>
 
-// Local:
-#include "instrument_aids.h"
+// Standard:
+#include <cstddef>
 
 
 namespace xf {

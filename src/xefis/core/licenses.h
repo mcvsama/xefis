@@ -14,11 +14,11 @@
 #ifndef XEFIS__CORE__LICENSES_H__INCLUDED
 #define XEFIS__CORE__LICENSES_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-
 // Xefis:
 #include <xefis/config/all.h>
+
+// Standard:
+#include <cstddef>
 
 
 namespace xf::licenses {

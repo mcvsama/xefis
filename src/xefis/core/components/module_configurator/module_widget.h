@@ -14,14 +14,8 @@
 #ifndef XEFIS__CORE__COMPONENTS__MODULE_CONFIGURATOR__MODULE_WIDGET_H__INCLUDED
 #define XEFIS__CORE__COMPONENTS__MODULE_CONFIGURATOR__MODULE_WIDGET_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-
-// Qt:
-#include <QLabel>
-#include <QStackedWidget>
-#include <QTimer>
-#include <QWidget>
+// Local:
+#include "module_widget.h"
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -33,8 +27,14 @@
 #include <xefis/support/ui/histogram_stats_widget.h>
 #include <xefis/support/ui/widget.h>
 
-// Local:
-#include "module_widget.h"
+// Qt:
+#include <QLabel>
+#include <QStackedWidget>
+#include <QTimer>
+#include <QWidget>
+
+// Standard:
+#include <cstddef>
 
 
 namespace xf::configurator {

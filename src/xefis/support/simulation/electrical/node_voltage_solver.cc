@@ -11,6 +11,16 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
+// Local:
+#include "node_voltage_solver.h"
+
+// Xefis:
+#include <xefis/config/all.h>
+#include <xefis/support/simulation/electrical/exception.h>
+
+// Neutrino:
+#include <neutrino/stdexcept.h>
+
 // Standard:
 #include <algorithm>
 #include <cmath>
@@ -20,19 +30,6 @@
 #include <stdexcept>
 #include <unordered_map>
 #include <unordered_set>
-
-// Lib:
-#include <boost/range/adaptors.hpp>
-
-// Neutrino:
-#include <neutrino/stdexcept.h>
-
-// Xefis:
-#include <xefis/config/all.h>
-#include <xefis/support/simulation/electrical/exception.h>
-
-// Local:
-#include "node_voltage_solver.h"
 
 
 namespace xf::electrical {

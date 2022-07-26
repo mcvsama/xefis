@@ -14,22 +14,22 @@
 #ifndef XEFIS__UTILITY__STRING_H__INCLUDED
 #define XEFIS__UTILITY__STRING_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <string>
-#include <string_view>
-
-// Qt:
-#include <QtCore/QString>
-#include <QtGui/QColor>
+// Xefis:
+#include <xefis/config/all.h>
+#include <xefis/utility/hextable.h>
 
 // Neutrino:
 #include <neutrino/blob.h>
 #include <neutrino/numeric.h>
 
-// Xefis:
-#include <xefis/config/all.h>
-#include <xefis/utility/hextable.h>
+// Qt:
+#include <QtCore/QString>
+#include <QtGui/QColor>
+
+// Standard:
+#include <cstddef>
+#include <string>
+#include <string_view>
 
 
 namespace xf {

@@ -14,6 +14,24 @@
 #ifndef XEFIS__MODULES__COMM__LINK_H__INCLUDED
 #define XEFIS__MODULES__COMM__LINK_H__INCLUDED
 
+// Xefis:
+#include <xefis/config/all.h>
+#include <xefis/core/module.h>
+#include <xefis/core/setting.h>
+#include <xefis/core/sockets/module_socket.h>
+#include <xefis/support/sockets/socket_changed.h>
+#include <xefis/utility/types.h>
+
+// Neutrino:
+#include <neutrino/endian.h>
+#include <neutrino/logger.h>
+#include <neutrino/numeric.h>
+#include <neutrino/stdexcept.h>
+#include <neutrino/strong_type.h>
+
+// Qt:
+#include <QtCore/QTimer>
+
 // Standard:
 #include <cstddef>
 #include <functional>
@@ -24,24 +42,6 @@
 #include <type_traits>
 #include <variant>
 #include <vector>
-
-// Qt:
-#include <QtCore/QTimer>
-
-// Neutrino:
-#include <neutrino/endian.h>
-#include <neutrino/logger.h>
-#include <neutrino/numeric.h>
-#include <neutrino/stdexcept.h>
-#include <neutrino/strong_type.h>
-
-// Xefis:
-#include <xefis/config/all.h>
-#include <xefis/core/module.h>
-#include <xefis/core/setting.h>
-#include <xefis/core/sockets/module_socket.h>
-#include <xefis/support/sockets/socket_changed.h>
-#include <xefis/utility/types.h>
 
 
 #define XEFIS_LINK_SEND_DEBUG 0

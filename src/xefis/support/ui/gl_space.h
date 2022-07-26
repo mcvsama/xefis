@@ -14,20 +14,20 @@
 #ifndef XEFIS__SUPPORT__UI__GL_H__INCLUDED
 #define XEFIS__SUPPORT__UI__GL_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <initializer_list>
-#include <memory>
-
-// System:
-#define GL_GLEXT_PROTOTYPES // What kind of joke is that?
-#include <GL/gl.h>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/simulation/rigid_body/shape.h>
 #include <xefis/support/simulation/rigid_body/shape_material.h>
 #include <xefis/support/simulation/rigid_body/shape_vertex.h>
+
+// System:
+#define GL_GLEXT_PROTOTYPES // What kind of joke is that?
+#include <GL/gl.h>
+
+// Standard:
+#include <cstddef>
+#include <initializer_list>
+#include <memory>
 
 
 namespace xf {

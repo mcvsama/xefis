@@ -14,12 +14,12 @@
 #ifndef XEFIS__UTILITY__IS_OPTIONAL_H__INCLUDED
 #define XEFIS__UTILITY__IS_OPTIONAL_H__INCLUDED
 
+// Xefis:
+#include <xefis/config/all.h>
+
 // Standard:
 #include <cstddef>
 #include <type_traits>
-
-// Xefis:
-#include <xefis/config/all.h>
 
 
 namespace xf {

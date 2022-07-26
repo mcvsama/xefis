@@ -14,15 +14,15 @@
 #ifndef XEFIS__CORE__SOCKETS__SOCKET_CONVERTER_H__INCLUDED
 #define XEFIS__CORE__SOCKETS__SOCKET_CONVERTER_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <vector>
+// Xefis:
+#include <xefis/config/all.h>
 
 // Boost:
 #include <boost/format.hpp>
 
-// Xefis:
-#include <xefis/config/all.h>
+// Standard:
+#include <cstddef>
+#include <vector>
 
 
 namespace xf {

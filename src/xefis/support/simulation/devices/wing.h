@@ -14,14 +14,14 @@
 #ifndef XEFIS__SUPPORT__SIMULATION__DEVICES__WING_H__INCLUDED
 #define XEFIS__SUPPORT__SIMULATION__DEVICES__WING_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/aerodynamics/airfoil.h>
 #include <xefis/support/simulation/rigid_body/body.h>
 #include <xefis/support/simulation/rigid_body/concepts.h>
+
+// Standard:
+#include <cstddef>
 
 
 namespace xf::sim {

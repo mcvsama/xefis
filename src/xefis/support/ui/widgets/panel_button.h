@@ -14,16 +14,16 @@
 #ifndef XEFIS__SUPPORT__UI__WIDGETS__PANEL_BUTTON_H__INCLUDED
 #define XEFIS__SUPPORT__UI__WIDGETS__PANEL_BUTTON_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-
-// Qt:
-#include <QtWidgets/QPushButton>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/v1/socket.h>
 #include <xefis/support/ui/widgets/panel_widget.h>
+
+// Qt:
+#include <QtWidgets/QPushButton>
+
+// Standard:
+#include <cstddef>
 
 
 namespace xf {

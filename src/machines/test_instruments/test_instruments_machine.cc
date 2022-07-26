@@ -11,17 +11,17 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-#include <thread>
+// Local:
+#include "test_instruments_machine.h"
 
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/xefis_machine.h>
 #include <xefis/modules/systems/afcs_api.h>
 
-// Local:
-#include "test_instruments_machine.h"
+// Standard:
+#include <cstddef>
+#include <thread>
 
 
 TestInstrumentsMachine::TestInstrumentsMachine (xf::Xefis& xefis):

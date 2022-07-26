@@ -14,15 +14,15 @@
 #ifndef XEFIS__SUPPORT__SIMULATION__CONSTRAINTS__ANGULAR_SPRING_CONSTRAINT_H__INCLUDED
 #define XEFIS__SUPPORT__SIMULATION__CONSTRAINTS__ANGULAR_SPRING_CONSTRAINT_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <memory>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/simulation/constraints/hinge_precalculation.h>
 #include <xefis/support/simulation/rigid_body/body.h>
 #include <xefis/support/simulation/rigid_body/constraint.h>
+
+// Standard:
+#include <cstddef>
+#include <memory>
 
 
 namespace xf::rigid_body {

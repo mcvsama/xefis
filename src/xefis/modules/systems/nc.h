@@ -14,12 +14,6 @@
 #ifndef XEFIS__MODULES__SYSTEMS__NC_H__INCLUDED
 #define XEFIS__MODULES__SYSTEMS__NC_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-
-// Boost:
-#include <boost/circular_buffer.hpp>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
@@ -27,6 +21,12 @@
 #include <xefis/support/sockets/socket_observer.h>
 #include <xefis/utility/smoother.h>
 #include <xefis/utility/range_smoother.h>
+
+// Boost:
+#include <boost/circular_buffer.hpp>
+
+// Standard:
+#include <cstddef>
 
 
 namespace si = neutrino::si;

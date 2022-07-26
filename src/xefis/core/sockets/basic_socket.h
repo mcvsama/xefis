@@ -14,8 +14,11 @@
 #ifndef XEFIS__CORE__SOCKETS__BASIC_SOCKET_H__INCLUDED
 #define XEFIS__CORE__SOCKETS__BASIC_SOCKET_H__INCLUDED
 
-// Standard:
-#include <variant>
+// Xefis:
+#include <xefis/config/all.h>
+#include <xefis/core/cycle.h>
+#include <xefis/core/sockets/common.h>
+#include <xefis/core/sockets/socket_converter.h>
 
 // Neutrino:
 #include <neutrino/noncopyable.h>
@@ -24,11 +27,8 @@
 #include <neutrino/variant.h>
 #include <neutrino/utility.h>
 
-// Xefis:
-#include <xefis/config/all.h>
-#include <xefis/core/cycle.h>
-#include <xefis/core/sockets/common.h>
-#include <xefis/core/sockets/socket_converter.h>
+// Standard:
+#include <variant>
 
 
 namespace xf {

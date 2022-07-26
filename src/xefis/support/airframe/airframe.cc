@@ -11,19 +11,19 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
+// Local:
+#include "airframe.h"
+
+// Xefis:
+#include <xefis/config/all.h>
 
 // Neutrino:
 #include <neutrino/qt/qdom.h>
 #include <neutrino/qt/qdom_iterator.h>
 #include <neutrino/stdexcept.h>
 
-// Xefis:
-#include <xefis/config/all.h>
-
-// Local:
-#include "airframe.h"
+// Standard:
+#include <cstddef>
 
 
 namespace xf {

@@ -14,21 +14,21 @@
 #ifndef XEFIS__MODULES__COMM__UDP_H__INCLUDED
 #define XEFIS__MODULES__COMM__UDP_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-
-// Qt:
-#include <QtNetwork/QUdpSocket>
-
-// Neutrino:
-#include <neutrino/logger.h>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
 #include <xefis/core/setting.h>
 #include <xefis/core/sockets/module_socket.h>
 #include <xefis/support/sockets/socket_changed.h>
+
+// Neutrino:
+#include <neutrino/logger.h>
+
+// Qt:
+#include <QtNetwork/QUdpSocket>
+
+// Standard:
+#include <cstddef>
 
 
 class UDP_IO: public xf::Module

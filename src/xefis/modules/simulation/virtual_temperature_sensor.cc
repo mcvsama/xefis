@@ -11,17 +11,17 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-
-// Neutrino:
-#include <neutrino/numeric.h>
+// Local:
+#include "virtual_temperature_sensor.h"
 
 // Xefis:
 #include <xefis/config/all.h>
 
-// Local:
-#include "virtual_temperature_sensor.h"
+// Neutrino:
+#include <neutrino/numeric.h>
+
+// Standard:
+#include <cstddef>
 
 
 VirtualTemperatureSensor::VirtualTemperatureSensor (xf::sim::FlightSimulation const& flight_simulation,

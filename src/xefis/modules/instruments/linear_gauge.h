@@ -14,12 +14,8 @@
 #ifndef XEFIS__MODULES__INSTRUMENTS__LINEAR_GAUGE_H__INCLUDED
 #define XEFIS__MODULES__INSTRUMENTS__LINEAR_GAUGE_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <optional>
-
-// Neutrino:
-#include <neutrino/synchronized.h>
+// Local:
+#include "gauge.h"
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -30,8 +26,12 @@
 #include <xefis/support/instrument/instrument_support.h>
 #include <xefis/support/sockets/socket_observer.h>
 
-// Local:
-#include "gauge.h"
+// Neutrino:
+#include <neutrino/synchronized.h>
+
+// Standard:
+#include <cstddef>
+#include <optional>
 
 
 // TODO handle nans

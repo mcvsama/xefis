@@ -11,14 +11,14 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
+// Local:
+#include "afcs_eac_yd.h"
 
 // Xefis:
 #include <xefis/config/all.h>
 
-// Local:
-#include "afcs_eac_yd.h"
+// Standard:
+#include <cstddef>
 
 
 AFCS_EAC_YD::AFCS_EAC_YD (std::string_view const& instance):

@@ -14,15 +14,15 @@
 #ifndef XEFIS__CORE__SOCKETS__BASIC_MODULE_SOCKET_H__INCLUDED
 #define XEFIS__CORE__SOCKETS__BASIC_MODULE_SOCKET_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <string_view>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
 #include <xefis/core/sockets/basic_socket.h>
 #include <xefis/core/sockets/module_socket_path.h>
+
+// Standard:
+#include <cstddef>
+#include <string_view>
 
 
 namespace xf {

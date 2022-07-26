@@ -11,15 +11,11 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-#include <functional>
+// Local:
+#include "joystick.h"
 
-// System:
-#include <linux/joystick.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
+// Xefis:
+#include <xefis/config/all.h>
 
 // Neutrino:
 #include <neutrino/numeric.h>
@@ -27,11 +23,15 @@
 #include <neutrino/qt/qdom_iterator.h>
 #include <neutrino/stdexcept.h>
 
-// Xefis:
-#include <xefis/config/all.h>
+// System:
+#include <linux/joystick.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
-// Local:
-#include "joystick.h"
+// Standard:
+#include <cstddef>
+#include <functional>
 
 
 JoystickInput::Button::Button (QDomElement const&, xf::ModuleOut<bool>& socket):

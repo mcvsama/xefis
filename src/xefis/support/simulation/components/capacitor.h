@@ -14,13 +14,13 @@
 #ifndef XEFIS__SUPPORT__SIMULATION__COMPONENTS__CAPACITOR_H__INCLUDED
 #define XEFIS__SUPPORT__SIMULATION__COMPONENTS__CAPACITOR_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <string_view>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/simulation/components/voltage_source.h>
+
+// Standard:
+#include <cstddef>
+#include <string_view>
 
 
 namespace xf::electrical {

@@ -11,15 +11,15 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
+// Local:
+#include "node.h"
 
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/simulation/electrical/element.h>
 
-// Local:
-#include "node.h"
+// Standard:
+#include <cstddef>
 
 
 namespace xf::electrical {

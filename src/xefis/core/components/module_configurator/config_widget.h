@@ -14,19 +14,19 @@
 #ifndef XEFIS__CORE__COMPONENTS__MODULE_CONFIGURATOR__CONFIG_WIDGET_H__INCLUDED
 #define XEFIS__CORE__COMPONENTS__MODULE_CONFIGURATOR__CONFIG_WIDGET_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <tuple>
-
-// Qt:
-#include <QString>
-#include <QWidget>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/ui/histogram_widget.h>
 #include <xefis/support/ui/histogram_stats_widget.h>
 #include <xefis/support/ui/widget.h>
+
+// Qt:
+#include <QString>
+#include <QWidget>
+
+// Standard:
+#include <cstddef>
+#include <tuple>
 
 
 namespace xf::configurator {

@@ -14,17 +14,17 @@
 #ifndef XEFIS__SUPPORT__SIMULATION__RIGID_BODY__GROUP_H__INCLUDED
 #define XEFIS__SUPPORT__SIMULATION__RIGID_BODY__GROUP_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <vector>
-
-// Neutrino:
-#include <neutrino/noncopyable.h>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/math/geometry.h>
 #include <xefis/support/simulation/rigid_body/concepts.h>
+
+// Neutrino:
+#include <neutrino/noncopyable.h>
+
+// Standard:
+#include <cstddef>
+#include <vector>
 
 
 namespace xf::rigid_body {

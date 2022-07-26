@@ -14,23 +14,23 @@
 #ifndef XEFIS__CORE__INSTRUMENT_H__INCLUDED
 #define XEFIS__CORE__INSTRUMENT_H__INCLUDED
 
+// Xefis:
+#include <xefis/config/all.h>
+#include <xefis/core/module.h>
+#include <xefis/core/paint_request.h>
+
+// Neutrino:
+#include <neutrino/noncopyable.h>
+
+// Lib:
+#include <boost/circular_buffer.hpp>
+
 // Standard:
 #include <cstddef>
 #include <atomic>
 #include <future>
 #include <string>
 #include <type_traits>
-
-// Lib:
-#include <boost/circular_buffer.hpp>
-
-// Neutrino:
-#include <neutrino/noncopyable.h>
-
-// Xefis:
-#include <xefis/config/all.h>
-#include <xefis/core/module.h>
-#include <xefis/core/paint_request.h>
 
 
 namespace xf {

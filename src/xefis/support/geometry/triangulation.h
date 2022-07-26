@@ -14,6 +14,10 @@
 #ifndef XEFIS__SUPPORT__GEOMETRY__TRIANGULATION_H__INCLUDED
 #define XEFIS__SUPPORT__GEOMETRY__TRIANGULATION_H__INCLUDED
 
+// Xefis:
+#include <xefis/config/all.h>
+#include <xefis/support/math/geometry.h>
+
 // Standard:
 #include <algorithm>
 #include <array>
@@ -21,10 +25,6 @@
 #include <cstddef>
 #include <list>
 #include <type_traits>
-
-// Xefis:
-#include <xefis/config/all.h>
-#include <xefis/support/math/geometry.h>
 
 
 namespace xf {

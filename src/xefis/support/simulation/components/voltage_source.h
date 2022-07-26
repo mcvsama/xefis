@@ -14,14 +14,14 @@
 #ifndef XEFIS__SUPPORT__SIMULATION__COMPONENTS__VOLTAGE_SOURCE_H__INCLUDED
 #define XEFIS__SUPPORT__SIMULATION__COMPONENTS__VOLTAGE_SOURCE_H__INCLUDED
 
+// Xefis:
+#include <xefis/config/all.h>
+#include <xefis/support/simulation/electrical/element.h>
+
 // Standard:
 #include <cstddef>
 #include <string>
 #include <string_view>
-
-// Xefis:
-#include <xefis/config/all.h>
-#include <xefis/support/simulation/electrical/element.h>
 
 
 namespace xf::electrical {

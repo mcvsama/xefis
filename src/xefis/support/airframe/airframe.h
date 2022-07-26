@@ -14,13 +14,6 @@
 #ifndef XEFIS__SUPPORT__AIRFRAME__AIRFRAME_H__INCLUDED
 #define XEFIS__SUPPORT__AIRFRAME__AIRFRAME_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <optional>
-
-// Neutrino:
-#include <neutrino/stdexcept.h>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/airframe/flaps.h>
@@ -28,6 +21,13 @@
 #include <xefis/support/airframe/lift.h>
 #include <xefis/support/airframe/drag.h>
 #include <xefis/support/airframe/types.h>
+
+// Neutrino:
+#include <neutrino/stdexcept.h>
+
+// Standard:
+#include <cstddef>
+#include <optional>
 
 
 namespace xf {

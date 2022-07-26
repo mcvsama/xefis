@@ -11,15 +11,15 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
+// Local:
+#include "panel_widget.h"
 
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/panel.h>
 
-// Local:
-#include "panel_widget.h"
+// Standard:
+#include <cstddef>
 
 
 namespace xf {

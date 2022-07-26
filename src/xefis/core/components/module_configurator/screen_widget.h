@@ -14,14 +14,6 @@
 #ifndef XEFIS__CORE__COMPONENTS__MODULE_CONFIGURATOR__SCREEN_WIDGET_H__INCLUDED
 #define XEFIS__CORE__COMPONENTS__MODULE_CONFIGURATOR__SCREEN_WIDGET_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <unordered_map>
-
-// Qt:
-#include <QTimer>
-#include <QWidget>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/screen.h>
@@ -29,6 +21,14 @@
 #include <xefis/support/ui/histogram_widget.h>
 #include <xefis/support/ui/histogram_stats_widget.h>
 #include <xefis/support/ui/widget.h>
+
+// Qt:
+#include <QTimer>
+#include <QWidget>
+
+// Standard:
+#include <cstddef>
+#include <unordered_map>
 
 
 namespace xf::configurator {

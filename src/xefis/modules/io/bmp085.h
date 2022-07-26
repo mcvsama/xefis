@@ -14,21 +14,21 @@
 #ifndef XEFIS__MODULES__IO__BMP085_H__INCLUDED
 #define XEFIS__MODULES__IO__BMP085_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-
-// Qt:
-#include <QTimer>
-
-// Neutrino:
-#include <neutrino/bus/i2c.h>
-#include <neutrino/logger.h>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
 #include <xefis/core/setting.h>
 #include <xefis/core/sockets/module_socket.h>
+
+// Neutrino:
+#include <neutrino/bus/i2c.h>
+#include <neutrino/logger.h>
+
+// Qt:
+#include <QTimer>
+
+// Standard:
+#include <cstddef>
 
 
 namespace si = neutrino::si;

@@ -11,17 +11,17 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-
-// Qt:
-#include <QtWidgets/QWidget>
+// Local:
+#include "group_box.h"
 
 // Xefis:
 #include <xefis/config/all.h>
 
-// Local:
-#include "group_box.h"
+// Qt:
+#include <QtWidgets/QWidget>
+
+// Standard:
+#include <cstddef>
 
 
 namespace xf {

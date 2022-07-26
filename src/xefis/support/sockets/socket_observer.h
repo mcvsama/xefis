@@ -14,19 +14,19 @@
 #ifndef XEFIS__SUPPORT__SOCKETS__MODULE_SOCKET_OBSERVER_H__INCLUDED
 #define XEFIS__SUPPORT__SOCKETS__MODULE_SOCKET_OBSERVER_H__INCLUDED
 
+// Xefis:
+#include <xefis/config/all.h>
+#include <xefis/core/sockets/basic_socket.h>
+#include <xefis/utility/smoother.h>
+
+// Neutrino:
+#include <neutrino/variant.h>
+
 // Standard:
 #include <cstddef>
 #include <functional>
 #include <variant>
 #include <list>
-
-// Neutrino:
-#include <neutrino/variant.h>
-
-// Xefis:
-#include <xefis/config/all.h>
-#include <xefis/core/sockets/basic_socket.h>
-#include <xefis/utility/smoother.h>
 
 
 namespace xf {

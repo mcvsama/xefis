@@ -14,18 +14,19 @@
 #ifndef XEFIS__MODULES__SYSTEMS__WATCHDOG_H__INCLUDED
 #define XEFIS__MODULES__SYSTEMS__WATCHDOG_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-
-// Qt:
-#include <QtCore/QSocketNotifier>
+// Xefis:
+#include <xefis/app/xefis.h>
+#include <xefis/config/all.h>
+#include <xefis/core/module.h>
 
 // Neutrino:
 #include <neutrino/logger.h>
 
-// Xefis:
-#include <xefis/config/all.h>
-#include <xefis/core/module.h>
+// Qt:
+#include <QtCore/QSocketNotifier>
+
+// Standard:
+#include <cstddef>
 
 
 class Watchdog: public xf::Module

@@ -14,23 +14,23 @@
 #ifndef XEFIS__CORE__COMPONENTS__MODULE_CONFIGURATOR__MODULE_CONFIGURATOR_H__INCLUDED
 #define XEFIS__CORE__COMPONENTS__MODULE_CONFIGURATOR__MODULE_CONFIGURATOR_H__INCLUDED
 
-// Standard:
-#include <cstddef>
+// Local:
+#include "configurable_items_list.h"
+#include "module_widget.h"
+#include "processing_loop_widget.h"
+#include "screen_widget.h"
+
+// Xefis:
+#include <xefis/config/all.h>
+#include <xefis/core/machine.h>
 
 // Qt:
 #include <QtWidgets/QWidget>
 #include <QtWidgets/QStackedWidget>
 #include <QtWidgets/QLabel>
 
-// Xefis:
-#include <xefis/config/all.h>
-#include <xefis/core/machine.h>
-
-// Local:
-#include "configurable_items_list.h"
-#include "module_widget.h"
-#include "processing_loop_widget.h"
-#include "screen_widget.h"
+// Standard:
+#include <cstddef>
 
 
 namespace xf {

@@ -11,14 +11,6 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-#include <memory>
-#include <string>
-
-// Neutrino:
-#include <neutrino/test/auto_test.h>
-
 // Xefis:
 #include <xefis/support/math/euler_angles.h>
 #include <xefis/support/math/tait_bryan_angles.h>
@@ -30,6 +22,14 @@
 #include <xefis/support/simulation/rigid_body/system.h>
 #include <xefis/support/simulation/rigid_body/utility.h>
 #include <xefis/support/simulation/simulation.h>
+
+// Neutrino:
+#include <neutrino/test/auto_test.h>
+
+// Standard:
+#include <cstddef>
+#include <memory>
+#include <string>
 
 
 namespace xf::test {

@@ -14,11 +14,9 @@
 #ifndef XEFIS__CORE__PROCESSING_LOOP_H__INCLUDED
 #define XEFIS__CORE__PROCESSING_LOOP_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-
-// Qt:
-#include <QTimer>
+// Xefis:
+#include <xefis/config/all.h>
+#include <xefis/core/sockets/module_out.h>
 
 // Neutrino:
 #include <neutrino/logger.h>
@@ -27,9 +25,11 @@
 #include <neutrino/time.h>
 #include <neutrino/tracker.h>
 
-// Xefis:
-#include <xefis/config/all.h>
-#include <xefis/core/sockets/module_out.h>
+// Qt:
+#include <QTimer>
+
+// Standard:
+#include <cstddef>
 
 
 namespace xf {

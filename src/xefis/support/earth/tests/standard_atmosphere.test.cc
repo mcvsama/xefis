@@ -11,15 +11,15 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-#include <cmath>
+// Xefis:
+#include <xefis/support/earth/air/standard_atmosphere.h>
 
 // Neutrino:
 #include <neutrino/test/auto_test.h>
 
-// Xefis:
-#include <xefis/support/earth/air/standard_atmosphere.h>
+// Standard:
+#include <cstddef>
+#include <cmath>
 
 
 namespace xf::test {

@@ -14,18 +14,6 @@
 #ifndef XEFIS__SUPPORT__SIMULATION__RIGID_BODY__BODY_H__INCLUDED
 #define XEFIS__SUPPORT__SIMULATION__RIGID_BODY__BODY_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <list>
-#include <memory>
-#include <mutex>
-#include <optional>
-
-// Neutrino:
-#include <neutrino/noncopyable.h>
-#include <neutrino/numeric.h>
-#include <neutrino/stdexcept.h>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/earth/air/atmosphere_model.h>
@@ -38,6 +26,18 @@
 #include <xefis/support/nature/wrench.h>
 #include <xefis/support/simulation/rigid_body/concepts.h>
 #include <xefis/support/simulation/rigid_body/shape.h>
+
+// Neutrino:
+#include <neutrino/noncopyable.h>
+#include <neutrino/numeric.h>
+#include <neutrino/stdexcept.h>
+
+// Standard:
+#include <cstddef>
+#include <list>
+#include <memory>
+#include <mutex>
+#include <optional>
 
 
 namespace xf::rigid_body {

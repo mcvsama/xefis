@@ -14,20 +14,20 @@
 #ifndef XEFIS__SUPPORT__INSTRUMENT__TEXT_PAINTER_H__INCLUDED
 #define XEFIS__SUPPORT__INSTRUMENT__TEXT_PAINTER_H__INCLUDED
 
+// Xefis:
+#include <xefis/config/all.h>
+#include <xefis/support/instrument/shadow.h>
+
+// Qt:
+#include <QtGui/QImage>
+#include <QtGui/QPainter>
+
 // Standard:
 #include <cstddef>
 #include <map>
 #include <memory>
 #include <optional>
 #include <tuple>
-
-// Qt:
-#include <QtGui/QImage>
-#include <QtGui/QPainter>
-
-// Xefis:
-#include <xefis/config/all.h>
-#include <xefis/support/instrument/shadow.h>
 
 
 namespace xf {

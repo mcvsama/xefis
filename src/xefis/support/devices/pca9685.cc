@@ -11,17 +11,11 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
+// Local:
+#include "pca9685.h"
 
-// System:
-#include <unistd.h>
-
-// Lib:
-#include <boost/endian/conversion.hpp>
-
-// Qt:
-#include <QTimer>
+// Xefis:
+#include <xefis/config/all.h>
 
 // Neutrino:
 #include <neutrino/numeric.h>
@@ -29,11 +23,17 @@
 #include <neutrino/time_helper.h>
 #include <neutrino/stdexcept.h>
 
-// Xefis:
-#include <xefis/config/all.h>
+// Qt:
+#include <QTimer>
 
-// Local:
-#include "pca9685.h"
+// Lib:
+#include <boost/endian/conversion.hpp>
+
+// System:
+#include <unistd.h>
+
+// Standard:
+#include <cstddef>
 
 
 namespace xf {

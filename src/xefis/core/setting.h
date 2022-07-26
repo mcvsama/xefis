@@ -14,19 +14,19 @@
 #ifndef XEFIS__CORE__SETTING_H__INCLUDED
 #define XEFIS__CORE__SETTING_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <cstdint>
-
-// Neutrino:
-#include <neutrino/time.h>
-#include <neutrino/time_helper.h>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
 #include <xefis/core/sockets/module_socket_path.h>
 #include <xefis/utility/blob.h>
+
+// Neutrino:
+#include <neutrino/time.h>
+#include <neutrino/time_helper.h>
+
+// Standard:
+#include <cstddef>
+#include <cstdint>
 
 
 namespace xf {

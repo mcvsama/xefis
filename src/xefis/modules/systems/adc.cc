@@ -11,14 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-#include <memory>
-#include <map>
-
-// Neutrino:
-#include <neutrino/exception.h>
-#include <neutrino/qt/qdom.h>
+// Local:
+#include "adc.h"
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -28,8 +22,14 @@
 #include <xefis/support/nature/constants.h>
 #include <xefis/utility/convergence.h>
 
-// Local:
-#include "adc.h"
+// Neutrino:
+#include <neutrino/exception.h>
+#include <neutrino/qt/qdom.h>
+
+// Standard:
+#include <cstddef>
+#include <memory>
+#include <map>
 
 
 AirDataComputer::AirDataComputer (xf::Airframe* airframe, xf::Logger const& logger, std::string_view const& instance):

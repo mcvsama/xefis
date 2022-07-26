@@ -13,14 +13,13 @@
 
 #ifndef XEFIS__UTILITY__NAMED_INSTANCE_H__INCLUDED
 #define XEFIS__UTILITY__NAMED_INSTANCE_H__INCLUDED
-// TODO add to Makefile
+
+// Xefis:
+#include <xefis/config/all.h>
 
 // Standard:
 #include <cstddef>
 #include <string_view>
-
-// Xefis:
-#include <xefis/config/all.h>
 
 
 namespace xf {

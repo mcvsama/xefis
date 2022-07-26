@@ -14,17 +14,17 @@
 #ifndef XEFIS__CORE__SCREEN_SPEC_H__INCLUDED
 #define XEFIS__CORE__SCREEN_SPEC_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-
-// Qt:
-#include <QRect>
+// Xefis:
+#include <xefis/config/all.h>
 
 // Neutrino:
 #include <neutrino/qt/qutils.h>
 
-// Xefis:
-#include <xefis/config/all.h>
+// Qt:
+#include <QRect>
+
+// Standard:
+#include <cstddef>
 
 
 namespace xf {

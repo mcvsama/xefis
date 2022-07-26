@@ -14,14 +14,14 @@
 #ifndef XEFIS__SUPPORT__SIMULATION__CONSTRAINTS__FIXED_CONSTRAINT_H__INCLUDED
 #define XEFIS__SUPPORT__SIMULATION__CONSTRAINTS__FIXED_CONSTRAINT_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/nature/force_moments.h>
 #include <xefis/support/simulation/constraints/helpers/fixed_orientation_helper.h>
 #include <xefis/support/simulation/rigid_body/constraint.h>
+
+// Standard:
+#include <cstddef>
 
 
 namespace xf::rigid_body {

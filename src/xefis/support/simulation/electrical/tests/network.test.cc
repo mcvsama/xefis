@@ -11,17 +11,6 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cmath>
-#include <cstddef>
-#include <filesystem>
-#include <vector>
-
-// Neutrino:
-#include <neutrino/test/auto_test.h>
-#include <neutrino/test/test_values.h>
-#include <neutrino/time_helper.h>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/simulation/components/capacitor.h>
@@ -29,6 +18,17 @@
 #include <xefis/support/simulation/components/voltage_source.h>
 #include <xefis/support/simulation/electrical/network.h>
 #include <xefis/support/simulation/electrical/node_voltage_solver.h>
+
+// Neutrino:
+#include <neutrino/test/auto_test.h>
+#include <neutrino/test/test_values.h>
+#include <neutrino/time_helper.h>
+
+// Standard:
+#include <cmath>
+#include <cstddef>
+#include <filesystem>
+#include <vector>
 
 
 namespace xf::test {

@@ -14,15 +14,15 @@
 #ifndef XEFIS__SUPPORT__PROTOCOLS__NMEA__EXCEPTIONS_H__INCLUDED
 #define XEFIS__SUPPORT__PROTOCOLS__NMEA__EXCEPTIONS_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <string>
+// Xefis:
+#include <xefis/config/all.h>
 
 // Lib:
 #include <boost/format.hpp>
 
-// Xefis:
-#include <xefis/config/all.h>
+// Standard:
+#include <cstddef>
+#include <string>
 
 
 namespace xf::nmea {

@@ -14,17 +14,6 @@
 #ifndef XEFIS__MODULES__INSTRUMENTS__HSI_H__INCLUDED
 #define XEFIS__MODULES__INSTRUMENTS__HSI_H__INCLUDED
 
-// Standard:
-#include <array>
-#include <cstddef>
-#include <future>
-
-// Neutrino:
-#include <neutrino/synchronized.h>
-
-// Qt:
-#include <QPainterPath>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/graphics.h>
@@ -35,6 +24,17 @@
 #include <xefis/support/instrument/instrument_support.h>
 #include <xefis/utility/event_timestamper.h>
 #include <xefis/utility/temporal.h>
+
+// Qt:
+#include <QPainterPath>
+
+// Neutrino:
+#include <neutrino/synchronized.h>
+
+// Standard:
+#include <array>
+#include <cstddef>
+#include <future>
 
 
 namespace si = neutrino::si;

@@ -11,11 +11,25 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-#include <random>
-#include <tuple>
-#include <iomanip>
+// Local:
+#include "xbee.h"
+
+// Xefis:
+#include <xefis/config/all.h>
+#include <xefis/utility/blob.h>
+#include <xefis/utility/string.h>
+
+// Neutrino:
+#include <neutrino/bus/serial_port.h>
+#include <neutrino/qt/qdom.h>
+#include <neutrino/string.h>
+#include <neutrino/time_helper.h>
+
+// Qt:
+#include <QtCore/QTimer>
+
+// Lib:
+#include <boost/endian/conversion.hpp>
 
 // System:
 #include <sys/types.h>
@@ -25,25 +39,11 @@
 #include <termios.h>
 #include <errno.h>
 
-// Qt:
-#include <QtCore/QTimer>
-
-// Lib:
-#include <boost/endian/conversion.hpp>
-
-// Neutrino:
-#include <neutrino/bus/serial_port.h>
-#include <neutrino/qt/qdom.h>
-#include <neutrino/string.h>
-#include <neutrino/time_helper.h>
-
-// Xefis:
-#include <xefis/config/all.h>
-#include <xefis/utility/blob.h>
-#include <xefis/utility/string.h>
-
-// Local:
-#include "xbee.h"
+// Standard:
+#include <cstddef>
+#include <random>
+#include <tuple>
+#include <iomanip>
 
 
 XBee::XBee (xf::Logger const& logger, std::string_view const& instance):

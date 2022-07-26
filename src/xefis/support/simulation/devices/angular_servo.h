@@ -14,16 +14,16 @@
 #ifndef XEFIS__SUPPORT__SIMULATION__DEVICES__ANGULAR_SERVO_H__INCLUDED
 #define XEFIS__SUPPORT__SIMULATION__DEVICES__ANGULAR_SERVO_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <memory>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/simulation/constraints/hinge_precalculation.h>
 #include <xefis/support/simulation/devices/interfaces/servo.h>
 #include <xefis/support/simulation/rigid_body/body.h>
 #include <xefis/support/simulation/rigid_body/constraint.h>
+
+// Standard:
+#include <cstddef>
+#include <memory>
 
 
 namespace xf::sim {

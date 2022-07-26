@@ -14,27 +14,27 @@
 #ifndef XEFIS__CORE__COMPONENTS__SOCKET_TREE__SOCKET_TREE_H__INCLUDED
 #define XEFIS__CORE__COMPONENTS__SOCKET_TREE__SOCKET_TREE_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-
-// Boost:
-#include <boost/algorithm/string.hpp>
-
-// Qt:
-#include <QTreeWidget>
-#include <QTimer>
-
-// Neutrino:
-#include <neutrino/qt/qutils.h>
-#include <neutrino/sequence.h>
+// Local:
+#include "socket_item.h"
 
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
 #include <xefis/core/sockets/module_socket.h>
 
-// Local:
-#include "socket_item.h"
+// Neutrino:
+#include <neutrino/qt/qutils.h>
+#include <neutrino/sequence.h>
+
+// Qt:
+#include <QTreeWidget>
+#include <QTimer>
+
+// Boost:
+#include <boost/algorithm/string.hpp>
+
+// Standard:
+#include <cstddef>
 
 
 namespace xf {

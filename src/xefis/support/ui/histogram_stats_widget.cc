@@ -11,20 +11,20 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
+// Local:
+#include "histogram_stats_widget.h"
+
+// Xefis:
+#include <xefis/config/all.h>
+#include <xefis/support/ui/paint_helper.h>
 
 // Qt:
 #include <QLabel>
 #include <QWidget>
 #include <QGridLayout>
 
-// Xefis:
-#include <xefis/config/all.h>
-#include <xefis/support/ui/paint_helper.h>
-
-// Local:
-#include "histogram_stats_widget.h"
+// Standard:
+#include <cstddef>
 
 
 namespace xf {

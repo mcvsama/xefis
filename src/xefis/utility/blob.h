@@ -14,15 +14,15 @@
 #ifndef XEFIS__UTILITY__BLOB_H__INCLUDED
 #define XEFIS__UTILITY__BLOB_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <cstring>
+// Xefis:
+#include <xefis/config/all.h>
 
 // Neutrino:
 #include <neutrino/blob.h>
 
-// Xefis:
-#include <xefis/config/all.h>
+// Standard:
+#include <cstddef>
+#include <cstring>
 
 
 // Add some Xefis-specific stuff to the neutrino namespace.

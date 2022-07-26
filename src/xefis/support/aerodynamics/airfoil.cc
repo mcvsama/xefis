@@ -11,15 +11,15 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
+// Local:
+#include "airfoil.h"
 
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/nature/wrench.h>
 
-// Local:
-#include "airfoil.h"
+// Standard:
+#include <cstddef>
 
 
 namespace xf {

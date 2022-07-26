@@ -14,14 +14,14 @@
 #ifndef XEFIS__CORE__SOCKETS__MODULE_SOCKET_H__INCLUDED
 #define XEFIS__CORE__SOCKETS__MODULE_SOCKET_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/sockets/basic_module_socket.h>
 #include <xefis/core/sockets/module_in.h>
 #include <xefis/core/sockets/module_out.h>
+
+// Standard:
+#include <cstddef>
 
 #endif
 

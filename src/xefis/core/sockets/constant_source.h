@@ -14,11 +14,11 @@
 #ifndef XEFIS__CORE__SOCKETS__CONSTANT_SOURCE_H__INCLUDED
 #define XEFIS__CORE__SOCKETS__CONSTANT_SOURCE_H__INCLUDED
 
-// Standard:
-#include <variant>
-
 // Xefis:
 #include <xefis/config/all.h>
+
+// Standard:
+#include <variant>
 
 
 namespace xf {

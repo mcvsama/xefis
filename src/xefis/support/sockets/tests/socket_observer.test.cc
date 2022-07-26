@@ -11,18 +11,18 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-
-// Neutrino:
-#include <neutrino/test/auto_test.h>
-
 // Xefis:
 #include <xefis/core/cycle.h>
 #include <xefis/core/module.h>
 #include <xefis/core/sockets/module_out.h>
 #include <xefis/core/sockets/socket.h>
 #include <xefis/support/sockets/socket_observer.h>
+
+// Neutrino:
+#include <neutrino/test/auto_test.h>
+
+// Standard:
+#include <cstddef>
 
 
 namespace xf::test {

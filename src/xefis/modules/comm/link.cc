@@ -11,13 +11,13 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-#include <memory>
-#include <random>
+// Local:
+#include "link.h"
 
-// Lib:
-#include <boost/endian/conversion.hpp>
+// Xefis:
+#include <xefis/config/all.h>
+#include <xefis/utility/blob.h>
+#include <xefis/utility/hextable.h>
 
 // Neutrino:
 #include <neutrino/crypto/hmac.h>
@@ -25,13 +25,13 @@
 #include <neutrino/qt/qdom_iterator.h>
 #include <neutrino/stdexcept.h>
 
-// Xefis:
-#include <xefis/config/all.h>
-#include <xefis/utility/blob.h>
-#include <xefis/utility/hextable.h>
+// Lib:
+#include <boost/endian/conversion.hpp>
 
-// Local:
-#include "link.h"
+// Standard:
+#include <cstddef>
+#include <memory>
+#include <random>
 
 
 using namespace neutrino::si::literals;

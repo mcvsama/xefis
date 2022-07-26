@@ -14,19 +14,20 @@
 #ifndef XEFIS__MODULES__SYSTEMS__FLAPS_CONTROL_H__INCLUDED
 #define XEFIS__MODULES__SYSTEMS__FLAPS_CONTROL_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <set>
-
-// Neutrino:
-#include <neutrino/range.h>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
 #include <xefis/core/setting.h>
 #include <xefis/core/sockets/module_socket.h>
+#include <xefis/support/airframe/airframe.h>
 #include <xefis/support/sockets/socket_value_changed.h>
+
+// Neutrino:
+#include <neutrino/range.h>
+
+// Standard:
+#include <cstddef>
+#include <set>
 
 
 namespace si = neutrino::si;

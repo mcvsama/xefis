@@ -14,12 +14,12 @@
 #ifndef XEFIS__SUPPORT__SOCKETS__SOCKET_ACTION_H__INCLUDED
 #define XEFIS__SUPPORT__SOCKETS__SOCKET_ACTION_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/cycle.h>
+
+// Standard:
+#include <cstddef>
 
 
 namespace xf {

@@ -11,12 +11,11 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-#include <cstdlib>
-#include <iostream>
-#include <string>
-#include <vector>
+// Xefis:
+#include <xefis/config/all.h>
+
+// Neutrino:
+#include <neutrino/fail.h>
 
 // System:
 #include <sys/types.h>
@@ -28,11 +27,12 @@
 #include <string.h>
 #include <errno.h>
 
-// Neutrino:
-#include <neutrino/fail.h>
-
-// Xefis:
-#include <xefis/config/all.h>
+// Standard:
+#include <cstddef>
+#include <cstdlib>
+#include <iostream>
+#include <string>
+#include <vector>
 
 
 namespace si = neutrino::si;

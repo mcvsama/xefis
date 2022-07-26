@@ -14,13 +14,13 @@
 #ifndef XEFIS__SUPPORT__MATH__NORTH_EAST_DOWN_H__INCLUDED
 #define XEFIS__SUPPORT__MATH__NORTH_EAST_DOWN_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/math/geometry.h>
 #include <xefis/support/math/placement.h>
+
+// Standard:
+#include <cstddef>
 
 
 namespace xf {

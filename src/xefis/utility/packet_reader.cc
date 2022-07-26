@@ -11,15 +11,15 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-#include <algorithm>
+// Local:
+#include "packet_reader.h"
 
 // Neutrino:
 #include <neutrino/numeric.h>
 
-// Local:
-#include "packet_reader.h"
+// Standard:
+#include <cstddef>
+#include <algorithm>
 
 
 namespace xf {

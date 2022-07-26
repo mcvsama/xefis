@@ -11,20 +11,20 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <algorithm>
-#include <cstddef>
-
-// Neutrino:
-#include <neutrino/numeric.h>
+// Local:
+#include "various_shapes.h"
 
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/math/geometry.h>
 #include <xefis/support/simulation/rigid_body/shape_vertex.h>
 
-// Local:
-#include "various_shapes.h"
+// Neutrino:
+#include <neutrino/numeric.h>
+
+// Standard:
+#include <algorithm>
+#include <cstddef>
 
 
 namespace xf::rigid_body {

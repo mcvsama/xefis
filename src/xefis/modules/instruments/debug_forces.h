@@ -14,15 +14,15 @@
 #ifndef XEFIS__MODULES__INSTRUMENTS__DEBUG_FORCES_H__INCLUDED
 #define XEFIS__MODULES__INSTRUMENTS__DEBUG_FORCES_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/graphics.h>
 #include <xefis/core/instrument.h>
 #include <xefis/core/sockets/socket.h>
 #include <xefis/support/instrument/instrument_support.h>
+
+// Standard:
+#include <cstddef>
 
 
 namespace si = neutrino::si;

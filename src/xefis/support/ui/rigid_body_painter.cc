@@ -11,19 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-
-// System:
-#include <GL/gl.h>
-#include <GL/glu.h>
-
-// Qt:
-#include <QOpenGLFunctions>
-#include <QPainter>
-
-// Neutrino:
-#include <neutrino/stdexcept.h>
+// Local:
+#include "rigid_body_painter.h"
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -38,8 +27,19 @@
 #include <xefis/support/ui/gl_space.h>
 #include <xefis/support/ui/paint_helper.h>
 
-// Local:
-#include "rigid_body_painter.h"
+// Neutrino:
+#include <neutrino/stdexcept.h>
+
+// Qt:
+#include <QOpenGLFunctions>
+#include <QPainter>
+
+// System:
+#include <GL/gl.h>
+#include <GL/glu.h>
+
+// Standard:
+#include <cstddef>
 
 
 namespace xf {

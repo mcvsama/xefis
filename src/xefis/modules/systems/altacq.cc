@@ -11,17 +11,17 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-
-// Neutrino:
-#include <neutrino/time_helper.h>
+// Local:
+#include "altacq.h"
 
 // Xefis:
 #include <xefis/config/all.h>
 
-// Local:
-#include "altacq.h"
+// Neutrino:
+#include <neutrino/time_helper.h>
+
+// Standard:
+#include <cstddef>
 
 
 AltAcq::AltAcq (std::string_view const& instance):

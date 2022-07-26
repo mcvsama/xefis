@@ -14,15 +14,15 @@
 #ifndef XEFIS__UTILITY__TEMPORAL_H__INCLUDED
 #define XEFIS__UTILITY__TEMPORAL_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <type_traits>
+// Xefis:
+#include <xefis/config/all.h>
 
 // Neutrino:
 #include <neutrino/time_helper.h>
 
-// Xefis:
-#include <xefis/config/all.h>
+// Standard:
+#include <cstddef>
+#include <type_traits>
 
 
 namespace xf {

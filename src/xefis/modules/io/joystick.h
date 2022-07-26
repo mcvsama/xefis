@@ -14,11 +14,15 @@
 #ifndef XEFIS__MODULES__IO__JOYSTICK_H__INCLUDED
 #define XEFIS__MODULES__IO__JOYSTICK_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <vector>
-#include <array>
-#include <set>
+// Xefis:
+#include <xefis/config/all.h>
+#include <xefis/core/module.h>
+#include <xefis/core/setting.h>
+#include <xefis/core/sockets/module_socket.h>
+
+// Neutrino:
+#include <neutrino/logger.h>
+#include <neutrino/range.h>
 
 // Qt:
 #include <QObject>
@@ -26,15 +30,11 @@
 #include <QTimer>
 #include <QDomElement>
 
-// Neutrino:
-#include <neutrino/logger.h>
-#include <neutrino/range.h>
-
-// Xefis:
-#include <xefis/config/all.h>
-#include <xefis/core/module.h>
-#include <xefis/core/setting.h>
-#include <xefis/core/sockets/module_socket.h>
+// Standard:
+#include <cstddef>
+#include <vector>
+#include <array>
+#include <set>
 
 
 namespace si = neutrino::si;

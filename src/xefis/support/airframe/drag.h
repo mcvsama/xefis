@@ -14,15 +14,15 @@
 #ifndef XEFIS__SUPPORT__AIRFRAME__DRAG_H__INCLUDED
 #define XEFIS__SUPPORT__AIRFRAME__DRAG_H__INCLUDED
 
-// Standard:
-#include <cstddef>
+// Xefis:
+#include <xefis/config/all.h>
+#include <xefis/support/airframe/types.h>
 
 // Neutrino:
 #include <neutrino/math/field.h>
 
-// Xefis:
-#include <xefis/config/all.h>
-#include <xefis/support/airframe/types.h>
+// Standard:
+#include <cstddef>
 
 
 namespace xf {

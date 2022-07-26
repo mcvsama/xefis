@@ -14,14 +14,14 @@
 #ifndef XEFIS__SUPPORT__SIMULATION__RIGID_BODY__VARIOUS_SHAPES_H__INCLUDED
 #define XEFIS__SUPPORT__SIMULATION__RIGID_BODY__VARIOUS_SHAPES_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/aerodynamics/airfoil_spline.h>
 #include <xefis/support/simulation/rigid_body/shape.h>
 #include <xefis/support/simulation/rigid_body/shape_material.h>
+
+// Standard:
+#include <cstddef>
 
 
 namespace xf::rigid_body {

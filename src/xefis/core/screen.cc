@@ -11,11 +11,15 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-#include <functional>
-#include <algorithm>
-#include <thread>
+// Local:
+#include "screen.h"
+
+// Xefis:
+#include <xefis/config/all.h>
+#include <xefis/core/module.h>
+
+// Neutrino:
+#include <neutrino/time_helper.h>
 
 // Qt:
 #include <QPainter>
@@ -24,15 +28,11 @@
 #include <QSvgRenderer>
 #include <QTimer>
 
-// Neutrino:
-#include <neutrino/time_helper.h>
-
-// Xefis:
-#include <xefis/config/all.h>
-#include <xefis/core/module.h>
-
-// Local:
-#include "screen.h"
+// Standard:
+#include <cstddef>
+#include <functional>
+#include <algorithm>
+#include <thread>
 
 
 namespace xf {

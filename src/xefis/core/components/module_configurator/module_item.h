@@ -14,18 +14,18 @@
 #ifndef XEFIS__CORE__COMPONENTS__MODULE_CONFIGURATOR__MODULE_ITEM_H__INCLUDED
 #define XEFIS__CORE__COMPONENTS__MODULE_CONFIGURATOR__MODULE_ITEM_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-
-// Qt:
-#include <QtWidgets/QTreeWidgetItem>
+// Local:
+#include "processing_loop_item.h"
 
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
 
-// Local:
-#include "processing_loop_item.h"
+// Qt:
+#include <QtWidgets/QTreeWidgetItem>
+
+// Standard:
+#include <cstddef>
 
 
 namespace xf::configurator {

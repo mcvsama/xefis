@@ -11,14 +11,14 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
+// Local:
+#include "flaps_bugs.h"
 
 // Xefis:
 #include <xefis/config/all.h>
 
-// Local:
-#include "flaps_bugs.h"
+// Standard:
+#include <cstddef>
 
 
 FlapsBugs::FlapsBugs (xf::Flaps const& flaps, std::string_view const& instance):

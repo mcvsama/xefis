@@ -11,24 +11,24 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-#include <memory>
-#include <iostream>
+// Local:
+#include "bmp085.h"
 
-// Lib:
-#include <boost/endian/conversion.hpp>
+// Xefis:
+#include <xefis/config/all.h>
 
 // Neutrino:
 #include <neutrino/qt/qdom.h>
 #include <neutrino/stdexcept.h>
 #include <neutrino/time.h>
 
-// Xefis:
-#include <xefis/config/all.h>
+// Lib:
+#include <boost/endian/conversion.hpp>
 
-// Local:
-#include "bmp085.h"
+// Standard:
+#include <cstddef>
+#include <memory>
+#include <iostream>
 
 
 BMP085::BMP085 (xf::Logger const& logger, std::string_view const& instance):

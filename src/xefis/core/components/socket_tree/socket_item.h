@@ -14,16 +14,16 @@
 #ifndef XEFIS__CORE__COMPONENTS__SOCKET_TREE__SOCKET_ITEM_H__INCLUDED
 #define XEFIS__CORE__COMPONENTS__SOCKET_TREE__SOCKET_ITEM_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-
-// Qt:
-#include <QtWidgets/QTreeWidgetItem>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
 #include <xefis/core/sockets/socket.h>
+
+// Qt:
+#include <QtWidgets/QTreeWidgetItem>
+
+// Standard:
+#include <cstddef>
 
 
 namespace xf {

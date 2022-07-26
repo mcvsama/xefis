@@ -11,22 +11,22 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-#include <iomanip>
-#include <map>
-
-// Lib:
-#include <boost/endian/conversion.hpp>
-
-// Neutrino:
-#include <neutrino/time_helper.h>
+// Local:
+#include "chr_um6.h"
 
 // Xefis:
 #include <xefis/config/all.h>
 
-// Local:
-#include "chr_um6.h"
+// Neutrino:
+#include <neutrino/time_helper.h>
+
+// Lib:
+#include <boost/endian/conversion.hpp>
+
+// Standard:
+#include <cstddef>
+#include <iomanip>
+#include <map>
 
 
 namespace xf {

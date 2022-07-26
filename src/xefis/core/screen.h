@@ -14,24 +14,6 @@
 #ifndef XEFIS__CORE__SCREEN_H__INCLUDED
 #define XEFIS__CORE__SCREEN_H__INCLUDED
 
-// Standard:
-#include <atomic>
-#include <cstddef>
-#include <optional>
-#include <unordered_map>
-#include <vector>
-
-// Qt:
-#include <QSize>
-#include <QImage>
-#include <QWidget>
-
-// Neutrino:
-#include <neutrino/logger.h>
-#include <neutrino/noncopyable.h>
-#include <neutrino/tracker.h>
-#include <neutrino/work_performer.h>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/graphics.h>
@@ -39,6 +21,24 @@
 #include <xefis/core/machine.h>
 #include <xefis/core/screen_spec.h>
 #include <xefis/utility/named_instance.h>
+
+// Neutrino:
+#include <neutrino/logger.h>
+#include <neutrino/noncopyable.h>
+#include <neutrino/tracker.h>
+#include <neutrino/work_performer.h>
+
+// Qt:
+#include <QSize>
+#include <QImage>
+#include <QWidget>
+
+// Standard:
+#include <atomic>
+#include <cstddef>
+#include <optional>
+#include <unordered_map>
+#include <vector>
 
 
 namespace xf {

@@ -14,20 +14,20 @@
 #ifndef XEFIS__UTILITY__SMOOTHER_H__INCLUDED
 #define XEFIS__UTILITY__SMOOTHER_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <cmath>
-#include <algorithm>
-
-// Boost:
-#include <boost/circular_buffer.hpp>
+// Xefis:
+#include <xefis/config/all.h>
 
 // Neutrino:
 #include <neutrino/numeric.h>
 #include <neutrino/range.h>
 
-// Xefis:
-#include <xefis/config/all.h>
+// Boost:
+#include <boost/circular_buffer.hpp>
+
+// Standard:
+#include <cstddef>
+#include <cmath>
+#include <algorithm>
 
 
 namespace xf {

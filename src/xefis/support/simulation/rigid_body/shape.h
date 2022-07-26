@@ -14,16 +14,16 @@
 #ifndef XEFIS__SUPPORT__SIMULATION__RIGID_BODY__SHAPE_H__INCLUDED
 #define XEFIS__SUPPORT__SIMULATION__RIGID_BODY__SHAPE_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <functional>
-#include <vector>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/math/geometry.h>
 #include <xefis/support/simulation/rigid_body/concepts.h>
 #include <xefis/support/simulation/rigid_body/shape_vertex.h>
+
+// Standard:
+#include <cstddef>
+#include <functional>
+#include <vector>
 
 
 namespace xf::rigid_body {

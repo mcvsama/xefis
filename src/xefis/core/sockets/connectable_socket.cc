@@ -11,14 +11,14 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
+// Local:
+#include "connectable_socket.h"
 
 // Xefis:
 #include <xefis/app/xefis.h>
 
-// Local:
-#include "connectable_socket.h"
+// Standard:
+#include <cstddef>
 
 
 namespace xf {

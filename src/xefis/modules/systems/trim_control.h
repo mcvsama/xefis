@@ -14,18 +14,19 @@
 #ifndef XEFIS__MODULES__SYSTEMS__TRIM_CONTROL_H__INCLUDED
 #define XEFIS__MODULES__SYSTEMS__TRIM_CONTROL_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-
-// Qt:
-#include <QtCore/QTimer>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
 #include <xefis/core/setting.h>
 #include <xefis/core/sockets/module_socket.h>
 #include <xefis/support/sockets/socket_observer.h>
+#include <xefis/support/ui/sound_manager.h>
+
+// Qt:
+#include <QtCore/QTimer>
+
+// Standard:
+#include <cstddef>
 
 
 class TrimControlIO: public xf::Module

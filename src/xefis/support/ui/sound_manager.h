@@ -14,18 +14,18 @@
 #ifndef XEFIS__SUPPORT__UI__SOUND_MANAGER_H__INCLUDED
 #define XEFIS__SUPPORT__UI__SOUND_MANAGER_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <set>
-
-// Qt:
-#include <QtCore/QProcess>
+// Xefis:
+#include <xefis/config/all.h>
 
 // Neutrino:
 #include <neutrino/logger.h>
 
-// Xefis:
-#include <xefis/config/all.h>
+// Qt:
+#include <QtCore/QProcess>
+
+// Standard:
+#include <cstddef>
+#include <set>
 
 
 namespace xf {

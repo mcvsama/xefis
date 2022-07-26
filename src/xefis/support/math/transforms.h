@@ -14,14 +14,14 @@
 #ifndef XEFIS__SUPPORT__MATH__TRANSFORMS_H__INCLUDED
 #define XEFIS__SUPPORT__MATH__TRANSFORMS_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/math/geometry.h>
 #include <xefis/support/math/placement.h>
 #include <xefis/support/nature/constants.h>
+
+// Standard:
+#include <cstddef>
 
 
 namespace xf {

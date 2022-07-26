@@ -11,22 +11,22 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-#include <tuple>
-
-// Boost:
-#include <boost/range/adaptor/indexed.hpp>
-
-// Neutrino:
-#include <neutrino/test/auto_test.h>
-
 // Xefis:
 #include <xefis/core/module.h>
 #include <xefis/core/sockets/module_socket.h>
 #include <xefis/core/sockets/tests/test_cycle.h>
 #include <xefis/support/sockets/socket_quadrature_counter.h>
 #include <xefis/support/sockets/socket_quadrature_decoder.h>
+
+// Neutrino:
+#include <neutrino/test/auto_test.h>
+
+// Boost:
+#include <boost/range/adaptor/indexed.hpp>
+
+// Standard:
+#include <cstddef>
+#include <tuple>
 
 
 namespace xf::test {

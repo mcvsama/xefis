@@ -16,12 +16,12 @@
 #ifndef XEFIS__CONFIG__RESOURCES_H__INCLUDED
 #define XEFIS__CONFIG__RESOURCES_H__INCLUDED
 
+// Xefis:
+#include <xefis/config/all.h>
+
 // Qt:
 #include <QtGui/QPixmap>
 #include <QtGui/QPixmapCache>
-
-// Xefis:
-#include <xefis/config/all.h>
 
 
 namespace xf::config {

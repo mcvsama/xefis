@@ -14,16 +14,16 @@
 #ifndef XEFIS__UTILITY__PACKET_READER_H__INCLUDED
 #define XEFIS__UTILITY__PACKET_READER_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <vector>
-#include <functional>
+// Xefis:
+#include <xefis/config/all.h>
 
 // Neutrino:
 #include <neutrino/noncopyable.h>
 
-// Xefis:
-#include <xefis/config/all.h>
+// Standard:
+#include <cstddef>
+#include <vector>
+#include <functional>
 
 
 namespace xf {

@@ -14,20 +14,20 @@
 #ifndef XEFIS__SUPPORT__DEVICES__CHR_UM6_H__INCLUDED
 #define XEFIS__SUPPORT__DEVICES__CHR_UM6_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <cstring>
-#include <functional>
-#include <queue>
+// Xefis:
+#include <xefis/config/all.h>
+#include <xefis/utility/packet_reader.h>
 
 // Neutrino:
 #include <neutrino/bus/serial_port.h>
 #include <neutrino/logger.h>
 #include <neutrino/time_helper.h>
 
-// Xefis:
-#include <xefis/config/all.h>
-#include <xefis/utility/packet_reader.h>
+// Standard:
+#include <cstddef>
+#include <cstring>
+#include <functional>
+#include <queue>
 
 
 namespace xf {

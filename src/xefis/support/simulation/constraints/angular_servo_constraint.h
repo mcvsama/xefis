@@ -14,15 +14,6 @@
 #ifndef XEFIS__SUPPORT__SIMULATION__CONSTRAINTS__ANGULAR_SERVO_CONSTRAINT_H__INCLUDED
 #define XEFIS__SUPPORT__SIMULATION__CONSTRAINTS__ANGULAR_SERVO_CONSTRAINT_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <memory>
-#include <optional>
-#include <variant>
-
-// Neutrino:
-#include <neutrino/range.h>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/simulation/components/resistor.h>
@@ -30,6 +21,15 @@
 #include <xefis/support/simulation/constraints/hinge_precalculation.h>
 #include <xefis/support/simulation/failure/sigmoidal_temperature_failure.h>
 #include <xefis/support/simulation/rigid_body/body.h>
+
+// Neutrino:
+#include <neutrino/range.h>
+
+// Standard:
+#include <cstddef>
+#include <memory>
+#include <optional>
+#include <variant>
 
 
 namespace xf::rigid_body {

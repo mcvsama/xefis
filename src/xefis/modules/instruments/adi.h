@@ -14,17 +14,6 @@
 #ifndef XEFIS__MODULES__INSTRUMENTS__ADI_H__INCLUDED
 #define XEFIS__MODULES__INSTRUMENTS__ADI_H__INCLUDED
 
-// Standard:
-#include <array>
-#include <cstddef>
-
-// Qt:
-#include <QtGui/QColor>
-#include <QtGui/QPainterPath>
-
-// Neutrino:
-#include <neutrino/synchronized.h>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/graphics.h>
@@ -34,6 +23,17 @@
 #include <xefis/support/instrument/instrument_support.h>
 #include <xefis/support/sockets/socket_observer.h>
 #include <xefis/utility/event_timestamper.h>
+
+// Neutrino:
+#include <neutrino/synchronized.h>
+
+// Qt:
+#include <QtGui/QColor>
+#include <QtGui/QPainterPath>
+
+// Standard:
+#include <array>
+#include <cstddef>
 
 
 namespace si = neutrino::si;

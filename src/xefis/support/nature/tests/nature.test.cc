@@ -11,18 +11,18 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-#include <memory>
-#include <string>
-
-// Neutrino:
-#include <neutrino/test/auto_test.h>
-
 // Xefis:
 #include <xefis/support/nature/mass_moments.h>
 #include <xefis/support/nature/velocity_moments.h>
 #include <xefis/support/nature/wrench.h>
+
+// Neutrino:
+#include <neutrino/test/auto_test.h>
+
+// Standard:
+#include <cstddef>
+#include <memory>
+#include <string>
 
 
 namespace xf::test {

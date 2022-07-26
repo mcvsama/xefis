@@ -14,15 +14,15 @@
 #ifndef XEFIS__UTILITY__TRANSISTOR_H__INCLUDED
 #define XEFIS__UTILITY__TRANSISTOR_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <cmath>
-#include <algorithm>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/utility/numeric.h>
 #include <xefis/utility/smoother.h>
+
+// Standard:
+#include <cstddef>
+#include <cmath>
+#include <algorithm>
 
 
 namespace xf {

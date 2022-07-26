@@ -14,18 +14,6 @@
 #ifndef XEFIS__MODULES__IO__GPS_H__INCLUDED
 #define XEFIS__MODULES__IO__GPS_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <array>
-#include <map>
-
-// Qt:
-#include <QtCore/QSocketNotifier>
-
-// Neutrino:
-#include <neutrino/bus/serial_port.h>
-#include <neutrino/logger.h>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
@@ -33,6 +21,18 @@
 #include <xefis/core/sockets/module_socket.h>
 #include <xefis/core/system.h>
 #include <xefis/support/protocols/nmea/parser.h>
+
+// Neutrino:
+#include <neutrino/bus/serial_port.h>
+#include <neutrino/logger.h>
+
+// Qt:
+#include <QtCore/QSocketNotifier>
+
+// Standard:
+#include <cstddef>
+#include <array>
+#include <map>
 
 
 namespace si = neutrino::si;

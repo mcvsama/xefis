@@ -14,13 +14,6 @@
 #ifndef XEFIS__MACHINES__TEST_INSTRUMENTS__TEST_SCREEN_1_H__INCLUDED
 #define XEFIS__MACHINES__TEST_INSTRUMENTS__TEST_SCREEN_1_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <memory>
-
-// Neutrino:
-#include <neutrino/work_performer.h>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/graphics.h>
@@ -36,6 +29,13 @@
 #include <xefis/modules/instruments/vertical_trim.h>
 #include <xefis/modules/instruments/radial_gauge.h>
 #include <xefis/support/earth/navigation/navaid_storage.h>
+
+// Neutrino:
+#include <neutrino/work_performer.h>
+
+// Standard:
+#include <cstddef>
+#include <memory>
 
 
 class TestScreen1: public xf::Screen

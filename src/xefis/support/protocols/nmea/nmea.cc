@@ -11,24 +11,24 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-#include <string>
+// Local:
+#include "nmea.h"
+#include "exceptions.h"
 
-// Lib:
-#include <boost/format.hpp>
-#include <boost/lexical_cast.hpp>
+// Xefis:
+#include <xefis/config/all.h>
 
 // Neutrino:
 #include <neutrino/numeric.h>
 #include <neutrino/stdexcept.h>
 
-// Xefis:
-#include <xefis/config/all.h>
+// Lib:
+#include <boost/format.hpp>
+#include <boost/lexical_cast.hpp>
 
-// Local:
-#include "nmea.h"
-#include "exceptions.h"
+// Standard:
+#include <cstddef>
+#include <string>
 
 
 namespace xf::nmea {

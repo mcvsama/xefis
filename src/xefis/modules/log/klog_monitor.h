@@ -14,17 +14,17 @@
 #ifndef XEFIS__MODULES__LOG__KLOG_MONITOR_H__INCLUDED
 #define XEFIS__MODULES__LOG__KLOG_MONITOR_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <array>
-
-// Qt:
-#include <QtCore/QTimer>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
 #include <xefis/core/sockets/module_socket.h>
+
+// Qt:
+#include <QtCore/QTimer>
+
+// Standard:
+#include <cstddef>
+#include <array>
 
 
 class KLogMonitorIO: public xf::Module

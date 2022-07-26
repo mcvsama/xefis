@@ -14,19 +14,19 @@
 #ifndef XEFIS__SUPPORT__NATURE__WRENCH_H__INCLUDED
 #define XEFIS__SUPPORT__NATURE__WRENCH_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-
-// Lib:
-#include <boost/range.hpp>
-
-// Neutrino:
-#include <neutrino/math/math.h>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/math/geometry.h>
 #include <xefis/support/nature/force_moments.h>
+
+// Neutrino:
+#include <neutrino/math/math.h>
+
+// Lib:
+#include <boost/range.hpp>
+
+// Standard:
+#include <cstddef>
 
 
 namespace xf {

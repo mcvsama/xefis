@@ -11,8 +11,12 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
+// Local:
+#include "panel_rotary_encoder.h"
+
+// Xefis:
+#include <xefis/config/all.h>
+#include <xefis/utility/numeric.h>
 
 // Qt:
 #include <QtGui/QPainter>
@@ -20,12 +24,8 @@
 #include <QtGui/QWheelEvent>
 #include <QtWidgets/QLayout>
 
-// Xefis:
-#include <xefis/config/all.h>
-#include <xefis/utility/numeric.h>
-
-// Local:
-#include "panel_rotary_encoder.h"
+// Standard:
+#include <cstddef>
 
 
 namespace xf {

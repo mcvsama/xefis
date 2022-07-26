@@ -11,15 +11,15 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
+// Local:
+#include "trim_control.h"
 
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/ui/sound_manager.h>
 
-// Local:
-#include "trim_control.h"
+// Standard:
+#include <cstddef>
 
 
 TrimControl::TrimControl (xf::SoundManager* sound_manager, std::string_view const& instance):

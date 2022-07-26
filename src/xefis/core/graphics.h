@@ -14,17 +14,17 @@
 #ifndef XEFIS__CORE__GRAPHICS_H__INCLUDED
 #define XEFIS__CORE__GRAPHICS_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-
-// Qt:
-#include <QFont>
+// Xefis:
+#include <xefis/config/all.h>
 
 // Neutrino:
 #include <neutrino/logger.h>
 
-// Xefis:
-#include <xefis/config/all.h>
+// Qt:
+#include <QFont>
+
+// Standard:
+#include <cstddef>
 
 
 namespace xf {

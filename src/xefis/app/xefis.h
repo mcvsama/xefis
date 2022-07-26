@@ -14,27 +14,27 @@
 #ifndef XEFIS__APP__XEFIS_H__INCLUDED
 #define XEFIS__APP__XEFIS_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <string>
-#include <map>
-
-// Lib:
-#include <boost/lexical_cast.hpp>
-
-// Qt:
-#include <QTimer>
-#include <QApplication>
-
-// Neutrino:
-#include <neutrino/logger.h>
-#include <neutrino/system.h>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/components/configurator/configurator_widget.h>
 #include <xefis/core/graphics.h>
 #include <xefis/core/system.h>
+
+// Neutrino:
+#include <neutrino/logger.h>
+#include <neutrino/system.h>
+
+// Qt:
+#include <QTimer>
+#include <QApplication>
+
+// Lib:
+#include <boost/lexical_cast.hpp>
+
+// Standard:
+#include <cstddef>
+#include <string>
+#include <map>
 
 
 namespace xf {

@@ -14,6 +14,18 @@
 #ifndef XEFIS__CORE__MODULE_H__INCLUDED
 #define XEFIS__CORE__MODULE_H__INCLUDED
 
+// Xefis:
+#include <xefis/config/all.h>
+#include <xefis/core/cycle.h>
+#include <xefis/utility/named_instance.h>
+
+// Neutrino:
+#include <neutrino/noncopyable.h>
+#include <neutrino/sequence.h>
+
+// Lib:
+#include <boost/circular_buffer.hpp>
+
 // Standard:
 #include <cstddef>
 #include <vector>
@@ -21,18 +33,6 @@
 #include <optional>
 #include <memory>
 #include <type_traits>
-
-// Lib:
-#include <boost/circular_buffer.hpp>
-
-// Neutrino:
-#include <neutrino/noncopyable.h>
-#include <neutrino/sequence.h>
-
-// Xefis:
-#include <xefis/config/all.h>
-#include <xefis/core/cycle.h>
-#include <xefis/utility/named_instance.h>
 
 
 class QWidget;

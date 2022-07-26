@@ -14,10 +14,6 @@
 #ifndef XEFIS__MODULES__SYSTEMS__AFCS_EAC_YD_H__INCLUDED
 #define XEFIS__MODULES__SYSTEMS__AFCS_EAC_YD_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <string>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
@@ -25,6 +21,10 @@
 #include <xefis/core/setting.h>
 #include <xefis/support/control/pid_controller.h>
 #include <xefis/support/sockets/socket_observer.h>
+
+// Standard:
+#include <cstddef>
+#include <string>
 
 
 class AFCS_EAC_YD_IO: public xf::Module

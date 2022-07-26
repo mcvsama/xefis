@@ -17,14 +17,14 @@
 #ifndef XEFIS__SUPPORT__EARTH__NAVIGATION__MAGNETIC_VARIATION_H__INCLUDED
 #define XEFIS__SUPPORT__EARTH__NAVIGATION__MAGNETIC_VARIATION_H__INCLUDED
 
-// Standard:
-#include <cstddef>
+// Xefis:
+#include <xefis/config/all.h>
 
 // Neutrino:
 #include <neutrino/numeric.h>
 
-// Xefis:
-#include <xefis/config/all.h>
+// Standard:
+#include <cstddef>
 
 
 namespace xf {

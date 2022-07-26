@@ -11,9 +11,12 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-#include <functional>
+// Local:
+#include "rigid_body_viewer.h"
+
+// Xefis:
+#include <xefis/config/all.h>
+#include <xefis/core/machine.h>
 
 // Qt:
 #include <QCoreApplication>
@@ -21,12 +24,9 @@
 #include <QScreen>
 #include <QShortcut>
 
-// Xefis:
-#include <xefis/config/all.h>
-#include <xefis/core/machine.h>
-
-// Local:
-#include "rigid_body_viewer.h"
+// Standard:
+#include <cstddef>
+#include <functional>
 
 
 namespace xf {

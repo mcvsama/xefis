@@ -14,9 +14,6 @@
 #ifndef XEFIS__MODULES__HELPERS__MIXER_H__INCLUDED
 #define XEFIS__MODULES__HELPERS__MIXER_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/logger.h>
@@ -24,6 +21,9 @@
 #include <xefis/core/setting.h>
 #include <xefis/core/socket.h>
 #include <xefis/support/sockets/socket_value_changed.h>
+
+// Standard:
+#include <cstddef>
 
 
 template<class Value>

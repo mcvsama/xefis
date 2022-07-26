@@ -14,19 +14,19 @@
 #ifndef XEFIS__CORE__PAINT_REQUEST_H__INCLUDED
 #define XEFIS__CORE__PAINT_REQUEST_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <atomic>
-
-// Qt:
-#include <QPaintDevice>
+// Xefis:
+#include <xefis/config/all.h>
+#include <xefis/utility/types.h>
 
 // Neutrino:
 #include <neutrino/noncopyable.h>
 
-// Xefis:
-#include <xefis/config/all.h>
-#include <xefis/utility/types.h>
+// Qt:
+#include <QPaintDevice>
+
+// Standard:
+#include <cstddef>
+#include <atomic>
 
 
 namespace xf {

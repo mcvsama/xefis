@@ -14,14 +14,14 @@
 #ifndef XEFIS__CORE__SOCKETS__COMMON_H__INCLUDED
 #define XEFIS__CORE__SOCKETS__COMMON_H__INCLUDED
 
-// Standard:
-#include <cstddef>
+// Xefis:
+#include <xefis/config/all.h>
 
 // Neutrino:
 #include <neutrino/stdexcept.h>
 
-// Xefis:
-#include <xefis/config/all.h>
+// Standard:
+#include <cstddef>
 
 
 namespace xf {

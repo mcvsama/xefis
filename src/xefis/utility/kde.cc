@@ -11,19 +11,19 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-
-// Qt:
-#include <QX11Info>
-#include <QWidget>
+// Local:
+#include "kde.h"
 
 // Lib:
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 
-// Local:
-#include "kde.h"
+// Qt:
+#include <QX11Info>
+#include <QWidget>
+
+// Standard:
+#include <cstddef>
 
 
 namespace xf {

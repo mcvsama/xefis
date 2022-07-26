@@ -11,26 +11,26 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-#include <memory>
-#include <thread>
+// Local:
+#include "navaid_storage.h"
 
-// Qt:
-#include <QFile>
-#include <QTextStream>
+// Xefis:
+#include <xefis/config/all.h>
+#include <xefis/support/earth/earth.h>
 
 // Neutrino:
 #include <neutrino/exception.h>
 #include <neutrino/numeric.h>
 #include <neutrino/qt/qzdevice.h>
 
-// Xefis:
-#include <xefis/config/all.h>
-#include <xefis/support/earth/earth.h>
+// Qt:
+#include <QFile>
+#include <QTextStream>
 
-// Local:
-#include "navaid_storage.h"
+// Standard:
+#include <cstddef>
+#include <memory>
+#include <thread>
 
 
 namespace xf {

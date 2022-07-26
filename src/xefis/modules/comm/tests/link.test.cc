@@ -11,15 +11,15 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
+// Xefis:
+#include <xefis/core/sockets/tests/test_cycle.h>
+#include <xefis/modules/comm/link.h>
 
 // Neutrino:
 #include <neutrino/test/auto_test.h>
 
-// Xefis:
-#include <xefis/core/sockets/tests/test_cycle.h>
-#include <xefis/modules/comm/link.h>
+// Standard:
+#include <cstddef>
 
 
 namespace xf::test {

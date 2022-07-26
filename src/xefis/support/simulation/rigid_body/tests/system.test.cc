@@ -11,16 +11,6 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-#include <memory>
-#include <string>
-
-// Neutrino:
-#include <neutrino/qt/qutils.h>
-#include <neutrino/test/dummy_qapplication.h>
-#include <neutrino/test/manual_test.h>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/geometry/triangulation.h>
@@ -39,6 +29,16 @@
 #include <xefis/support/simulation/rigid_body/various_shapes.h>
 #include <xefis/support/simulation/simulation.h>
 #include <xefis/support/ui/rigid_body_viewer.h>
+
+// Neutrino:
+#include <neutrino/qt/qutils.h>
+#include <neutrino/test/dummy_qapplication.h>
+#include <neutrino/test/manual_test.h>
+
+// Standard:
+#include <cstddef>
+#include <memory>
+#include <string>
 
 
 namespace xf::test {

@@ -14,16 +14,16 @@
 #ifndef XEFIS__SUPPORT__SOCKETS__SOCKET_VALUE_CHANGED_ACTION_H__INCLUDED
 #define XEFIS__SUPPORT__SOCKETS__SOCKET_VALUE_CHANGED_ACTION_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <functional>
-#include <optional>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/sockets/socket.h>
 #include <xefis/support/sockets/socket_action.h>
 #include <xefis/support/sockets/socket_value_changed.h>
+
+// Standard:
+#include <cstddef>
+#include <functional>
+#include <optional>
 
 
 namespace xf {

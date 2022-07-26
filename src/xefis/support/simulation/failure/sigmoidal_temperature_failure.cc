@@ -11,12 +11,12 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
+// Local:
+#include "sigmoidal_temperature_failure.h"
+
 // Standard:
 #include <cstddef>
 #include <cmath>
-
-// Local:
-#include "sigmoidal_temperature_failure.h"
 
 
 namespace xf {

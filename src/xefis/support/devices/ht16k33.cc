@@ -11,20 +11,20 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-#include <memory>
+// Local:
+#include "ht16k33.h"
+
+// Xefis:
+#include <xefis/config/all.h>
 
 // Neutrino:
 #include <neutrino/numeric.h>
 #include <neutrino/qt/qdom.h>
 #include <neutrino/stdexcept.h>
 
-// Xefis:
-#include <xefis/config/all.h>
-
-// Local:
-#include "ht16k33.h"
+// Standard:
+#include <cstddef>
+#include <memory>
 
 
 namespace xf {

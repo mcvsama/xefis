@@ -14,17 +14,17 @@
 #ifndef XEFIS__CORE__SOCKETS__ASSIGNABLE_SOCKET_H__INCLUDED
 #define XEFIS__CORE__SOCKETS__ASSIGNABLE_SOCKET_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-
-// Neutrino:
-#include <neutrino/blob.h>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/sockets/basic_assignable_socket.h>
 #include <xefis/core/sockets/socket.h>
 #include <xefis/utility/is_optional.h>
+
+// Neutrino:
+#include <neutrino/blob.h>
+
+// Standard:
+#include <cstddef>
 
 
 namespace xf {

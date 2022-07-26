@@ -11,19 +11,19 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
+// Local:
+#include "transport.h"
+
+// Xefis:
+#include <xefis/config/all.h>
 
 // Neutrino:
 #include <neutrino/crypto/aes.h>
 #include <neutrino/crypto/hkdf.h>
 #include <neutrino/crypto/utility.h>
 
-// Xefis:
-#include <xefis/config/all.h>
-
-// Local:
-#include "transport.h"
+// Standard:
+#include <cstddef>
 
 
 namespace xf::crypto::xle {

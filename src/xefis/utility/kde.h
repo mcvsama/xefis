@@ -14,11 +14,11 @@
 #ifndef XEFIS__UTILITY__KDE_H__INCLUDED
 #define XEFIS__UTILITY__KDE_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-
 // Lib:
 #include <QWidget>
+
+// Standard:
+#include <cstddef>
 
 
 namespace xf {

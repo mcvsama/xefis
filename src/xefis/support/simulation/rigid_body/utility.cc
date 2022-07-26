@@ -11,17 +11,17 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-#include <memory>
+// Local:
+#include "utility.h"
 
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/nature/constants.h>
 #include <xefis/support/nature/mass_moments.h>
 
-// Local:
-#include "utility.h"
+// Standard:
+#include <cstddef>
+#include <memory>
 
 
 namespace xf::rigid_body {

@@ -14,11 +14,11 @@
 #ifndef XEFIS__SUPPORT__PROTOCOLS__NMEA__GPS_H__INCLUDED
 #define XEFIS__SUPPORT__PROTOCOLS__NMEA__GPS_H__INCLUDED
 
-// Xefis:
-#include <xefis/config/all.h>
-
 // Local:
 #include "nmea.h"
+
+// Xefis:
+#include <xefis/config/all.h>
 
 
 namespace xf::nmea {

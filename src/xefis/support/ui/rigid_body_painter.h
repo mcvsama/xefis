@@ -14,8 +14,11 @@
 #ifndef XEFIS__SUPPORT__UI__RIGID_BODY_PAINTER_H__INCLUDED
 #define XEFIS__SUPPORT__UI__RIGID_BODY_PAINTER_H__INCLUDED
 
-// Standard:
-#include <cstddef>
+// Xefis:
+#include <xefis/config/all.h>
+#include <xefis/support/math/euler_angles.h>
+#include <xefis/support/simulation/rigid_body/system.h>
+#include <xefis/support/ui/gl_space.h>
 
 // Qt:
 #include <QOpenGLFunctions>
@@ -23,11 +26,8 @@
 #include <QRect>
 #include <QPoint>
 
-// Xefis:
-#include <xefis/config/all.h>
-#include <xefis/support/math/euler_angles.h>
-#include <xefis/support/simulation/rigid_body/system.h>
-#include <xefis/support/ui/gl_space.h>
+// Standard:
+#include <cstddef>
 
 
 namespace xf {

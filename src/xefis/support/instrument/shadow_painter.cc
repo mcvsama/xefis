@@ -11,17 +11,17 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-
-// Neutrino:
-#include <neutrino/responsibility.h>
+// Local:
+#include "shadow_painter.h"
 
 // Xefis:
 #include <xefis/config/all.h>
 
-// Local:
-#include "shadow_painter.h"
+// Neutrino:
+#include <neutrino/responsibility.h>
+
+// Standard:
+#include <cstddef>
 
 
 namespace xf {

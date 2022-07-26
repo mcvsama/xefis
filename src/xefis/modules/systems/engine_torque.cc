@@ -11,18 +11,18 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-#include <variant>
-
-// Neutrino:
-#include <neutrino/variant.h>
+// Local:
+#include "engine_torque.h"
 
 // Xefis:
 #include <xefis/config/all.h>
 
-// Local:
-#include "engine_torque.h"
+// Neutrino:
+#include <neutrino/variant.h>
+
+// Standard:
+#include <cstddef>
+#include <variant>
 
 
 EngineTorque::EngineTorque (std::string_view const& instance):

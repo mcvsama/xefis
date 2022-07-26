@@ -14,16 +14,6 @@
 #ifndef XEFIS__MODULES__IO__XBEE_H__INCLUDED
 #define XEFIS__MODULES__IO__XBEE_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <map>
-
-// Qt:
-#include <QtCore/QSocketNotifier>
-
-// Neutrino:
-#include <neutrino/logger.h>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
@@ -31,6 +21,16 @@
 #include <xefis/core/sockets/module_socket.h>
 #include <xefis/support/sockets/socket_changed.h>
 #include <xefis/utility/smoother.h>
+
+// Neutrino:
+#include <neutrino/logger.h>
+
+// Qt:
+#include <QtCore/QSocketNotifier>
+
+// Standard:
+#include <cstddef>
+#include <map>
 
 
 namespace si = neutrino::si;

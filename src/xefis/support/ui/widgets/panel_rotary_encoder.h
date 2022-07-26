@@ -14,18 +14,18 @@
 #ifndef XEFIS__SUPPORT__UI__WIDGETS__PANEL_ROTARY_ENCODER_H__INCLUDED
 #define XEFIS__SUPPORT__UI__WIDGETS__PANEL_ROTARY_ENCODER_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <memory>
+// Xefis:
+#include <xefis/config/all.h>
+#include <xefis/core/v1/socket.h>
+#include <xefis/support/ui/widgets/panel_widget.h>
 
 // Qt:
 #include <QtCore/QTimer>
 #include <QtWidgets/QWidget>
 
-// Xefis:
-#include <xefis/config/all.h>
-#include <xefis/core/v1/socket.h>
-#include <xefis/support/ui/widgets/panel_widget.h>
+// Standard:
+#include <cstddef>
+#include <memory>
 
 
 namespace xf {

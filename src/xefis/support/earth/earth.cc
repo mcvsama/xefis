@@ -11,22 +11,22 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-#include <cmath>
-#include <algorithm>
-
-// Boost:
-#include <boost/format.hpp>
-
-// Neutrino:
-#include <neutrino/numeric.h>
+// Local:
+#include "earth.h"
 
 // Xefis:
 #include <xefis/config/all.h>
 
-// Local:
-#include "earth.h"
+// Neutrino:
+#include <neutrino/numeric.h>
+
+// Boost:
+#include <boost/format.hpp>
+
+// Standard:
+#include <cstddef>
+#include <cmath>
+#include <algorithm>
 
 
 namespace xf {

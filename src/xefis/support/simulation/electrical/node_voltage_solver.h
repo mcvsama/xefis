@@ -14,21 +14,21 @@
 #ifndef XEFIS__SUPPORT__SIMULATION__ELECTRICAL__NODE_VOLTAGE_SOLVER_H__INCLUDED
 #define XEFIS__SUPPORT__SIMULATION__ELECTRICAL__NODE_VOLTAGE_SOLVER_H__INCLUDED
 
+// Xefis:
+#include <xefis/config/all.h>
+#include <xefis/support/simulation/electrical/element.h>
+#include <xefis/support/simulation/electrical/network.h>
+#include <xefis/support/simulation/electrical/node.h>
+
+// Neutrino:
+#include <neutrino/noncopyable.h>
+
 // Standard:
 #include <cstddef>
 #include <string>
 #include <unordered_set>
 #include <variant>
 #include <vector>
-
-// Neutrino:
-#include <neutrino/noncopyable.h>
-
-// Xefis:
-#include <xefis/config/all.h>
-#include <xefis/support/simulation/electrical/element.h>
-#include <xefis/support/simulation/electrical/network.h>
-#include <xefis/support/simulation/electrical/node.h>
 
 
 namespace xf::electrical {

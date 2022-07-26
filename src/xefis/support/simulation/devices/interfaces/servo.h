@@ -14,11 +14,11 @@
 #ifndef XEFIS__SUPPORT__SIMULATION__DEVICES__SERVO_H__INCLUDED
 #define XEFIS__SUPPORT__SIMULATION__DEVICES__SERVO_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-
 // Xefis:
 #include <xefis/config/all.h>
+
+// Standard:
+#include <cstddef>
 
 
 namespace xf::sim {

@@ -14,15 +14,15 @@
 #ifndef XEFIS__CORE__SYSTEM_H__INCLUDED
 #define XEFIS__CORE__SYSTEM_H__INCLUDED
 
-// Standard:
-#include <cstddef>
+// Xefis:
+#include <xefis/config/all.h>
 
 // Neutrino:
 #include <neutrino/bus/serial_port.h>
 #include <neutrino/logger.h>
 
-// Xefis:
-#include <xefis/config/all.h>
+// Standard:
+#include <cstddef>
 
 
 namespace xf {

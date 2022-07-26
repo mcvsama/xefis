@@ -11,20 +11,20 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-
-// Lib:
-#include <boost/format.hpp>
-
-// Neutrino:
-#include <neutrino/numeric.h>
+// Local:
+#include "horizontal_trim.h"
 
 // Xefis:
 #include <xefis/config/all.h>
 
-// Local:
-#include "horizontal_trim.h"
+// Neutrino:
+#include <neutrino/numeric.h>
+
+// Lib:
+#include <boost/format.hpp>
+
+// Standard:
+#include <cstddef>
 
 
 HorizontalTrim::HorizontalTrim (xf::Graphics const& graphics, std::string_view const& instance):

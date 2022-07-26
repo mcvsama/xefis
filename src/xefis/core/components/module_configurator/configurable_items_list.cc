@@ -11,25 +11,25 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-#include <set>
-
-// Qt:
-#include <QtWidgets/QLayout>
-#include <QtWidgets/QHeaderView>
-
-// Neutrino:
-#include <neutrino/qt/qutils.h>
-
-// Xefis:
-#include <xefis/config/all.h>
-
 // Local:
 #include "configurable_items_list.h"
 #include "module_item.h"
 #include "processing_loop_item.h"
 #include "screen_item.h"
+
+// Xefis:
+#include <xefis/config/all.h>
+
+// Neutrino:
+#include <neutrino/qt/qutils.h>
+
+// Qt:
+#include <QtWidgets/QLayout>
+#include <QtWidgets/QHeaderView>
+
+// Standard:
+#include <cstddef>
+#include <set>
 
 
 namespace xf::configurator {

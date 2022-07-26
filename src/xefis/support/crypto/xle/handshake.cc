@@ -11,23 +11,23 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-#include <limits>
+// Local:
+#include "handshake.h"
 
-// Boost:
-#include <boost/random.hpp>
+// Xefis:
+#include <xefis/config/all.h>
 
 // Neutrino:
 #include <neutrino/crypto/hmac.h>
 #include <neutrino/crypto/modp.h>
 #include <neutrino/crypto/utility.h>
 
-// Xefis:
-#include <xefis/config/all.h>
+// Boost:
+#include <boost/random.hpp>
 
-// Local:
-#include "handshake.h"
+// Standard:
+#include <cstddef>
+#include <limits>
 
 
 namespace xf::crypto::xle {

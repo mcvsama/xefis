@@ -14,13 +14,13 @@
 #ifndef XEFIS__SUPPORT__SIMULATION__CONSTRAINTS__HELPERS__FIXED_ORIENTATION_HELPER_H__INCLUDED
 #define XEFIS__SUPPORT__SIMULATION__CONSTRAINTS__HELPERS__FIXED_ORIENTATION_HELPER_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/math/placement.h>
 #include <xefis/support/simulation/rigid_body/concepts.h>
+
+// Standard:
+#include <cstddef>
 
 
 namespace xf::rigid_body {

@@ -14,13 +14,13 @@
 #ifndef XEFIS__SUPPORT__SOCKETS__SOCKET_CHANGED_H__INCLUDED
 #define XEFIS__SUPPORT__SOCKETS__SOCKET_CHANGED_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/cycle.h>
 #include <xefis/core/sockets/basic_socket.h>
+
+// Standard:
+#include <cstddef>
 
 
 namespace xf {

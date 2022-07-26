@@ -11,23 +11,23 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
+// Local:
+#include "afcs.h"
+#include "afcs_api.h"
 
-// Qt:
-#include <QtWidgets/QPushButton>
-#include <QtWidgets/QLayout>
+// Xefis:
+#include <xefis/config/all.h>
 
 // Neutrino:
 #include <neutrino/qt/qdom.h>
 #include <neutrino/numeric.h>
 
-// Xefis:
-#include <xefis/config/all.h>
+// Qt:
+#include <QtWidgets/QPushButton>
+#include <QtWidgets/QLayout>
 
-// Local:
-#include "afcs.h"
-#include "afcs_api.h"
+// Standard:
+#include <cstddef>
 
 
 AFCS::AFCS (std::string_view const& instance):

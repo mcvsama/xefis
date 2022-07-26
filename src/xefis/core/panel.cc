@@ -11,18 +11,18 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-
-// Neutrino:
-#include <neutrino/qt/qdom.h>
+// Local:
+#include "panel.h"
 
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/ui/widgets/panel_widget.h>
 
-// Local:
-#include "panel.h"
+// Neutrino:
+#include <neutrino/qt/qdom.h>
+
+// Standard:
+#include <cstddef>
 
 
 namespace xf {

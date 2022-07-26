@@ -14,22 +14,22 @@
 #ifndef XEFIS__SUPPORT__SIMULATION__RIGID_BODY__SYSTEM_H__INCLUDED
 #define XEFIS__SUPPORT__SIMULATION__RIGID_BODY__SYSTEM_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <memory>
-#include <type_traits>
-#include <vector>
-
-// Neutrino:
-#include <neutrino/noncopyable.h>
-#include <neutrino/sequence.h>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/simulation/rigid_body/body.h>
 #include <xefis/support/simulation/rigid_body/concepts.h>
 #include <xefis/support/simulation/rigid_body/constraint.h>
 #include <xefis/support/simulation/rigid_body/frame_precalculation.h>
+
+// Neutrino:
+#include <neutrino/noncopyable.h>
+#include <neutrino/sequence.h>
+
+// Standard:
+#include <cstddef>
+#include <memory>
+#include <type_traits>
+#include <vector>
 
 
 namespace xf::rigid_body {

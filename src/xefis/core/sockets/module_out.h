@@ -14,17 +14,17 @@
 #ifndef XEFIS__CORE__SOCKETS__MODULE_OUT_H__INCLUDED
 #define XEFIS__CORE__SOCKETS__MODULE_OUT_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <cstdint>
-
-// Neutrino:
-#include <neutrino/blob.h>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/sockets/assignable_socket.h>
 #include <xefis/core/sockets/basic_module_out.h>
+
+// Neutrino:
+#include <neutrino/blob.h>
+
+// Standard:
+#include <cstddef>
+#include <cstdint>
 
 
 namespace xf {

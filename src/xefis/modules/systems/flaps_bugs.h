@@ -14,10 +14,6 @@
 #ifndef XEFIS__MODULES__SYSTEMS__FLAPS_BUGS_H__INCLUDED
 #define XEFIS__MODULES__SYSTEMS__FLAPS_BUGS_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <set>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
@@ -25,6 +21,10 @@
 #include <xefis/core/sockets/module_socket.h>
 #include <xefis/support/airframe/flaps.h>
 #include <xefis/support/sockets/socket_value_changed.h>
+
+// Standard:
+#include <cstddef>
+#include <set>
 
 
 namespace si = neutrino::si;

@@ -11,22 +11,22 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-#include <algorithm>
-#include <cctype>
-
-// System:
-#include <sys/klog.h>
-
-// Neutrino:
-#include <neutrino/qt/qdom.h>
+// Local:
+#include "klog_monitor.h"
 
 // Xefis:
 #include <xefis/config/all.h>
 
-// Local:
-#include "klog_monitor.h"
+// Neutrino:
+#include <neutrino/qt/qdom.h>
+
+// System:
+#include <sys/klog.h>
+
+// Standard:
+#include <cstddef>
+#include <algorithm>
+#include <cctype>
 
 
 KLogMonitor::KLogMonitor (std::string_view const& instance):

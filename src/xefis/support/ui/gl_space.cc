@@ -11,15 +11,15 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-#include <optional>
+// Local:
+#include "gl_space.h"
 
 // Xefis:
 #include <xefis/config/all.h>
 
-// Local:
-#include "gl_space.h"
+// Standard:
+#include <cstddef>
+#include <optional>
 
 
 namespace xf {

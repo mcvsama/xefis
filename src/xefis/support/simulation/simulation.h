@@ -14,16 +14,16 @@
 #ifndef XEFIS__SUPPORT__SIMULATION__SIMULATION_H__INCLUDED
 #define XEFIS__SUPPORT__SIMULATION__SIMULATION_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <functional>
+// Xefis:
+#include <xefis/config/all.h>
+#include <xefis/support/nature/force_moments.h>
 
 // Neutrino:
 #include <neutrino/logger.h>
 
-// Xefis:
-#include <xefis/config/all.h>
-#include <xefis/support/nature/force_moments.h>
+// Standard:
+#include <cstddef>
+#include <functional>
 
 
 namespace xf {

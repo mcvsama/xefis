@@ -11,18 +11,18 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-
-// Lib:
-#include <boost/range/adaptors.hpp>
+// Local:
+#include "system.h"
 
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/nature/constants.h>
 
-// Local:
-#include "system.h"
+// Lib:
+#include <boost/range/adaptors.hpp>
+
+// Standard:
+#include <cstddef>
 
 
 namespace xf::rigid_body {

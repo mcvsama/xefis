@@ -14,20 +14,20 @@
 #ifndef XEFIS__MODULES__TEST__TEST_GENERATOR_H__INCLUDED
 #define XEFIS__MODULES__TEST__TEST_GENERATOR_H__INCLUDED
 
+// Xefis:
+#include <xefis/config/all.h>
+#include <xefis/core/module.h>
+#include <xefis/core/sockets/module_socket.h>
+
+// Neutrino:
+#include <neutrino/range.h>
+
 // Standard:
 #include <cstddef>
 #include <memory>
 #include <tuple>
 #include <utility>
 #include <vector>
-
-// Neutrino:
-#include <neutrino/range.h>
-
-// Xefis:
-#include <xefis/config/all.h>
-#include <xefis/core/module.h>
-#include <xefis/core/sockets/module_socket.h>
 
 
 namespace si = neutrino::si;

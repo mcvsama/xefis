@@ -14,12 +14,12 @@
 #ifndef XEFIS__SUPPORT__SIMULATION__RIGID_BODY__CONCEPTS_H__INCLUDED
 #define XEFIS__SUPPORT__SIMULATION__RIGID_BODY__CONCEPTS_H__INCLUDED
 
+// Xefis:
+#include <xefis/config/all.h>
+
 // Standard:
 #include <concepts>
 #include <cstddef>
-
-// Xefis:
-#include <xefis/config/all.h>
 
 
 namespace xf::rigid_body {

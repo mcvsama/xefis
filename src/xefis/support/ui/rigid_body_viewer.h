@@ -14,8 +14,14 @@
 #ifndef XEFIS__SUPPORT__UI__RIGID_BODY_VIEWER_H__INCLUDED
 #define XEFIS__SUPPORT__UI__RIGID_BODY_VIEWER_H__INCLUDED
 
-// Standard:
-#include <cstddef>
+// Xefis:
+#include <xefis/config/all.h>
+#include <xefis/support/simulation/rigid_body/system.h>
+#include <xefis/support/ui/gl_animation_widget.h>
+#include <xefis/support/ui/rigid_body_painter.h>
+
+// Neutrino:
+#include <neutrino/qt/qutils.h>
 
 // Qt:
 #include <QKeyEvent>
@@ -23,14 +29,8 @@
 #include <QWheelEvent>
 #include <QWidget>
 
-// Neutrino:
-#include <neutrino/qt/qutils.h>
-
-// Xefis:
-#include <xefis/config/all.h>
-#include <xefis/support/simulation/rigid_body/system.h>
-#include <xefis/support/ui/gl_animation_widget.h>
-#include <xefis/support/ui/rigid_body_painter.h>
+// Standard:
+#include <cstddef>
 
 
 namespace xf {

@@ -14,13 +14,13 @@
 #ifndef XEFIS__SUPPORT__MATH__EULER_ANGLES_H__INCLUDED
 #define XEFIS__SUPPORT__MATH__EULER_ANGLES_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <cmath>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/math/geometry.h>
+
+// Standard:
+#include <cstddef>
+#include <cmath>
 
 
 namespace xf {

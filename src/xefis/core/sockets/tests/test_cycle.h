@@ -14,15 +14,16 @@
 #ifndef XEFIS__CORE__TESTS__TEST_CYCLE_H__INCLUDED
 #define XEFIS__CORE__TESTS__TEST_CYCLE_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <iostream>
+// Xefis:
+#include <xefis/core/cycle.h>
 
 // Neutrino:
 #include <neutrino/logger.h>
 
-// Xefis:
-#include <xefis/core/cycle.h>
+// Standard:
+#include <cstddef>
+#include <iostream>
+
 
 namespace xf::test {
 

@@ -11,19 +11,19 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-
-// Qt:
-#include <QtWidgets/QTreeWidgetItem>
+// Local:
+#include "socket_item.h"
+#include "socket_tree.h"
 
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/sockets/socket_converter.h>
 
-// Local:
-#include "socket_item.h"
-#include "socket_tree.h"
+// Qt:
+#include <QtWidgets/QTreeWidgetItem>
+
+// Standard:
+#include <cstddef>
 
 
 namespace xf {

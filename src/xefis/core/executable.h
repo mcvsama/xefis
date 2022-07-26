@@ -14,25 +14,25 @@
 #ifndef XEFIS__CORE__APPLICATION_H__INCLUDED
 #define XEFIS__CORE__APPLICATION_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <functional>
-#include <iostream>
+// Xefis:
+#include <xefis/config/all.h>
+
+// Neutrino:
+#include <neutrino/backtrace.h>
+#include <neutrino/fail.h>
+
+// Qt:
+#include <QtCore/QTextCodec>
 
 // System:
 #include <signal.h>
 #include <locale.h>
 #include <string.h>
 
-// Qt:
-#include <QtCore/QTextCodec>
-
-// Neutrino:
-#include <neutrino/backtrace.h>
-#include <neutrino/fail.h>
-
-// Xefis:
-#include <xefis/config/all.h>
+// Standard:
+#include <cstddef>
+#include <functional>
+#include <iostream>
 
 
 namespace xf {

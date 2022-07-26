@@ -14,14 +14,14 @@
 #ifndef XEFIS__SUPPORT__EARTH__NAVIGATION__NAVAID_H__INCLUDED
 #define XEFIS__SUPPORT__EARTH__NAVIGATION__NAVAID_H__INCLUDED
 
-// Standard:
-#include <cstddef>
+// Xefis:
+#include <xefis/config/all.h>
 
 // Qt:
 #include <QtCore/QString>
 
-// Xefis:
-#include <xefis/config/all.h>
+// Standard:
+#include <cstddef>
 
 
 namespace xf {

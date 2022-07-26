@@ -14,18 +14,18 @@
 #ifndef XEFIS__MODULES__INSTRUMENTS__GAUGE_H__INCLUDED
 #define XEFIS__MODULES__INSTRUMENTS__GAUGE_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <cmath>
-
-// Boost:
-#include <boost/format.hpp>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/instrument.h>
 #include <xefis/core/setting.h>
 #include <xefis/core/sockets/socket.h>
+
+// Boost:
+#include <boost/format.hpp>
+
+// Standard:
+#include <cstddef>
+#include <cmath>
 
 
 class BasicGauge: public xf::Instrument

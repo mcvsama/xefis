@@ -14,18 +14,18 @@
 #ifndef XEFIS__SUPPORT__DEVICES__PCA9685_H__INCLUDED
 #define XEFIS__SUPPORT__DEVICES__PCA9685_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <array>
+// Xefis:
+#include <xefis/config/all.h>
+#include <xefis/core/sockets/module_socket.h>
+#include <xefis/utility/smoother.h>
 
 // Neutrino:
 #include <neutrino/bus/i2c.h>
 #include <neutrino/logger.h>
 
-// Xefis:
-#include <xefis/config/all.h>
-#include <xefis/core/sockets/module_socket.h>
-#include <xefis/utility/smoother.h>
+// Standard:
+#include <cstddef>
+#include <array>
 
 
 namespace xf {

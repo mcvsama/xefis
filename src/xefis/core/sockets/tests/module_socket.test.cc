@@ -11,21 +11,21 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
+// Xefis:
+#include <xefis/core/cycle.h>
+#include <xefis/core/sockets/module_socket.h>
+#include <xefis/core/sockets/tests/test_cycle.h>
+
+// Neutrino:
+#include <neutrino/demangle.h>
+#include <neutrino/test/auto_test.h>
+
 // Standard:
 #include <cstddef>
 #include <memory>
 #include <sstream>
 #include <string>
 #include <type_traits>
-
-// Neutrino:
-#include <neutrino/demangle.h>
-#include <neutrino/test/auto_test.h>
-
-// Xefis:
-#include <xefis/core/cycle.h>
-#include <xefis/core/sockets/module_socket.h>
-#include <xefis/core/sockets/tests/test_cycle.h>
 
 
 namespace xf::test {

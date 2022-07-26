@@ -14,17 +14,6 @@
 #ifndef XEFIS__MODULES__INSTRUMENTS__DATATABLE_H__INCLUDED
 #define XEFIS__MODULES__INSTRUMENTS__DATATABLE_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <optional>
-
-// Qt:
-#include <QtWidgets/QWidget>
-#include <QtXml/QDomElement>
-
-// Neutrino:
-#include <neutrino/synchronized.h>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/graphics.h>
@@ -32,6 +21,17 @@
 #include <xefis/core/sockets/socket.h>
 #include <xefis/support/instrument/instrument_support.h>
 #include <xefis/support/sockets/socket_observer.h>
+
+// Neutrino:
+#include <neutrino/synchronized.h>
+
+// Qt:
+#include <QtWidgets/QWidget>
+#include <QtXml/QDomElement>
+
+// Standard:
+#include <cstddef>
+#include <optional>
 
 
 // TODO handle nans

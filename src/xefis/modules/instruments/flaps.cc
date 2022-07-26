@@ -11,17 +11,17 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-
-// Neutrino:
-#include <neutrino/numeric.h>
+// Local:
+#include "flaps.h"
 
 // Xefis:
 #include <xefis/config/all.h>
 
-// Local:
-#include "flaps.h"
+// Neutrino:
+#include <neutrino/numeric.h>
+
+// Standard:
+#include <cstddef>
 
 
 using namespace neutrino::si::literals;

@@ -14,13 +14,13 @@
 #ifndef XEFIS__SUPPORT__EARTH__ATMOSPHERE_MODEL_H__INCLUDED
 #define XEFIS__SUPPORT__EARTH__ATMOSPHERE_MODEL_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/earth/air/air.h>
 #include <xefis/support/math/geometry.h>
+
+// Standard:
+#include <cstddef>
 
 
 namespace xf {

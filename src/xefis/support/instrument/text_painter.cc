@@ -11,21 +11,21 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-#include <cmath>
-
-// Neutrino:
-#include <neutrino/numeric.h>
-
-// Qt:
-#include <QPainterPath>
+// Local:
+#include "text_painter.h"
 
 // Xefis:
 #include <xefis/config/all.h>
 
-// Local:
-#include "text_painter.h"
+// Qt:
+#include <QPainterPath>
+
+// Neutrino:
+#include <neutrino/numeric.h>
+
+// Standard:
+#include <cstddef>
+#include <cmath>
 
 
 namespace xf {

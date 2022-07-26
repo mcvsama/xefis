@@ -11,21 +11,21 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-#include <algorithm>
-
-// Neutrino:
-#include <neutrino/demangle.h>
-#include <neutrino/exception_support.h>
+// Local:
+#include "module.h"
 
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/sockets/module_socket.h>
 #include <xefis/core/setting.h>
 
-// Local:
-#include "module.h"
+// Neutrino:
+#include <neutrino/demangle.h>
+#include <neutrino/exception_support.h>
+
+// Standard:
+#include <cstddef>
+#include <algorithm>
 
 
 namespace xf {

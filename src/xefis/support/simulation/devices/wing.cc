@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
+// Local:
+#include "wing.h"
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -21,8 +21,8 @@
 #include <xefis/support/geometry/triangulation.h>
 #include <xefis/support/simulation/rigid_body/various_shapes.h>
 
-// Local:
-#include "wing.h"
+// Standard:
+#include <cstddef>
 
 
 namespace xf::sim {

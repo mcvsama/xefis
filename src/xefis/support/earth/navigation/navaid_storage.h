@@ -14,24 +14,24 @@
 #ifndef XEFIS__SUPPORT__EARTH__NAVIGATION__NAVAID_STORAGE_H__INCLUDED
 #define XEFIS__SUPPORT__EARTH__NAVIGATION__NAVAID_STORAGE_H__INCLUDED
 
+// Local:
+#include "navaid.h"
+
+// Xefis:
+#include <xefis/config/all.h>
+
+// Neutrino:
+#include <neutrino/logger.h>
+
+// Lib:
+#include <kdtree++/kdtree.hpp>
+
 // Standard:
 #include <cstddef>
 #include <future>
 #include <set>
 #include <string_view>
 #include <map>
-
-// Lib:
-#include <kdtree++/kdtree.hpp>
-
-// Neutrino:
-#include <neutrino/logger.h>
-
-// Xefis:
-#include <xefis/config/all.h>
-
-// Local:
-#include "navaid.h"
 
 
 namespace xf {

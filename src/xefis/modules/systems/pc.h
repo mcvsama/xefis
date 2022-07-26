@@ -14,18 +14,19 @@
 #ifndef XEFIS__MODULES__SYSTEMS__PC_H__INCLUDED
 #define XEFIS__MODULES__SYSTEMS__PC_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <array>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
 #include <xefis/core/setting.h>
 #include <xefis/core/sockets/module_socket.h>
+#include <xefis/support/airframe/airframe.h>
 #include <xefis/support/sockets/socket_observer.h>
 #include <xefis/utility/smoother.h>
 #include <xefis/utility/range_smoother.h>
+
+// Standard:
+#include <cstddef>
+#include <array>
 
 
 namespace si = neutrino::si;

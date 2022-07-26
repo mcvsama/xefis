@@ -14,17 +14,17 @@
 #ifndef XEFIS__CORE__PANEL_H__INCLUDED
 #define XEFIS__CORE__PANEL_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <set>
+// Xefis:
+#include <xefis/config/all.h>
+#include <xefis/core/graphics.h>
 
 // Qt:
 #include <QtCore/QTimer>
 #include <QtWidgets/QWidget>
 
-// Xefis:
-#include <xefis/config/all.h>
-#include <xefis/core/graphics.h>
+// Standard:
+#include <cstddef>
+#include <set>
 
 
 namespace xf {

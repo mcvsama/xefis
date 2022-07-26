@@ -14,13 +14,13 @@
 #ifndef XEFIS__SUPPORT__SIMULATION__RIGID_BODY__SHAPE_MATERIAL_H__INCLUDED
 #define XEFIS__SUPPORT__SIMULATION__RIGID_BODY__SHAPE_MATERIAL_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <initializer_list>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/math/geometry.h>
+
+// Standard:
+#include <cstddef>
+#include <initializer_list>
 
 
 namespace xf::rigid_body {

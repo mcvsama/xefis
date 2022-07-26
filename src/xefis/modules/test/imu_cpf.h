@@ -14,14 +14,14 @@
 #ifndef XEFIS__MODULES__TEST__IMU_CPF_H__INCLUDED
 #define XEFIS__MODULES__TEST__IMU_CPF_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
 #include <xefis/core/sockets/module_socket.h>
 #include <xefis/support/sockets/socket_observer.h>
+
+// Standard:
+#include <cstddef>
 
 
 namespace si = neutrino::si;

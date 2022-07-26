@@ -14,15 +14,15 @@
 #ifndef XEFIS__SUPPORT__SIMULATION__CONSTRAINTS__LINEAR_LIMITS_CONSTRAINT_H__INCLUDED
 #define XEFIS__SUPPORT__SIMULATION__CONSTRAINTS__LINEAR_LIMITS_CONSTRAINT_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <optional>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/nature/force_moments.h>
 #include <xefis/support/simulation/constraints/slider_precalculation.h>
 #include <xefis/support/simulation/rigid_body/constraint.h>
+
+// Standard:
+#include <cstddef>
+#include <optional>
 
 
 namespace xf::rigid_body {

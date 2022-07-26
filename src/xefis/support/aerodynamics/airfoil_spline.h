@@ -14,17 +14,17 @@
 #ifndef XEFIS__SUPPORT__AERODYNAMICS__AIRFOIL_SPLINE_H__INCLUDED
 #define XEFIS__SUPPORT__AERODYNAMICS__AIRFOIL_SPLINE_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <initializer_list>
-#include <utility>
-#include <vector>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/geometry/triangulation.h>
 #include <xefis/support/math/geometry.h>
 #include <xefis/support/nature/mass_moments.h>
+
+// Standard:
+#include <cstddef>
+#include <initializer_list>
+#include <utility>
+#include <vector>
 
 
 namespace xf {

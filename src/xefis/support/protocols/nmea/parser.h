@@ -14,20 +14,20 @@
 #ifndef XEFIS__SUPPORT__PROTOCOLS__NMEA__PARSER_H__INCLUDED
 #define XEFIS__SUPPORT__PROTOCOLS__NMEA__PARSER_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <variant>
-
-// Neutrino:
-#include <neutrino/noncopyable.h>
+// Local:
+#include "gps.h"
+#include "mtk.h"
 
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/protocols/nmea/nmea.h>
 
-// Local:
-#include "gps.h"
-#include "mtk.h"
+// Neutrino:
+#include <neutrino/noncopyable.h>
+
+// Standard:
+#include <cstddef>
+#include <variant>
 
 
 namespace xf::nmea {

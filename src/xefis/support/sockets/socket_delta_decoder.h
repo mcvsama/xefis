@@ -14,17 +14,17 @@
 #ifndef XEFIS__SUPPORT__SOCKETS__SOCKET_DELTA_DECODER_H__INCLUDED
 #define XEFIS__SUPPORT__SOCKETS__SOCKET_DELTA_DECODER_H__INCLUDED
 
+// Xefis:
+#include <xefis/config/all.h>
+#include <xefis/core/sockets/socket.h>
+#include <xefis/support/sockets/socket_value_changed.h>
+
 // Standard:
 #include <concepts>
 #include <cstddef>
 #include <functional>
 #include <optional>
 #include <type_traits>
-
-// Xefis:
-#include <xefis/config/all.h>
-#include <xefis/core/sockets/socket.h>
-#include <xefis/support/sockets/socket_value_changed.h>
 
 
 namespace xf {

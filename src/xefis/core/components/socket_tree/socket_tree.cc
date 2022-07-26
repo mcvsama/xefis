@@ -11,8 +11,13 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
+// Local:
+#include "socket_tree.h"
+#include "socket_item.h"
+
+// Xefis:
+#include <xefis/config/all.h>
+#include <xefis/core/sockets/socket.h>
 
 // Qt:
 #include <QBoxLayout>
@@ -20,13 +25,8 @@
 #include <QTreeWidgetItem>
 #include <QTreeWidgetItemIterator>
 
-// Xefis:
-#include <xefis/config/all.h>
-#include <xefis/core/sockets/socket.h>
-
-// Local:
-#include "socket_tree.h"
-#include "socket_item.h"
+// Standard:
+#include <cstddef>
 
 
 namespace xf {

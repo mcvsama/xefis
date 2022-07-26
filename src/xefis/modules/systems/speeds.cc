@@ -11,15 +11,15 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
+// Local:
+#include "speeds.h"
 
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/airframe/airframe.h>
 
-// Local:
-#include "speeds.h"
+// Standard:
+#include <cstddef>
 
 
 Speeds::Speeds (xf::Airframe* airframe, std::string_view const& instance):

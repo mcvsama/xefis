@@ -14,13 +14,6 @@
 #ifndef XEFIS__CORE__COMPONENTS__MODULE_CONFIGURATOR__PROCESSING_LOOP_WIDGET_H__INCLUDED
 #define XEFIS__CORE__COMPONENTS__MODULE_CONFIGURATOR__PROCESSING_LOOP_WIDGET_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-
-// Qt:
-#include <QTimer>
-#include <QWidget>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/processing_loop.h>
@@ -28,6 +21,13 @@
 #include <xefis/support/ui/histogram_widget.h>
 #include <xefis/support/ui/histogram_stats_widget.h>
 #include <xefis/support/ui/widget.h>
+
+// Qt:
+#include <QTimer>
+#include <QWidget>
+
+// Standard:
+#include <cstddef>
 
 
 namespace xf::configurator {

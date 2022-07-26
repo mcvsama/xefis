@@ -14,22 +14,22 @@
 #ifndef XEFIS__CORE__SOCKETS__SOCKET_TRAITS_H__INCLUDED
 #define XEFIS__CORE__SOCKETS__SOCKET_TRAITS_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <string>
-#include <utility>
-
-// Boost:
-#include <boost/lexical_cast.hpp>
+// Xefis:
+#include <xefis/config/all.h>
+#include <xefis/core/sockets/socket.h>
+#include <xefis/utility/blob.h>
 
 // Neutrino:
 #include <neutrino/c++20.h>
 #include <neutrino/stdexcept.h>
 
-// Xefis:
-#include <xefis/config/all.h>
-#include <xefis/core/sockets/socket.h>
-#include <xefis/utility/blob.h>
+// Boost:
+#include <boost/lexical_cast.hpp>
+
+// Standard:
+#include <cstddef>
+#include <string>
+#include <utility>
 
 
 namespace xf::detail {

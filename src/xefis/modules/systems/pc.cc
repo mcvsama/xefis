@@ -11,14 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-#include <limits>
-
-// Neutrino:
-#include <neutrino/exception.h>
-#include <neutrino/numeric.h>
-#include <neutrino/qt/qdom.h>
+// Local:
+#include "pc.h"
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -29,8 +23,14 @@
 #include <xefis/support/earth/navigation/wind_triangle.h>
 #include <xefis/support/nature/constants.h>
 
-// Local:
-#include "pc.h"
+// Neutrino:
+#include <neutrino/exception.h>
+#include <neutrino/numeric.h>
+#include <neutrino/qt/qdom.h>
+
+// Standard:
+#include <cstddef>
+#include <limits>
 
 
 PerformanceComputer::PerformanceComputer (xf::Airframe* airframe, std::string_view const& instance):

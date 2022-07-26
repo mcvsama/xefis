@@ -11,19 +11,19 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-
-// System:
-#include <sys/unistd.h>
-#include <sys/fcntl.h>
+// Local:
+#include "watchdog.h"
 
 // Xefis:
 #include <xefis/app/xefis.h>
 #include <xefis/config/all.h>
 
-// Local:
-#include "watchdog.h"
+// System:
+#include <sys/unistd.h>
+#include <sys/fcntl.h>
+
+// Standard:
+#include <cstddef>
 
 
 Watchdog::Watchdog (xf::Xefis* xefis, xf::Logger const& logger, std::string_view const& instance):

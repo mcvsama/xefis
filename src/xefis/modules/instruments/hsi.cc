@@ -11,14 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-
-// Qt:
-#include <QRadialGradient>
-
-// Neutrino:
-#include <neutrino/numeric.h>
+// Local:
+#include "hsi.h"
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -26,8 +20,14 @@
 #include <xefis/support/earth/navigation/wind_triangle.h>
 #include <xefis/support/instrument/text_layout.h>
 
-// Local:
-#include "hsi.h"
+// Neutrino:
+#include <neutrino/numeric.h>
+
+// Qt:
+#include <QRadialGradient>
+
+// Standard:
+#include <cstddef>
 
 
 namespace hsi_detail {

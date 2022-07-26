@@ -11,12 +11,19 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-#include <memory>
-#include <ctime>
-#include <functional>
-#include <iomanip>
+// Local:
+#include "chr_um6.h"
+
+// Xefis:
+#include <xefis/config/all.h>
+#include <xefis/core/system.h>
+#include <xefis/utility/string.h>
+
+// Neutrino:
+#include <neutrino/numeric.h>
+
+// Lib:
+#include <boost/endian/conversion.hpp>
 
 // System:
 #include <sys/types.h>
@@ -25,19 +32,12 @@
 #include <termios.h>
 #include <errno.h>
 
-// Lib:
-#include <boost/endian/conversion.hpp>
-
-// Neutrino:
-#include <neutrino/numeric.h>
-
-// Xefis:
-#include <xefis/config/all.h>
-#include <xefis/core/system.h>
-#include <xefis/utility/string.h>
-
-// Local:
-#include "chr_um6.h"
+// Standard:
+#include <cstddef>
+#include <memory>
+#include <ctime>
+#include <functional>
+#include <iomanip>
 
 
 CHRUM6::CHRUM6 (xf::SerialPort&& serial_port, xf::Logger const& logger, std::string_view const& instance):

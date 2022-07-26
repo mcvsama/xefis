@@ -14,23 +14,23 @@
 #ifndef XEFIS__SUPPORT__INSTRUMENT__INSTRUMENT_AIDS_H__INCLUDED
 #define XEFIS__SUPPORT__INSTRUMENT__INSTRUMENT_AIDS_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <optional>
-
-// Qt:
-#include <QPen>
-#include <QFont>
-
-// Neutrino:
-#include <neutrino/strong_type.h>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/graphics.h>
 #include <xefis/core/screen.h>
 #include <xefis/support/instrument/shadow.h>
 #include <xefis/utility/types.h>
+
+// Neutrino:
+#include <neutrino/strong_type.h>
+
+// Qt:
+#include <QPen>
+#include <QFont>
+
+// Standard:
+#include <cstddef>
+#include <optional>
 
 
 namespace xf {

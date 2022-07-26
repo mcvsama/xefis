@@ -11,26 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-#include <cstdlib>
-#include <fstream>
-#include <sstream>
-#include <string>
-#include <vector>
-#include <thread>
-
-// System:
-#include <signal.h>
-
-// Qt:
-#include <QtCore/QTextCodec>
-
-// Neutrino:
-#include <neutrino/demangle.h>
-#include <neutrino/fail.h>
-#include <neutrino/time_helper.h>
-#include <neutrino/work_performer.h>
+// Local:
+#include "xefis.h"
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -42,8 +24,26 @@
 #include <xefis/support/ui/sound_manager.h>
 #include <xefis/xefis_machine.h>
 
-// Local:
-#include "xefis.h"
+// Neutrino:
+#include <neutrino/demangle.h>
+#include <neutrino/fail.h>
+#include <neutrino/time_helper.h>
+#include <neutrino/work_performer.h>
+
+// Qt:
+#include <QtCore/QTextCodec>
+
+// System:
+#include <signal.h>
+
+// Standard:
+#include <cstddef>
+#include <cstdlib>
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <vector>
+#include <thread>
 
 
 namespace xf {

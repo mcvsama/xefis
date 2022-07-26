@@ -14,12 +14,8 @@
 #ifndef XEFIS__MODULES__SYSTEMS__AFCS_H__INCLUDED
 #define XEFIS__MODULES__SYSTEMS__AFCS_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <string>
-
-// Neutrino:
-#include <neutrino/range.h>
+// Local:
+#include "afcs_api.h"
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -29,8 +25,13 @@
 #include <xefis/support/sockets/socket_delta_decoder.h>
 #include <xefis/support/sockets/socket_value_changed_action.h>
 
-// Local:
-#include "afcs_api.h"
+// Neutrino:
+#include <neutrino/range.h>
+
+// Standard:
+#include <cstddef>
+#include <set>
+#include <string>
 
 
 namespace si = neutrino::si;

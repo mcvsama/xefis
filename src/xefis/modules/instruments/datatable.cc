@@ -11,24 +11,24 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-
-// Qt:
-#include <QtWidgets/QLayout>
-
-// Lib:
-#include <boost/format.hpp>
-
-// Neutrino:
-#include <neutrino/exception_support.h>
+// Local:
+#include "datatable.h"
 
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/utility/types.h>
 
-// Local:
-#include "datatable.h"
+// Neutrino:
+#include <neutrino/exception_support.h>
+
+// Lib:
+#include <boost/format.hpp>
+
+// Qt:
+#include <QtWidgets/QLayout>
+
+// Standard:
+#include <cstddef>
 
 
 Datatable::Line::Line (std::string_view const& label, xf::BasicSocket const& socket):

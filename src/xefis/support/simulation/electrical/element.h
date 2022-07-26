@@ -14,17 +14,17 @@
 #ifndef XEFIS__SUPPORT__SIMULATION__ELECTRICAL__ELEMENT_H__INCLUDED
 #define XEFIS__SUPPORT__SIMULATION__ELECTRICAL__ELEMENT_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <string>
-#include <string_view>
+// Xefis:
+#include <xefis/config/all.h>
+#include <xefis/support/simulation/electrical/node.h>
 
 // Neutrino:
 #include <neutrino/noncopyable.h>
 
-// Xefis:
-#include <xefis/config/all.h>
-#include <xefis/support/simulation/electrical/node.h>
+// Standard:
+#include <cstddef>
+#include <string>
+#include <string_view>
 
 
 namespace xf::electrical {

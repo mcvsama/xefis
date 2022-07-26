@@ -14,13 +14,6 @@
 #ifndef XEFIS__MODULES__SYSTEMS__ADC_H__INCLUDED
 #define XEFIS__MODULES__SYSTEMS__ADC_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <string>
-
-// Neutrino:
-#include <neutrino/logger.h>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
@@ -30,6 +23,13 @@
 #include <xefis/support/sockets/socket_observer.h>
 #include <xefis/utility/lookahead.h>
 #include <xefis/utility/smoother.h>
+
+// Neutrino:
+#include <neutrino/logger.h>
+
+// Standard:
+#include <cstddef>
+#include <string>
 
 
 namespace si = neutrino::si;

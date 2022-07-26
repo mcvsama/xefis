@@ -14,10 +14,6 @@
 #ifndef XEFIS__SUPPORT__AERODYNAMICS__AIRFOIL_H__INCLUDED
 #define XEFIS__SUPPORT__AERODYNAMICS__AIRFOIL_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <utility>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/aerodynamics/airfoil_characteristics.h>
@@ -25,6 +21,10 @@
 #include <xefis/support/earth/air/standard_atmosphere.h>
 #include <xefis/support/math/geometry.h>
 #include <xefis/support/nature/wrench.h>
+
+// Standard:
+#include <cstddef>
+#include <utility>
 
 
 namespace xf {

@@ -11,17 +11,17 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-
-// Neutrino:
-#include <neutrino/math/math.h>
+// Local:
+#include "imu_cpf.h"
 
 // Xefis:
 #include <xefis/config/all.h>
 
-// Local:
-#include "imu_cpf.h"
+// Neutrino:
+#include <neutrino/math/math.h>
+
+// Standard:
+#include <cstddef>
 
 
 IMU_CPF::IMU_CPF (std::string_view const& instance):

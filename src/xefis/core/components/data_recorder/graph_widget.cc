@@ -11,17 +11,17 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-
-// Qt:
-#include <QtWidgets/QLayout>
+// Local:
+#include "graph_widget.h"
 
 // Xefis:
 #include <xefis/config/all.h>
 
-// Local:
-#include "graph_widget.h"
+// Qt:
+#include <QtWidgets/QLayout>
+
+// Standard:
+#include <cstddef>
 
 
 namespace xf {

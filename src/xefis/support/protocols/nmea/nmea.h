@@ -14,12 +14,12 @@
 #ifndef XEFIS__SUPPORT__PROTOCOLS__NMEA__NMEA_H__INCLUDED
 #define XEFIS__SUPPORT__PROTOCOLS__NMEA__NMEA_H__INCLUDED
 
+// Xefis:
+#include <xefis/config/all.h>
+
 // Standard:
 #include <cstddef>
 #include <string>
-
-// Xefis:
-#include <xefis/config/all.h>
 
 
 namespace xf::nmea {

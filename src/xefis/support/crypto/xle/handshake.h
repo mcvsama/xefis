@@ -14,20 +14,20 @@
 #ifndef XEFIS__SUPPORT__CRYPTO__XLE__HANDSHAKE_H__INCLUDED
 #define XEFIS__SUPPORT__CRYPTO__XLE__HANDSHAKE_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <functional>
-#include <variant>
-
-// Boost:
-#include <boost/random/random_device.hpp>
+// Xefis:
+#include <xefis/config/all.h>
 
 // Neutrino:
 #include <neutrino/crypto/diffie_hellman_exchange.h>
 #include <neutrino/crypto/hash.h>
 
-// Xefis:
-#include <xefis/config/all.h>
+// Boost:
+#include <boost/random/random_device.hpp>
+
+// Standard:
+#include <cstddef>
+#include <functional>
+#include <variant>
 
 
 namespace xf::crypto::xle {

@@ -14,24 +14,24 @@
 #ifndef XEFIS__SUPPORT__UI__HISTOGRAM_WIDGET_H__INCLUDED
 #define XEFIS__SUPPORT__UI__HISTOGRAM_WIDGET_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <optional>
-#include <vector>
-
-// Lib:
-#include <boost/lexical_cast.hpp>
-
-// Qt:
-#include <QWidget>
+// Xefis:
+#include <xefis/config/all.h>
+#include <xefis/support/ui/canvas_widget.h>
 
 // Neutrino:
 #include <neutrino/math/histogram.h>
 #include <neutrino/numeric.h>
 
-// Xefis:
-#include <xefis/config/all.h>
-#include <xefis/support/ui/canvas_widget.h>
+// Qt:
+#include <QWidget>
+
+// Lib:
+#include <boost/lexical_cast.hpp>
+
+// Standard:
+#include <cstddef>
+#include <optional>
+#include <vector>
 
 
 namespace xf {

@@ -16,18 +16,18 @@
 #ifndef XEFIS__SUPPORT__CRYPTO__XLE__TRANSPORT_H__INCLUDED
 #define XEFIS__SUPPORT__CRYPTO__XLE__TRANSPORT_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-
-// Boost:
-#include <boost/random/random_device.hpp>
+// Xefis:
+#include <xefis/config/all.h>
 
 // Neutrino:
 #include <neutrino/crypto/hash.h>
 #include <neutrino/exception.h>
 
-// Xefis:
-#include <xefis/config/all.h>
+// Boost:
+#include <boost/random/random_device.hpp>
+
+// Standard:
+#include <cstddef>
 
 
 namespace xf::crypto::xle {

@@ -11,25 +11,25 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-
-// Qt:
-#include <QBoxLayout>
-#include <QGridLayout>
-#include <QTabWidget>
-
-// Neutrino:
-#include <neutrino/math/histogram.h>
-#include <neutrino/numeric.h>
+// Local:
+#include "processing_loop_widget.h"
 
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/components/module_configurator/config_widget.h>
 #include <xefis/support/ui/paint_helper.h>
 
-// Local:
-#include "processing_loop_widget.h"
+// Neutrino:
+#include <neutrino/math/histogram.h>
+#include <neutrino/numeric.h>
+
+// Qt:
+#include <QBoxLayout>
+#include <QGridLayout>
+#include <QTabWidget>
+
+// Standard:
+#include <cstddef>
 
 
 namespace xf::configurator {
