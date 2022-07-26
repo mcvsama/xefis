@@ -25,6 +25,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/components/module_configurator/config_widget.h>
+#include <xefis/support/ui/paint_helper.h>
 
 // Local:
 #include "screen_widget.h"
@@ -36,6 +37,7 @@ ScreenWidget::ScreenWidget (Screen& screen, QWidget* parent):
 	ConfigWidget (parent),
 	_screen (screen)
 {
+	auto const ph = PaintHelper (*this, palette(), font());
 	auto* name_label = create_colored_strip_label (QString::fromStdString (_screen.instance()).toHtmlEscaped(), QColor (0xff, 0xaa, 0x00), Qt::AlignBottom, this);
 
 	auto tabs = new QTabWidget (this);
@@ -44,7 +46,7 @@ ScreenWidget::ScreenWidget (Screen& screen, QWidget* parent):
 	auto* layout = new QVBoxLayout (this);
 	layout->setMargin (0);
 	layout->addWidget (name_label);
-	layout->addItem (new QSpacerItem (0, em_pixels (0.15f), QSizePolicy::Fixed, QSizePolicy::Fixed));
+	layout->addItem (new QSpacerItem (0, ph.em_pixels (0.15f), QSizePolicy::Fixed, QSizePolicy::Fixed));
 	layout->addWidget (tabs);
 
 	_refresh_timer = new QTimer (this);
@@ -94,6 +96,7 @@ ScreenWidget::refresh()
 QWidget*
 ScreenWidget::create_performance_tab()
 {
+	auto const ph = PaintHelper (*this, palette(), font());
 	auto* widget = new QWidget (this);
 
 	// Prepare list of Widgets objects for each WorkPerformer:
@@ -141,7 +144,7 @@ ScreenWidget::create_performance_tab()
 			tab_layout->setMargin (0);
 			tab_layout->addWidget (widgets.start_latency_group, 0, 0);
 			tab_layout->addWidget (widgets.total_latency_group, 1, 0);
-			tab_layout->addItem (new QSpacerItem (0, em_pixels (0.5f), QSizePolicy::Expanding, QSizePolicy::Fixed), 2, 0);
+			tab_layout->addItem (new QSpacerItem (0, ph.em_pixels (0.5f), QSizePolicy::Expanding, QSizePolicy::Fixed), 2, 0);
 			tab_layout->addWidget (handled_modules_info, 3, 0);
 			tab_layout->addItem (new QSpacerItem (0, 0, QSizePolicy::Expanding, QSizePolicy::Fixed), 0, 1);
 			tab_layout->addItem (new QSpacerItem (0, 0, QSizePolicy::Fixed, QSizePolicy::Expanding), 4, 0);

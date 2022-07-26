@@ -1,6 +1,6 @@
 /* vim:ts=4
  *
- * Copyleft 2019  Michał Gawron
+ * Copyleft 2022  Michał Gawron
  * Marduk Unix Labs, http://mulabs.org/
  *
  * This program is free software: you can redistribute it and/or modify
@@ -87,12 +87,6 @@ class RigidBodyPainter: protected QOpenGLFunctions
 		{ _planet_body = planet_body; }
 
 	/**
-	 * Paint the system.
-	 */
-	void
-	paint (rigid_body::System const& system, QOpenGLPaintDevice& canvas);
-
-	/**
 	 * Set camera focus point.
 	 */
 	void
@@ -164,6 +158,12 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	void
 	set_angular_momenta_visible (bool visible) noexcept
 		{ _angular_momenta_visible = visible; }
+
+	/**
+	 * Paint the system.
+	 */
+	void
+	paint (rigid_body::System const& system, QOpenGLPaintDevice& canvas);
 
   private:
 	void

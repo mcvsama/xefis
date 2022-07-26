@@ -31,14 +31,9 @@
 
 namespace xf {
 
-RigidBodyViewer::RigidBodyViewer (rigid_body::System& system,
-								  QSize const window_size,
-								  RefreshRate const refresh_rate,
-								  Evolve const evolve):
-	GLAnimationWidget (window_size, refresh_rate, std::bind (&RigidBodyViewer::draw, this, std::placeholders::_1)),
-	_rigid_body_system (system),
-	_rigid_body_painter (si::PixelDensity (screen()->physicalDotsPerInch())),
-	_evolve (evolve)
+RigidBodyViewer::RigidBodyViewer (QWidget* parent, RefreshRate const refresh_rate):
+	GLAnimationWidget (parent, refresh_rate, std::bind (&RigidBodyViewer::draw, this, std::placeholders::_1)),
+	_rigid_body_painter (si::PixelDensity (screen()->physicalDotsPerInch()))
 {
 	setWindowTitle("Xefis rigid body viewer");
 
@@ -200,9 +195,12 @@ RigidBodyViewer::draw (QOpenGLPaintDevice& canvas)
 		}
 	}
 
-	_rigid_body_painter.set_camera_position (position());
-	_rigid_body_painter.set_camera_angles (x_angle(), -y_angle(), 0_deg);
-	_rigid_body_painter.paint (_rigid_body_system, canvas);
+	if (_rigid_body_system)
+	{
+		_rigid_body_painter.set_camera_position (position());
+		_rigid_body_painter.set_camera_angles (x_angle(), -y_angle(), 0_deg);
+		_rigid_body_painter.paint (*_rigid_body_system, canvas);
+	}
 }
 
 
@@ -212,6 +210,7 @@ RigidBodyViewer::display_menu()
 	QMenu menu;
 
 	// "Show constraints"
+	if (_rigid_body_system && !_rigid_body_system->constraints().empty())
 	{
 		auto* action = menu.addAction ("Show &constraints", [&] {
 			_rigid_body_painter.set_constraints_visible (!_rigid_body_painter.constraints_visible());

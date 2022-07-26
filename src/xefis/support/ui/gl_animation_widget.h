@@ -50,7 +50,7 @@ class GLAnimationWidget: public QOpenGLWidget
   public:
 	// Ctor
 	explicit
-	GLAnimationWidget (QSize size, RefreshRate, std::function<void (QOpenGLPaintDevice&)> display_function);
+	GLAnimationWidget (QWidget* parent, RefreshRate, std::function<void (QOpenGLPaintDevice&)> display_function);
 
 	/**
 	 * Return current FPS (frames per second).

@@ -29,6 +29,7 @@
 #include <xefis/config/all.h>
 #include <xefis/core/components/module_configurator/config_widget.h>
 #include <xefis/support/qt/ownership_breaker.h>
+#include <xefis/support/ui/paint_helper.h>
 
 // Local:
 #include "module_widget.h"
@@ -42,6 +43,7 @@ ModuleWidget::ModuleWidget (Module& module, QWidget* parent):
 	_instrument (dynamic_cast<Instrument*> (&_module))
 {
 	auto full_name_str = QString::fromStdString (identifier (module));
+	auto const ph = PaintHelper (*this, palette(), font());
 
 	QString module_type = _instrument ? "Instrument " : "Module ";
 	QColor color = _instrument ? QColor (0xff, 0x66, 0xff) : QColor (0x50, 0x79, 0xff);
@@ -68,7 +70,7 @@ ModuleWidget::ModuleWidget (Module& module, QWidget* parent):
 	auto* layout = new QVBoxLayout (this);
 	layout->setMargin (0);
 	layout->addWidget (name_label);
-	layout->addItem (new QSpacerItem (0, em_pixels (0.15f), QSizePolicy::Fixed, QSizePolicy::Fixed));
+	layout->addItem (new QSpacerItem (0, ph.em_pixels (0.15f), QSizePolicy::Fixed, QSizePolicy::Fixed));
 	layout->addWidget (tabs);
 
 	_refresh_timer = new QTimer (this);

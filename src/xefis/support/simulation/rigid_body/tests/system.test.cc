@@ -98,9 +98,11 @@ run (rigid_body::System& system, rigid_body::Body* followed_body, std::function<
 	QWidget w (nullptr);
 	auto const lh = neutrino::default_line_height (&w);
 
-	RigidBodyViewer viewer (system, QSize (50 * lh, 50 * lh), 60_Hz, [&] (si::Time const dt) {
+	RigidBodyViewer viewer (nullptr, 60_Hz);
+	viewer.set_rigid_body_system (&system, [&] (si::Time const dt) {
 		simulation.evolve (dt, 1_s);
 	});
+	viewer.resize (QSize (50 * lh, 50 * lh));
 	viewer.set_followed (followed_body);
 	viewer.show();
 

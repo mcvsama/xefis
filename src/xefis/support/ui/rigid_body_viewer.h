@@ -73,12 +73,19 @@ class RigidBodyViewer: public GLAnimationWidget
 	static constexpr float		kHighPrecision		{ 0.05f };
 
   public:
+	// Ctor
+	explicit
+	RigidBodyViewer (QWidget* parent, RefreshRate);
+
 	/**
+	 * Assign a rigid body system. Pass nullptr to unassign.
+	 *
 	 * \param	evolve
 	 *			Evolution function called before each redraw.
 	 *			May be nullptr.
 	 */
-	RigidBodyViewer (rigid_body::System&, QSize window_size, RefreshRate, Evolve evolve);
+	void
+	set_rigid_body_system (rigid_body::System*, Evolve evolve_function = {});
 
 	/**
 	 * Set related machine. Used to show configurator widget when pressing Esc.
@@ -174,7 +181,7 @@ class RigidBodyViewer: public GLAnimationWidget
 
   private:
 	Machine*							_machine						{ nullptr };
-	rigid_body::System&					_rigid_body_system;
+	rigid_body::System*					_rigid_body_system				{ nullptr };
 	RigidBodyPainter					_rigid_body_painter;
 	Evolve								_evolve;
 	QPoint								_last_pos;
@@ -189,6 +196,14 @@ class RigidBodyViewer: public GLAnimationWidget
 	si::Angle							_x_angle						{ kDefaultXAngle };
 	si::Angle							_y_angle						{ kDefaultYAngle };
 };
+
+
+inline void
+RigidBodyViewer::set_rigid_body_system (rigid_body::System* system, Evolve evolve)
+{
+	_rigid_body_system = system;
+	_evolve = evolve;
+}
 
 } // namespace xf
 

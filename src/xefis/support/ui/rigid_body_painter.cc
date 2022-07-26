@@ -1,6 +1,6 @@
 /* vim:ts=4
  *
- * Copyleft 2019  Michał Gawron
+ * Copyleft 2022  Michał Gawron
  * Marduk Unix Labs, http://mulabs.org/
  *
  * This program is free software: you can redistribute it and/or modify
@@ -36,6 +36,7 @@
 #include <xefis/support/simulation/devices/wing.h>
 #include <xefis/support/simulation/rigid_body/various_shapes.h>
 #include <xefis/support/ui/gl_space.h>
+#include <xefis/support/ui/paint_helper.h>
 
 // Local:
 #include "rigid_body_painter.h"
@@ -53,14 +54,13 @@ void
 RigidBodyPainter::paint (rigid_body::System const& system, QOpenGLPaintDevice& canvas)
 {
 	initializeOpenGLFunctions();
+	auto const ph = PaintHelper (canvas);
 
 	QPainter painter (&canvas);
+	ph.setup_painter (painter);
+
 	QRectF rect (0, 0, canvas.width(), canvas.height());
 	QPointF center = rect.center();
-
-	painter.setRenderHint (QPainter::Antialiasing, true);
-	painter.setRenderHint (QPainter::TextAntialiasing, true);
-	painter.setRenderHint (QPainter::SmoothPixmapTransform, true);
 
 	painter.translate (center);
 	painter.beginNativePainting();

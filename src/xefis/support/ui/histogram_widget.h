@@ -31,12 +31,12 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/support/ui/widget.h>
+#include <xefis/support/ui/canvas_widget.h>
 
 
 namespace xf {
 
-class HistogramWidget: public xf::Widget
+class HistogramWidget: public CanvasWidget
 {
   public:
 	enum class Style
@@ -77,20 +77,10 @@ class HistogramWidget: public xf::Widget
 
   protected:
 	void
-	update_canvas();
-
-	void
-	resizeEvent (QResizeEvent*) override;
-
-	void
-	paintEvent (QPaintEvent*) override;
-
-	void
-	changeEvent (QEvent*) override;
+	update_canvas() override;
 
   private:
 	Style						_style				{ Style::Bars };
-	std::optional<QImage>		_canvas;
 	std::vector<float>			_marks;
 	std::vector<std::size_t>	_bins;
 	std::size_t					_y_max;
@@ -125,30 +115,9 @@ template<class Value>
 				_marks.emplace_back (pos);
 		}
 
-		_canvas.reset();
+		mark_dirty();
 		update();
 	}
-
-
-inline void
-HistogramWidget::set_grid_lines (std::size_t number)
-{
-	_grid_lines = number;
-}
-
-
-inline void
-HistogramWidget::set_y_legend_visible (bool visible)
-{
-	_y_legend_visible = visible;
-}
-
-
-inline void
-HistogramWidget::set_style (Style style)
-{
-	_style = style;
-}
 
 } // namespace xf
 

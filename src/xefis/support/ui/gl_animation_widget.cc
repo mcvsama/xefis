@@ -24,8 +24,8 @@
 
 namespace xf {
 
-GLAnimationWidget::GLAnimationWidget (QSize size, RefreshRate const refresh_rate, std::function<void (QOpenGLPaintDevice&)> const display_function):
-	QOpenGLWidget (nullptr),
+GLAnimationWidget::GLAnimationWidget (QWidget* parent, RefreshRate const refresh_rate, std::function<void (QOpenGLPaintDevice&)> const display_function):
+	QOpenGLWidget (parent),
 	_requested_refresh_rate (refresh_rate),
 	_display_function (display_function)
 {
@@ -44,7 +44,6 @@ GLAnimationWidget::GLAnimationWidget (QSize size, RefreshRate const refresh_rate
 	set_refresh_rate (refresh_rate);
 	_refresh_timer->start();
 
-	resize (size);
 	create();
 }
 

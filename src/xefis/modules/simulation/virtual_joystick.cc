@@ -1,6 +1,6 @@
 /* vim:ts=4
  *
- * Copyleft 2012…2016  Michał Gawron
+ * Copyleft 2022  Michał Gawron
  * Marduk Unix Labs, http://mulabs.org/
  *
  * This program is free software: you can redistribute it and/or modify
@@ -26,6 +26,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/support/ui/paint_helper.h>
 #include <xefis/support/ui/widget.h>
 #include <xefis/utility/kde.h>
 
@@ -83,6 +84,7 @@ class VirtualJoystickWidget: public xf::Widget
 
   private:
 	std::optional<MouseControl>	_control;
+	xf::PaintHelper				_paint_helper	{ *this, palette(), font() };
 };
 
 
@@ -142,8 +144,9 @@ class VirtualLinearWidget: public xf::Widget
 	xf::Range<float>			_range;
 	Orientation					_orientation;
 	Style						_style;
-	float						_value { 0.0 };
+	float						_value			{ 0.0 };
 	std::optional<MouseControl>	_control;
+	xf::PaintHelper				_paint_helper	{ *this, palette(), font() };
 };
 
 
@@ -158,7 +161,7 @@ VirtualJoystickWidget::VirtualJoystickWidget (QWidget* parent):
 	Widget (parent)
 {
 	setStyleSheet (kTransparentStyleSheet);
-	setFixedSize (em_pixels (20), em_pixels (20));
+	setFixedSize (_paint_helper.em_pixels (20), _paint_helper.em_pixels (20));
 }
 
 
@@ -170,7 +173,7 @@ VirtualJoystickWidget::position() const noexcept
 		using std::abs;
 		using xf::sgn;
 
-		auto const m2 = 2 * em_pixels (kMarginEm);
+		auto const m2 = 2 * _paint_helper.em_pixels (kMarginEm);
 		auto const size = std::min (width() - m2, height() - m2);
 		auto const pos = _control->delta() / (0.5 * size);
 
@@ -195,7 +198,7 @@ VirtualJoystickWidget::position() const noexcept
 void
 VirtualJoystickWidget::paintEvent (QPaintEvent*)
 {
-	auto const m = em_pixels (kMarginEm);
+	auto const m = _paint_helper.em_pixels (kMarginEm);
 	QRectF r = rect().marginsRemoved (QMargins (m, m, m, m));
 
 	if (r.width() < r.height())
@@ -216,18 +219,18 @@ VirtualJoystickWidget::paintEvent (QPaintEvent*)
 	{
 		auto const color = outlining ? Qt::black : Qt::white;
 		auto const brush_color = outlining ? Qt::white : Qt::blue;
-		auto const added_width = outlining ? em_pixels (0.2) : 0.0;
+		auto const added_width = outlining ? _paint_helper.em_pixels (0.2) : 0.0;
 		auto const half_right = QPointF (0.5 * r.width(), 0.0);
 		auto const half_down = QPointF (0.0, 0.5 * r.height());
 		auto const center = r.topLeft() + half_right + half_down;
 
 		// Box:
 		painter.setBrush (Qt::NoBrush);
-		painter.setPen (QPen (color, added_width + em_pixels (0.3), Qt::SolidLine, Qt::SquareCap));
+		painter.setPen (QPen (color, added_width + _paint_helper.em_pixels (0.3), Qt::SolidLine, Qt::SquareCap));
 		painter.drawRect (r);
 
 		// Cross:
-		painter.setPen (QPen (color, added_width + em_pixels (0.1), Qt::SolidLine, Qt::FlatCap));
+		painter.setPen (QPen (color, added_width + _paint_helper.em_pixels (0.1), Qt::SolidLine, Qt::FlatCap));
 		painter.drawLine (r.topLeft() + half_right, r.bottomLeft() + half_right);
 		painter.drawLine (r.topLeft() + half_down, r.topRight() + half_down);
 
@@ -244,13 +247,13 @@ VirtualJoystickWidget::paintEvent (QPaintEvent*)
 									 -pos.y() * 0.5 * r.width());
 		}
 
-		auto const c = em_pixels (0.8);
+		auto const c = _paint_helper.em_pixels (0.8);
 		auto ellipse = QRectF (QPointF (0.0, 0.0), QSizeF (c, c));
 		ellipse.moveCenter (finish_point);
 
-		painter.setPen (QPen (brush_color, added_width + em_pixels (0.1), Qt::SolidLine, Qt::FlatCap));
+		painter.setPen (QPen (brush_color, added_width + _paint_helper.em_pixels (0.1), Qt::SolidLine, Qt::FlatCap));
 		painter.drawLine (center, finish_point);
-		painter.setPen (QPen (Qt::white, em_pixels (0.2)));
+		painter.setPen (QPen (Qt::white, _paint_helper.em_pixels (0.2)));
 		painter.drawEllipse (ellipse);
 	}
 }
@@ -299,11 +302,11 @@ VirtualLinearWidget::VirtualLinearWidget (xf::Range<float> range, Orientation or
 	switch (_orientation)
 	{
 		case Horizontal:
-			setFixedSize (em_pixels (20), em_pixels (5));
+			setFixedSize (_paint_helper.em_pixels (20), _paint_helper.em_pixels (5));
 			break;
 
 		case Vertical:
-			setFixedSize (em_pixels (5), em_pixels (20));
+			setFixedSize (_paint_helper.em_pixels (5), _paint_helper.em_pixels (20));
 			break;
 	}
 }
@@ -345,7 +348,7 @@ VirtualLinearWidget::value() const noexcept
 void
 VirtualLinearWidget::paintEvent (QPaintEvent*)
 {
-	auto const m = em_pixels (kMarginEm);
+	auto const m = _paint_helper.em_pixels (kMarginEm);
 	QRectF r = rect();
 
 	QPainter painter (this);
@@ -364,11 +367,11 @@ VirtualLinearWidget::paintEvent (QPaintEvent*)
 	for (auto const outlining: { true, false })
 	{
 		auto const color = outlining ? Qt::black : Qt::white;
-		auto const added_width = outlining ? em_pixels (0.2) : 0.0;
+		auto const added_width = outlining ? _paint_helper.em_pixels (0.2) : 0.0;
 		auto const y = xf::renormalize (value(), _range, kInternalRange) * r.height();
 
 		// Throttle:
-		painter.setPen (QPen (color, added_width + em_pixels (0.1), Qt::SolidLine, Qt::FlatCap));
+		painter.setPen (QPen (color, added_width + _paint_helper.em_pixels (0.1), Qt::SolidLine, Qt::FlatCap));
 
 		if (outlining && _style == Filled)
 			painter.fillRect (QRectF (QPointF (r.left(), r.bottom() - y), r.bottomRight()), QColor (0, 255, 0, 200));
@@ -377,7 +380,7 @@ VirtualLinearWidget::paintEvent (QPaintEvent*)
 
 		// Box:
 		painter.setBrush (Qt::NoBrush);
-		painter.setPen (QPen (color, added_width + em_pixels (0.3), Qt::SolidLine, Qt::SquareCap));
+		painter.setPen (QPen (color, added_width + _paint_helper.em_pixels (0.3), Qt::SolidLine, Qt::SquareCap));
 		painter.drawRect (r);
 	}
 }

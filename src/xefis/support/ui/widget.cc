@@ -1,6 +1,6 @@
 /* vim:ts=4
  *
- * Copyleft 2012…2016  Michał Gawron
+ * Copyleft 2022  Michał Gawron
  * Marduk Unix Labs, http://mulabs.org/
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,6 +21,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/support/ui/paint_helper.h>
 
 // Local:
 #include "widget.h"
@@ -54,16 +55,17 @@ QWidget*
 Widget::create_colored_strip_label (QString const& text, QColor color, Qt::Alignment strip_position, QWidget* parent) const
 {
 	auto* widget = new QWidget (parent);
+	auto const ph = PaintHelper (*widget, widget->palette(), widget->font());
 
 	auto* strip = create_color_widget (color, widget);
-	strip->setFixedHeight (em_pixels (0.3f));
+	strip->setFixedHeight (ph.em_pixels (0.3f));
 
 	auto* label = new QLabel (text, widget);
 	label->setStyleSheet ("margin: 0.15em;");
 	label->setAlignment (Qt::AlignLeft);
 
 	QFont font = label->font();
-	font.setPixelSize (em_pixels (1.4f));
+	font.setPixelSize (ph.em_pixels (1.4f));
 	label->setFont (font);
 
 	auto* layout = new QGridLayout (widget);

@@ -26,6 +26,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/components/module_configurator/config_widget.h>
+#include <xefis/support/ui/paint_helper.h>
 
 // Local:
 #include "processing_loop_widget.h"
@@ -37,6 +38,7 @@ ProcessingLoopWidget::ProcessingLoopWidget (ProcessingLoop& processing_loop, QWi
 	ConfigWidget (parent),
 	_processing_loop (processing_loop)
 {
+	auto const ph = PaintHelper (*this, palette(), font());
 	auto* name_label = create_colored_strip_label (QString::fromStdString (_processing_loop.instance()).toHtmlEscaped(), QColor (0xff, 0xd7, 0), Qt::AlignBottom, this);
 
 	auto tabs = new QTabWidget (this);
@@ -45,7 +47,7 @@ ProcessingLoopWidget::ProcessingLoopWidget (ProcessingLoop& processing_loop, QWi
 	auto* layout = new QVBoxLayout (this);
 	layout->setMargin (0);
 	layout->addWidget (name_label);
-	layout->addItem (new QSpacerItem (0, em_pixels (0.15f), QSizePolicy::Fixed, QSizePolicy::Fixed));
+	layout->addItem (new QSpacerItem (0, ph.em_pixels (0.15f), QSizePolicy::Fixed, QSizePolicy::Fixed));
 	layout->addWidget (tabs);
 
 	_refresh_timer = new QTimer (this);
