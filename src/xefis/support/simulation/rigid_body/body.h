@@ -329,6 +329,23 @@ class Body: public Noncopyable
 		{ return _frame_cache; }
 
 	/**
+	 * Return true if the body is broken and must not be used in the system
+	 * evolution (eg. it contains NaN values anywhere).
+	 */
+	[[nodiscard]]
+	bool
+	broken() const
+		{ return _broken; }
+
+	/**
+	 * Mark body as broken to remove it from calculations (but not from the
+	 * system, it should simply be skipped when evolving the system, etc).
+	 */
+	void
+	set_broken()
+		{ _broken = true; }
+
+	/**
 	 * Evolve the body (eg. change the shape if it's changeable).
 	 */
 	virtual void
@@ -365,6 +382,8 @@ class Body: public Noncopyable
 	ShapeType												_shape_type;
 	// Mutex for all those _world_space_* and _body_space_* optionals:
 	mutable std::mutex										_optionals_mutex;
+	// The body is not valid for computation anymore (eg. has NaNs in physical quantities):
+	bool													_broken { false };
 };
 
 

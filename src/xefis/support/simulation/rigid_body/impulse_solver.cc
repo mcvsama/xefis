@@ -28,13 +28,13 @@
 
 namespace xf::rigid_body {
 
-ImpulseSolver::ImpulseSolver (System& system, uint32_t const iterations):
+ImpulseSolver::ImpulseSolver (System& system, uint32_t const max_iterations):
 	_system (system),
-	_iterations (iterations)
+	_max_iterations (max_iterations)
 { }
 
 
-void
+EvolutionDetails
 ImpulseSolver::evolve (si::Time const dt)
 {
 	// Reset required parts of frame cache:
@@ -50,7 +50,7 @@ ImpulseSolver::evolve (si::Time const dt)
 	update_mass_moments();
 	update_gravitational_forces();
 	update_external_forces();
-	update_constraint_forces (dt);
+	auto const details = update_constraint_forces (dt);
 	update_acceleration_moments();
 	update_velocity_moments (dt);
 	update_locations (dt);
@@ -60,6 +60,8 @@ ImpulseSolver::evolve (si::Time const dt)
 		body->evolve (dt);
 
 	++_processed_frames;
+
+    return details;
 }
 
 
@@ -142,11 +144,20 @@ ImpulseSolver::update_external_forces()
 }
 
 
-void
+EvolutionDetails
 ImpulseSolver::update_constraint_forces (si::Time const dt)
 {
-	for (size_t i = 0; i < _iterations; ++i)
+	bool precise_enough = false;
+	size_t iteration = 0;
+
+    for (auto const& constraint: _system.constraints())
+        constraint->previous_calculation_force_moments().reset();
+
+	for (iteration = 0; iteration < _max_iterations && !precise_enough; ++iteration)
 	{
+		precise_enough = true;
+
+		// Reset constraint forces:
 		for (auto& body: _system.bodies())
 			body->frame_cache().constraint_force_moments = ForceMoments<WorldSpace>();
 
@@ -157,26 +168,43 @@ ImpulseSolver::update_constraint_forces (si::Time const dt)
 				auto& b1 = constraint->body_1();
 				auto& b2 = constraint->body_2();
 
-				auto const total_ext_forces_1 = b1.frame_cache().gravitational_force_moments + b1.frame_cache().external_force_moments;
-				auto const total_ext_forces_2 = b2.frame_cache().gravitational_force_moments + b2.frame_cache().external_force_moments;
-
-				auto const correction = constraint->constraint_forces (b1.frame_cache().velocity_moments, total_ext_forces_1,
-																	   b2.frame_cache().velocity_moments, total_ext_forces_2,
-																	   dt);
-
 				auto& fc1 = b1.frame_cache();
 				auto& fc2 = b2.frame_cache();
 
-				fc1.constraint_force_moments += correction[0];
-				fc2.constraint_force_moments += correction[1];
+				if (!b1.broken() && !b2.broken())
+				{
+					auto const total_ext_forces_1 = fc1.gravitational_force_moments + fc1.external_force_moments;
+					auto const total_ext_forces_2 = fc2.gravitational_force_moments + fc2.external_force_moments;
 
-				// Recalculate accelerations:
-				fc1.acceleration_moments = acceleration_moments (b1, fc1.all_force_moments());
-				fc2.acceleration_moments = acceleration_moments (b2, fc2.all_force_moments());
+					auto const constraint_forces = constraint->constraint_forces (fc1.velocity_moments, total_ext_forces_1,
+																				  fc2.velocity_moments, total_ext_forces_2,
+																				  dt);
 
-				// Recalculate velocity moments:
-				fc1.velocity_moments = calculate_velocity_moments (b1, fc1.acceleration_moments, dt);
-				fc2.velocity_moments = calculate_velocity_moments (b2, fc2.acceleration_moments, dt);
+                    if (constraint->previous_calculation_force_moments())
+                    {
+                        auto const& prev = *constraint->previous_calculation_force_moments();
+                        auto const dF = abs (constraint_forces[0].force() - prev.force());
+                        auto const dT = abs (constraint_forces[0].torque() - prev.torque());
+
+                        if (dF > 0.001_N || dT > 0.001_Nm) // TODO configurable
+                            precise_enough = false;
+                    }
+                    else
+                        precise_enough = false;
+
+                    constraint->previous_calculation_force_moments() = constraint_forces[0];
+
+					fc1.constraint_force_moments += constraint_forces[0];
+					fc2.constraint_force_moments += constraint_forces[1];
+
+					// Recalculate accelerations:
+					fc1.acceleration_moments = acceleration_moments (b1, fc1.all_force_moments());
+					fc2.acceleration_moments = acceleration_moments (b2, fc2.all_force_moments());
+
+					// Recalculate velocity moments:
+					fc1.velocity_moments = calculate_velocity_moments (b1, fc1.acceleration_moments, dt);
+					fc2.velocity_moments = calculate_velocity_moments (b2, fc2.acceleration_moments, dt);
+				}
 			}
 		}
 	}
@@ -187,6 +215,11 @@ ImpulseSolver::update_constraint_forces (si::Time const dt)
 		constraint->calculated_constraint_forces ({ constraint->body_1().frame_cache().constraint_force_moments,
 													constraint->body_2().frame_cache().constraint_force_moments });
 	}
+
+    return {
+        .iterations_run = iteration,
+        .converged = precise_enough,
+    };
 }
 
 
