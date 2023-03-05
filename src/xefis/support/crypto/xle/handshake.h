@@ -20,6 +20,7 @@
 // Neutrino:
 #include <neutrino/crypto/diffie_hellman_exchange.h>
 #include <neutrino/crypto/hash.h>
+#include <neutrino/exception.h>
 
 // Boost:
 #include <boost/random/random_device.hpp>
@@ -34,30 +35,12 @@ namespace xf::crypto::xle {
 
 using HandshakeID = uint64_t;
 
-
 /**
  * Generates/parses handshake blobs and calculates final ephemeral key from
  * the handshake.
  */
 class Handshake
 {
-  public:
-	class WrongSignature: public std::runtime_error
-	{
-	  public:
-		WrongSignature():
-			std::runtime_error ("wrong signature")
-		{ }
-	};
-
-	class ReusedHandshakeID: public std::runtime_error
-	{
-	  public:
-		ReusedHandshakeID():
-			std::runtime_error ("reusing handshake ID")
-		{ }
-	};
-
   protected:
 	/**
 	 * Serialized master handshake looks like this (all numbers are little-endian):
@@ -85,7 +68,6 @@ class Handshake
 	 *     salt (8 B)
 	 *     handshake_id (8 B)
 	 *     unix_timestamp_ms (8 B)
-	 *     error_code (1 B)
 	 *     dhe_exchange (variable size)
 	 *     signature (_hmac_size B)
 	 * }
@@ -93,30 +75,54 @@ class Handshake
 	class SlaveHandshake
 	{
 	  public:
-		HandshakeID	handshake_id;
-		uint64_t	unix_timestamp_ms;
-		uint8_t		error_code;
-		Blob		dhe_exchange_blob;
+		HandshakeID		handshake_id;
+		uint64_t		unix_timestamp_ms;
+		Blob			dhe_exchange_blob;
 	};
 
   public:
 	// Ctor
-	Handshake (boost::random::random_device&, BlobView master_signature_key, BlobView slave_signature_key, size_t hmac_size = 12);
+	Handshake (boost::random::random_device&,
+			   BlobView master_signature_key,
+			   BlobView slave_signature_key,
+			   size_t hmac_size = 12,
+			   si::Time max_time_difference = 60_s);
 
   protected:
 	static constexpr Hash::Algorithm const kHashAlgorithm = Hash::SHA3_256;
 
   protected:
 	boost::random::random_device&	_random_device;
-	Blob							_master_signature_key;
-	Blob							_slave_signature_key;
+	Blob const						_master_signature_key;
+	Blob const						_slave_signature_key;
 	DiffieHellmanExchange			_dhe_exchange;
-	size_t							_hmac_size;
+	size_t const					_hmac_size;
+	si::Time const					_max_time_difference;
 };
 
 
 class HandshakeMaster: public Handshake
 {
+  public:
+	enum class ErrorCode: uint8_t
+	{
+		WrongSignature,
+		DeltaTimeTooHigh,
+	};
+
+	class Exception: public neutrino::Exception
+	{
+	  public:
+		Exception (ErrorCode, std::string_view message);
+
+		ErrorCode
+		error_code() const
+			{ return _error_code; }
+
+	  private:
+		ErrorCode _error_code;
+	};
+
   public:
 	// Ctor
 	using Handshake::Handshake;
@@ -126,7 +132,7 @@ class HandshakeMaster: public Handshake
 	 */
 	[[nodiscard]]
 	Blob
-	generate_handshake_blob();
+	generate_handshake_blob (si::Time unix_timestamp);
 
 	/**
 	 * Return the ephemeral key to use for encryption.
@@ -152,6 +158,26 @@ class HandshakeSlave: public Handshake
   public:
 	using IDUsedBeforeCallback = std::function<bool (HandshakeID)>;
 
+	enum class ErrorCode: uint8_t
+	{
+		WrongSignature,
+		ReusedHandshakeID,
+		DeltaTimeTooHigh,
+	};
+
+	class Exception: public neutrino::Exception
+	{
+	  public:
+		Exception (ErrorCode, std::string_view message);
+
+		ErrorCode
+		error_code() const
+			{ return _error_code; }
+
+	  private:
+		ErrorCode _error_code;
+	};
+
 	struct HandshakeAndKey
 	{
 		Blob	handshake_response;
@@ -175,7 +201,7 @@ class HandshakeSlave: public Handshake
 	 */
 	[[nodiscard]]
 	HandshakeAndKey
-	generate_handshake_blob_and_key (BlobView master_handshake_blob);
+	generate_handshake_blob_and_key (BlobView master_handshake_blob, si::Time unix_timestamp);
 
   private:
 	[[nodiscard]]
@@ -189,6 +215,20 @@ class HandshakeSlave: public Handshake
   private:
 	IDUsedBeforeCallback _id_used_before;
 };
+
+
+inline
+HandshakeMaster::Exception::Exception (ErrorCode const error_code, std::string_view const message):
+	neutrino::Exception (message),
+	_error_code (error_code)
+{ }
+
+
+inline
+HandshakeSlave::Exception::Exception (ErrorCode const error_code, std::string_view const message):
+	neutrino::Exception (message),
+	_error_code (error_code)
+{ }
 
 } // namespace xf::crypto::xle
 
