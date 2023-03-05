@@ -49,7 +49,11 @@ class Transport
 	};
 
   protected:
-	static constexpr Hash::Algorithm const kHashAlgorithm = Hash::SHA3_256;
+	static constexpr Hash::Algorithm const kSignatureHMACHashAlgorithm = Hash::SHA3_256;
+	static constexpr Hash::Algorithm const kDataEncryptionKeyHKDFHashAlgorithm = Hash::SHA3_256;
+	static constexpr Hash::Algorithm const kDataNonceHashAlgorithm = Hash::SHA3_256;
+	static constexpr Hash::Algorithm const kSeqNumEncryptionKeyHKDFHashAlgorithm = Hash::SHA3_256;
+	static constexpr Hash::Algorithm const kSeqNumNonceHashAlgorithm = Hash::SHA3_256;
 
   public:
 	// Ctor
