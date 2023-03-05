@@ -42,10 +42,25 @@ class Transport
 
 	static constexpr size_t kDataSaltSize = 8;
 
-	class DecryptionFailure: public Exception
+	enum ErrorCode
+	{
+		HMACTooShort,
+		InvalidAuthentication,
+		SeqNumFromPast,
+		SeqNumFromFarFuture,
+	};
+
+	class DecryptionFailure: public neutrino::Exception
 	{
 	  public:
-		using Exception::Exception;
+		DecryptionFailure (ErrorCode, std::string_view const message);
+
+		ErrorCode
+		error_code() const
+			{ return _error_code; }
+
+	  private:
+		ErrorCode _error_code;
 	};
 
   protected:
@@ -82,7 +97,11 @@ class Transmitter: public Transport
   public:
 	// Ctor
 	explicit
-	Transmitter (boost::random::random_device&, BlobView ephemeral_session_key, size_t hmac_size = 12, BlobView key_salt = {}, BlobView hkdf_user_info = {});
+	Transmitter (boost::random::random_device&,
+				 BlobView ephemeral_session_key,
+				 size_t hmac_size = 12,
+				 BlobView key_salt = {},
+				 BlobView hkdf_user_info = {});
 
 	/**
 	 * Return next encrypted packet.
@@ -109,6 +128,13 @@ class Receiver: public Transport
 	Blob
 	decrypt_packet (BlobView data, std::optional<SequenceNumber> maximum_allowed_sequence_number = {});
 };
+
+
+inline
+Transport::DecryptionFailure::DecryptionFailure (ErrorCode const error_code, std::string_view const message):
+	Exception (message),
+	_error_code (error_code)
+{ }
 
 } // namespace xf::crypto::xle
 

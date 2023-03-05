@@ -54,7 +54,11 @@ Transport::Transport (BlobView const ephemeral_session_key, size_t const hmac_si
 }
 
 
-Transmitter::Transmitter (boost::random::random_device& random_device, BlobView const ephemeral_session_key, size_t const hmac_size, BlobView const key_salt, BlobView const hkdf_user_info):
+Transmitter::Transmitter (boost::random::random_device& random_device,
+						  BlobView const ephemeral_session_key,
+						  size_t const hmac_size,
+						  BlobView const key_salt,
+						  BlobView const hkdf_user_info):
 	Transport (ephemeral_session_key, hmac_size, key_salt, hkdf_user_info),
 	_random_device (random_device)
 { }
@@ -149,21 +153,21 @@ Receiver::decrypt_packet (BlobView const encrypted_packet, std::optional<Sequenc
 			blob_to_value (binary_sequence_number, sequence_number);
 
 			if (sequence_number <= _sequence_number)
-				throw DecryptionFailure ("sequence number from past is invalid");
+				throw DecryptionFailure (ErrorCode::SeqNumFromPast, "sequence number from past is invalid");
 
 			if (maximum_allowed_sequence_number)
 				if (sequence_number > *maximum_allowed_sequence_number)
-					throw DecryptionFailure ("sequence number from far future is invalid");
+					throw DecryptionFailure (ErrorCode::SeqNumFromFarFuture, "sequence number from far future is invalid");
 
 			_sequence_number = sequence_number;
 
 			return Blob (data);
 		}
 		else
-			throw DecryptionFailure ("invalid authentication");
+			throw DecryptionFailure (ErrorCode::InvalidAuthentication, "invalid authentication");
 	}
 	else
-		throw DecryptionFailure ("HMAC too short");
+		throw DecryptionFailure (ErrorCode::HMACTooShort, "HMAC too short");
 }
 
 } // namespace xf::crypto::xle
