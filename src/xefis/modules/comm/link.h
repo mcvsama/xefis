@@ -185,15 +185,15 @@ class LinkProtocol
 			 *
 			 * \param	retained
 			 *			True if module input should retain its last value when link is down or corrupted.
-			 * \param	fallback_value
+			 * \param	value_if_nil
 			 *			Value that should be used for nil-values, because integers don't have any special values
 			 *			that could be used as nil.
-			 *			Note this fallback_value is only used on transmitting side only, if module socket is nil.
+			 *			Note this value_if_nil is only used on transmitting side only, if module socket is nil.
 			 */
 			template<class U = Value>
 				requires (std::is_integral_v<U>)
 				explicit
-				Socket (xf::Socket<Value>&, xf::AssignableSocket<Value>*, Retained, Value fallback_value);
+				Socket (xf::Socket<Value>&, xf::AssignableSocket<Value>*, Retained, Value value_if_nil);
 
 			/**
 			 * Ctor for floating-point values and SI values
@@ -216,8 +216,8 @@ class LinkProtocol
 			 * Ctor for read-only integral sockets.
 			 */
 			explicit
-			Socket (xf::Socket<Value>& socket, Retained retained, Value fallback_value):
-				Socket (socket, nullptr, retained, fallback_value)
+			Socket (xf::Socket<Value>& socket, Retained retained, Value value_if_nil):
+				Socket (socket, nullptr, retained, value_if_nil)
 			{ }
 
 			/**
@@ -232,8 +232,8 @@ class LinkProtocol
 			 * Ctor for writable integral sockets.
 			 */
 			explicit
-			Socket (xf::AssignableSocket<Value>& assignable_socket, Retained retained, Value fallback_value):
-				Socket (assignable_socket, &assignable_socket, retained, fallback_value)
+			Socket (xf::AssignableSocket<Value>& assignable_socket, Retained retained, Value value_if_nil):
+				Socket (assignable_socket, &assignable_socket, retained, value_if_nil)
 			{ }
 
 			/**
@@ -281,7 +281,7 @@ class LinkProtocol
 		  private:
 			xf::Socket<Value>&				_socket;
 			xf::AssignableSocket<Value>*	_assignable_socket;
-			si::decay_quantity_t<Value>		_fallback_value {};
+			si::decay_quantity_t<Value>		_value_if_nil {};
 			std::optional<Value>			_value;
 			// Retain last valid value on error (when value is NaN or failsafe kicks in):
 			bool							_retained;
@@ -306,7 +306,7 @@ class LinkProtocol
 				// More than 1 bit only makes sense for integer Values:
 				uint8_t							bits			{ 1 };
 				bool							retained		{ false }; // TODO Use class Retained?
-				Value							fallback_value	{}; // TODO make class FallbackValue
+				Value							value_if_nil	{}; // TODO make class FallbackValue
 				Value							value			{};
 			};
 
@@ -425,16 +425,16 @@ class LinkProtocol
 
 	template<size_t Bytes, std::integral Value>
 		static auto
-		socket (xf::Socket<Value>& socket, Retained retained, Value fallback_value)
+		socket (xf::Socket<Value>& socket, Retained retained, Value value_if_nil)
 		{
-			return std::make_shared<Socket<Bytes, Value>> (socket, retained, fallback_value);
+			return std::make_shared<Socket<Bytes, Value>> (socket, retained, value_if_nil);
 		}
 
 	template<size_t Bytes, std::integral Value>
 		static auto
-		socket (xf::AssignableSocket<Value>& assignable_socket, Retained retained, Value fallback_value)
+		socket (xf::AssignableSocket<Value>& assignable_socket, Retained retained, Value value_if_nil)
 		{
-			return std::make_shared<Socket<Bytes, Value>> (assignable_socket, retained, fallback_value);
+			return std::make_shared<Socket<Bytes, Value>> (assignable_socket, retained, value_if_nil);
 		}
 
 	template<size_t Bytes, si::FloatingPointOrQuantity Value>
@@ -474,43 +474,43 @@ class LinkProtocol
 	}
 
 	static Bitfield::BitSource<bool>
-	bitfield_socket (xf::Socket<bool>& socket, Retained retained, bool fallback_value)
+	bitfield_socket (xf::Socket<bool>& socket, Retained retained, bool value_if_nil)
 	{
-		return { socket, nullptr, 1, *retained, fallback_value, false };
+		return { socket, nullptr, 1, *retained, value_if_nil, false };
 	}
 
 	static Bitfield::BitSource<bool>
-	bitfield_socket (xf::AssignableSocket<bool>& assignable_socket, Retained retained, bool fallback_value)
+	bitfield_socket (xf::AssignableSocket<bool>& assignable_socket, Retained retained, bool value_if_nil)
 	{
-		return { assignable_socket, &assignable_socket, 1, *retained, fallback_value, false };
+		return { assignable_socket, &assignable_socket, 1, *retained, value_if_nil, false };
 	}
 
 	/**
-	 * Note that fallback_value will be used not only when socket is nil, but also be used when integer value doesn't
+	 * Note that value_if_nil will be used not only when socket is nil, but also be used when integer value doesn't
 	 * fit in given number of bits.
 	 */
 	template<class Unsigned>
 		static Bitfield::BitSource<Unsigned>
-		bitfield_socket (xf::Socket<Unsigned>& socket, Bits bits, Retained retained, Unsigned fallback_value)
+		bitfield_socket (xf::Socket<Unsigned>& socket, Bits bits, Retained retained, Unsigned value_if_nil)
 		{
-			if (!fits_in_bits (fallback_value, bits))
-				throw xf::InvalidArgument ("fallback_value doesn't fit in given number of bits");
+			if (!fits_in_bits (value_if_nil, bits))
+				throw xf::InvalidArgument ("value_if_nil doesn't fit in given number of bits");
 
-			return { socket, nullptr, *bits, *retained, fallback_value, 0 };
+			return { socket, nullptr, *bits, *retained, value_if_nil, 0 };
 		}
 
 	/**
-	 * Note that fallback_value will be used not only when socket is nil, but also be used when integer value doesn't
+	 * Note that value_if_nil will be used not only when socket is nil, but also be used when integer value doesn't
 	 * fit in given number of bits.
 	 */
 	template<class Unsigned>
 		static Bitfield::BitSource<Unsigned>
-		bitfield_socket (xf::AssignableSocket<Unsigned>& assignable_socket, Bits bits, Retained retained, Unsigned fallback_value)
+		bitfield_socket (xf::AssignableSocket<Unsigned>& assignable_socket, Bits bits, Retained retained, Unsigned value_if_nil)
 		{
-			if (!fits_in_bits (fallback_value, bits))
-				throw xf::InvalidArgument ("fallback_value doesn't fit in given number of bits");
+			if (!fits_in_bits (value_if_nil, bits))
+				throw xf::InvalidArgument ("value_if_nil doesn't fit in given number of bits");
 
-			return { assignable_socket, &assignable_socket, *bits, *retained, fallback_value, 0 };
+			return { assignable_socket, &assignable_socket, *bits, *retained, value_if_nil, 0 };
 		}
 
 	static auto
@@ -642,16 +642,16 @@ template<uint8_t B, class V>
 	template<class U>
 		requires (std::is_integral_v<U>)
 		inline
-		LinkProtocol::Socket<B, V>::Socket (xf::Socket<Value>& socket, xf::AssignableSocket<Value>* assignable_socket, Retained retained, Value fallback_value):
+		LinkProtocol::Socket<B, V>::Socket (xf::Socket<Value>& socket, xf::AssignableSocket<Value>* assignable_socket, Retained retained, Value value_if_nil):
 			_socket (socket),
 			_assignable_socket (assignable_socket),
-			_fallback_value (fallback_value),
+			_value_if_nil (value_if_nil),
 			_retained (*retained)
 		{
 			_produce = [this](Blob& blob) {
 				int64_t int_value = _socket
 					? *_socket
-					: _fallback_value;
+					: _value_if_nil;
 
 				serialize<xf::int_for_width_t<kBytes>> (blob, int_value);
 			};
@@ -672,7 +672,7 @@ template<uint8_t B, class V>
 		LinkProtocol::Socket<B, V>::Socket (xf::Socket<Value>& socket, xf::AssignableSocket<Value>* assignable_socket, Retained retained, std::optional<Value> offset):
 			_socket (socket),
 			_assignable_socket (assignable_socket),
-			_fallback_value (std::numeric_limits<decltype (_fallback_value)>::quiet_NaN()),
+			_value_if_nil (std::numeric_limits<decltype (_value_if_nil)>::quiet_NaN()),
 			_retained (*retained),
 			_offset (offset)
 		{
@@ -683,7 +683,7 @@ template<uint8_t B, class V>
 						? _offset
 							? (*_socket - *_offset).base_value()
 							: (*_socket).base_value()
-						: _fallback_value;
+						: _value_if_nil;
 
 					serialize<neutrino::float_for_width_t<kBytes>> (blob, value);
 				}
@@ -693,7 +693,7 @@ template<uint8_t B, class V>
 						? _offset
 							? *_socket - *_offset
 							: *_socket
-						: _fallback_value;
+						: _value_if_nil;
 
 					serialize<neutrino::float_for_width_t<kBytes>> (blob, value);
 				}

@@ -120,7 +120,7 @@ LinkProtocol::Bitfield::produce (Blob& blob)
 	for (auto const& bsvariant: _bit_sources)
 	{
 		std::visit ([&bits] (auto&& bs) {
-			uint_least64_t v = bs.fallback_value;
+			uint_least64_t v = bs.value_if_nil;
 
 			if (bs.socket && fits_in_bits (*bs.socket, Bits (bs.bits)))
 				v = *bs.socket;
