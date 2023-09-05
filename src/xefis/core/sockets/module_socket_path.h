@@ -52,13 +52,13 @@ class ModuleSocketPath
 	ModuleSocketPath (ModuleSocketPath const&) = default;
 
 	// Ctor
-	ModuleSocketPath (ModuleSocketPath&&) = default;
+	ModuleSocketPath (ModuleSocketPath&&) noexcept = default;
 
 	ModuleSocketPath&
 	operator= (ModuleSocketPath const&) = default;
 
 	ModuleSocketPath&
-	operator= (ModuleSocketPath&&) = default;
+	operator= (ModuleSocketPath&&) noexcept = default;
 
 	bool
 	operator== (ModuleSocketPath const& other) const noexcept;

@@ -56,7 +56,7 @@ template<class tValueType>
 		Temporal (Temporal const&) = default;
 
 		// Move ctor
-		Temporal (Temporal&&) = default;
+		Temporal (Temporal&&) noexcept = default;
 
 		// Copy assignment
 		Temporal<ValueType>&
