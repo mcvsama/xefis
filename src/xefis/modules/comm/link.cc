@@ -122,7 +122,7 @@ LinkProtocol::Bitfield::produce (Blob& blob)
 		std::visit ([&bits] (auto&& bs) {
 			uint_least64_t v = bs.value_if_nil;
 
-			if (bs.socket && fits_in_bits (*bs.socket, Bits (bs.bits)))
+			if (bs.socket && fits_in_bits (*bs.socket, bs.bits))
 				v = *bs.socket;
 			// TODO signal error if doesn't fits_in_bits()?
 
@@ -205,11 +205,11 @@ LinkProtocol::Bitfield::failsafe()
 }
 
 
-LinkProtocol::Signature::Signature (NonceBytes nonce_bytes, SignatureBytes signature_bytes, Key key, PacketList packets):
-	Sequence (packets),
-	_nonce_bytes (*nonce_bytes),
-	_signature_bytes (*signature_bytes),
-	_key (*key),
+LinkProtocol::Signature::Signature (Params&& params):
+	Sequence (params.packets),
+	_nonce_bytes (params.nonce_bytes),
+	_signature_bytes (params.signature_bytes),
+	_key (params.key),
 	_rng (std::random_device{}())
 {
 	_temp.reserve (size());
@@ -278,17 +278,11 @@ LinkProtocol::Signature::eat (Blob::const_iterator begin, Blob::const_iterator e
 }
 
 
-LinkProtocol::Envelope::Envelope (Magic magic, PacketList packets):
-	Sequence (packets),
-	_magic (*magic)
-{ }
-
-
-LinkProtocol::Envelope::Envelope (Magic magic, SendEvery send_every, SendOffset send_offset, PacketList packets):
-	Sequence (packets),
-	_magic (*magic),
-	_send_every (*send_every),
-	_send_offset (*send_offset)
+LinkProtocol::Envelope::Envelope (Params&& params):
+	Sequence (params.packets),
+	_magic (params.magic),
+	_send_every (params.send_every),
+	_send_offset (params.send_offset)
 { }
 
 

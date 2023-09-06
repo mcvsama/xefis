@@ -36,6 +36,7 @@
 #include <cstddef>
 #include <functional>
 #include <initializer_list>
+#include <limits>
 #include <memory>
 #include <optional>
 #include <random>
@@ -50,22 +51,12 @@
 
 namespace si = neutrino::si;
 
-
 class Link;
 
 
 class LinkProtocol
 {
   public:
-	using Bits				= xf::StrongType<uint8_t, struct BitsType>;
-	using Magic				= xf::StrongType<Blob, struct MagicType>;
-	using Key				= xf::StrongType<Blob, struct KeyType>;
-	using SendEvery			= xf::StrongType<std::size_t, struct SendOffsetType>;
-	using SendOffset		= xf::StrongType<std::size_t, struct SendOffsetType>;
-	using Retained			= xf::StrongType<bool, struct RetainedType>;
-	using NonceBytes		= xf::StrongType<uint8_t, struct NonceBytesType>;
-	using SignatureBytes	= xf::StrongType<uint8_t, struct SignatureBytesType>;
-
 	/**
 	 * Thrown on known parse errors.
 	 */
@@ -174,6 +165,24 @@ class LinkProtocol
 		  public:
 			using Value = pValue;
 
+			/**
+			 * This one is used with integer values.
+			 */
+			struct IntegerParams
+			{
+				bool					retained	{ false };
+				Value					value_if_nil;
+			};
+
+			/**
+			 * This one is for floating-point and SI values.
+			 */
+			struct FloatingPointParams
+			{
+				bool					retained	{ false };
+				std::optional<Value>	offset		{ };
+			};
+
 			static constexpr uint8_t kBytes { pBytes };
 
 			static_assert ((std::integral<Value> && (kBytes == 1 || kBytes == 2 || kBytes == 4 || kBytes == 8)) ||
@@ -193,7 +202,7 @@ class LinkProtocol
 			template<class U = Value>
 				requires (std::is_integral_v<U>)
 				explicit
-				Socket (xf::Socket<Value>&, xf::AssignableSocket<Value>*, Retained, Value value_if_nil);
+				Socket (xf::Socket<Value>&, xf::AssignableSocket<Value>*, IntegerParams&&);
 
 			/**
 			 * Ctor for floating-point values and SI values
@@ -209,39 +218,39 @@ class LinkProtocol
 			template<class U = Value>
 				requires si::FloatingPointOrQuantity<U>
 				explicit
-				Socket (xf::Socket<Value>&, xf::AssignableSocket<Value>*, Retained, std::optional<Value> offset = {});
+				Socket (xf::Socket<Value>&, xf::AssignableSocket<Value>*, FloatingPointParams&&);
 
 		  public:
 			/**
 			 * Ctor for read-only integral sockets.
 			 */
 			explicit
-			Socket (xf::Socket<Value>& socket, Retained retained, Value value_if_nil):
-				Socket (socket, nullptr, retained, value_if_nil)
+			Socket (xf::Socket<Value>& socket, IntegerParams&& params):
+				Socket (socket, nullptr, std::move (params))
 			{ }
 
 			/**
 			 * Ctor for read-only floating-point and SI-value sockets.
 			 */
 			explicit
-			Socket (xf::Socket<Value>& socket, Retained retained, std::optional<Value> offset = {}):
-				Socket (socket, nullptr, retained, offset)
+			Socket (xf::Socket<Value>& socket, FloatingPointParams&& params):
+				Socket (socket, nullptr, std::move (params))
 			{ }
 
 			/**
 			 * Ctor for writable integral sockets.
 			 */
 			explicit
-			Socket (xf::AssignableSocket<Value>& assignable_socket, Retained retained, Value value_if_nil):
-				Socket (assignable_socket, &assignable_socket, retained, value_if_nil)
+			Socket (xf::AssignableSocket<Value>& assignable_socket, IntegerParams&& params):
+				Socket (assignable_socket, &assignable_socket, std::move (params))
 			{ }
 
 			/**
 			 * Ctor for writable floating-point and SI-value sockets.
 			 */
 			explicit
-			Socket (xf::AssignableSocket<Value>& assignable_socket, Retained retained, std::optional<Value> offset = {}):
-				Socket (assignable_socket, &assignable_socket, retained, offset)
+			Socket (xf::AssignableSocket<Value>& assignable_socket, FloatingPointParams&& params):
+				Socket (assignable_socket, &assignable_socket, std::move (params))
 			{ }
 
 			Blob::size_type
@@ -298,16 +307,34 @@ class LinkProtocol
 	class Bitfield: public Packet
 	{
 	  public:
+		struct BoolParams
+		{
+			bool		retained		{ false };
+			bool		value_if_nil	{ false };
+
+			static constexpr BoolParams make_default()
+			{
+				return { .retained = false, .value_if_nil = false };
+			}
+		};
+
+		template<class Value>
+			struct UnsignedParams
+			{
+				uint8_t		bits			{ std::numeric_limits<Value>::digits };
+				bool		retained		{ false };
+				Value		value_if_nil	{ false };
+			};
+
 		template<class Value>
 			struct BitSource
 			{
 				xf::Socket<Value>&				socket;
 				xf::AssignableSocket<Value>*	assignable_socket;
-				// More than 1 bit only makes sense for integer Values:
-				uint8_t							bits			{ 1 };
-				bool							retained		{ false }; // TODO Use class Retained?
-				Value							value_if_nil	{}; // TODO make class FallbackValue
-				Value							value			{};
+				uint8_t							bits;
+				bool							retained;
+				Value							value_if_nil;
+				Value							value {};
 			};
 
 		using SourceVariant	= std::variant<BitSource<bool>, BitSource<uint8_t>, BitSource<uint16_t>,
@@ -347,8 +374,17 @@ class LinkProtocol
 	class Signature: public Sequence
 	{
 	  public:
+		struct Params
+		{
+			uint8_t			nonce_bytes;
+			uint8_t			signature_bytes;
+			Blob			key;
+			PacketList&&	packets;
+		};
+
+	  public:
 		explicit
-		Signature (NonceBytes, SignatureBytes, Key, PacketList);
+		Signature (Params&&);
 
 		Blob::size_type
 		size() const override;
@@ -375,13 +411,21 @@ class LinkProtocol
 	class Envelope: public Sequence
 	{
 	  public:
-		// Ctor
-		explicit
-		Envelope (Magic, PacketList);
+		struct Params
+		{
+			// Magic is a unique envelope identifier vector:
+			Blob		magic;
+			// Only send this envelope every Nth time:
+			size_t		send_every	{ 1 };
+			// Start sending first packet from send_offset:
+			size_t		send_offset	{ 0 };
+			PacketList	packets		{};
+		};
 
+	  public:
 		// Ctor
 		explicit
-		Envelope (Magic, SendEvery, SendOffset, PacketList);
+		Envelope (Params&&);
 
 		Blob const&
 		magic() const;
@@ -394,9 +438,9 @@ class LinkProtocol
 
 	  private:
 		Blob		_magic;
-		uint64_t	_send_every		= 1;
-		uint64_t	_send_offset	= 0;
-		uint64_t	_send_pos		= 0;
+		uint64_t	_send_every;
+		uint64_t	_send_offset;
+		uint64_t	_send_pos	{ 0 };
 	};
 
 	using EnvelopeList = std::initializer_list<std::shared_ptr<Envelope>>;
@@ -425,46 +469,52 @@ class LinkProtocol
 
 	template<size_t Bytes, std::integral Value>
 		static auto
-		socket (xf::Socket<Value>& socket, Retained retained, Value value_if_nil)
+		socket (xf::Socket<Value>& socket, Socket<Bytes, Value>::IntegerParams&& params = {})
 		{
-			return std::make_shared<Socket<Bytes, Value>> (socket, retained, value_if_nil);
+			return std::make_shared<Socket<Bytes, Value>> (socket, std::move (params));
 		}
 
 	template<size_t Bytes, std::integral Value>
 		static auto
-		socket (xf::AssignableSocket<Value>& assignable_socket, Retained retained, Value value_if_nil)
+		socket (xf::AssignableSocket<Value>& assignable_socket, Socket<Bytes, Value>::IntegerParams&& params = {})
 		{
-			return std::make_shared<Socket<Bytes, Value>> (assignable_socket, retained, value_if_nil);
+			return std::make_shared<Socket<Bytes, Value>> (assignable_socket, std::move (params));
 		}
 
 	template<size_t Bytes, si::FloatingPointOrQuantity Value>
 		static auto
-		socket (xf::Socket<Value>& socket, Retained retained)
+		socket (xf::Socket<Value>& socket, Socket<Bytes, Value>::FloatingPointParams&& params = {})
 		{
-			return std::make_shared<Socket<Bytes, Value>> (socket, retained);
+			return std::make_shared<Socket<Bytes, Value>> (socket, std::move (params));
 		}
 
 	template<size_t Bytes, si::FloatingPointOrQuantity Value>
 		static auto
-		socket (xf::AssignableSocket<Value>& assignable_socket, Retained retained)
+		socket (xf::AssignableSocket<Value>& assignable_socket, Socket<Bytes, Value>::FloatingPointParams&& params = {})
 		{
-			return std::make_shared<Socket<Bytes, Value>> (assignable_socket, retained);
+			return std::make_shared<Socket<Bytes, Value>> (assignable_socket, std::move (params));
 		}
 
 	template<size_t Bytes, si::FloatingPointOrQuantity Value, class Offset>
 		static auto
-		socket (xf::Socket<Value>& socket, Retained retained, Offset offset)
+		socket (xf::Socket<Value>& socket, Socket<Bytes, Value>::FloatingPointParams&& params = {})
 		{
 			// Allow Offset to be a Quantity specified over different but compatible Unit (eg. Feet instead of Meters).
-			return std::make_shared<Socket<Bytes, Value>> (socket, retained, std::optional<Value> (offset));
+			return std::make_shared<Socket<Bytes, Value>> (socket, {
+				.retained	= params.retained,
+				.offset		= std::optional<Value> (params.offset),
+			});
 		}
 
 	template<size_t Bytes, si::FloatingPointOrQuantity Value, class Offset>
 		static auto
-		socket (xf::AssignableSocket<Value>& assignable_socket, Retained retained, Offset offset)
+		socket (xf::AssignableSocket<Value>& assignable_socket, Socket<Bytes, Value>::FloatingPointParams&& params = {})
 		{
 			// Allow Offset to be a Quantity specified over different but compatible Unit (eg. Feet instead of Meters).
-			return std::make_shared<Socket<Bytes, Value>> (assignable_socket, retained, std::optional<Value> (offset));
+			return std::make_shared<Socket<Bytes, Value>> (assignable_socket, {
+				.retained	= params.retained,
+				.offset		= std::optional<Value> (params.offset),
+			});
 		}
 
 	static auto
@@ -473,16 +523,31 @@ class LinkProtocol
 		return std::make_shared<Bitfield> (std::forward<std::remove_reference_t<decltype (sockets)>> (sockets));
 	}
 
+	// FIXME The = ::make_default() is a workaround for possible bug in GCC, where = {} doesn't work.
 	static Bitfield::BitSource<bool>
-	bitfield_socket (xf::Socket<bool>& socket, Retained retained, bool value_if_nil)
+	bitfield_socket (xf::Socket<bool>& socket, Bitfield::BoolParams&& params = Bitfield::BoolParams::make_default())
 	{
-		return { socket, nullptr, 1, *retained, value_if_nil, false };
+		return {
+			.socket				= socket,
+			.assignable_socket	= nullptr,
+			.bits				= 1,
+			.retained			= params.retained,
+			.value_if_nil		= params.value_if_nil,
+			.value				= false,
+		};
 	}
 
 	static Bitfield::BitSource<bool>
-	bitfield_socket (xf::AssignableSocket<bool>& assignable_socket, Retained retained, bool value_if_nil)
+	bitfield_socket (xf::AssignableSocket<bool>& assignable_socket, Bitfield::BoolParams&& params = Bitfield::BoolParams::make_default())
 	{
-		return { assignable_socket, &assignable_socket, 1, *retained, value_if_nil, false };
+		return {
+			.socket				= assignable_socket,
+			.assignable_socket	= &assignable_socket,
+			.bits				= 1,
+			.retained			= params.retained,
+			.value_if_nil		= params.value_if_nil,
+			.value				= false,
+		};
 	}
 
 	/**
@@ -491,12 +556,19 @@ class LinkProtocol
 	 */
 	template<class Unsigned>
 		static Bitfield::BitSource<Unsigned>
-		bitfield_socket (xf::Socket<Unsigned>& socket, Bits bits, Retained retained, Unsigned value_if_nil)
+		bitfield_socket (xf::Socket<Unsigned>& socket, Bitfield::UnsignedParams<Unsigned>&& params = {})
 		{
-			if (!fits_in_bits (value_if_nil, bits))
+			if (!fits_in_bits (params.value_if_nil, params.bits))
 				throw xf::InvalidArgument ("value_if_nil doesn't fit in given number of bits");
 
-			return { socket, nullptr, *bits, *retained, value_if_nil, 0 };
+			return {
+				.socket				= socket,
+				.assignable_socket	= nullptr,
+				.bits				= params.bits,
+				.retained			= params.retained,
+				.value_if_nil		= params.value_if_nil,
+				.value				= 0,
+			};
 		}
 
 	/**
@@ -505,30 +577,31 @@ class LinkProtocol
 	 */
 	template<class Unsigned>
 		static Bitfield::BitSource<Unsigned>
-		bitfield_socket (xf::AssignableSocket<Unsigned>& assignable_socket, Bits bits, Retained retained, Unsigned value_if_nil)
+		bitfield_socket (xf::AssignableSocket<Unsigned>& assignable_socket, Bitfield::UnsignedParams<Unsigned>&& params = {})
 		{
-			if (!fits_in_bits (value_if_nil, bits))
+			if (!fits_in_bits (params.value_if_nil, params.bits))
 				throw xf::InvalidArgument ("value_if_nil doesn't fit in given number of bits");
 
-			return { assignable_socket, &assignable_socket, *bits, *retained, value_if_nil, 0 };
+			return {
+				.socket				= assignable_socket,
+				.assignable_socket	= &assignable_socket,
+				.bits				= params.bits,
+				.retained			= params.retained,
+				.value_if_nil		= params.value_if_nil,
+				.value				= 0,
+			};
 		}
 
 	static auto
-	signature (NonceBytes nonce_bytes, SignatureBytes signature_bytes, Key key, PacketList&& packets)
+	signature (Signature::Params&& params)
 	{
-		return std::make_shared<Signature> (nonce_bytes, signature_bytes, key, std::forward<PacketList> (packets));
+		return std::make_shared<Signature> (std::move (params));
 	}
 
 	static auto
-	envelope (Magic magic, PacketList&& packets)
+	envelope (Envelope::Params&& params)
 	{
-		return std::make_shared<Envelope> (magic, std::forward<PacketList> (packets));
-	}
-
-	static auto
-	envelope (Magic magic, SendEvery send_every, SendOffset send_offset, PacketList&& packets)
-	{
-		return std::make_shared<Envelope> (magic, send_every, send_offset, std::forward<PacketList> (packets));
+		return std::make_shared<Envelope> (std::move (params));
 	}
 
   private:
@@ -540,8 +613,8 @@ class LinkProtocol
 	to_string (Blob const&);
 
 	static constexpr bool
-	fits_in_bits (uint_least64_t value, Bits bits)
-		{ return value < xf::static_pow (2U, *bits); }
+	fits_in_bits (uint_least64_t value, uint8_t bits)
+		{ return value < xf::static_pow (2U, bits); }
 
   private:
 	Link*										_link				{ nullptr };
@@ -642,11 +715,11 @@ template<uint8_t B, class V>
 	template<class U>
 		requires (std::is_integral_v<U>)
 		inline
-		LinkProtocol::Socket<B, V>::Socket (xf::Socket<Value>& socket, xf::AssignableSocket<Value>* assignable_socket, Retained retained, Value value_if_nil):
+		LinkProtocol::Socket<B, V>::Socket (xf::Socket<Value>& socket, xf::AssignableSocket<Value>* assignable_socket, IntegerParams&& params):
 			_socket (socket),
 			_assignable_socket (assignable_socket),
-			_value_if_nil (value_if_nil),
-			_retained (*retained)
+			_value_if_nil (params.value_if_nil),
+			_retained (params.retained)
 		{
 			_produce = [this](Blob& blob) {
 				int64_t int_value = _socket
@@ -669,12 +742,12 @@ template<uint8_t B, class V>
 	template<class U>
 		requires si::FloatingPointOrQuantity<U>
 		inline
-		LinkProtocol::Socket<B, V>::Socket (xf::Socket<Value>& socket, xf::AssignableSocket<Value>* assignable_socket, Retained retained, std::optional<Value> offset):
+		LinkProtocol::Socket<B, V>::Socket (xf::Socket<Value>& socket, xf::AssignableSocket<Value>* assignable_socket, FloatingPointParams&& params):
 			_socket (socket),
 			_assignable_socket (assignable_socket),
 			_value_if_nil (std::numeric_limits<decltype (_value_if_nil)>::quiet_NaN()),
-			_retained (*retained),
-			_offset (offset)
+			_retained (params.retained),
+			_offset (params.offset)
 		{
 			_produce = [this](Blob& blob) {
 				if constexpr (si::is_quantity<Value>())

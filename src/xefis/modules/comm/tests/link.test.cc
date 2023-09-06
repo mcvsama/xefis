@@ -91,31 +91,70 @@ class GCS_Tx_LinkProtocol: public LinkProtocol
 		explicit
 		GCS_Tx_LinkProtocol (IO* io):
 			LinkProtocol ({
-				envelope (Magic ({ 0xe4, 0x40 }), {
-					signature (NonceBytes (8), SignatureBytes (12), Key ({ 0x88, 0x99, 0xaa, 0xbb }), {
-						socket<8> (io->nil_si_prop,				Retained (false)),
-						socket<8> (io->angle_prop,				Retained (false)),
-						socket<8> (io->angle_prop_r,			Retained (true)),
-						socket<2> (io->velocity_prop,			Retained (false)),
-						socket<2> (io->velocity_prop_r,			Retained (true)),
-						socket<2> (io->velocity_prop_offset,	Retained (false),	1000_kph),
-						socket<2> (io->velocity_prop_offset_r,	Retained (true),	1000_kph),
-						socket<2> (io->int_prop,				Retained (false),	0L),
-						socket<2> (io->int_prop_r,				Retained (true),	0L),
-					}),
-				}),
-				envelope (Magic ({ 0xa3, 0x80 }), {
-					signature (NonceBytes (8), SignatureBytes (8), Key ({ 0x55, 0x37, 0x12, 0xf9 }), {
-						bitfield ({
-							bitfield_socket (io->bool_prop,					Retained (false),	kFallbackBool),
-							bitfield_socket (io->bool_prop_r,				Retained (true),	kFallbackBool),
-							bitfield_socket (io->uint_prop,		Bits (4),	Retained (true),	kFallbackInt),
-							bitfield_socket (io->uint_prop_r,	Bits (4),	Retained (true),	kFallbackInt),
+				envelope ({
+					.magic		= { 0xe4, 0x40 },
+					.packets	= {
+						signature ({
+							.nonce_bytes		= 9,
+							.signature_bytes	= 12,
+							.key				= { 0x88, 0x99, 0xaa, 0xbb },
+							.packets			= {
+								socket<8> (io->nil_si_prop),
+								socket<8> (io->angle_prop,				{ }),
+								socket<8> (io->angle_prop_r,			{ .retained = true }),
+								socket<2> (io->velocity_prop,			{ .retained = false }),
+								socket<2> (io->velocity_prop_r,			{ .retained = true }),
+								socket<2> (io->velocity_prop_offset,	{ .retained = false, .offset = 1000_kph }),
+								socket<2> (io->velocity_prop_offset_r,	{ .retained = true,  .offset = 1000_kph }),
+								socket<2> (io->int_prop,				{ .retained = false, .value_if_nil = 0L }),
+								socket<2> (io->int_prop_r,				{ .retained = true,  .value_if_nil = 0L }),
+							},
 						}),
-					}),
+						signature ({
+							.nonce_bytes		= 8,
+							.signature_bytes	= 12,
+							.key				= { 0x88, 0x99, 0xaa, 0xbb },
+							.packets			= {
+								socket<8> (io->nil_si_prop,				{ .retained = false }),
+								socket<8> (io->angle_prop,				{ .retained = false }),
+								socket<8> (io->angle_prop_r,			{ .retained = true }),
+								socket<2> (io->velocity_prop,			{ .retained = false }),
+								socket<2> (io->velocity_prop_r,			{ .retained = true }),
+								socket<2> (io->velocity_prop_offset,	{ .retained = false, .offset = 1000_kph }),
+								socket<2> (io->velocity_prop_offset_r,	{ .retained = true,	 .offset = 1000_kph }),
+								socket<2> (io->int_prop,				{ .retained = false, .value_if_nil = 0L }),
+								socket<2> (io->int_prop_r,				{ .retained = true,	 .value_if_nil = 0L }),
+							},
+						}),
+					},
 				}),
-				envelope (Magic ({ 0x01, 0x02 }), SendEvery (10), SendOffset (8), {
-					socket<4> (io->dummy, Retained (false), 0L),
+				envelope ({
+					.magic		= { 0xa3, 0x80 },
+					.packets	= {
+						signature ({
+							.nonce_bytes		= 8,
+							.signature_bytes	= 8,
+							.key				= { 0x55, 0x37, 0x12, 0xf9 },
+							.packets			= {
+								bitfield ({
+									bitfield_socket (io->bool_prop),
+									bitfield_socket (io->bool_prop,		{ .retained = false, .value_if_nil = kFallbackBool }),
+									bitfield_socket (io->bool_prop_r,	{ .retained = true,  .value_if_nil = kFallbackBool }),
+									bitfield_socket (io->uint_prop),
+									bitfield_socket (io->uint_prop,		{ .bits = 4,         .retained = true, .value_if_nil = kFallbackInt }),
+									bitfield_socket (io->uint_prop_r,	{ .bits = 4,         .retained = true, .value_if_nil = kFallbackInt }),
+								}),
+							},
+						}),
+					},
+				}),
+				envelope ({
+					.magic			= { 0x01, 0x02 },
+					.send_every		= 10,
+					.send_offset	= 8,
+					.packets		= {
+						socket<4> (io->dummy, { .retained = false, .value_if_nil = 0L }),
+					},
 				}),
 			})
 		{ }
@@ -130,9 +169,16 @@ class GCS_Rx_LinkProtocol: public LinkProtocol
 		explicit
 		GCS_Rx_LinkProtocol (IO* io):
 			LinkProtocol({
-				envelope (Magic ({ 0xe4, 0x40 }), {
-					signature (NonceBytes (8), SignatureBytes (12), Key ({ 0x87, 0x11, 0x65, 0xa4 }), {
-					}),
+				envelope ({
+					.magic		= { 0xe4, 0x40 },
+					.packets	= {
+						signature ({
+							.nonce_bytes		= 8,
+							.signature_bytes	= 12,
+							.key				= { 0x87, 0x11, 0x65, 0xa4 },
+							.packets			= { },
+						}),
+					},
 				}),
 			})
 		{ }
