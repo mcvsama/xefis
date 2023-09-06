@@ -105,6 +105,8 @@ class Transmitter: public Transport
 
 	/**
 	 * Return next encrypted packet.
+	 *
+	 * \throws std::logic_error if calculated HMAC size < configured hmac_size.
 	 */
 	[[nodiscard]]
 	Blob
@@ -123,6 +125,8 @@ class Receiver: public Transport
 
 	/**
 	 * Return next decrypted packet.
+	 *
+	 * \throws DecryptionFailure on various occasions.
 	 */
 	[[nodiscard]]
 	Blob
