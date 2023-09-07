@@ -71,10 +71,12 @@ class ProcessingLoop:
 		ModuleDetails (Module&);
 
 		Module&
-		module() noexcept;
+		module() noexcept
+			{ return *_module; }
 
 		Module const&
-		module() const noexcept;
+		module() const noexcept
+			{ return *_module; }
 
 	  private:
 		Module* _module;
@@ -121,7 +123,8 @@ class ProcessingLoop:
 	 */
 	[[nodiscard]]
 	si::Time
-	period();
+	period()
+		{ return _loop_period; }
 
 	/**
 	 * A sequence of modules loaded into this processing loop.
@@ -142,21 +145,24 @@ class ProcessingLoop:
 	 */
 	[[nodiscard]]
 	boost::circular_buffer<si::Time> const&
-	communication_times() const noexcept;
+	communication_times() const noexcept
+		{ return _communication_times; }
 
 	/**
 	 * Processing times buffer.
 	 */
 	[[nodiscard]]
 	boost::circular_buffer<si::Time> const&
-	processing_times() const noexcept;
+	processing_times() const noexcept
+		{ return _processing_times; }
 
 	/**
 	 * Processing latencies buffer.
 	 */
 	[[nodiscard]]
 	boost::circular_buffer<si::Time> const&
-	processing_latencies() const noexcept;
+	processing_latencies() const noexcept
+		{ return _processing_latencies; }
 
   protected:
 	/**
@@ -202,33 +208,12 @@ ProcessingLoop::ModuleDetails::ModuleDetails (Module& module):
 { }
 
 
-inline Module&
-ProcessingLoop::ModuleDetails::module() noexcept
-{
-	return *_module;
-}
-
-
-inline Module const&
-ProcessingLoop::ModuleDetails::module() const noexcept
-{
-	return *_module;
-}
-
-
 inline Cycle const*
 ProcessingLoop::current_cycle() const
 {
 	return _current_cycle
 		? &_current_cycle.value()
 		: nullptr;
-}
-
-
-inline si::Time
-ProcessingLoop::period()
-{
-	return _loop_period;
 }
 
 
@@ -243,27 +228,6 @@ inline auto
 ProcessingLoop::module_details_list() const noexcept -> Sequence<ModuleDetailsList::const_iterator>
 {
 	return { _module_details_list.cbegin(), _module_details_list.cend() };
-}
-
-
-inline boost::circular_buffer<si::Time> const&
-ProcessingLoop::communication_times() const noexcept
-{
-	return _communication_times;
-}
-
-
-inline boost::circular_buffer<si::Time> const&
-ProcessingLoop::processing_times() const noexcept
-{
-	return _processing_times;
-}
-
-
-inline boost::circular_buffer<si::Time> const&
-ProcessingLoop::processing_latencies() const noexcept
-{
-	return _processing_latencies;
 }
 
 } // namespace xf
