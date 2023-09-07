@@ -614,7 +614,7 @@ class LinkProtocol
 
 	static constexpr bool
 	fits_in_bits (uint_least64_t value, uint8_t bits)
-		{ return value < xf::static_pow (2U, bits); }
+		{ return value == 0 || value < xf::static_pow<uint_least64_t> (2U, bits); }
 
   private:
 	Link*										_link				{ nullptr };
