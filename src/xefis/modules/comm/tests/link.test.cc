@@ -137,11 +137,9 @@ class GCS_Tx_LinkProtocol: public LinkProtocol
 							.key				= { 0x55, 0x37, 0x12, 0xf9 },
 							.packets			= {
 								bitfield ({
-									bitfield_socket (io->bool_prop),
 									bitfield_socket (io->bool_prop,		{ .retained = false, .value_if_nil = kFallbackBool }),
 									bitfield_socket (io->bool_prop_r,	{ .retained = true,  .value_if_nil = kFallbackBool }),
-									bitfield_socket (io->uint_prop),
-									bitfield_socket (io->uint_prop,		{ .bits = 4,         .retained = true, .value_if_nil = kFallbackInt }),
+									bitfield_socket (io->uint_prop,		{ .bits = 4,         .retained = false, .value_if_nil = kFallbackInt }),
 									bitfield_socket (io->uint_prop_r,	{ .bits = 4,         .retained = true, .value_if_nil = kFallbackInt }),
 								}),
 							},
@@ -396,7 +394,7 @@ AutoTest t4 ("modules/io/link: protocol: invalid data transmission (wrong signat
 	test_asserts::verify ("bool_prop_r is retained", *rx.bool_prop_r == false);
 	test_asserts::verify ("int_prop is nil", !rx.int_prop);
 	test_asserts::verify ("int_prop_r is retained", *rx.int_prop_r == -5);
-	test_asserts::verify ("uint_prop is nil", !!rx.uint_prop);
+	test_asserts::verify ("uint_prop is nil", !rx.uint_prop);
 	test_asserts::verify ("uint_prop_r is retained", *rx.uint_prop_r == 15u);
 });
 
