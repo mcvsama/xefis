@@ -37,7 +37,7 @@ Blob const slave_signature_key_1	{ 0xee, 0x55, 0xda, 0xcc, 0x77, 0xff, 0x00, 0x0
 Blob const slave_signature_key_2	{ 0xcc, 0x55, 0xda, 0xcc, 0x77, 0xff, 0x00, 0x07 };
 
 
-AutoTest t1 ("Xefis Lossy Encryption: correct handshake", []{
+AutoTest t1 ("Xefis Lossy Encryption/Handshake: correct handshake", []{
 	using xf::crypto::xle::HandshakeMaster;
 	using xf::crypto::xle::HandshakeSlave;
 
@@ -54,7 +54,7 @@ AutoTest t1 ("Xefis Lossy Encryption: correct handshake", []{
 });
 
 
-AutoTest t2 ("Xefis Lossy Encryption: handshake with wrong signature", []{
+AutoTest t2 ("Xefis Lossy Encryption/Handshake: handshake with wrong signature", []{
 	using xf::crypto::xle::HandshakeMaster;
 	using xf::crypto::xle::HandshakeSlave;
 
@@ -104,7 +104,7 @@ AutoTest t2 ("Xefis Lossy Encryption: handshake with wrong signature", []{
 });
 
 
-AutoTest t3 ("Xefis Lossy Encryption: reusing handshake ID", []{
+AutoTest t3 ("Xefis Lossy Encryption/Handshake: reusing handshake ID", []{
 	using xf::crypto::xle::HandshakeID;
 	using xf::crypto::xle::HandshakeMaster;
 	using xf::crypto::xle::HandshakeSlave;
@@ -136,7 +136,7 @@ AutoTest t3 ("Xefis Lossy Encryption: reusing handshake ID", []{
 });
 
 
-AutoTest t4 ("Xefis Lossy Encryption: wrong timestamp on master side", []{
+AutoTest t4 ("Xefis Lossy Encryption/Handshake: wrong timestamp on master side", []{
 	using xf::crypto::xle::HandshakeMaster;
 	using xf::crypto::xle::HandshakeSlave;
 
@@ -162,7 +162,7 @@ AutoTest t4 ("Xefis Lossy Encryption: wrong timestamp on master side", []{
 });
 
 
-AutoTest t5 ("Xefis Lossy Encryption: wrong timestamp on slave side", []{
+AutoTest t5 ("Xefis Lossy Encryption/Handshake: wrong timestamp on slave side", []{
 	using xf::crypto::xle::HandshakeMaster;
 	using xf::crypto::xle::HandshakeSlave;
 

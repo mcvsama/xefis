@@ -27,7 +27,7 @@
 namespace xf::test {
 namespace {
 
-AutoTest t1 ("Xefis Lossy Encryption: encryption and decryption", []{
+AutoTest t1 ("Xefis Lossy Encryption/Transport: encryption and decryption", []{
 	Blob const key = value_to_blob ("abcdefghijklmnop");
 
 	boost::random::random_device rnd;
