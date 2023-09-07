@@ -85,7 +85,7 @@ class ProcessingLoop:
   public:
 	// Ctor
 	explicit
-	ProcessingLoop (Machine& machine, std::string_view const& instance, si::Frequency loop_frequency, Logger const&);
+	ProcessingLoop (std::string_view const& instance, si::Frequency loop_frequency, Logger const&);
 
 	// Dtor
 	virtual
@@ -94,20 +94,6 @@ class ProcessingLoop:
 	template<class Compatible>
 		void
 		register_module (Registrant<Compatible>&);
-
-	/**
-	 * Return the machine object to which this ProcessingLoop belongs.
-	 */
-	[[nodiscard]]
-	Machine&
-	machine() const noexcept;
-
-	/**
-	 * Return main Xefis object.
-	 */
-	[[nodiscard]]
-	Xefis&
-	xefis() const noexcept;
 
 	/**
 	 * Start looping.
@@ -185,8 +171,6 @@ class ProcessingLoop:
 
   private:
 	ProcessingLoopIO&					_io						{ *this };
-	Machine&							_machine;
-	Xefis&								_xefis;
 	QTimer*								_loop_timer;
 	si::Time							_loop_period;
 	std::optional<Timestamp>			_previous_timestamp;
@@ -229,20 +213,6 @@ inline Module const&
 ProcessingLoop::ModuleDetails::module() const noexcept
 {
 	return *_module;
-}
-
-
-inline Machine&
-ProcessingLoop::machine() const noexcept
-{
-	return _machine;
-}
-
-
-inline Xefis&
-ProcessingLoop::xefis() const noexcept
-{
-	return _xefis;
 }
 
 

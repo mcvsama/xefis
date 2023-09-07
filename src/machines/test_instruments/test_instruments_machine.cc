@@ -501,7 +501,7 @@ TestInstrumentsMachine::TestInstrumentsMachine (xf::Xefis& xefis):
 	test_screen_2->hsi_2->radio_range_warning								<< test_generator_hsi_radio_range_warning;
 	test_screen_2->hsi_2->radio_range_critical								<< test_generator_hsi_radio_range_critical;
 
-	auto& test_loop_registrant = _test_loop.emplace (*this, "Main loop", 120_Hz, _logger.with_scope ("short computations loop"));
+	auto& test_loop_registrant = _test_loop.emplace ("Main loop", 120_Hz, _logger.with_scope ("short computations loop"));
 	auto& test_loop = *test_loop_registrant;
 
 	register_screen (test_screen_1);

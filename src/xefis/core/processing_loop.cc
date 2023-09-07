@@ -34,10 +34,8 @@
 
 namespace xf {
 
-ProcessingLoop::ProcessingLoop (Machine& machine, std::string_view const& instance, si::Frequency loop_frequency, Logger const& logger):
+ProcessingLoop::ProcessingLoop (std::string_view const& instance, si::Frequency loop_frequency, Logger const& logger):
 	ProcessingLoopIO (instance),
-	_machine (machine),
-	_xefis (machine.xefis()),
 	_loop_period (1.0 / loop_frequency),
 	_logger (logger)
 {
