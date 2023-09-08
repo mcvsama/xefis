@@ -90,10 +90,6 @@ class Module:
 			_module (module)
 		{ }
 
-		// Dtor
-		virtual
-		~ModuleSocketAPI() = default;
-
 		/**
 		 * Set reference to the module object.
 		 */
@@ -105,7 +101,7 @@ class Module:
 		 * If uninitialized settings are found, UninitializedSettings is thrown.
 		 * Also call virtual Module::verify_settings().
 		 */
-		virtual void
+		void
 		verify_settings();
 
 		/**
