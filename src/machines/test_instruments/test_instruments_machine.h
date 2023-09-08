@@ -47,13 +47,13 @@ class TestInstrumentsMachine: public xf::Machine
 	~TestInstrumentsMachine();
 
   private:
-	xf::Logger											_logger;
-	std::unique_ptr<xf::NavaidStorage>					_navaid_storage;
-	std::unique_ptr<xf::WorkPerformer>					_work_performer;
-	std::optional<xf::Registrant<xf::ProcessingLoop>>	_test_loop;
-	std::optional<xf::Registrant<TestScreen1>>			_test_screen_1;
-	std::optional<xf::Registrant<TestScreen2>>			_test_screen_2;
-	std::optional<xf::Registrant<TestGenerator>>		_test_generator;
+	xf::Logger							_logger;
+	std::unique_ptr<xf::NavaidStorage>	_navaid_storage;
+	std::unique_ptr<xf::WorkPerformer>	_work_performer;
+	std::optional<xf::ProcessingLoop>	_test_loop;
+	std::optional<TestScreen1>			_test_screen_1;
+	std::optional<TestScreen2>			_test_screen_2;
+	std::optional<TestGenerator>		_test_generator;
 };
 
 #endif

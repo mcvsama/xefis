@@ -109,8 +109,8 @@ ConfigurableItemsList::read()
 
 	_tmp_processing_loop_ptrs.clear();
 
-	for (auto& processing_loop: _machine.processing_loops())
-		_tmp_processing_loop_ptrs.push_back (&processing_loop.value());
+	for (auto* processing_loop: _machine.processing_loops())
+		_tmp_processing_loop_ptrs.push_back (processing_loop);
 
 	populate_subtree (*_list->invisibleRootItem(), _tmp_processing_loop_ptrs, [](auto* item) -> ProcessingLoop* {
 		if (auto* pli = dynamic_cast<ProcessingLoopItem*> (item))
@@ -126,8 +126,8 @@ ConfigurableItemsList::read()
 	// Screens:
 	_tmp_screen_ptrs.clear();
 
-	for (auto& screen: _machine.screens())
-		_tmp_screen_ptrs.push_back (&screen.value());
+	for (auto* screen: _machine.screens())
+		_tmp_screen_ptrs.push_back (screen);
 
 	populate_subtree (*_list->invisibleRootItem(), _tmp_screen_ptrs, [](auto* item) -> Screen* {
 		if (auto* si = dynamic_cast<ScreenItem*> (item))

@@ -22,7 +22,6 @@
 // Neutrino:
 #include <neutrino/noncopyable.h>
 #include <neutrino/sequence.h>
-#include <neutrino/tracker.h>
 
 // Standard:
 #include <cstddef>
@@ -37,8 +36,8 @@ class ConfiguratorWidget;
 class Machine: private Noncopyable
 {
   private:
-	using ProcessingLoopsTracker	= Tracker<ProcessingLoop>;
-	using ScreensTracker			= Tracker<Screen>;
+	using ProcessingLoops	= std::list<ProcessingLoop*>;
+	using Screens			= std::list<Screen*>;
 
   public:
 	// Ctor
@@ -57,45 +56,50 @@ class Machine: private Noncopyable
 	 * Return main Xefis object.
 	 */
 	Xefis&
-	xefis() const noexcept;
+	xefis() const noexcept
+		{ return _xefis; }
 
 	/**
 	 * A sequence of registered processing loops.
 	 */
-	Sequence<ProcessingLoopsTracker::Iterator>
-	processing_loops() noexcept;
+	Sequence<ProcessingLoops::iterator>
+	processing_loops() noexcept
+		{ return { _processing_loops.begin(), _processing_loops.end() }; }
 
 	/**
 	 * A sequence of registered processing loops.
 	 */
-	Sequence<ProcessingLoopsTracker::ConstIterator>
-	processing_loops() const noexcept;
+	Sequence<ProcessingLoops::const_iterator>
+	processing_loops() const noexcept
+		{ return { _processing_loops.begin(), _processing_loops.end() }; }
 
 	/**
 	 * A sequence of registered screens.
 	 */
-	Sequence<ScreensTracker::Iterator>
-	screens() noexcept;
+	Sequence<Screens::iterator>
+	screens() noexcept
+		{ return { _screens.begin(), _screens.end() }; }
 
 	/**
 	 * A sequence of registered processing loops.
 	 */
-	Sequence<ScreensTracker::ConstIterator>
-	screens() const noexcept;
+	Sequence<Screens::const_iterator>
+	screens() const noexcept
+		{ return { _screens.begin(), _screens.end() }; }
 
 	/**
 	 * Register a processing loop.
 	 */
-	template<class CompatibleProcessingLoop>
-		void
-		register_processing_loop (Registrant<CompatibleProcessingLoop>&);
+	void
+	register_processing_loop (ProcessingLoop& processing_loop)
+		{ _processing_loops.push_back (&processing_loop); }
 
 	/**
 	 * Register a screen.
 	 */
-	template<class CompatibleScreen>
-		void
-		register_screen (Registrant<CompatibleScreen>&);
+	void
+	register_screen (Screen& screen)
+		{ _screens.push_back (&screen); }
 
 	/**
 	 * Show configurator widget.
@@ -105,65 +109,10 @@ class Machine: private Noncopyable
 
   private:
 	Xefis&								_xefis;
-	Tracker<ProcessingLoop>				_processing_loops;
-	Tracker<Screen>						_screens;
+	ProcessingLoops						_processing_loops;
+	Screens								_screens;
 	std::unique_ptr<ConfiguratorWidget>	_configurator_widget;
 };
-
-
-inline Xefis&
-Machine::xefis() const noexcept
-{
-	return _xefis;
-}
-
-
-inline auto
-Machine::processing_loops() noexcept -> Sequence<ProcessingLoopsTracker::Iterator>
-{
-	return { _processing_loops.begin(), _processing_loops.end() };
-}
-
-
-inline auto
-Machine::processing_loops() const noexcept -> Sequence<ProcessingLoopsTracker::ConstIterator>
-{
-	return { _processing_loops.cbegin(), _processing_loops.cend() };
-}
-
-
-inline auto
-Machine::screens() noexcept -> Sequence<ScreensTracker::Iterator>
-{
-	return { _screens.begin(), _screens.end() };
-}
-
-
-inline auto
-Machine::screens() const noexcept -> Sequence<ScreensTracker::ConstIterator>
-{
-	return { _screens.cbegin(), _screens.cend() };
-}
-
-
-template<class CompatibleProcessingLoop>
-	inline void
-	Machine::register_processing_loop (Registrant<CompatibleProcessingLoop>& processing_loop)
-	{
-		// Don't give access to public to Registry interface, so that user doesn't
-		// register instrument with some weird Details value.
-		_processing_loops.register_object (processing_loop);
-	}
-
-
-template<class CompatibleScreen>
-	inline void
-	Machine::register_screen (Registrant<CompatibleScreen>& screen)
-	{
-		// Don't give access to public to Registry interface, so that user doesn't
-		// register instrument with some weird Details value.
-		_screens.register_object (screen);
-	}
 
 } // namespace xf
 
