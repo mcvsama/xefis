@@ -23,13 +23,13 @@
 #include <neutrino/noncopyable.h>
 #include <neutrino/sequence.h>
 #include <neutrino/time.h>
-#include <neutrino/tracker.h>
 
 // Qt:
 #include <QTimer>
 
 // Standard:
 #include <cstddef>
+#include <set>
 
 
 namespace xf {
@@ -59,43 +59,35 @@ class ProcessingLoop:
 {
 	Q_OBJECT
 
+  private:
 	static constexpr std::size_t	kMaxProcessingTimesBackLog	= 1000;
 	static constexpr float			kLatencyFactorLogThreshold	= 2.0f;
 
-  public:
-	class ModuleDetails
-	{
-	  public:
-		// Ctor
-		explicit
-		ModuleDetails (Module&);
-
-		Module&
-		module() noexcept
-			{ return *_module; }
-
-		Module const&
-		module() const noexcept
-			{ return *_module; }
-
-	  private:
-		Module* _module;
-	};
-
-	using ModuleDetailsList = std::vector<ModuleDetails>;
+    using Modules = std::set<Module*>;
 
   public:
 	// Ctor
 	explicit
 	ProcessingLoop (std::string_view const& instance, si::Frequency loop_frequency, Logger const&);
 
-	// Dtor
-	virtual
-	~ProcessingLoop();
+	explicit
+	ProcessingLoop (ProcessingLoop const&) = delete;
 
-	template<class Compatible>
-		void
-		register_module (Registrant<Compatible>&);
+	explicit
+	ProcessingLoop (ProcessingLoop&&) = delete;
+
+	ProcessingLoop&
+	operator= (ProcessingLoop const&) = delete;
+
+	ProcessingLoop&
+	operator= (ProcessingLoop&&) = delete;
+
+	/**
+	 * Register a module in the processing loop. The module must be destroyed
+	 * before loop is destroyed.
+	 */
+    void
+    register_module (Module&);
 
 	/**
 	 * Start looping.
@@ -130,15 +122,17 @@ class ProcessingLoop:
 	 * A sequence of modules loaded into this processing loop.
 	 */
 	[[nodiscard]]
-	Sequence<ModuleDetailsList::iterator>
-	module_details_list() noexcept;
+    Sequence<Modules::iterator>
+	modules() noexcept
+        { return { _modules.begin(), _modules.end() }; }
 
 	/**
 	 * A sequence of modules loaded into this processing loop.
 	 */
 	[[nodiscard]]
-	Sequence<ModuleDetailsList::const_iterator>
-	module_details_list() const noexcept;
+    Sequence<Modules::const_iterator>
+	modules() const noexcept
+        { return { _modules.begin(), _modules.end() }; }
 
 	/**
 	 * Processing times buffer.
@@ -166,10 +160,11 @@ class ProcessingLoop:
 
   protected:
 	/**
-	 * Execute single loop cycle.
+	 * Execute single loop cycle assuming that the current time is
+	 * given by "now".
 	 */
 	virtual void
-	execute_cycle();
+	execute_cycle (si::Time now);
 
 	// LoggerTagProvider API
 	std::optional<std::string>
@@ -182,8 +177,7 @@ class ProcessingLoop:
 	std::optional<Timestamp>			_previous_timestamp;
 	std::vector<Module*>				_uninitialized_modules;
 	std::optional<Cycle>				_current_cycle;
-	Tracker<Module>						_modules_tracker;
-	ModuleDetailsList					_module_details_list;
+	Modules                             _modules;
 	boost::circular_buffer<si::Time>	_communication_times	{ kMaxProcessingTimesBackLog };
 	boost::circular_buffer<si::Time>	_processing_times		{ kMaxProcessingTimesBackLog };
 	boost::circular_buffer<si::Time>	_processing_latencies	{ kMaxProcessingTimesBackLog };
@@ -192,20 +186,12 @@ class ProcessingLoop:
 };
 
 
-template<class Compatible>
-	inline void
-	ProcessingLoop::register_module (Registrant<Compatible>& registrant)
-	{
-		_modules_tracker.register_object (registrant);
-		_module_details_list.emplace_back (*registrant);
-		_uninitialized_modules.push_back (&*registrant);
-	}
-
-
-inline
-ProcessingLoop::ModuleDetails::ModuleDetails (Module& module):
-	_module (&module)
-{ }
+inline void
+ProcessingLoop::register_module (Module& module)
+{
+    _modules.insert (&module);
+    _uninitialized_modules.push_back (&module);
+}
 
 
 inline Cycle const*
@@ -214,20 +200,6 @@ ProcessingLoop::current_cycle() const
 	return _current_cycle
 		? &_current_cycle.value()
 		: nullptr;
-}
-
-
-inline auto
-ProcessingLoop::module_details_list() noexcept -> Sequence<ModuleDetailsList::iterator>
-{
-	return { _module_details_list.begin(), _module_details_list.end() };
-}
-
-
-inline auto
-ProcessingLoop::module_details_list() const noexcept -> Sequence<ModuleDetailsList::const_iterator>
-{
-	return { _module_details_list.cbegin(), _module_details_list.cend() };
 }
 
 } // namespace xf

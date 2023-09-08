@@ -43,24 +43,11 @@ ProcessingLoop::ProcessingLoop (std::string_view const& instance, si::Frequency 
 	_loop_timer->setSingleShot (false);
 	_loop_timer->setTimerType (Qt::PreciseTimer);
 	_loop_timer->setInterval (_loop_period.in<si::Millisecond>());
-	QObject::connect (_loop_timer, &QTimer::timeout, this, &ProcessingLoop::execute_cycle);
+	QObject::connect (_loop_timer, &QTimer::timeout, this, [this] {
+		execute_cycle (TimeHelper::now());
+	});
 
 	_logger.set_logger_tag_provider (*this);
-}
-
-
-ProcessingLoop::~ProcessingLoop()
-{
-	// The only allowed registered module during destruction is this ProcessingLoop itself:
-	if (_modules_tracker.size() > 1 || (_modules_tracker.size() == 1 && &_modules_tracker.begin()->value() != this))
-	{
-		_logger << "Destroying ProcessingLoop. Registered modules:\n";
-
-		for (auto const& disclosure: _modules_tracker)
-			_logger << "  module " << identifier (disclosure.value()) << "\n";
-
-		Exception::terminate ("ProcessingLoop destroyed while still having registered modules");
-	}
 }
 
 
@@ -86,34 +73,31 @@ ProcessingLoop::stop()
 
 
 void
-ProcessingLoop::execute_cycle()
+ProcessingLoop::execute_cycle (si::Time const now)
 {
-	si::Time t = TimeHelper::now();
-
 	if (_previous_timestamp)
 	{
-		si::Time dt = t - *_previous_timestamp;
+		si::Time dt = now - *_previous_timestamp;
 		si::Time latency = dt - _loop_period;
 
-		_current_cycle = Cycle (_next_cycle_number++, t, dt, _loop_period, _logger);
+		_current_cycle = Cycle (_next_cycle_number++, now, dt, _loop_period, _logger);
 		_processing_latencies.push_back (latency);
 		_io.latency = latency;
 		_io.actual_frequency = 1.0 / dt;
 
-		for (auto& module_details: _module_details_list)
-			Module::ProcessingLoopAPI (module_details.module()).reset_cache();
+		for (auto* module: _modules)
+			Module::ProcessingLoopAPI (*module).reset_cache();
 
 		_communication_times.push_back (TimeHelper::measure ([this] {
-			for (auto& module_details: _module_details_list)
-				Module::ProcessingLoopAPI (module_details.module()).communicate (*_current_cycle);
+			for (auto* module: _modules)
+				Module::ProcessingLoopAPI (*module).communicate (*_current_cycle);
 		}));
 
 		_processing_times.push_back (TimeHelper::measure ([this] {
-			for (auto& module_details: _module_details_list)
+			for (auto* module: _modules)
 			{
-				auto& module = module_details.module();
-				Module::AccountingAPI (module).set_cycle_time (period());
-				Module::ProcessingLoopAPI (module).fetch_and_process (*_current_cycle);
+				Module::AccountingAPI (*module).set_cycle_time (period());
+				Module::ProcessingLoopAPI (*module).fetch_and_process (*_current_cycle);
 			}
 		}));
 
@@ -121,7 +105,7 @@ ProcessingLoop::execute_cycle()
 			_logger << boost::format ("Latency! %.0f%% delay.\n") % (latency / _loop_period * 100.0);
 	}
 
-	_previous_timestamp = t;
+	_previous_timestamp = now;
 	_current_cycle.reset();
 }
 

@@ -148,13 +148,11 @@ ConfigurableItemsList::read()
 			_tmp_module_ptrs.clear();
 			ProcessingLoop& processing_loop = pli->processing_loop();
 
-			for (auto& module_details: processing_loop.module_details_list())
+			for (auto* module: processing_loop.modules())
 			{
-				auto& module = module_details.module();
-
 				// Don't add Instruments. They will be children of Screen items.
-				if (!dynamic_cast<Instrument*> (&module))
-					_tmp_module_ptrs.push_back (&module);
+				if (!dynamic_cast<Instrument*> (module))
+					_tmp_module_ptrs.push_back (module);
 			}
 
 			populate_subtree (*pli, _tmp_module_ptrs, [](auto* item) -> Module* {
