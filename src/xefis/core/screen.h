@@ -25,7 +25,7 @@
 // Neutrino:
 #include <neutrino/logger.h>
 #include <neutrino/noncopyable.h>
-#include <neutrino/tracker.h>
+#include <neutrino/sequence.h>
 #include <neutrino/work_performer.h>
 
 // Qt:
@@ -37,12 +37,15 @@
 #include <atomic>
 #include <cstddef>
 #include <optional>
+#include <set>
 #include <unordered_map>
 #include <vector>
 
 
 namespace xf {
-namespace detail {
+
+class Machine;
+
 
 /**
  * Metrics of asynchronous (on-work-performer) painting.
@@ -88,11 +91,6 @@ class InstrumentDetails
 	compute_position (QSize const canvas_size);
 };
 
-} // namespace detail
-
-
-class Machine;
-
 
 /**
  * Stores per-WorkPerformer performance metrics.
@@ -121,7 +119,8 @@ class Screen:
 	Q_OBJECT
 
   private:
-	using InstrumentTracker = Tracker<Instrument, detail::InstrumentDetails>;
+	using InstrumentsSet = std::set<Instrument*>;
+	using InstrumentDetailsMap = std::unordered_map<Instrument*, InstrumentDetails>; // TODO std::flat_map
 
   public:
 	// Ctor
@@ -134,9 +133,14 @@ class Screen:
 	/**
 	 * Register instrument
 	 */
-	template<class Instrument>
-		void
-		register_instrument (Registrant<Instrument>&, WorkPerformer&);
+	void
+	register_instrument (Instrument&, WorkPerformer&);
+
+	/**
+	 * Deregister instrument
+	 */
+	void
+	deregister_instrument (Instrument&);
 
 	/**
 	 * Set position and size of an instrument.
@@ -171,24 +175,30 @@ class Screen:
 	wait();
 
 	/**
-	 * Return the instrument tracker object.
+	 * Return the sequence of registered instruments.
 	 */
-	InstrumentTracker&
-	instrument_tracker() noexcept
-		{ return _instrument_tracker; }
+	Sequence<InstrumentsSet::iterator>
+	instruments() noexcept
+		{ return { _instruments_set.begin(), _instruments_set.end() }; }
 
 	/**
-	 * Return the instrument tracker object.
+	 * Return the sequence of registered instruments.
 	 */
-	InstrumentTracker const&
-	instrument_tracker() const noexcept
-		{ return _instrument_tracker; }
+	Sequence<InstrumentsSet::const_iterator>
+	instruments() const noexcept
+		{ return { _instruments_set.begin(), _instruments_set.end() }; }
+
+	/**
+	 * Return WorkPerformer for given instrument.
+	 */
+	WorkPerformer*
+	work_performer_for (Instrument const&) const;
 
 	/**
 	 * Return WorkPerformerMetrics object for given WorkPerformer object or nullptr.
 	 */
 	WorkPerformerMetrics const*
-	work_performer_metrics_for (WorkPerformer const*);
+	work_performer_metrics_for (WorkPerformer const&) const;
 
   protected:
 	// QWidget API:
@@ -232,7 +242,7 @@ class Screen:
 	 * Wait for async paint to be done in an active loop.
 	 */
 	void
-	wait_for_async_paint (InstrumentTracker::Disclosure&);
+	wait_for_async_paint (InstrumentDetails&);
 
 	/**
 	 * Prepare canvas for an instrument.
@@ -248,13 +258,13 @@ class Screen:
 	allocate_image (QSize) const;
 
 	void
-	instrument_registered (InstrumentTracker::Disclosure&);
-
-	void
-	instrument_deregistered (InstrumentTracker::Disclosure&);
-
-	void
 	sort_by_z_index();
+
+	InstrumentDetails*
+	find_details (Instrument const&);
+
+	InstrumentDetails const*
+	find_details (Instrument const&) const;
 
   private slots:
 	/**
@@ -275,13 +285,14 @@ class Screen:
   private:
 	Machine&					_machine;
 	Logger						_logger;
-	InstrumentTracker			_instrument_tracker;
 	QTimer*						_hide_logo_timer;
 	QTimer*						_refresh_timer;
 	QImage						_canvas;
 	std::optional<QImage>		_logo_image;
-	std::vector<InstrumentTracker::Disclosure*>
-								_z_index_sorted_disclosures;
+	InstrumentsSet				_instruments_set;
+	InstrumentDetailsMap		_instrument_details_map;
+	std::vector<InstrumentDetails*>
+								_z_index_order;
 	ScreenSpec					_screen_spec;
 	si::Time const				_frame_time;
 	bool						_displaying_logo		{ true };
@@ -289,14 +300,6 @@ class Screen:
 	std::unordered_map<WorkPerformer const*, WorkPerformerMetrics>
 								_work_performer_metrics	{ 10 };
 };
-
-
-template<class Instrument>
-	inline void
-	Screen::register_instrument (Registrant<Instrument>& instrument, WorkPerformer& work_performer)
-	{
-		_instrument_tracker.register_object (instrument, detail::InstrumentDetails (*instrument, work_performer));
-	}
 
 } // namespace xf
 

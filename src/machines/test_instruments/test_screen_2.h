@@ -52,8 +52,8 @@ class TestScreen2: public xf::Screen
 	xf::WorkPerformer			_hsi_work_performer;
 
   public:
-	xf::Registrant<HSI>			hsi_1;
-	xf::Registrant<HSI>			hsi_2;
+	HSI							hsi_1;
+	HSI							hsi_2;
 };
 
 #endif

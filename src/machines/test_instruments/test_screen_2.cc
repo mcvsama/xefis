@@ -34,16 +34,16 @@ TestScreen2::TestScreen2 (xf::ScreenSpec const& spec, xf::Graphics const& graphi
 	register_instrument (this->hsi_1, _hsi_work_performer);
 	register_instrument (this->hsi_2, _hsi_work_performer);
 
-	this->hsi_1->arpt_runways_range_threshold	= 2_nmi;
-	this->hsi_1->arpt_map_range_threshold		= 1_nmi;
-	this->hsi_1->arpt_runway_extension_length	= 10_nmi;
+	this->hsi_1.arpt_runways_range_threshold	= 2_nmi;
+	this->hsi_1.arpt_map_range_threshold		= 1_nmi;
+	this->hsi_1.arpt_runway_extension_length	= 10_nmi;
 
-	this->hsi_2->arpt_runways_range_threshold	= 20_nmi;
-	this->hsi_2->arpt_map_range_threshold		= 1_nmi;
-	this->hsi_2->arpt_runway_extension_length	= 10_nmi;
+	this->hsi_2.arpt_runways_range_threshold	= 20_nmi;
+	this->hsi_2.arpt_map_range_threshold		= 1_nmi;
+	this->hsi_2.arpt_runway_extension_length	= 10_nmi;
 
-	set (*this->hsi_1, { 0.0f, 0.0f, 0.5f, 1.0f });
-	set (*this->hsi_2, { 0.5f, 0.0f, 0.5f, 1.0f });
+	set (this->hsi_1, { 0.0f, 0.0f, 0.5f, 1.0f });
+	set (this->hsi_2, { 0.5f, 0.0f, 0.5f, 1.0f });
 
 	set_paint_bounding_boxes (false);
 }

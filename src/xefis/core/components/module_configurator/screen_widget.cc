@@ -69,7 +69,7 @@ ScreenWidget::refresh()
 
 	for (auto const& widgets_pair: _work_performer_widgets)
 	{
-		if (auto metrics = _screen.work_performer_metrics_for (widgets_pair.first))
+		if (auto metrics = _screen.work_performer_metrics_for (*widgets_pair.first))
 		{
 			auto const& widgets = widgets_pair.second;
 
@@ -100,21 +100,24 @@ ScreenWidget::create_performance_tab()
 	auto* widget = new QWidget (this);
 
 	// Prepare list of Widgets objects for each WorkPerformer:
-	for (auto& instrument_disclosure: _screen.instrument_tracker())
+	for (auto* const instrument: _screen.instruments())
 	{
-		auto const* work_performer = instrument_disclosure.details().work_performer;
-		auto const module_name = identifier (instrument_disclosure.value());
+		auto const* work_performer = _screen.work_performer_for (*instrument);
+		auto const module_name = identifier (*instrument);
 
-		if (auto widgets_pair = _work_performer_widgets.find (work_performer);
-			widgets_pair != _work_performer_widgets.end())
+		if (work_performer)
 		{
-			widgets_pair->second.module_names += " • " + module_name;
-		}
-		else
-		{
-			auto& widgets = _work_performer_widgets[work_performer];
-			widgets.work_performer = work_performer;
-			widgets.module_names = module_name;
+			if (auto widgets_pair = _work_performer_widgets.find (work_performer);
+				widgets_pair != _work_performer_widgets.end())
+			{
+				widgets_pair->second.module_names += " • " + module_name;
+			}
+			else
+			{
+				auto& widgets = _work_performer_widgets[work_performer];
+				widgets.work_performer = work_performer;
+				widgets.module_names = module_name;
+			}
 		}
 	}
 

@@ -36,7 +36,10 @@
 
 
 namespace xf {
-namespace detail {
+
+static constexpr char		kLogoPath[]			= "share/images/xefis.svg";
+static constexpr si::Time	kLogoDisplayTime	= 2_s;
+
 
 InstrumentDetails::InstrumentDetails (Instrument& instrument, WorkPerformer& work_performer):
 	instrument (instrument),
@@ -58,20 +61,12 @@ InstrumentDetails::compute_position (QSize const canvas_size)
 	this->instrument.mark_dirty();
 }
 
-} // namespace detail
-
-
-static constexpr char		kLogoPath[]			= "share/images/xefis.svg";
-static constexpr si::Time	kLogoDisplayTime	= 2_s;
-
 
 Screen::Screen (ScreenSpec const& spec, Graphics const& graphics, Machine& machine, std::string_view const& instance, Logger const& logger):
 	QWidget (nullptr),
 	NamedInstance (instance),
 	_machine (machine),
 	_logger (logger.with_scope ("<screen>")),
-	_instrument_tracker ([&](InstrumentTracker::Disclosure& disclosure) { instrument_registered (disclosure); },
-						 [&](InstrumentTracker::Disclosure& disclosure) { instrument_deregistered (disclosure); }),
 	_screen_spec (spec),
 	_frame_time (1 / spec.refresh_rate())
 {
@@ -113,17 +108,42 @@ Screen::~Screen()
 
 
 void
+Screen::register_instrument (Instrument& instrument, WorkPerformer& work_performer)
+{
+	_instruments_set.insert (&instrument);
+	auto const [inserted_at, inserted] = _instrument_details_map.emplace (std::make_pair (&instrument, InstrumentDetails (instrument, work_performer)));
+
+	if (inserted)
+	{
+		_z_index_order.push_back (&inserted_at->second);
+		sort_by_z_index();
+	}
+}
+
+
+void
+Screen::deregister_instrument (Instrument& instrument)
+{
+	if (auto* details = find_details (instrument))
+	{
+		wait_for_async_paint (*details);
+		_instrument_details_map.erase (&instrument);
+		auto new_end = std::remove (_z_index_order.begin(), _z_index_order.end(), details);
+		_z_index_order.resize (neutrino::to_unsigned (new_end - _z_index_order.begin()));
+	}
+
+	_instruments_set.erase (&instrument);
+}
+
+
+void
 Screen::set (Instrument const& instrument, QRectF const requested_position, QPointF const anchor_position)
 {
-	for (auto& disclosure: _instrument_tracker)
+	if (auto* details = find_details (instrument))
 	{
-		if (&disclosure.value() == &instrument)
-		{
-			disclosure.details().requested_position = requested_position;
-			disclosure.details().anchor_position = anchor_position;
-			disclosure.details().computed_position.reset();
-			break;
-		}
+		details->requested_position = requested_position;
+		details->anchor_position = anchor_position;
+		details->computed_position.reset();
 	}
 }
 
@@ -138,12 +158,9 @@ Screen::set_centered (Instrument const& instrument, QRectF const requested_posit
 void
 Screen::set_z_index (Instrument const& instrument, int const new_z_index)
 {
-	auto found = std::find_if (_z_index_sorted_disclosures.begin(), _z_index_sorted_disclosures.end(),
-							   [&instrument](auto const* disclosure) { return &disclosure->value() == &instrument; });
-
-	if (found != _z_index_sorted_disclosures.end())
+	if (auto* details = find_details (instrument))
 	{
-		(*found)->details().z_index = new_z_index;
+		details->z_index = new_z_index;
 		sort_by_z_index();
 	}
 }
@@ -160,15 +177,25 @@ void
 Screen::wait()
 {
 	// Make sure all async painting is finished:
-	for (auto& disclosure: _instrument_tracker)
-		wait_for_async_paint (disclosure);
+	for (auto& [instrument, details]: _instrument_details_map)
+		wait_for_async_paint (details);
+}
+
+
+WorkPerformer*
+Screen::work_performer_for (Instrument const& instrument) const
+{
+	if (auto* details = find_details (instrument))
+		return details->work_performer;
+	else
+		return nullptr;
 }
 
 
 WorkPerformerMetrics const*
-Screen::work_performer_metrics_for (WorkPerformer const* work_performer)
+Screen::work_performer_metrics_for (WorkPerformer const& work_performer) const
 {
-	if (auto metrics = _work_performer_metrics.find (work_performer);
+	if (auto metrics = _work_performer_metrics.find (&work_performer);
 		metrics != _work_performer_metrics.end())
 	{
 		return &metrics->second;
@@ -210,8 +237,8 @@ Screen::update_canvas (QSize size)
 		_canvas = allocate_image (size);
 		_canvas.fill (Qt::black);
 
-		for (auto& disclosure: _instrument_tracker)
-			disclosure.details().computed_position.reset();
+		for (auto& [instrument, details]: _instrument_details_map)
+			details.computed_position.reset();
 	}
 }
 
@@ -240,20 +267,19 @@ Screen::update_instruments()
 	QSize const canvas_size = _canvas.size();
 
 	// Ask instruments to paint themselves:
-	for (auto* disclosure: _z_index_sorted_disclosures)
+	for (auto* const details: _z_index_order)
 	{
-		auto& instrument = disclosure->value();
-		auto& details = disclosure->details();
+		auto& instrument = details->instrument;
 
-		if (!details.computed_position)
-			details.compute_position (canvas_size);
+		if (!details->computed_position)
+			details->compute_position (canvas_size);
 
-		if (details.computed_position->isValid())
+		if (details->computed_position->isValid())
 		{
-			if (details.result.valid() && is_ready (details.result))
+			if (details->result.valid() && is_ready (details->result))
 			{
 				Exception::catch_and_log (_logger, [&] {
-					auto const perf_metrics = details.result.get();
+					auto const perf_metrics = details->result.get();
 					// Update per-instrument metrics:
 					{
 						auto accounting_api = Instrument::AccountingAPI (instrument);
@@ -261,22 +287,22 @@ Screen::update_instruments()
 						accounting_api.add_painting_time (perf_metrics.painting_time);
 					}
 					// Update per-WorkPerformer metrics:
-					_work_performer_metrics[details.work_performer].start_latencies.push_back (perf_metrics.start_latency);
-					_work_performer_metrics[details.work_performer].total_latencies.push_back (perf_metrics.start_latency + perf_metrics.painting_time);
+					_work_performer_metrics[details->work_performer].start_latencies.push_back (perf_metrics.start_latency);
+					_work_performer_metrics[details->work_performer].total_latencies.push_back (perf_metrics.start_latency + perf_metrics.painting_time);
 				});
 
-				std::swap (details.canvas, details.canvas_to_use);
+				std::swap (details->canvas, details->canvas_to_use);
 			}
 
 			// Start new painting job:
-			if (!details.result.valid() && instrument.dirty_since_last_check())
+			if (!details->result.valid() && instrument.dirty_since_last_check())
 			{
-				prepare_canvas_for_instrument (details.canvas, details.computed_position->size());
+				prepare_canvas_for_instrument (details->canvas, details->computed_position->size());
 
-				PaintRequest::Metric metric (details.computed_position->size(), _screen_spec.pixel_density(), _screen_spec.base_pen_width(), _screen_spec.base_font_height());
-				PaintRequest paint_request (*details.canvas, metric, details.previous_size);
+				PaintRequest::Metric metric (details->computed_position->size(), _screen_spec.pixel_density(), _screen_spec.base_pen_width(), _screen_spec.base_font_height());
+				PaintRequest paint_request (*details->canvas, metric, details->previous_size);
 
-				details.previous_size = details.computed_position->size();
+				details->previous_size = details->computed_position->size();
 
 				auto task = instrument.paint (std::move (paint_request));
 				auto request_time = TimeHelper::now();
@@ -284,13 +310,13 @@ Screen::update_instruments()
 					auto const start_time = TimeHelper::now();
 					auto const painting_time = TimeHelper::measure (t);
 
-					return detail::PaintPerformanceMetrics {
+					return PaintPerformanceMetrics {
 						start_time - request_time,
 						painting_time,
 					};
 				};
 
-				details.result = details.work_performer->submit (std::move (measured_task));
+				details->result = details->work_performer->submit (std::move (measured_task));
 			}
 		}
 		else
@@ -305,23 +331,21 @@ Screen::compose_instruments()
 	_canvas.fill (Qt::black);
 	QPainter canvas_painter (&_canvas);
 
-	for (auto* disclosure: _z_index_sorted_disclosures)
+	for (auto* const details: _z_index_order)
 	{
-		auto& details = disclosure->details();
-
-		if (details.computed_position && details.computed_position->isValid())
+		if (details->computed_position && details->computed_position->isValid())
 		{
-			if (auto* painted_image = details.canvas_to_use.get())
+			if (auto* painted_image = details->canvas_to_use.get())
 			{
 				// Discard images that have different size than requested computed_position->size(), beacuse
 				// it means a resize happened during async painting of the instrument.
-				if (details.computed_position->size() == painted_image->size())
-					canvas_painter.drawImage (*details.computed_position, *painted_image, QRect (QPoint (0, 0), details.computed_position->size()));
+				if (details->computed_position->size() == painted_image->size())
+					canvas_painter.drawImage (*details->computed_position, *painted_image, QRect (QPoint (0, 0), details->computed_position->size()));
 
 				if (_paint_bounding_boxes)
 				{
 					canvas_painter.setPen (QPen (QBrush (Qt::red), 2.0));
-					canvas_painter.drawRect (*details.computed_position);
+					canvas_painter.drawRect (*details->computed_position);
 				}
 			}
 		}
@@ -330,9 +354,9 @@ Screen::compose_instruments()
 
 
 void
-Screen::wait_for_async_paint (InstrumentTracker::Disclosure& disclosure)
+Screen::wait_for_async_paint (InstrumentDetails& details)
 {
-	auto const& result = disclosure.details().result;
+	auto const& result = details.result;
 
 	while (result.valid() && !is_ready (result))
 		result.wait();
@@ -366,27 +390,30 @@ Screen::allocate_image (QSize size) const
 
 
 void
-Screen::instrument_registered (InstrumentTracker::Disclosure& disclosure)
-{
-	_z_index_sorted_disclosures.push_back (&disclosure);
-	sort_by_z_index();
-}
-
-
-void
-Screen::instrument_deregistered (InstrumentTracker::Disclosure& disclosure)
-{
-	wait_for_async_paint (disclosure);
-	auto new_end = std::remove (_z_index_sorted_disclosures.begin(), _z_index_sorted_disclosures.end(), &disclosure);
-	_z_index_sorted_disclosures.resize (neutrino::to_unsigned (new_end - _z_index_sorted_disclosures.begin()));
-}
-
-
-void
 Screen::sort_by_z_index()
 {
-	std::stable_sort (_z_index_sorted_disclosures.begin(), _z_index_sorted_disclosures.end(),
-					  [](auto const* a, auto const* b) { return a->details().z_index < b->details().z_index; });
+	std::stable_sort (_z_index_order.begin(), _z_index_order.end(),
+					  [](auto const* a, auto const* b) { return a->z_index < b->z_index; });
+}
+
+
+InstrumentDetails*
+Screen::find_details (Instrument const& instrument)
+{
+	if (auto const& pair = _instrument_details_map.find (&const_cast<Instrument&> (instrument));
+		pair != _instrument_details_map.end())
+	{
+		return &pair->second;
+	}
+	else
+		return nullptr;
+}
+
+
+InstrumentDetails const*
+Screen::find_details (Instrument const& instrument) const
+{
+	return const_cast<Screen*> (this)->find_details (instrument);
 }
 
 

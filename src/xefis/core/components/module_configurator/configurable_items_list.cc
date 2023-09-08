@@ -173,8 +173,8 @@ ConfigurableItemsList::read()
 			_tmp_module_ptrs.clear();
 			Screen& screen = si->screen();
 
-			for (auto& disclosure: screen.instrument_tracker())
-				_tmp_module_ptrs.push_back (&*disclosure.registrant());
+			for (auto* instrument: screen.instruments())
+				_tmp_module_ptrs.push_back (instrument);
 
 			populate_subtree (*si, _tmp_module_ptrs, [](auto* item) -> Module* {
 				if (auto* mi = dynamic_cast<ModuleItem*> (item))
