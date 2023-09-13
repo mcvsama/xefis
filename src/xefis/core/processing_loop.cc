@@ -75,35 +75,35 @@ ProcessingLoop::stop()
 void
 ProcessingLoop::execute_cycle (si::Time const now)
 {
-	if (_previous_timestamp)
-	{
-		si::Time dt = now - *_previous_timestamp;
-		si::Time latency = dt - _loop_period;
+	if (!_previous_timestamp)
+		_previous_timestamp = now - _loop_period;
 
-		_current_cycle = Cycle (_next_cycle_number++, now, dt, _loop_period, _logger);
-		_processing_latencies.push_back (latency);
-		_io.latency = latency;
-		_io.actual_frequency = 1.0 / dt;
+	si::Time dt = now - *_previous_timestamp;
+	si::Time latency = dt - _loop_period;
 
+	_current_cycle = Cycle (_next_cycle_number++, now, dt, _loop_period, _logger);
+	_processing_latencies.push_back (latency);
+	_io.latency = latency;
+	_io.actual_frequency = 1.0 / dt;
+
+	for (auto* module: _modules)
+		Module::ProcessingLoopAPI (*module).reset_cache();
+
+	_communication_times.push_back (TimeHelper::measure ([this] {
 		for (auto* module: _modules)
-			Module::ProcessingLoopAPI (*module).reset_cache();
+			Module::ProcessingLoopAPI (*module).communicate (*_current_cycle);
+	}));
 
-		_communication_times.push_back (TimeHelper::measure ([this] {
-			for (auto* module: _modules)
-				Module::ProcessingLoopAPI (*module).communicate (*_current_cycle);
-		}));
+	_processing_times.push_back (TimeHelper::measure ([this] {
+		for (auto* module: _modules)
+		{
+			Module::AccountingAPI (*module).set_cycle_time (period());
+			Module::ProcessingLoopAPI (*module).fetch_and_process (*_current_cycle);
+		}
+	}));
 
-		_processing_times.push_back (TimeHelper::measure ([this] {
-			for (auto* module: _modules)
-			{
-				Module::AccountingAPI (*module).set_cycle_time (period());
-				Module::ProcessingLoopAPI (*module).fetch_and_process (*_current_cycle);
-			}
-		}));
-
-		if (latency > kLatencyFactorLogThreshold * _loop_period)
-			_logger << boost::format ("Latency! %.0f%% delay.\n") % (latency / _loop_period * 100.0);
-	}
+	if (latency > kLatencyFactorLogThreshold * _loop_period)
+		_logger << boost::format ("Latency! %.0f%% delay.\n") % (latency / _loop_period * 100.0);
 
 	_previous_timestamp = now;
 	_current_cycle.reset();
