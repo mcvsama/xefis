@@ -48,7 +48,7 @@ class HistogramStatsWidget: public xf::Widget
 	 */
 	template<class HistogramValue, class CriticalValue = HistogramValue>
 		void
-		set_data (Histogram<HistogramValue> const&, std::optional<CriticalValue> critical_value = {});
+		set_data (Histogram<HistogramValue> const&, std::optional<CriticalValue> critical_value = std::nullopt);
 
   private:
 	QLabel*	_num_samples_value;

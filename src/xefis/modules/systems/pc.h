@@ -174,7 +174,7 @@ class PerformanceComputer: public PerformanceComputerIO
 	 * May return empty result if it's not possible to compute TAS.
 	 */
 	std::optional<si::Velocity>
-	aoa_to_tas_now (si::Angle aoa, std::optional<si::Acceleration> load = {}) const;
+	aoa_to_tas_now (si::Angle aoa, std::optional<si::Acceleration> load = std::nullopt) const;
 
   private:
 	PerformanceComputerIO&			_io									{ *this };

@@ -59,7 +59,7 @@ template<class pValue>
 		 * Create a Socket with initial value.
 		 */
 		explicit
-		Socket (Value const& value, std::optional<Value> const& fallback_value = {});
+		Socket (Value const& value, std::optional<Value> const& fallback_value = std::nullopt);
 
 		/**
 		 * Compare current values with another Socket, nil-value included.

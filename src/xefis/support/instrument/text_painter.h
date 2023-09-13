@@ -126,16 +126,16 @@ class TextPainter: virtual public QPainter
 	get_vertical_text_box (QPointF const& position, Qt::Alignment flags, QString const& text) const;
 
 	void
-	fast_draw_text (QPointF const& position, QString const& text, std::optional<Shadow> = {});
+	fast_draw_text (QPointF const& position, QString const& text, std::optional<Shadow> = std::nullopt);
 
 	void
-	fast_draw_text (QPointF const& position, Qt::Alignment flags, QString const& text, std::optional<Shadow> = {});
+	fast_draw_text (QPointF const& position, Qt::Alignment flags, QString const& text, std::optional<Shadow> = std::nullopt);
 
 	void
-	fast_draw_text (QRectF const& target, Qt::Alignment flags, QString const& text, std::optional<Shadow> = {});
+	fast_draw_text (QRectF const& target, Qt::Alignment flags, QString const& text, std::optional<Shadow> = std::nullopt);
 
 	void
-	fast_draw_vertical_text (QPointF const& position, Qt::Alignment flags, QString const& text, std::optional<Shadow> = {});
+	fast_draw_vertical_text (QPointF const& position, Qt::Alignment flags, QString const& text, std::optional<Shadow> = std::nullopt);
 
   private:
 	/**

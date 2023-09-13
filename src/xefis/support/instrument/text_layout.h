@@ -222,7 +222,7 @@ class TextLayout
 	 * \param	painter is the painter to use.
 	 */
 	void
-	paint (QPointF position, Qt::Alignment alignment, TextPainter& painter, std::optional<Shadow> shadow = {}) const;
+	paint (QPointF position, Qt::Alignment alignment, TextPainter& painter, std::optional<Shadow> shadow = std::nullopt) const;
 
   private:
 	Qt::Alignment	_default_line_alignment		= Qt::AlignLeft | Qt::AlignTop;
