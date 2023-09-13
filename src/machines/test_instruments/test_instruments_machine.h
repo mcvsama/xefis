@@ -28,7 +28,6 @@
 
 // Neutrino:
 #include <neutrino/logger.h>
-#include <neutrino/tracker.h>
 #include <neutrino/work_performer.h>
 
 // Standard:
