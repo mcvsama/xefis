@@ -27,6 +27,9 @@ namespace xf {
 
 /**
  * Checks if socket's value changed since last check.
+ * Differs from SocketChanged in that the SocketChanged only looks
+ * for Socket's serial, and SocketValueChanged also compares actual
+ * value of the socket.
  */
 template<class pValue>
 	class SocketValueChanged: public SocketChanged
