@@ -192,11 +192,6 @@ Xefis::print_copyrights (std::ostream& out)
 		<< "=====" << endl
 		<< licenses::font_crystal << endl
 		<< endl;
-	out << "The 'half' library is distributed under the following license" << endl
-		<< "=============================================================" << endl
-		<< endl
-		<< licenses::lib_half << endl
-		<< endl;
 	out << "The 'kdtree++' library is distributed under the following license" << endl
 		<< "=================================================================" << endl
 		<< endl

@@ -15,7 +15,6 @@
 #define XEFIS__CONFIG__CORE_TYPES_H__INCLUDED
 
 // Lib:
-#include <lib/half/half.hpp>
 #include <type_safe/integer.hpp>
 
 // Neutrino:
@@ -26,16 +25,6 @@
 
 
 namespace ts = type_safe;
-
-
-inline half_float::half
-operator "" _half (long double value)
-{
-	return half_float::half (static_cast<float> (value));
-}
-
-
-using float16_t = half_float::half;
 
 #endif
 

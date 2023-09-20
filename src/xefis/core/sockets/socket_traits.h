@@ -308,7 +308,12 @@ template<class FloatingPoint>
 		to_string (Socket<FloatingPoint> const& socket, SocketConversionSettings const& settings)
 		{
 			if (socket)
-				return std::to_string (*socket);
+			{
+				if constexpr (std::is_same<FloatingPoint, float16_t>())
+					return std::to_string (static_cast<float32_t> (*socket));
+				else
+					return std::to_string (*socket);
+			}
 			else
 				return settings.nil_value;
 		}
