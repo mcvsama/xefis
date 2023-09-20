@@ -981,7 +981,7 @@ PaintingWork::paint_speeds_and_wind()
 		QString s_tas ("---");
 
 		if (_p.wind_tas_speed)
-			s_tas = QString ("%1").arg (static_cast<long> (_p.wind_tas_speed->in<si::Knot>()), 3, 10, QChar (L'\u2007'));
+			s_tas = QString ("%1").arg (static_cast<long> (_p.wind_tas_speed->in<si::Knot>()), 3, 10, QChar (L'\N{FIGURE SPACE}'));
 
 		QString wind_str = s_dir + "/" + s_tas;
 		layout.add_new_line();
