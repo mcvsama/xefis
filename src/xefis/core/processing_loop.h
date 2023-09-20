@@ -29,7 +29,7 @@
 
 // Standard:
 #include <cstddef>
-#include <set>
+#include <vector>
 
 
 namespace xf {
@@ -63,7 +63,7 @@ class ProcessingLoop:
 	static constexpr std::size_t	kMaxProcessingTimesBackLog	= 1000;
 	static constexpr float			kLatencyFactorLogThreshold	= 2.0f;
 
-    using Modules = std::set<Module*>;
+    using Modules = std::vector<Module*>;
 
   public:
 	// Ctor
@@ -189,7 +189,7 @@ class ProcessingLoop:
 inline void
 ProcessingLoop::register_module (Module& module)
 {
-    _modules.insert (&module);
+    _modules.push_back (&module);
     _uninitialized_modules.push_back (&module);
 }
 
