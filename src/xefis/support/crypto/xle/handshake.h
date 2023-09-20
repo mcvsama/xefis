@@ -20,6 +20,7 @@
 // Neutrino:
 #include <neutrino/crypto/diffie_hellman_exchange.h>
 #include <neutrino/crypto/hash.h>
+#include <neutrino/crypto/secure.h>
 #include <neutrino/exception.h>
 
 // Boost:
@@ -41,6 +42,15 @@ using HandshakeID = uint64_t;
  */
 class Handshake
 {
+  public:
+	struct Params
+	{
+		BlobView	master_signature_key;
+		BlobView	slave_signature_key;
+		size_t		hmac_size				{ 12 };
+		si::Time	max_time_difference		{ 60_s };
+	};
+
   protected:
 	/**
 	 * Serialized master handshake looks like this (all numbers are little-endian):
@@ -82,19 +92,15 @@ class Handshake
 
   public:
 	// Ctor
-	Handshake (boost::random::random_device&,
-			   BlobView master_signature_key,
-			   BlobView slave_signature_key,
-			   size_t hmac_size = 12,
-			   si::Time max_time_difference = 60_s);
+	Handshake (boost::random::random_device&, Params const&);
 
   protected:
 	static constexpr Hash::Algorithm const kHashAlgorithm = Hash::SHA3_256;
 
   protected:
 	boost::random::random_device&	_random_device;
-	Blob const						_master_signature_key;
-	Blob const						_slave_signature_key;
+	Secure<Blob> const				_master_signature_key;
+	Secure<Blob> const				_slave_signature_key;
 	DiffieHellmanExchange			_dhe_exchange;
 	size_t const					_hmac_size;
 	si::Time const					_max_time_difference;
@@ -136,7 +142,8 @@ class HandshakeMaster: public Handshake
 
 	/**
 	 * Return the ephemeral key to use for encryption.
-	 * If key can't be calculated (eg. it was used before or the handshake is incorrect), return std::nullopt.
+	 * If key can't be calculated (eg. it was used before or the handshake is incorrect),
+	 * throws Exception with appropriate error code.
 	 */
 	[[nodiscard]]
 	Blob
@@ -180,8 +187,8 @@ class HandshakeSlave: public Handshake
 
 	struct HandshakeAndKey
 	{
-		Blob	handshake_response;
-		Blob	ephemeral_key;
+		Secure<Blob>	handshake_response;
+		Secure<Blob>	ephemeral_key;
 	};
 
   public:

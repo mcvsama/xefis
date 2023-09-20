@@ -31,8 +31,8 @@ AutoTest t1 ("Xefis Lossy Encryption/Transport: encryption and decryption", []{
 	Blob const key = value_to_blob ("abcdefghijklmnop");
 
 	boost::random::random_device rnd;
-	xf::crypto::xle::Transmitter tx (rnd, key);
-	xf::crypto::xle::Receiver rx (key);
+	xf::crypto::xle::Transmitter tx (rnd, { .ephemeral_session_key = key });
+	xf::crypto::xle::Receiver rx ({ .ephemeral_session_key = key });
 
 	Blob plain_text = value_to_blob ("");
 	Blob encrypted = tx.encrypt_packet (plain_text);

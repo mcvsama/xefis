@@ -33,17 +33,13 @@
 
 namespace xf::crypto::xle {
 
-Handshake::Handshake (boost::random::random_device& random_device,
-					  BlobView const master_signature_key,
-					  BlobView const slave_signature_key,
-					  size_t const hmac_size,
-					  si::Time const max_time_difference):
+Handshake::Handshake (boost::random::random_device& random_device, Params const& params):
 	_random_device (random_device),
-	_master_signature_key (master_signature_key),
-	_slave_signature_key (slave_signature_key),
+	_master_signature_key (params.master_signature_key),
+	_slave_signature_key (params.slave_signature_key),
 	_dhe_exchange (random_device, RFC3526_Group14<DiffieHellmanExchange::Integer>),
-	_hmac_size (hmac_size),
-	_max_time_difference (max_time_difference)
+	_hmac_size (params.hmac_size),
+	_max_time_difference (params.max_time_difference)
 { }
 
 
@@ -79,7 +75,7 @@ HandshakeMaster::make_master_handshake_blob (MasterHandshake const& master_hands
 	Blob const salt = random_blob (8, _random_device);
 	Blob const handshake_id_blob = value_to_blob (master_handshake.handshake_id);
 	Blob const handshake_data = salt + handshake_id_blob + value_to_blob (master_handshake.unix_timestamp_ms) + master_handshake.dhe_exchange_blob;
-	Blob const signature = calculate_hmac<kHashAlgorithm> ({ .data = handshake_data, .key = _master_signature_key }).substr (0, _hmac_size);
+	Blob const signature = calculate_hmac<kHashAlgorithm> ({ .data = handshake_data, .key = *_master_signature_key }).substr (0, _hmac_size);
 
 	return handshake_data + signature;
 }
@@ -95,7 +91,7 @@ HandshakeMaster::parse_and_verify_slave_handshake_blob (BlobView const slave_han
 	extracted_signature.remove_prefix (extracted_dhe_exchange_blob.size());
 
 	BlobView const extracted_handshake_data = slave_handshake_blob.substr (0, slave_handshake_blob.size() - _hmac_size);
-	Blob const calculated_signature = calculate_hmac<kHashAlgorithm> ({ .data = extracted_handshake_data, .key = _slave_signature_key }).substr (0, _hmac_size);
+	Blob const calculated_signature = calculate_hmac<kHashAlgorithm> ({ .data = extracted_handshake_data, .key = *_slave_signature_key }).substr (0, _hmac_size);
 
 	SlaveHandshake extracted;
 	blob_to_value (slave_handshake_blob.substr (8, 8), extracted.handshake_id);
@@ -146,7 +142,7 @@ HandshakeSlave::make_slave_handshake_blob (SlaveHandshake const& slave_handshake
 	Blob const salt = random_blob (8, _random_device);
 	Blob const handshake_id_blob = value_to_blob (slave_handshake.handshake_id);
 	Blob const handshake_data = salt + handshake_id_blob + value_to_blob (slave_handshake.unix_timestamp_ms) + slave_handshake.dhe_exchange_blob;
-	Blob const signature = calculate_hmac<kHashAlgorithm> ({ .data = handshake_data, .key = _slave_signature_key }).substr (0, _hmac_size);
+	Blob const signature = calculate_hmac<kHashAlgorithm> ({ .data = handshake_data, .key = *_slave_signature_key }).substr (0, _hmac_size);
 
 	return handshake_data + signature;
 }
@@ -162,7 +158,7 @@ HandshakeSlave::parse_and_verify_master_handshake_blob (BlobView const master_ha
 	extracted_signature.remove_prefix (extracted_dhe_exchange_blob.size());
 
 	BlobView const extracted_handshake_data = master_handshake.substr (0, master_handshake.size() - _hmac_size);
-	Blob const calculated_signature = calculate_hmac<kHashAlgorithm> ({ .data = extracted_handshake_data, .key = _master_signature_key }).substr (0, _hmac_size);
+	Blob const calculated_signature = calculate_hmac<kHashAlgorithm> ({ .data = extracted_handshake_data, .key = *_master_signature_key }).substr (0, _hmac_size);
 
 	MasterHandshake extracted;
 	blob_to_value (master_handshake.substr (8, 8), extracted.handshake_id);

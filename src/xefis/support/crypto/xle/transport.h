@@ -21,6 +21,7 @@
 
 // Neutrino:
 #include <neutrino/crypto/hash.h>
+#include <neutrino/crypto/secure.h>
 #include <neutrino/exception.h>
 
 // Boost:
@@ -33,7 +34,7 @@
 namespace xf::crypto::xle {
 
 /**
- * Tool for packets encryption. Allows packets to be undelivered.
+ * Tool for packets encryption.
  */
 class Transport
 {
@@ -41,6 +42,16 @@ class Transport
 	using SequenceNumber = uint64_t;
 
 	static constexpr size_t kDataSaltSize = 8;
+
+	struct Params
+	{
+		BlobView	ephemeral_session_key;
+		BlobView	authentication_secret		{ };
+		BlobView	data_encryption_secret		{ };
+		BlobView	seq_num_encryption_secret	{ };
+		size_t		hmac_size					{ 12 };
+		BlobView	hkdf_user_info				{ };
+	};
 
 	enum ErrorCode
 	{
@@ -73,7 +84,7 @@ class Transport
   public:
 	// Ctor
 	explicit
-	Transport (BlobView ephemeral_session_key, size_t hmac_size = 12, BlobView key_salt = {}, BlobView hkdf_user_info = {});
+	Transport (Params const&);
 
 	/**
 	 * Return how much larger the resulting packet will be compared to plain text.
@@ -83,11 +94,18 @@ class Transport
 	data_margin() const
 		{ return sizeof (SequenceNumber) + _hmac_size + kDataSaltSize; }
 
+	/**
+	 * Return data encryption key hash.
+	 */
+	Blob
+	data_encryption_key_hash() const
+		{ return calculate_hash<Hash::SHA3_256> (*_data_encryption_key); }
+
   protected:
 	size_t			_hmac_size;
-	Blob			_hmac_key;
-	Blob			_data_encryption_key;
-	Blob			_seq_num_encryption_key;
+	Secure<Blob>	_hmac_key;
+	Secure<Blob>	_data_encryption_key;
+	Secure<Blob>	_seq_num_encryption_key;
 	SequenceNumber	_sequence_number	{ 0 };
 };
 
@@ -97,11 +115,7 @@ class Transmitter: public Transport
   public:
 	// Ctor
 	explicit
-	Transmitter (boost::random::random_device&,
-				 BlobView ephemeral_session_key,
-				 size_t hmac_size = 12,
-				 BlobView key_salt = {},
-				 BlobView hkdf_user_info = {});
+	Transmitter (boost::random::random_device&, Params const&);
 
 	/**
 	 * Return next encrypted packet.
@@ -130,7 +144,7 @@ class Receiver: public Transport
 	 */
 	[[nodiscard]]
 	Blob
-	decrypt_packet (BlobView data, std::optional<SequenceNumber> maximum_allowed_sequence_number = {});
+	decrypt_packet (BlobView data, std::optional<SequenceNumber> maximum_allowed_sequence_number = std::nullopt);
 };
 
 
