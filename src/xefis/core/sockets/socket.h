@@ -67,7 +67,7 @@ template<class pValue>
 		 */
 		[[nodiscard]]
 		bool
-		operator== (Socket<Value> const& other);
+		operator== (Socket<Value> const& other) const noexcept (noexcept (std::declval<Value>() == std::declval<Value>()));
 
 		/**
 		 * Return contained value.
@@ -209,7 +209,7 @@ template<class V>
 
 template<class V>
 	inline bool
-	Socket<V>::operator== (Socket<Value> const& other)
+	Socket<V>::operator== (Socket<Value> const& other) const noexcept (noexcept (std::declval<Value>() == std::declval<Value>()))
 	{
 		return (!_value && !other._value)
 			|| (_value && other._value && *_value == *other._value);
