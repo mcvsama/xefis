@@ -114,6 +114,7 @@ class HandshakeMaster: public Handshake
 	{
 		WrongSignature,
 		DeltaTimeTooHigh,
+		InvalidHandshakeID,
 	};
 
 	class Exception: public neutrino::Exception
@@ -157,6 +158,9 @@ class HandshakeMaster: public Handshake
 	[[nodiscard]]
 	SlaveHandshake
 	parse_and_verify_slave_handshake_blob (BlobView);
+
+  private:
+	HandshakeID _handshake_id;
 };
 
 

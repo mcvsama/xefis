@@ -199,6 +199,36 @@ AutoTest t5 ("Xefis Lossy Encryption/Handshake: wrong timestamp on slave side", 
 	test_asserts::verify ("delta-time-too-high is signalled", thrown_delta_time_too_high);
 });
 
+
+AutoTest t6 ("Xefis Lossy Encryption/Handshake: mismatched handshake IDs", []{
+	si::Time const now = neutrino::TimeHelper::now();
+	boost::random::random_device rnd;
+	HandshakeMaster master_1 (rnd, params);
+	HandshakeMaster master_2 (rnd, params);
+	HandshakeSlave slave (rnd, params);
+
+	Blob const master_1_handshake = master_1.generate_handshake_blob (now);
+	Blob const master_2_handshake = master_2.generate_handshake_blob (now);
+	auto const slave_handshake_and_key = slave.generate_handshake_blob_and_key (master_1_handshake, now);
+
+	slave.set_callback_for_handshake_id_used_before ([used_handshake_ids = std::set<HandshakeID>()] (HandshakeID const handshake_id) mutable {
+		return used_handshake_ids.insert (handshake_id).second;
+	});
+
+	bool thrown_invalid_handshake_id = false;
+
+	try {
+		Blob const key = master_2.calculate_key (*slave_handshake_and_key.handshake_response);
+	}
+	catch (xf::crypto::xle::HandshakeMaster::Exception const& exception)
+	{
+		test_asserts::verify ("correct error is signalled", exception.error_code() == HandshakeMaster::ErrorCode::InvalidHandshakeID);
+		thrown_invalid_handshake_id = true;
+	}
+
+	test_asserts::verify ("invalid-handshake-id is signalled", thrown_invalid_handshake_id);
+});
+
 } // namespace
 } // namespace xf::test
 

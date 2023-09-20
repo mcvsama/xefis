@@ -49,9 +49,10 @@ HandshakeMaster::generate_handshake_blob (si::Time const unix_timestamp)
 	using HandshakeIDLimits = std::numeric_limits<HandshakeID>;
 
 	auto handshake_id_distribution = boost::random::uniform_int_distribution<HandshakeID> (HandshakeIDLimits::min(), HandshakeIDLimits::max());
+	_handshake_id = handshake_id_distribution (_random_device);
 
 	return make_master_handshake_blob ({
-		.handshake_id = handshake_id_distribution (_random_device),
+		.handshake_id = _handshake_id,
 		.unix_timestamp_ms = round_to<uint64_t> (unix_timestamp.in<si::Millisecond>()),
 		.dhe_exchange_blob = _dhe_exchange.generate_exchange_blob(),
 	});
@@ -103,6 +104,9 @@ HandshakeMaster::parse_and_verify_slave_handshake_blob (BlobView const slave_han
 
 	if (abs (1_ms * extracted.unix_timestamp_ms - neutrino::TimeHelper::now()) > _max_time_difference)
 		throw Exception (ErrorCode::DeltaTimeTooHigh, "delta time too high");
+
+	if (extracted.handshake_id != _handshake_id)
+		throw Exception (ErrorCode::InvalidHandshakeID, "invalid handshake ID");
 
 	return extracted;
 }
