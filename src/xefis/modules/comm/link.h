@@ -828,7 +828,7 @@ template<uint8_t B, class V>
 		LinkProtocol::Socket<B, V>::serialize (Blob& blob, SourceType src)
 		{
 			auto const size = sizeof (CastType);
-			CastType casted (src);
+			auto casted = static_cast<CastType> (src);
 			neutrino::perhaps_native_to_little_inplace (casted);
 			uint8_t* ptr = reinterpret_cast<uint8_t*> (&casted);
 			blob.resize (blob.size() + size);
