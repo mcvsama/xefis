@@ -338,7 +338,7 @@ LinkProtocol::produce (Blob& blob, [[maybe_unused]] xf::Logger const& logger)
 		e->produce (blob);
 
 #if XEFIS_LINK_SEND_DEBUG
-	logger << "Send: " << to_string (blob) << std::endl;
+	logger << "Send: " << to_hex_string (blob, ":") << std::endl;
 #endif
 }
 
@@ -347,7 +347,7 @@ Blob::const_iterator
 LinkProtocol::eat (Blob::const_iterator begin, Blob::const_iterator end, Link* link, QTimer* reacquire_timer, QTimer* failsafe_timer, xf::Logger const& logger)
 {
 #if XEFIS_LINK_RECV_DEBUG
-	logger << "Recv: " << to_string (Blob (begin, end)) << std::endl;
+	logger << "Recv: " << to_hex_string (BlobView (begin, end), ":") << std::endl;
 #endif
 
 	_aux_magic_buffer.resize (_magic_size);
@@ -447,22 +447,6 @@ LinkProtocol::failsafe()
 {
 	for (auto& e: _envelopes)
 		e->failsafe();
-}
-
-
-std::string
-LinkProtocol::to_string (Blob const& blob)
-{
-	if (blob.empty())
-		return "";
-
-	std::string s;
-
-	for (auto v: blob)
-		s += QString ("%1").arg (v, 2, 16, QChar ('0')).toStdString() + ":";
-
-	s.pop_back();
-	return s;
 }
 
 

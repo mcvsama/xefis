@@ -605,13 +605,6 @@ class LinkProtocol
 	}
 
   private:
-	/**
-	 * Convert to user-readable string.
-	 * For debugging purposes.
-	 */
-	static std::string
-	to_string (Blob const&);
-
 	static constexpr bool
 	fits_in_bits (uint_least64_t value, uint8_t bits)
 		{ return value == 0 || value < xf::static_pow<uint_least64_t> (2U, bits); }
