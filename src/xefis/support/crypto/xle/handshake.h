@@ -38,7 +38,8 @@ using HandshakeID = uint64_t;
 
 /**
  * Generates/parses handshake blobs and calculates final ephemeral key from
- * the handshake.
+ * the handshake for master and slave ends. The resulting ephemeral key from
+ * the DHE is hashed to get uniform pseudorandom distribution.
  */
 class Handshake
 {
@@ -117,7 +118,7 @@ class HandshakeMaster: public Handshake
 		InvalidHandshakeID,
 	};
 
-	class Exception: public neutrino::Exception
+	class Exception: public neutrino::FastException
 	{
 	  public:
 		Exception (ErrorCode, std::string_view message);
@@ -167,7 +168,11 @@ class HandshakeMaster: public Handshake
 class HandshakeSlave: public Handshake
 {
   public:
-	using IDUsedBeforeCallback = std::function<bool (HandshakeID)>;
+	/**
+     * This function should return true if and only if given handshake ID
+     * has been used before.
+     */
+	using IDReuseCheckCallback = std::function<bool (HandshakeID)>;
 
 	enum class ErrorCode: uint8_t
 	{
@@ -176,7 +181,7 @@ class HandshakeSlave: public Handshake
 		DeltaTimeTooHigh,
 	};
 
-	class Exception: public neutrino::Exception
+	class Exception: public neutrino::FastException
 	{
 	  public:
 		Exception (ErrorCode, std::string_view message);
@@ -197,14 +202,7 @@ class HandshakeSlave: public Handshake
 
   public:
 	// Ctor
-	using Handshake::Handshake;
-
-	/**
-	 * Set function that tells if given handshake ID has been used before.
-	 */
-	void
-	set_callback_for_handshake_id_used_before (IDUsedBeforeCallback const callback)
-		{ _id_used_before = callback; }
+	HandshakeSlave (boost::random::random_device&, Params const&, IDReuseCheckCallback);
 
 	/**
 	 * Generate handshake response blob to be sent to the initiator and the resulting
@@ -224,20 +222,20 @@ class HandshakeSlave: public Handshake
 	parse_and_verify_master_handshake_blob (BlobView);
 
   private:
-	IDUsedBeforeCallback _id_used_before;
+	IDReuseCheckCallback _id_used_before;
 };
 
 
 inline
 HandshakeMaster::Exception::Exception (ErrorCode const error_code, std::string_view const message):
-	neutrino::Exception (message),
+	neutrino::FastException (message),
 	_error_code (error_code)
 { }
 
 
 inline
 HandshakeSlave::Exception::Exception (ErrorCode const error_code, std::string_view const message):
-	neutrino::Exception (message),
+	neutrino::FastException (message),
 	_error_code (error_code)
 { }
 

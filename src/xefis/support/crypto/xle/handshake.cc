@@ -112,13 +112,22 @@ HandshakeMaster::parse_and_verify_slave_handshake_blob (BlobView const slave_han
 }
 
 
+HandshakeSlave::HandshakeSlave (boost::random::random_device& rnd,
+                                Params const& params,
+                                IDReuseCheckCallback const id_reuse_check_callback):
+    Handshake (rnd, params),
+    _id_used_before (id_reuse_check_callback)
+{ }
+
+
 HandshakeSlave::HandshakeAndKey
 HandshakeSlave::generate_handshake_blob_and_key (BlobView const master_handshake_blob, si::Time const unix_timestamp)
 {
 	auto const master_handshake = parse_and_verify_master_handshake_blob (master_handshake_blob);
 
 	// Handshake receiver should verify that new handshake has never been used before,
-	// to prevent replay attacks.
+	// to prevent replay attacks. Only correct handshakes should be checked,
+	// otherwise we'd be vulnerable to DoS attacks.
 	if (_id_used_before && _id_used_before (master_handshake.handshake_id))
 		throw Exception (ErrorCode::ReusedHandshakeID, "reusing handshake ID");
 

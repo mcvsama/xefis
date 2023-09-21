@@ -52,7 +52,7 @@ HandshakeMaster::Params const params = {
 AutoTest t1 ("Xefis Lossy Encryption/Handshake: correct handshake", []{
 	boost::random::random_device rnd;
 	HandshakeMaster master (rnd, params);
-	HandshakeSlave slave (rnd, params);
+	HandshakeSlave slave (rnd, params, [](HandshakeID) { return false; });
 
 	Blob const master_handshake = master.generate_handshake_blob (neutrino::TimeHelper::now());
 	auto const slave_handshake_and_key = slave.generate_handshake_blob_and_key (master_handshake, neutrino::TimeHelper::now());
@@ -75,7 +75,7 @@ AutoTest t2 ("Xefis Lossy Encryption/Handshake: handshake with wrong signature",
 		HandshakeSlave slave (rnd, {
 			.master_signature_key = master_signature_key_2,
 			.slave_signature_key = slave_signature_key,
-		});
+		}, [](HandshakeID) { return false; });
 
 		Blob const master_handshake = master.generate_handshake_blob (now);
 		bool thrown_wrong_signature = false;
@@ -104,7 +104,7 @@ AutoTest t2 ("Xefis Lossy Encryption/Handshake: handshake with wrong signature",
 		HandshakeSlave slave (rnd, {
 			.master_signature_key = master_signature_key,
 			.slave_signature_key = slave_signature_key_1,
-		});
+		}, [](HandshakeID) { return false; });
 
 		Blob const master_1_handshake = master_1.generate_handshake_blob (now);
 		Blob const master_2_handshake = master_2.generate_handshake_blob (now);
@@ -129,15 +129,12 @@ AutoTest t3 ("Xefis Lossy Encryption/Handshake: reusing handshake ID", []{
 	si::Time const now = neutrino::TimeHelper::now();
 	boost::random::random_device rnd;
 	HandshakeMaster master (rnd, params);
-	HandshakeSlave slave (rnd, params);
+	HandshakeSlave slave (rnd, params, [used_handshake_ids = std::set<HandshakeID>()] (HandshakeID const handshake_id) mutable {
+		return !used_handshake_ids.insert (handshake_id).second;
+	});
 
 	Blob const master_handshake = master.generate_handshake_blob (now);
 	auto const slave_handshake_and_key = slave.generate_handshake_blob_and_key (master_handshake, now);
-
-	slave.set_callback_for_handshake_id_used_before ([used_handshake_ids = std::set<HandshakeID>()] (HandshakeID const handshake_id) mutable {
-		return used_handshake_ids.insert (handshake_id).second;
-	});
-
 	bool thrown_reused_handshake_id = false;
 
 	try {
@@ -156,7 +153,7 @@ AutoTest t3 ("Xefis Lossy Encryption/Handshake: reusing handshake ID", []{
 AutoTest t4 ("Xefis Lossy Encryption/Handshake: wrong timestamp on master side", []{
 	boost::random::random_device rnd;
 	HandshakeMaster master (rnd, params);
-	HandshakeSlave slave (rnd, params);
+	HandshakeSlave slave (rnd, params, [](HandshakeID) { return false; });
 
 	si::Time const now = neutrino::TimeHelper::now();
 	Blob const master_handshake = master.generate_handshake_blob (now + 20_s);
@@ -179,7 +176,7 @@ AutoTest t4 ("Xefis Lossy Encryption/Handshake: wrong timestamp on master side",
 AutoTest t5 ("Xefis Lossy Encryption/Handshake: wrong timestamp on slave side", []{
 	boost::random::random_device rnd;
 	HandshakeMaster master (rnd, params);
-	HandshakeSlave slave (rnd, params);
+	HandshakeSlave slave (rnd, params, [](HandshakeID) { return false; });
 
 	si::Time const now = neutrino::TimeHelper::now();
 	Blob const master_handshake = master.generate_handshake_blob (now);
@@ -205,16 +202,13 @@ AutoTest t6 ("Xefis Lossy Encryption/Handshake: mismatched handshake IDs", []{
 	boost::random::random_device rnd;
 	HandshakeMaster master_1 (rnd, params);
 	HandshakeMaster master_2 (rnd, params);
-	HandshakeSlave slave (rnd, params);
+	HandshakeSlave slave (rnd, params, [used_handshake_ids = std::set<HandshakeID>()] (HandshakeID const handshake_id) mutable {
+		return !used_handshake_ids.insert (handshake_id).second;
+	});
 
 	Blob const master_1_handshake = master_1.generate_handshake_blob (now);
 	Blob const master_2_handshake = master_2.generate_handshake_blob (now);
 	auto const slave_handshake_and_key = slave.generate_handshake_blob_and_key (master_1_handshake, now);
-
-	slave.set_callback_for_handshake_id_used_before ([used_handshake_ids = std::set<HandshakeID>()] (HandshakeID const handshake_id) mutable {
-		return used_handshake_ids.insert (handshake_id).second;
-	});
-
 	bool thrown_invalid_handshake_id = false;
 
 	try {
