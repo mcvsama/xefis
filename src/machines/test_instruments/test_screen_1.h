@@ -59,9 +59,6 @@ class TestScreen1: public xf::Screen
 	xf::Logger							_logger;
 	xf::Graphics const&					_graphics;
 	xf::NavaidStorage const&			_navaid_storage;
-	xf::WorkPerformer					_adi_work_performer;
-	xf::WorkPerformer					_hsi_work_performer;
-	xf::WorkPerformer					_others_work_performer;
 
   public:
 	ADI									adi;
@@ -95,6 +92,14 @@ class TestScreen1: public xf::Screen
 	Label								glide_ratio_label;
 	LinearGauge<double>					load_factor;
 	Label								load_factor_label;
+
+  private:
+	// Since work performers perform tasks provided by modules (painting stuff, etc),
+	// they should be deleted first, to make sure no task is being executed when the module
+	// itself is deleted.
+	xf::WorkPerformer					_adi_work_performer;
+	xf::WorkPerformer					_hsi_work_performer;
+	xf::WorkPerformer					_others_work_performer;
 };
 
 #endif

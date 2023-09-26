@@ -26,10 +26,10 @@ TestScreen2::TestScreen2 (xf::ScreenSpec const& spec, xf::Graphics const& graphi
 	_logger (logger),
 	_graphics (graphics),
 	_navaid_storage (navaid_storage),
-	_hsi_work_performer (2, _logger.with_scope ("big-HSI")),
 	// Instruments:
 	hsi_1 (_graphics, _navaid_storage, _logger, "big-hsi-1"),
-	hsi_2 (_graphics, _navaid_storage, _logger, "big-hsi-2")
+	hsi_2 (_graphics, _navaid_storage, _logger, "big-hsi-2"),
+	_hsi_work_performer (2, _logger.with_scope ("big-HSI"))
 {
 	register_instrument (this->hsi_1, _hsi_work_performer);
 	register_instrument (this->hsi_2, _hsi_work_performer);

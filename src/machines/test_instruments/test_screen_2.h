@@ -49,11 +49,16 @@ class TestScreen2: public xf::Screen
 	xf::Logger					_logger;
 	xf::Graphics const&			_graphics;
 	xf::NavaidStorage const&	_navaid_storage;
-	xf::WorkPerformer			_hsi_work_performer;
 
   public:
 	HSI							hsi_1;
 	HSI							hsi_2;
+
+  private:
+	// Since work performers perform tasks provided by modules (painting stuff, etc),
+	// they should be deleted first, to make sure no task is being executed when the module
+	// itself is deleted.
+	xf::WorkPerformer			_hsi_work_performer;
 };
 
 #endif

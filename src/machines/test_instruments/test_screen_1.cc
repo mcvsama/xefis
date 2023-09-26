@@ -45,9 +45,6 @@ TestScreen1::TestScreen1 (xf::ScreenSpec const& spec, xf::Graphics const& graphi
 	_logger (logger),
 	_graphics (graphics),
 	_navaid_storage (navaid_storage),
-	_adi_work_performer (1, _logger.with_scope ("ADI")),
-	_hsi_work_performer (1, _logger.with_scope ("HSI")),
-	_others_work_performer (1, _logger.with_scope ("generic")),
 	// Instruments:
 	adi (_graphics, "adi"),
 	hsi (_graphics, _navaid_storage, _logger, "hsi"),
@@ -79,7 +76,10 @@ TestScreen1::TestScreen1 (xf::ScreenSpec const& spec, xf::Graphics const& graphi
 	glide_ratio (_graphics, nullptr, "eicas.glide-ratio"),
 	glide_ratio_label (_graphics, "eicas.label.glide-ratio"),
 	load_factor (_graphics, nullptr, "eicas.load-factor"),
-	load_factor_label (_graphics, "eicas.label.load-factor")
+	load_factor_label (_graphics, "eicas.label.load-factor"),
+	_adi_work_performer (1, _logger.with_scope ("ADI")),
+	_hsi_work_performer (1, _logger.with_scope ("HSI")),
+	_others_work_performer (1, _logger.with_scope ("generic"))
 {
 	register_instruments();
 	place_instruments();
