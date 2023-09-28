@@ -47,9 +47,8 @@ template<class pBaseSpace = void, class pSpace = pBaseSpace>
 		Placement() = default;
 
 		// Ctor
-		template<class = void>
-			requires (!std::is_same<BaseSpace, Space>())
-			Placement (Position const&, RotationToBody const&);
+		Placement (Position const&, RotationToBody const&)
+			requires (!std::is_same<BaseSpace, Space>());
 
 		// Ctor
 		Placement (Position const&, RotationToBase const&);
@@ -107,11 +106,10 @@ template<class pBaseSpace = void, class pSpace = pBaseSpace>
 		/**
 		 * Translate in-place the body by a relative vector in Space.
 		 */
-		template<class = void>
+		void
+		translate_frame (SpaceVector<si::Length, Space> const& vector)
 			requires (!std::is_same<BaseSpace, Space>())
-			void
-			translate_frame (SpaceVector<si::Length, Space> const& vector)
-				{ translate (_body_to_base_rotation * vector); }
+			{ translate (_body_to_base_rotation * vector); }
 
 		/**
 		 * Rotate in-place the body.
@@ -187,14 +185,13 @@ template<class pBaseSpace = void, class pSpace = pBaseSpace>
 
 
 template<class B, class F>
-	template<class>
-		requires (!std::is_same<B, F>())
-		inline
-		Placement<B, F>::Placement (Position const& position, RotationToBody const& rotation):
-			_position (position),
-			_base_to_body_rotation (rotation),
-			_body_to_base_rotation (~rotation)
-		{ }
+	inline
+	Placement<B, F>::Placement (Position const& position, RotationToBody const& rotation)
+		requires (!std::is_same<B, F>()):
+		_position (position),
+		_base_to_body_rotation (rotation),
+		_body_to_base_rotation (~rotation)
+	{ }
 
 
 template<class B, class F>
