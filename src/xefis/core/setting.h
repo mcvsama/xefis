@@ -41,7 +41,7 @@ class BasicSetting
 {
   public:
 	/**
-	 * Tag for creating a setting that doesn't not need to be set by user explicitly, but doesn't necessarily
+	 * Tag for creating a setting that doesn't need to be set by user explicitly, and doesn't necessarily
 	 * have any default value.
 	 */
 	enum OptionalTag { Optional };
@@ -222,7 +222,7 @@ template<class V>
 	Setting<V>::operator*() -> Value&
 	{
 		if (!_value)
-			throw Uninitialized ("reading uninitialized setting");
+			throw Uninitialized ("reading uninitialized setting: " + name());
 
 		return *_value;
 	}
@@ -233,7 +233,7 @@ template<class V>
 	Setting<V>::operator*() const -> Value const&
 	{
 		if (!_value)
-			throw Uninitialized ("reading uninitialized setting");
+			throw Uninitialized ("reading uninitialized setting: " + name());
 
 		return *_value;
 	}
@@ -244,7 +244,7 @@ template<class V>
 	Setting<V>::operator->() const -> Value const*
 	{
 		if (!_value)
-			throw Uninitialized ("reading uninitialized setting");
+			throw Uninitialized ("reading uninitialized setting: " + name());
 
 		return &_value.value();
 	}
