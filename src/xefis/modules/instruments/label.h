@@ -21,7 +21,6 @@
 #include <xefis/core/module.h>
 #include <xefis/core/setting.h>
 #include <xefis/support/instrument/instrument_support.h>
-#include <xefis/utility/types.h>
 
 // Standard:
 #include <cstddef>

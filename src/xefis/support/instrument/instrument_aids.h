@@ -19,7 +19,6 @@
 #include <xefis/core/graphics.h>
 #include <xefis/core/screen.h>
 #include <xefis/support/instrument/shadow.h>
-#include <xefis/utility/types.h>
 
 // Neutrino:
 #include <neutrino/strong_type.h>

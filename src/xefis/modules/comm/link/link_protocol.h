@@ -1,6 +1,6 @@
 /* vim:ts=4
  *
- * Copyleft 2012…2016  Michał Gawron
+ * Copyleft 2012…2023  Michał Gawron
  * Marduk Unix Labs, http://mulabs.org/
  *
  * This program is free software: you can redistribute it and/or modify
@@ -11,23 +11,18 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__MODULES__COMM__LINK_H__INCLUDED
-#define XEFIS__MODULES__COMM__LINK_H__INCLUDED
+#ifndef XEFIS__MODULES__COMM__LINK__PROTOCOL_H__INCLUDED
+#define XEFIS__MODULES__COMM__LINK__PROTOCOL_H__INCLUDED
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/module.h>
-#include <xefis/core/setting.h>
-#include <xefis/core/sockets/module_socket.h>
-#include <xefis/support/sockets/socket_changed.h>
-#include <xefis/utility/types.h>
+#include <xefis/core/sockets/assignable_socket.h>
 
 // Neutrino:
 #include <neutrino/endian.h>
 #include <neutrino/logger.h>
 #include <neutrino/numeric.h>
 #include <neutrino/stdexcept.h>
-#include <neutrino/strong_type.h>
 
 // Qt:
 #include <QtCore/QTimer>
@@ -37,10 +32,10 @@
 #include <functional>
 #include <initializer_list>
 #include <limits>
-#include <memory>
+//#include <memory>
 #include <optional>
 #include <random>
-#include <type_traits>
+//#include <type_traits>
 #include <variant>
 #include <vector>
 
@@ -51,7 +46,7 @@
 
 namespace si = neutrino::si;
 
-class Link;
+class InputLink;
 
 
 class LinkProtocol
@@ -59,6 +54,7 @@ class LinkProtocol
   public:
 	/**
 	 * Thrown on known parse errors.
+	 * TODO use std::expect to be faster?
 	 */
 	class ParseError
 	{ };
@@ -170,7 +166,11 @@ class LinkProtocol
 			 */
 			struct IntegerParams
 			{
+				// True if module input should retain its last value when link is down or corrupted.
 				bool					retained	{ false };
+				// Value that should be used for nil-values, because integers don't have any special values
+				// that could be used as nil.
+				// Note this value_if_nil is only used on transmitting side only, if module socket is nil.
 				Value					value_if_nil;
 			};
 
@@ -179,25 +179,33 @@ class LinkProtocol
 			 */
 			struct FloatingPointParams
 			{
+				// True if module input should retain its last value when link is down or corrupted.
 				bool					retained	{ false };
+				// If used, set to value where most precision is needed. Useful for 2-byte floats.
 				std::optional<Value>	offset		{ };
+			};
+
+			/**
+			 * This one is used with string values.
+			 */
+			struct StringParams
+			{
+				// True if module input should retain its last value when link is down or corrupted.
+				bool					retained	{ false };
 			};
 
 			static constexpr uint8_t kBytes { pBytes };
 
 			static_assert ((std::integral<Value> && (kBytes == 1 || kBytes == 2 || kBytes == 4 || kBytes == 8)) ||
-						   (si::FloatingPointOrQuantity<Value> && (kBytes == 2 || kBytes == 4 || kBytes == 8)));
+						   (si::FloatingPointOrQuantity<Value> && (kBytes == 2 || kBytes == 4 || kBytes == 8)) ||
+						   (std::is_same_v<Value, std::string> && (kBytes >= 1 && kBytes <= 254)));
+
+			// For Sockets holding std::strings encode xf::nil with magic length 255:
+			static uint8_t constexpr kStringNilSize = 255;
 
 		  private:
 			/**
-			 * Ctor for integrals
-			 *
-			 * \param	retained
-			 *			True if module input should retain its last value when link is down or corrupted.
-			 * \param	value_if_nil
-			 *			Value that should be used for nil-values, because integers don't have any special values
-			 *			that could be used as nil.
-			 *			Note this value_if_nil is only used on transmitting side only, if module socket is nil.
+			 * Ctor for integer types.
 			 */
 			template<class U = Value>
 				requires (std::is_integral_v<U>)
@@ -205,35 +213,26 @@ class LinkProtocol
 				Socket (xf::Socket<Value>&, xf::AssignableSocket<Value>*, IntegerParams&&);
 
 			/**
-			 * Ctor for floating-point values and SI values
-			 *
-			 * Separate parameter Offset is used to allow conversion from Quantity<Offset> to Quantity<Value>
-			 * if quantities differ by, eg. scaling ratio.
-			 *
-			 * \param	retained
-			 *			True if input module socket should retain its last value when link is down or corrupted.
-			 * \param	offset_value
-			 *			If used, set to value where most precision is needed. Useful for 2-byte floats.
+			 * Ctor for floating-point values and SI values.
 			 */
 			template<class U = Value>
 				requires si::FloatingPointOrQuantity<U>
 				explicit
 				Socket (xf::Socket<Value>&, xf::AssignableSocket<Value>*, FloatingPointParams&&);
 
+			/**
+			 * Ctor for string values.
+			 */
+			explicit
+			Socket (xf::Socket<std::string>&, xf::AssignableSocket<std::string>*, StringParams&&);
+
 		  public:
 			/**
 			 * Ctor for read-only integral sockets.
 			 */
 			explicit
-			Socket (xf::Socket<Value>& socket, IntegerParams&& params):
-				Socket (socket, nullptr, std::move (params))
-			{ }
-
-			/**
-			 * Ctor for read-only floating-point and SI-value sockets.
-			 */
-			explicit
-			Socket (xf::Socket<Value>& socket, FloatingPointParams&& params):
+			Socket (xf::Socket<Value>& socket, IntegerParams&& params)
+				requires std::integral<Value>:
 				Socket (socket, nullptr, std::move (params))
 			{ }
 
@@ -241,21 +240,47 @@ class LinkProtocol
 			 * Ctor for writable integral sockets.
 			 */
 			explicit
-			Socket (xf::AssignableSocket<Value>& assignable_socket, IntegerParams&& params):
+			Socket (xf::AssignableSocket<Value>& assignable_socket, IntegerParams&& params)
+				requires std::integral<Value>:
 				Socket (assignable_socket, &assignable_socket, std::move (params))
+			{ }
+
+			/**
+			 * Ctor for read-only floating-point and SI-value sockets.
+			 */
+			explicit
+			Socket (xf::Socket<Value>& socket, FloatingPointParams&& params)
+				requires si::FloatingPointOrQuantity<Value>:
+				Socket (socket, nullptr, std::move (params))
 			{ }
 
 			/**
 			 * Ctor for writable floating-point and SI-value sockets.
 			 */
 			explicit
-			Socket (xf::AssignableSocket<Value>& assignable_socket, FloatingPointParams&& params):
+			Socket (xf::AssignableSocket<Value>& assignable_socket, FloatingPointParams&& params)
+				requires si::FloatingPointOrQuantity<Value>:
+				Socket (assignable_socket, &assignable_socket, std::move (params))
+			{ }
+
+			/**
+			 * Ctor for read-only string sockets.
+			 */
+			explicit
+			Socket (xf::Socket<std::string>& socket, StringParams&& params):
+				Socket (socket, nullptr, std::move (params))
+			{ }
+
+			/**
+			 * Ctor for writable string sockets.
+			 */
+			explicit
+			Socket (xf::AssignableSocket<std::string>& assignable_socket, StringParams&& params):
 				Socket (assignable_socket, &assignable_socket, std::move (params))
 			{ }
 
 			Blob::size_type
-			size() const override
-				{ return kBytes; }
+			size() const override;
 
 			void
 			produce (Blob& blob) override
@@ -273,19 +298,19 @@ class LinkProtocol
 
 		  private:
 			/**
-			 * Serialize SourceType and add to Blob.
+			 * Serialize SourceType and add to Blob (append at the end of the blob).
 			 */
 			template<class CastType, class SourceType>
 				static void
-				serialize (Blob&, SourceType);
+				serialize (SourceType, Blob&);
 
 			/**
 			 * Unserialize data from Blob and put it to src.
 			 */
-			template<class CastType, class SourceType>
+			template<class CastType, class TargetType>
 				[[nodiscard]]
 				static Blob::const_iterator
-				unserialize (Blob::const_iterator begin, Blob::const_iterator end, SourceType&);
+				unserialize (Blob::const_iterator begin, Blob::const_iterator end, TargetType&);
 
 		  private:
 			xf::Socket<Value>&				_socket;
@@ -414,12 +439,16 @@ class LinkProtocol
 		struct Params
 		{
 			// Magic is a unique envelope identifier vector:
-			Blob		magic;
+			Blob					magic;
 			// Only send this envelope every Nth time:
-			size_t		send_every	{ 1 };
+			size_t					send_every		{ 1 };
 			// Start sending first packet from send_offset:
-			size_t		send_offset	{ 0 };
-			PacketList	packets		{};
+			size_t					send_offset		{ 0 };
+			// If provided, the envelope will be sent-out if and only if this function returns true.
+			// `send_every` is not taken into account while `send_predicate()` returns false.
+			std::function<bool()>	send_predicate	{ nullptr };
+			// List of packets this envelope will comprise:
+			PacketList				packets			{};
 		};
 
 	  public:
@@ -437,10 +466,11 @@ class LinkProtocol
 		produce (Blob& blob) override;
 
 	  private:
-		Blob		_magic;
-		uint64_t	_send_every;
-		uint64_t	_send_offset;
-		uint64_t	_send_pos	{ 0 };
+		Blob					_magic;
+		uint64_t				_send_every;
+		uint64_t				_send_offset;
+		uint64_t				_send_pos	{ 0 };
+		std::function<bool()>	_send_predicate;
 	};
 
 	using EnvelopeList = std::initializer_list<std::shared_ptr<Envelope>>;
@@ -457,7 +487,7 @@ class LinkProtocol
 	produce (Blob&, xf::Logger const&);
 
 	Blob::const_iterator
-	eat (Blob::const_iterator begin, Blob::const_iterator end, Link*, QTimer* reacquire_timer, QTimer* failsafe_timer, xf::Logger const&);
+	eat (Blob::const_iterator begin, Blob::const_iterator end, InputLink*, QTimer* reacquire_timer, QTimer* failsafe_timer, xf::Logger const&);
 
 	void
 	failsafe();
@@ -515,6 +545,20 @@ class LinkProtocol
 				.retained	= params.retained,
 				.offset		= std::optional<Value> (params.offset),
 			});
+		}
+
+	template<size_t Bytes>
+		static auto
+		socket (xf::Socket<std::string>& socket, Socket<Bytes, std::string>::StringParams&& params = {})
+		{
+			return std::make_shared<Socket<Bytes, std::string>> (socket, std::move (params));
+		}
+
+	template<size_t Bytes>
+		static auto
+		socket (xf::AssignableSocket<std::string>& assignable_socket, Socket<Bytes, std::string>::StringParams&& params = {})
+		{
+			return std::make_shared<Socket<Bytes, std::string>> (assignable_socket, std::move (params));
 		}
 
 	static auto
@@ -610,97 +654,10 @@ class LinkProtocol
 		{ return value == 0 || value < xf::static_pow<uint_least64_t> (2U, bits); }
 
   private:
-	Link*										_link				{ nullptr };
 	std::vector<std::shared_ptr<Envelope>>		_envelopes;
 	std::map<Blob, std::shared_ptr<Envelope>>	_envelope_magics;
 	Blob::size_type								_magic_size			{ 0 };
 	Blob										_aux_magic_buffer;
-};
-
-
-class LinkIO: public xf::Module
-{
-  public:
-	/*
-	 * Settings
-	 */
-
-	xf::Setting<si::Frequency>	send_frequency			{ this, "send_frequency", xf::BasicSetting::Optional };
-	xf::Setting<si::Time>		reacquire_after			{ this, "reacquire_after", xf::BasicSetting::Optional };
-	xf::Setting<si::Time>		failsafe_after			{ this, "failsafe_after", xf::BasicSetting::Optional };
-
-	/*
-	 * Input
-	 */
-
-	xf::ModuleIn<std::string>	link_input				{ this, "input" };
-
-	/*
-	 * Output
-	 */
-
-	xf::ModuleOut<std::string>	link_output				{ this, "output" };
-	xf::ModuleOut<bool>			link_valid				{ this, "link-valid" };
-	xf::ModuleOut<int64_t>		link_failsafes			{ this, "failsafes" };
-	xf::ModuleOut<int64_t>		link_reacquires			{ this, "reacquires" };
-	xf::ModuleOut<int64_t>		link_error_bytes		{ this, "error-bytes" };
-	xf::ModuleOut<int64_t>		link_valid_bytes		{ this, "valid-bytes" };
-	xf::ModuleOut<int64_t>		link_valid_envelopes	{ this, "valid-envelopes" };
-
-  public:
-	using xf::Module::Module;
-};
-
-
-class Link:
-	public QObject,
-	public LinkIO
-{
-	Q_OBJECT
-
-  private:
-	static constexpr char kLoggerScope[] = "mod::Link";
-
-  public:
-	// Ctor
-	explicit
-	Link (std::unique_ptr<LinkProtocol>, xf::Logger const&, std::string_view const& instance = {});
-
-	void
-	verify_settings() override;
-
-	void
-	process (xf::Cycle const&) override;
-
-  private slots:
-	/**
-	 * Called by output timer.
-	 */
-	void
-	send_output();
-
-	/**
-	 * Called by failsafe timer.
-	 */
-	void
-	failsafe();
-
-	/**
-	 * Called by reacquire timer.
-	 */
-	void
-	reacquire();
-
-  private:
-	LinkIO&							_io					{ *this };
-	xf::Logger						_logger;
-	QTimer*							_failsafe_timer		{ nullptr };
-	QTimer*							_reacquire_timer	{ nullptr };
-	QTimer*							_output_timer		{ nullptr };
-	Blob							_input_blob;
-	Blob							_output_blob;
-	std::unique_ptr<LinkProtocol>	_protocol;
-	xf::SocketChanged				_input_changed		{ link_input };
 };
 
 
@@ -714,15 +671,15 @@ template<uint8_t B, class V>
 			_value_if_nil (params.value_if_nil),
 			_retained (params.retained)
 		{
-			_produce = [this](Blob& blob) {
+			_produce = [this] (Blob& blob) {
 				int64_t int_value = _socket
 					? *_socket
 					: _value_if_nil;
 
-				serialize<xf::int_for_width_t<kBytes>> (blob, int_value);
+				serialize<xf::int_for_width_t<kBytes>> (int_value, blob);
 			};
 
-			_eat = [this](Blob::const_iterator begin, Blob::const_iterator end) -> Blob::const_iterator {
+			_eat = [this] (Blob::const_iterator begin, Blob::const_iterator end) -> Blob::const_iterator {
 				Value value;
 				auto result = unserialize<xf::int_for_width_t<kBytes>> (begin, end, value);
 				_value = value;
@@ -742,7 +699,7 @@ template<uint8_t B, class V>
 			_retained (params.retained),
 			_offset (params.offset)
 		{
-			_produce = [this](Blob& blob) {
+			_produce = [this] (Blob& blob) {
 				if constexpr (si::is_quantity<Value>())
 				{
 					typename Value::Value const value = _socket
@@ -751,7 +708,7 @@ template<uint8_t B, class V>
 							: (*_socket).base_value()
 						: _value_if_nil;
 
-					serialize<neutrino::float_for_width_t<kBytes>> (blob, value);
+					serialize<neutrino::float_for_width_t<kBytes>> (value, blob);
 				}
 				else if constexpr (std::is_floating_point<Value>())
 				{
@@ -761,11 +718,11 @@ template<uint8_t B, class V>
 							: *_socket
 						: _value_if_nil;
 
-					serialize<neutrino::float_for_width_t<kBytes>> (blob, value);
+					serialize<neutrino::float_for_width_t<kBytes>> (value, blob);
 				}
 			};
 
-			_eat = [this](Blob::const_iterator begin, Blob::const_iterator end) -> Blob::const_iterator {
+			_eat = [this] (Blob::const_iterator begin, Blob::const_iterator end) -> Blob::const_iterator {
 				neutrino::float_for_width_t<kBytes> float_value;
 
 				auto result = unserialize<neutrino::float_for_width_t<kBytes>> (begin, end, float_value);
@@ -786,12 +743,43 @@ template<uint8_t B, class V>
 
 
 template<uint8_t B, class V>
+	inline
+	LinkProtocol::Socket<B, V>::Socket (xf::Socket<std::string>& socket, xf::AssignableSocket<std::string>* assignable_socket, StringParams&& params):
+		_socket (socket),
+		_assignable_socket (assignable_socket),
+		_retained (params.retained)
+	{
+		_produce = [this] (Blob& blob) {
+			serialize<void> (_socket.get_optional(), blob);
+		};
+
+		_eat = [this] (Blob::const_iterator begin, Blob::const_iterator end) -> Blob::const_iterator {
+			std::optional<std::string> value;
+			auto result = unserialize<void> (begin, end, value);
+			_value = value;
+			return result;
+		};
+	}
+
+
+template<uint8_t B, class V>
+	inline Blob::size_type
+	LinkProtocol::Socket<B, V>::size() const
+	{
+		if constexpr (std::is_same_v<V, std::string>)
+			return kBytes + 1; // String + 1-byte length info
+		else
+			return kBytes;
+	}
+
+
+template<uint8_t B, class V>
 	inline void
 	LinkProtocol::Socket<B, V>::apply()
 	{
 		if (_assignable_socket)
 		{
-			if constexpr (std::is_integral<Value>())
+			if constexpr (std::is_integral<Value>() || std::is_same_v<Value, std::string>)
 			{
 				if (_value)
 					*_assignable_socket = _value;
@@ -809,6 +797,8 @@ template<uint8_t B, class V>
 				else if (!_retained)
 					*_assignable_socket = xf::nil;
 			}
+			else
+				static_assert (false, "missing LinkProtocol::Socket<>::apply() implementation");
 		}
 	}
 
@@ -825,32 +815,75 @@ template<uint8_t B, class V>
 template<uint8_t B, class V>
 	template<class CastType, class SourceType>
 		inline void
-		LinkProtocol::Socket<B, V>::serialize (Blob& blob, SourceType src)
+		LinkProtocol::Socket<B, V>::serialize (SourceType src, Blob& blob)
 		{
-			auto const size = sizeof (CastType);
-			auto casted = static_cast<CastType> (src);
-			neutrino::perhaps_native_to_little_inplace (casted);
-			uint8_t* ptr = reinterpret_cast<uint8_t*> (&casted);
-			blob.resize (blob.size() + size);
-			std::copy (ptr, ptr + size, &blob[blob.size() - size]);
+			if constexpr (std::is_same_v<SourceType, std::optional<std::string>>)
+			{
+				auto const start = blob.size();
+				blob.resize (blob.size() + 1 + kBytes);
+
+				if (src)
+				{
+					auto& string = *src;
+					// Strings longer than kBytes will be truncated:
+					uint8_t size = std::min<size_t> (kBytes, string.size());
+					// Length of the field + 1 B that tells the actual size of the string:
+					blob[start] = size;
+					std::copy (string.data(), string.data() + size, &blob[start + 1]);
+					std::fill (&blob[start + 1 + size], &blob[start + 1 + kBytes], 0);
+				}
+				else
+				{
+					blob[start] = kStringNilSize;
+					std::fill (&blob[start + 1], &blob[start + 1 + kBytes], 0);
+				}
+			}
+			else
+			{
+				auto const size = sizeof (CastType);
+				auto casted = static_cast<CastType> (src);
+				neutrino::perhaps_native_to_little_inplace (casted);
+				uint8_t* ptr = reinterpret_cast<uint8_t*> (&casted);
+				blob.resize (blob.size() + size);
+				std::copy (ptr, ptr + size, &blob[blob.size() - size]);
+			}
 		}
 
 
 template<uint8_t B, class V>
-	template<class CastType, class SourceType>
+	template<class CastType, class TargetType>
 		inline Blob::const_iterator
-		LinkProtocol::Socket<B, V>::unserialize (Blob::const_iterator begin, Blob::const_iterator end, SourceType& src)
+		LinkProtocol::Socket<B, V>::unserialize (Blob::const_iterator begin, Blob::const_iterator end, TargetType& target)
 		{
-			if (neutrino::to_unsigned (std::distance (begin, end)) < sizeof (CastType))
-				throw ParseError();
+			if constexpr (std::is_same_v<TargetType, std::optional<std::string>>)
+			{
+				if (neutrino::to_unsigned (std::distance (begin, end)) < kBytes + 1)
+					throw ParseError();
 
-			std::size_t size = sizeof (CastType);
-			auto const work_end = begin + neutrino::to_signed (size);
-			CastType casted;
-			std::copy (begin, work_end, reinterpret_cast<uint8_t*> (&casted));
-			neutrino::perhaps_little_to_native_inplace (casted);
-			src = casted;
-			return work_end;
+				uint8_t size = *begin;
+
+				if (size != kStringNilSize)
+				{
+					std::string& string = target.emplace();
+					string.resize (size);
+					std::copy (begin + 1, begin + 1 + size, string.data());
+				}
+
+				return begin + 1 + kBytes; // 1 is for string length encoded at the beginning of [begin, end).
+			}
+			else
+			{
+				if (neutrino::to_unsigned (std::distance (begin, end)) < sizeof (CastType))
+					throw ParseError();
+
+				std::size_t size = sizeof (CastType);
+				auto const work_end = begin + neutrino::to_signed (size);
+				CastType casted;
+				std::copy (begin, work_end, reinterpret_cast<uint8_t*> (&casted));
+				neutrino::perhaps_little_to_native_inplace (casted);
+				target = casted;
+				return work_end;
+			}
 		}
 
 #endif
