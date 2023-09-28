@@ -48,6 +48,12 @@ class Simulation
 	explicit
 	Simulation (si::Frequency world_frequency, Logger const&, Evolve);
 
+	// Ctor
+	explicit
+	Simulation (si::Time const frame_dt, Logger const& logger, Evolve const evolve):
+		Simulation (1 / frame_dt, logger, evolve)
+	{ }
+
 	/**
 	 * Return current simulation frame Δt.
 	 */
@@ -62,6 +68,21 @@ class Simulation
 	void
 	set_frame_dt (si::Time const dt) noexcept
 		{ _frame_dt = dt; }
+
+	/**
+	 * Return current world frequency (equivalent to `1 / frame_dt()`).
+	 */
+	[[nodiscard]]
+	si::Frequency
+	world_frequency() const noexcept
+		{ return 1 / _frame_dt; }
+
+	/**
+	 * Set new world frequency (equivalent to `set_frame_dt (1 / frequency)`).
+	 */
+	void
+	set_world_frequency (si::Frequency const frequency)
+		{ _frame_dt = 1 / frequency; }
 
 	/**
 	 * Return integrated simulation time.
