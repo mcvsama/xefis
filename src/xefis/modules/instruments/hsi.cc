@@ -1317,7 +1317,7 @@ PaintingWork::paint_tcas_and_navaid_info()
 	_painter.resetTransform();
 	_painter.setClipping (false);
 
-	auto configure_layout = [&](xf::TextLayout& layout, QColor const& color, QString const& reference, QString const& identifier, std::optional<si::Length> const& distance) -> void
+	auto configure_layout = [&] (xf::TextLayout& layout, QColor const& color, QString const& reference, QString const& identifier, std::optional<si::Length> const& distance) -> void
 	{
 		if (!reference.isEmpty())
 			layout.add_fragment (reference, font_b, color);
@@ -1546,7 +1546,7 @@ PaintingWork::paint_navaids()
 		return mapped_pos;
 	};
 
-	auto paint_navaid = [&](xf::Navaid const& navaid)
+	auto paint_navaid = [&] (xf::Navaid const& navaid)
 	{
 		QTransform feature_centered_transform = _c.aircraft_center_transform;
 		QPointF translation = position_feature (navaid.position());
@@ -1795,7 +1795,7 @@ PaintingWork::paint_circle (CircularArea const& area, QColor const color)
 	pen.setDashPattern (QVector<qreal>() << 5 << 3);
 	_painter.setPen (pen);
 	_painter.setBrush (Qt::NoBrush);
-	_painter.paint (_c.black_shadow, [&]() {
+	_painter.paint (_c.black_shadow, [&] () {
 		_painter.drawEllipse (QRectF (center_pos - radius_vect, center_pos + radius_vect));
 	});
 }
@@ -1817,7 +1817,7 @@ PaintingWork::paint_locs()
 	std::vector<std::pair<QPointF, QString>> texts_to_paint;
 	texts_to_paint.reserve (128);
 
-	auto paint_texts_to_paint = [&]() -> void
+	auto paint_texts_to_paint = [&] () -> void
 	{
 		_painter.resetTransform();
 

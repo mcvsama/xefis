@@ -105,7 +105,7 @@ Gear::async_paint (xf::PaintRequest const& paint_request, PaintingParams const& 
 	QRectF box = painter.get_text_box (QPointF (0.f, 0.f), Qt::AlignHCenter | Qt::AlignVCenter, "DOWN");
 	box.adjust (-hmargin, -vmargin, hmargin, vmargin);
 
-	auto paint_graybox = [&]() -> void {
+	auto paint_graybox = [&] () -> void {
 		painter.setFont (box_font);
 		painter.setPen (aids->get_pen (gray, 1.0f));
 
@@ -120,7 +120,7 @@ Gear::async_paint (xf::PaintRequest const& paint_request, PaintingParams const& 
 			painter.drawLine (QPointF (x, box.top()), QPointF (x - d, box.bottom()));
 	};
 
-	auto paint_down = [&]() -> void {
+	auto paint_down = [&] () -> void {
 		painter.setFont (box_font);
 		painter.setPen (aids->get_pen (Qt::green, 1.0f));
 
@@ -130,7 +130,7 @@ Gear::async_paint (xf::PaintRequest const& paint_request, PaintingParams const& 
 		painter.drawRect (box);
 	};
 
-	auto should_paint_graybox = [&](bool gear_up, bool gear_down) -> bool {
+	auto should_paint_graybox = [&] (bool gear_up, bool gear_down) -> bool {
 		return !pp.requested_down || (v_requested_down && (gear_up || !gear_down)) || (!v_requested_down && (gear_down || !gear_up));
 	};
 
