@@ -207,18 +207,16 @@ class LinkProtocol
 			/**
 			 * Ctor for integer types.
 			 */
-			template<class U = Value>
-				requires (std::is_integral_v<U>)
-				explicit
-				Socket (xf::Socket<Value>&, xf::AssignableSocket<Value>*, IntegerParams&&);
+			explicit
+			Socket (xf::Socket<Value>&, xf::AssignableSocket<Value>*, IntegerParams&&)
+				requires std::integral<Value>;
 
 			/**
 			 * Ctor for floating-point values and SI values.
 			 */
-			template<class U = Value>
-				requires si::FloatingPointOrQuantity<U>
-				explicit
-				Socket (xf::Socket<Value>&, xf::AssignableSocket<Value>*, FloatingPointParams&&);
+			explicit
+			Socket (xf::Socket<Value>&, xf::AssignableSocket<Value>*, FloatingPointParams&&)
+				requires si::FloatingPointOrQuantity<Value>;
 
 			/**
 			 * Ctor for string values.
@@ -661,85 +659,83 @@ class LinkProtocol
 };
 
 
+template<uint16_t B, class V>
+	inline
+	LinkProtocol::Socket<B, V>::Socket (xf::Socket<Value>& socket, xf::AssignableSocket<Value>* assignable_socket, IntegerParams&& params)
+		requires std::integral<Value>:
+		_socket (socket),
+		_assignable_socket (assignable_socket),
+		_value_if_nil (params.value_if_nil),
+		_retained (params.retained)
+	{
+		_produce = [this] (Blob& blob) {
+			int64_t int_value = _socket
+				? *_socket
+				: _value_if_nil;
+
+			serialize<xf::int_for_width_t<kBytes>> (int_value, blob);
+		};
+
+		_eat = [this] (Blob::const_iterator begin, Blob::const_iterator end) -> Blob::const_iterator {
+			Value value;
+			auto result = unserialize<xf::int_for_width_t<kBytes>> (begin, end, value);
+			_value = value;
+			return result;
+		};
+	}
+
+
 template<uint8_t B, class V>
-	template<class U>
-		requires (std::is_integral_v<U>)
-		inline
-		LinkProtocol::Socket<B, V>::Socket (xf::Socket<Value>& socket, xf::AssignableSocket<Value>* assignable_socket, IntegerParams&& params):
-			_socket (socket),
-			_assignable_socket (assignable_socket),
-			_value_if_nil (params.value_if_nil),
-			_retained (params.retained)
-		{
-			_produce = [this] (Blob& blob) {
-				int64_t int_value = _socket
-					? *_socket
+	inline
+	LinkProtocol::Socket<B, V>::Socket (xf::Socket<Value>& socket, xf::AssignableSocket<Value>* assignable_socket, FloatingPointParams&& params)
+		requires si::FloatingPointOrQuantity<Value>:
+		_socket (socket),
+		_assignable_socket (assignable_socket),
+		_value_if_nil (std::numeric_limits<decltype (_value_if_nil)>::quiet_NaN()),
+		_retained (params.retained),
+		_offset (params.offset)
+	{
+		_produce = [this] (Blob& blob) {
+			if constexpr (si::is_quantity<Value>())
+			{
+				typename Value::Value const value = _socket
+					? _offset
+						? (*_socket - *_offset).base_value()
+						: (*_socket).base_value()
 					: _value_if_nil;
 
-				serialize<xf::int_for_width_t<kBytes>> (int_value, blob);
-			};
+				serialize<neutrino::float_for_width_t<kBytes>> (value, blob);
+			}
+			else if constexpr (std::is_floating_point<Value>())
+			{
+				Value const value = _socket
+					? _offset
+						? *_socket - *_offset
+						: *_socket
+					: _value_if_nil;
 
-			_eat = [this] (Blob::const_iterator begin, Blob::const_iterator end) -> Blob::const_iterator {
-				Value value;
-				auto result = unserialize<xf::int_for_width_t<kBytes>> (begin, end, value);
-				_value = value;
-				return result;
-			};
-		}
+				serialize<neutrino::float_for_width_t<kBytes>> (value, blob);
+			}
+		};
 
+		_eat = [this] (Blob::const_iterator begin, Blob::const_iterator end) -> Blob::const_iterator {
+			neutrino::float_for_width_t<kBytes> float_value;
 
-template<uint8_t B, class V>
-	template<class U>
-		requires si::FloatingPointOrQuantity<U>
-		inline
-		LinkProtocol::Socket<B, V>::Socket (xf::Socket<Value>& socket, xf::AssignableSocket<Value>* assignable_socket, FloatingPointParams&& params):
-			_socket (socket),
-			_assignable_socket (assignable_socket),
-			_value_if_nil (std::numeric_limits<decltype (_value_if_nil)>::quiet_NaN()),
-			_retained (params.retained),
-			_offset (params.offset)
-		{
-			_produce = [this] (Blob& blob) {
+			auto result = unserialize<neutrino::float_for_width_t<kBytes>> (begin, end, float_value);
+
+			if (std::isnan (float_value))
+				_value.reset();
+			else
+			{
 				if constexpr (si::is_quantity<Value>())
-				{
-					typename Value::Value const value = _socket
-						? _offset
-							? (*_socket - *_offset).base_value()
-							: (*_socket).base_value()
-						: _value_if_nil;
-
-					serialize<neutrino::float_for_width_t<kBytes>> (value, blob);
-				}
+					_value = Value { float_value };
 				else if constexpr (std::is_floating_point<Value>())
-				{
-					Value const value = _socket
-						? _offset
-							? *_socket - *_offset
-							: *_socket
-						: _value_if_nil;
+					_value = float_value;
+			}
 
-					serialize<neutrino::float_for_width_t<kBytes>> (value, blob);
-				}
-			};
-
-			_eat = [this] (Blob::const_iterator begin, Blob::const_iterator end) -> Blob::const_iterator {
-				neutrino::float_for_width_t<kBytes> float_value;
-
-				auto result = unserialize<neutrino::float_for_width_t<kBytes>> (begin, end, float_value);
-
-				if (std::isnan (float_value))
-					_value.reset();
-				else
-				{
-					if constexpr (si::is_quantity<Value>())
-						_value = Value { float_value };
-					else if constexpr (std::is_floating_point<Value>())
-						_value = float_value;
-				}
-
-				return result;
-			};
-		}
+			return result;
+		};
+	}
 
 
 template<uint8_t B, class V>
