@@ -132,7 +132,7 @@ class GroundToAirLinkProtocol: public LinkProtocol
 	// Ctor
 	template<class IO>
 		explicit
-		GroundToAirLinkProtocol (IO* io):
+		GroundToAirLinkProtocol (IO& io):
 			LinkProtocol ({
 				// Must be first envelope (its data will be messed with to test
 				// if it's discarded in such case):
@@ -144,30 +144,30 @@ class GroundToAirLinkProtocol: public LinkProtocol
 							.signature_bytes	= 12,
 							.key				= { 0x88, 0x99, 0xaa, 0xbb },
 							.packets			= {
-								socket<30> (io->string_prop,			{ .retained = false }),
-								socket<15> (io->string_prop_r,			{ .retained = true }),
-								socket<10> (io->string_nil,				{ .retained = true }),
-								socket<10> (io->string_nil_trunc,		{ .retained = true,		.truncate = true }),
-								socket<4> (io->string_trunc,			{ .retained = true,		.truncate = true }),
-								socket<5> (io->string_multiblock,		{ .retained = true }),
-								socket<8> (io->nil_si_prop),
-								socket<8> (io->angle_prop),
-								socket<8> (io->angle_prop_r,			{ .retained = true }),
-								socket<2> (io->velocity_prop,			{ .retained = false }),
-								socket<2> (io->velocity_prop_r,			{ .retained = true }),
-								socket<2> (io->velocity_prop_offset,	{ .retained = false,	.offset = 1000_kph }),
-								socket<2> (io->velocity_prop_offset_r,	{ .retained = true,		.offset = 1000_kph }),
-								socket<2> (io->int_prop,				{ .retained = false,	.value_if_nil = 0L }),
-								socket<2> (io->int_prop_r,				{ .retained = true,		.value_if_nil = 0L }),
+								socket<30> (io.string_prop,				{ .retained = false }),
+								socket<15> (io.string_prop_r,			{ .retained = true }),
+								socket<10> (io.string_nil,				{ .retained = true }),
+								socket<10> (io.string_nil_trunc,		{ .retained = true,		.truncate = true }),
+								socket<4> (io.string_trunc,				{ .retained = true,		.truncate = true }),
+								socket<5> (io.string_multiblock,		{ .retained = true }),
+								socket<8> (io.nil_si_prop),
+								socket<8> (io.angle_prop),
+								socket<8> (io.angle_prop_r,				{ .retained = true }),
+								socket<2> (io.velocity_prop,			{ .retained = false }),
+								socket<2> (io.velocity_prop_r,			{ .retained = true }),
+								socket<2> (io.velocity_prop_offset,		{ .retained = false,	.offset = 1000_kph }),
+								socket<2> (io.velocity_prop_offset_r,	{ .retained = true,		.offset = 1000_kph }),
+								socket<2> (io.int_prop,					{ .retained = false,	.value_if_nil = 0L }),
+								socket<2> (io.int_prop_r,				{ .retained = true,		.value_if_nil = 0L }),
 							},
 						}),
 					},
 				}),
 				envelope ({
 					.magic			= { 0xfe, 0x5a },
-					.send_predicate	= [io] { return io->handshake_request.valid(); },
+					.send_predicate	= [&io] { return io.handshake_request.valid(); },
 					.packets		= {
-						socket<256> (io->handshake_request, { .retained = false }),
+						socket<256> (io.handshake_request, { .retained = false }),
 					},
 				}),
 				// This must be last on the list of envelopes
@@ -181,10 +181,10 @@ class GroundToAirLinkProtocol: public LinkProtocol
 							.key				= { 0x55, 0x37, 0x12, 0xf9 },
 							.packets			= {
 								bitfield ({
-									bitfield_socket (io->bool_prop,		{ .retained = false,	.value_if_nil = kFallbackBool }),
-									bitfield_socket (io->bool_prop_r,	{ .retained = true,		.value_if_nil = kFallbackBool }),
-									bitfield_socket (io->uint_prop,		{ .bits = 4,			.retained = false,	.value_if_nil = kFallbackInt }),
-									bitfield_socket (io->uint_prop_r,	{ .bits = 4,			.retained = true,	.value_if_nil = kFallbackInt }),
+									bitfield_socket (io.bool_prop,		{ .retained = false,	.value_if_nil = kFallbackBool }),
+									bitfield_socket (io.bool_prop_r,	{ .retained = true,		.value_if_nil = kFallbackBool }),
+									bitfield_socket (io.uint_prop,		{ .bits = 4,			.retained = false,	.value_if_nil = kFallbackInt }),
+									bitfield_socket (io.uint_prop_r,	{ .bits = 4,			.retained = true,	.value_if_nil = kFallbackInt }),
 								}),
 							},
 						}),
@@ -197,7 +197,7 @@ class GroundToAirLinkProtocol: public LinkProtocol
 					.send_every		= 10,
 					.send_offset	= 8,
 					.packets		= {
-						socket<4> (io->dummy, { .retained = false, .value_if_nil = 0L }),
+						socket<4> (io.dummy, { .retained = false, .value_if_nil = 0L }),
 					},
 				}),
 			})
@@ -211,13 +211,13 @@ class AirToGroundLinkProtocol: public LinkProtocol
 	// Ctor
 	template<class IO>
 		explicit
-		AirToGroundLinkProtocol (IO* io):
+		AirToGroundLinkProtocol (IO& io):
 			LinkProtocol({
 				envelope ({
 					.magic			= { 0xe4, 0x40 },
-					.send_predicate	= [io] { return io->handshake_response.valid(); },
+					.send_predicate	= [&io] { return io.handshake_response.valid(); },
 					.packets		= {
-						socket<256> (io->handshake_response, { .retained = false }),
+						socket<256> (io.handshake_response, { .retained = false }),
 					},
 				}),
 			})
@@ -238,8 +238,8 @@ void transmit (LinkProtocol& tx_protocol, LinkProtocol& rx_protocol)
 AutoTest t1 ("modules/io/link: protocol: valid data transmission", []{
 	Ground_Tx_Data tx;
 	Air_Rx_Data rx;
-	GroundToAirLinkProtocol tx_protocol (&tx);
-	GroundToAirLinkProtocol rx_protocol (&rx);
+	GroundToAirLinkProtocol tx_protocol (tx);
+	GroundToAirLinkProtocol rx_protocol (rx);
 	TestCycle cycle;
 
 	auto test = [&] {
@@ -316,8 +316,8 @@ AutoTest t1 ("modules/io/link: protocol: valid data transmission", []{
 AutoTest t2 ("modules/io/link: protocol: nils and out-of range values transmission", []{
 	Ground_Tx_Data tx;
 	Air_Rx_Data rx;
-	GroundToAirLinkProtocol tx_protocol (&tx);
-	GroundToAirLinkProtocol rx_protocol (&rx);
+	GroundToAirLinkProtocol tx_protocol (tx);
+	GroundToAirLinkProtocol rx_protocol (rx);
 	TestCycle cycle;
 
 	// Test bit-bool:
@@ -364,8 +364,8 @@ AutoTest t2 ("modules/io/link: protocol: nils and out-of range values transmissi
 AutoTest t3 ("modules/io/link: protocol: offsets increase precision", []{
 	Ground_Tx_Data tx;
 	Air_Rx_Data rx;
-	GroundToAirLinkProtocol tx_protocol (&tx);
-	GroundToAirLinkProtocol rx_protocol (&rx);
+	GroundToAirLinkProtocol tx_protocol (tx);
+	GroundToAirLinkProtocol rx_protocol (rx);
 	TestCycle cycle;
 
 	tx.velocity_prop << 1001_kph;
@@ -383,8 +383,8 @@ AutoTest t4 ("modules/io/link: protocol: invalid data transmission (wrong signat
 
 	Ground_Tx_Data tx;
 	Air_Rx_Data rx;
-	GroundToAirLinkProtocol tx_protocol (&tx);
-	GroundToAirLinkProtocol rx_protocol (&rx);
+	GroundToAirLinkProtocol tx_protocol (tx);
+	GroundToAirLinkProtocol rx_protocol (rx);
 	TestCycle cycle;
 
 	// Transmit correctly first:
@@ -476,8 +476,8 @@ AutoTest t5 ("modules/io/link: protocol: send-every/send-offset", []{
 
 	Ground_Tx_Data tx;
 	Air_Rx_Data rx;
-	GroundToAirLinkProtocol tx_protocol (&tx);
-	GroundToAirLinkProtocol rx_protocol (&rx);
+	GroundToAirLinkProtocol tx_protocol (tx);
+	GroundToAirLinkProtocol rx_protocol (rx);
 	TestCycle cycle;
 
 	constexpr int64_t kFirstInt = 11223344;
@@ -533,10 +533,10 @@ AutoTest t6 ("modules/io/link: protocol: encrypted channel works", []{
 	Air_Tx_Data air_tx_data;
 	Air_Rx_Data air_rx_data;
 
-	auto ground_tx_protocol = std::make_unique<GroundToAirLinkProtocol> (&ground_tx_data);
-	auto ground_rx_protocol = std::make_unique<AirToGroundLinkProtocol> (&ground_rx_data);
-	auto air_tx_protocol = std::make_unique<AirToGroundLinkProtocol> (&air_tx_data);
-	auto air_rx_protocol = std::make_unique<GroundToAirLinkProtocol> (&air_rx_data);
+	auto ground_tx_protocol = std::make_unique<GroundToAirLinkProtocol> (ground_tx_data);
+	auto ground_rx_protocol = std::make_unique<AirToGroundLinkProtocol> (ground_rx_data);
+	auto air_tx_protocol = std::make_unique<AirToGroundLinkProtocol> (air_tx_data);
+	auto air_rx_protocol = std::make_unique<GroundToAirLinkProtocol> (air_rx_data);
 
 	auto ground_transceiver = xle::MasterTransceiver (crypto_params, g_logger.with_scope ("ground-transceiver"), "ground/transceiver");
 	auto air_transceiver = xle::SlaveTransceiver (crypto_params, handshake_id_reuse_check, g_logger.with_scope ("air-transceiver"), "air/transceiver");
