@@ -45,7 +45,9 @@ template<template<class> class SocketType>
 		SocketType<std::string>		string_prop				{ this, "string_prop" };
 		SocketType<std::string>		string_prop_r			{ this, "string_prop_r" };
 		SocketType<std::string>		string_nil				{ this, "string_nil" };
+		SocketType<std::string>		string_nil_trunc		{ this, "string_nil_trunc" };
 		SocketType<std::string>		string_trunc			{ this, "string_trunc" };
+		SocketType<std::string>		string_multiblock		{ this, "string_multiblock" };
 		SocketType<si::Angle>		nil_si_prop				{ this, "nil" };
 		SocketType<si::Angle>		angle_prop				{ this, "angle" };
 		SocketType<si::Angle>		angle_prop_r			{ this, "angle_r" };
@@ -70,7 +72,9 @@ template<template<class> class SocketType>
 				&string_prop,
 				&string_prop_r,
 				&string_nil,
+				&string_nil_trunc,
 				&string_trunc,
+				&string_multiblock,
 				&nil_si_prop,
 				&angle_prop,
 				&angle_prop_r,
@@ -140,19 +144,21 @@ class GroundToAirLinkProtocol: public LinkProtocol
 							.signature_bytes	= 12,
 							.key				= { 0x88, 0x99, 0xaa, 0xbb },
 							.packets			= {
-								socket<32> (io->string_prop,			{ .retained = false }),
-								socket<32> (io->string_prop_r,			{ .retained = true }),
+								socket<30> (io->string_prop,			{ .retained = false }),
+								socket<15> (io->string_prop_r,			{ .retained = true }),
 								socket<10> (io->string_nil,				{ .retained = true }),
-								socket<4> (io->string_trunc,			{ .retained = true }),
+								socket<10> (io->string_nil_trunc,		{ .retained = true,		.truncate = true }),
+								socket<4> (io->string_trunc,			{ .retained = true,		.truncate = true }),
+								socket<5> (io->string_multiblock,		{ .retained = true }),
 								socket<8> (io->nil_si_prop),
 								socket<8> (io->angle_prop),
 								socket<8> (io->angle_prop_r,			{ .retained = true }),
 								socket<2> (io->velocity_prop,			{ .retained = false }),
 								socket<2> (io->velocity_prop_r,			{ .retained = true }),
-								socket<2> (io->velocity_prop_offset,	{ .retained = false, .offset = 1000_kph }),
-								socket<2> (io->velocity_prop_offset_r,	{ .retained = true,  .offset = 1000_kph }),
-								socket<2> (io->int_prop,				{ .retained = false, .value_if_nil = 0L }),
-								socket<2> (io->int_prop_r,				{ .retained = true,  .value_if_nil = 0L }),
+								socket<2> (io->velocity_prop_offset,	{ .retained = false,	.offset = 1000_kph }),
+								socket<2> (io->velocity_prop_offset_r,	{ .retained = true,		.offset = 1000_kph }),
+								socket<2> (io->int_prop,				{ .retained = false,	.value_if_nil = 0L }),
+								socket<2> (io->int_prop_r,				{ .retained = true,		.value_if_nil = 0L }),
 							},
 						}),
 					},
@@ -161,7 +167,7 @@ class GroundToAirLinkProtocol: public LinkProtocol
 					.magic			= { 0xfe, 0x5a },
 					.send_predicate	= [io] { return io->handshake_request.valid(); },
 					.packets		= {
-						socket<128> (io->handshake_request, { .retained = false }),
+						socket<256> (io->handshake_request, { .retained = false }),
 					},
 				}),
 				// This must be last on the list of envelopes
@@ -175,10 +181,10 @@ class GroundToAirLinkProtocol: public LinkProtocol
 							.key				= { 0x55, 0x37, 0x12, 0xf9 },
 							.packets			= {
 								bitfield ({
-									bitfield_socket (io->bool_prop,		{ .retained = false, .value_if_nil = kFallbackBool }),
-									bitfield_socket (io->bool_prop_r,	{ .retained = true,  .value_if_nil = kFallbackBool }),
-									bitfield_socket (io->uint_prop,		{ .bits = 4,         .retained = false, .value_if_nil = kFallbackInt }),
-									bitfield_socket (io->uint_prop_r,	{ .bits = 4,         .retained = true, .value_if_nil = kFallbackInt }),
+									bitfield_socket (io->bool_prop,		{ .retained = false,	.value_if_nil = kFallbackBool }),
+									bitfield_socket (io->bool_prop_r,	{ .retained = true,		.value_if_nil = kFallbackBool }),
+									bitfield_socket (io->uint_prop,		{ .bits = 4,			.retained = false,	.value_if_nil = kFallbackInt }),
+									bitfield_socket (io->uint_prop_r,	{ .bits = 4,			.retained = true,	.value_if_nil = kFallbackInt }),
 								}),
 							},
 						}),
@@ -211,7 +217,7 @@ class AirToGroundLinkProtocol: public LinkProtocol
 					.magic			= { 0xe4, 0x40 },
 					.send_predicate	= [io] { return io->handshake_response.valid(); },
 					.packets		= {
-						socket<128> (io->handshake_response, { .retained = false }),
+						socket<256> (io->handshake_response, { .retained = false }),
 					},
 				}),
 			})
@@ -243,6 +249,7 @@ AutoTest t1 ("modules/io/link: protocol: valid data transmission", []{
 		test_asserts::verify ("string_prop transmitted properly", rx.string_prop == tx.string_prop);
 		test_asserts::verify ("string_prop_r transmitted properly", rx.string_prop_r == tx.string_prop_r);
 		test_asserts::verify ("string_nil transmitted properly", !rx.string_nil);
+		test_asserts::verify ("string_nil_trunc transmitted properly", !rx.string_nil_trunc);
 		test_asserts::verify ("string_trunc transmitted (and truncated) as expected", rx.string_trunc.value_or ("nil!") == "1234");
 		test_asserts::verify ("nil_si_prop transmitted properly", rx.nil_si_prop == tx.nil_si_prop);
 		test_asserts::verify ("angle_prop transmitted properly (optional() version)", rx.angle_prop == tx.angle_prop);
@@ -254,10 +261,23 @@ AutoTest t1 ("modules/io/link: protocol: valid data transmission", []{
 		test_asserts::verify ("uint_prop transmitted properly", *rx.uint_prop == *tx.uint_prop);
 	};
 
-	tx.string_prop << "testing valid data transmission";
+	auto multiblock_test = [&] {
+		for (auto i = 0u; i < 4u; ++i)
+		{
+			cycle += 1_s;
+			tx.fetch_all (cycle);
+			transmit (tx_protocol, rx_protocol);
+		}
+
+		test_asserts::verify ("string_multiblock transmitted properly", rx.string_multiblock == tx.string_multiblock);
+	};
+
+	tx.string_prop << "123456789012345678901234567890";
 	tx.string_prop_r << "retained string";
 	tx.string_nil << xf::no_data_source;
+	tx.string_nil_trunc << xf::no_data_source;
 	tx.string_trunc << "1234567890";
+	tx.string_multiblock << "12345678901234567"; // socket<5> uses 5-byte buffer, so this should be transmitted within 4 cycles.
 	tx.angle_prop << 1.99_rad;
 	tx.velocity_prop << 101_kph;
 	tx.velocity_prop_offset << 101_kph;
@@ -265,6 +285,7 @@ AutoTest t1 ("modules/io/link: protocol: valid data transmission", []{
 	tx.int_prop << -2;
 	tx.uint_prop << 3u;
 	test();
+	multiblock_test();
 
 	for (auto const& angle: { -12_rad, 0_rad, 0.99_rad, 1.59_rad, 300_rad })
 	{
@@ -505,7 +526,7 @@ AutoTest t6 ("modules/io/link: protocol: encrypted channel works", []{
 		.max_time_difference		= 60_s,
 	};
 
-	auto handshake_id_reuse_check = [] (xle::HandshakeID) { return false; };
+	auto handshake_id_reuse_check = [](xle::HandshakeID) { return false; };
 
 	Ground_Tx_Data ground_tx_data;
 	Ground_Rx_Data ground_rx_data;
@@ -514,10 +535,9 @@ AutoTest t6 ("modules/io/link: protocol: encrypted channel works", []{
 
 	auto ground_tx_protocol = std::make_unique<GroundToAirLinkProtocol> (&ground_tx_data);
 	auto ground_rx_protocol = std::make_unique<AirToGroundLinkProtocol> (&ground_rx_data);
-	auto air_rx_protocol = std::make_unique<GroundToAirLinkProtocol> (&air_rx_data);
 	auto air_tx_protocol = std::make_unique<AirToGroundLinkProtocol> (&air_tx_data);
+	auto air_rx_protocol = std::make_unique<GroundToAirLinkProtocol> (&air_rx_data);
 
-	auto loop = xf::TestProcessingLoop (0.1_s);
 	auto ground_transceiver = xle::MasterTransceiver (crypto_params, g_logger.with_scope ("ground-transceiver"), "ground/transceiver");
 	auto air_transceiver = xle::SlaveTransceiver (crypto_params, handshake_id_reuse_check, g_logger.with_scope ("air-transceiver"), "air/transceiver");
 
@@ -532,17 +552,35 @@ AutoTest t6 ("modules/io/link: protocol: encrypted channel works", []{
 	air_transceiver.handshake_request << air_rx_data.handshake_request;
 	air_tx_data.handshake_response << air_transceiver.handshake_response;
 
+	air_rx_link.link_input << ground_tx_link.link_output;
+	ground_rx_link.link_input << air_tx_link.link_output;
+
+	auto loop = xf::TestProcessingLoop (0.1_s);
+	loop.register_module (ground_transceiver);
+	loop.register_module (ground_tx_data);
+	loop.register_module (ground_rx_data);
 	loop.register_module (ground_tx_link);
 	loop.register_module (ground_rx_link);
+	loop.register_module (air_transceiver);
+	loop.register_module (air_tx_data);
+	loop.register_module (air_rx_data);
 	loop.register_module (air_tx_link);
 	loop.register_module (air_rx_link);
 
-	loop.next_cycles (10);
+	auto [session_prepared, session_activated] = ground_transceiver.start_handshake();
+	auto constexpr kMaxCycles = 6u;
+
+	for (size_t cycles = 0; !is_ready (session_prepared) && !is_ready (session_activated); ++cycles)
+	{
+		test_asserts::verify (std::format ("handshake completes in {} cycles", cycles), cycles < kMaxCycles);
+		loop.next_cycle();
+	}
 
 	auto const u = to_blob ("hello!");
 	auto const e = ground_transceiver.encrypt_packet (u);
 	auto const d = air_transceiver.decrypt_packet (e);
-	std::cout << "DECRYPTED=" << neutrino::to_string (d) << "\n";
+
+	test_asserts::verify ("encryption works from ground to air using transceivers directly", d == u);
 });
 
 } // namespace

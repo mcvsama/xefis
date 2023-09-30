@@ -35,7 +35,7 @@ namespace xf::crypto::xle {
 static Blob const kMasterToSlave { 0x01 };
 static Blob const kSlaveToMaster { 0x02 };
 
-static boost::random::random_device transceiver_rnd;
+static thread_local boost::random::random_device transceiver_rnd;
 
 
 Transceiver::Transceiver (Role const role, xf::Logger const& logger):

@@ -31,9 +31,9 @@ namespace xf {
 class TestProcessingLoop: public ProcessingLoop
 {
   public:
-	static inline std::ostringstream	log_buffer;
-	static inline xf::LoggerOutput		logger_output	{ log_buffer };
-	static inline xf::Logger			logger			{ logger_output };
+	static thread_local inline std::ostringstream	log_buffer;
+	static thread_local inline xf::LoggerOutput		logger_output	{ log_buffer };
+	static thread_local inline xf::Logger			logger			{ logger_output };
 
   public:
 	// Ctor

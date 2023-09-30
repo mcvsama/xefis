@@ -21,6 +21,7 @@
 // Neutrino:
 #include <neutrino/endian.h>
 #include <neutrino/logger.h>
+#include <neutrino/memory.h>
 #include <neutrino/numeric.h>
 #include <neutrino/stdexcept.h>
 
@@ -28,6 +29,7 @@
 #include <QtCore/QTimer>
 
 // Standard:
+#include <algorithm>
 #include <cstddef>
 #include <functional>
 #include <initializer_list>
@@ -153,7 +155,7 @@ class LinkProtocol
 	/**
 	 * Packet that refers to a particular Socket, so it can send/receive value of that module socket.
 	 */
-	template<uint8_t pBytes, class pValue>
+	template<uint16_t pBytes, class pValue>
 		class Socket: public Packet
 		{
 		  public:
@@ -190,16 +192,19 @@ class LinkProtocol
 			{
 				// True if module input should retain its last value when link is down or corrupted.
 				bool					retained	{ false };
+				bool					truncate	{ false };
 			};
 
-			static constexpr uint8_t kBytes { pBytes };
+			static constexpr uint16_t kBytes { pBytes };
+
+			static uint16_t constexpr kTruncatedStringMetaSize = 2;
+			static uint16_t constexpr kUntruncatedStringMetaSize = 6;
+			static uint16_t constexpr kNilStringSize = 0xffff;
+			static uint16_t constexpr kMaxStringSize = kNilStringSize - 1;
 
 			static_assert ((std::integral<Value> && (kBytes == 1 || kBytes == 2 || kBytes == 4 || kBytes == 8)) ||
 						   (si::FloatingPointOrQuantity<Value> && (kBytes == 2 || kBytes == 4 || kBytes == 8)) ||
-						   (std::is_same_v<Value, std::string> && (kBytes >= 1 && kBytes <= 254)));
-
-			// For Sockets holding std::strings encode xf::nil with magic length 255:
-			static uint8_t constexpr kStringNilSize = 255;
+						   (std::is_same_v<Value, std::string> && (kBytes >= 1 && kBytes <= kMaxStringSize)));
 
 		  private:
 			/**
@@ -297,28 +302,34 @@ class LinkProtocol
 			 * Serialize SourceType and add to Blob (append at the end of the blob).
 			 */
 			template<class CastType, class SourceType>
-				static void
+				void
 				serialize (SourceType, Blob&);
 
 			/**
 			 * Unserialize data from Blob and put it to src.
 			 */
-			template<class CastType, class TargetType>
+			template<class CastType>
 				[[nodiscard]]
-				static Blob::const_iterator
-				unserialize (Blob::const_iterator begin, Blob::const_iterator end, TargetType&);
+				Blob::const_iterator
+				unserialize (Blob::const_iterator begin, Blob::const_iterator end);
 
 		  private:
 			xf::Socket<Value>&				_socket;
 			xf::AssignableSocket<Value>*	_assignable_socket;
-			si::decay_quantity_t<Value>		_value_if_nil {};
+			si::decay_quantity_t<Value>		_value_if_nil		{};
 			std::optional<Value>			_value;
 			// Retain last valid value on error (when value is NaN or failsafe kicks in):
 			bool							_retained;
 			std::optional<Value>			_offset;
 			std::function<void (Blob&)>		_produce;
+			bool							_truncated_string	{ true };
 			std::function<Blob::const_iterator (Blob::const_iterator, Blob::const_iterator)>
 											_eat;
+			size_t							_cycle_number		{ 0 };
+			uint16_t						_current_serial		{ 0xffff };
+			std::vector<bool>				_received_blocks;
+			bool							_recovered			{ false };
+			std::string						_recovered_string;
 		};
 
 	/**
@@ -675,15 +686,12 @@ template<uint16_t B, class V>
 		};
 
 		_eat = [this] (Blob::const_iterator begin, Blob::const_iterator end) -> Blob::const_iterator {
-			Value value;
-			auto result = unserialize<xf::int_for_width_t<kBytes>> (begin, end, value);
-			_value = value;
-			return result;
+			return unserialize<xf::int_for_width_t<kBytes>> (begin, end);
 		};
 	}
 
 
-template<uint8_t B, class V>
+template<uint16_t B, class V>
 	inline
 	LinkProtocol::Socket<B, V>::Socket (xf::Socket<Value>& socket, xf::AssignableSocket<Value>* assignable_socket, FloatingPointParams&& params)
 		requires si::FloatingPointOrQuantity<Value>:
@@ -717,57 +725,48 @@ template<uint8_t B, class V>
 		};
 
 		_eat = [this] (Blob::const_iterator begin, Blob::const_iterator end) -> Blob::const_iterator {
-			neutrino::float_for_width_t<kBytes> float_value;
-
-			auto result = unserialize<neutrino::float_for_width_t<kBytes>> (begin, end, float_value);
-
-			if (std::isnan (float_value))
-				_value.reset();
-			else
-			{
-				if constexpr (si::is_quantity<Value>())
-					_value = Value { float_value };
-				else if constexpr (std::is_floating_point<Value>())
-					_value = float_value;
-			}
-
-			return result;
+			return unserialize<neutrino::float_for_width_t<kBytes>> (begin, end);
 		};
 	}
 
 
-template<uint8_t B, class V>
+template<uint16_t B, class V>
 	inline
 	LinkProtocol::Socket<B, V>::Socket (xf::Socket<std::string>& socket, xf::AssignableSocket<std::string>* assignable_socket, StringParams&& params):
 		_socket (socket),
 		_assignable_socket (assignable_socket),
-		_retained (params.retained)
+		_retained (params.retained),
+		_truncated_string (params.truncate)
 	{
 		_produce = [this] (Blob& blob) {
+			// Only needed to see if the value changed, so modulo 16-bit is good enough:
+			_current_serial = _socket.serial() % 0xffff;
 			serialize<void> (_socket.get_optional(), blob);
 		};
 
 		_eat = [this] (Blob::const_iterator begin, Blob::const_iterator end) -> Blob::const_iterator {
-			std::optional<std::string> value;
-			auto result = unserialize<void> (begin, end, value);
-			_value = value;
-			return result;
+			return unserialize<void> (begin, end);
 		};
 	}
 
 
-template<uint8_t B, class V>
+template<uint16_t B, class V>
 	inline Blob::size_type
 	LinkProtocol::Socket<B, V>::size() const
 	{
-		if constexpr (std::is_same_v<V, std::string>)
-			return kBytes + 1; // String + 1-byte length info
+		if constexpr (std::is_same_v<Value, std::string>)
+		{
+			if (_truncated_string)
+				return kTruncatedStringMetaSize + kBytes;
+			else
+				return kUntruncatedStringMetaSize + kBytes;
+		}
 		else
 			return kBytes;
 	}
 
 
-template<uint8_t B, class V>
+template<uint16_t B, class V>
 	inline void
 	LinkProtocol::Socket<B, V>::apply()
 	{
@@ -797,7 +796,7 @@ template<uint8_t B, class V>
 	}
 
 
-template<uint8_t B, class V>
+template<uint16_t B, class V>
 	inline void
 	LinkProtocol::Socket<B, V>::failsafe()
 	{
@@ -806,30 +805,107 @@ template<uint8_t B, class V>
 	}
 
 
-template<uint8_t B, class V>
+template<uint16_t B, class V>
 	template<class CastType, class SourceType>
 		inline void
 		LinkProtocol::Socket<B, V>::serialize (SourceType src, Blob& blob)
 		{
 			if constexpr (std::is_same_v<SourceType, std::optional<std::string>>)
 			{
-				auto const start = blob.size();
-				blob.resize (blob.size() + 1 + kBytes);
+				auto const append_pos = blob.size();
 
-				if (src)
+				if (_truncated_string)
 				{
-					auto& string = *src;
-					// Strings longer than kBytes will be truncated:
-					uint8_t size = std::min<size_t> (kBytes, string.size());
-					// Length of the field + 1 B that tells the actual size of the string:
-					blob[start] = size;
-					std::copy (string.data(), string.data() + size, &blob[start + 1]);
-					std::fill (&blob[start + 1 + size], &blob[start + 1 + kBytes], 0);
+					auto constexpr kMetaB = kTruncatedStringMetaSize;
+					auto constexpr kBufferB = kBytes;
+
+					blob.resize (blob.size() + kMetaB + kBufferB);
+
+					if (src)
+					{
+						auto& string = *src;
+						// Strings longer than kBufferB will be truncated:
+						uint16_t const size = std::min<size_t> (kBufferB, string.size());
+						uint16_t const le_size = size;
+						neutrino::perhaps_native_to_little_inplace (le_size);
+
+						auto append_iterator = blob.begin() + neutrino::to_signed (append_pos);
+						append_iterator = neutrino::copy_value_to_memory (le_size, append_iterator);
+						append_iterator = std::copy (string.begin(), string.begin() + size, append_iterator);
+						std::fill (append_iterator, blob.end(), 0);
+					}
+					else
+					{
+						uint16_t const le_nil = kNilStringSize;
+						neutrino::perhaps_native_to_little_inplace (le_nil);
+
+						auto const append_iterator = neutrino::copy_value_to_memory (le_nil, blob.begin() + neutrino::to_signed (append_pos));
+						std::fill (append_iterator, blob.end(), 0);
+					}
 				}
 				else
 				{
-					blob[start] = kStringNilSize;
-					std::fill (&blob[start + 1], &blob[start + 1 + kBytes], 0);
+					auto constexpr kMetaB = kUntruncatedStringMetaSize;
+					auto constexpr kBufferB = kBytes;
+
+					blob.resize (blob.size() + kMetaB + kBufferB);
+
+					auto const append_meta = []<class AppendIterator>(uint16_t serial, uint16_t size, uint16_t block_number, AppendIterator append_iterator)
+						-> AppendIterator
+					{
+						neutrino::perhaps_native_to_little_inplace (serial);
+						neutrino::perhaps_native_to_little_inplace (size);
+						neutrino::perhaps_native_to_little_inplace (block_number);
+
+						append_iterator = neutrino::copy_value_to_memory (serial, append_iterator);
+						append_iterator = neutrino::copy_value_to_memory (size, append_iterator);
+						append_iterator = neutrino::copy_value_to_memory (block_number, append_iterator);
+
+						return append_iterator;
+					};
+
+					auto append_iterator = blob.begin() + neutrino::to_signed (append_pos);
+
+					if (src)
+					{
+						auto& string = *src;
+
+						if (string.size() > kMaxStringSize)
+							throw xf::Exception (std::format ("LinkProtocol: can't encode string longer than {} bytes", kMaxStringSize));
+
+						if (string.empty())
+							append_iterator = append_meta (_current_serial, string.size(), 0, append_iterator);
+						else
+						{
+							uint16_t const block_size = kBufferB;
+							// num_blocks will be at least 1:
+							auto const num_blocks = (string.size() - 1u) / block_size + 1u;
+
+							uint16_t const block_number = _cycle_number % num_blocks;
+							append_iterator = append_meta (_current_serial, string.size(), block_number, append_iterator);
+
+							auto bytes_to_copy = (block_number < num_blocks - 1)
+								? block_size
+								: string.size() % block_size;
+
+							if (bytes_to_copy == 0)
+								bytes_to_copy = block_size;
+
+							auto const copy_begin = string.begin() + block_number * block_size;
+							auto const copy_end = copy_begin + neutrino::to_signed (bytes_to_copy);
+							append_iterator = std::copy (copy_begin, copy_end, append_iterator);
+						}
+
+						// Fill the rest (or maybe the whole) buffer with zeros:
+						std::fill (append_iterator, blob.end(), 0);
+
+						++_cycle_number;
+					}
+					else
+					{
+						append_iterator = append_meta (_current_serial, kNilStringSize, 0, append_iterator);
+						std::fill (append_iterator, blob.end(), 0);
+					}
 				}
 			}
 			else
@@ -844,26 +920,121 @@ template<uint8_t B, class V>
 		}
 
 
-template<uint8_t B, class V>
-	template<class CastType, class TargetType>
+template<uint16_t B, class V>
+	template<class CastType>
 		inline Blob::const_iterator
-		LinkProtocol::Socket<B, V>::unserialize (Blob::const_iterator begin, Blob::const_iterator end, TargetType& target)
+		LinkProtocol::Socket<B, V>::unserialize (Blob::const_iterator begin, Blob::const_iterator end)
 		{
-			if constexpr (std::is_same_v<TargetType, std::optional<std::string>>)
+			if constexpr (std::is_same_v<Value, std::string>)
 			{
-				if (neutrino::to_unsigned (std::distance (begin, end)) < kBytes + 1)
-					throw ParseError();
-
-				uint8_t size = *begin;
-
-				if (size != kStringNilSize)
+				if (_truncated_string)
 				{
-					std::string& string = target.emplace();
-					string.resize (size);
-					std::copy (begin + 1, begin + 1 + size, string.data());
-				}
+					auto constexpr kMetaB = kTruncatedStringMetaSize;
+					auto constexpr kBufferB = kBytes;
 
-				return begin + 1 + kBytes; // 1 is for string length encoded at the beginning of [begin, end).
+					if (neutrino::to_unsigned (std::distance (begin, end)) < kMetaB + kBufferB)
+						throw ParseError();
+
+					uint16_t size;
+					auto read_iterator = neutrino::copy_memory_to_value (begin, size);
+					neutrino::perhaps_little_to_native_inplace (size);
+
+					if (size == kNilStringSize)
+						_value.reset();
+					else
+					{
+						if (size > kBufferB)
+							throw ParseError();
+						std::string string;
+						string.resize (size);
+						std::copy (read_iterator, read_iterator + size, string.data());
+						_value = std::move (string);
+					}
+
+					return begin + kMetaB + kBufferB;
+				}
+				else
+				{
+					auto constexpr kMetaB = kUntruncatedStringMetaSize;
+					auto constexpr kBufferB = kBytes;
+					auto const block_size = kBufferB;
+
+					uint16_t serial;
+					uint16_t size;
+					uint16_t block_number;
+
+					auto read_iterator = neutrino::copy_memory_to_value (begin, serial);
+					read_iterator = neutrino::copy_memory_to_value (read_iterator, size);
+					read_iterator = neutrino::copy_memory_to_value (read_iterator, block_number);
+
+					neutrino::perhaps_little_to_native_inplace (serial);
+					neutrino::perhaps_little_to_native_inplace (size);
+					neutrino::perhaps_little_to_native_inplace (block_number);
+
+					if (size == kNilStringSize)
+					{
+						if (!_recovered)
+						{
+							_recovered = true;
+							_value.reset();
+						}
+					}
+					else
+					{
+						if (serial != _current_serial)
+						{
+							_current_serial = serial;
+
+							if (size > 0)
+							{
+								_received_blocks.resize ((size - 1u) / block_size + 1u);
+								std::ranges::fill (_received_blocks, false);
+								_recovered = false;
+								_recovered_string.resize (size);
+							}
+							else
+							{
+								_received_blocks.clear();
+								_recovered = true;
+								_value = "";
+							}
+						}
+
+						if (!_recovered)
+						{
+							if (size != _recovered_string.size())
+								throw ParseError();
+
+							if (block_number >= _received_blocks.size())
+								throw ParseError();
+
+							// num_blocks will be at least 1:
+							auto const num_blocks = (size - 1u) / block_size + 1u;
+
+							if (!_received_blocks[block_number])
+							{
+								_received_blocks[block_number] = true;
+
+								auto bytes_to_copy = (block_number < num_blocks - 1)
+									? block_size
+									: size % block_size;
+
+								if (bytes_to_copy == 0)
+									bytes_to_copy = block_size;
+
+								std::copy (read_iterator, read_iterator + bytes_to_copy, &_recovered_string[block_number * block_size]);
+
+								if (std::ranges::all_of (_received_blocks, [](bool value) { return value; }))
+								{
+									_recovered = true;
+									_value = _recovered_string;
+								}
+							}
+						}
+					}
+
+					return begin + kMetaB + kBufferB;
+				}
 			}
 			else
 			{
@@ -872,10 +1043,22 @@ template<uint8_t B, class V>
 
 				std::size_t size = sizeof (CastType);
 				auto const work_end = begin + neutrino::to_signed (size);
-				CastType casted;
-				std::copy (begin, work_end, reinterpret_cast<uint8_t*> (&casted));
-				neutrino::perhaps_little_to_native_inplace (casted);
-				target = casted;
+				CastType cast_value;
+				std::copy (begin, work_end, reinterpret_cast<uint8_t*> (&cast_value));
+				neutrino::perhaps_little_to_native_inplace (cast_value);
+
+				if constexpr (si::FloatingPointOrQuantity<Value>)
+				{
+					if (std::isnan (cast_value))
+						_value.reset();
+					else if constexpr (si::is_quantity<Value>())
+						_value = Value { cast_value };
+					else if constexpr (std::is_floating_point<Value>())
+						_value = cast_value;
+				}
+				else
+					_value = cast_value;
+
 				return work_end;
 			}
 		}

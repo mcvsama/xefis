@@ -11,14 +11,12 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__CORE__SOCKETS__EXCEPTION_H__INCLUDED
-#define XEFIS__CORE__SOCKETS__EXCEPTION_H__INCLUDED
+// Local:
+#include "exception.h"
 
 // Xefis:
 #include <xefis/config/all.h>
-
-// Neutrino:
-#include <neutrino/exception.h>
+#include <xefis/core/sockets/basic_module_socket.h>
 
 // Standard:
 #include <cstddef>
@@ -26,21 +24,19 @@
 
 namespace xf {
 
-class BasicSocket;
-
-
-/**
- * Exception object thrown when trying to read a nil socket.
- */
-class NilValueException: public Exception
+std::string
+make_nil_value_exception_message (BasicSocket const& socket)
 {
-  public:
-	// Ctor
-	explicit
-	NilValueException (BasicSocket const& socket);
-};
+	if (auto const* basic_module_socket = dynamic_cast<BasicModuleSocket const*> (&socket))
+		return std::format ("tried to read a nil socket '{}'", basic_module_socket->path().string());
+	else
+		return "tried to read a nil socket";
+}
+
+
+NilValueException::NilValueException (BasicSocket const& socket):
+	Exception (make_nil_value_exception_message (socket))
+{ }
 
 } // namespace xf
-
-#endif
 

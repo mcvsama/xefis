@@ -225,7 +225,7 @@ template<class V>
 		else if (_fallback_value)
 			return *_fallback_value;
 		else
-			throw NilValueException();
+			throw NilValueException (*this);
 	}
 
 

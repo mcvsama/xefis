@@ -26,25 +26,17 @@
 namespace si = neutrino::si;
 
 
-class InputLinkIO: public xf::Module
+class InputLink:
+	public QObject,
+	public xf::Module
 {
-  public:
-	/*
-	 * Settings
-	 */
+	Q_OBJECT
 
+  public:
 	xf::Setting<si::Time>		reacquire_after			{ this, "reacquire_after", xf::BasicSetting::Optional };
 	xf::Setting<si::Time>		failsafe_after			{ this, "failsafe_after", xf::BasicSetting::Optional };
 
-	/*
-	 * Input
-	 */
-
 	xf::ModuleIn<std::string>	link_input				{ this, "input" };
-
-	/*
-	 * Output
-	 */
 
 	xf::ModuleOut<bool>			link_valid				{ this, "link-valid" };
 	xf::ModuleOut<int64_t>		link_failsafes			{ this, "failsafes" };
@@ -52,17 +44,6 @@ class InputLinkIO: public xf::Module
 	xf::ModuleOut<int64_t>		link_error_bytes		{ this, "error-bytes" };
 	xf::ModuleOut<int64_t>		link_valid_bytes		{ this, "valid-bytes" };
 	xf::ModuleOut<int64_t>		link_valid_envelopes	{ this, "valid-envelopes" };
-
-  public:
-	using xf::Module::Module;
-};
-
-
-class InputLink:
-	public QObject,
-	public InputLinkIO
-{
-	Q_OBJECT
 
   private:
 	static constexpr char kLoggerScope[] = "mod::InputLink";
