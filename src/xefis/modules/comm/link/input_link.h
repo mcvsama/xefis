@@ -26,6 +26,13 @@
 namespace si = neutrino::si;
 
 
+struct InputLinkParams
+{
+	std::optional<si::Time>		reacquire_after;
+	std::optional<si::Time>		failsafe_after;
+};
+
+
 class InputLink:
 	public QObject,
 	public xf::Module
@@ -33,9 +40,6 @@ class InputLink:
 	Q_OBJECT
 
   public:
-	xf::Setting<si::Time>		reacquire_after			{ this, "reacquire_after", xf::BasicSetting::Optional };
-	xf::Setting<si::Time>		failsafe_after			{ this, "failsafe_after", xf::BasicSetting::Optional };
-
 	xf::ModuleIn<std::string>	link_input				{ this, "input" };
 
 	xf::ModuleOut<bool>			link_valid				{ this, "link-valid" };
@@ -51,7 +55,7 @@ class InputLink:
   public:
 	// Ctor
 	explicit
-	InputLink (std::unique_ptr<LinkProtocol>, xf::Logger const&, std::string_view const& instance = {});
+	InputLink (std::unique_ptr<LinkProtocol>, InputLinkParams const&, xf::Logger const&, std::string_view const& instance = {});
 
 	void
 	process (xf::Cycle const&) override;
@@ -76,6 +80,7 @@ class InputLink:
 	Blob							_input_blob;
 	std::unique_ptr<LinkProtocol>	_protocol;
 	xf::SocketChanged				_input_changed		{ link_input };
+	InputLinkParams					_params;
 };
 
 #endif

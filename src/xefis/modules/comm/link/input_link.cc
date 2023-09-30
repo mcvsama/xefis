@@ -18,26 +18,27 @@
 using namespace neutrino::si::literals;
 
 
-InputLink::InputLink (std::unique_ptr<LinkProtocol> protocol, xf::Logger const& logger, std::string_view const& instance):
+InputLink::InputLink (std::unique_ptr<LinkProtocol> protocol, InputLinkParams const& params, xf::Logger const& logger, std::string_view const& instance):
 	Module (instance),
 	_logger (logger.with_scope (std::string (kLoggerScope) + "#" + instance)),
-	_protocol (std::move (protocol))
+	_protocol (std::move (protocol)),
+	_params (params)
 {
 	_input_blob.reserve (2 * _protocol->size());
 
-	if (this->failsafe_after)
+	if (_params.failsafe_after)
 	{
 		_failsafe_timer = new QTimer (this);
 		_failsafe_timer->setSingleShot (true);
-		_failsafe_timer->setInterval (this->failsafe_after->in<si::Millisecond>());
+		_failsafe_timer->setInterval (_params.failsafe_after->in<si::Millisecond>());
 		QObject::connect (_failsafe_timer, SIGNAL (timeout()), this, SLOT (failsafe()));
 	}
 
-	if (this->reacquire_after)
+	if (_params.reacquire_after)
 	{
 		_reacquire_timer = new QTimer (this);
 		_reacquire_timer->setSingleShot (true);
-		_reacquire_timer->setInterval (this->reacquire_after->in<si::Millisecond>());
+		_reacquire_timer->setInterval (_params.reacquire_after->in<si::Millisecond>());
 		QObject::connect (_reacquire_timer, SIGNAL (timeout()), this, SLOT (reacquire()));
 	}
 }

@@ -542,9 +542,9 @@ AutoTest t6 ("modules/io/link: protocol: encrypted channel works", []{
 	auto air_transceiver = xle::SlaveTransceiver (crypto_params, handshake_id_reuse_check, g_logger.with_scope ("air-transceiver"), "air/transceiver");
 
 	auto ground_tx_link = OutputLink (std::move (ground_tx_protocol), 30_Hz, g_logger.with_scope ("ground-tx-link"), "ground/tx-link");
-	auto ground_rx_link = InputLink (std::move (ground_rx_protocol), g_logger.with_scope ("ground-rx-link"), "ground/rx-link");
+	auto ground_rx_link = InputLink (std::move (ground_rx_protocol), {}, g_logger.with_scope ("ground-rx-link"), "ground/rx-link");
 	auto air_tx_link = OutputLink (std::move (air_tx_protocol), 30_Hz, g_logger.with_scope ("air-tx-link"), "air/tx-link");
-	auto air_rx_link = InputLink (std::move (air_rx_protocol), g_logger.with_scope ("air-rx-link"), "air/rx-link");
+	auto air_rx_link = InputLink (std::move (air_rx_protocol), {}, g_logger.with_scope ("air-rx-link"), "air/rx-link");
 
 	ground_tx_data.handshake_request << ground_transceiver.handshake_request;
 	ground_transceiver.handshake_response << ground_rx_data.handshake_response;
