@@ -288,7 +288,7 @@ void transmit (LinkProtocol& tx_protocol, LinkProtocol& rx_protocol)
 {
 	Blob blob;
 	tx_protocol.produce (blob, g_logger);
-	auto end = rx_protocol.eat (blob.begin(), blob.end(), nullptr, nullptr, nullptr, g_logger);
+	auto end = rx_protocol.consume (blob.begin(), blob.end(), nullptr, nullptr, nullptr, g_logger);
 
 	test_asserts::verify ("rx_protocol ate all input bytes", end == blob.end());
 }
@@ -468,7 +468,7 @@ AutoTest t4 ("modules/io/link: protocol: invalid data transmission (wrong signat
 
 	Blob blob;
 	tx_protocol.produce (blob, g_logger);
-	rx_protocol.eat (blob.begin(), blob.end(), nullptr, nullptr, nullptr, g_logger);
+	rx_protocol.consume (blob.begin(), blob.end(), nullptr, nullptr, nullptr, g_logger);
 
 	// Transmit invalid data:
 	tx.string_prop << "invalid string";
@@ -500,7 +500,7 @@ AutoTest t4 ("modules/io/link: protocol: invalid data transmission (wrong signat
 	blob[blob.size() - 6] = 0xff;
 	blob[blob.size() - 5] = 0x00;
 	blob[blob.size() - 4] = 0xff;
-	rx_protocol.eat (blob.begin(), blob.end(), nullptr, nullptr, nullptr, g_logger);
+	rx_protocol.consume (blob.begin(), blob.end(), nullptr, nullptr, nullptr, g_logger);
 
 	// Test that values weren't changed during last invalid transmission:
 	test_asserts::verify ("string_prop didn't change", rx.string_prop.value_or ("nil!") == "non-retained string");

@@ -62,7 +62,7 @@ class LinkProtocol
 
 	/**
 	 * Thrown by sub-packets when there's no enough input data
-	 * Note that each Envelope's eat() is called when it's known for sure that there's enough data in the input buffer
+	 * Note that each Envelope's consume() is called when it's known for sure that there's enough data in the input buffer
 	 * to cover whole Envelope.
 	 */
 	class InsufficientDataError
@@ -107,7 +107,7 @@ class LinkProtocol
 		 * Data will be output when apply() is called.
 		 */
 		virtual Blob::const_iterator
-		eat (Blob::const_iterator, Blob::const_iterator, xf::Logger const&) = 0;
+		consume (Blob::const_iterator, Blob::const_iterator, xf::Logger const&) = 0;
 
 		/**
 		 * Apply parsed data to sockets, etc.
@@ -141,7 +141,7 @@ class LinkProtocol
 		produce (Blob&, xf::Logger const&) override;
 
 		Blob::const_iterator
-		eat (Blob::const_iterator, Blob::const_iterator, xf::Logger const&) override;
+		consume (Blob::const_iterator, Blob::const_iterator, xf::Logger const&) override;
 
 		void
 		apply() override;
@@ -289,8 +289,8 @@ class LinkProtocol
 				{ _produce (blob); }
 
 			Blob::const_iterator
-			eat (Blob::const_iterator const begin, Blob::const_iterator const end, xf::Logger const&) override
-				{ return _eat (begin, end); }
+			consume (Blob::const_iterator const begin, Blob::const_iterator const end, xf::Logger const&) override
+				{ return _consume (begin, end); }
 
 			void
 			apply() override;
@@ -325,7 +325,7 @@ class LinkProtocol
 			std::function<void (Blob&)>		_produce;
 			bool							_truncated_string	{ true };
 			std::function<Blob::const_iterator (Blob::const_iterator, Blob::const_iterator)>
-											_eat;
+											_consume;
 			size_t							_cycle_number		{ 0 };
 			uint16_t						_current_serial		{ 0xffff };
 			std::vector<bool>				_received_blocks;
@@ -384,7 +384,7 @@ class LinkProtocol
 		produce (Blob&, xf::Logger const&) override;
 
 		Blob::const_iterator
-		eat (Blob::const_iterator, Blob::const_iterator, xf::Logger const&) override;
+		consume (Blob::const_iterator, Blob::const_iterator, xf::Logger const&) override;
 
 		void
 		apply() override;
@@ -426,7 +426,7 @@ class LinkProtocol
 		produce (Blob&, xf::Logger const&) override;
 
 		Blob::const_iterator
-		eat (Blob::const_iterator, Blob::const_iterator, xf::Logger const&) override;
+		consume (Blob::const_iterator, Blob::const_iterator, xf::Logger const&) override;
 
 	  private:
 		uint8_t			_nonce_bytes		{ 0 };
@@ -477,7 +477,7 @@ class LinkProtocol
 		produce (Blob& blob, xf::Logger const&) override;
 
 		Blob::const_iterator
-		eat (Blob::const_iterator, Blob::const_iterator, xf::Logger const&) override;
+		consume (Blob::const_iterator, Blob::const_iterator, xf::Logger const&) override;
 
 	  private:
 		Blob							_unique_prefix;
@@ -502,7 +502,7 @@ class LinkProtocol
 	produce (Blob&, xf::Logger const&);
 
 	Blob::const_iterator
-	eat (Blob::const_iterator begin, Blob::const_iterator end, InputLink*, QTimer* reacquire_timer, QTimer* failsafe_timer, xf::Logger const&);
+	consume (Blob::const_iterator begin, Blob::const_iterator end, InputLink*, QTimer* reacquire_timer, QTimer* failsafe_timer, xf::Logger const&);
 
 	void
 	failsafe();
@@ -693,7 +693,7 @@ template<uint16_t B, class V>
 			serialize<xf::int_for_width_t<kBytes>> (int_value, blob);
 		};
 
-		_eat = [this] (Blob::const_iterator begin, Blob::const_iterator end) -> Blob::const_iterator {
+		_consume = [this] (Blob::const_iterator begin, Blob::const_iterator end) -> Blob::const_iterator {
 			return unserialize<xf::int_for_width_t<kBytes>> (begin, end);
 		};
 	}
@@ -732,7 +732,7 @@ template<uint16_t B, class V>
 			}
 		};
 
-		_eat = [this] (Blob::const_iterator begin, Blob::const_iterator end) -> Blob::const_iterator {
+		_consume = [this] (Blob::const_iterator begin, Blob::const_iterator end) -> Blob::const_iterator {
 			return unserialize<neutrino::float_for_width_t<kBytes>> (begin, end);
 		};
 	}
@@ -752,7 +752,7 @@ template<uint16_t B, class V>
 			serialize<void> (_socket.get_optional(), blob);
 		};
 
-		_eat = [this] (Blob::const_iterator begin, Blob::const_iterator end) -> Blob::const_iterator {
+		_consume = [this] (Blob::const_iterator begin, Blob::const_iterator end) -> Blob::const_iterator {
 			return unserialize<void> (begin, end);
 		};
 	}

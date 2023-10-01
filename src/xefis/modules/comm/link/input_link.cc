@@ -51,7 +51,7 @@ InputLink::process (xf::Cycle const& cycle)
 		if (this->link_input && _input_changed.serial_changed())
 		{
 			_input_blob.insert (_input_blob.end(), this->link_input->begin(), this->link_input->end());
-			auto e = _protocol->eat (_input_blob.begin(), _input_blob.end(), this, _reacquire_timer, _failsafe_timer, cycle.logger() + _logger);
+			auto e = _protocol->consume (_input_blob.begin(), _input_blob.end(), this, _reacquire_timer, _failsafe_timer, cycle.logger() + _logger);
 			auto valid_bytes = std::distance (_input_blob.cbegin(), e);
 			this->link_valid_bytes = this->link_valid_bytes.value_or (0) + valid_bytes;
 			_input_blob.erase (_input_blob.begin(), e);

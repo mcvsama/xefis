@@ -66,10 +66,10 @@ LinkProtocol::Sequence::produce (Blob& blob, xf::Logger const& logger)
 
 
 Blob::const_iterator
-LinkProtocol::Sequence::eat (Blob::const_iterator begin, Blob::const_iterator end, xf::Logger const& logger)
+LinkProtocol::Sequence::consume (Blob::const_iterator begin, Blob::const_iterator end, xf::Logger const& logger)
 {
 	for (auto const& packet: _packets)
-		begin = packet->eat (begin, end, logger);
+		begin = packet->consume (begin, end, logger);
 
 	return begin;
 }
@@ -150,7 +150,7 @@ LinkProtocol::Bitfield::produce (Blob& blob, xf::Logger const&)
 
 
 Blob::const_iterator
-LinkProtocol::Bitfield::eat (Blob::const_iterator begin, Blob::const_iterator end, xf::Logger const&)
+LinkProtocol::Bitfield::consume (Blob::const_iterator begin, Blob::const_iterator end, xf::Logger const&)
 {
 	if (std::distance (begin, end) < static_cast<Blob::difference_type> (size()))
 		throw InsufficientDataError();
@@ -251,7 +251,7 @@ LinkProtocol::Signature::produce (Blob& blob, xf::Logger const& logger)
 
 
 Blob::const_iterator
-LinkProtocol::Signature::eat (Blob::const_iterator begin, Blob::const_iterator end, xf::Logger const& logger)
+LinkProtocol::Signature::consume (Blob::const_iterator begin, Blob::const_iterator end, xf::Logger const& logger)
 {
 	auto const data_size = Sequence::size();
 	auto const whole_size = size();
@@ -272,9 +272,9 @@ LinkProtocol::Signature::eat (Blob::const_iterator begin, Blob::const_iterator e
 	if (!std::equal (sign_begin, sign_end, hmac.begin()))
 		throw ParseError();
 
-	auto const eating_end = begin + neutrino::to_signed (data_size);
+	auto const consuming_end = begin + neutrino::to_signed (data_size);
 
-	if (Sequence::eat (begin, eating_end, logger) != eating_end)
+	if (Sequence::consume (begin, consuming_end, logger) != consuming_end)
 		throw ParseError();
 
 	return begin + neutrino::to_signed (whole_size);
@@ -344,7 +344,7 @@ LinkProtocol::Envelope::produce (Blob& blob, xf::Logger const& logger)
 
 
 Blob::const_iterator
-LinkProtocol::Envelope::eat (Blob::const_iterator begin, Blob::const_iterator end, xf::Logger const& logger)
+LinkProtocol::Envelope::consume (Blob::const_iterator begin, Blob::const_iterator end, xf::Logger const& logger)
 {
 	if (_transceiver)
 	{
@@ -354,10 +354,10 @@ LinkProtocol::Envelope::eat (Blob::const_iterator begin, Blob::const_iterator en
 			if (_transceiver->ready())
 			{
 				auto const decrypted = _transceiver->decrypt_packet (BlobView (begin, envelope_end));
-				auto read_iterator = Sequence::eat (decrypted.begin(), decrypted.end(), logger);
+				auto read_iterator = Sequence::consume (decrypted.begin(), decrypted.end(), logger);
 
 				if (read_iterator != decrypted.end())
-					throw xf::Exception ("Envelope::eat(): not all data consumed by the envelope after decryption");
+					throw xf::Exception ("Envelope::consume(): not all data consumed by the envelope after decryption");
 			}
 		}
 		catch (...)
@@ -370,7 +370,7 @@ LinkProtocol::Envelope::eat (Blob::const_iterator begin, Blob::const_iterator en
 		return envelope_end;
 	}
 	else
-		return Sequence::eat (begin, end, logger);
+		return Sequence::consume (begin, end, logger);
 }
 
 
@@ -405,12 +405,12 @@ LinkProtocol::produce (Blob& blob, [[maybe_unused]] xf::Logger const& logger)
 
 
 Blob::const_iterator
-LinkProtocol::eat (Blob::const_iterator begin,
-				   Blob::const_iterator end,
-				   InputLink* input_link,
-				   QTimer* reacquire_timer,
-				   QTimer* failsafe_timer,
-				   xf::Logger const& logger)
+LinkProtocol::consume (Blob::const_iterator begin,
+					   Blob::const_iterator end,
+					   InputLink* input_link,
+					   QTimer* reacquire_timer,
+					   QTimer* failsafe_timer,
+					   xf::Logger const& logger)
 {
 #if XEFIS_LINK_RECV_DEBUG
 	logger << "Recv: " << neutrino::to_hex_string (BlobView (begin, end), ":") << std::endl;
@@ -456,7 +456,7 @@ LinkProtocol::eat (Blob::const_iterator begin,
 					return;
 				}
 
-				auto e = envelope->eat (begin + neutrino::to_signed (_unique_prefix_size), end, logger);
+				auto e = envelope->consume (begin + neutrino::to_signed (_unique_prefix_size), end, logger);
 
 				if (e != begin)
 				{
