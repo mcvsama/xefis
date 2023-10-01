@@ -62,6 +62,7 @@ PROJECTS.xefis.files				+= xefis/core/sockets/connectable_socket.h
 PROJECTS.xefis.files				+= xefis/core/sockets/constant_source.h
 PROJECTS.xefis.files				+= xefis/core/sockets/exception.cc
 PROJECTS.xefis.files				+= xefis/core/sockets/exception.h
+PROJECTS.xefis.files				+= xefis/core/sockets/identifier.h
 PROJECTS.xefis.files				+= xefis/core/sockets/module_in.h
 PROJECTS.xefis.files				+= xefis/core/sockets/module_out.h
 PROJECTS.xefis.files				+= xefis/core/sockets/module_socket.h
