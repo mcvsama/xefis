@@ -18,7 +18,7 @@
 #include <xefis/config/all.h>
 
 // Standard:
-#include <variant>
+#include <cstddef>
 
 
 namespace xf {

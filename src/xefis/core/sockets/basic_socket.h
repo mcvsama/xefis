@@ -24,11 +24,10 @@
 #include <neutrino/noncopyable.h>
 #include <neutrino/nonmovable.h>
 #include <neutrino/numeric.h>
-#include <neutrino/variant.h>
 #include <neutrino/utility.h>
 
 // Standard:
-#include <variant>
+#include <cstddef>
 
 
 namespace xf {

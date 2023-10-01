@@ -19,8 +19,12 @@
 #include <xefis/core/sockets/constant_source.h>
 #include <xefis/core/sockets/socket.h>
 
+// Neutrino:
+#include <neutrino/variant.h>
+
 // Standard:
 #include <cstddef>
+#include <variant>
 
 
 namespace xf {
