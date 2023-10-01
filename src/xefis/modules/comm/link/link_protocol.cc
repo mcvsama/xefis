@@ -24,7 +24,9 @@
 #include <neutrino/crypto/hmac.h>
 #include <neutrino/qt/qdom.h>
 #include <neutrino/qt/qdom_iterator.h>
+#include <neutrino/exception_support.h>
 #include <neutrino/stdexcept.h>
+#include <neutrino/string.h>
 
 // Lib:
 #include <boost/endian/conversion.hpp>
@@ -56,18 +58,18 @@ LinkProtocol::Sequence::size() const
 
 
 void
-LinkProtocol::Sequence::produce (Blob& blob)
+LinkProtocol::Sequence::produce (Blob& blob, xf::Logger const& logger)
 {
 	for (auto const& packet: _packets)
-		packet->produce (blob);
+		packet->produce (blob, logger);
 }
 
 
 Blob::const_iterator
-LinkProtocol::Sequence::eat (Blob::const_iterator begin, Blob::const_iterator end)
+LinkProtocol::Sequence::eat (Blob::const_iterator begin, Blob::const_iterator end, xf::Logger const& logger)
 {
 	for (auto const& packet: _packets)
-		begin = packet->eat (begin, end);
+		begin = packet->eat (begin, end, logger);
 
 	return begin;
 }
@@ -113,7 +115,7 @@ LinkProtocol::Bitfield::size() const
 
 
 void
-LinkProtocol::Bitfield::produce (Blob& blob)
+LinkProtocol::Bitfield::produce (Blob& blob, xf::Logger const&)
 {
 	std::vector<bool> bits;
 	bits.reserve (8 * size());
@@ -148,7 +150,7 @@ LinkProtocol::Bitfield::produce (Blob& blob)
 
 
 Blob::const_iterator
-LinkProtocol::Bitfield::eat (Blob::const_iterator begin, Blob::const_iterator end)
+LinkProtocol::Bitfield::eat (Blob::const_iterator begin, Blob::const_iterator end, xf::Logger const&)
 {
 	if (std::distance (begin, end) < static_cast<Blob::difference_type> (size()))
 		throw InsufficientDataError();
@@ -225,12 +227,12 @@ LinkProtocol::Signature::size() const
 
 
 void
-LinkProtocol::Signature::produce (Blob& blob)
+LinkProtocol::Signature::produce (Blob& blob, xf::Logger const& logger)
 {
 	_temp.clear();
 
 	// Add data:
-	Sequence::produce (_temp);
+	Sequence::produce (_temp, logger);
 
 	// Append nonce:
 	std::uniform_int_distribution<uint8_t> distribution;
@@ -249,7 +251,7 @@ LinkProtocol::Signature::produce (Blob& blob)
 
 
 Blob::const_iterator
-LinkProtocol::Signature::eat (Blob::const_iterator begin, Blob::const_iterator end)
+LinkProtocol::Signature::eat (Blob::const_iterator begin, Blob::const_iterator end, xf::Logger const& logger)
 {
 	auto const data_size = Sequence::size();
 	auto const whole_size = size();
@@ -272,7 +274,7 @@ LinkProtocol::Signature::eat (Blob::const_iterator begin, Blob::const_iterator e
 
 	auto const eating_end = begin + neutrino::to_signed (data_size);
 
-	if (Sequence::eat (begin, eating_end) != eating_end)
+	if (Sequence::eat (begin, eating_end, logger) != eating_end)
 		throw ParseError();
 
 	return begin + neutrino::to_signed (whole_size);
@@ -284,7 +286,8 @@ LinkProtocol::Envelope::Envelope (Params&& params):
 	_magic (params.magic),
 	_send_every (params.send_every),
 	_send_offset (params.send_offset),
-	_send_predicate (params.send_predicate)
+	_send_predicate (params.send_predicate),
+	_transceiver (params.transceiver)
 { }
 
 
@@ -298,23 +301,76 @@ LinkProtocol::Envelope::magic() const
 Blob::size_type
 LinkProtocol::Envelope::size() const
 {
-	return Sequence::size();
+	if (_transceiver)
+		return Sequence::size() + _transceiver->ciphertext_expansion();
+	else
+		return Sequence::size();
 }
 
 
 void
-LinkProtocol::Envelope::produce (Blob& blob)
+LinkProtocol::Envelope::produce (Blob& blob, xf::Logger const& logger)
 {
 	if (!_send_predicate || _send_predicate())
 	{
 		if (_send_pos % _send_every == _send_offset)
 		{
-			blob += _magic;
-			Sequence::produce (blob);
+			if (_transceiver)
+			{
+				try {
+					if (_transceiver->ready())
+					{
+						Blob unencrypted_blob;
+						Sequence::produce (unencrypted_blob, logger);
+						blob += _magic + _transceiver->encrypt_packet (unencrypted_blob);
+					}
+				}
+				catch (...)
+				{
+					logger << "Could not produce envelope: " << neutrino::describe_exception (std::current_exception()) << "\n";
+					// Do not produce anything if encryption fails.
+				}
+			}
+			else
+			{
+				blob += _magic;
+				Sequence::produce (blob, logger);
+			}
 		}
 
 		++_send_pos;
 	}
+}
+
+
+Blob::const_iterator
+LinkProtocol::Envelope::eat (Blob::const_iterator begin, Blob::const_iterator end, xf::Logger const& logger)
+{
+	if (_transceiver)
+	{
+		auto const envelope_end = std::next (begin, neutrino::to_signed (size()));
+
+		try {
+			if (_transceiver->ready())
+			{
+				auto const decrypted = _transceiver->decrypt_packet (BlobView (begin, envelope_end));
+				auto read_iterator = Sequence::eat (decrypted.begin(), decrypted.end(), logger);
+
+				if (read_iterator != decrypted.end())
+					throw xf::Exception ("Envelope::eat(): not all data consumed by the envelope after decryption");
+			}
+		}
+		catch (...)
+		{
+			logger << "Could not consume envelope: " << neutrino::describe_exception (std::current_exception()) << "\n";
+			// TODO Maybe each envelope should have its own failsafe timer?
+			failsafe();
+		}
+
+		return envelope_end;
+	}
+	else
+		return Sequence::eat (begin, end, logger);
 }
 
 
@@ -340,7 +396,7 @@ void
 LinkProtocol::produce (Blob& blob, [[maybe_unused]] xf::Logger const& logger)
 {
 	for (auto& e: _envelopes)
-		e->produce (blob);
+		e->produce (blob, logger);
 
 #if XEFIS_LINK_SEND_DEBUG
 	logger << "Send: " << neutrino::to_hex_string (blob, ":") << std::endl;
@@ -400,7 +456,7 @@ LinkProtocol::eat (Blob::const_iterator begin,
 					return;
 				}
 
-				auto e = envelope->eat (begin + neutrino::to_signed (_magic_size), end);
+				auto e = envelope->eat (begin + neutrino::to_signed (_magic_size), end, logger);
 
 				if (e != begin)
 				{

@@ -33,8 +33,13 @@
 namespace xf::test {
 namespace {
 
-xf::LoggerOutput g_logger_output (std::clog);
-xf::Logger g_logger (g_logger_output);
+namespace xle = xf::crypto::xle;
+
+auto g_logger_output	= xf::LoggerOutput (std::clog);
+auto g_logger			= xf::Logger (g_logger_output);
+
+auto constexpr kFallbackBool	= true;
+auto constexpr kFallbackInt		= 12UL;
 
 
 template<template<class> class SocketType>
@@ -48,6 +53,7 @@ template<template<class> class SocketType>
 		SocketType<std::string>		string_nil_trunc		{ this, "string_nil_trunc" };
 		SocketType<std::string>		string_trunc			{ this, "string_trunc" };
 		SocketType<std::string>		string_multiblock		{ this, "string_multiblock" };
+		SocketType<std::string>		string_empty			{ this, "string_empty" };
 		SocketType<si::Angle>		nil_si_prop				{ this, "nil" };
 		SocketType<si::Angle>		angle_prop				{ this, "angle" };
 		SocketType<si::Angle>		angle_prop_r			{ this, "angle_r" };
@@ -75,6 +81,7 @@ template<template<class> class SocketType>
 				&string_nil_trunc,
 				&string_trunc,
 				&string_multiblock,
+				&string_empty,
 				&nil_si_prop,
 				&angle_prop,
 				&angle_prop_r,
@@ -102,6 +109,7 @@ template<template<class> class SocketType>
 	{
 	  public:
 		SocketType<std::string>		handshake_response		{ this, "handshake_response" };
+		SocketType<int>				int_prop				{ this, "int_prop" };
 
 	  public:
 		void
@@ -109,6 +117,7 @@ template<template<class> class SocketType>
 		{
 			std::initializer_list<BasicSocket*> const sockets = {
 				&handshake_response,
+				&int_prop,
 			};
 
 			for (auto* socket: sockets)
@@ -117,28 +126,20 @@ template<template<class> class SocketType>
 	};
 
 
-using Ground_Tx_Data = GroundToAirData<xf::ModuleIn>;
-using Ground_Rx_Data = AirToGroundData<xf::ModuleOut>;
-using Air_Tx_Data = AirToGroundData<xf::ModuleIn>;
-using Air_Rx_Data = GroundToAirData<xf::ModuleOut>;
-
-constexpr auto kFallbackBool	= true;
-constexpr auto kFallbackInt		= 12UL;
-
-
 class GroundToAirLinkProtocol: public LinkProtocol
 {
   public:
 	// Ctor
 	template<class IO>
 		explicit
-		GroundToAirLinkProtocol (IO& io):
+		GroundToAirLinkProtocol (IO& io, xle::Transceiver* transceiver = nullptr):
 			LinkProtocol ({
 				// Must be first envelope (its data will be messed with to test
 				// if it's discarded in such case):
 				envelope ({
-					.magic		= { 0xe4, 0x40 },
-					.packets	= {
+					.magic			= { 0x00, 0x01 },
+					.transceiver	= transceiver,
+					.packets		= {
 						signature ({
 							.nonce_bytes		= 9,
 							.signature_bytes	= 12,
@@ -150,6 +151,7 @@ class GroundToAirLinkProtocol: public LinkProtocol
 								socket<10> (io.string_nil_trunc,		{ .retained = true,		.truncate = true }),
 								socket<4> (io.string_trunc,				{ .retained = true,		.truncate = true }),
 								socket<5> (io.string_multiblock,		{ .retained = true }),
+								socket<30> (io.string_empty,			{ .retained = true }),
 								socket<8> (io.nil_si_prop),
 								socket<8> (io.angle_prop),
 								socket<8> (io.angle_prop_r,				{ .retained = true }),
@@ -163,17 +165,26 @@ class GroundToAirLinkProtocol: public LinkProtocol
 						}),
 					},
 				}),
+				// XLE handshake envelope:
 				envelope ({
-					.magic			= { 0xfe, 0x5a },
+					.magic			= { 0x00, 0x00 },
 					.send_predicate	= [&io] { return io.handshake_request.valid(); },
 					.packets		= {
-						socket<256> (io.handshake_request, { .retained = false }),
+						// Always good to have at least basic checksum:
+						signature ({
+							.nonce_bytes		= 0,
+							.signature_bytes	= 4,
+							.key				= { 0xaa, 0xaa },
+							.packets			= {
+								socket<256> (io.handshake_request, { .retained = false }),
+							},
+						}),
 					},
 				}),
 				// This must be last on the list of envelopes
 				// that are transmitted immediately (not delayed):
 				envelope ({
-					.magic		= { 0xa3, 0x80 },
+					.magic		= { 0x00, 0x02 },
 					.packets	= {
 						signature ({
 							.nonce_bytes		= 8,
@@ -193,7 +204,7 @@ class GroundToAirLinkProtocol: public LinkProtocol
 				// Envelope that will not be transmitted until some time
 				// passes:
 				envelope ({
-					.magic			= { 0x01, 0x02 },
+					.magic			= { 0x00, 0x03 },
 					.send_every		= 10,
 					.send_offset	= 8,
 					.packets		= {
@@ -211,18 +222,66 @@ class AirToGroundLinkProtocol: public LinkProtocol
 	// Ctor
 	template<class IO>
 		explicit
-		AirToGroundLinkProtocol (IO& io):
-			LinkProtocol({
+		AirToGroundLinkProtocol (IO& io, xle::Transceiver* transceiver = nullptr):
+			LinkProtocol ({
+				// XLE handshake envelope:
 				envelope ({
-					.magic			= { 0xe4, 0x40 },
+					.magic			= { 0xff, 0x00 },
 					.send_predicate	= [&io] { return io.handshake_response.valid(); },
 					.packets		= {
-						socket<256> (io.handshake_response, { .retained = false }),
+						// Always good to have at least basic checksum:
+						signature ({
+							.nonce_bytes		= 0,
+							.signature_bytes	= 4,
+							.key				= { 0xbb, 0xbb },
+							.packets			= {
+								socket<256> (io.handshake_response, { .retained = false }),
+							},
+						}),
+					},
+				}),
+				// Normal data envelope:
+				envelope ({
+					.magic			= { 0xff, 0x01 },
+					.transceiver	= transceiver,
+					.packets		= {
+						socket<4> (io.int_prop),
 					},
 				}),
 			})
 		{ }
 };
+
+
+using Ground_Tx_Data = GroundToAirData<xf::ModuleIn>;
+using Ground_Rx_Data = AirToGroundData<xf::ModuleOut>;
+using Air_Tx_Data = AirToGroundData<xf::ModuleIn>;
+using Air_Rx_Data = GroundToAirData<xf::ModuleOut>;
+
+auto constinit crypto_params = xle::Transceiver::CryptoParams {
+	.master_signature_key		= { 0x00, 0x01, 0x02, 0x03 },
+	.slave_signature_key		= { 0x0c, 0x0d, 0x0e, 0x0f },
+	.authentication_secret		= { 0x01 },
+	.data_encryption_secret		= { 0x02 },
+	.seq_num_encryption_secret	= { 0x03 },
+	.hmac_size					= 16,
+	.max_time_difference		= 60_s,
+};
+
+
+xle::MasterTransceiver
+get_ground_transceiver()
+{
+	return xle::MasterTransceiver (crypto_params, g_logger.with_scope ("ground-transceiver"), "ground/transceiver");
+}
+
+
+xle::SlaveTransceiver
+get_air_transceiver()
+{
+	auto handshake_id_reuse_check = [](xle::HandshakeID) { return false; };
+	return xle::SlaveTransceiver (crypto_params, handshake_id_reuse_check, g_logger.with_scope ("air-transceiver"), "air/transceiver");
+}
 
 
 void transmit (LinkProtocol& tx_protocol, LinkProtocol& rx_protocol)
@@ -251,6 +310,7 @@ AutoTest t1 ("modules/io/link: protocol: valid data transmission", []{
 		test_asserts::verify ("string_nil transmitted properly", !rx.string_nil);
 		test_asserts::verify ("string_nil_trunc transmitted properly", !rx.string_nil_trunc);
 		test_asserts::verify ("string_trunc transmitted (and truncated) as expected", rx.string_trunc.value_or ("nil!") == "1234");
+		test_asserts::verify ("string_empty transmitted properly", rx.string_empty == tx.string_empty);
 		test_asserts::verify ("nil_si_prop transmitted properly", rx.nil_si_prop == tx.nil_si_prop);
 		test_asserts::verify ("angle_prop transmitted properly (optional() version)", rx.angle_prop == tx.angle_prop);
 		test_asserts::verify ("angle_prop transmitted properly", *rx.angle_prop == *tx.angle_prop);
@@ -278,6 +338,7 @@ AutoTest t1 ("modules/io/link: protocol: valid data transmission", []{
 	tx.string_nil_trunc << xf::no_data_source;
 	tx.string_trunc << "1234567890";
 	tx.string_multiblock << "12345678901234567"; // socket<5> uses 5-byte buffer, so this should be transmitted within 4 cycles.
+	tx.string_empty << "";
 	tx.angle_prop << 1.99_rad;
 	tx.velocity_prop << 101_kph;
 	tx.velocity_prop_offset << 101_kph;
@@ -514,32 +575,18 @@ AutoTest t5 ("modules/io/link: protocol: send-every/send-offset", []{
 
 
 AutoTest t6 ("modules/io/link: protocol: encrypted channel works", []{
-	namespace xle = xf::crypto::xle;
-
-	static auto constinit crypto_params = xle::Transceiver::CryptoParams {
-		.master_signature_key		= { 0x00, 0x01, 0x02, 0x03 },
-		.slave_signature_key		= { 0x0c, 0x0d, 0x0e, 0x0f },
-		.authentication_secret		= { 0x01 },
-		.data_encryption_secret		= { 0x02 },
-		.seq_num_encryption_secret	= { 0x03 },
-		.hmac_size					= 16,
-		.max_time_difference		= 60_s,
-	};
-
-	auto handshake_id_reuse_check = [](xle::HandshakeID) { return false; };
-
 	Ground_Tx_Data ground_tx_data;
 	Ground_Rx_Data ground_rx_data;
 	Air_Tx_Data air_tx_data;
 	Air_Rx_Data air_rx_data;
 
-	auto ground_tx_protocol = std::make_unique<GroundToAirLinkProtocol> (ground_tx_data);
-	auto ground_rx_protocol = std::make_unique<AirToGroundLinkProtocol> (ground_rx_data);
-	auto air_tx_protocol = std::make_unique<AirToGroundLinkProtocol> (air_tx_data);
-	auto air_rx_protocol = std::make_unique<GroundToAirLinkProtocol> (air_rx_data);
+	auto ground_transceiver = get_ground_transceiver();
+	auto air_transceiver = get_air_transceiver();
 
-	auto ground_transceiver = xle::MasterTransceiver (crypto_params, g_logger.with_scope ("ground-transceiver"), "ground/transceiver");
-	auto air_transceiver = xle::SlaveTransceiver (crypto_params, handshake_id_reuse_check, g_logger.with_scope ("air-transceiver"), "air/transceiver");
+	auto ground_tx_protocol = std::make_unique<GroundToAirLinkProtocol> (ground_tx_data, &ground_transceiver);
+	auto ground_rx_protocol = std::make_unique<AirToGroundLinkProtocol> (ground_rx_data, &ground_transceiver);
+	auto air_tx_protocol = std::make_unique<AirToGroundLinkProtocol> (air_tx_data, &air_transceiver);
+	auto air_rx_protocol = std::make_unique<GroundToAirLinkProtocol> (air_rx_data, &air_transceiver);
 
 	auto ground_tx_link = OutputLink (std::move (ground_tx_protocol), 30_Hz, g_logger.with_scope ("ground-tx-link"), "ground/tx-link");
 	auto ground_rx_link = InputLink (std::move (ground_rx_protocol), {}, g_logger.with_scope ("ground-rx-link"), "ground/rx-link");
@@ -576,11 +623,34 @@ AutoTest t6 ("modules/io/link: protocol: encrypted channel works", []{
 		loop.next_cycle();
 	}
 
-	auto const u = to_blob ("hello!");
-	auto const e = ground_transceiver.encrypt_packet (u);
-	auto const d = air_transceiver.decrypt_packet (e);
+	// Test data transmission in both directions:
+	loop.next_cycles (5);
 
-	test_asserts::verify ("encryption works from ground to air using transceivers directly", d == u);
+	// Ground to air encryption:
+	{
+		auto const u = to_blob ("hello!");
+		auto const e = ground_transceiver.encrypt_packet (u);
+		auto const d = air_transceiver.decrypt_packet (e);
+
+		test_asserts::verify ("encryption works from ground to air using transceivers directly", d == u);
+	}
+
+	// Air to ground encryption:
+	{
+		auto const u = to_blob ("hello back!");
+		auto const e = air_transceiver.encrypt_packet (u);
+		auto const d = ground_transceiver.decrypt_packet (e);
+
+		test_asserts::verify ("encryption works from air to ground using transceivers directly", d == u);
+	}
+
+	// Test data transmission in both directions, after directly using
+	// transceivers:
+	loop.next_cycles (5);
+
+	ground_tx_data.string_prop << "abc123";
+	loop.next_cycles (1);
+	test_asserts::verify ("data transmitted properly", ground_tx_data.string_prop == air_rx_data.string_prop);
 });
 
 } // namespace

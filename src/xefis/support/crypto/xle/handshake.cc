@@ -164,6 +164,7 @@ HandshakeSlave::make_slave_handshake_blob (SlaveHandshake const& slave_handshake
 Handshake::MasterHandshake
 HandshakeSlave::parse_and_verify_master_handshake_blob (BlobView const master_handshake)
 {
+	// Skip salt, handshake_id and timestamp:
 	BlobView const extracted_dhe_exchange_blob_and_signature = master_handshake.substr (24);
 	BlobView extracted_dhe_exchange_blob = extracted_dhe_exchange_blob_and_signature;
 	BlobView extracted_signature = extracted_dhe_exchange_blob_and_signature;

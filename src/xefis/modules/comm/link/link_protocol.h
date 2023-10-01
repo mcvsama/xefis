@@ -17,6 +17,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/sockets/assignable_socket.h>
+#include <xefis/modules/comm/xle_transceiver.h>
 
 // Neutrino:
 #include <neutrino/endian.h>
@@ -99,14 +100,14 @@ class LinkProtocol
 		 * Serialize data and add it to the blob.
 		 */
 		virtual void
-		produce (Blob&) = 0;
+		produce (Blob&, xf::Logger const&) = 0;
 
 		/**
 		 * Parse data and set temporary variables.
 		 * Data will be output when apply() is called.
 		 */
 		virtual Blob::const_iterator
-		eat (Blob::const_iterator, Blob::const_iterator) = 0;
+		eat (Blob::const_iterator, Blob::const_iterator, xf::Logger const&) = 0;
 
 		/**
 		 * Apply parsed data to sockets, etc.
@@ -137,10 +138,10 @@ class LinkProtocol
 		size() const override;
 
 		void
-		produce (Blob&) override;
+		produce (Blob&, xf::Logger const&) override;
 
 		Blob::const_iterator
-		eat (Blob::const_iterator, Blob::const_iterator) override;
+		eat (Blob::const_iterator, Blob::const_iterator, xf::Logger const&) override;
 
 		void
 		apply() override;
@@ -284,11 +285,11 @@ class LinkProtocol
 			size() const override;
 
 			void
-			produce (Blob& blob) override
+			produce (Blob& blob, xf::Logger const&) override
 				{ _produce (blob); }
 
 			Blob::const_iterator
-			eat (Blob::const_iterator const begin, Blob::const_iterator const end) override
+			eat (Blob::const_iterator const begin, Blob::const_iterator const end, xf::Logger const&) override
 				{ return _eat (begin, end); }
 
 			void
@@ -380,10 +381,10 @@ class LinkProtocol
 		size() const override;
 
 		void
-		produce (Blob&) override;
+		produce (Blob&, xf::Logger const&) override;
 
 		Blob::const_iterator
-		eat (Blob::const_iterator, Blob::const_iterator) override;
+		eat (Blob::const_iterator, Blob::const_iterator, xf::Logger const&) override;
 
 		void
 		apply() override;
@@ -422,10 +423,10 @@ class LinkProtocol
 		size() const override;
 
 		void
-		produce (Blob&) override;
+		produce (Blob&, xf::Logger const&) override;
 
 		Blob::const_iterator
-		eat (Blob::const_iterator, Blob::const_iterator) override;
+		eat (Blob::const_iterator, Blob::const_iterator, xf::Logger const&) override;
 
 	  private:
 		uint8_t			_nonce_bytes		{ 0 };
@@ -446,16 +447,19 @@ class LinkProtocol
 		struct Params
 		{
 			// Magic is a unique envelope identifier vector:
-			Blob					magic;
+			Blob							magic;
 			// Only send this envelope every Nth time:
-			size_t					send_every		{ 1 };
+			size_t							send_every		{ 1 };
 			// Start sending first packet from send_offset:
-			size_t					send_offset		{ 0 };
+			size_t							send_offset		{ 0 };
 			// If provided, the envelope will be sent-out if and only if this function returns true.
 			// `send_every` is not taken into account while `send_predicate()` returns false.
-			std::function<bool()>	send_predicate	{ nullptr };
+			std::function<bool()>			send_predicate	{ nullptr };
+			// Optional encryption transceiver. If provided, the envelope will not be sent
+			// until the transceiver reports connected() == true.
+			xf::crypto::xle::Transceiver*	transceiver		{ nullptr };
 			// List of packets this envelope will comprise:
-			PacketList				packets			{};
+			PacketList						packets			{};
 		};
 
 	  public:
@@ -470,14 +474,18 @@ class LinkProtocol
 		size() const override;
 
 		void
-		produce (Blob& blob) override;
+		produce (Blob& blob, xf::Logger const&) override;
+
+		Blob::const_iterator
+		eat (Blob::const_iterator, Blob::const_iterator, xf::Logger const&) override;
 
 	  private:
-		Blob					_magic;
-		uint64_t				_send_every;
-		uint64_t				_send_offset;
-		uint64_t				_send_pos	{ 0 };
-		std::function<bool()>	_send_predicate;
+		Blob							_magic;
+		uint64_t						_send_every;
+		uint64_t						_send_offset;
+		uint64_t						_send_pos	{ 0 };
+		std::function<bool()>			_send_predicate;
+		xf::crypto::xle::Transceiver*	_transceiver;
 	};
 
 	using EnvelopeList = std::initializer_list<std::shared_ptr<Envelope>>;
@@ -945,6 +953,7 @@ template<uint16_t B, class V>
 					{
 						if (size > kBufferB)
 							throw ParseError();
+
 						std::string string;
 						string.resize (size);
 						std::copy (read_iterator, read_iterator + size, string.data());

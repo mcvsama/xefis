@@ -91,7 +91,7 @@ class Transport
 	 */
 	[[nodiscard]]
 	size_t
-	data_margin() const
+	ciphertext_expansion() const
 		{ return sizeof (SequenceNumber) + _hmac_size + kDataSaltSize; }
 
 	/**
@@ -100,6 +100,14 @@ class Transport
 	Blob
 	data_encryption_key_hash() const
 		{ return calculate_hash<Hash::SHA3_256> (*_data_encryption_key); }
+
+	/**
+	 * Return how much larger the resulting packet will be compared to plain text.
+	 */
+	[[nodiscard]]
+	static size_t
+	ciphertext_expansion (size_t hmac_size)
+		{ return sizeof (SequenceNumber) + hmac_size + kDataSaltSize; }
 
   protected:
 	size_t			_hmac_size;

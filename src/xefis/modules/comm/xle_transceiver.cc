@@ -38,10 +38,36 @@ static Blob const kSlaveToMaster { 0x02 };
 static thread_local boost::random::random_device transceiver_rnd;
 
 
-Transceiver::Transceiver (Role const role, xf::Logger const& logger):
+Transceiver::Transceiver (Role const role, size_t ciphertext_expansion, xf::Logger const& logger):
 	_role (role),
-	_logger (logger)
+	_logger (logger),
+	_ciphertext_expansion (ciphertext_expansion)
 { }
+
+
+bool
+Transceiver::ready() const
+{
+	if (auto const* active_session = this->active_session();
+		active_session && active_session->connected())
+	{
+		return true;
+	}
+
+	if (auto const* next_session_candidate = this->next_session_candidate();
+		next_session_candidate && next_session_candidate->connected())
+	{
+		return true;
+	}
+
+	if (auto const* previous_session = this->previous_session();
+		previous_session && previous_session->connected())
+	{
+		return true;
+	}
+
+	return false;
+}
 
 
 Blob
@@ -267,7 +293,7 @@ MasterTransceiver::Session::receiver()
 
 
 MasterTransceiver::MasterTransceiver (CryptoParams const& params, xf::Logger const& logger, std::string_view const& instance):
-	Transceiver (Role::Master, logger.with_scope (std::string (kLoggerScope) + "#" + instance)),
+	Transceiver (Role::Master, Transport::ciphertext_expansion (params.hmac_size), logger.with_scope (std::string (kLoggerScope) + "#" + instance)),
 	Module ("MasterTransceiver"),
 	_crypto_params (params)
 { }
@@ -373,7 +399,7 @@ SlaveTransceiver::SlaveTransceiver (CryptoParams const& params,
 									std::function<bool (HandshakeID)> handshake_id_reuse_check,
 									xf::Logger const& logger,
 									std::string_view const& instance):
-	Transceiver (Role::Slave, logger.with_scope (std::string (kLoggerScope) + "#" + instance)),
+	Transceiver (Role::Slave, Transport::ciphertext_expansion (params.hmac_size), logger.with_scope (std::string (kLoggerScope) + "#" + instance)),
 	Module ("SlaveTransceiver"),
 	_crypto_params (params),
 	_handshake_id_reuse_check (handshake_id_reuse_check)

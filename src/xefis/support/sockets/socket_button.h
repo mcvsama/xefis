@@ -18,6 +18,9 @@
 #include <xefis/config/all.h>
 #include <xefis/core/sockets/socket.h>
 
+// Neutrino:
+#include <neutrino/variant.h>
+
 // Standard:
 #include <cstddef>
 #include <functional>

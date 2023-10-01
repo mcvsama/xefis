@@ -52,7 +52,7 @@ enum class Role {
 
 
 /**
- * For debugging and testing logs.
+ * For debugging and test logs.
  */
 class WithIDs
 {
@@ -95,6 +95,7 @@ class Transceiver
 		si::Time	max_time_difference		{ 60_s };
 	};
 
+  protected:
 	class Session: public WithIDs
 	{
 	  public:
@@ -103,6 +104,14 @@ class Transceiver
 		// Dtor
 		virtual
 		~Session() = default;
+
+		[[nodiscard]]
+		virtual bool
+		connected() const = 0;
+
+		[[nodiscard]]
+		virtual Transmitter const&
+		transmitter() const = 0;
 
 		[[nodiscard]]
 		virtual Blob
@@ -114,9 +123,14 @@ class Transceiver
 	};
 
   public:
-	// Ctor
+	/**
+	 * Ctor
+	 *
+	 * \param	ciphertext_expansion
+	 *			How many bytes the encrypted packet will be bigger than the original unencrypted one.
+	 */
 	explicit
-	Transceiver (Role, xf::Logger const&);
+	Transceiver (Role, size_t ciphertext_expansion, xf::Logger const&);
 
 	// Dtor
 	virtual
@@ -139,6 +153,22 @@ class Transceiver
 	bool
 	connecting() const noexcept
 		{ return !!next_session_candidate(); }
+
+	/**
+	 * Return true if the transceiver is ready to encrypt/decrypt packets.
+	 */
+	[[nodiscard]]
+	bool
+	ready() const;
+
+	/**
+	 * Return how much larger the resulting packet will be compared to plain text.
+	 * This function can be called only if connected() returns true.
+	 */
+	[[nodiscard]]
+	size_t
+	ciphertext_expansion() const
+		{ return _ciphertext_expansion; }
 
 	/**
 	 * Encrypt packet.
@@ -169,6 +199,14 @@ class Transceiver
 	[[nodiscard]]
 	virtual Session*
 	previous_session() = 0;
+
+	/**
+	 * Return previous session which was previously an active session before
+	 * shift_session().
+	 */
+	[[nodiscard]]
+	virtual Session const*
+	previous_session() const = 0;
 
 	/**
 	 * Return session that is currently used to encrypt and decrypt packets.
@@ -222,6 +260,7 @@ class Transceiver
   private:
 	Role const	_role;
 	xf::Logger	_logger;
+	size_t		_ciphertext_expansion;
 };
 
 
@@ -391,9 +430,21 @@ class MasterTransceiver:
 		std::optional<Blob>
 		rx_key_hash() const;
 
+		// Session API
+		[[nodiscard]]
+		bool
+		connected() const override
+			{ return std::holds_alternative<Connected> (_state); }
+
 		[[nodiscard]]
 		Transmitter&
 		transmitter();
+
+		// Session API
+		[[nodiscard]]
+		Transmitter const&
+		transmitter() const override
+			{ return const_cast<Session*> (this)->transmitter(); }
 
 		[[nodiscard]]
 		Receiver&
@@ -457,6 +508,12 @@ class MasterTransceiver:
 	[[nodiscard]]
 	Session*
 	previous_session() override
+		{ return _previous_session.get(); }
+
+	// Transceiver API
+	[[nodiscard]]
+	Session const*
+	previous_session() const override
 		{ return _previous_session.get(); }
 
 	// Transceiver API
@@ -556,6 +613,18 @@ class SlaveTransceiver:
 
 		// Session API
 		[[nodiscard]]
+		bool
+		connected() const override
+			{ return true; }
+
+		// Session API
+		[[nodiscard]]
+		Transmitter const&
+		transmitter() const override
+			{ return *_transmitter; }
+
+		// Session API
+		[[nodiscard]]
 		Blob
 		encrypt_packet (BlobView const packet)
 			{ return _transmitter->encrypt_packet (packet); }
@@ -605,6 +674,12 @@ class SlaveTransceiver:
 	[[nodiscard]]
 	Session*
 	previous_session() override
+		{ return nullptr; }
+
+	// Transceiver API
+	[[nodiscard]]
+	Session const*
+	previous_session() const override
 		{ return nullptr; }
 
 	// Transceiver API
