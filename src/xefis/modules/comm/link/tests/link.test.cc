@@ -137,7 +137,7 @@ class GroundToAirLinkProtocol: public LinkProtocol
 				// Must be first envelope (its data will be messed with to test
 				// if it's discarded in such case):
 				envelope ({
-					.magic			= { 0x00, 0x01 },
+					.unique_prefix	= { 0x00, 0x01 },
 					.transceiver	= transceiver,
 					.packets		= {
 						signature ({
@@ -167,7 +167,7 @@ class GroundToAirLinkProtocol: public LinkProtocol
 				}),
 				// XLE handshake envelope:
 				envelope ({
-					.magic			= { 0x00, 0x00 },
+					.unique_prefix	= { 0x00, 0x00 },
 					.send_predicate	= [&io] { return io.handshake_request.valid(); },
 					.packets		= {
 						// Always good to have at least basic checksum:
@@ -184,8 +184,8 @@ class GroundToAirLinkProtocol: public LinkProtocol
 				// This must be last on the list of envelopes
 				// that are transmitted immediately (not delayed):
 				envelope ({
-					.magic		= { 0x00, 0x02 },
-					.packets	= {
+					.unique_prefix	= { 0x00, 0x02 },
+					.packets		= {
 						signature ({
 							.nonce_bytes		= 8,
 							.signature_bytes	= 8,
@@ -204,7 +204,7 @@ class GroundToAirLinkProtocol: public LinkProtocol
 				// Envelope that will not be transmitted until some time
 				// passes:
 				envelope ({
-					.magic			= { 0x00, 0x03 },
+					.unique_prefix	= { 0x00, 0x03 },
 					.send_every		= 10,
 					.send_offset	= 8,
 					.packets		= {
@@ -226,7 +226,7 @@ class AirToGroundLinkProtocol: public LinkProtocol
 			LinkProtocol ({
 				// XLE handshake envelope:
 				envelope ({
-					.magic			= { 0xff, 0x00 },
+					.unique_prefix	= { 0xff, 0x00 },
 					.send_predicate	= [&io] { return io.handshake_response.valid(); },
 					.packets		= {
 						// Always good to have at least basic checksum:
@@ -242,7 +242,7 @@ class AirToGroundLinkProtocol: public LinkProtocol
 				}),
 				// Normal data envelope:
 				envelope ({
-					.magic			= { 0xff, 0x01 },
+					.unique_prefix	= { 0xff, 0x01 },
 					.transceiver	= transceiver,
 					.packets		= {
 						socket<4> (io.int_prop),

@@ -69,14 +69,14 @@ class LinkProtocol
 	{ };
 
 	/**
-	 * Thrown when one of Envelopes has different magic string size than the others.
+	 * Thrown when one of Envelopes has different unique_prefix string size than the others.
 	 */
 	class InvalidMagicSize: public xf::Exception
 	{
 	  public:
 		explicit
 		InvalidMagicSize():
-			Exception ("invalid magic string length; envelopes' magic strings must be the same length")
+			Exception ("invalid unique_prefix string length; envelopes' unique_prefix strings must be the same length")
 		{ }
 	};
 
@@ -438,7 +438,7 @@ class LinkProtocol
 
 	/**
 	 * A single packet containing a set of packets. Configurable how often should be sent,
-	 * also contains magic bytes to be able to distinguish between different Envelopes
+	 * also contains unique_prefix to be able to distinguish between different Envelopes
 	 * coming from remote end.
 	 */
 	class Envelope: public Sequence
@@ -447,7 +447,7 @@ class LinkProtocol
 		struct Params
 		{
 			// Magic is a unique envelope identifier vector:
-			Blob							magic;
+			Blob							unique_prefix;
 			// Only send this envelope every Nth time:
 			size_t							send_every		{ 1 };
 			// Start sending first packet from send_offset:
@@ -468,7 +468,7 @@ class LinkProtocol
 		Envelope (Params&&);
 
 		Blob const&
-		magic() const;
+		unique_prefix() const;
 
 		Blob::size_type
 		size() const override;
@@ -480,7 +480,7 @@ class LinkProtocol
 		eat (Blob::const_iterator, Blob::const_iterator, xf::Logger const&) override;
 
 	  private:
-		Blob							_magic;
+		Blob							_unique_prefix;
 		uint64_t						_send_every;
 		uint64_t						_send_offset;
 		uint64_t						_send_pos	{ 0 };
@@ -670,9 +670,9 @@ class LinkProtocol
 
   private:
 	std::vector<std::shared_ptr<Envelope>>		_envelopes;
-	std::map<Blob, std::shared_ptr<Envelope>>	_envelope_magics;
-	Blob::size_type								_magic_size			{ 0 };
-	Blob										_aux_magic_buffer;
+	std::map<Blob, std::shared_ptr<Envelope>>	_envelope_unique_prefixes;
+	Blob::size_type								_unique_prefix_size { 0 };
+	Blob										_aux_unique_prefix_buffer;
 };
 
 

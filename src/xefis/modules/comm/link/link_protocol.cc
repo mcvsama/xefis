@@ -283,7 +283,7 @@ LinkProtocol::Signature::eat (Blob::const_iterator begin, Blob::const_iterator e
 
 LinkProtocol::Envelope::Envelope (Params&& params):
 	Sequence (params.packets),
-	_magic (params.magic),
+	_unique_prefix (params.unique_prefix),
 	_send_every (params.send_every),
 	_send_offset (params.send_offset),
 	_send_predicate (params.send_predicate),
@@ -292,9 +292,9 @@ LinkProtocol::Envelope::Envelope (Params&& params):
 
 
 Blob const&
-LinkProtocol::Envelope::magic() const
+LinkProtocol::Envelope::unique_prefix() const
 {
-	return _magic;
+	return _unique_prefix;
 }
 
 
@@ -322,7 +322,7 @@ LinkProtocol::Envelope::produce (Blob& blob, xf::Logger const& logger)
 					{
 						Blob unencrypted_blob;
 						Sequence::produce (unencrypted_blob, logger);
-						blob += _magic + _transceiver->encrypt_packet (unencrypted_blob);
+						blob += _unique_prefix + _transceiver->encrypt_packet (unencrypted_blob);
 					}
 				}
 				catch (...)
@@ -333,7 +333,7 @@ LinkProtocol::Envelope::produce (Blob& blob, xf::Logger const& logger)
 			}
 			else
 			{
-				blob += _magic;
+				blob += _unique_prefix;
 				Sequence::produce (blob, logger);
 			}
 		}
@@ -379,14 +379,14 @@ LinkProtocol::LinkProtocol (EnvelopeList envelopes):
 {
 	if (!_envelopes.empty())
 	{
-		_magic_size = _envelopes[0]->magic().size();
+		_unique_prefix_size = _envelopes[0]->unique_prefix().size();
 
 		for (auto const& e: _envelopes)
 		{
-			if (e->magic().size() != _magic_size)
+			if (e->unique_prefix().size() != _unique_prefix_size)
 				throw InvalidMagicSize();
 
-			_envelope_magics[e->magic()] = e;
+			_envelope_unique_prefixes[e->unique_prefix()] = e;
 		}
 	}
 }
@@ -416,9 +416,9 @@ LinkProtocol::eat (Blob::const_iterator begin,
 	logger << "Recv: " << neutrino::to_hex_string (BlobView (begin, end), ":") << std::endl;
 #endif
 
-	_aux_magic_buffer.resize (_magic_size);
+	_aux_unique_prefix_buffer.resize (_unique_prefix_size);
 
-	while (std::distance (begin, end) > static_cast<Blob::difference_type> (_magic_size + 1))
+	while (std::distance (begin, end) > static_cast<Blob::difference_type> (_unique_prefix_size + 1))
 	{
 		auto skip_byte_and_retry = [&]() {
 			// Skip one byte and try again:
@@ -438,25 +438,25 @@ LinkProtocol::eat (Blob::const_iterator begin,
 
 		xf::Exception::catch_and_log (logger, [&] {
 			try {
-				// Find the right magic and envelope:
-				std::copy (begin, begin + neutrino::to_signed (_magic_size), _aux_magic_buffer.begin());
-				auto envelope_and_magic = _envelope_magics.find (_aux_magic_buffer);
+				// Find the right unique_prefix and envelope:
+				std::copy (begin, begin + neutrino::to_signed (_unique_prefix_size), _aux_unique_prefix_buffer.begin());
+				auto envelope_and_unique_prefix = _envelope_unique_prefixes.find (_aux_unique_prefix_buffer);
 
 				// If not found, retry starting with next byte:
-				if (envelope_and_magic == _envelope_magics.end())
+				if (envelope_and_unique_prefix == _envelope_unique_prefixes.end())
 					throw LinkProtocol::ParseError();
 
-				auto envelope = envelope_and_magic->second;
+				auto envelope = envelope_and_unique_prefix->second;
 				// Now see if we have enough data in input buffer for this envelope type.
 				// If not, return and retry when enough data is read.
-				if (neutrino::to_unsigned (std::distance (begin, end)) - _magic_size < envelope->size())
+				if (neutrino::to_unsigned (std::distance (begin, end)) - _unique_prefix_size < envelope->size())
 				{
 					return_from_outer_function = true;
 					outer_result = begin;
 					return;
 				}
 
-				auto e = envelope->eat (begin + neutrino::to_signed (_magic_size), end, logger);
+				auto e = envelope->eat (begin + neutrino::to_signed (_unique_prefix_size), end, logger);
 
 				if (e != begin)
 				{
