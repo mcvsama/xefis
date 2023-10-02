@@ -31,7 +31,7 @@ InputLink::InputLink (std::unique_ptr<LinkProtocol> protocol, InputLinkParams co
 		_failsafe_timer = new QTimer (this);
 		_failsafe_timer->setSingleShot (true);
 		_failsafe_timer->setInterval (_params.failsafe_after->in<si::Millisecond>());
-		QObject::connect (_failsafe_timer, SIGNAL (timeout()), this, SLOT (failsafe()));
+		QObject::connect (_failsafe_timer, &QTimer::timeout, this, &InputLink::failsafe);
 	}
 
 	if (_params.reacquire_after)
@@ -39,7 +39,7 @@ InputLink::InputLink (std::unique_ptr<LinkProtocol> protocol, InputLinkParams co
 		_reacquire_timer = new QTimer (this);
 		_reacquire_timer->setSingleShot (true);
 		_reacquire_timer->setInterval (_params.reacquire_after->in<si::Millisecond>());
-		QObject::connect (_reacquire_timer, SIGNAL (timeout()), this, SLOT (reacquire()));
+		QObject::connect (_reacquire_timer, &QTimer::timeout, this, &InputLink::reacquire);
 	}
 }
 

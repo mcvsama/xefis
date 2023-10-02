@@ -33,12 +33,8 @@ struct InputLinkParams
 };
 
 
-class InputLink:
-	public QObject,
-	public xf::Module
+class InputLink: public xf::Module
 {
-	Q_OBJECT
-
   public:
 	xf::ModuleIn<std::string>	link_input				{ this, "input" };
 
