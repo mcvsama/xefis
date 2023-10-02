@@ -42,7 +42,7 @@ Wing::Wing (Airfoil const& airfoil, si::Density const material_density):
 
 
 void
-Wing::update_external_forces (AtmosphereModel const* atmosphere)
+Wing::update_external_forces (AtmosphericModel const* atmosphere)
 {
 	if (atmosphere)
 	{

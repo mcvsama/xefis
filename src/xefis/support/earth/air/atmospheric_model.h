@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__SUPPORT__EARTH__ATMOSPHERE_MODEL_H__INCLUDED
-#define XEFIS__SUPPORT__EARTH__ATMOSPHERE_MODEL_H__INCLUDED
+#ifndef XEFIS__SUPPORT__EARTH__ATMOSPHERIC_MODEL_H__INCLUDED
+#define XEFIS__SUPPORT__EARTH__ATMOSPHERIC_MODEL_H__INCLUDED
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -49,12 +49,12 @@ template<class Space>
 /**
  * General atmosphere model.
  */
-class AtmosphereModel
+class AtmosphericModel
 {
   public:
 	// Dtor
 	virtual
-	~AtmosphereModel() = default;
+	~AtmosphericModel() = default;
 
 	[[nodiscard]]
 	virtual Air

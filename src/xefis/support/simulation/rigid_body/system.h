@@ -52,7 +52,7 @@ class System: private Noncopyable
 	System() = default;
 
 	// Ctor
-	System (AtmosphereModel const&);
+	System (AtmosphericModel const&);
 
 	/**
 	 * Add new body to the system.
@@ -114,16 +114,16 @@ class System: private Noncopyable
 	 * Return atmosphere model to use by bodies or nullptr if it wasn't set.
 	 */
 	[[nodiscard]]
-	AtmosphereModel const*
-	atmosphere_model() const noexcept
-		{ return _atmosphere_model; }
+	AtmosphericModel const*
+	atmospheric_model() const noexcept
+		{ return _atmospheric_model; }
 
 	/**
 	 * Set atmosphere model to use by bodies or set it to nullptr.
 	 */
 	void
-	set_atmosphere_model (AtmosphereModel const* atmosphere_model) noexcept
-		{ _atmosphere_model = atmosphere_model; }
+	set_atmospheric_model (AtmosphericModel const* atmospheric_model) noexcept
+		{ _atmospheric_model = atmospheric_model; }
 
 	/**
 	 * Make a group belonging to this system.
@@ -204,7 +204,7 @@ class System: private Noncopyable
 	// Bodies acting on all bodies gravitationally (contains pointers to elements in _bodies):
 	BodyPointers			_gravitating_bodies;
 	BodyPointers			_non_gravitating_bodies;
-	AtmosphereModel const*	_atmosphere_model { nullptr };
+	AtmosphericModel const*	_atmospheric_model { nullptr };
 };
 
 } // namespace xf::rigid_body
@@ -216,8 +216,8 @@ class System: private Noncopyable
 namespace xf::rigid_body {
 
 inline
-System::System (AtmosphereModel const& atmosphere_model):
-	_atmosphere_model (&atmosphere_model)
+System::System (AtmosphericModel const& atmospheric_model):
+	_atmospheric_model (&atmospheric_model)
 { }
 
 

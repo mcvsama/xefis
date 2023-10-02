@@ -17,7 +17,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/earth/air/air.h>
-#include <xefis/support/earth/air/atmosphere_model.h>
+#include <xefis/support/earth/air/atmospheric_model.h>
 #include <xefis/support/math/geometry.h>
 
 // Standard:
@@ -32,7 +32,7 @@ namespace xf {
  * TODO use winds to affect density/pressure at that point.
  * TODO maybe the winds model should be a separate class plugged in into Atmosphere object?
  */
-class StandardAtmosphere: public AtmosphereModel
+class StandardAtmosphere: public AtmosphericModel
 {
   public:
 	[[nodiscard]]

@@ -16,7 +16,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/support/earth/air/atmosphere_model.h>
+#include <xefis/support/earth/air/atmospheric_model.h>
 #include <xefis/support/math/geometry.h>
 #include <xefis/support/math/placement.h>
 #include <xefis/support/nature/acceleration_moments.h>
@@ -356,7 +356,7 @@ class Body: public Noncopyable
 	 * Ask body to update external force moments by calling apply_force() methods.
 	 */
 	virtual void
-	update_external_forces (AtmosphereModel const*)
+	update_external_forces (AtmosphericModel const*)
 	{ }
 
   private:
