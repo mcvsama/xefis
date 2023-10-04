@@ -20,8 +20,5 @@
 #include <xefis/core/sockets/module_in.h>
 #include <xefis/core/sockets/module_out.h>
 
-// Standard:
-#include <cstddef>
-
 #endif
 
