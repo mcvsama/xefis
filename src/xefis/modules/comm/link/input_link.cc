@@ -28,18 +28,18 @@ InputLink::InputLink (std::unique_ptr<LinkProtocol> protocol, InputLinkParams co
 
 	if (_params.failsafe_after)
 	{
-		_failsafe_timer = new QTimer (this);
+		_failsafe_timer = std::make_unique<QTimer>();
 		_failsafe_timer->setSingleShot (true);
 		_failsafe_timer->setInterval (_params.failsafe_after->in<si::Millisecond>());
-		QObject::connect (_failsafe_timer, &QTimer::timeout, this, &InputLink::failsafe);
+		QObject::connect (_failsafe_timer.get(), &QTimer::timeout, [this] { failsafe(); });
 	}
 
 	if (_params.reacquire_after)
 	{
-		_reacquire_timer = new QTimer (this);
+		_reacquire_timer = std::make_unique<QTimer>();
 		_reacquire_timer->setSingleShot (true);
 		_reacquire_timer->setInterval (_params.reacquire_after->in<si::Millisecond>());
-		QObject::connect (_reacquire_timer, &QTimer::timeout, this, &InputLink::reacquire);
+		QObject::connect (_reacquire_timer.get(), &QTimer::timeout, [this] { reacquire(); });
 	}
 }
 
@@ -51,7 +51,7 @@ InputLink::process (xf::Cycle const& cycle)
 		if (this->link_input && _input_changed.serial_changed())
 		{
 			_input_blob.insert (_input_blob.end(), this->link_input->begin(), this->link_input->end());
-			auto e = _protocol->consume (_input_blob.begin(), _input_blob.end(), this, _reacquire_timer, _failsafe_timer, cycle.logger() + _logger);
+			auto e = _protocol->consume (_input_blob.begin(), _input_blob.end(), this, _reacquire_timer.get(), _failsafe_timer.get(), cycle.logger() + _logger);
 			auto valid_bytes = std::distance (_input_blob.cbegin(), e);
 			this->link_valid_bytes = this->link_valid_bytes.value_or (0) + valid_bytes;
 			_input_blob.erase (_input_blob.begin(), e);
@@ -79,5 +79,4 @@ InputLink::reacquire()
 	this->link_valid = true;
 	this->link_reacquires = this->link_reacquires.value_or (0) + 1;
 }
-
 

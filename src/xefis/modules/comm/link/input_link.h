@@ -71,8 +71,8 @@ class InputLink: public xf::Module
 
   private:
 	xf::Logger						_logger;
-	QTimer*							_failsafe_timer		{ nullptr };
-	QTimer*							_reacquire_timer	{ nullptr };
+	std::unique_ptr<QTimer>			_failsafe_timer;
+	std::unique_ptr<QTimer>			_reacquire_timer;
 	Blob							_input_blob;
 	std::unique_ptr<LinkProtocol>	_protocol;
 	xf::SocketChanged				_input_changed		{ link_input };
