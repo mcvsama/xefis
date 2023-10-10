@@ -58,9 +58,17 @@ class Constraint: public ConnectedBodies
 	template<std::size_t N>
 		using JacobianW = math::Matrix<si::Length, 3, N, WorldSpace, WorldSpace>;
 
+	// Total integrated jacobian:
+	template<std::size_t N>
+		using Jacobian = math::Vector<si::Velocity, N, WorldSpace>;
+
 	// Location constraint vector (angles are represented by axis-angle vector):
 	template<std::size_t N>
 		using LocationConstraint = math::Vector<si::Length, N, WorldSpace>;
+
+	// Lambda:
+	template<std::size_t N>
+		using Lambda = math::Vector<si::Force, N, WorldSpace>;
 
 	// Constraint mass matrix:
 	template<std::size_t N>
@@ -188,7 +196,7 @@ class Constraint: public ConnectedBodies
 						  si::Time dt) = 0;
 
 	/**
-	 * Helper function to calculate actual corrective forces for given Jacobians and location constraints.
+	 * Helper function that calculates actual corrective forces for given Jacobians and location constraints.
 	 *
 	 * \param	ext_forces_1, ext_forces_2
 	 *			External force-moments acting on bodies 1, 2.
@@ -196,17 +204,38 @@ class Constraint: public ConnectedBodies
 	template<std::size_t N>
 		[[nodiscard]]
 		ConstraintForces
-		calculate_constraint_forces (VelocityMoments<WorldSpace> const& vm_1,
-									 ForceMoments<WorldSpace> const& ext_forces_1,
-									 JacobianV<N> const& Jv1,
+		calculate_constraint_forces (JacobianV<N> const& Jv1,
 									 JacobianW<N> const& Jw1,
-									 VelocityMoments<WorldSpace> const& vm_2,
-									 ForceMoments<WorldSpace> const& ext_forces_2,
 									 JacobianV<N> const& Jv2,
 									 JacobianW<N> const& Jw2,
-									 LocationConstraint<N> const&,
-									 ConstraintMassMatrix<N> const&,
-									 si::Time dt) const;
+									 Lambda<N> const& lambda) const;
+
+	/**
+	 * Calculates total jacobian (J[i]) for current simulation frame.
+	 */
+	template<std::size_t N>
+		[[nodiscard]]
+		Jacobian<N>
+		calculate_jacobian (VelocityMoments<WorldSpace> const& vm_1,
+							ForceMoments<WorldSpace> const& ext_forces_1,
+							JacobianV<N> const& Jv1,
+							JacobianW<N> const& Jw1,
+							VelocityMoments<WorldSpace> const& vm_2,
+							ForceMoments<WorldSpace> const& ext_forces_2,
+							JacobianV<N> const& Jv2,
+							JacobianW<N> const& Jw2,
+							si::Time dt) const;
+
+	/**
+	 * Calculate lambda (a vector of si::Force).
+	 */
+	template<std::size_t N>
+		[[nodiscard]]
+		Lambda<N>
+		calculate_lambda (LocationConstraint<N> const& location_constraint,
+						  Jacobian<N> const& J,
+						  ConstraintMassMatrix<N> const& K,
+						  si::Time dt) const;
 
 	/**
 	 * Calculate mass matrix K in a generic way.
@@ -291,17 +320,35 @@ Constraint::constraint_forces (VelocityMoments<WorldSpace> const& vm_1, ForceMom
 
 template<std::size_t N>
 	inline ConstraintForces
-	Constraint::calculate_constraint_forces (VelocityMoments<WorldSpace> const& vm_1,
-											 ForceMoments<WorldSpace> const& ext_forces_1,
-											 JacobianV<N> const& Jv1,
+	Constraint::calculate_constraint_forces (JacobianV<N> const& Jv1,
 											 JacobianW<N> const& Jw1,
-											 VelocityMoments<WorldSpace> const& vm_2,
-											 ForceMoments<WorldSpace> const& ext_forces_2,
 											 JacobianV<N> const& Jv2,
 											 JacobianW<N> const& Jw2,
-											 LocationConstraint<N> const& location_constraint,
-											 ConstraintMassMatrix<N> const& K,
-											 si::Time dt) const
+											 Lambda<N> const& lambda) const
+	{
+		auto const Fc1 = ~Jv1 * lambda;
+		auto const Tc1 = ~Jw1 * lambda;
+		auto const Fc2 = ~Jv2 * lambda;
+		auto const Tc2 = ~Jw2 * lambda;
+
+		return {
+			ForceMoments<WorldSpace> (Fc1, Tc1),
+			ForceMoments<WorldSpace> (Fc2, Tc2),
+		};
+	}
+
+
+template<std::size_t N>
+	inline Constraint::Jacobian<N>
+	Constraint::calculate_jacobian (VelocityMoments<WorldSpace> const& vm_1,
+									ForceMoments<WorldSpace> const& ext_forces_1,
+									JacobianV<N> const& Jv1,
+									JacobianW<N> const& Jw1,
+									VelocityMoments<WorldSpace> const& vm_2,
+									ForceMoments<WorldSpace> const& ext_forces_2,
+									JacobianV<N> const& Jv2,
+									JacobianW<N> const& Jw2,
+									si::Time dt) const
 	{
 		auto const v1 = vm_1.velocity();
 		auto const w1 = vm_1.angular_velocity() / 1_rad;
@@ -313,24 +360,25 @@ template<std::size_t N>
 		auto const inv_M2 = body_2().frame_cache().inv_M;
 		auto const inv_I2 = body_2().frame_cache().inv_I;
 
-		// J * (v + Δt * a)
-		auto const Jvi = Jv1 * (v1 + dt * inv_M1 * (ext_forces_1.force()))
-					   + Jw1 * (w1 + dt * inv_I1 * (ext_forces_1.torque()))
-					   + Jv2 * (v2 + dt * inv_M2 * (ext_forces_2.force()))
-					   + Jw2 * (w2 + dt * inv_I2 * (ext_forces_2.torque()));
+		// Total jacobian: J * (v + Δt * a)
+		auto const J = Jv1 * (v1 + dt * inv_M1 * (ext_forces_1.force()))
+					 + Jw1 * (w1 + dt * inv_I1 * (ext_forces_1.torque()))
+					 + Jv2 * (v2 + dt * inv_M2 * (ext_forces_2.force()))
+					 + Jw2 * (w2 + dt * inv_I2 * (ext_forces_2.torque()));
 
+		return J;
+	}
+
+
+template<std::size_t N>
+	inline Constraint::Lambda<N>
+	Constraint::calculate_lambda (LocationConstraint<N> const& location_constraint,
+								  Jacobian<N> const& J,
+								  ConstraintMassMatrix<N> const& K,
+								  si::Time const dt) const
+	{
 		auto const stabilization_bias = baumgarte_factor() / dt * location_constraint;
-		auto const lambda = (-inv (K) * (Jvi + stabilization_bias)) / dt;
-
-		auto const Fc1 = ~Jv1 * lambda;
-		auto const Tc1 = ~Jw1 * lambda;
-		auto const Fc2 = ~Jv2 * lambda;
-		auto const Tc2 = ~Jw2 * lambda;
-
-		return {
-			ForceMoments<WorldSpace> (Fc1, Tc1),
-			ForceMoments<WorldSpace> (Fc2, Tc2),
-		};
+		return (-inv (K) * (J + stabilization_bias)) / dt;
 	}
 
 

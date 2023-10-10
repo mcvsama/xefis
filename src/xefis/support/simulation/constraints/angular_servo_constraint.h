@@ -17,8 +17,9 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/simulation/components/resistor.h>
-#include <xefis/support/simulation/constraints/angular_spring_constraint.h>
+#include <xefis/support/simulation/constraints/angular_motor_constraint.h>
 #include <xefis/support/simulation/constraints/hinge_precalculation.h>
+#include <xefis/support/simulation/devices/interfaces/angular_servo.h>
 #include <xefis/support/simulation/failure/sigmoidal_temperature_failure.h>
 #include <xefis/support/simulation/rigid_body/body.h>
 
@@ -28,7 +29,9 @@
 // Standard:
 #include <cstddef>
 #include <memory>
+#include <numeric>
 #include <optional>
+#include <utility>
 #include <variant>
 
 
@@ -38,11 +41,11 @@ namespace xf::rigid_body {
 using AngularVelocityPotential	= decltype (1_rad / 1_s / 1_V);
 using TorquePotential			= decltype (1_Nm / 1_V);
 
-// Typical microservo angular velocity potential: 83°/s/V (about 500°/s at 6 V):
-static constexpr auto k9gramAngularVelocityPotential	= 83_deg / 1_s / 1_V;
+// Typical microservo angular velocity potential:
+static constexpr auto k9gramAngularVelocityPotential	= 500_deg / 1_s / 6_V;
 
-// Typical microservo torque potential: ~0.024 Nm/V (0.144 Nm at 6 V):
-static constexpr auto k9gramTorquePotential				= 0.024_Nm / 1_V;
+// Typical microservo torque potential:
+static constexpr auto k9gramTorquePotential				= 0.144_Nm / 6_V;
 
 
 /**
@@ -51,12 +54,11 @@ static constexpr auto k9gramTorquePotential				= 0.024_Nm / 1_V;
  * move to a specified set point angle.
  */
 class AngularServoConstraint:
+	public xf::sim::interfaces::AngularServo,
 	public Constraint,
 	public electrical::Resistor
 {
   public:
-	using ActionTorqueFunction	= std::function<si::Torque (si::Angle error, si::Voltage)>;
-	using DragTorqueFunction	= std::function<si::Torque (si::AngularVelocity const& arm_velocity, si::Voltage)>;
 	using TorqueEfficacy		= decltype (1_Nm / 1_W);
 
 	static constexpr si::Resistance			kInitialResistance					{ 1_kOhm };
@@ -70,29 +72,48 @@ class AngularServoConstraint:
 	/**
 	 * Ctor
 	 * \param	backlash
-	 *			If error (actual - setpoint) is greater or equal to backlash,
-	 *			full available force will be used. Otherwise it will linearly depend on the error.
+	 *			If error (abs (actual - setpoint)) is greater or equal to backlash, normal torque will be used.
+	 *			Otherwise, the servo will not act at all.
 	 */
 	explicit
-	AngularServoConstraint (HingePrecalculation&, si::Angle backlash, ActionTorqueFunction, DragTorqueFunction);
+	AngularServoConstraint (HingePrecalculation&, Range<si::Angle> angle_range, si::Angle backlash, AngularVelocityPotential, TorquePotential);
+
+	void
+	set_orientation (xf::sim::ServoOrientation const orientation)
+		{ _orientation = orientation; }
+
+	/**
+	 * Return angle range.
+	 */
+	[[nodiscard]]
+	Range<si::Angle>
+	angle_range() const noexcept
+		{ return _angle_range; }
+
+	/**
+	 * Return servo setpoint.
+	 */
+	si::Angle
+	setpoint() const noexcept
+		{ return _setpoint; }
 
 	/**
 	 * Set servo setpoint.
 	 */
 	void
-	set_setpoint (si::Angle setpoint)
-		{ _setpoint = setpoint; }
+	set_setpoint (si::Angle const setpoint)
+		{ _setpoint = std::to_underlying (_orientation) * std::clamp (setpoint, _angle_range.min(), _angle_range.max()); }
 
 	/**
 	 * Set electrical efficiency.
 	 * Setting this invalidates value set by set_efficacy().
 	 *
 	 * \param	efficiency_factor
-	 *			Should be in range 0…1.
+	 *			Must be in range 0…1.
 	 */
 	void
 	set_efficiency (double efficiency_factor)
-		{ _efficiency_efficacy = efficiency_factor; }
+		{ _effic = efficiency_factor; }
 
 	/**
 	 * Set electrical efficacy.
@@ -103,8 +124,23 @@ class AngularServoConstraint:
 	 */
 	void
 	set_efficacy (TorqueEfficacy efficacy)
-		{ _efficiency_efficacy = efficacy; }
+		{ _effic = efficacy; }
 
+	/**
+	 * Return current relative arm velocity.
+	 */
+	si::AngularVelocity
+	arm_angular_velocity() const
+		{ return _arm_angular_velocity; }
+
+	/**
+	 * Return current arm torque.
+	 */
+	si::Torque
+	arm_torque() const
+		{ return _arm_torque; }
+
+  protected:
 	// Constraint API
 	ConstraintForces
 	do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, ForceMoments<WorldSpace> const& ext_forces_1,
@@ -120,55 +156,29 @@ class AngularServoConstraint:
 	flow_current (si::Time dt) override;
 
   private:
-	std::optional<AngularSpringConstraint>					_spring_constraint;
-	std::variant<std::monostate, double, TorqueEfficacy>	_efficiency_efficacy;
+	void
+	update_velocity_and_torque();
+
+  private:
+	HingePrecalculation&									_hinge;
+	xf::sim::ServoOrientation								_orientation			{ xf::sim::ServoOrientation::Normal };
+	Range<si::Angle>										_angle_range;
 	si::Angle												_backlash;
-	si::Angle												_setpoint			{ 0_deg };
-	si::AngularVelocity										_angular_velocity;
-	si::Torque												_torque;
-	si::Power												_power_loss;
+	si::Angle												_setpoint				{ _angle_range.midpoint() };
+	std::variant<std::monostate, double, TorqueEfficacy>	_effic;
+	si::Power												_power_loss				{ 0_W };
 	SigmoidalTemperatureFailure								_failure_model;
+	AngularVelocityPotential								_angular_velocity_potential;
+	TorquePotential											_torque_potential;
+	AngularMotorConstraint									_motor_constraint;
+	si::AngularVelocity										_arm_angular_velocity	{ 0_radps };
+	si::Torque												_arm_torque				{ 0_Nm };
 };
 
 
 /*
  * Global functions
  */
-
-
-/**
- * Return an action torque function of angular error and servo operating voltage.
- *
- * \param	stall_torque_potential
- *			Servo stall torque per unit voltage.
- */
-constexpr auto
-servo_action_torque (TorquePotential stall_torque_potential)
-{
-	return [=] ([[maybe_unused]] si::Angle error, si::Voltage voltage) {
-		return stall_torque_potential * voltage;
-	};
-}
-
-
-/**
- * Return a drag torque function of angular velocity and servo operating voltage.
- *
- * \param	stall_torque_potential
- *			Servo stall torque per unit voltage.
- * \param	unloaded_angular_velocity_potential
- *			Unloaded servo arm velocity per unit voltage.
- */
-constexpr auto
-servo_drag_torque (TorquePotential stall_torque_potential, AngularVelocityPotential unloaded_angular_velocity_potential)
-{
-	return [=] (si::AngularVelocity arm_velocity, si::Voltage) {
-		// Since unloaded angular velocity is maximum velocity, it's achieved when acting force and drag force are equally opposite.
-		// So maximum drag == stall_torque_potential. Minimum drag is 0, when arm is not moving. Assume drag linear dependency on velocity
-		// and compute current drag:
-		return arm_velocity / unloaded_angular_velocity_potential * stall_torque_potential;
-	};
-}
 
 
 /**

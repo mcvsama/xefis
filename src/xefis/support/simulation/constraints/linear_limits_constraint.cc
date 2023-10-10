@@ -19,7 +19,6 @@
 
 // Standard:
 #include <cstddef>
-#include <array>
 
 
 namespace xf::rigid_body {
@@ -75,11 +74,14 @@ LinearLimitsConstraint::min_distance_corrections (VelocityMoments<WorldSpace> co
 		Jv2.put (~c.a, 0, 0);
 		Jw2.put (c.r2xa, 0, 0);
 		location_constraint_value (0, 0) = c.distance - *_min_distance;
-		auto const K = calculate_K (Jv1, Jw1, Jv2, Jw2);
 
-		return calculate_constraint_forces (vm_1, ext_forces_1, Jv1, Jw1,
-											vm_2, ext_forces_2, Jv2, Jw2,
-											location_constraint_value, K, dt);
+		auto const J = calculate_jacobian (vm_1, ext_forces_1, Jv1, Jw1,
+										   vm_2, ext_forces_2, Jv2, Jw2,
+										   dt);
+		auto const K = calculate_K (Jv1, Jw1, Jv2, Jw2);
+		auto const lambda = calculate_lambda (location_constraint_value, J, K, dt);
+
+		return calculate_constraint_forces (Jv1, Jw1, Jv2, Jw2, lambda);
 	}
 	else
 		return std::nullopt;
@@ -105,11 +107,14 @@ LinearLimitsConstraint::max_distance_corrections (VelocityMoments<WorldSpace> co
 		Jv2.put (-~c.a, 0, 0);
 		Jw2.put (-c.r2xa, 0, 0);
 		location_constraint_value (0, 0) = *_max_distance - c.distance;
-		auto const K = calculate_K (Jv1, Jw1, Jv2, Jw2);
 
-		return calculate_constraint_forces (vm_1, ext_forces_1, Jv1, Jw1,
-											vm_2, ext_forces_2, Jv2, Jw2,
-											location_constraint_value, K, dt);
+		auto const J = calculate_jacobian (vm_1, ext_forces_1, Jv1, Jw1,
+										   vm_2, ext_forces_2, Jv2, Jw2,
+										   dt);
+		auto const K = calculate_K (Jv1, Jw1, Jv2, Jw2);
+		auto const lambda = calculate_lambda (location_constraint_value, J, K, dt);
+
+		return calculate_constraint_forces (Jv1, Jw1, Jv2, Jw2, lambda);
 	}
 	else
 		return std::nullopt;

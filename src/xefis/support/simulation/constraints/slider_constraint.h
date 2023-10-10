@@ -33,6 +33,7 @@ class SliderConstraint: public Constraint
 	explicit
 	SliderConstraint (SliderPrecalculation&);
 
+  protected:
 	// Constraint API
 	ConstraintForces
 	do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, ForceMoments<WorldSpace> const& ext_forces_1,

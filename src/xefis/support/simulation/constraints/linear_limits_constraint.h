@@ -67,6 +67,7 @@ class LinearLimitsConstraint: public Constraint
 	void
 	set_distances (Range<si::Length>);
 
+  protected:
 	// Constraint API
 	ConstraintForces
 	do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, ForceMoments<WorldSpace> const& ext_forces_1,

@@ -38,16 +38,21 @@ class AngularSpringConstraint: public Constraint
 {
   public:
 	/**
-	 * Returns Torque for angular displacement. Preferred positive torque for positive angle gives negative feedback,
+	 * Returns Torque for angular displacement. Positive torque for positive angle gives negative feedback,
 	 * which stabilizes the constraint.
 	 */
-	using SpringTorqueFunction = std::function<si::Torque (si::Angle, SpaceVector<double, WorldSpace> const& hinge)>;
+	using SpringTorqueFunction = std::function<si::Torque (si::Angle,
+														   SpaceVector<double, WorldSpace> const& hinge,
+														   VelocityMoments<WorldSpace> const& vm1, ForceMoments<WorldSpace> const& fm1,
+														   VelocityMoments<WorldSpace> const& vm2, ForceMoments<WorldSpace> const& fm2,
+														   si::Time const dt)>;
 
   public:
 	// Ctor
 	explicit
 	AngularSpringConstraint (HingePrecalculation&, SpringTorqueFunction);
 
+  protected:
 	// Constraint API
 	ConstraintForces
 	do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, ForceMoments<WorldSpace> const& ext_forces_1,
@@ -67,11 +72,17 @@ class AngularSpringConstraint: public Constraint
 
 /**
  * Return an action torque function of angular error.
+ * For positive angle return negative torque to counteract the angle.
  */
 constexpr auto
 angular_spring_function (TorqueForAngle torque_for_angle)
 {
-	return [=] (si::Angle angle, SpaceVector<double, WorldSpace> const&) {
+	return [=] (si::Angle const angle,
+				[[maybe_unused]] SpaceVector<double, WorldSpace> const& hinge,
+				[[maybe_unused]] VelocityMoments<WorldSpace> const& vm1, [[maybe_unused]] ForceMoments<WorldSpace> const& fm1,
+				[[maybe_unused]] VelocityMoments<WorldSpace> const& vm2, [[maybe_unused]] ForceMoments<WorldSpace> const& fm2,
+				[[maybe_unused]] si::Time const dt)
+	{
 		return torque_for_angle * angle;
 	};
 }

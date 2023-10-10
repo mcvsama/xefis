@@ -98,11 +98,13 @@ FixedConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, 
 	location_constraint_value.put (x2 + r2 - x1 - r1, 0, 0);
 	location_constraint_value.put (_fixed_orientation.rotation_constraint_value (loc_1, loc_2), 0, 3);
 
+	auto const J = calculate_jacobian (vm_1, ext_forces_1, Jv1, Jw1,
+									   vm_2, ext_forces_2, Jv2, Jw2,
+									   dt);
 	auto const K = calculate_K (Jv1, Jw1, Jv2, Jw2);
+	auto const lambda = calculate_lambda (location_constraint_value, J, K, dt);
 
-	return calculate_constraint_forces (vm_1, ext_forces_1, Jv1, Jw1,
-										vm_2, ext_forces_2, Jv2, Jw2,
-										location_constraint_value, K, dt);
+	return calculate_constraint_forces (Jv1, Jw1, Jv2, Jw2, lambda);
 }
 
 } // namespace xf::rigid_body

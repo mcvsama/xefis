@@ -37,7 +37,7 @@ class HingePrecalculationData
 	SpaceLength<WorldSpace>				r2;
 	// x2 + r2 - x1 - r1:
 	SpaceLength<WorldSpace>				u;
-	// Normalized hinge visible from both bodies:
+	// Normalized hinge axis visible from both bodies:
 	SpaceVector<double, WorldSpace>		a1;
 	SpaceVector<double, WorldSpace>		a2;
 	// Two vectors orthogonal to a1 and to each other:

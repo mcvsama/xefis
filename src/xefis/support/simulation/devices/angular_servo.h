@@ -17,7 +17,8 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/simulation/constraints/hinge_precalculation.h>
-#include <xefis/support/simulation/devices/interfaces/servo.h>
+#include <xefis/support/simulation/constraints/angular_servo_constraint.h>
+#include <xefis/support/simulation/devices/interfaces/angular_servo.h>
 #include <xefis/support/simulation/rigid_body/body.h>
 #include <xefis/support/simulation/rigid_body/constraint.h>
 
@@ -28,19 +29,34 @@
 
 namespace xf::sim {
 
-class AngularServo: public rigid_body::Body
-					// TODO and electrial device
+class AngularServo:
+	public interfaces::AngularServo,
+	public rigid_body::Body
+	// TODO and electrial device
 {
+  public:
+	using Resolution = decltype (1 / 1_rad);
+
   public:
 	/**
 	 * Ctor
 	 * \param	AngularVelocityPotential, TorquePotential
 	 *			See AngularServoConstraint.
+	 * \param	resolution
+	 *			Number of recognized steps per radian of movement.
 	 * \param	MassMoments
 	 *			Servo mass moments.
 	 */
 	explicit
-	AngularServo (MassMoments<rigid_body::BodySpace> const&);
+	AngularServo (rigid_body::AngularServoConstraint&, Resolution resolution_per_radian, MassMoments<rigid_body::BodySpace> const&);
+
+	// Servo API
+	void
+	set_setpoint (si::Angle) override;
+
+  private:
+	rigid_body::AngularServoConstraint&	_constraint;
+	Resolution							_resolution;
 };
 
 
@@ -50,7 +66,7 @@ class AngularServo: public rigid_body::Body
 
 
 std::unique_ptr<AngularServo>
-make_standard_9gram_servo (Placement<rigid_body::WorldSpace, rigid_body::BodySpace> const& location);
+make_standard_9gram_servo (rigid_body::AngularServoConstraint& constraint);
 
 } // namespace xf::sim
 

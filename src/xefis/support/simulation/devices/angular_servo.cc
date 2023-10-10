@@ -17,6 +17,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/math/geometry.h>
+#include <xefis/support/simulation/constraints/angular_servo_constraint.h>
 
 // Neutrino:
 #include <neutrino/numeric.h>
@@ -28,13 +29,22 @@
 
 namespace xf::sim {
 
-AngularServo::AngularServo (MassMoments<rigid_body::BodySpace> const& mass_moments):
-	Body (mass_moments)
+AngularServo::AngularServo (rigid_body::AngularServoConstraint& constraint, Resolution const resolution, MassMoments<rigid_body::BodySpace> const& mass_moments):
+	Body (mass_moments),
+	_constraint (constraint),
+	_resolution (resolution)
 { }
 
 
+void
+AngularServo::set_setpoint (si::Angle const setpoint)
+{
+	_constraint.set_setpoint (neutrino::quantized (setpoint, _resolution, _constraint.angle_range()));
+}
+
+
 std::unique_ptr<AngularServo>
-make_standard_9gram_servo()
+make_standard_9gram_servo (rigid_body::AngularServoConstraint& constraint)
 {
 	std::array<PointMass<rigid_body::BodySpace>, 8> masses;
 	std::size_t i = 0;
@@ -46,7 +56,7 @@ make_standard_9gram_servo()
 
 	auto const mass_moments = MassMoments<rigid_body::BodySpace>::from_point_masses (begin (masses), end (masses));
 
-	return std::make_unique<AngularServo> (mass_moments);
+	return std::make_unique<AngularServo> (constraint, 2 / 1_deg, mass_moments);
 }
 
 } // namespace xf::sim
