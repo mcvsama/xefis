@@ -18,8 +18,7 @@
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
 #include <xefis/core/setting.h>
-#include <xefis/core/socket.h>
-#include <xefis/support/simulation/aerodynamic.v0/flight_simulation.h>
+#include <xefis/core/sockets/module_socket.h>
 
 // Neutrino:
 #include <neutrino/math/normal_distribution.h>

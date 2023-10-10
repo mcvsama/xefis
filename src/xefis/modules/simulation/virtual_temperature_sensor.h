@@ -18,7 +18,7 @@
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
 #include <xefis/core/setting.h>
-#include <xefis/core/socket.h>
+#include <xefis/core/sockets/module_socket.h>
 #include <xefis/support/simulation/aerodynamic.v0/flight_simulation.h>
 
 // Neutrino:
@@ -61,7 +61,8 @@ class VirtualTemperatureSensor: public VirtualTemperatureSensorIO
 	// Ctor
 	explicit
 	VirtualTemperatureSensor (xf::sim::FlightSimulation const&,
-							  xf::SpaceVector<si::Length, xf::AirframeFrame> const& mount_location,
+							  xf::rigid_body::Body& mount_body,
+							  xf::SpaceVector<si::Length, xf::BodySpace> const& mount_location,
 							  xf::Logger const&,
 							  std::string_view const& instance = {});
 
@@ -70,14 +71,14 @@ class VirtualTemperatureSensor: public VirtualTemperatureSensorIO
 	process (xf::Cycle const&) override;
 
   private:
-	VirtualTemperatureSensorIO&						_io					{ *this };
-	xf::Logger										_logger;
-	xf::sim::FlightSimulation const&				_flight_simulation;
-	xf::SpaceVector<si::Length, xf::AirframeFrame>	_mount_location;
+	VirtualTemperatureSensorIO&					_io					{ *this };
+	xf::Logger									_logger;
+	xf::sim::FlightSimulation const&			_flight_simulation;
+	xf::SpaceVector<si::Length, xf::BodySpace>	_mount_location;
 	// Device's noise:
-	std::default_random_engine						_random_generator;
-	xf::NormalDistribution<si::Temperature>			_noise				{ 0_K, 0_K };
-	si::Time										_last_measure_time	{ 0_s };
+	std::default_random_engine					_random_generator;
+	xf::NormalDistribution<si::Temperature>		_noise				{ 0_K, 0_K };
+	si::Time									_last_measure_time	{ 0_s };
 };
 
 #endif
