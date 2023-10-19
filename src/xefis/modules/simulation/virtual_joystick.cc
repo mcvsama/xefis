@@ -16,6 +16,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/machine.h>
 #include <xefis/support/ui/paint_helper.h>
 #include <xefis/support/ui/widget.h>
 #include <xefis/utility/kde.h>
@@ -24,11 +25,12 @@
 #include <neutrino/numeric.h>
 #include <neutrino/range.h>
 
-// Lib:
+// Qt:
 #include <QBoxLayout>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QWidget>
+#include <QShortcut>
 
 // Standard:
 #include <cstddef>
@@ -56,7 +58,7 @@ class VirtualJoystickWidget: public xf::Widget
   public:
 	// Ctor
 	explicit
-	VirtualJoystickWidget (QWidget* parent);
+	VirtualJoystickWidget (xf::Machine*, QWidget* parent);
 
 	/**
 	 * Return current joystick axes position. Both x and y
@@ -157,11 +159,20 @@ MouseControl::delta() const noexcept
 }
 
 
-VirtualJoystickWidget::VirtualJoystickWidget (QWidget* parent):
+VirtualJoystickWidget::VirtualJoystickWidget (xf::Machine* machine, QWidget* parent):
 	Widget (parent)
 {
 	setStyleSheet (kTransparentStyleSheet);
 	setFixedSize (_paint_helper.em_pixels (20), _paint_helper.em_pixels (20));
+
+	{
+		auto* esc = new QShortcut (this);
+		esc->setKey (Qt::Key_Escape);
+		QObject::connect (esc, &QShortcut::activated, [machine] {
+			if (machine)
+				machine->show_configurator();
+		});
+	}
 }
 
 
@@ -419,7 +430,7 @@ VirtualLinearWidget::mouseMoveEvent (QMouseEvent* event)
 }
 
 
-VirtualJoystick::VirtualJoystick (std::string_view const& instance):
+VirtualJoystick::VirtualJoystick (xf::Machine* machine, std::string_view const& instance):
 	VirtualJoystickIO (instance)
 {
 	using namespace std::literals;
@@ -428,7 +439,7 @@ VirtualJoystick::VirtualJoystick (std::string_view const& instance):
 	_widget->setWindowTitle (QString::fromStdString ("XEFIS virtual joystick" + (instance.empty() ? ""s : ": "s + instance)));
 	xf::set_kde_blur_background (*_widget, true);
 
-	_joystick_widget = new VirtualJoystickWidget (_widget);
+	_joystick_widget = new VirtualJoystickWidget (machine, _widget);
 
 	_throttle_widget = new VirtualLinearWidget ({ 0.0f, 1.0f }, VirtualLinearWidget::Vertical, VirtualLinearWidget::Filled, _widget);
 	_throttle_widget->set_value (0.0f);

@@ -19,6 +19,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/machine.h>
 #include <xefis/core/module.h>
 #include <xefis/core/setting.h>
 #include <xefis/core/sockets/module_socket.h>
@@ -51,7 +52,7 @@ class VirtualJoystick: public VirtualJoystickIO
   public:
 	// Ctor
 	explicit
-	VirtualJoystick (std::string_view const& instance = {});
+	VirtualJoystick (xf::Machine*, std::string_view const& instance = {});
 
 	QWidget*
 	widget() const noexcept;
