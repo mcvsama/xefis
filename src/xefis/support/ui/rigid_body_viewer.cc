@@ -40,7 +40,10 @@ RigidBodyViewer::RigidBodyViewer (QWidget* parent, RefreshRate const refresh_rat
 	{
 		auto* esc = new QShortcut (this);
 		esc->setKey (Qt::Key_Escape);
-		QObject::connect (esc, &QShortcut::activated, this, &RigidBodyViewer::show_configurator);
+		QObject::connect (esc, &QShortcut::activated, [this] {
+			if (_machine)
+				_machine->show_configurator();
+		});
 	}
 }
 
@@ -256,14 +259,6 @@ RigidBodyViewer::display_menu()
 	}
 
 	return !!menu.exec (QCursor::pos());
-}
-
-
-void
-RigidBodyViewer::show_configurator()
-{
-	if (_machine)
-		_machine->show_configurator();
 }
 
 } // namespace xf

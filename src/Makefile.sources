@@ -364,7 +364,6 @@ PROJECTS.xefis.files				+= xefis/support/ui/rigid_body_painter.cc
 PROJECTS.xefis.files				+= xefis/support/ui/rigid_body_painter.h
 PROJECTS.xefis.files				+= xefis/support/ui/rigid_body_viewer.cc
 PROJECTS.xefis.files				+= xefis/support/ui/rigid_body_viewer.h
-PROJECTS.xefis.files_moc			+= xefis/support/ui/rigid_body_viewer.h
 PROJECTS.xefis.files				+= xefis/support/ui/sound_manager.cc
 PROJECTS.xefis.files				+= xefis/support/ui/sound_manager.h
 PROJECTS.xefis.files				+= xefis/support/ui/widget.cc

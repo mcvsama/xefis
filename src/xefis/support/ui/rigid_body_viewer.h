@@ -43,8 +43,6 @@ class Machine;
  */
 class RigidBodyViewer: public GLAnimationWidget
 {
-	Q_OBJECT
-
   public:
 	// Evolution function called before each display frame:
 	using Evolve = std::function<void (si::Time dt)>;
@@ -174,10 +172,6 @@ class RigidBodyViewer: public GLAnimationWidget
 	 */
 	bool
 	display_menu();
-
-  private slots:
-	void
-	show_configurator();
 
   private:
 	Machine*							_machine						{ nullptr };
