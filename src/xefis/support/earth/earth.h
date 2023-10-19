@@ -29,6 +29,7 @@ namespace xf {
  * Compute distance between two sets of coordinates on Earth.
  * Result is in sphere radius units.
  */
+[[nodiscard]]
 si::Angle::Value
 haversine (si::LonLat const& a, si::LonLat const& b);
 
@@ -38,6 +39,7 @@ haversine (si::LonLat const& a, si::LonLat const& b);
  * Compute distance between two sets of coordinates on Earth.
  * Result is in nautical miles.
  */
+[[nodiscard]]
 si::Length
 haversine_earth (si::LonLat const& a, si::LonLat const& b);
 
@@ -47,6 +49,7 @@ haversine_earth (si::LonLat const& a, si::LonLat const& b);
  * to another point. For final bearing, reverse the arguments.
  * Result is in range [-180_deg, +180_deg].
  */
+[[nodiscard]]
 si::Angle
 initial_bearing (si::LonLat const& a, si::LonLat const& b);
 
@@ -56,18 +59,22 @@ initial_bearing (si::LonLat const& a, si::LonLat const& b);
  * Arcs are given by three points, the second one lies on the intersection.
  * Result is in degrees.
  */
+[[nodiscard]]
 si::Angle
 great_arcs_angle (si::LonLat const& a, si::LonLat const& common, si::LonLat const& b);
 
 
+[[nodiscard]]
 std::string
 to_dms (si::Angle, bool three_digits);
 
 
+[[nodiscard]]
 std::string
 to_latitude_dms (si::Angle);
 
 
+[[nodiscard]]
 std::string
 to_longitude_dms (si::Angle);
 
@@ -75,6 +82,7 @@ to_longitude_dms (si::Angle);
 /**
  * Mean value for two angles on a circle.
  */
+[[nodiscard]]
 si::Angle
 mean (si::Angle a, si::Angle b);
 
@@ -84,6 +92,7 @@ mean (si::Angle a, si::Angle b);
  */
 
 
+[[nodiscard]]
 inline si::Length
 haversine_earth (si::LonLat const& a, si::LonLat const& b)
 {

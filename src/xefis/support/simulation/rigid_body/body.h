@@ -58,6 +58,7 @@ class BodyFrameCache
 	VelocityMoments<WorldSpace>										velocity_moments;
 
   public:
+	[[nodiscard]]
 	ForceMoments<WorldSpace>
 	all_force_moments() const noexcept
 		{ return gravitational_force_moments + external_force_moments + constraint_force_moments; }
