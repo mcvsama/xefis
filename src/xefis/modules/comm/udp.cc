@@ -91,7 +91,7 @@ UDP::got_udp_packet()
 void
 UDP::interfere (QByteArray& blob)
 {
-	if (rand() % 3 == 0)
+	if (!blob.isEmpty() && rand() % 3 == 0)
 	{
 		// Erase random byte from the input sequence:
 		int i = rand() % blob.size();
