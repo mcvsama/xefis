@@ -48,10 +48,11 @@ class Watchdog: public xf::Module
 
   private:
 	xf::Logger							_logger;
-	std::unique_ptr<QSocketNotifier>	_notifier;
 	bool								_enabled			= false;
 	int									_watchdog_write_fd	= 0;
 	int									_watchdog_read_fd	= 0;
+	// Destroy first to disconnect signals:
+	std::unique_ptr<QSocketNotifier>	_notifier;
 };
 
 #endif

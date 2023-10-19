@@ -239,14 +239,15 @@ class GPS:
 		GPS&								_gps_module;
 		PowerCycle&							_power_cycle;
 
-		// Used to restart after a while if device doesn't respond:
-		std::unique_ptr<QTimer>				_alive_check_timer;
 		unsigned int						_requested_physical_baud_rate;
 		xf::SerialPort::Configuration		_serial_port_config;
 		std::unique_ptr<xf::SerialPort>		_serial_port;
 		xf::nmea::Parser					_nmea_parser;
 		bool								_reliable_fix_quality	= false;
 		bool								_first_message_received	= false;
+		// Used to restart after a while if device doesn't respond.
+		// Destroy first to disconnect signals:
+		std::unique_ptr<QTimer>				_alive_check_timer;
 	};
 
 	/**
