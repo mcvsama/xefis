@@ -32,21 +32,25 @@
 #include "udp.h"
 
 
-UDP::UDP (xf::Logger const& logger, std::string_view const& instance):
-	UDP_IO (instance),
+UDP::UDP (Parameters const parameters, xf::Logger const& logger, std::string_view const& instance):
+	Module (instance),
+	_parameters (parameters),
 	_logger (logger.with_scope (std::string (kLoggerScope) + "#" + instance))
 {
-	if (_io.tx_udp_host && _io.tx_udp_port)
+	if (_parameters.tx_udp_address)
+	{
+		_tx_qhostaddress = QHostAddress (QString::fromStdString (_parameters.tx_udp_address->host));
 		_tx = std::make_unique<QUdpSocket>();
+	}
 
-	if (_io.rx_udp_host && _io.rx_udp_port)
+	if (_parameters.rx_udp_address)
 	{
 		_rx = std::make_unique<QUdpSocket>();
 
-		if (!_rx->bind (QHostAddress (*_io.rx_udp_host), *_io.rx_udp_port, QUdpSocket::ShareAddress))
-			_logger << "Failed to bind to address " << _io.rx_udp_host->toStdString() << ":" << *_io.rx_udp_port << std::endl;
+		if (!_rx->bind (QHostAddress (QString::fromStdString (_parameters.rx_udp_address->host)), _parameters.rx_udp_address->port, QUdpSocket::ShareAddress))
+			_logger << std::format ("Failed to bind to address {}:{}\n", _parameters.rx_udp_address->host, _parameters.rx_udp_address->port);
 
-		QObject::connect (_rx.get(), SIGNAL (readyRead()), this, SLOT (got_udp_packet()));
+		QObject::connect (_rx.get(), &QUdpSocket::readyRead, [this] { got_udp_packet(); });
 	}
 }
 
@@ -54,16 +58,18 @@ UDP::UDP (xf::Logger const& logger, std::string_view const& instance):
 void
 UDP::process (xf::Cycle const&)
 {
-	if (_io.send && _send_changed.serial_changed())
+	if (_tx && _parameters.tx_udp_address)
 	{
-		std::string const& data = *_io.send;
-		QByteArray blob (data.data(), data.size());
+		if (this->send)
+		{
+			std::string const& data = *this->send;
+			QByteArray blob (data.data(), data.size());
 
-		if (_io.tx_interference)
-			interfere (blob);
+			if (_parameters.tx_interference)
+				interfere (blob);
 
-		if (_tx && _io.tx_udp_host && _io.tx_udp_port)
-			_tx->writeDatagram (blob.data(), blob.size(), QHostAddress (*_io.tx_udp_host), *_io.tx_udp_port);
+			_tx->writeDatagram (blob.data(), blob.size(), _tx_qhostaddress, _parameters.tx_udp_address->port);
+		}
 	}
 }
 
@@ -81,10 +87,10 @@ UDP::got_udp_packet()
 		_rx->readDatagram (_received_datagram.data(), datagram_size, nullptr, nullptr);
 	}
 
-	if (_io.rx_interference)
+	if (_parameters.rx_interference)
 		interfere (_received_datagram);
 
-	_io.receive = std::string (_received_datagram.data(), neutrino::to_unsigned (_received_datagram.size()));
+	this->receive = std::string (_received_datagram.data(), neutrino::to_unsigned (_received_datagram.size()));
 }
 
 

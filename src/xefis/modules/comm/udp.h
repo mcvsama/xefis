@@ -31,20 +31,9 @@
 #include <cstddef>
 
 
-class UDP_IO: public xf::Module
+class UDP: public xf::Module
 {
   public:
-	/*
-	 * Settings
-	 */
-
-	xf::Setting<QString>		tx_udp_host			{ this, "tx_udp_host", xf::BasicSetting::Optional };
-	xf::Setting<int>			tx_udp_port			{ this, "tx_udp_port" };
-	xf::Setting<bool>			tx_interference		{ this, "tx_interference", false };
-	xf::Setting<QString>		rx_udp_host			{ this, "rx_udp_host", xf::BasicSetting::Optional };
-	xf::Setting<int>			rx_udp_port			{ this, "rx_udp_port" };
-	xf::Setting<bool>			rx_interference		{ this, "rx_interference", false };
-
 	/*
 	 * Input
 	 */
@@ -58,15 +47,21 @@ class UDP_IO: public xf::Module
 	xf::ModuleOut<std::string>	receive				{ this, "receive" };
 
   public:
-	using xf::Module::Module;
-};
+	struct Address
+	{
+		std::string	host;
+		uint32_t	port;
+	};
 
-
-class UDP:
-	public QObject,
-	public UDP_IO
-{
-	Q_OBJECT
+	struct Parameters
+	{
+		std::optional<Address>	rx_udp_address;
+		std::optional<Address>	tx_udp_address;
+		// Whether to randomly interfere with transmitted data:
+		bool					rx_interference	{ false };
+		// Whether to randomly interfere with received data:
+		bool					tx_interference	{ false }; // TODO std::optional<float> tx_interference_probability;
+	};
 
   private:
 	static constexpr char kLoggerScope[] = "mod::UDP";
@@ -74,7 +69,7 @@ class UDP:
   public:
 	// Ctor
 	explicit
-	UDP (xf::Logger const&, std::string_view const& instance = {});
+	UDP (Parameters, xf::Logger const&, std::string_view const& instance = {});
 
 	// Module API
 	void
@@ -95,12 +90,14 @@ class UDP:
 	interfere (QByteArray& blob);
 
   private:
-	UDP_IO&							_io				{ *this };
+	Parameters						_parameters;
 	xf::Logger						_logger;
 	QByteArray						_received_datagram;
-	std::unique_ptr<QUdpSocket>		_tx;
+	xf::SocketChanged				_send_changed	{ this->send };
+	QHostAddress					_tx_qhostaddress;
+	// Destroy first to disconnect signals:
 	std::unique_ptr<QUdpSocket>		_rx;
-	xf::SocketChanged				_send_changed	{ _io.send };
+	std::unique_ptr<QUdpSocket>		_tx;
 };
 
 #endif
