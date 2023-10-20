@@ -43,7 +43,7 @@ class FixedConstraint: public Constraint
 	ConstraintForces
 	do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, ForceMoments<WorldSpace> const& ext_forces_1,
 						  VelocityMoments<WorldSpace> const& vm_2, ForceMoments<WorldSpace> const& ext_forces_2,
-						  si::Time dt) override;
+						  si::Time dt) const override;
 
   private:
 	SpaceLength<BodySpace>	_anchor_1;

@@ -16,6 +16,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/support/control/pid_controller.h>
 #include <xefis/support/simulation/components/resistor.h>
 #include <xefis/support/simulation/constraints/angular_motor_constraint.h>
 #include <xefis/support/simulation/constraints/hinge_precalculation.h>
@@ -145,11 +146,11 @@ class AngularServoConstraint:
 	ConstraintForces
 	do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, ForceMoments<WorldSpace> const& ext_forces_1,
 						  VelocityMoments<WorldSpace> const& vm_2, ForceMoments<WorldSpace> const& ext_forces_2,
-						  si::Time dt) override;
+						  si::Time dt) const override;
 
 	// Constraint API
 	void
-	calculated_constraint_forces (ConstraintForces const&) override;
+	calculated_constraint_forces (ConstraintForces const&, si::Time dt) override;
 
 	// Element API
 	void
@@ -159,9 +160,13 @@ class AngularServoConstraint:
 	void
 	update_velocity_and_torque();
 
+	void
+	update_pid_controller (si::Time const dt);
+
   private:
 	HingePrecalculation&									_hinge;
 	xf::sim::ServoOrientation								_orientation			{ xf::sim::ServoOrientation::Normal };
+	xf::PIDController<si::Angle, double>					_pid_controller;
 	Range<si::Angle>										_angle_range;
 	si::Angle												_backlash;
 	si::Angle												_setpoint				{ _angle_range.midpoint() };

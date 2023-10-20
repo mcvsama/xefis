@@ -37,7 +37,7 @@ FixedConstraint::FixedConstraint (Body& body_1, Body& body_2):
 ConstraintForces
 FixedConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, ForceMoments<WorldSpace> const& ext_forces_1,
 									   VelocityMoments<WorldSpace> const& vm_2, ForceMoments<WorldSpace> const& ext_forces_2,
-									   si::Time dt)
+									   si::Time dt) const
 {
 	auto const loc_1 = body_1().location();
 	auto const loc_2 = body_2().location();

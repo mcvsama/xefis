@@ -36,44 +36,35 @@ AngularServoConstraint::AngularServoConstraint (HingePrecalculation& hinge_preca
 	Constraint (hinge_precalculation),
 	Resistor ("AngularServoConstraint", kInitialResistance),
 	_hinge (hinge_precalculation),
+	_pid_controller ({ .p = 50.0, .i = 1.0, .d = 1.0 }, 0_deg),
 	_angle_range (angle_range),
 	_backlash (backlash),
 	_failure_model (kExpectedLifetime, kNormalOperationTemperature, kAbsoluteMaximumTemperatureRange.max()),
 	_angular_velocity_potential (angular_velocity_potential),
 	_torque_potential (torque_potential),
 	_motor_constraint (hinge_precalculation)
-{ }
+{
+	_pid_controller.set_integral_limit ({ -0.1_deg * 1_s, +0.1_deg * 1_s });
+	_pid_controller.set_output_limit ({ -1.0, +1.0 });
+}
 
 
 ConstraintForces
 AngularServoConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, ForceMoments<WorldSpace> const& ext_forces_1,
 											  VelocityMoments<WorldSpace> const& vm_2, ForceMoments<WorldSpace> const& ext_forces_2,
-											  si::Time dt)
+											  si::Time const dt) const
 {
-	auto const error = _hinge.data().angle - _setpoint;
-
-	if (abs (error) < _backlash)
-	{
-		_motor_constraint.set_torque (0_Nm);
-		_motor_constraint.set_max_angular_velocity (0_radps);
-	}
-	else
-	{
-		auto const angular_velocity = _angular_velocity_potential * voltage();
-		auto const factor = 2.0 / (1.0 + std::exp (-5.0 * error / 1_rad)) - 1.0;
-
-		_motor_constraint.set_torque (_torque_potential * voltage());
-		_motor_constraint.set_max_angular_velocity (factor * angular_velocity);
-	}
-
 	return _motor_constraint.constraint_forces (vm_1, ext_forces_1, vm_2, ext_forces_2, dt);
 }
 
 
 void
-AngularServoConstraint::calculated_constraint_forces (ConstraintForces const&)
+AngularServoConstraint::calculated_constraint_forces (ConstraintForces const& result, si::Time const dt)
 {
+	Constraint::calculated_constraint_forces (result, dt);
+
 	update_velocity_and_torque();
+	update_pid_controller (dt);
 
 	si::Power const mechanical_power = _arm_torque * _arm_angular_velocity / 1_rad;
 	si::Power electrical_power = 0_W;
@@ -130,6 +121,27 @@ AngularServoConstraint::update_velocity_and_torque()
 	auto const t2_about_hinge = projection_onto_normalized (Constraint::body_2().frame_cache().constraint_force_moments.torque(), hinge);
 	auto const arm_torque = t2_about_hinge - t1_about_hinge;
 	_arm_torque = (~arm_torque * hinge).scalar();
+}
+
+
+void
+AngularServoConstraint::update_pid_controller (si::Time const dt)
+{
+	auto const error = _hinge.data().angle - _setpoint;
+
+	if (abs (error) < _backlash)
+	{
+		_motor_constraint.set_abs_torque (0_Nm);
+		_motor_constraint.set_max_angular_velocity (0_radps);
+	}
+	else
+	{
+		auto const velocity_factor = _pid_controller.process (_setpoint, _hinge.data().angle, dt);
+		auto const angular_velocity = _angular_velocity_potential * voltage();
+
+		_motor_constraint.set_abs_torque (_torque_potential * voltage());
+		_motor_constraint.set_max_angular_velocity (velocity_factor * angular_velocity);
+	}
 }
 
 

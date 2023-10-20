@@ -213,7 +213,7 @@ ImpulseSolver::update_constraint_forces (si::Time const dt)
 	for (auto& constraint: _system.constraints())
 	{
 		constraint->calculated_constraint_forces ({ constraint->body_1().frame_cache().constraint_force_moments,
-													constraint->body_2().frame_cache().constraint_force_moments });
+													constraint->body_2().frame_cache().constraint_force_moments }, dt);
 	}
 
     return {

@@ -167,14 +167,22 @@ class Constraint: public ConnectedBodies
 	ConstraintForces
 	constraint_forces (VelocityMoments<WorldSpace> const& vm_1, ForceMoments<WorldSpace> const& ext_forces_1,
 					   VelocityMoments<WorldSpace> const& vm_2, ForceMoments<WorldSpace> const& ext_forces_2,
-					   si::Time dt);
+					   si::Time dt) const;
 
 	/**
 	 * Called when final constraint forces are obtained for current frame of simulation.
 	 */
 	virtual void
-	calculated_constraint_forces (ConstraintForces const&)
-	{ }
+	calculated_constraint_forces (ConstraintForces const& result, [[maybe_unused]] si::Time const dt)
+	{
+		if (_breaking_force)
+			if (abs (result[0].force()) > *_breaking_force || abs (result[1].force()) > *_breaking_force)
+				_broken = true;
+
+		if (_breaking_torque)
+			if (abs (result[0].torque()) > *_breaking_torque || abs (result[1].torque()) > *_breaking_torque)
+				_broken = true;
+	}
 
 	/**
 	 * Access the previous calculation ForceMoments used by the solver
@@ -193,7 +201,7 @@ class Constraint: public ConnectedBodies
 	virtual ConstraintForces
 	do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, ForceMoments<WorldSpace> const& ext_forces_1,
 						  VelocityMoments<WorldSpace> const& vm_2, ForceMoments<WorldSpace> const& ext_forces_2,
-						  si::Time dt) = 0;
+						  si::Time dt) const = 0;
 
 	/**
 	 * Helper function that calculates actual corrective forces for given Jacobians and location constraints.
@@ -294,18 +302,8 @@ Constraint::set_breaking_force_torque (std::optional<si::Force> const breaking_f
 inline ConstraintForces
 Constraint::constraint_forces (VelocityMoments<WorldSpace> const& vm_1, ForceMoments<WorldSpace> const& ext_forces_1,
 							   VelocityMoments<WorldSpace> const& vm_2, ForceMoments<WorldSpace> const& ext_forces_2,
-							   si::Time dt)
+							   si::Time dt) const
 {
-	auto result = do_constraint_forces (vm_1, ext_forces_1, vm_2, ext_forces_2, dt);
-
-	if (_breaking_force)
-		if (abs (result[0].force()) > *_breaking_force || abs (result[1].force()) > *_breaking_force)
-			_broken = true;
-
-	if (_breaking_torque)
-		if (abs (result[0].torque()) > *_breaking_torque || abs (result[1].torque()) > *_breaking_torque)
-			_broken = true;
-
 	if (_broken)
 	{
 		return {
@@ -314,7 +312,8 @@ Constraint::constraint_forces (VelocityMoments<WorldSpace> const& vm_1, ForceMom
 		};
 	}
 	else
-		return result;
+		return do_constraint_forces (vm_1, ext_forces_1, vm_2, ext_forces_2, dt);
+
 }
 
 

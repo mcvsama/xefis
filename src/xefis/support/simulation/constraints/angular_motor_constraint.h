@@ -46,7 +46,7 @@ class AngularMotorConstraint: public Constraint
 	 * The direction motion is set with max_angular_velocity().
 	 */
 	void
-	set_torque (si::Torque const torque) noexcept
+	set_abs_torque (si::Torque const torque) noexcept
 		{ _force = torque / 1_m; }
 
 	/**
@@ -69,7 +69,7 @@ class AngularMotorConstraint: public Constraint
 	ConstraintForces
 	do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, ForceMoments<WorldSpace> const& ext_forces_1,
 						  VelocityMoments<WorldSpace> const& vm_2, ForceMoments<WorldSpace> const& ext_forces_2,
-						  si::Time dt) override;
+						  si::Time dt) const override;
 
   private:
 	HingePrecalculation&	_hinge_precalculation;

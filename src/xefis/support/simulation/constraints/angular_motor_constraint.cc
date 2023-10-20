@@ -31,7 +31,7 @@ AngularMotorConstraint::AngularMotorConstraint (HingePrecalculation& hinge_preca
 ConstraintForces
 AngularMotorConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, ForceMoments<WorldSpace> const& ext_forces_1,
 											  VelocityMoments<WorldSpace> const& vm_2, ForceMoments<WorldSpace> const& ext_forces_2,
-											  si::Time dt)
+											  si::Time dt) const
 {
 	auto const& c = _hinge_precalculation.data();
 
@@ -40,8 +40,8 @@ AngularMotorConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const&
 	JacobianW<1> Jw2;
 	LocationConstraint<1> location_constraint_value;
 
-	Jw1.put (1_m * -~c.a1, 0, 0);
-	Jw2.put (1_m * ~c.a1, 0, 0);
+	Jw1.put (1_m * ~c.a1, 0, 0);
+	Jw2.put (1_m * -~c.a1, 0, 0);
 	location_constraint_value (0, 0) = _max_angular_velocity * 1_m / 1_rad * 1_s;
 
 	auto const J = calculate_jacobian (vm_1, ext_forces_1, Jv, Jw1,

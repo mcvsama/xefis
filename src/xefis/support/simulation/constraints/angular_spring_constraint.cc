@@ -38,7 +38,7 @@ AngularSpringConstraint::AngularSpringConstraint (HingePrecalculation& hinge, Sp
 ConstraintForces
 AngularSpringConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const& vm1, ForceMoments<WorldSpace> const& fm1,
 											   VelocityMoments<WorldSpace> const& vm2, ForceMoments<WorldSpace> const& fm2,
-											   si::Time const dt)
+											   si::Time const dt) const
 {
 	auto const angle = _hinge.data().angle;
 	auto const loc_1 = Constraint::body_1().location();
