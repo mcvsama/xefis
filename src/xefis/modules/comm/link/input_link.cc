@@ -60,6 +60,7 @@ InputLink::process (xf::Cycle const& cycle)
 	catch (LinkProtocol::ParseError const&)
 	{
 		(cycle.logger() + _logger) << "Packet parse error. Couldn't synchronize." << std::endl;
+		_input_blob.clear();
 	}
 }
 
