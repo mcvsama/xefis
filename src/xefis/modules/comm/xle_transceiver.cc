@@ -121,7 +121,7 @@ Transceiver::encrypt_packet (BlobView const packet)
 Blob
 Transceiver::decrypt_packet (BlobView const packet, std::optional<Transport::SequenceNumber> const maximum_allowed_sequence_number)
 {
-	auto const try_session = [&] (Session* session, std::string_view const session_name, bool shift_sessions, bool get_rid_of_previous_session, std::function<Blob()> const fallback = {}) -> Blob {
+	auto const try_session = [&] (Session* session, std::string_view const session_name, bool shift_sessions, bool get_rid_of_previous_session, std::function<Blob (std::string)> const fallback = {}) -> Blob {
 		if (session)
 		{
 			try {
@@ -138,20 +138,22 @@ Transceiver::decrypt_packet (BlobView const packet, std::optional<Transport::Seq
 			catch (...)
 			{
 				if (fallback)
-					return fallback();
+					return fallback (std::format ("{}: {}", session_name, neutrino::describe_exception (std::current_exception())));
 				else
 					throw FastException (std::format ("{}: {} thrown an exception, fallback unavailable", role_name(), session_name), std::current_exception());
 			}
 		}
 		else if (fallback)
-			return fallback();
+			return fallback (std::format ("{} unavailable", session_name));
 		else
 			throw FastException (std::format ("{}: {} is unavailable; fallback is unavailable", role_name(), session_name));
 	};
 
-	return try_session (active_session(), "active session", false, true, [&] {
-		return try_session (previous_session(), "previous session", false, false, [&] {
-			return try_session (next_session_candidate(), "next session candidate", true, false);
+	return try_session (active_session(), "active session", false, true, [&] (std::string const active_fallback_reason) -> Blob {
+		return try_session (previous_session(), "previous session", false, false, [&] (std::string const previous_fallback_reason) -> Blob {
+			return try_session (next_session_candidate(), "next session candidate", true, false, [&] (std::string const next_fallback_reason) -> Blob {
+				throw FastException (std::format ("{}: {}; {}; {}", role_name(), active_fallback_reason, previous_fallback_reason, next_fallback_reason));
+			});
 		});
 	});
 }
