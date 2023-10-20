@@ -80,10 +80,7 @@ UDP::got_udp_packet()
 	while (_rx->hasPendingDatagrams())
 	{
 		auto datagram_size = _rx->pendingDatagramSize();
-
-		if (_received_datagram.size() < datagram_size)
-			_received_datagram.resize (datagram_size);
-
+		_received_datagram.resize (datagram_size);
 		_rx->readDatagram (_received_datagram.data(), datagram_size, nullptr, nullptr);
 	}
 
