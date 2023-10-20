@@ -105,8 +105,6 @@ Transmitter::encrypt_packet (BlobView const data)
 	});
 	auto const encrypted_packet = encrypted_sequence_number + encrypted_data;
 
-	++_sequence_number;
-
 	return encrypted_packet;
 }
 
