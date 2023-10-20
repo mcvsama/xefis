@@ -28,6 +28,12 @@
 
 namespace xf {
 
+/**
+ * For a stable controller all parameters must be positive.
+ * Error is calculated as (measured - setpoint).
+ * If the error is positive, the output of the controller will
+ * be negative to reduce the error.
+ */
 template<class Param = double>
 	struct PIDSettings
 	{
