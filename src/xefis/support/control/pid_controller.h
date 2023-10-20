@@ -65,15 +65,15 @@ template<class pInput, class pProcessVariable = pInput, class pParam = double>
 
 	  public:
 		// Ctor
-		PIDController();
+		PIDController() = default;
 
 		// Ctor
 		explicit
-		PIDController (Settings const& settings, Input target);
+		PIDController (Settings const& settings, Input setpoint);
 
 		// Ctor
 		explicit
-		PIDController (Param p, Param i, Param d, Input target);
+		PIDController (Param p, Param i, Param d, Input setpoint);
 
 		/**
 		 * Set winding. That is value -1.0 is equal to 1.0.
@@ -81,43 +81,50 @@ template<class pInput, class pProcessVariable = pInput, class pParam = double>
 		 * be winded up, too.
 		 */
 		void
-		set_winding (bool winding);
+		set_winding (bool winding)
+			{ _winding = winding; }
 
 		/**
 		 * Get P parameter.
 		 */
 		Param
-		p() const noexcept;
+		p() const noexcept
+			{ return _p; }
 
 		/**
 		 * Set P parameter.
 		 */
 		void
-		set_p (Param p) noexcept;
+		set_p (Param p) noexcept
+			{ _p = p; }
 
 		/**
 		 * Get I parameter.
 		 */
 		Param
-		i() const noexcept;
+		i() const noexcept
+			{ return _i; }
 
 		/**
 		 * Set I parameter.
 		 */
 		void
-		set_i (Param i) noexcept;
+		set_i (Param i) noexcept
+			{ _i = i; }
 
 		/**
 		 * Get D parameter.
 		 */
 		Param
-		d() const noexcept;
+		d() const noexcept
+			{ return _d; }
 
 		/**
 		 * Set D parameter.
 		 */
 		void
-		set_d (Param d) noexcept;
+		set_d (Param d) noexcept
+			{ _d = d; }
 
 		/**
 		 * Set P, I and D at once.
@@ -129,51 +136,58 @@ template<class pInput, class pProcessVariable = pInput, class pParam = double>
 		 * Return overall gain of all three parameters.
 		 */
 		Param
-		gain() const noexcept;
+		gain() const noexcept
+			{ return _gain; }
 
 		/**
 		 * Set overall gain for all three paramters.
 		 */
 		void
-		set_gain (Param gain) noexcept;
+		set_gain (Param gain) noexcept
+			{ _gain = gain; }
 
 		/**
 		 * I (integral) parameter limit.
 		 */
 		std::optional<Range<Integral>>
-		integral_limit() const noexcept;
+		integral_limit() const noexcept
+			{ return _integral_limit; }
 
 		/**
 		 * Set I (integral) parameter limit.
 		 */
 		void
-		set_integral_limit (Range<Integral> limit) noexcept;
+		set_integral_limit (Range<Integral> limit) noexcept
+			{ _integral_limit = limit; }
 
 		/**
 		 * Set I (integral) parameter limit.
 		 */
 		void
-		set_integral_limit (std::optional<Range<Integral>> limit) noexcept;
+		set_integral_limit (std::optional<Range<Integral>> limit) noexcept
+			{ _integral_limit = limit; }
 
 		/**
 		 * Output limit.
 		 */
 		Range<ProcessVariable>
-		output_limit() const noexcept;
+		output_limit() const noexcept
+			{ return _output_limit; }
 
 		/**
 		 * Set output limit.
 		 */
 		void
-		set_output_limit (Range<ProcessVariable> limit) noexcept;
+		set_output_limit (Range<ProcessVariable> limit) noexcept
+			{ _output_limit = limit; }
 
 		/**
-		 * Set target value. Set target value. If winding is enabled,
-		 * then the target should be normalized to [-1..1].
+		 * Set setpoint value. If winding is enabled,
+		 * then the setpoint should be normalized to [-1..1].
 		 */
-		// TODO rename to set_reference_point() or set_setpoint()
 		void
-		set_target (Input target) noexcept;
+		set_setpoint (Input setpoint) noexcept
+			{ _setpoint = setpoint; }
 
 		/**
 		 * Process value for given dt (timespan) and return new value.
@@ -183,35 +197,39 @@ template<class pInput, class pProcessVariable = pInput, class pParam = double>
 		process (Input measured, si::Time dt) noexcept;
 
 		/**
-		 * Same as process (Input, Time), but also provide target value to be set.
+		 * Same as process (Input, Time), but also provide setpoint value to be set.
 		 */
 		ProcessVariable
-		process (Input target, Input measured, si::Time dt) noexcept;
+		process (Input setpoint, Input measured, si::Time dt) noexcept;
 
 		/**
 		 * Alias for process().
 		 */
 		ProcessVariable
-		operator() (Input input, si::Time dt) noexcept;
+		operator() (Input measured, si::Time dt) noexcept
+			{ return process (measured, dt); }
 
 		/**
 		 * Alias for process().
 		 */
 		ProcessVariable
-		operator() (Input target, Input measured, si::Time dt) noexcept;
+		operator() (Input setpoint, Input measured, si::Time dt) noexcept
+			{ return process (setpoint, measured, dt); }
 
 		/**
 		 * Return current controller output value.
 		 * TODO change to value() to be compatible with Smoother/RangeSmoother
 		 */
 		ProcessVariable
-		output() const noexcept;
+		output() const noexcept
+			{ return _output; }
 
 		/**
 		 * Return error value.
 		 */
 		Input
-		error() const noexcept;
+		error() const noexcept
+			{ return _previous_error; }
 
 		/**
 		 * Reset to default state.
@@ -221,10 +239,10 @@ template<class pInput, class pProcessVariable = pInput, class pParam = double>
 
 	  private:
 		bool							_winding					= false;
-		Input							_target						{ };
+		Input							_setpoint					{ };
 		Input							_previous_error				{ };
-		Integral						_integral					{ };
-		Derivative						_derivative					{ };
+		Integral						_integrated_error			{ };
+		Derivative						_error_derivative			{ };
 		Param							_p							= 0.0;
 		Param							_i							= 0.0;
 		std::optional<Range<Integral>>	_integral_limit;
@@ -237,14 +255,8 @@ template<class pInput, class pProcessVariable = pInput, class pParam = double>
 
 template<class V, class C, class P>
 	inline
-	PIDController<V, C, P>::PIDController()
-	{ }
-
-
-template<class V, class C, class P>
-	inline
-	PIDController<V, C, P>::PIDController (Settings const& settings, Input target):
-		_target (target),
+	PIDController<V, C, P>::PIDController (Settings const& settings, Input setpoint):
+		_setpoint (setpoint),
 		_p (settings.p),
 		_i (settings.i),
 		_d (settings.d)
@@ -255,8 +267,8 @@ template<class V, class C, class P>
 
 template<class V, class C, class P>
 	inline
-	PIDController<V, C, P>::PIDController (Param p, Param i, Param d, Input target):
-		_target (target),
+	PIDController<V, C, P>::PIDController (Param p, Param i, Param d, Input setpoint):
+		_setpoint (setpoint),
 		_p (p),
 		_i (i),
 		_d (d)
@@ -267,131 +279,11 @@ template<class V, class C, class P>
 
 template<class V, class C, class P>
 	inline void
-	PIDController<V, C, P>::set_winding (bool winding)
-	{
-		_winding = winding;
-	}
-
-
-template<class V, class C, class P>
-	inline typename PIDController<V, C, P>::Param
-	PIDController<V, C, P>::p() const noexcept
-	{
-		return _p;
-	}
-
-
-template<class V, class C, class P>
-	inline void
-	PIDController<V, C, P>::set_p (Param p) noexcept
-	{
-		_p = p;
-	}
-
-
-template<class V, class C, class P>
-	inline typename PIDController<V, C, P>::Param
-	PIDController<V, C, P>::i() const noexcept
-	{
-		return _i;
-	}
-
-
-template<class V, class C, class P>
-	inline void
-	PIDController<V, C, P>::set_i (Param i) noexcept
-	{
-		_i = i;
-	}
-
-
-template<class V, class C, class P>
-	inline typename PIDController<V, C, P>::Param
-	PIDController<V, C, P>::d() const noexcept
-	{
-		return _d;
-	}
-
-
-template<class V, class C, class P>
-	inline void
-	PIDController<V, C, P>::set_d (Param d) noexcept
-	{
-		_d = d;
-	}
-
-
-template<class V, class C, class P>
-	inline void
 	PIDController<V, C, P>::set_pid (Settings const& settings) noexcept
 	{
 		_p = settings.p;
 		_i = settings.i;
 		_d = settings.d;
-	}
-
-
-template<class V, class C, class P>
-	inline typename PIDController<V, C, P>::Param
-	PIDController<V, C, P>::gain() const noexcept
-	{
-		return _gain;
-	}
-
-
-template<class V, class C, class P>
-	inline void
-	PIDController<V, C, P>::set_gain (Param gain) noexcept
-	{
-		_gain = gain;
-	}
-
-
-template<class V, class C, class P>
-	inline std::optional<Range<typename PIDController<V, C, P>::Integral>>
-	PIDController<V, C, P>::integral_limit() const noexcept
-	{
-		return _integral_limit;
-	}
-
-
-template<class V, class C, class P>
-	inline void
-	PIDController<V, C, P>::set_integral_limit (Range<Integral> limit) noexcept
-	{
-		_integral_limit = limit;
-	}
-
-
-template<class V, class C, class P>
-	inline void
-	PIDController<V, C, P>::set_integral_limit (std::optional<Range<Integral>> limit) noexcept
-	{
-		_integral_limit = limit;
-	}
-
-
-template<class V, class C, class P>
-	inline Range<typename PIDController<V, C, P>::ProcessVariable>
-	PIDController<V, C, P>::output_limit() const noexcept
-	{
-		return _output_limit;
-	}
-
-
-template<class V, class C, class P>
-	inline void
-	PIDController<V, C, P>::set_output_limit (Range<ProcessVariable> limit) noexcept
-	{
-		_output_limit = limit;
-	}
-
-
-template<class V, class C, class P>
-	inline void
-	PIDController<V, C, P>::set_target (Input target) noexcept
-	{
-		_target = target;
 	}
 
 
@@ -409,24 +301,29 @@ template<class V, class C, class P>
 		if (_winding)
 		{
 			// TODO do it better
-			error = clamped<Input> (_target - measured, Input (-2.0), Input (+2.0));
+			error = clamped<Input> (measured - _setpoint, Input (-2.0), Input (+2.0));
+
 			if (abs (error) > Input (1.0))
 				error = error - sgn (error) * Input (2.0);
 		}
 		else
-			error = _target - measured;
+			error = measured - _setpoint;
 
 		// I:
-		_integral += error * dt;
+		_integrated_error += error * dt;
+
 		if (_integral_limit)
-			clamp (_integral, *_integral_limit);
+			clamp (_integrated_error, *_integral_limit);
+
 		// D:
-		_derivative = (error - _previous_error) / dt;
-		if (!isfinite (_derivative))
-			_derivative = Derivative();
+		_error_derivative = (error - _previous_error) / dt;
+
+		if (!isfinite (_error_derivative))
+			_error_derivative = Derivative();
+
 		// P and the rest:
-		auto computed = _gain * (_p * error + _i * _integral / 1_s + _d * _derivative * 1_s);
-		_output = clamped<ProcessVariable> (ProcessVariable (si::quantity (computed)), _output_limit);
+		auto anti_error_action = -_gain * (_p * error + _i * _integrated_error / 1_s + _d * _error_derivative * 1_s);
+		_output = clamped<ProcessVariable> (ProcessVariable (si::quantity (anti_error_action)), _output_limit);
 		_previous_error = error;
 
 		return _output;
@@ -435,42 +332,10 @@ template<class V, class C, class P>
 
 template<class V, class C, class P>
 	inline typename PIDController<V, C, P>::ProcessVariable
-	PIDController<V, C, P>::process (Input target, Input measured, si::Time dt) noexcept
+	PIDController<V, C, P>::process (Input setpoint, Input measured, si::Time dt) noexcept
 	{
-		set_target (target);
+		set_setpoint (setpoint);
 		return process (measured, dt);
-	}
-
-
-template<class V, class C, class P>
-	inline typename PIDController<V, C, P>::ProcessVariable
-	PIDController<V, C, P>::operator() (Input measured, si::Time dt) noexcept
-	{
-		return process (measured, dt);
-	}
-
-
-template<class V, class C, class P>
-	inline typename PIDController<V, C, P>::ProcessVariable
-	PIDController<V, C, P>::operator() (Input target, Input measured, si::Time dt) noexcept
-	{
-		return process (target, measured, dt);
-	}
-
-
-template<class V, class C, class P>
-	inline typename PIDController<V, C, P>::ProcessVariable
-	PIDController<V, C, P>::output() const noexcept
-	{
-		return _output;
-	}
-
-
-template<class V, class C, class P>
-	inline typename PIDController<V, C, P>::Input
-	PIDController<V, C, P>::error() const noexcept
-	{
-		return _previous_error;
 	}
 
 
@@ -480,8 +345,8 @@ template<class V, class C, class P>
 	{
 		_output = ProcessVariable();
 		_previous_error = Input();
-		_integral = Integral();
-		_derivative = Derivative();
+		_integrated_error = Integral();
+		_error_derivative = Derivative();
 	}
 
 } // namespace xf

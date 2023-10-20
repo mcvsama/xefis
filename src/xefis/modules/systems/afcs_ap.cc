@@ -105,7 +105,7 @@ AFCS_AP::compute_ap()
 		_ailerons_pid.set_output_limit ({ *_io.ailerons_minimum, *_io.ailerons_maximum });
 		_ailerons_pid (_io.cmd_roll.value_or (*_io.measured_roll), *_io.measured_roll, update_dt);
 
-		computed_elevator = _elevator_smoother (-si::cos (*_io.measured_roll) * _elevator_pid.output(), update_dt);
+		computed_elevator = _elevator_smoother (si::cos (*_io.measured_roll) * _elevator_pid.output(), update_dt);
 		computed_ailerons = _ailerons_smoother (_ailerons_pid.output(), update_dt);
 
 		_io.serviceable = true;
