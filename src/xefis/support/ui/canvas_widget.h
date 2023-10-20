@@ -30,6 +30,9 @@
 
 namespace xf {
 
+/**
+ * Simple helper widget that one can paint on.
+ */
 class CanvasWidget: public QWidget
 {
   public:
