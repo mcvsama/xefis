@@ -35,8 +35,6 @@ class PanelWidget;
 
 class Panel: public QWidget
 {
-	Q_OBJECT
-
   public:
 	// Ctor
 	explicit

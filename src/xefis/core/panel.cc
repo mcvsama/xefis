@@ -53,7 +53,7 @@ Panel::Panel (QWidget* parent, Graphics const& graphics):
 	_timer = new QTimer (this);
 	_timer->setInterval (100);
 	_timer->setSingleShot (false);
-	QObject::connect (_timer, SIGNAL (timeout()), this, SLOT (read()));
+	QObject::connect (_timer, &QTimer::timeout, [this] { read(); });
 	_timer->start();
 }
 
