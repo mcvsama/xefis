@@ -56,7 +56,6 @@ Wing::update_external_forces (AtmosphericModel const* atmosphere)
 
 		auto const body_position_in_ecef = world_to_ecef * location().position();
 		auto const body_velocity_in_ecef = world_to_ecef * velocity_moments<rigid_body::WorldSpace>().velocity();
-		// FIXME take velocity_moments().angular_velocity() into account
 
 		auto ecef_atmosphere_state = atmosphere->state_at (body_position_in_ecef);
 		ecef_atmosphere_state.wind -= body_velocity_in_ecef;
