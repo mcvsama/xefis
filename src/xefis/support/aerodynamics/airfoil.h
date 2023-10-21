@@ -48,6 +48,14 @@ template<class Space>
 	};
 
 
+template<class Space>
+	struct AerodynamicForcesAndAOA
+	{
+		AerodynamicForces<Space>	forces;
+		AngleOfAttack				angle_of_attack;
+	};
+
+
 /**
  * Airfoil represents an airfoil, which is an airfoil characteristics combined with chord length and wing length.
  * This class actually allows querying for various forces generated on the wing by the moving air.
@@ -135,16 +143,16 @@ class Airfoil
 	 * Also compute angle of attack and put result into @result_aoa.
 	 */
 	[[nodiscard]]
-	AerodynamicForces<AirfoilSplineSpace>
-	planar_aerodynamic_forces (AtmosphereState<AirfoilSplineSpace> const&, AngleOfAttack& result_aoa) const;
+	AerodynamicForcesAndAOA<AirfoilSplineSpace>
+	planar_aerodynamic_forces (AtmosphereState<AirfoilSplineSpace> const&) const;
 
 	/**
 	 * Like planar_aerodynamic_forces(), except it corrects the center of pressure position (returned Wrench's position) in the Z axis, to be in the center of
 	 * the airfoil (half the length).
 	 */
 	[[nodiscard]]
-	AerodynamicForces<AirfoilSplineSpace>
-	aerodynamic_forces (AtmosphereState<AirfoilSplineSpace> const&, AngleOfAttack& result_aoa) const;
+	AerodynamicForcesAndAOA<AirfoilSplineSpace>
+	aerodynamic_forces (AtmosphereState<AirfoilSplineSpace> const&) const;
 
   private:
 	/**

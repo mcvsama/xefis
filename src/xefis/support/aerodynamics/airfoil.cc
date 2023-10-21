@@ -66,14 +66,16 @@ Airfoil::pitching_moment (si::Angle alpha, Reynolds re, si::Pressure dynamic_pre
 }
 
 
-AerodynamicForces<AirfoilSplineSpace>
-Airfoil::planar_aerodynamic_forces (AtmosphereState<AirfoilSplineSpace> const& atm, AngleOfAttack& aoa) const
+AerodynamicForcesAndAOA<AirfoilSplineSpace>
+Airfoil::planar_aerodynamic_forces (AtmosphereState<AirfoilSplineSpace> const& atm) const
 {
 	// Wind vector will be normalized, so make sure it's not near 0:
 	if (abs (atm.wind) > 1e-6_mps)
 	{
-		aoa.alpha = 1_rad * atan2 (atm.wind[1], atm.wind[0]);
-		aoa.beta = 1_rad * atan2 (atm.wind[2], atm.wind[0]);
+		auto const aoa = AngleOfAttack {
+			.alpha	= 1_rad * atan2 (atm.wind[1], atm.wind[0]),
+			.beta	= 1_rad * atan2 (atm.wind[2], atm.wind[0]),
+		};
 
 		SpaceVector<si::Velocity, AirfoilSplineSpace> const planar_wind { atm.wind[0], atm.wind[1], 0_mps };
 		si::Velocity const	planar_tas				= abs (planar_wind);
@@ -97,26 +99,30 @@ Airfoil::planar_aerodynamic_forces (AtmosphereState<AirfoilSplineSpace> const& a
 		// TODO drag should be 3D, that is also in Z direction
 		// TODO maybe lift, too?
 		return {
-			lift * lift_direction,
-			drag * drag_direction,
-			pitching_moment_vec,
-			cp_position,
+			.forces = {
+				lift * lift_direction,
+				drag * drag_direction,
+				pitching_moment_vec,
+				cp_position,
+			},
+			.angle_of_attack = aoa,
 		};
 	}
 	else
 	{
-		aoa.alpha = 0_deg;
-		aoa.beta = 0_deg;
-		return {};
+		return {
+			.forces = {},
+			.angle_of_attack = { 0_deg, 0_deg },
+		};
 	}
 }
 
 
-AerodynamicForces<AirfoilSplineSpace>
-Airfoil::aerodynamic_forces (AtmosphereState<AirfoilSplineSpace> const& atm, AngleOfAttack& aoa) const
+AerodynamicForcesAndAOA<AirfoilSplineSpace>
+Airfoil::aerodynamic_forces (AtmosphereState<AirfoilSplineSpace> const& atm) const
 {
-	auto planar = planar_aerodynamic_forces (atm, aoa);
-	planar.center_of_pressure += SpaceLength<AirfoilSplineSpace> { 0_m, 0_m, 0.5 * _wing_length };
+	auto planar = planar_aerodynamic_forces (atm);
+	planar.forces.center_of_pressure += SpaceLength<AirfoilSplineSpace> { 0_m, 0_m, 0.5 * _wing_length };
 	return planar;
 }
 

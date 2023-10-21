@@ -63,11 +63,10 @@ Wing::update_external_forces (AtmosphericModel const* atmosphere)
 			.air = ecef_atmosphere_state.air,
 			.wind = ecef_to_spline_transform * ecef_atmosphere_state.wind,
 		};
-		AngleOfAttack aoa;
 
 		// Center of pressure Wrench:
-		auto const spline_aeroforces_at_origin = _airfoil.aerodynamic_forces (body_atmosphere_state, aoa);
-		auto const body_aeroforces_at_origin = ~body_to_airfoil_spline * spline_aeroforces_at_origin;
+		auto const spline_aeroforces_at_origin = _airfoil.aerodynamic_forces (body_atmosphere_state);
+		auto const body_aeroforces_at_origin = ~body_to_airfoil_spline * spline_aeroforces_at_origin.forces;
 
 		// Compute 'at COM' values:
 		_lift_force = body_aeroforces_at_origin.lift;
