@@ -153,7 +153,7 @@ class FlightGear:
   public:
 	// Ctor
 	explicit
-	FlightGear (std::string_view const& instance = {});
+	FlightGear (xf::ProcessingLoop&, std::string_view const& instance = {});
 
 	// Module API
 	void

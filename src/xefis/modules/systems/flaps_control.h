@@ -73,7 +73,7 @@ class FlapsControl: public FlapsControlIO
   public:
 	// Ctor
 	explicit
-	FlapsControl (xf::Airframe&, std::string_view const& instance = {});
+	FlapsControl (xf::ProcessingLoop&, xf::Airframe&, std::string_view const& instance = {});
 
   protected:
 	// Module API

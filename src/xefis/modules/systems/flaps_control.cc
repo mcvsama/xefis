@@ -29,8 +29,8 @@
 #include <cstddef>
 
 
-FlapsControl::FlapsControl (xf::Airframe& airframe, std::string_view const& instance):
-	FlapsControlIO (instance)
+FlapsControl::FlapsControl (xf::ProcessingLoop& loop, xf::Airframe& airframe, std::string_view const& instance):
+	FlapsControlIO (loop, instance)
 {
 	for (auto s: airframe.flaps().settings())
 		_settings_list.insert (s.second.angle());

@@ -72,7 +72,7 @@ class DebugForces:
   public:
 	// Ctor
 	explicit
-	DebugForces (xf::Graphics const&, std::string_view const& instance = {});
+	DebugForces (xf::ProcessingLoop&, xf::Graphics const&, std::string_view const& instance = {});
 
 	// Module API
 	void

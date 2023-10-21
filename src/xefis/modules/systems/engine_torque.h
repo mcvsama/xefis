@@ -82,7 +82,7 @@ class EngineTorque: public EngineTorqueIO
   public:
 	// Ctor
 	explicit
-	EngineTorque (std::string_view const& instance = {});
+	EngineTorque (xf::ProcessingLoop&, std::string_view const& instance = {});
 
   protected:
 	// Module API

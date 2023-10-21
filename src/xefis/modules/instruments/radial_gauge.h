@@ -92,7 +92,7 @@ template<class Value>
 	  public:
 		// Ctor
 		explicit
-		RadialGauge (xf::Graphics const&, Converter = nullptr, std::string_view const& instance = {});
+		RadialGauge (xf::ProcessingLoop&, xf::Graphics const&, Converter = nullptr, std::string_view const& instance = {});
 
 		// Module API
 		void
@@ -124,8 +124,8 @@ template<class Value>
 
 template<class Value>
 	inline
-	RadialGauge<Value>::RadialGauge (xf::Graphics const& graphics, Converter converter, std::string_view const& instance):
-		Gauge<Value> (instance),
+	RadialGauge<Value>::RadialGauge (xf::ProcessingLoop& loop, xf::Graphics const& graphics, Converter converter, std::string_view const& instance):
+		Gauge<Value> (loop, instance),
 		xf::InstrumentSupport (graphics),
 		_converter (converter)
 	{

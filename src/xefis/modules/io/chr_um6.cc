@@ -40,8 +40,8 @@
 #include <iomanip>
 
 
-CHRUM6::CHRUM6 (xf::SerialPort&& serial_port, xf::Logger const& logger, std::string_view const& instance):
-	CHRUM6_IO (instance),
+CHRUM6::CHRUM6 (xf::ProcessingLoop& loop, xf::SerialPort&& serial_port, xf::Logger const& logger, std::string_view const& instance):
+	CHRUM6_IO (loop, instance),
 	_logger (logger.with_scope (std::string (kLoggerScope) + "#" + instance)),
 	_serial_port (std::move (serial_port))
 {

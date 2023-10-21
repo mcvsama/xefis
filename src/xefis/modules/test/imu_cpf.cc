@@ -24,8 +24,8 @@
 #include <cstddef>
 
 
-IMU_CPF::IMU_CPF (std::string_view const& instance):
-	IMU_CPF_IO (instance)
+IMU_CPF::IMU_CPF (xf::ProcessingLoop& loop, std::string_view const& instance):
+	IMU_CPF_IO (loop, instance)
 {
 	_centripetal_computer.set_callback (std::bind (&IMU_CPF::compute_centripetal, this));
 	_centripetal_computer.add_depending_smoothers ({

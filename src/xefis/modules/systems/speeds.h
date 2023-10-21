@@ -58,7 +58,7 @@ class Speeds: public SpeedsIO
   public:
 	// Ctor
 	explicit
-	Speeds (xf::Airframe*, std::string_view const& instance = {});
+	Speeds (xf::ProcessingLoop&, xf::Airframe*, std::string_view const& instance = {});
 
 	// Module API
 	void

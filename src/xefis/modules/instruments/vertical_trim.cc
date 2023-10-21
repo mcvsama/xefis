@@ -27,8 +27,8 @@
 #include <cstddef>
 
 
-VerticalTrim::VerticalTrim (xf::Graphics const& graphics, std::string_view const& instance):
-	VerticalTrimIO (instance),
+VerticalTrim::VerticalTrim (xf::ProcessingLoop& loop, xf::Graphics const& graphics, std::string_view const& instance):
+	VerticalTrimIO (loop, instance),
 	InstrumentSupport (graphics)
 {
 	_inputs_observer.set_callback ([&]{

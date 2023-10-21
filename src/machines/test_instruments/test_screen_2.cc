@@ -21,14 +21,14 @@
 #include <cstddef>
 
 
-TestScreen2::TestScreen2 (xf::ScreenSpec const& spec, xf::Graphics const& graphics, xf::NavaidStorage const& navaid_storage, xf::Machine& machine, xf::Logger const& logger):
+TestScreen2::TestScreen2 (xf::ProcessingLoop& loop, xf::ScreenSpec const& spec, xf::Graphics const& graphics, xf::NavaidStorage const& navaid_storage, xf::Machine& machine, xf::Logger const& logger):
 	Screen (spec, graphics, machine, "Test Screen 2", logger.with_scope ("TestScreen2")),
 	_logger (logger),
 	_graphics (graphics),
 	_navaid_storage (navaid_storage),
 	// Instruments:
-	hsi_1 (_graphics, _navaid_storage, _logger, "big-hsi-1"),
-	hsi_2 (_graphics, _navaid_storage, _logger, "big-hsi-2"),
+	hsi_1 (loop, _graphics, _navaid_storage, _logger, "big-hsi-1"),
+	hsi_2 (loop, _graphics, _navaid_storage, _logger, "big-hsi-2"),
 	_hsi_work_performer (2, _logger.with_scope ("big-HSI"))
 {
 	register_instrument (this->hsi_1, _hsi_work_performer);

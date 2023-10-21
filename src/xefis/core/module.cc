@@ -16,6 +16,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/processing_loop.h>
 #include <xefis/core/sockets/module_socket.h>
 #include <xefis/core/setting.h>
 
@@ -199,6 +200,14 @@ Module::Module (std::string_view const& instance):
 	NamedInstance (instance)
 {
 	ModuleSocketAPI (*this).verify_settings();
+}
+
+
+Module::Module (ProcessingLoop& loop, std::string_view const& instance):
+	NamedInstance (instance)
+{
+	ModuleSocketAPI (*this).verify_settings();
+	loop.register_module (*this);
 }
 
 

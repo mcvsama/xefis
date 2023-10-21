@@ -24,8 +24,8 @@
 #include <cstddef>
 
 
-Gear::Gear (xf::Graphics const& graphics, std::string_view const& instance):
-	GearIO (instance),
+Gear::Gear (xf::ProcessingLoop& loop, xf::Graphics const& graphics, std::string_view const& instance):
+	GearIO (loop, instance),
 	InstrumentSupport (graphics)
 {
 	_inputs_observer.set_callback ([&] {

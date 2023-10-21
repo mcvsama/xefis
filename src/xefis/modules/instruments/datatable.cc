@@ -69,8 +69,8 @@ Datatable::Line::stringified() const
 }
 
 
-Datatable::Datatable (xf::Graphics const& graphics, std::string_view const& instance):
-	Instrument (instance),
+Datatable::Datatable (xf::ProcessingLoop& loop, xf::Graphics const& graphics, std::string_view const& instance):
+	Instrument (loop, instance),
 	InstrumentSupport (graphics)
 {
 	_inputs_observer.set_callback ([&]{

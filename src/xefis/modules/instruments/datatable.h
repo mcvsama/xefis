@@ -85,7 +85,7 @@ class Datatable:
   public:
 	// Ctor
 	explicit
-	Datatable (xf::Graphics const&, std::string_view const& instance = {});
+	Datatable (xf::ProcessingLoop&, xf::Graphics const&, std::string_view const& instance = {});
 
 	/**
 	 * Set font size for all labels.

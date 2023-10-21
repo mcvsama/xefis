@@ -39,7 +39,7 @@ class VirtualServoController: public xf::Module
   public:
 	// Ctor
 	explicit
-	VirtualServoController (std::string_view const& instance = {});
+	VirtualServoController (xf::ProcessingLoop&, std::string_view const& instance = {});
 
 	/**
 	 * Allocate/return ModuleIn for the servo (named automatically).

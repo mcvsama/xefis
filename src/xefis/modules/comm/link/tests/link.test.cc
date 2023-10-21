@@ -70,6 +70,9 @@ template<template<class> class SocketType>
 		SocketType<int64_t>			dummy					{ this, "dummy" };
 
 	  public:
+		// Ctor
+		using Module::Module;
+
 		void
 		fetch_all (Cycle const& cycle)
 		{
@@ -112,6 +115,9 @@ template<template<class> class SocketType>
 		SocketType<int>				int_prop				{ this, "int_prop" };
 
 	  public:
+		// Ctor
+		using Module::Module;
+
 		void
 		fetch_all (Cycle const& cycle)
 		{
@@ -270,17 +276,17 @@ auto constinit crypto_params = xle::Transceiver::CryptoParams {
 
 
 xle::MasterTransceiver
-get_ground_transceiver()
+get_ground_transceiver (xf::ProcessingLoop& loop)
 {
-	return xle::MasterTransceiver (crypto_params, g_logger.with_scope ("ground-transceiver"), "ground/transceiver");
+	return xle::MasterTransceiver (loop, crypto_params, g_logger.with_scope ("ground-transceiver"), "ground/transceiver");
 }
 
 
 xle::SlaveTransceiver
-get_air_transceiver()
+get_air_transceiver (xf::ProcessingLoop& loop)
 {
 	auto handshake_id_reuse_check = [](xle::HandshakeID) { return false; };
-	return xle::SlaveTransceiver (crypto_params, handshake_id_reuse_check, g_logger.with_scope ("air-transceiver"), "air/transceiver");
+	return xle::SlaveTransceiver (loop, crypto_params, handshake_id_reuse_check, g_logger.with_scope ("air-transceiver"), "air/transceiver");
 }
 
 
@@ -295,8 +301,9 @@ void transmit (LinkProtocol& tx_protocol, LinkProtocol& rx_protocol)
 
 
 AutoTest t1 ("modules/io/link: protocol: valid data transmission", []{
-	Ground_Tx_Data tx;
-	Air_Rx_Data rx;
+	TestProcessingLoop loop (0.1_s);
+	Ground_Tx_Data tx (loop);
+	Air_Rx_Data rx (loop);
 	GroundToAirLinkProtocol tx_protocol (tx);
 	GroundToAirLinkProtocol rx_protocol (rx);
 	TestCycle cycle;
@@ -375,8 +382,9 @@ AutoTest t1 ("modules/io/link: protocol: valid data transmission", []{
 
 
 AutoTest t2 ("modules/io/link: protocol: nils and out-of range values transmission", []{
-	Ground_Tx_Data tx;
-	Air_Rx_Data rx;
+	TestProcessingLoop loop (0.1_s);
+	Ground_Tx_Data tx (loop);
+	Air_Rx_Data rx (loop);
 	GroundToAirLinkProtocol tx_protocol (tx);
 	GroundToAirLinkProtocol rx_protocol (rx);
 	TestCycle cycle;
@@ -423,8 +431,9 @@ AutoTest t2 ("modules/io/link: protocol: nils and out-of range values transmissi
 
 
 AutoTest t3 ("modules/io/link: protocol: offsets increase precision", []{
-	Ground_Tx_Data tx;
-	Air_Rx_Data rx;
+	TestProcessingLoop loop (0.1_s);
+	Ground_Tx_Data tx (loop);
+	Air_Rx_Data rx (loop);
 	GroundToAirLinkProtocol tx_protocol (tx);
 	GroundToAirLinkProtocol rx_protocol (rx);
 	TestCycle cycle;
@@ -442,8 +451,9 @@ AutoTest t3 ("modules/io/link: protocol: offsets increase precision", []{
 AutoTest t4 ("modules/io/link: protocol: invalid data transmission (wrong signature)", []{
 	// This tests signature verification and checks if values are retained or not, according to the protocol.
 
-	Ground_Tx_Data tx;
-	Air_Rx_Data rx;
+	TestProcessingLoop loop (0.1_s);
+	Ground_Tx_Data tx (loop);
+	Air_Rx_Data rx (loop);
 	GroundToAirLinkProtocol tx_protocol (tx);
 	GroundToAirLinkProtocol rx_protocol (rx);
 	TestCycle cycle;
@@ -535,8 +545,9 @@ AutoTest t4 ("modules/io/link: protocol: invalid data transmission (wrong signat
 AutoTest t5 ("modules/io/link: protocol: send-every/send-offset", []{
 	// The third envelope should be sent every two packets, starting from packet with index 1.
 
-	Ground_Tx_Data tx;
-	Air_Rx_Data rx;
+	TestProcessingLoop loop (0.1_s);
+	Ground_Tx_Data tx (loop);
+	Air_Rx_Data rx (loop);
 	GroundToAirLinkProtocol tx_protocol (tx);
 	GroundToAirLinkProtocol rx_protocol (rx);
 	TestCycle cycle;
@@ -575,23 +586,24 @@ AutoTest t5 ("modules/io/link: protocol: send-every/send-offset", []{
 
 
 AutoTest t6 ("modules/io/link: protocol: encrypted channel works", []{
-	Ground_Tx_Data ground_tx_data;
-	Ground_Rx_Data ground_rx_data;
-	Air_Tx_Data air_tx_data;
-	Air_Rx_Data air_rx_data;
+	TestProcessingLoop loop (0.1_s);
+	Ground_Tx_Data ground_tx_data (loop);
+	Ground_Rx_Data ground_rx_data (loop);
+	Air_Tx_Data air_tx_data (loop);
+	Air_Rx_Data air_rx_data (loop);
 
-	auto ground_transceiver = get_ground_transceiver();
-	auto air_transceiver = get_air_transceiver();
+	auto ground_transceiver = get_ground_transceiver (loop);
+	auto air_transceiver = get_air_transceiver (loop);
 
 	auto ground_tx_protocol = std::make_unique<GroundToAirLinkProtocol> (ground_tx_data, &ground_transceiver);
 	auto ground_rx_protocol = std::make_unique<AirToGroundLinkProtocol> (ground_rx_data, &ground_transceiver);
 	auto air_tx_protocol = std::make_unique<AirToGroundLinkProtocol> (air_tx_data, &air_transceiver);
 	auto air_rx_protocol = std::make_unique<GroundToAirLinkProtocol> (air_rx_data, &air_transceiver);
 
-	auto ground_tx_link = OutputLink (std::move (ground_tx_protocol), 30_Hz, g_logger.with_scope ("ground-tx-link"), "ground/tx-link");
-	auto ground_rx_link = InputLink (std::move (ground_rx_protocol), {}, g_logger.with_scope ("ground-rx-link"), "ground/rx-link");
-	auto air_tx_link = OutputLink (std::move (air_tx_protocol), 30_Hz, g_logger.with_scope ("air-tx-link"), "air/tx-link");
-	auto air_rx_link = InputLink (std::move (air_rx_protocol), {}, g_logger.with_scope ("air-rx-link"), "air/rx-link");
+	auto ground_tx_link = OutputLink (loop, std::move (ground_tx_protocol), 30_Hz, g_logger.with_scope ("ground-tx-link"), "ground/tx-link");
+	auto ground_rx_link = InputLink (loop, std::move (ground_rx_protocol), {}, g_logger.with_scope ("ground-rx-link"), "ground/rx-link");
+	auto air_tx_link = OutputLink (loop, std::move (air_tx_protocol), 30_Hz, g_logger.with_scope ("air-tx-link"), "air/tx-link");
+	auto air_rx_link = InputLink (loop, std::move (air_rx_protocol), {}, g_logger.with_scope ("air-rx-link"), "air/rx-link");
 
 	ground_tx_data.handshake_request << ground_transceiver.handshake_request;
 	ground_transceiver.handshake_response << ground_rx_data.handshake_response;
@@ -601,18 +613,6 @@ AutoTest t6 ("modules/io/link: protocol: encrypted channel works", []{
 
 	air_rx_link.link_input << ground_tx_link.link_output;
 	ground_rx_link.link_input << air_tx_link.link_output;
-
-	auto loop = xf::TestProcessingLoop (0.1_s);
-	loop.register_module (ground_transceiver);
-	loop.register_module (ground_tx_data);
-	loop.register_module (ground_rx_data);
-	loop.register_module (ground_tx_link);
-	loop.register_module (ground_rx_link);
-	loop.register_module (air_transceiver);
-	loop.register_module (air_tx_data);
-	loop.register_module (air_rx_data);
-	loop.register_module (air_tx_link);
-	loop.register_module (air_rx_link);
 
 	auto [session_prepared, session_activated] = ground_transceiver.start_handshake();
 	auto constexpr kMaxCycles = 6u;

@@ -46,13 +46,13 @@ TestInstrumentsMachine::TestInstrumentsMachine (xf::Xefis& xefis):
 	xf::ScreenSpec spec { QRect { 0, 0, 1366, 768 }, 15_in, 30_Hz, line_width, font_height };
 	spec.set_scale (1.25f);
 
-	auto& test_screen_1 = _test_screen_1.emplace (spec, xefis.graphics(), *_navaid_storage, *this, _logger.with_scope ("test screen"));
+	auto& test_screen_1 = _test_screen_1.emplace (_test_loop, spec, xefis.graphics(), *_navaid_storage, *this, _logger.with_scope ("test screen"));
 	test_screen_1.set_paint_bounding_boxes (false);
 
-	auto& test_screen_2 = _test_screen_2.emplace (spec, xefis.graphics(), *_navaid_storage, *this, _logger.with_scope ("test screen"));
+	auto& test_screen_2 = _test_screen_2.emplace (_test_loop, spec, xefis.graphics(), *_navaid_storage, *this, _logger.with_scope ("test screen"));
 	test_screen_2.set_paint_bounding_boxes (false);
 
-	auto& test_generator = _test_generator.emplace ("test generator");
+	auto& test_generator = _test_generator.emplace (_test_loop, "test generator");
 	auto& test_generator_hsi_range											= test_generator.create_enum_socket<si::Length> ("hsi/range", { { 5_nmi, 10_s }, { 20_nmi, 10_s }, { 40_nmi, 4_s }, { 80_nmi, 2_s }, { 160_nmi, 2_s } });
 	auto& test_generator_hsi_speed_gs										= test_generator.create_socket<si::Velocity> ("hsi/speed/ground-speed", 0_kt, { 0_kt, 400_kt }, 13_kt / 1_s);
 	auto& test_generator_hsi_speed_tas										= test_generator.create_socket<si::Velocity> ("hsi/speed/true-airspeed", 0_kt, { 0_kt, 400_kt }, 17_kt / 1_s);
@@ -500,26 +500,14 @@ TestInstrumentsMachine::TestInstrumentsMachine (xf::Xefis& xefis):
 	test_screen_2.hsi_2.radio_range_warning									<< test_generator_hsi_radio_range_warning;
 	test_screen_2.hsi_2.radio_range_critical								<< test_generator_hsi_radio_range_critical;
 
-	auto& test_loop = _test_loop.emplace ("Main loop", 120_Hz, _logger.with_scope ("short computations loop"));
-
 	register_screen (test_screen_1); // TODO add option IncludeInstruments
 	register_screen (test_screen_2);
-	register_processing_loop (test_loop);
-
-	// Register all instruments in the processing loop:
-	for (auto* instrument: test_screen_1.instruments())
-		test_loop.register_module (*instrument);
-
-	for (auto* instrument: test_screen_2.instruments())
-		test_loop.register_module (*instrument);
-
-	// Register the rest:
-	test_loop.register_module (test_generator);
-	test_loop.register_module (test_loop);
-	test_loop.start();
+	register_processing_loop (_test_loop);
 
 	test_screen_1.show();
 	test_screen_2.show();
+
+	_test_loop.start();
 }
 
 

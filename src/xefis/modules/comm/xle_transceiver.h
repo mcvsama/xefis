@@ -474,7 +474,7 @@ class MasterTransceiver:
   public:
 	// Ctor
 	explicit
-	MasterTransceiver (CryptoParams const&, xf::Logger const&, std::string_view const& instance = {});
+	MasterTransceiver (xf::ProcessingLoop&, CryptoParams const&, xf::Logger const&, std::string_view const& instance = {});
 
 	/**
 	 * Perform a handshake.
@@ -645,7 +645,8 @@ class SlaveTransceiver:
   public:
 	// Ctor
 	explicit
-	SlaveTransceiver (CryptoParams const&,
+	SlaveTransceiver (xf::ProcessingLoop&,
+					  CryptoParams const&,
 					  std::function<bool (HandshakeID)> handshake_id_reuse_check,
 					  xf::Logger const&,
 					  std::string_view const& instance = {});

@@ -51,7 +51,7 @@ class InputLink: public xf::Module
   public:
 	// Ctor
 	explicit
-	InputLink (std::unique_ptr<LinkProtocol>, InputLinkParams const&, xf::Logger const&, std::string_view const& instance = {});
+	InputLink (xf::ProcessingLoop&, std::unique_ptr<LinkProtocol>, InputLinkParams const&, xf::Logger const&, std::string_view const& instance = {});
 
 	void
 	process (xf::Cycle const&) override;

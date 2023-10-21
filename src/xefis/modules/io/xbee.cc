@@ -46,8 +46,8 @@
 #include <iomanip>
 
 
-XBee::XBee (xf::Logger const& logger, std::string_view const& instance):
-	XBeeIO (instance),
+XBee::XBee (xf::ProcessingLoop& loop, xf::Logger const& logger, std::string_view const& instance):
+	XBeeIO (loop, instance),
 	_logger (logger.with_scope (std::string (kLoggerScope) + "#" + instance))
 {
 	_restart_timer = new QTimer (this);

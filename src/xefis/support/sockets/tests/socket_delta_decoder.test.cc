@@ -15,6 +15,7 @@
 #include <xefis/core/module.h>
 #include <xefis/core/sockets/module_socket.h>
 #include <xefis/support/sockets/socket_delta_decoder.h>
+#include <xefis/test/test_processing_loop.h>
 
 // Neutrino:
 #include <neutrino/test/auto_test.h>
@@ -30,7 +31,8 @@ AutoTest t1 ("SocketDeltaDecoder", []{
 	using Integer = int16_t;
 	using Callback = std::function<void (std::optional<Integer>)>;
 
-	Module module;
+	TestProcessingLoop loop (0.1_s);
+	Module module (loop);
 	ModuleOut<Integer> socket (&module, "output");
 	Callback verifications_callback;
 	SocketDeltaDecoder<Integer> decoder (socket, [&verifications_callback] (auto const delta) {

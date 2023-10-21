@@ -93,7 +93,7 @@ class TestGenerator: public xf::Module
   public:
 	// Ctor
 	explicit
-	TestGenerator (std::string_view const& instance = {});
+	TestGenerator (xf::ProcessingLoop&, std::string_view const& instance = {});
 
 	/**
 	 * Create and manage new output socket for sockets that can be used

@@ -21,8 +21,8 @@
 #include <cstddef>
 
 
-FlapsBugs::FlapsBugs (xf::Flaps const& flaps, std::string_view const& instance):
-	FlapsBugsIO (instance),
+FlapsBugs::FlapsBugs (xf::ProcessingLoop& loop, xf::Flaps const& flaps, std::string_view const& instance):
+	FlapsBugsIO (loop, instance),
 	_flaps (flaps)
 { }
 

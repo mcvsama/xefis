@@ -281,7 +281,7 @@ class AFCS: public AFCS_IO
   public:
 	// Ctor
 	explicit
-	AFCS (std::string_view const& instance = {});
+	AFCS (xf::ProcessingLoop&, std::string_view const& instance = {});
 
   protected:
 	// Module API

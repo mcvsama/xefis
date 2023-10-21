@@ -43,7 +43,7 @@ class TestScreen2: public xf::Screen
   public:
 	// Ctor
 	explicit
-	TestScreen2 (xf::ScreenSpec const&, xf::Graphics const&, xf::NavaidStorage const&, xf::Machine&, xf::Logger const& logger);
+	TestScreen2 (xf::ProcessingLoop&, xf::ScreenSpec const&, xf::Graphics const&, xf::NavaidStorage const&, xf::Machine&, xf::Logger const& logger);
 
   private:
 	xf::Logger					_logger;

@@ -26,8 +26,8 @@
 #include <cstddef>
 
 
-Watchdog::Watchdog (xf::Xefis* xefis, xf::Logger const& logger, std::string_view const& instance):
-	Module (instance),
+Watchdog::Watchdog (xf::ProcessingLoop& loop, xf::Xefis* xefis, xf::Logger const& logger, std::string_view const& instance):
+	Module (loop, instance),
 	_logger (logger.with_scope (std::string (kLoggerScope) + "#" + instance))
 {
 	std::optional<int> watchdog_write_fd = xefis->options().watchdog_write_fd;

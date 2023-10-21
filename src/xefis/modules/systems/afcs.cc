@@ -30,8 +30,8 @@
 #include <cstddef>
 
 
-AFCS::AFCS (std::string_view const& instance):
-	AFCS_IO (instance)
+AFCS::AFCS (xf::ProcessingLoop& loop, std::string_view const& instance):
+	AFCS_IO (loop, instance)
 {
 	make_button_action (_io.button_ap, &AFCS::button_press_ap);
 	make_button_action (_io.button_at, &AFCS::button_press_at);

@@ -207,7 +207,7 @@ class Status:
   public:
 	// Ctor
 	explicit
-	Status (xf::Graphics const&, std::string_view const& instance = {});
+	Status (xf::ProcessingLoop&, xf::Graphics const&, std::string_view const& instance = {});
 
 	/**
 	 * Configure new message.

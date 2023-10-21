@@ -2098,8 +2098,8 @@ PaintingWork::to_px (si::Length const length) const
 } // namespace hsi_detail
 
 
-HSI::HSI (xf::Graphics const& graphics, xf::NavaidStorage const& navaid_storage, xf::Logger const& logger, std::string_view const& instance):
-	HSI_IO (instance),
+HSI::HSI (xf::ProcessingLoop& loop, xf::Graphics const& graphics, xf::NavaidStorage const& navaid_storage, xf::Logger const& logger, std::string_view const& instance):
+	HSI_IO (loop, instance),
 	_logger (logger.with_scope (std::string (kLoggerScope) + "#" + instance)),
 	_navaid_storage (navaid_storage),
 	_instrument_support (graphics)

@@ -21,8 +21,8 @@
 #include <cstddef>
 
 
-VirtualServoController::VirtualServoController (std::string_view const& instance):
-	Module (instance)
+VirtualServoController::VirtualServoController (xf::ProcessingLoop& loop, std::string_view const& instance):
+	Module (loop, instance)
 { }
 
 

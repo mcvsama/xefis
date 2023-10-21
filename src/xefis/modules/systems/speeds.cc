@@ -22,8 +22,8 @@
 #include <cstddef>
 
 
-Speeds::Speeds (xf::Airframe* airframe, std::string_view const& instance):
-	SpeedsIO (instance),
+Speeds::Speeds (xf::ProcessingLoop& loop, xf::Airframe* airframe, std::string_view const& instance):
+	SpeedsIO (loop, instance),
 	_airframe (airframe)
 {
 	_speeds_computer.set_callback (std::bind (&Speeds::compute, this));

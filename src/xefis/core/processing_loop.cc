@@ -35,7 +35,7 @@
 namespace xf {
 
 ProcessingLoop::ProcessingLoop (std::string_view const& instance, si::Frequency loop_frequency, Logger const& logger):
-	ProcessingLoopIO (instance),
+	Module (instance),
 	_loop_period (1.0 / loop_frequency),
 	_logger (logger)
 {
@@ -48,6 +48,8 @@ ProcessingLoop::ProcessingLoop (std::string_view const& instance, si::Frequency 
 	});
 
 	_logger.set_logger_tag_provider (*this);
+
+	register_module (*this);
 }
 
 
@@ -83,8 +85,8 @@ ProcessingLoop::execute_cycle (si::Time const now)
 
 	_current_cycle = Cycle (_next_cycle_number++, now, dt, _loop_period, _logger);
 	_processing_latencies.push_back (latency);
-	_io.latency = latency;
-	_io.actual_frequency = 1.0 / dt;
+	this->latency = latency;
+	this->actual_frequency = 1.0 / dt;
 
 	for (auto* module: _modules)
 		Module::ProcessingLoopAPI (*module).reset_cache();

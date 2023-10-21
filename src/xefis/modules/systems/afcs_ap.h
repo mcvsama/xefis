@@ -84,7 +84,7 @@ class AFCS_AP: public AFCS_AP_IO
   public:
 	// Ctor
 	explicit
-	AFCS_AP (xf::Logger const&, std::string_view const& instance = {});
+	AFCS_AP (xf::ProcessingLoop&, xf::Logger const&, std::string_view const& instance = {});
 
   protected:
 	// Module API

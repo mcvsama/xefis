@@ -15,6 +15,7 @@
 #include <xefis/core/module.h>
 #include <xefis/core/sockets/module_socket.h>
 #include <xefis/core/sockets/tests/test_cycle.h>
+#include <xefis/test/test_processing_loop.h>
 #include <xefis/support/sockets/socket_quadrature_counter.h>
 #include <xefis/support/sockets/socket_quadrature_decoder.h>
 
@@ -95,7 +96,8 @@ AutoTest t1 ("SocketQuadratureDecoder + SocketQuadratureCounter", []{
 	auto callback = [&callback_result] (auto delta, Integer total) {
 		callback_result = { delta, total };
 	};
-	Module module;
+	TestProcessingLoop loop (0.1_s);
+	Module module (loop);
 	ModuleOut<bool> socket_a (&module, "line-a");
 	ModuleOut<bool> socket_b (&module, "line-b");
 	SocketQuadratureCounter<Integer> decoder (socket_a, socket_b, initial_value, callback);

@@ -430,8 +430,8 @@ VirtualLinearWidget::mouseMoveEvent (QMouseEvent* event)
 }
 
 
-VirtualJoystick::VirtualJoystick (xf::Machine* machine, std::string_view const& instance):
-	VirtualJoystickIO (instance)
+VirtualJoystick::VirtualJoystick (xf::ProcessingLoop& loop, xf::Machine* machine, std::string_view const& instance):
+	VirtualJoystickIO (loop, instance)
 {
 	using namespace std::literals;
 

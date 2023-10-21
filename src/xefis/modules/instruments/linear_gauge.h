@@ -90,7 +90,7 @@ template<class Value>
 	  public:
 		// Ctor
 		explicit
-		LinearGauge (xf::Graphics const&, Converter = nullptr, std::string_view const& instance = {});
+		LinearGauge (xf::ProcessingLoop&, xf::Graphics const&, Converter = nullptr, std::string_view const& instance = {});
 
 		// Module API
 		void
@@ -121,8 +121,8 @@ template<class Value>
 
 template<class Value>
 	inline
-	LinearGauge<Value>::LinearGauge (xf::Graphics const& graphics, Converter converter, std::string_view const& instance):
-		Gauge<Value> (instance),
+	LinearGauge<Value>::LinearGauge (xf::ProcessingLoop& loop, xf::Graphics const& graphics, Converter converter, std::string_view const& instance):
+		Gauge<Value> (loop, instance),
 		xf::InstrumentSupport (graphics),
 		_converter (converter)
 	{

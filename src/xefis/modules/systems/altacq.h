@@ -68,7 +68,7 @@ class AltAcq: public AltAcqIO
   public:
 	// Ctor
 	explicit
-	AltAcq (std::string_view const& instance = {});
+	AltAcq (xf::ProcessingLoop&, std::string_view const& instance = {});
 
   protected:
 	// Module API

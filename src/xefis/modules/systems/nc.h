@@ -96,7 +96,7 @@ class NavigationComputer: public NavigationComputerIO
   public:
 	// Ctor
 	explicit
-	NavigationComputer (std::string_view const& instance);
+	NavigationComputer (xf::ProcessingLoop&, std::string_view const& instance);
 
   protected:
 	// Module API

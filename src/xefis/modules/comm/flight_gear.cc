@@ -119,8 +119,8 @@ struct FGOutputData
 END_PACKED_STRUCT
 
 
-FlightGear::FlightGear (std::string_view const& instance):
-	FlightGearIO (instance)
+FlightGear::FlightGear (xf::ProcessingLoop& loop, std::string_view const& instance):
+	FlightGearIO (loop, instance)
 {
 	_serviceable_flags = {
 		&_io.ahrs_serviceable,

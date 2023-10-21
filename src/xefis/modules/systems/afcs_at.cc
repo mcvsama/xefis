@@ -26,8 +26,8 @@
 #include <cstddef>
 
 
-AFCS_AT::AFCS_AT (std::string_view const& instance):
-	AFCS_AT_IO (instance)
+AFCS_AT::AFCS_AT (xf::ProcessingLoop& loop, std::string_view const& instance):
+	AFCS_AT_IO (loop, instance)
 {
 	_ias_pid.set_integral_limit ({ -5.0_m, +5.0_m });
 

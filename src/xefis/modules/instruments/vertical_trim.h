@@ -68,7 +68,7 @@ class VerticalTrim:
   public:
 	// Ctor
 	explicit
-	VerticalTrim (xf::Graphics const&, std::string_view const& instance = {});
+	VerticalTrim (xf::ProcessingLoop&, xf::Graphics const&, std::string_view const& instance = {});
 
 	// Module API
 	void

@@ -29,8 +29,8 @@
 #include <cstddef>
 
 
-ETSAirspeed::ETSAirspeed (xf::i2c::Device&& device, xf::Logger const& logger, std::string_view const& instance):
-	ETSAirspeedIO (instance),
+ETSAirspeed::ETSAirspeed (xf::ProcessingLoop& loop, xf::i2c::Device&& device, xf::Logger const& logger, std::string_view const& instance):
+	ETSAirspeedIO (loop, instance),
 	_logger (logger.with_scope (std::string (kLoggerScope) + "#" + instance)),
 	_device (std::move (device))
 {

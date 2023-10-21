@@ -92,19 +92,16 @@ AutoTestT1::auto_test_t1()
 	// pressing a button with property MasterTransceiver::start_handshake_button.
 	for (int start_mode: { kMethodCallStart, kButtonPressStart })
 	{
-		auto master = xle::MasterTransceiver (crypto_params, TestProcessingLoop::logger);
-		auto slave = xle::SlaveTransceiver (crypto_params, [](xle::HandshakeID) { return false; }, TestProcessingLoop::logger);
-
-		slave.handshake_request << master.handshake_request;
-		master.handshake_response << slave.handshake_response;
-
+		auto loop = TestProcessingLoop (0.01_s);
 		// In reverse order to make sure slave gets handled first, which means
 		// it will cause master to be processed first, since slave depends
 		// on master. So in the end master.process() will be called first,
 		// then slave.process().
-		TestProcessingLoop loop (0.01_s);
-		loop.register_module (slave);
-		loop.register_module (master);
+		auto slave = xle::SlaveTransceiver (loop, crypto_params, [](xle::HandshakeID) { return false; }, TestProcessingLoop::logger);
+		auto master = xle::MasterTransceiver (loop, crypto_params, TestProcessingLoop::logger);
+
+		slave.handshake_request << master.handshake_request;
+		master.handshake_response << slave.handshake_response;
 
 		std::string start_mode_prefix = (start_mode == kMethodCallStart)
 			? "start by start_handshake()"
@@ -574,15 +571,12 @@ auto_test_t2()
 		};
 	};
 
-	auto master = xle::MasterTransceiver (crypto_params, TestProcessingLoop::logger);
-	auto slave = xle::SlaveTransceiver (crypto_params, [](xle::HandshakeID) { return false; }, TestProcessingLoop::logger);
+	auto loop = TestProcessingLoop (0.01_s);
+	auto slave = xle::SlaveTransceiver (loop, crypto_params, [](xle::HandshakeID) { return false; }, TestProcessingLoop::logger);
+	auto master = xle::MasterTransceiver (loop, crypto_params, TestProcessingLoop::logger);
 
 	slave.handshake_request << std::function (make_random_loss ("master → slave")) << master.handshake_request;
 	master.handshake_response << std::function (make_random_loss ("slave → master")) << slave.handshake_response;
-
-	TestProcessingLoop loop (0.01_s);
-	loop.register_module (slave);
-	loop.register_module (master);
 
 	auto const test_communication = [&] (std::string p, std::optional<bool> expected_to_fail_opt = std::nullopt) {
 		static auto const p1 = to_blob ("(master → slave) message");

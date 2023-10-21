@@ -60,7 +60,7 @@ class Label:
   public:
 	// Ctor
 	explicit
-	Label (xf::Graphics const&, std::string_view const& instance = {});
+	Label (xf::ProcessingLoop&, xf::Graphics const&, std::string_view const& instance = {});
 
 	// Instrument API
 	std::packaged_task<void()>

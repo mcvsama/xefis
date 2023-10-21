@@ -25,8 +25,8 @@
 #include <cstddef>
 
 
-AFCS_AP::AFCS_AP (xf::Logger const& logger, std::string_view const& instance):
-	AFCS_AP_IO (instance),
+AFCS_AP::AFCS_AP (xf::ProcessingLoop& loop, xf::Logger const& logger, std::string_view const& instance):
+	AFCS_AP_IO (loop, instance),
 	_logger (logger.with_scope (std::string (kLoggerScope) + "#" + instance))
 {
 	constexpr auto radian_second = 1.0_rad * 1.0_s;

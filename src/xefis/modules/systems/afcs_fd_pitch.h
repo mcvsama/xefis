@@ -106,7 +106,7 @@ class AFCS_FD_Pitch: public AFCS_FD_Pitch_IO
   public:
 	// Ctor
 	explicit
-	AFCS_FD_Pitch (xf::Logger const&, std::string_view const& instance = {});
+	AFCS_FD_Pitch (xf::ProcessingLoop&, xf::Logger const&, std::string_view const& instance = {});
 
   protected:
 	// Module API

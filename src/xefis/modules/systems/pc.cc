@@ -33,8 +33,8 @@
 #include <limits>
 
 
-PerformanceComputer::PerformanceComputer (xf::Airframe* airframe, std::string_view const& instance):
-	PerformanceComputerIO (instance),
+PerformanceComputer::PerformanceComputer (xf::ProcessingLoop& loop, xf::Airframe* airframe, std::string_view const& instance):
+	PerformanceComputerIO (loop, instance),
 	_airframe (airframe)
 {
 	_wind_computer.set_callback (std::bind (&PerformanceComputer::compute_wind, this));

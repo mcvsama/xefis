@@ -178,7 +178,7 @@ class XBee:
 
   public:
 	// Ctor
-	XBee (xf::Logger const&, std::string_view const& instance = {});
+	XBee (xf::ProcessingLoop&, xf::Logger const&, std::string_view const& instance = {});
 
 	// Dtor
 	~XBee();

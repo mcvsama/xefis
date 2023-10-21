@@ -177,7 +177,7 @@ class JoystickInput:
   public:
 	// Ctor
 	explicit
-	JoystickInput (QDomElement const& config, xf::Logger const&, std::string_view const& instance = {});
+	JoystickInput (xf::ProcessingLoop&, QDomElement const& config, xf::Logger const&, std::string_view const& instance = {});
 
 	// Module API
 	void

@@ -583,7 +583,7 @@ class HSI: public HSI_IO
 
   public:
 	// Ctor
-	HSI (xf::Graphics const&, xf::NavaidStorage const&, xf::Logger const&, std::string_view const& instance = {});
+	HSI (xf::ProcessingLoop&, xf::Graphics const&, xf::NavaidStorage const&, xf::Logger const&, std::string_view const& instance = {});
 
 	// Module API
 	void

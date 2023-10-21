@@ -303,7 +303,7 @@ class GPS:
   public:
 	// Ctor
 	explicit
-	GPS (xf::System*, xf::SerialPort::Configuration const&, xf::Logger const&, std::string_view const& instance = {});
+	GPS (xf::ProcessingLoop&, xf::System*, xf::SerialPort::Configuration const&, xf::Logger const&, std::string_view const& instance = {});
 
 	// Dtor
 	~GPS();

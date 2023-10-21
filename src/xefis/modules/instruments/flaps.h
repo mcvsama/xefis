@@ -69,7 +69,7 @@ class Flaps:
   public:
 	// Ctor
 	explicit
-	Flaps (xf::Graphics const&, std::string_view const& instance = {});
+	Flaps (xf::ProcessingLoop&, xf::Graphics const&, std::string_view const& instance = {});
 
 	// Module API
 	void

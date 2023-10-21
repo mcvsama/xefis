@@ -70,7 +70,7 @@ class IMU_CPF: public IMU_CPF_IO
   public:
 	// Ctor
 	explicit
-	IMU_CPF (std::string_view const& instance = {});
+	IMU_CPF (xf::ProcessingLoop&, std::string_view const& instance = {});
 
   protected:
 	void

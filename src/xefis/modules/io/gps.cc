@@ -509,8 +509,8 @@ GPS::PowerCycle::notify_connection_established()
 }
 
 
-GPS::GPS (xf::System* system, xf::SerialPort::Configuration const& serial_port_config, xf::Logger const& logger, std::string_view const& instance):
-	GPS_IO (instance),
+GPS::GPS (xf::ProcessingLoop& loop, xf::System* system, xf::SerialPort::Configuration const& serial_port_config, xf::Logger const& logger, std::string_view const& instance):
+	GPS_IO (loop, instance),
 	_logger (logger.with_scope (std::string (kLoggerScope) + "#" + instance)),
 	_system (system),
 	_serial_port_config (serial_port_config)

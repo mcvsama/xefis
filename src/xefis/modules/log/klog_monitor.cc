@@ -29,8 +29,8 @@
 #include <cctype>
 
 
-KLogMonitor::KLogMonitor (std::string_view const& instance):
-	KLogMonitorIO (instance)
+KLogMonitor::KLogMonitor (xf::ProcessingLoop& loop, std::string_view const& instance):
+	KLogMonitorIO (loop, instance)
 {
 	_timer = new QTimer (this);
 	_timer->setInterval (100);

@@ -29,8 +29,8 @@ TestGenerator::update_all (si::Time const update_dt)
 }
 
 
-TestGenerator::TestGenerator (std::string_view const& instance):
-	Module (instance)
+TestGenerator::TestGenerator (xf::ProcessingLoop& loop, std::string_view const& instance):
+	Module (loop, instance)
 { }
 
 

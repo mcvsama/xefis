@@ -26,8 +26,8 @@
 #include <cstddef>
 
 
-AFCS_FD_Pitch::AFCS_FD_Pitch (xf::Logger const& logger, std::string_view const& instance):
-	AFCS_FD_Pitch_IO (instance),
+AFCS_FD_Pitch::AFCS_FD_Pitch (xf::ProcessingLoop& loop, xf::Logger const& logger, std::string_view const& instance):
+	AFCS_FD_Pitch_IO (loop, instance),
 	_logger (logger.with_scope (std::string (kLoggerScope) + "#" + instance))
 {
 	constexpr auto sec = 1.0_s;

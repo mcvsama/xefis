@@ -38,26 +38,17 @@ class Machine;
 class Xefis;
 
 
-class ProcessingLoopIO: public Module
-{
-  public:
-	ModuleOut<si::Frequency>	actual_frequency	{ this, "actual_frequency" };
-	ModuleOut<si::Time>			latency				{ this, "latency" };
-
-  public:
-	using xf::Module::Module;
-};
-
-
 /**
  * A loop that periodically goes through all modules and calls process() method.
  */
 class ProcessingLoop:
 	public QObject,
-	public ProcessingLoopIO,
+	public Module,
 	public LoggerTagProvider
 {
-	Q_OBJECT
+  public:
+	ModuleOut<si::Frequency>	actual_frequency	{ this, "actual_frequency" };
+	ModuleOut<si::Time>			latency				{ this, "latency" };
 
   private:
 	static constexpr std::size_t	kMaxProcessingTimesBackLog	= 1000;
@@ -171,7 +162,6 @@ class ProcessingLoop:
 	logger_tag() const override;
 
   private:
-	ProcessingLoopIO&					_io						{ *this };
 	QTimer*								_loop_timer;
 	si::Time							_loop_period;
 	std::optional<Timestamp>			_previous_timestamp;

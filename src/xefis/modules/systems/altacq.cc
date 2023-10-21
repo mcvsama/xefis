@@ -24,8 +24,8 @@
 #include <cstddef>
 
 
-AltAcq::AltAcq (std::string_view const& instance):
-	AltAcqIO (instance)
+AltAcq::AltAcq (xf::ProcessingLoop& loop, std::string_view const& instance):
+	AltAcqIO (loop, instance)
 {
 	_output_computer.set_minimum_dt (100_ms);
 	_output_computer.set_callback (std::bind (&AltAcq::compute_altitude_acquire_distance, this));

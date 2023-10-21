@@ -15,6 +15,7 @@
 #include <xefis/core/cycle.h>
 #include <xefis/core/sockets/module_socket.h>
 #include <xefis/core/sockets/tests/test_cycle.h>
+#include <xefis/test/test_processing_loop.h>
 
 // Neutrino:
 #include <neutrino/demangle.h>
@@ -113,7 +114,8 @@ template<class T>
 	struct TestEnvironment
 	{
 	  public:
-		Module						module;
+		TestProcessingLoop			loop	{ 0.1_s };
+		Module						module	{ loop };
 		ModuleOut<T>				out		{ &module, "out" };
 		ModuleIn<T>					mid		{ &module, "mid" };
 		ModuleIn<T>					in		{ &module, "in" };
@@ -264,7 +266,8 @@ AutoTest t2 ("xf::Socket fallback values", for_all_types ([](auto value1, auto v
 	// Test fallback_value provided in ctor:
 	{
 		auto const fallback_value = value1;
-		Module module;
+		TestProcessingLoop loop (0.1_s);
+		Module module (loop);
 		ModuleIn<T> tmp_prop (&module, "fallback-test", fallback_value);
 		test_asserts::verify (desc_type<T> ("fallback-value set in ctor works"), *tmp_prop == fallback_value);
 	}
@@ -456,7 +459,8 @@ AutoTest t5 ("xf::Socket serialization", for_all_types ([](auto value1, auto val
 AutoTest t6 ("xf::Socket various behavior", for_all_types ([](auto value1, auto) {
 	using T = decltype (value1);
 
-	Module module;
+	TestProcessingLoop loop (0.1_s);
+	Module module (loop);
 	ModuleOut<T> out { &module, "out" };
 	ModuleIn<T> in { &module, "in" };
 
@@ -474,7 +478,8 @@ AutoTest t6 ("xf::Socket various behavior", for_all_types ([](auto value1, auto)
 AutoTest t7 ("xf::Socket operator=", for_all_types ([](auto value1, auto value2) {
 	using T = decltype (value1);
 
-	Module module;
+	TestProcessingLoop loop (0.1_s);
+	Module module (loop);
 
 	// Make sure ModuleIn<T>::operator= (ModuleIn<T>) is forbidden as it may be misleading:
 	test_asserts::verify ("ModuleIn<T>::operator= (ModuleIn<T>) is forbidden", !std::copyable<ModuleIn<T>>);
@@ -523,6 +528,7 @@ AutoTest t9 ("xf::Socket << std::unique_ptr<xf::Socket>", []{
 	test_asserts::verify ("can use unique_ptr<Socket> as data source", env1.in.value_or (0) == 10);
 });
 
+
 AutoTest t10 ("xf::ConnectableSocket expression", []{
 	TestEnvironment<int32_t> env;
 
@@ -535,7 +541,8 @@ AutoTest t10 ("xf::ConnectableSocket expression", []{
 
 
 AutoTest t11 ("xf::ConnectableSocket expression (different input/output types)", []{
-	Module						module;
+	TestProcessingLoop			loop	{ 0.1_s };
+	Module						module	{ loop };
 	ModuleOut<int>				out		{ &module, "out" };
 	ModuleIn<std::string>		in		{ &module, "in" };
 	TestCycle					cycle;
@@ -553,7 +560,8 @@ AutoTest t11 ("xf::ConnectableSocket expression (different input/output types)",
 
 
 AutoTest t12 ("xf::ConnectableSocket expression (reactions to nil)", []{
-	Module						module;
+	TestProcessingLoop			loop	{ 0.1_s };
+	Module						module	{ loop };
 	ModuleOut<int>				out		{ &module, "out" };
 	ModuleIn<std::string>		in0		{ &module, "in0" };
 	ModuleIn<std::string>		in1		{ &module, "in1" };

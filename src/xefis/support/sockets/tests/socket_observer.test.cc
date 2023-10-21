@@ -17,6 +17,7 @@
 #include <xefis/core/sockets/module_out.h>
 #include <xefis/core/sockets/socket.h>
 #include <xefis/support/sockets/socket_observer.h>
+#include <xefis/test/test_processing_loop.h>
 
 // Neutrino:
 #include <neutrino/test/auto_test.h>
@@ -57,7 +58,8 @@ template<class T>
 	struct TestEnvironment
 	{
 	  public:
-		Module						module;
+		TestProcessingLoop			loop	{ 0.1_s };
+		Module						module	{ loop };
 		ModuleOut<T>				out		{ &module, "out" };
 		ModuleIn<T>					in		{ &module, "in" };
 		TestCycle					cycle;

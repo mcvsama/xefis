@@ -22,8 +22,8 @@
 #include <cstddef>
 
 
-TrimControl::TrimControl (xf::SoundManager* sound_manager, std::string_view const& instance):
-	TrimControlIO (instance),
+TrimControl::TrimControl (xf::ProcessingLoop& loop, xf::SoundManager* sound_manager, std::string_view const& instance):
+	TrimControlIO (loop, instance),
 	_sound_manager (sound_manager)
 {
 	_timer = std::make_unique<QTimer>();

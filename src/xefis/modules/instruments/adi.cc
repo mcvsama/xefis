@@ -3046,8 +3046,8 @@ PaintingWork::paint_radar_altimeter_failure (AdiPaintRequest& pr) const
 } // namespace adi_detail
 
 
-ADI::ADI (xf::Graphics const& graphics, std::string_view const& instance):
-	ADI_IO (instance),
+ADI::ADI (xf::ProcessingLoop& loop, xf::Graphics const& graphics, std::string_view const& instance):
+	ADI_IO (loop, instance),
 	_painting_work (graphics)
 {
 	_fpv_computer.set_callback (std::bind (&ADI::compute_fpv, this));

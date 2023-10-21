@@ -27,8 +27,8 @@
 #include <cstddef>
 
 
-HorizontalTrim::HorizontalTrim (xf::Graphics const& graphics, std::string_view const& instance):
-	HorizontalTrimIO (instance),
+HorizontalTrim::HorizontalTrim (xf::ProcessingLoop& loop, xf::Graphics const& graphics, std::string_view const& instance):
+	HorizontalTrimIO (loop, instance),
 	InstrumentSupport (graphics)
 {
 	_inputs_observer.set_callback ([&]{

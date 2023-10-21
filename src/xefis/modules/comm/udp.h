@@ -69,7 +69,7 @@ class UDP: public xf::Module
   public:
 	// Ctor
 	explicit
-	UDP (Parameters, xf::Logger const&, std::string_view const& instance = {});
+	UDP (xf::ProcessingLoop&, Parameters, xf::Logger const&, std::string_view const& instance = {});
 
 	// Module API
 	void

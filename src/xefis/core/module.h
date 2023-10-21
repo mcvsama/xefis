@@ -42,6 +42,7 @@ namespace xf {
 class BasicSetting;
 class BasicModuleIn;
 class BasicModuleOut;
+class ProcessingLoop;
 
 
 /**
@@ -75,6 +76,8 @@ class Module:
 	public NamedInstance,
 	private Noncopyable
 {
+	friend class ProcessingLoop;
+
 	static constexpr std::size_t kMaxProcessingTimesBackLog = 1000;
 
   public:
@@ -282,6 +285,17 @@ class Module:
 		configurator_widget() = 0;
 	};
 
+  private:
+	/**
+	 * Ctor available to a friend class ProcessingLoop. ProcessingLoop is a Module itself, but
+	 * it registers itself only at the end of its own constructor.
+	 *
+	 * \param	instance
+	 *			Instance name for GUI identification and debugging purposes.
+	 */
+	explicit
+	Module (std::string_view const& instance = {});
+
   public:
 	/**
 	 * Ctor
@@ -290,7 +304,7 @@ class Module:
 	 *			Instance name for GUI identification and debugging purposes.
 	 */
 	explicit
-	Module (std::string_view const& instance = {});
+	Module (ProcessingLoop&, std::string_view const& instance = {});
 
 	// Dtor
 	virtual

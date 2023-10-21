@@ -92,8 +92,8 @@ Status::Cache::solve_scroll_and_cursor (std::vector<Message*> const& visible_mes
 }
 
 
-Status::Status (xf::Graphics const& graphics, std::string_view const& instance):
-	StatusIO (instance),
+Status::Status (xf::ProcessingLoop& loop, xf::Graphics const& graphics, std::string_view const& instance):
+	StatusIO (loop, instance),
 	InstrumentSupport (graphics)
 {
 	_input_cursor_decoder = std::make_unique<xf::SocketDeltaDecoder<>> (_io.cursor_value, [this] (auto delta) {
