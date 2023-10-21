@@ -52,20 +52,22 @@ Wing::update_external_forces (AtmosphericModel const* atmosphere)
 		auto const body_to_airfoil_spline = RotationMatrix<AirfoilSplineSpace, rigid_body::BodySpace> (math::unit);
 		auto const world_to_body = location().base_to_body_rotation();
 		// ECEF → WorldSpace → BodySpace → AirfoilSplineSpace:
-		RotationMatrix<AirfoilSplineSpace, ECEFSpace> ecef_to_spline = body_to_airfoil_spline * world_to_body * ~world_to_ecef;
+		RotationMatrix<AirfoilSplineSpace, ECEFSpace> ecef_to_spline_transform = body_to_airfoil_spline * world_to_body * ~world_to_ecef;
 
 		auto const body_position_in_ecef = world_to_ecef * location().position();
 		auto const body_velocity_in_ecef = world_to_ecef * velocity_moments<rigid_body::WorldSpace>().velocity();
 		// FIXME take velocity_moments().angular_velocity() into account
 
-		auto const air = atmosphere->air_at (body_position_in_ecef);
-		auto const ecef_wind = atmosphere->wind_at (body_position_in_ecef) - body_velocity_in_ecef;
-		auto const spline_wind = ecef_to_spline * ecef_wind;
-		auto const atmosphere_state = AtmosphereState<AirfoilSplineSpace> { air, spline_wind };
+		auto ecef_atmosphere_state = atmosphere->state_at (body_position_in_ecef);
+		ecef_atmosphere_state.wind -= body_velocity_in_ecef;
+		auto const body_atmosphere_state = AtmosphereState<AirfoilSplineSpace> {
+			.air = ecef_atmosphere_state.air,
+			.wind = ecef_to_spline_transform * ecef_atmosphere_state.wind,
+		};
 		AngleOfAttack aoa;
 
 		// Center of pressure Wrench:
-		auto const spline_aeroforces_at_origin = _airfoil.aerodynamic_forces (atmosphere_state, aoa);
+		auto const spline_aeroforces_at_origin = _airfoil.aerodynamic_forces (body_atmosphere_state, aoa);
 		auto const body_aeroforces_at_origin = ~body_to_airfoil_spline * spline_aeroforces_at_origin;
 
 		// Compute 'at COM' values:
