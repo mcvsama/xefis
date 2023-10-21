@@ -26,6 +26,16 @@
 
 namespace xf {
 
+struct Air
+{
+	si::Density				density;
+	si::Pressure			pressure;
+	si::Temperature			temperature;
+	si::DynamicViscosity	dynamic_viscosity;
+	si::Velocity			speed_of_sound;
+};
+
+
 inline si::Velocity
 speed_of_sound (si::Temperature static_air_temperature)
 {
