@@ -78,14 +78,13 @@ class Body: public Noncopyable
 	};
 
   public:
-	// Dtor
-	virtual
-	~Body() = default;
-
-  public:
 	// Ctor
 	template<class MassMomentsSpace>
 		Body (MassMoments<MassMomentsSpace> const&, ShapeType = ShapeIsConstant);
+
+	// Dtor
+	virtual
+	~Body() = default;
 
 	/**
 	 * Return mass moments at center-of-mass.
