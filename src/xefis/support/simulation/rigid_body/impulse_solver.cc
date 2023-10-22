@@ -209,6 +209,21 @@ ImpulseSolver::update_constraint_forces (si::Time const dt)
 		}
 	}
 
+	for (auto const& constraint: _system.constraints())
+	{
+		if (constraint->enabled() && !constraint->broken())
+		{
+			auto& b1 = constraint->body_1();
+			auto& b2 = constraint->body_2();
+
+			auto& fc1 = b1.frame_cache();
+			auto& fc2 = b2.frame_cache();
+
+			fc1.acceleration_moments_except_gravity = acceleration_moments (b1, fc1.force_moments_except_gravity());
+			fc2.acceleration_moments_except_gravity = acceleration_moments (b2, fc2.force_moments_except_gravity());
+		}
+	}
+
 	// Tell each constraint that we finally calculated its forces:
 	for (auto& constraint: _system.constraints())
 	{
