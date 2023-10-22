@@ -37,28 +37,16 @@ GLSpace::set_hfov_perspective (QSize const size, si::Angle hfov, float near_plan
 }
 
 
-rigid_body::ShapeMaterial
-GLSpace::make_material (QColor const& color)
-{
-	rigid_body::ShapeMaterial m;
-	m.set_diffuse_color (color);
-	m.set_ambient_color (color);
-	m.set_specular_color (color);
-	m.set_shininess (0.1);
-	return m;
-}
-
-
 void
 GLSpace::set_material (rigid_body::ShapeMaterial const& material)
 {
-	glFogCoordf (material.fog_distance());
-	glColor4fv (to_opengl (material.emission_color()));
-	glMaterialfv (GL_FRONT, GL_EMISSION, to_opengl (material.emission_color()));
-	glMaterialfv (GL_FRONT, GL_AMBIENT, to_opengl (material.ambient_color()));
-	glMaterialfv (GL_FRONT, GL_DIFFUSE, to_opengl (material.diffuse_color()));
-	glMaterialfv (GL_FRONT, GL_SPECULAR, to_opengl (material.specular_color()));
-	glMaterialf (GL_FRONT, GL_SHININESS, material.shininess() * 127);
+	glFogCoordf (material.fog_distance);
+	glColor4fv (to_opengl (material.emission_color));
+	glMaterialfv (GL_FRONT, GL_EMISSION, to_opengl (material.emission_color));
+	glMaterialfv (GL_FRONT, GL_AMBIENT, to_opengl (material.ambient_color));
+	glMaterialfv (GL_FRONT, GL_DIFFUSE, to_opengl (material.diffuse_color));
+	glMaterialfv (GL_FRONT, GL_SPECULAR, to_opengl (material.specular_color));
+	glMaterialf (GL_FRONT, GL_SHININESS, material.shininess * 127);
 }
 
 

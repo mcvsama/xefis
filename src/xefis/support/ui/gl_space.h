@@ -105,13 +105,6 @@ class GLSpace
 	to_opengl (QColor const&);
 
 	/**
-	 * Return ShapeMaterial for given color.
-	 */
-	[[nodiscard]]
-	rigid_body::ShapeMaterial
-	make_material (QColor const&);
-
-	/**
 	 * Set perspective parameters.
 	 */
 	static void

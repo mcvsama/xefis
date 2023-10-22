@@ -311,5 +311,19 @@ make_airfoil_shape (AirfoilSpline const& spline, si::Length const chord_length, 
 	return shape;
 }
 
+
+Shape
+make_center_of_mass_symbol_shape (si::Length const radius, ShapeMaterial const& a, ShapeMaterial const& b)
+{
+	return make_sphere_shape (radius, 8, 8, {   0_deg,  90_deg }, { -90_deg,   0_deg }, a)
+		 + make_sphere_shape (radius, 8, 8, {   0_deg,  90_deg }, {   0_deg, +90_deg }, b)
+		 + make_sphere_shape (radius, 8, 8, {  90_deg, 180_deg }, { -90_deg,   0_deg }, b)
+		 + make_sphere_shape (radius, 8, 8, {  90_deg, 180_deg }, {   0_deg, +90_deg }, a)
+		 + make_sphere_shape (radius, 8, 8, { 180_deg, 270_deg }, { -90_deg,   0_deg }, a)
+		 + make_sphere_shape (radius, 8, 8, { 180_deg, 270_deg }, {   0_deg, +90_deg }, b)
+		 + make_sphere_shape (radius, 8, 8, { 270_deg, 360_deg }, { -90_deg,   0_deg }, b)
+		 + make_sphere_shape (radius, 8, 8, { 270_deg, 360_deg }, {   0_deg, +90_deg }, a);
+}
+
 } // namespace xf::rigid_body
 

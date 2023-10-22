@@ -23,6 +23,7 @@
 #include <xefis/support/simulation/constraints/hinge_constraint.h>
 #include <xefis/support/simulation/constraints/slider_constraint.h>
 #include <xefis/support/simulation/devices/wing.h>
+#include <xefis/support/simulation/rigid_body/various_materials.h>
 #include <xefis/support/simulation/rigid_body/various_shapes.h>
 #include <xefis/support/ui/gl_space.h>
 #include <xefis/support/ui/paint_helper.h>
@@ -233,14 +234,13 @@ RigidBodyPainter::paint_planet()
 			auto const sky_color = get_intermediate_color (normalized_altitude, sky_low_color, sky_high_color);
 			auto const sky_fog_color = get_intermediate_color (normalized_altitude, low_sky_fog_color, high_sky_fog_color);
 
-			auto sky_material = _gl.make_material (Qt::black);
-			sky_material.set_shininess (0.0);
+			auto sky_material = rigid_body::kBlackMatte;
 
 			auto const configure_material = [&] (rigid_body::ShapeMaterial& material, si::Angle const latitude)
 			{
 				// Set dome color (fog simulation) depending on latitude:
 				float const norm = std::clamp<float> (renormalize<si::Angle> (latitude, Range { 67.5_deg, 90_deg }, Range { 1.0f, 0.0f }), 0.0f, 1.0f);
-				material.set_emission_color (get_intermediate_color (std::pow (norm, 1.0 + 2 * normalized_altitude), sky_color, sky_fog_color));
+				material.emission_color = get_intermediate_color (std::pow (norm, 1.0 + 2 * normalized_altitude), sky_color, sky_fog_color);
 			};
 
 			auto sky = rigid_body::make_sphere_shape (kEarthMeanRadius + kSkyHeight, 20, 20, { 0_deg, 360_deg }, { 60_deg, 90_deg }, sky_material, configure_material);
@@ -258,15 +258,14 @@ RigidBodyPainter::paint_planet()
 
 		// Sun:
 		_gl.save_matrix ([&] {
-			auto sun_material = _gl.make_material (Qt::black);
-			sun_material.set_shininess (0.0);
+			auto sun_material = rigid_body::kBlackMatte;
 
 			auto const configure_material = [&] (rigid_body::ShapeMaterial& material, si::Angle const latitude)
 			{
 				float const actual_radius = 0.025;
 				float const norm = renormalize<si::Angle> (latitude, Range { 0_deg, 90_deg }, Range { 0.0f, 1.0f });
 				float const alpha = std::clamp<float> (std::pow (norm + actual_radius, 6.0f), 0.0f, 1.0f);
-				material.set_emission_color (QColor (0xff, 0xff, 0xff, 0xff * alpha));
+				material.emission_color = QColor (0xff, 0xff, 0xff, 0xff * alpha);
 			};
 
 			// Assume it's noon at Lon/Lat 0°/0° right now.
@@ -297,11 +296,11 @@ RigidBodyPainter::paint_planet()
 			auto const ground_fog_color = get_intermediate_color (normalized_altitude, low_ground_fog_color, high_ground_fog_color);
 
 			rigid_body::ShapeMaterial ground_material;
-			ground_material.set_emission_color (ground_color);
-			ground_material.set_ambient_color (Qt::black);
-			ground_material.set_diffuse_color (Qt::black);
-			ground_material.set_specular_color (Qt::black);
-			ground_material.set_shininess (0.0);
+			ground_material.emission_color = ground_color;
+			ground_material.ambient_color = Qt::black;
+			ground_material.diffuse_color = Qt::black;
+			ground_material.specular_color = Qt::black;
+			ground_material.shininess = 0.0;
 
 			glFogi (GL_FOG_MODE, GL_EXP);
 			glFogi (GL_FOG_COORD_SRC, GL_FRAGMENT_DEPTH);
@@ -412,7 +411,7 @@ RigidBodyPainter::paint_constraint (rigid_body::Constraint const& constraint)
 				auto const r2 = b2.location().unbound_transform_to_base (hinge->hinge_precalculation().body_2_anchor());
 				auto const t1 = x1 + r1;
 				auto const t2 = x2 + r2;
-				auto const material = _gl.make_material (QColor (0xff, 0x99, 0x00));
+				auto const material = rigid_body::make_material (QColor (0xff, 0x99, 0x00));
 
 				rod_from_to (kDefaultConstraintDiameter, x1, t1, false, material);
 				rod_from_to (kDefaultConstraintDiameter, x2, t2, false, material);
@@ -426,7 +425,7 @@ RigidBodyPainter::paint_constraint (rigid_body::Constraint const& constraint)
 			}
 			else if (dynamic_cast<rigid_body::FixedConstraint const*> (&constraint))
 			{
-				auto const material = _gl.make_material (QColor (0xff, 0x00, 0x99));
+				auto const material = rigid_body::make_material (QColor (0xff, 0x00, 0x99));
 				rod_from_to (kDefaultConstraintDiameter, x1, x2, false, material);
 			}
 		});
@@ -457,7 +456,7 @@ RigidBodyPainter::paint_forces (rigid_body::Body const& body)
 	auto const com = body.location().position() - fbp;
 
 	if (show_gravity)
-		draw_arrow (com, gfm.force() * force_to_length, _gl.make_material (gravity_color));
+		draw_arrow (com, gfm.force() * force_to_length, rigid_body::make_material (gravity_color));
 
 	if (auto const* wing = dynamic_cast<sim::Wing const*> (&body))
 	{
@@ -466,16 +465,16 @@ RigidBodyPainter::paint_forces (rigid_body::Body const& body)
 
 		if (show_aerodynamic_forces)
 		{
-			draw_arrow (at, loc.unbound_transform_to_base (wing->lift_force()) * force_to_length, _gl.make_material (lift_color));
-			draw_arrow (at, loc.unbound_transform_to_base (wing->drag_force()) * force_to_length, _gl.make_material (drag_color));
-			draw_arrow (at, loc.unbound_transform_to_base (wing->pitching_moment()) * torque_to_length, _gl.make_material (torque_color));
+			draw_arrow (at, loc.unbound_transform_to_base (wing->lift_force()) * force_to_length, rigid_body::make_material (lift_color));
+			draw_arrow (at, loc.unbound_transform_to_base (wing->drag_force()) * force_to_length, rigid_body::make_material (drag_color));
+			draw_arrow (at, loc.unbound_transform_to_base (wing->pitching_moment()) * torque_to_length, rigid_body::make_material (torque_color));
 		}
 	}
 
 	if (!show_aerodynamic_forces)
-		draw_arrow (com, efm.force() * force_to_length, _gl.make_material (external_force_color));
+		draw_arrow (com, efm.force() * force_to_length, rigid_body::make_material (external_force_color));
 
-	draw_arrow (com, efm.torque() * torque_to_length, _gl.make_material (external_torque_color));
+	draw_arrow (com, efm.torque() * torque_to_length, rigid_body::make_material (external_torque_color));
 }
 
 
@@ -487,7 +486,7 @@ RigidBodyPainter::paint_angular_velocity (rigid_body::Body const& body)
 	auto const com = body.location().position() - followed_body_position();
 	auto const omega = body.velocity_moments<rigid_body::WorldSpace>().angular_velocity();
 
-	draw_arrow (com, omega * angular_velocity_to_length, _gl.make_material (Qt::darkMagenta));
+	draw_arrow (com, omega * angular_velocity_to_length, rigid_body::make_material (Qt::darkMagenta));
 }
 
 
@@ -501,7 +500,7 @@ RigidBodyPainter::paint_angular_momentum (rigid_body::Body const& body)
 	auto const L = I * body.velocity_moments<rigid_body::BodySpace>().angular_velocity();
 	auto const L_world = body.location().unbound_transform_to_base (L);
 
-	draw_arrow (com, L_world * angular_momentum_to_length, _gl.make_material (Qt::darkBlue));
+	draw_arrow (com, L_world * angular_momentum_to_length, rigid_body::make_material (Qt::darkBlue));
 }
 
 
@@ -553,9 +552,9 @@ RigidBodyPainter::paint_ecef_basis (QOpenGLPaintDevice& canvas)
 	si::Length const cone_radius = 15_mm * scale;
 	si::Length const cone_length = 40_mm * scale;
 
-	auto const blue = _gl.make_material (QColor (0x11, 0x11, 0xff));
-	auto const red = _gl.make_material (Qt::red);
-	auto const green = _gl.make_material (Qt::green);
+	auto const blue = rigid_body::make_material (QColor (0x11, 0x11, 0xff));
+	auto const red = rigid_body::make_material (Qt::red);
+	auto const green = rigid_body::make_material (Qt::green);
 
 	auto const draw_basis = [&] {
 		_gl.save_matrix ([&] {

@@ -19,6 +19,7 @@
 #include <xefis/support/aerodynamics/airfoil_spline.h>
 #include <xefis/support/simulation/rigid_body/shape.h>
 #include <xefis/support/simulation/rigid_body/shape_material.h>
+#include <xefis/support/simulation/rigid_body/various_materials.h>
 
 // Standard:
 #include <cstddef>
@@ -71,6 +72,11 @@ rigid_body::Shape
 make_airfoil_shape (AirfoilSpline const& spline, si::Length chord_length, si::Length wing_length, bool with_front_and_back = true,
 					rigid_body::ShapeMaterial const& = {});
 
+/**
+ * Make a center-of-mass symbol.
+ */
+Shape
+make_center_of_mass_symbol_shape (si::Length radius, ShapeMaterial const& a = kBlackMatte, ShapeMaterial const& b = kWhiteMatte);
 
 /**
  * Set planar normals for triangles, that is make each vertex' normal
