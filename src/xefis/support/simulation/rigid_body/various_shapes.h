@@ -28,49 +28,49 @@
 namespace xf::rigid_body {
 
 // Called by make_sphere to get material for vertices.
-using MakeSphereMaterialCallback	= std::function<void (rigid_body::ShapeMaterial&, si::Angle latitude)>;
+using MakeSphereMaterialCallback	= std::function<void (ShapeMaterial&, si::Angle latitude)>;
 
 
 /**
  * Make a cube of given size.
  */
-rigid_body::Shape
-make_cube_shape (si::Length edge_length, rigid_body::ShapeMaterial const& material = {});
+Shape
+make_cube_shape (si::Length edge_length, ShapeMaterial const& material = {});
 
 /**
  * Make sphere of given radius.
  */
-rigid_body::Shape
+Shape
 make_sphere_shape (si::Length radius, size_t slices, size_t stacks,
 				   Range<si::Angle> h_range = { 0_deg, 360_deg }, Range<si::Angle> v_range = { -90_deg, +90_deg },
-				   rigid_body::ShapeMaterial const& material = {}, MakeSphereMaterialCallback = nullptr);
+				   ShapeMaterial const& material = {}, MakeSphereMaterialCallback = nullptr);
 
 /**
  * Make a rod shape without bottom/top faces, placed along the Z axis.
  */
-rigid_body::Shape
+Shape
 make_cylinder_shape (si::Length length, si::Length radius, size_t num_faces, bool with_front_and_back = true,
-					 rigid_body::ShapeMaterial const& = {});
+					 ShapeMaterial const& = {});
 
 /**
  * Make a cone shape placed along the Z axis with pointy part pointing towards positive Z values.
  */
-rigid_body::Shape
+Shape
 make_cone_shape (si::Length length, si::Length radius, size_t num_faces, bool with_bottom = true,
-				 rigid_body::ShapeMaterial const& = {});
+				 ShapeMaterial const& = {});
 
 /**
  * Make a solid circle placed on X-Y plane.
  */
-rigid_body::Shape
-make_solid_circle (si::Length radius, size_t num_slices, rigid_body::ShapeMaterial const& = {});
+Shape
+make_solid_circle (si::Length radius, size_t num_slices, ShapeMaterial const& = {});
 
 /**
  * Make a wing shape.
  */
-rigid_body::Shape
+Shape
 make_airfoil_shape (AirfoilSpline const& spline, si::Length chord_length, si::Length wing_length, bool with_front_and_back = true,
-					rigid_body::ShapeMaterial const& = {});
+					ShapeMaterial const& = {});
 
 /**
  * Make a center-of-mass symbol.
