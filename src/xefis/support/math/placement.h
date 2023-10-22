@@ -32,7 +32,7 @@ namespace xf {
 
 // TODO Perhaps rename *_to_base() to *_to_world(), and maybe *_to_body() to *_to_local()?
 template<class pBaseSpace = void, class pSpace = pBaseSpace>
-	struct Placement
+	class Placement
 	{
 	  public:
 		using BaseSpace			= pBaseSpace;

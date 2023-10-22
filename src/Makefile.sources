@@ -262,6 +262,7 @@ PROJECTS.xefis.files				+= xefis/support/nature/acceleration_moments.h
 PROJECTS.xefis.files				+= xefis/support/nature/constants.h
 PROJECTS.xefis.files				+= xefis/support/nature/force_moments.h
 PROJECTS.xefis.files				+= xefis/support/nature/mass_moments.h
+PROJECTS.xefis.files				+= xefis/support/nature/various_inertia_matrices.h
 PROJECTS.xefis.files				+= xefis/support/nature/velocity_moments.h
 PROJECTS.xefis.files				+= xefis/support/nature/wrench.h
 PROJECTS.xefis.files				+= xefis/support/protocols/nmea/exceptions.h

@@ -32,7 +32,7 @@ namespace xf {
  * Angular velocity isn't normally called a moment, but it sounds consistent with Force- or Mass-moments.
  */
 template<class Space = void>
-	struct VelocityMoments
+	class VelocityMoments
 	{
 	  public:
 		// Ctor

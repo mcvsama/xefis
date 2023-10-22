@@ -33,7 +33,7 @@ namespace xf {
  *   • 1st moment = angular acceleration.
  */
 template<class Space = void>
-	struct AccelerationMoments
+	class AccelerationMoments
 	{
 	  public:
 		// Ctor

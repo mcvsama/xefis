@@ -33,7 +33,7 @@ namespace xf {
  *   • 1st moment = torque (except for moments that don't change angular momentum).
  */
 template<class Space = void>
-	struct ForceMoments
+	class ForceMoments
 	{
 	  public:
 		// Ctor
