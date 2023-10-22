@@ -125,6 +125,10 @@ make_sphere_shape (si::Length const radius, size_t slices, size_t stacks,
 		}
 	}
 
+	shape.for_all_vertices ([] (ShapeVertex& v) {
+		v.set_normal (v.position() / 1_m);
+	});
+
 	return shape;
 }
 
