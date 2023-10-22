@@ -39,7 +39,7 @@ class VirtualJoystickIO: public xf::Module
 
 	xf::ModuleOut<double>	x_axis		{ this, "axis/x" };
 	xf::ModuleOut<double>	y_axis		{ this, "axis/y" };
-	xf::ModuleOut<double>	rudder		{ this, "rudder" };
+	xf::ModuleOut<double>	pedals		{ this, "pedals" };
 	xf::ModuleOut<double>	throttle	{ this, "throttle" };
 
   public:
@@ -67,7 +67,7 @@ class VirtualJoystick: public VirtualJoystickIO
 	xf::Widget*				_widget;
 	VirtualJoystickWidget*	_joystick_widget;
 	VirtualLinearWidget*	_throttle_widget;
-	VirtualLinearWidget*	_rudder_widget;
+	VirtualLinearWidget*	_pedals_widget;
 };
 
 

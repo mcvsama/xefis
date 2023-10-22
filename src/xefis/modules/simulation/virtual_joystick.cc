@@ -444,15 +444,15 @@ VirtualJoystick::VirtualJoystick (xf::ProcessingLoop& loop, xf::Machine* machine
 	_throttle_widget = new VirtualLinearWidget ({ 0.0f, 1.0f }, VirtualLinearWidget::Vertical, VirtualLinearWidget::Filled, _widget);
 	_throttle_widget->set_value (0.0f);
 
-	_rudder_widget = new VirtualLinearWidget ({ -1.0f, 1.0f }, VirtualLinearWidget::Horizontal, VirtualLinearWidget::BarOnly, _widget);
-	_rudder_widget->set_value (0.0f);
+	_pedals_widget = new VirtualLinearWidget ({ -1.0f, 1.0f }, VirtualLinearWidget::Horizontal, VirtualLinearWidget::BarOnly, _widget);
+	_pedals_widget->set_value (0.0f);
 
 	auto* layout = new QGridLayout (_widget);
 	layout->setMargin (0);
 	layout->setSpacing (0);
 	layout->addWidget (_throttle_widget, 0, 0);
 	layout->addWidget (_joystick_widget, 0, 1);
-	layout->addWidget (_rudder_widget, 1, 1);
+	layout->addWidget (_pedals_widget, 1, 1);
 	layout->setSizeConstraint (QLayout::SetFixedSize);
 
 	_widget->show();
@@ -466,6 +466,6 @@ VirtualJoystick::process (xf::Cycle const&)
 	_io.x_axis = jpos.x();
 	_io.y_axis = jpos.y();
 	_io.throttle = _throttle_widget->value();
-	_io.rudder = _rudder_widget->value();
+	_io.pedals = _pedals_widget->value();
 }
 
