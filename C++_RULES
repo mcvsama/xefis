@@ -1,0 +1,9 @@
+Move constructor and move operator= should be marked noexcept if possible
+	Some things use `std::move_if_noexcept`. If your object is not
+	noexcept, they fall back to copying, perhaps unnecessarily.
+%
+Rule of 5.
+%
+Never write `~Class() = default` alone unless the intent is to add the `virtual` specifier.
+%
+
