@@ -42,14 +42,14 @@ AngularMotorConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const&
 
 	Jw1.put (1_m * ~c.a1, 0, 0);
 	Jw2.put (1_m * -~c.a1, 0, 0);
-	location_constraint_value (0, 0) = _max_angular_velocity * 1_m / 1_rad * 1_s;
+	location_constraint_value = _max_angular_velocity * 1_m / 1_rad * 1_s;
 
 	auto const J = calculate_jacobian (vm_1, ext_forces_1, Jv, Jw1,
 									   vm_2, ext_forces_2, Jv, Jw2,
 									   dt);
 	auto const K = calculate_K (Jw1, Jw2);
 	auto lambda = calculate_lambda (location_constraint_value, J, K, dt);
-	lambda (0, 0) = std::clamp (lambda.scalar(), -_force, +_force);
+	lambda = std::clamp (lambda.scalar(), -_force, +_force); // TODO scalar?
 
 	return calculate_constraint_forces (Jv, Jw1, Jv, Jw2, lambda);
 }

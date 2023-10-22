@@ -271,10 +271,10 @@ inline void
 GLSpace::rotate (RotationMatrix<auto, auto> const& r)
 {
 	std::array<double, 16> const array {
-		r (0, 0), r (1, 0), r (2, 0), 0.0,
-		r (0, 1), r (1, 1), r (2, 1), 0.0,
-		r (0, 2), r (1, 2), r (2, 2), 0.0,
-		0.0,      0.0,      0.0,      1.0,
+		r[0, 0], r[1, 0], r[2, 0], 0.0,
+		r[0, 1], r[1, 1], r[2, 1], 0.0,
+		r[0, 2], r[1, 2], r[2, 2], 0.0,
+		0.0,     0.0,     0.0,     1.0,
 	};
 
 	glMultMatrixd (array.data());

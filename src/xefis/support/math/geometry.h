@@ -225,7 +225,7 @@ template<class S, std::size_t C, std::size_t R, class TF, class SF>
 			auto const v_norm = abs (matrix.column (c));
 
 			for (std::size_t r = 0; r < R; ++r)
-				matrix (c, r) /= si::quantity (v_norm);
+				matrix[c, r] /= si::quantity (v_norm);
 		}
 	}
 
@@ -408,9 +408,9 @@ template<class TF = void, class SF = TF>
 	rotation_axis (RotationMatrix<TF, SF> const& m)
 	{
 		SpaceVector<double, TF> result {
-			m (1, 2) - m (2, 1),
-			m (2, 0) - m (0, 2),
-			m (0, 1) - m (1, 0),
+			m[1, 2] - m[2, 1],
+			m[2, 0] - m[0, 2],
+			m[0, 1] - m[1, 0],
 		};
 
 		// FIXME What a hack, better use quaternions:

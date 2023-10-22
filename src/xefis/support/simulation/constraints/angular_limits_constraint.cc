@@ -69,7 +69,7 @@ AngularLimitsConstraint::min_angle_corrections (VelocityMoments<WorldSpace> cons
 
 		Jw1.put (1_m * -~c.a1, 0, 0);
 		Jw2.put (1_m * ~c.a1, 0, 0);
-		location_constraint_value (0, 0) = (c.angle - *_min_angle) * 1_m / 1_rad;
+		location_constraint_value = (c.angle - *_min_angle) * 1_m / 1_rad;
 
 		auto const J = calculate_jacobian (vm_1, ext_forces_1, Jv, Jw1,
 										   vm_2, ext_forces_2, Jv, Jw2,
@@ -99,7 +99,7 @@ AngularLimitsConstraint::max_angle_corrections (VelocityMoments<WorldSpace> cons
 
 		Jw1.put (1_m * ~c.a1, 0, 0);
 		Jw2.put (1_m * -~c.a1, 0, 0);
-		location_constraint_value (0, 0) = (*_max_angle - c.angle) * 1_m / 1_rad;
+		location_constraint_value = (*_max_angle - c.angle) * 1_m / 1_rad;
 
 		auto const J = calculate_jacobian (vm_1, ext_forces_1, Jv, Jw1,
 										   vm_2, ext_forces_2, Jv, Jw2,
