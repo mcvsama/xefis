@@ -273,25 +273,29 @@ class Body: public Noncopyable
 	 * Rotate the body about given point.
 	 */
 	void
-	rotate_about (SpaceLength<WorldSpace> const& about_point, RotationMatrix<WorldSpace> const&);
+	rotate_about (SpaceLength<WorldSpace> const& about_point, RotationMatrix<WorldSpace> const& rotation)
+		{ _location.rotate_base_frame_about (about_point, rotation); }
 
 	/**
 	 * Translate the body by given vector.
 	 */
 	void
-	translate (SpaceLength<WorldSpace> const&);
+	translate (SpaceLength<WorldSpace> const& translation)
+		{ _location.translate_frame (translation); }
 
 	/**
 	 * Translate the body so that its center of mass is at newly given point.
 	 */
 	void
-	move_to (SpaceLength<WorldSpace> const& new_position);
+	move_to (SpaceLength<WorldSpace> const& new_position)
+		{ _location.set_position (new_position); }
 
 	/**
 	 * Translate the body so that its origin is at newly given point.
 	 */
 	void
-	move_origin_to (SpaceLength<WorldSpace> const& new_origin_position);
+	move_origin_to (SpaceLength<WorldSpace> const& new_origin_position)
+		{ move_to (new_origin_position + origin_to_center_of_mass<WorldSpace>()); }
 
 	/**
 	 * Calculate total kinetic energy of the body in WorldSpace frame of reference.
@@ -602,34 +606,6 @@ template<CoordinateSystemConcept Space>
 		else if constexpr (std::is_same_v<Space, WorldSpace>)
 			return _location.unbound_transform_to_base (-_origin_position);
 	}
-
-
-inline void
-Body::rotate_about (SpaceLength<WorldSpace> const& about_point, RotationMatrix<WorldSpace> const& rotation)
-{
-	_location.rotate_base_frame_about (about_point, rotation);
-}
-
-
-inline void
-Body::translate (SpaceLength<WorldSpace> const& translation)
-{
-	_location.translate_frame (translation);
-}
-
-
-inline void
-Body::move_to (SpaceLength<WorldSpace> const& new_position)
-{
-	_location.set_position (new_position);
-}
-
-
-inline void
-Body::move_origin_to (SpaceLength<WorldSpace> const& new_origin_position)
-{
-	move_to (new_origin_position + origin_to_center_of_mass<WorldSpace>());
-}
 
 } // namespace xf::rigid_body
 
