@@ -202,6 +202,7 @@ PROJECTS.xefis.files				+= xefis/support/aerodynamics/airfoil_characteristics.h
 PROJECTS.xefis.files				+= xefis/support/aerodynamics/airfoil_spline.cc
 PROJECTS.xefis.files				+= xefis/support/aerodynamics/airfoil_spline.h
 PROJECTS.xefis.files				+= xefis/support/aerodynamics/angle_of_attack.h
+PROJECTS.xefis.files				+= xefis/support/aerodynamics/pressure.h
 PROJECTS.xefis.files				+= xefis/support/aerodynamics/reynolds.h
 PROJECTS.xefis.files				+= xefis/support/airframe/airframe.cc
 PROJECTS.xefis.files				+= xefis/support/airframe/airframe.h

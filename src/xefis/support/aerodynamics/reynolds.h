@@ -43,13 +43,6 @@ reynolds_number (si::Velocity fluid_speed, si::Length characteristic_dimension, 
 	return Reynolds (fluid_speed * characteristic_dimension / nu);
 }
 
-
-constexpr si::Pressure
-dynamic_pressure (si::Density fluid_density, si::Velocity fluid_speed)
-{
-	return 0.5 * fluid_density * square (fluid_speed);
-}
-
 } // namespace xf
 
 #endif
