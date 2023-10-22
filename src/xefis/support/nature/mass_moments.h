@@ -29,6 +29,7 @@
 // Standard:
 #include <cstddef>
 #include <initializer_list>
+#include <iterator>
 
 
 namespace xf {
@@ -45,15 +46,8 @@ template<class pSpace = void>
 		// Dipole moment:
 		SpaceVector<si::Length, Space>			position;
 		// Quadrupole moment:
-		SpaceMatrix<si::MomentOfInertia, Space>	moment_of_inertia;
+		SpaceMatrix<si::MomentOfInertia, Space>	moment_of_inertia	{ math::zero };
 	};
-
-
-/**
- * Tag used in one of constructors of MassMoments.
- */
-class FromPointMassRange
-{ };
 
 
 /**
@@ -73,24 +67,22 @@ template<class pSpace = void>
 		// Ctor
 		MassMoments() = default;
 
-		// TODO construct from direct mass, COM and MOI. Calculation from point masses should be in separate (static) function.
-
 		// Ctor
 		MassMoments (si::Mass, SpaceVector<si::Length, Space> const& center_of_mass_position, SpaceMatrix<si::MomentOfInertia, Space> const& moment_of_inertia);
 
-		// Ctor
-		MassMoments (std::initializer_list<PointMass> point_masses);
-
-		// Ctor
-		template<class PointMassIterator>
-			explicit
-			MassMoments (FromPointMassRange, PointMassIterator begin, PointMassIterator end);
+		// Ctor method
+		static MassMoments<Space>
+		zero()
+			{ return MassMoments<Space> (0_kg, math::zero, math::zero); }
 
 		// Ctor method
-		template<class PointMassIterator>
-			static MassMoments
-			from_point_masses (PointMassIterator begin, PointMassIterator end)
-				{ return MassMoments (FromPointMassRange(), begin, end); }
+		static MassMoments
+		from_point_masses (std::forward_iterator auto begin, std::forward_iterator auto end);
+
+		// Ctor method
+		static MassMoments
+		from_point_masses (std::initializer_list<PointMass> point_masses)
+			{ return from_point_masses (point_masses.begin(), point_masses.end()); }
 
 		MassMoments&
 		operator+= (MassMoments const& other);
@@ -129,11 +121,6 @@ template<class pSpace = void>
 		// TODO rozdziel na MOI@zero i na MOI@COM
 			{ return _inversed_moment_of_inertia; }
 
-	  public:
-		static MassMoments<Space>
-		zero()
-			{ return MassMoments<Space> (0_kg, math::zero, math::zero); }
-
 	  private:
 		si::Mass															_mass						{ 0_kg };
 		SpaceVector<si::Length, Space>										_center_of_mass_position	{ 0_m, 0_m, 0_m };
@@ -148,9 +135,9 @@ template<class Space>
 	parallel_axis_theorem (SpaceMatrix<si::MomentOfInertia, Space> const& moi_at_com, si::Mass mass, SpaceVector<si::Length, Space> const& displacement);
 
 
-template<class F>
+template<class S>
 	inline
-	MassMoments<F>::MassMoments (si::Mass mass, SpaceVector<si::Length, Space> const& center_of_mass_position, SpaceMatrix<si::MomentOfInertia, Space> const& moment_of_inertia):
+	MassMoments<S>::MassMoments (si::Mass mass, SpaceVector<si::Length, Space> const& center_of_mass_position, SpaceMatrix<si::MomentOfInertia, Space> const& moment_of_inertia):
 		_mass (mass),
 		_center_of_mass_position (center_of_mass_position),
 		_moment_of_inertia (moment_of_inertia),
@@ -158,77 +145,54 @@ template<class F>
 	{ }
 
 
-template<class F>
-	inline
-	MassMoments<F>::MassMoments (std::initializer_list<PointMass> point_masses):
-		MassMoments (FromPointMassRange(), point_masses.begin(), point_masses.end())
-	{ }
+template<class S>
+	inline MassMoments<S>
+	MassMoments<S>::from_point_masses (std::forward_iterator auto begin, std::forward_iterator auto end)
+	{
+		size_t count = 0;
 
+		// TODO what really is needed: skipping pointmasses with mass == 0_kg.
+		SpaceMatrix<double, Space> const unit (math::unit);
 
-template<class F>
-	template<class PointMassIterator>
-		inline
-		MassMoments<F>::MassMoments (FromPointMassRange, PointMassIterator begin, PointMassIterator end)
+		si::Mass computed_mass = 0_kg;
+		SpaceVector<decltype (si::Length{} * si::Mass{}), Space> computed_center (math::zero);
+		SpaceMatrix<si::MomentOfInertia, Space> computed_moment_of_inertia (math::zero);
+
+		// Center of mass formula: R = 1/M * Σ m[i] * r[i]; where M is total mass.
+
+		for (auto const& point_mass: boost::make_iterator_range (begin, end))
 		{
-			size_t count = 0;
+			auto const m = point_mass.mass;
+			auto const r = point_mass.position;
+			auto const i = point_mass.moment_of_inertia;
 
-			// TODO what really is needed: skipping pointmasses with mass == 0_kg.
-			SpaceMatrix<double, Space> const unit (math::unit);
-
-			si::Mass computed_mass = 0_kg;
-			SpaceVector<decltype (si::Length{} * si::Mass{}), Space> computed_center (math::zero);
-			SpaceMatrix<si::MomentOfInertia, Space> computed_moment_of_inertia (math::zero);
-
-			// Center of mass formula: R = 1/M * Σ m[i] * r[i]; where M is total mass.
-
-			for (auto const& point_mass: boost::make_iterator_range (begin, end))
+			if (m != 0_kg)
 			{
-				auto const m = point_mass.mass;
-				auto const r = point_mass.position;
-				auto const i = point_mass.moment_of_inertia;
-
-				if (m != 0_kg)
-				{
-					++count;
-					computed_mass += m;
-					computed_center += m * r;
-					computed_moment_of_inertia += parallel_axis_theorem (i, m, r);
-				}
-			}
-
-			// Override values if we actually only used one point mass, or none at all:
-			if (count == 0)
-			{
-				_mass = 0_kg;
-				_center_of_mass_position = math::zero;
-				_moment_of_inertia = math::zero;
-				_inversed_moment_of_inertia = math::zero;
-			}
-			else if (count == 1)
-			{
-				_mass = begin->mass;
-				_center_of_mass_position = begin->position;
-				_moment_of_inertia = begin->moment_of_inertia;
-				_inversed_moment_of_inertia = inv (_moment_of_inertia);
-			}
-			else
-			{
-				_mass = computed_mass;
-				_moment_of_inertia = computed_moment_of_inertia;
-				_inversed_moment_of_inertia = inv (computed_moment_of_inertia);
-				_center_of_mass_position = computed_center / computed_mass;
+				++count;
+				computed_mass += m;
+				computed_center += m * r;
+				computed_moment_of_inertia += parallel_axis_theorem (i, m, r);
 			}
 		}
 
+		// Override values if we actually only used one point mass, or none at all:
+		if (count == 0)
+			return MassMoments();
+		else if (count == 1)
+			return MassMoments (begin->mass, begin->position, begin->moment_of_inertia);
+		else
+			return MassMoments (computed_mass, computed_center / computed_mass, computed_moment_of_inertia);
+	}
 
-template<class F>
-	inline MassMoments<F>&
-	MassMoments<F>::operator+= (MassMoments const& other)
+
+template<class S>
+	inline MassMoments<S>&
+	MassMoments<S>::operator+= (MassMoments const& other)
 	{
 		auto const& mm1 = *this;
 		auto const& mm2 = other;
 
-		MassMoments<F> result;
+		MassMoments<S> result;
 		result._mass = mm1._mass + mm2._mass;
 
 		if (result._mass != 0_kg)
@@ -369,7 +333,7 @@ template<class Scalar, class Space>
 			point_masses.push_back (PointMass<Space> { mass, position_2, math::zero });
 		}
 
-		return MassMoments<Space> (FromPointMassRange(), begin (point_masses), end (point_masses));
+		return MassMoments<Space>::from_point_masses (begin (point_masses), end (point_masses));
 	}
 
 } // namespace xf
