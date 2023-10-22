@@ -172,7 +172,7 @@ class Body: public Noncopyable
 		apply_force (ForceMoments<Space> const& force_moments);
 
 	/**
-	 * Apply force at center-of-mass for the duration of the following simulation frame.
+	 * Apply force at given position relative to the center-of-mass for the duration of the following simulation frame.
 	 * See remarks for apply_force (ForceMoments<Space>).
 	 * Use world frame of reference and provided Space coordinate system.
 	 */
