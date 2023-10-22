@@ -125,7 +125,7 @@ class Body: public Noncopyable
 		{ _location = location; }
 
 	/**
-	 * Return velocity moments of this part in the absolute frame of reference.
+	 * Return velocity moments of the center of mass in the absolute frame of reference.
 	 */
 	template<CoordinateSystemConcept Space>
 		[[nodiscard]]
@@ -321,8 +321,8 @@ class Body: public Noncopyable
 	 * Return center of mass vector of the argument from the most recent call
 	 * to set_mass_moments().
 	 *
-	 * When set_mass_moments() is called, it offsets the provided MassMoments<> by the center of mass
-	 * so that it's at the origin of BodySpace. The original center of mass position is
+	 * When set_mass_moments() is called, it offsets the provided MassMoments<> so that
+	 * the center of mass is at the origin in BodySpace. The original center of mass position is
 	 * returned by this function.
 	 */
 	SpaceLength<BodySpace>
