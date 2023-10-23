@@ -79,10 +79,10 @@ template<class Space = void>
  */
 template<class Space = void>
 	inline SpaceMatrix<si::MomentOfInertia, Space>
-	make_solid_cylinder_inertia_matrix (si::Mass const& mass, si::Length const radius, si::Length const height)
+	make_solid_cylinder_inertia_matrix (si::Mass const& mass, si::Length const radius, si::Length const length)
 	{
-		auto const i00 = mass * (1.0 / 12.0) * (3.0 * square (radius) + square (height));
-		auto const i11 = mass * (1.0 / 12.0) * (3.0 * square (radius) + square (height));
+		auto const i00 = mass * (1.0 / 12.0) * (3.0 * square (radius) + square (length));
+		auto const i11 = mass * (1.0 / 12.0) * (3.0 * square (radius) + square (length));
 		auto const i22 = mass * (1.0 / 2.0) * square (radius);
 		auto const zero = 1_kg * 1_m2;
 
