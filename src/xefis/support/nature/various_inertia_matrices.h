@@ -78,7 +78,7 @@ template<class Space = void>
  * The cylinder is considered to have length in the Z direction.
  */
 template<class Space = void>
-	inline SpaceMatrix<si::MomentOfInertia, Space> const&
+	inline SpaceMatrix<si::MomentOfInertia, Space>
 	make_solid_cylinder_inertia_matrix (si::Mass const& mass, si::Length const radius, si::Length const height)
 	{
 		auto const i00 = mass * (1.0 / 12.0) * (3.0 * square (radius) + square (height));
