@@ -45,10 +45,22 @@ template<class Space = void>
 		ForceMoments (SpaceVector<si::Force, Space> const& force, SpaceVector<si::Torque, Space> const& torque);
 
 		constexpr ForceMoments&
-		operator+= (ForceMoments const& other);
+		operator+= (ForceMoments const&);
 
 		constexpr ForceMoments&
-		operator-= (ForceMoments const& other);
+		operator-= (ForceMoments const&);
+
+		constexpr ForceMoments&
+		operator+= (SpaceVector<si::Force, Space> const&);
+
+		constexpr ForceMoments&
+		operator-= (SpaceVector<si::Force, Space> const&);
+
+		constexpr ForceMoments&
+		operator+= (SpaceVector<si::Torque, Space> const&);
+
+		constexpr ForceMoments&
+		operator-= (SpaceVector<si::Torque, Space> const&);
 
 		[[nodiscard]]
 		constexpr SpaceVector<si::Force, Space> const&
@@ -115,6 +127,42 @@ template<class Space>
 
 
 template<class Space>
+	constexpr ForceMoments<Space>&
+	ForceMoments<Space>::operator+= (SpaceVector<si::Force, Space> const& other)
+	{
+		_force += other;
+		return *this;
+	}
+
+
+template<class Space>
+	constexpr ForceMoments<Space>&
+	ForceMoments<Space>::operator-= (SpaceVector<si::Force, Space> const& other)
+	{
+		_force -= other;
+		return *this;
+	}
+
+
+template<class Space>
+	constexpr ForceMoments<Space>&
+	ForceMoments<Space>::operator+= (SpaceVector<si::Torque, Space> const& other)
+	{
+		_torque += other;
+		return *this;
+	}
+
+
+template<class Space>
+	constexpr ForceMoments<Space>&
+	ForceMoments<Space>::operator-= (SpaceVector<si::Torque, Space> const& other)
+	{
+		_torque -= other;
+		return *this;
+	}
+
+
+template<class Space>
 	constexpr ForceMoments<Space>
 	ForceMoments<Space>::at (SpaceVector<si::Length, Space> const& point) const
 	{
@@ -150,6 +198,22 @@ template<class Space>
 
 template<class Space>
 	constexpr ForceMoments<Space>
+	operator+ (ForceMoments<Space> a, SpaceVector<si::Force, Space> const& b)
+	{
+		return a += b;
+	}
+
+
+template<class Space>
+	constexpr ForceMoments<Space>
+	operator+ (ForceMoments<Space> a, SpaceVector<si::Torque, Space> const& b)
+	{
+		return a += b;
+	}
+
+
+template<class Space>
+	constexpr ForceMoments<Space>
 	operator- (ForceMoments<Space> a)
 	{
 		return {
@@ -162,6 +226,22 @@ template<class Space>
 template<class Space>
 	constexpr ForceMoments<Space>
 	operator- (ForceMoments<Space> a, ForceMoments<Space> const& b)
+	{
+		return a -= b;
+	}
+
+
+template<class Space>
+	constexpr ForceMoments<Space>
+	operator- (ForceMoments<Space> a, SpaceVector<si::Force, Space> const& b)
+	{
+		return a -= b;
+	}
+
+
+template<class Space>
+	constexpr ForceMoments<Space>
+	operator- (ForceMoments<Space> a, SpaceVector<si::Torque, Space> const& b)
 	{
 		return a -= b;
 	}
