@@ -126,8 +126,10 @@ class HingePrecalculation: public FramePrecalculation<HingePrecalculationData>
 	calculate (HingePrecalculationData&) override;
 
   private:
+	// Anchor as visible from each body:
 	SpaceLength<BodySpace>	_anchor_1;
 	SpaceLength<BodySpace>	_anchor_2;
+	// Hinge as visible from each body:
 	SpaceLength<BodySpace>	_hinge_1;
 	SpaceLength<BodySpace>	_hinge_2;
 	FixedOrientationHelper	_fixed_orientation;

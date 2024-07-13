@@ -271,6 +271,10 @@ template<class S, class TF, class SF>
 	}
 
 
+/**
+ * Ensure that the length of a vector does not exceed a specified maximum,
+ * adjusting the vector's magnitude if necessary while preserving its direction.
+ */
 template<class T, class F>
 	[[nodiscard]]
 	constexpr SpaceVector<T, F>
