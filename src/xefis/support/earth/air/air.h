@@ -44,7 +44,7 @@ template<class Space>
 
 
 [[nodiscard]]
-inline si::Velocity
+constexpr si::Velocity
 speed_of_sound (si::Temperature static_air_temperature)
 {
 	return 38.967854_kt * std::sqrt (static_air_temperature.in<si::Kelvin>());
@@ -52,7 +52,7 @@ speed_of_sound (si::Temperature static_air_temperature)
 
 
 [[nodiscard]]
-inline si::Length
+constexpr si::Length
 density_altitude (si::Length pressure_altitude, si::Temperature static_air_temperature)
 {
 	float t_s = 273.15 + (15.0 - (0.0019812 * pressure_altitude.in<si::Foot>()));
@@ -61,7 +61,7 @@ density_altitude (si::Length pressure_altitude, si::Temperature static_air_tempe
 
 
 [[nodiscard]]
-inline si::Velocity
+constexpr si::Velocity
 true_airspeed (si::Velocity indicated_airspeed, si::Length density_altitude)
 {
 	return indicated_airspeed / std::pow (1.0 - 6.8755856 * 1e-6 * density_altitude.in<si::Foot>(), 2.127940);
@@ -69,7 +69,7 @@ true_airspeed (si::Velocity indicated_airspeed, si::Length density_altitude)
 
 
 [[nodiscard]]
-inline si::Velocity
+constexpr si::Velocity
 indicated_airspeed (si::Velocity true_airspeed, si::Length density_altitude)
 {
 	return true_airspeed * std::pow (1.0 - 6.8755856 * 1e-6 * density_altitude.in<si::Foot>(), 2.127940);
