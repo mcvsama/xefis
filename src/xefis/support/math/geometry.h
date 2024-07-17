@@ -590,6 +590,24 @@ template<class Triangle>
 	}
 
 
+template<class Space>
+	inline si::Angle
+	angle_between (SpaceVector<auto, Space> const& a,
+				   SpaceVector<auto, Space> const& b)
+	{
+		return 1_rad * std::acos (dot_product (a, b) / (abs (a) * abs (b)));
+	}
+
+
+template<class Space>
+	inline auto
+	cos_angle_between (SpaceVector<auto, Space> const& a,
+					   SpaceVector<auto, Space> const& b)
+	{
+		return dot_product (a, b) / (abs (a) * abs (b));
+	}
+
+
 /*
  * Polar-cartesian conversions
  */
