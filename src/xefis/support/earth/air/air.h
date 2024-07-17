@@ -75,6 +75,30 @@ indicated_airspeed (si::Velocity true_airspeed, si::Length density_altitude)
 	return true_airspeed * std::pow (1.0 - 6.8755856 * 1e-6 * density_altitude.in<si::Foot>(), 2.127940);
 }
 
+
+[[nodiscard]]
+constexpr si::Pressure
+dynamic_pressure (si::Density const fluid_density, si::Velocity const fluid_speed)
+{
+	return 0.5 * fluid_density * square (fluid_speed);
+}
+
+
+[[nodiscard]]
+si::Pressure
+total_pressure (Air<ECEFSpace> const& air,
+				SpaceLength<ECEFSpace> const& sensor_normal_vector,
+				SpaceVector<si::Velocity, ECEFSpace> sensor_velocity);
+
+/**
+ * Normal vector to the sensor's surface is the X axis in the Placement object.
+ */
+[[nodiscard]]
+si::Pressure
+total_pressure (Atmosphere const& atmosphere,
+				Placement<ECEFSpace> const& placement,
+				SpaceVector<si::Velocity, ECEFSpace> const sensor_velocity);
+
 } // namespace xf
 
 #endif
