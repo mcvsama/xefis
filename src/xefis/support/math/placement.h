@@ -77,6 +77,15 @@ template<class pBaseSpace = void, class pSpace = pBaseSpace>
 			{ return _base_to_body_rotation; }
 
 		/**
+		 * Return base's X, Y, Z axes viewed in BodySpace coordinates.
+		 * Same as base_to_body_rotation().
+		 */
+		[[nodiscard]]
+		RotationToBody const&
+		base_coordinates() const noexcept
+			{ return _base_to_body_rotation; }
+
+		/**
 		 * Set body's rotation matrix.
 		 */
 		void
@@ -88,6 +97,15 @@ template<class pBaseSpace = void, class pSpace = pBaseSpace>
 		[[nodiscard]]
 		RotationToBase const&
 		body_to_base_rotation() const noexcept
+			{ return _body_to_base_rotation; }
+
+		/**
+		 * Return body's X, Y, Z axes viewed in BaseSpace coordinates.
+		 * Same as body_to_base_rotation().
+		 */
+		[[nodiscard]]
+		RotationToBase const&
+		body_coordinates() const noexcept
 			{ return _body_to_base_rotation; }
 
 		/**
