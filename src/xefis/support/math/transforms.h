@@ -59,7 +59,7 @@ ecef_to_ned_rotation (SpaceVector<si::Length, ECEFSpace> const& position)
 inline RotationMatrix<NEDSpace, AirframeSpace>
 airframe_to_ned_rotation (Placement<ECEFSpace, AirframeSpace> const& pr)
 {
-	return ecef_to_ned_rotation (pr.position()) * pr.body_to_base_rotation();
+	return ecef_to_ned_rotation (pr.position()) * pr.body_coordinates();
 }
 
 } // namespace xf
