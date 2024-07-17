@@ -266,6 +266,16 @@ template<class B, class F>
 		_position += about_point;
 	}
 
+
+template<class BaseSpace>
+	[[nodiscard]]
+	inline auto
+	relative_rotation (Placement<BaseSpace, auto> const& from, Placement<BaseSpace, auto> const& to)
+	{
+		// Divide the "from" rotation matrix by the "to" rotation matrix (mutiply by inversion):
+		return from.base_to_body_rotation() * to.body_to_base_rotation();
+	}
+
 } // namespace xf
 
 #endif
