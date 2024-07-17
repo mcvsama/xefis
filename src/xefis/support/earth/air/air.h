@@ -1,6 +1,6 @@
 /* vim:ts=4
  *
- * Copyleft 2008…2013  Michał Gawron
+ * Copyleft 2024  Michał Gawron
  * Marduk Unix Labs, http://mulabs.org/
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,8 +16,10 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/support/math/placement.h>
 
 // Neutrino:
+#include <neutrino/math/math.h>
 #include <neutrino/numeric.h>
 
 // Standard:
@@ -26,16 +28,22 @@
 
 namespace xf {
 
-struct Air
-{
-	si::Density				density;
-	si::Pressure			pressure;
-	si::Temperature			temperature;
-	si::DynamicViscosity	dynamic_viscosity;
-	si::Velocity			speed_of_sound;
-};
+class Atmosphere;
 
 
+template<class Space>
+	struct Air
+	{
+		si::Density							density;
+		si::Pressure						pressure;
+		si::Temperature						temperature;
+		si::DynamicViscosity				dynamic_viscosity;
+		si::Velocity						speed_of_sound;
+		SpaceVector<si::Velocity, Space>	velocity;
+	};
+
+
+[[nodiscard]]
 inline si::Velocity
 speed_of_sound (si::Temperature static_air_temperature)
 {
@@ -43,6 +51,7 @@ speed_of_sound (si::Temperature static_air_temperature)
 }
 
 
+[[nodiscard]]
 inline si::Length
 density_altitude (si::Length pressure_altitude, si::Temperature static_air_temperature)
 {
@@ -51,6 +60,7 @@ density_altitude (si::Length pressure_altitude, si::Temperature static_air_tempe
 }
 
 
+[[nodiscard]]
 inline si::Velocity
 true_airspeed (si::Velocity indicated_airspeed, si::Length density_altitude)
 {
@@ -58,6 +68,7 @@ true_airspeed (si::Velocity indicated_airspeed, si::Length density_altitude)
 }
 
 
+[[nodiscard]]
 inline si::Velocity
 indicated_airspeed (si::Velocity true_airspeed, si::Length density_altitude)
 {

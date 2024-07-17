@@ -131,10 +131,10 @@ ImpulseSolver::update_gravitational_forces (Body& b1, Body& b2)
 void
 ImpulseSolver::update_external_forces()
 {
-	auto const& atmospheric_model = _system.atmospheric_model();
+	auto const& atmosphere = _system.atmosphere();
 
 	for (auto& body: _system.bodies())
-		body->update_external_forces (atmospheric_model);
+		body->update_external_forces (atmosphere);
 
 	for (auto& body: _system.bodies())
 	{

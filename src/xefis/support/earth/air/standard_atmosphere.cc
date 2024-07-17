@@ -128,48 +128,31 @@ standard_temperature_gradient (std::map<si::Length, InternationalStandardAtmosph
 } // namespace
 
 
-Air
+Air<ECEFSpace>
 StandardAtmosphere::air_at (SpaceVector<si::Length, ECEFSpace> const& position) const
 {
 	return air_at_radius (abs (position));
 }
 
 
-Air
-StandardAtmosphere::air_at_radius (si::Length radius) const
+Air<ECEFSpace>
+StandardAtmosphere::air_at_radius (si::Length const radius) const
 {
 	return air_at_amsl (radius - kEarthMeanRadius);
 }
 
 
-Air
-StandardAtmosphere::air_at_amsl (si::Length geometric_altitude_amsl) const
+Air<ECEFSpace>
+StandardAtmosphere::air_at_amsl (si::Length const geometric_altitude_amsl) const
 {
-	Air air;
+	Air<ECEFSpace> air;
 	air.density = standard_density (geometric_altitude_amsl);
 	air.pressure = standard_pressure (geometric_altitude_amsl);
 	air.temperature = standard_temperature (geometric_altitude_amsl);
 	air.dynamic_viscosity = dynamic_air_viscosity (air.temperature);
 	air.speed_of_sound = speed_of_sound (air.temperature);
+	air.velocity = { 0_mps, 0_mps, 0_mps }; // TODO model the wind
 	return air;
-}
-
-
-SpaceVector<si::Velocity, ECEFSpace>
-StandardAtmosphere::wind_at (SpaceVector<si::Length, ECEFSpace> const&) const
-{
-	// TODO model it.
-	return { 0_mps, 0_mps, 0_mps };
-}
-
-
-AtmosphereState<ECEFSpace>
-StandardAtmosphere::state_at (SpaceVector<si::Length, ECEFSpace> const& position) const
-{
-	return {
-		air_at (position),
-		wind_at (position),
-	};
 }
 
 
@@ -246,7 +229,7 @@ standard_pressure (si::Length geometric_altitude_amsl)
 
 
 si::Temperature
-standard_temperature (si::Length geometric_altitude_amsl)
+standard_temperature (si::Length const geometric_altitude_amsl)
 {
 	return international_standard_atmosphere_temperature().extrapolated_value (geometric_altitude_amsl);
 }
@@ -278,7 +261,7 @@ standard_temperature_gradient (si::Length geometric_altitude_amsl)
 
 
 si::DynamicViscosity
-dynamic_air_viscosity (si::Temperature temperature)
+dynamic_air_viscosity (si::Temperature const temperature)
 {
 	return air_temperature_to_dynamic_viscosity().extrapolated_value (temperature);
 }

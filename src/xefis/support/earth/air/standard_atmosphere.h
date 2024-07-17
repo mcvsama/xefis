@@ -32,28 +32,20 @@ namespace xf {
  * TODO use winds to affect density/pressure at that point.
  * TODO maybe the winds model should be a separate class plugged in into Atmosphere object?
  */
-class StandardAtmosphere: public AtmosphericModel
+class StandardAtmosphere: public Atmosphere
 {
   public:
 	[[nodiscard]]
-	Air
+	Air<ECEFSpace>
 	air_at (SpaceVector<si::Length, ECEFSpace> const& position) const override;
 
 	[[nodiscard]]
-	Air
-	air_at_radius (si::Length radius) const override;
+	Air<ECEFSpace>
+	air_at_radius (si::Length radius) const;
 
 	[[nodiscard]]
-	Air
-	air_at_amsl (si::Length amsl_height) const override;
-
-	[[nodiscard]]
-	SpaceVector<si::Velocity, ECEFSpace>
-	wind_at (SpaceVector<si::Length, ECEFSpace> const& position) const override;
-
-	[[nodiscard]]
-	AtmosphereState<ECEFSpace>
-	state_at (SpaceVector<si::Length, ECEFSpace> const& position) const override;
+	Air<ECEFSpace>
+	air_at_amsl (si::Length amsl_height) const;
 };
 
 

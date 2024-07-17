@@ -375,7 +375,7 @@ class Body: public Noncopyable
 	 * Ask body to update external force moments by calling apply_force() methods.
 	 */
 	virtual void
-	update_external_forces (AtmosphericModel const*)
+	update_external_forces (Atmosphere const*)
 	{ }
 
   private:

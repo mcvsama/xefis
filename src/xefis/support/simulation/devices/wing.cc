@@ -42,7 +42,7 @@ Wing::Wing (Airfoil const& airfoil, si::Density const material_density):
 
 
 void
-Wing::update_external_forces (AtmosphericModel const* atmosphere)
+Wing::update_external_forces (Atmosphere const* atmosphere)
 {
 	if (atmosphere)
 	{
@@ -57,15 +57,19 @@ Wing::update_external_forces (AtmosphericModel const* atmosphere)
 		auto const body_position_in_ecef = world_to_ecef * location().position();
 		auto const body_velocity_in_ecef = world_to_ecef * velocity_moments<rigid_body::WorldSpace>().velocity();
 
-		auto ecef_atmosphere_state = atmosphere->state_at (body_position_in_ecef);
-		ecef_atmosphere_state.wind -= body_velocity_in_ecef;
-		auto const body_atmosphere_state = AtmosphereState<AirfoilSplineSpace> {
-			.air = ecef_atmosphere_state.air,
-			.wind = ecef_to_spline_transform * ecef_atmosphere_state.wind,
+		auto ecef_air = atmosphere->air_at (body_position_in_ecef);
+		ecef_air.velocity -= body_velocity_in_ecef;
+		auto const body_air = Air<AirfoilSplineSpace> {
+			.density = ecef_air.density,
+			.pressure = ecef_air.pressure,
+			.temperature = ecef_air.temperature,
+			.dynamic_viscosity = ecef_air.dynamic_viscosity,
+			.speed_of_sound = ecef_air.speed_of_sound,
+			.velocity = ecef_to_spline_transform * ecef_air.velocity,
 		};
 
 		// Center of pressure Wrench:
-		auto const spline_aeroforces_at_origin = _airfoil.aerodynamic_forces (body_atmosphere_state);
+		auto const spline_aeroforces_at_origin = _airfoil.aerodynamic_forces (body_air);
 		auto const body_aeroforces_at_origin = ~body_to_airfoil_spline * spline_aeroforces_at_origin.forces;
 
 		// Compute 'at COM' values:

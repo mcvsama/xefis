@@ -26,45 +26,18 @@
 namespace xf {
 
 /**
- * StandardAtmosphere state at some given position.
- */
-template<class Space>
-	struct AtmosphereState
-	{
-		Air									air;
-		SpaceVector<si::Velocity, Space>	wind;
-	};
-
-
-/**
  * General atmosphere model.
  */
-class AtmosphericModel
+class Atmosphere
 {
   public:
 	// Dtor
 	virtual
-	~AtmosphericModel() = default;
+	~Atmosphere() = default;
 
 	[[nodiscard]]
-	virtual Air
+	virtual Air<ECEFSpace>
 	air_at (SpaceVector<si::Length, ECEFSpace> const& position) const = 0;
-
-	[[nodiscard]]
-	virtual Air
-	air_at_radius (si::Length radius) const = 0;
-
-	[[nodiscard]]
-	virtual Air
-	air_at_amsl (si::Length amsl_height) const = 0;
-
-	[[nodiscard]]
-	virtual SpaceVector<si::Velocity, ECEFSpace>
-	wind_at (SpaceVector<si::Length, ECEFSpace> const& position) const = 0;
-
-	[[nodiscard]]
-	virtual AtmosphereState<ECEFSpace>
-	state_at (SpaceVector<si::Length, ECEFSpace> const& position) const = 0;
 };
 
 } // namespace xf

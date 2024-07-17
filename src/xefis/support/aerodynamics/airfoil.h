@@ -18,7 +18,7 @@
 #include <xefis/config/all.h>
 #include <xefis/support/aerodynamics/airfoil_characteristics.h>
 #include <xefis/support/aerodynamics/reynolds.h>
-#include <xefis/support/earth/air/standard_atmosphere.h>
+#include <xefis/support/earth/air/air.h>
 #include <xefis/support/math/geometry.h>
 #include <xefis/support/nature/wrench.h>
 
@@ -144,7 +144,7 @@ class Airfoil
 	 */
 	[[nodiscard]]
 	AerodynamicForcesAndAOA<AirfoilSplineSpace>
-	planar_aerodynamic_forces (AtmosphereState<AirfoilSplineSpace> const&) const;
+	planar_aerodynamic_forces (Air<AirfoilSplineSpace> const&) const;
 
 	/**
 	 * Like planar_aerodynamic_forces(), except it corrects the center of pressure position (returned Wrench's position) in the Z axis, to be in the center of
@@ -152,7 +152,7 @@ class Airfoil
 	 */
 	[[nodiscard]]
 	AerodynamicForcesAndAOA<AirfoilSplineSpace>
-	aerodynamic_forces (AtmosphereState<AirfoilSplineSpace> const&) const;
+	aerodynamic_forces (Air<AirfoilSplineSpace> const&) const;
 
   private:
 	/**
