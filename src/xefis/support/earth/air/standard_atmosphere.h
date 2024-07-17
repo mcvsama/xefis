@@ -17,7 +17,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/earth/air/air.h>
-#include <xefis/support/earth/air/atmospheric_model.h>
+#include <xefis/support/earth/air/atmosphere.h>
 #include <xefis/support/math/geometry.h>
 
 // Standard:
