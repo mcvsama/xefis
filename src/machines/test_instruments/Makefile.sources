@@ -1,7 +1,7 @@
-XEFIS_MACHINES.test_instruments.files += test_instruments_machine.cc
-XEFIS_MACHINES.test_instruments.files += test_instruments_machine.h
-XEFIS_MACHINES.test_instruments.files += test_screen_1.cc
-XEFIS_MACHINES.test_instruments.files += test_screen_1.h
-XEFIS_MACHINES.test_instruments.files += test_screen_2.cc
-XEFIS_MACHINES.test_instruments.files += test_screen_2.h
+XEFIS_MACHINES.test_instruments.sources += test_instruments_machine.cc
+XEFIS_MACHINES.test_instruments.sources += test_instruments_machine.h
+XEFIS_MACHINES.test_instruments.sources += test_screen_1.cc
+XEFIS_MACHINES.test_instruments.sources += test_screen_1.h
+XEFIS_MACHINES.test_instruments.sources += test_screen_2.cc
+XEFIS_MACHINES.test_instruments.sources += test_screen_2.h
 
