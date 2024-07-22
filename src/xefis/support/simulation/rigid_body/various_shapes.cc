@@ -143,9 +143,10 @@ make_sphere_shape (si::Length const radius, size_t slices, size_t stacks,
 
 
 Shape
-make_cylinder_shape (si::Length const length, si::Length const radius, size_t num_faces, bool with_front_and_back,
-					 ShapeMaterial const& material)
+make_cylinder_shape (CylinderShapeParameters const& params, ShapeMaterial const& material)
 {
+	auto num_faces = params.num_faces;
+
 	if (num_faces < 3)
 		num_faces = 3;
 
@@ -154,12 +155,12 @@ make_cylinder_shape (si::Length const length, si::Length const radius, size_t nu
 	std::optional<Shape::TriangleFan> face1;
 	std::optional<Shape::TriangleFan> face2;
 
-	if (with_front_and_back)
+	if (params.with_front_and_back)
 	{
 		face1.emplace();
 		face1->emplace_back (SpaceLength<BodySpace> (0_m, 0_m, 0_m), SpaceVector<double, BodySpace> (0.0, 0.0, -1.0), material);
 		face2.emplace();
-		face2->emplace_back (SpaceLength<BodySpace> (0_m, 0_m, length), SpaceVector<double, BodySpace> (0.0, 0.0, +1.0), material);
+		face2->emplace_back (SpaceLength<BodySpace> (0_m, 0_m, params.length), SpaceVector<double, BodySpace> (0.0, 0.0, +1.0), material);
 	}
 
 	si::Angle const da = 360_deg / num_faces;
@@ -169,23 +170,23 @@ make_cylinder_shape (si::Length const length, si::Length const radius, size_t nu
 	{
 		auto const x = sin (angle);
 		auto const y = cos (angle);
-		auto const x_len = radius * x;
-		auto const y_len = radius * y;
+		auto const x_len = params.radius * x;
+		auto const y_len = params.radius * y;
 		SpaceVector<double, BodySpace> const normal (x, y, 0);
 		SpaceLength<BodySpace> const p1 (x_len, y_len, 0_m);
-		SpaceLength<BodySpace> const p2 (x_len, y_len, length);
+		SpaceLength<BodySpace> const p2 (x_len, y_len, params.length);
 
 		strip.emplace_back (p1, normal, material);
 		strip.emplace_back (p2, normal, material);
 
-		if (with_front_and_back)
+		if (params.with_front_and_back)
 		{
 			face1->emplace_back (p1, SpaceVector<double, BodySpace> (0.0, 0.0, -1.0), material);
 			face2->emplace_back (p2, SpaceVector<double, BodySpace> (0.0, 0.0, +1.0), material);
 		}
 	}
 
-	if (with_front_and_back)
+	if (params.with_front_and_back)
 	{
 		// Reverse order to keep the face facing outside:
 		std::reverse (std::next (face2->begin()), face2->end());

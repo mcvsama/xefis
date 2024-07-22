@@ -32,6 +32,15 @@ namespace xf::rigid_body {
 using MakeSphereMaterialCallback	= std::function<void (ShapeMaterial&, si::Angle latitude)>;
 
 
+struct CylinderShapeParameters
+{
+	si::Length	length;
+	si::Length	radius;
+	size_t		num_faces;
+	bool		with_front_and_back;
+};
+
+
 /**
  * Make a cube of given size.
  */
@@ -63,8 +72,7 @@ make_sphere_shape (si::Length radius, size_t slices, size_t stacks,
  * Make a rod shape without bottom/top faces, placed along the Z axis.
  */
 Shape
-make_cylinder_shape (si::Length length, si::Length radius, size_t num_faces, bool with_front_and_back = true,
-					 ShapeMaterial const& = {});
+make_cylinder_shape (CylinderShapeParameters const&, ShapeMaterial const& = {});
 
 /**
  * Make a cone shape placed along the Z axis with pointy part pointing towards positive Z values.
@@ -91,6 +99,7 @@ make_airfoil_shape (AirfoilSpline const& spline, si::Length chord_length, si::Le
  */
 Shape
 make_center_of_mass_symbol_shape (si::Length radius, ShapeMaterial const& a = kBlackMatte, ShapeMaterial const& b = kWhiteMatte);
+
 
 /**
  * Set planar normals for triangles, that is make each vertex' normal

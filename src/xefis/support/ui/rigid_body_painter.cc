@@ -401,7 +401,13 @@ RigidBodyPainter::paint_constraint (rigid_body::Constraint const& constraint)
 					_gl.rotate (alpha_beta[1], 0, 1, 0);
 					_gl.rotate (90_deg, 0, 1, 0);
 
-					_gl.draw (rigid_body::make_cylinder_shape (1_m * abs (diff / 1_m), radius, 16, front_back_faces, material));
+					auto const shape = rigid_body::make_cylinder_shape ({
+						.length = 1_m * abs (diff / 1_m),
+						.radius = radius,
+						.num_faces = 16,
+						.with_front_and_back = front_back_faces,
+					}, material);
+					_gl.draw (shape);
 				});
 			};
 
@@ -523,7 +529,7 @@ RigidBodyPainter::draw_arrow (SpaceLength<rigid_body::WorldSpace> const& origin,
 			_gl.rotate (alpha_beta[0], 0, 0, 1);
 			_gl.rotate (alpha_beta[1], 0, 1, 0);
 			_gl.rotate (90_deg, 0, 1, 0);
-			_gl.draw (rigid_body::make_cylinder_shape (length, radius, kNumFaces, true, material));
+			_gl.draw (rigid_body::make_cylinder_shape ({ .length = length, .radius = radius, .num_faces = kNumFaces, .with_front_and_back = true }, material));
 			_gl.translate (0_m, 0_m, length);
 			_gl.draw (rigid_body::make_cone_shape (cone_length, cone_radius, kNumFaces, true, material));
 		}
@@ -574,20 +580,20 @@ RigidBodyPainter::paint_ecef_basis (QOpenGLPaintDevice& canvas)
 			// X axis:
 			_gl.save_matrix ([&] {
 				_gl.rotate (+90_deg, 0.0, 1.0, 0.0);
-				_gl.draw (rigid_body::make_cylinder_shape (length, radius, kNumFaces, false, red));
+				_gl.draw (rigid_body::make_cylinder_shape ({ .length = length, .radius = radius, .num_faces = kNumFaces, .with_front_and_back = false }, red));
 				_gl.translate (0_m, 0_m, length);
 				_gl.draw (rigid_body::make_cone_shape (cone_length, cone_radius, kNumFaces, true, red));
 			});
 			// Y axis:
 			_gl.save_matrix ([&] {
 				_gl.rotate (-90_deg, 1.0, 0.0, 0.0);
-				_gl.draw (rigid_body::make_cylinder_shape (length, radius, kNumFaces, false, green));
+				_gl.draw (rigid_body::make_cylinder_shape ({ .length = length, .radius = radius, .num_faces = kNumFaces, .with_front_and_back = false }, green));
 				_gl.translate (0_m, 0_m, length);
 				_gl.draw (rigid_body::make_cone_shape (cone_length, cone_radius, kNumFaces, true, green));
 			});
 			// Z axis:
 			_gl.save_matrix ([&] {
-				_gl.draw (rigid_body::make_cylinder_shape (length, radius, kNumFaces, false, blue));
+				_gl.draw (rigid_body::make_cylinder_shape ({ .length = length, .radius = radius, .num_faces = kNumFaces, .with_front_and_back = false }, blue));
 				_gl.translate (0_m, 0_m, length);
 				_gl.draw (rigid_body::make_cone_shape (cone_length, cone_radius, kNumFaces, true, blue));
 			});
