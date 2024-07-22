@@ -28,7 +28,7 @@ namespace xf::rigid_body {
 
 HingePrecalculation::HingePrecalculation (Body& body_1, Body& body_2):
 	FramePrecalculation (body_1, body_2),
-	_fixed_orientation (body_1.location(), body_2.location())
+	_fixed_orientation (body_1.placement(), body_2.placement())
 { }
 
 
@@ -38,14 +38,14 @@ HingePrecalculation::HingePrecalculation (SpaceLength<BodySpace> const& anchor_p
 										  Body& body_2):
 	HingePrecalculation (body_1, body_2)
 {
-	auto const loc_1 = body_1.location();
-	auto const loc_2 = body_2.location();
+	auto const pl_1 = body_1.placement();
+	auto const pl_2 = body_2.placement();
 	auto const hinge = anchor_point_2 - anchor_point_1;
 
 	_anchor_1 = anchor_point_1;
-	_anchor_2 = loc_2.bound_transform_to_body (loc_1.bound_transform_to_base (anchor_point_1));
+	_anchor_2 = pl_2.bound_transform_to_body (pl_1.bound_transform_to_base (anchor_point_1));
 	_hinge_1 = normalized (hinge);
-	_hinge_2 = normalized (loc_2.unbound_transform_to_body (loc_1.unbound_transform_to_base (hinge)));
+	_hinge_2 = normalized (pl_2.unbound_transform_to_body (pl_1.unbound_transform_to_base (hinge)));
 }
 
 
@@ -55,14 +55,14 @@ HingePrecalculation::HingePrecalculation (Body& body_1,
 										  SpaceLength<BodySpace> const& anchor_point_2):
 	HingePrecalculation (body_1, body_2)
 {
-	auto const loc_1 = body_1.location();
-	auto const loc_2 = body_2.location();
+	auto const pl_1 = body_1.placement();
+	auto const pl_2 = body_2.placement();
 	auto const hinge = anchor_point_2 - anchor_point_1;
 
-	_anchor_1 = loc_1.bound_transform_to_body (loc_2.bound_transform_to_base (anchor_point_1));
+	_anchor_1 = pl_1.bound_transform_to_body (pl_2.bound_transform_to_base (anchor_point_1));
 	_anchor_2 = anchor_point_1;
 	_hinge_1 = normalized (anchor_point_2 - anchor_point_1);
-	_hinge_2 = normalized (loc_2.unbound_transform_to_body (loc_1.unbound_transform_to_base (hinge)));
+	_hinge_2 = normalized (pl_2.unbound_transform_to_body (pl_1.unbound_transform_to_base (hinge)));
 }
 
 
@@ -72,32 +72,32 @@ HingePrecalculation::HingePrecalculation (Body& body_1,
 										  Body& body_2):
 	HingePrecalculation (body_1, body_2)
 {
-	auto const loc_1 = body_1.location();
-	auto const loc_2 = body_2.location();
+	auto const pl_1 = body_1.placement();
+	auto const pl_2 = body_2.placement();
 	auto const hinge = anchor_point_2 - anchor_point_1;
 
-	_anchor_1 = loc_1.bound_transform_to_body (anchor_point_1);
-	_anchor_2 = loc_2.bound_transform_to_body (anchor_point_2);
-	_hinge_1 = normalized (loc_1.unbound_transform_to_body (hinge));
-	_hinge_2 = normalized (loc_2.unbound_transform_to_body (hinge));
+	_anchor_1 = pl_1.bound_transform_to_body (anchor_point_1);
+	_anchor_2 = pl_2.bound_transform_to_body (anchor_point_2);
+	_hinge_1 = normalized (pl_1.unbound_transform_to_body (hinge));
+	_hinge_2 = normalized (pl_2.unbound_transform_to_body (hinge));
 }
 
 
 void
 HingePrecalculation::calculate (HingePrecalculationData& data)
 {
-	auto const loc_1 = body_1().location();
-	auto const loc_2 = body_2().location();
-	auto const x1 = body_1().location().position();
-	auto const x2 = body_2().location().position();
-	auto const r1 = loc_1.unbound_transform_to_base (body_1_anchor());
-	auto const r2 = loc_2.unbound_transform_to_base (body_2_anchor());
+	auto const pl_1 = body_1().placement();
+	auto const pl_2 = body_2().placement();
+	auto const x1 = body_1().placement().position();
+	auto const x2 = body_2().placement().position();
+	auto const r1 = pl_1.unbound_transform_to_base (body_1_anchor());
+	auto const r2 = pl_2.unbound_transform_to_base (body_2_anchor());
 	auto const u = x2 + r2 - x1 - r1;
-	auto const a1 = loc_1.unbound_transform_to_base (body_1_hinge()) / abs (body_1_hinge());
-	auto const a2 = loc_2.unbound_transform_to_base (body_2_hinge()) / abs (body_2_hinge());
+	auto const a1 = pl_1.unbound_transform_to_base (body_1_hinge()) / abs (body_1_hinge());
+	auto const a2 = pl_2.unbound_transform_to_base (body_2_hinge()) / abs (body_2_hinge());
 	auto const t1 = normalized (cross_product (a1, find_non_colinear (a1) * 1_m));
 	auto const t2 = normalized (cross_product (a1, t1));
-	auto const rotation_error = _fixed_orientation.rotation_constraint_value (loc_1, loc_2);
+	auto const rotation_error = _fixed_orientation.rotation_constraint_value (pl_1, pl_2);
 	auto const angle = projection_onto_normalized (rotation_error, a1);
 
 	data.x1 = x1;

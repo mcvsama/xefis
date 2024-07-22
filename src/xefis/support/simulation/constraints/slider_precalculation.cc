@@ -27,32 +27,32 @@ SliderPrecalculation::SliderPrecalculation (Body& body_1,
 											Body& body_2,
 											SpaceVector<double, WorldSpace> const& axis):
 	FramePrecalculation (body_1, body_2),
-	_fixed_orientation (body_1.location(), body_2.location())
+	_fixed_orientation (body_1.placement(), body_2.placement())
 {
-	auto const loc_1 = body_1.location();
-	auto const loc_2 = body_2.location();
+	auto const pl_1 = body_1.placement();
+	auto const pl_2 = body_2.placement();
 
 	// Choose anchor point at world origin (it can be anything). Compute and save two relative vectors to it.
 	SpaceLength<WorldSpace> const origin (math::zero);
-	_anchor_1 = loc_1.bound_transform_to_body (origin);
-	_anchor_2 = loc_2.bound_transform_to_body (origin);
-	_axis_1 = loc_1.unbound_transform_to_body (axis);
-	_axis_2 = loc_2.unbound_transform_to_body (axis);
+	_anchor_1 = pl_1.bound_transform_to_body (origin);
+	_anchor_2 = pl_2.bound_transform_to_body (origin);
+	_axis_1 = pl_1.unbound_transform_to_body (axis);
+	_axis_2 = pl_2.unbound_transform_to_body (axis);
 }
 
 
 void
 SliderPrecalculation::calculate (SliderPrecalculationData& data)
 {
-	auto const loc_1 = body_1().location();
-	auto const loc_2 = body_2().location();
+	auto const pl_1 = body_1().placement();
+	auto const pl_2 = body_2().placement();
 
-	auto const x1 = loc_1.position();
-	auto const x2 = loc_2.position();
-	auto const r1 = loc_1.unbound_transform_to_base (_anchor_1);
-	auto const r2 = loc_2.unbound_transform_to_base (_anchor_2);
+	auto const x1 = pl_1.position();
+	auto const x2 = pl_2.position();
+	auto const r1 = pl_1.unbound_transform_to_base (_anchor_1);
+	auto const r2 = pl_2.unbound_transform_to_base (_anchor_2);
 	auto const u = x2 + r2 - x1 - r1;
-	auto const a1 = loc_1.unbound_transform_to_base (_axis_1);
+	auto const a1 = pl_1.unbound_transform_to_base (_axis_1);
 	auto const distance = (~u * a1).scalar();
 	auto const z = find_non_colinear (a1);
 	auto const t1 = normalized (cross_product (a1, z));
@@ -71,7 +71,7 @@ SliderPrecalculation::calculate (SliderPrecalculationData& data)
 	data.r1uxa = ~cross_product (r1 + u, a1);
 	data.r2xa = ~cross_product (r2, a1);
 	// Angular differences:
-	data.rotation_error = _fixed_orientation.rotation_constraint_value (loc_1, loc_2);
+	data.rotation_error = _fixed_orientation.rotation_constraint_value (pl_1, pl_2);
 }
 
 } // namespace xf::rigid_body

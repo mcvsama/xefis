@@ -53,7 +53,7 @@ ImpulseSolver::evolve (si::Time const dt)
 	auto const details = update_constraint_forces (dt);
 	update_acceleration_moments();
 	update_velocity_moments (dt);
-	update_locations (dt);
+	update_placements (dt);
 	orthonormalize_rotation_matrices();
 
 	for (auto& body: _system.bodies())
@@ -73,7 +73,7 @@ ImpulseSolver::update_mass_moments()
 		auto const mass_moments = body->mass_moments<BodySpace>();
 
 		body->frame_cache().inv_M = (1.0 / mass_moments.mass()) * SpaceMatrix<double, WorldSpace> (math::unit);
-		body->frame_cache().inv_I = body->location().unbound_transform_to_base (mass_moments).inversed_moment_of_inertia();
+		body->frame_cache().inv_I = body->placement().unbound_transform_to_base (mass_moments).inversed_moment_of_inertia();
 	}
 }
 
@@ -102,8 +102,8 @@ ImpulseSolver::update_gravitational_forces (Body& b1, Body& b2)
 {
 	auto const m1 = b1.mass_moments<BodySpace>().mass();
 	auto const m2 = b2.mass_moments<BodySpace>().mass();
-	auto const c1 = b1.location().position();
-	auto const c2 = b2.location().position();
+	auto const c1 = b1.placement().position();
+	auto const c2 = b2.placement().position();
 
 	// For very short distances simulation will be inaccurate due to quantized time, and will result
 	// in one of bodies attaining unrealistically huge velocities.
@@ -241,10 +241,10 @@ ImpulseSolver::update_constraint_forces (si::Time const dt)
 AccelerationMoments<WorldSpace>
 ImpulseSolver::acceleration_moments (Body const& body, ForceMoments<WorldSpace> const& force_moments)
 {
-	auto const fm = body.location().unbound_transform_to_body (force_moments);
+	auto const fm = body.placement().unbound_transform_to_body (force_moments);
 	auto const mm = body.mass_moments<BodySpace>();
 	auto const am = AccelerationMoments<BodySpace> (fm.force() / mm.mass(), 1_rad * mm.inversed_moment_of_inertia() * fm.torque());
-	return body.location().unbound_transform_to_base (am);
+	return body.placement().unbound_transform_to_base (am);
 }
 
 
@@ -283,20 +283,20 @@ ImpulseSolver::update_velocity_moments (si::Time const dt)
 
 
 void
-ImpulseSolver::update_locations (si::Time dt)
+ImpulseSolver::update_placements (si::Time dt)
 {
 	for (auto& body: _system.bodies())
 	{
-		auto location = body->location();
+		auto placement = body->placement();
 		auto const vm = body->velocity_moments<WorldSpace>();
 		auto const ds = vm.velocity() * dt;
 		auto const dr_vec = vm.angular_velocity() * dt;
 		auto const dr = to_rotation_matrix (dr_vec);
 
-		location.translate_frame (ds);
-		location.rotate_body_frame (dr);
+		placement.translate_frame (ds);
+		placement.rotate_body_frame (dr);
 
-		body->set_location (location);
+		body->set_placement (placement);
 	}
 }
 
@@ -308,9 +308,9 @@ ImpulseSolver::orthonormalize_rotation_matrices()
 	if (!_system.bodies().empty())
 	{
 		auto& body = _system.bodies()[_processed_frames % _system.bodies().size()];
-		auto loc = body->location();
-		loc.set_body_to_base_rotation (vector_normalized (orthogonalized (loc.body_to_base_rotation())));
-		body->set_location (loc);
+		auto pl = body->placement();
+		pl.set_body_to_base_rotation (vector_normalized (orthogonalized (pl.body_to_base_rotation())));
+		body->set_placement (pl);
 	}
 }
 

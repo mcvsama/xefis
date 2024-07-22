@@ -50,10 +50,10 @@ make_iss()
 	xf::MassMoments<rigid_body::BodySpace> const iss_mass_moments (419'725_kg, math::zero, math::unit);
 
 	auto body = std::make_unique<rigid_body::Body> (iss_mass_moments);
-	auto loc = body->location();
-	loc.set_position (math::reframe<rigid_body::WorldSpace, void> (iss_ecef_position));
-	loc.set_body_to_base_rotation (math::reframe<rigid_body::WorldSpace, rigid_body::BodySpace> (iss_ecef_rotation));
-	body->set_location (loc);
+	auto pl = body->placement();
+	pl.set_position (math::reframe<rigid_body::WorldSpace, void> (iss_ecef_position));
+	pl.set_body_to_base_rotation (math::reframe<rigid_body::WorldSpace, rigid_body::BodySpace> (iss_ecef_rotation));
+	body->set_placement (pl);
 	body->set_velocity_moments (VelocityMoments<rigid_body::WorldSpace> { iss_velocity, iss_angular_velocity });
 
 	return body;
@@ -81,23 +81,23 @@ AutoTest t_1 ("rigid_body::System: 90-minute simulation of gravitational forces"
 
 	simulation.evolve (orbital_period / 4, real_time_limit);
 
-	test_asserts::verify_equal_with_epsilon ("ISS traveled 1/4 of distance", iss.location().position(), iss_position_1_of_4, interim_precision);
-	test_asserts::verify_equal_with_epsilon ("Earth didn't travel much", earth.location().position(), earth_initial_position, 1_cm);
+	test_asserts::verify_equal_with_epsilon ("ISS traveled 1/4 of distance", iss.placement().position(), iss_position_1_of_4, interim_precision);
+	test_asserts::verify_equal_with_epsilon ("Earth didn't travel much", earth.placement().position(), earth_initial_position, 1_cm);
 
 	simulation.evolve (orbital_period / 4, real_time_limit);
 
-	test_asserts::verify_equal_with_epsilon ("ISS traveled 2/4 of distance", iss.location().position(), iss_position_2_of_4, interim_precision);
-	test_asserts::verify_equal_with_epsilon ("Earth didn't travel much", earth.location().position(), earth_initial_position, 1_cm);
+	test_asserts::verify_equal_with_epsilon ("ISS traveled 2/4 of distance", iss.placement().position(), iss_position_2_of_4, interim_precision);
+	test_asserts::verify_equal_with_epsilon ("Earth didn't travel much", earth.placement().position(), earth_initial_position, 1_cm);
 
 	simulation.evolve (orbital_period / 4, real_time_limit);
 
-	test_asserts::verify_equal_with_epsilon ("ISS traveled 3/4 of distance", iss.location().position(), iss_position_3_of_4, interim_precision);
-	test_asserts::verify_equal_with_epsilon ("Earth didn't travel much", earth.location().position(), earth_initial_position, 1_cm);
+	test_asserts::verify_equal_with_epsilon ("ISS traveled 3/4 of distance", iss.placement().position(), iss_position_3_of_4, interim_precision);
+	test_asserts::verify_equal_with_epsilon ("Earth didn't travel much", earth.placement().position(), earth_initial_position, 1_cm);
 
 	simulation.evolve (orbital_period / 4, real_time_limit);
 
-	test_asserts::verify_equal_with_epsilon ("ISS is back at its original position", iss.location().position(), iss_position_4_of_4, final_precision);
-	test_asserts::verify_equal_with_epsilon ("Earth didn't travel much", earth.location().position(), earth_initial_position, 1_cm);
+	test_asserts::verify_equal_with_epsilon ("ISS is back at its original position", iss.placement().position(), iss_position_4_of_4, final_precision);
+	test_asserts::verify_equal_with_epsilon ("Earth didn't travel much", earth.placement().position(), earth_initial_position, 1_cm);
 });
 
 } // namespace

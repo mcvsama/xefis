@@ -50,11 +50,11 @@ Wing::update_external_forces (Atmosphere const* atmosphere)
 		// Rotations:
 		auto const world_to_ecef = RotationMatrix<ECEFSpace, rigid_body::WorldSpace> (math::unit);
 		auto const body_to_airfoil_spline = RotationMatrix<AirfoilSplineSpace, rigid_body::BodySpace> (math::unit);
-		auto const world_to_body = location().base_to_body_rotation();
+		auto const world_to_body = placement().base_to_body_rotation();
 		// ECEF → WorldSpace → BodySpace → AirfoilSplineSpace:
 		RotationMatrix<AirfoilSplineSpace, ECEFSpace> ecef_to_spline_transform = body_to_airfoil_spline * world_to_body * ~world_to_ecef;
 
-		auto const body_position_in_ecef = world_to_ecef * location().position();
+		auto const body_position_in_ecef = world_to_ecef * placement().position();
 		auto const body_velocity_in_ecef = world_to_ecef * velocity_moments<rigid_body::WorldSpace>().velocity();
 
 		auto ecef_air = atmosphere->air_at (body_position_in_ecef);

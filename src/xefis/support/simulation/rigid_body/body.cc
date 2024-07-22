@@ -26,7 +26,7 @@ namespace xf::rigid_body {
 void
 Body::rotate_about_center_of_mass (RotationMatrix<WorldSpace> const& rotation)
 {
-	_location.rotate_body_frame (rotation);
+	_placement.rotate_body_frame (rotation);
 	_velocity_moments = rotation * _velocity_moments;
 	_acceleration_moments = rotation * _acceleration_moments;
 
@@ -38,7 +38,7 @@ Body::rotate_about_center_of_mass (RotationMatrix<WorldSpace> const& rotation)
 void
 Body::rotate_about_world_origin (RotationMatrix<WorldSpace> const& rotation)
 {
-	_location.rotate_base_frame (rotation);
+	_placement.rotate_base_frame (rotation);
 	_velocity_moments = rotation * _velocity_moments;
 	_acceleration_moments = rotation * _acceleration_moments;
 
@@ -50,9 +50,9 @@ Body::rotate_about_world_origin (RotationMatrix<WorldSpace> const& rotation)
 void
 Body::rotate_about_body_origin (RotationMatrix<WorldSpace> const& rotation)
 {
-	auto const about_point = _location.bound_transform_to_base (_origin_position);
+	auto const about_point = _placement.bound_transform_to_base (_origin_position);
 
-	_location.rotate_base_frame_about (about_point, rotation);
+	_placement.rotate_base_frame_about (about_point, rotation);
 	_velocity_moments = rotation * _velocity_moments;
 	_acceleration_moments = rotation * _acceleration_moments;
 

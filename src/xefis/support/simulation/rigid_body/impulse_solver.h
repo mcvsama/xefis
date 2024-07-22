@@ -125,7 +125,7 @@ class ImpulseSolver: private Noncopyable
 	update_velocity_moments (si::Time dt);
 
 	void
-	update_locations (si::Time dt);
+	update_placements (si::Time dt);
 
 	void
 	orthonormalize_rotation_matrices();

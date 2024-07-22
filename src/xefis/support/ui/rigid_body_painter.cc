@@ -141,7 +141,7 @@ RigidBodyPainter::apply_camera_rotations()
 
 	if (_followed_body && _following_orientation)
 	{
-		auto const body_rotation_matrix = _followed_body->location().base_to_body_rotation();
+		auto const body_rotation_matrix = _followed_body->placement().base_to_body_rotation();
 		auto const axis = rotation_axis (body_rotation_matrix);
 		auto const angle = rotation_angle_about_matrix_axis (body_rotation_matrix, axis);
 		_gl.rotate (angle, axis[0], axis[1], axis[2]);
@@ -362,10 +362,10 @@ void
 RigidBodyPainter::paint_body (rigid_body::Body const& body)
 {
 	_gl.save_matrix ([&] {
-		auto const translation = body.location().position() - followed_body_position();
+		auto const translation = body.placement().position() - followed_body_position();
 
 		_gl.translate (translation);
-		_gl.rotate (body.location().base_to_body_rotation());
+		_gl.rotate (body.placement().base_to_body_rotation());
 
 		if (auto const& shape = body.shape())
 			_gl.draw (*shape);
@@ -387,8 +387,8 @@ RigidBodyPainter::paint_constraint (rigid_body::Constraint const& constraint)
 			auto fcorr = followed_body_position();
 			auto const& b1 = constraint.body_1();
 			auto const& b2 = constraint.body_2();
-			auto x1 = b1.location().position() - fcorr;
-			auto x2 = b2.location().position() - fcorr;
+			auto x1 = b1.placement().position() - fcorr;
+			auto x2 = b2.placement().position() - fcorr;
 
 			auto const rod_from_to = [this] (si::Length const radius, auto const& from, auto const& to, bool front_back_faces, rigid_body::ShapeMaterial const& material)
 			{
@@ -407,8 +407,8 @@ RigidBodyPainter::paint_constraint (rigid_body::Constraint const& constraint)
 
 			if (auto const* hinge = dynamic_cast<rigid_body::HingeConstraint const*> (&constraint))
 			{
-				auto const r1 = b1.location().unbound_transform_to_base (hinge->hinge_precalculation().body_1_anchor());
-				auto const r2 = b2.location().unbound_transform_to_base (hinge->hinge_precalculation().body_2_anchor());
+				auto const r1 = b1.placement().unbound_transform_to_base (hinge->hinge_precalculation().body_1_anchor());
+				auto const r2 = b2.placement().unbound_transform_to_base (hinge->hinge_precalculation().body_2_anchor());
 				auto const t1 = x1 + r1;
 				auto const t2 = x2 + r2;
 				auto const material = rigid_body::make_material (QColor (0xff, 0x99, 0x00));
@@ -453,21 +453,21 @@ RigidBodyPainter::paint_forces (rigid_body::Body const& body)
 	auto const gfm = cache.gravitational_force_moments;
 	auto const efm = cache.external_force_moments;
 	auto const fbp = followed_body_position();
-	auto const com = body.location().position() - fbp;
+	auto const com = body.placement().position() - fbp;
 
 	if (show_gravity)
 		draw_arrow (com, gfm.force() * force_to_length, rigid_body::make_material (gravity_color));
 
 	if (auto const* wing = dynamic_cast<sim::Wing const*> (&body))
 	{
-		auto const& loc = wing->location();
-		auto const at = loc.bound_transform_to_base (wing->center_of_pressure()) - fbp;
+		auto const& pl = wing->placement();
+		auto const at = pl.bound_transform_to_base (wing->center_of_pressure()) - fbp;
 
 		if (show_aerodynamic_forces)
 		{
-			draw_arrow (at, loc.unbound_transform_to_base (wing->lift_force()) * force_to_length, rigid_body::make_material (lift_color));
-			draw_arrow (at, loc.unbound_transform_to_base (wing->drag_force()) * force_to_length, rigid_body::make_material (drag_color));
-			draw_arrow (at, loc.unbound_transform_to_base (wing->pitching_moment()) * torque_to_length, rigid_body::make_material (torque_color));
+			draw_arrow (at, pl.unbound_transform_to_base (wing->lift_force()) * force_to_length, rigid_body::make_material (lift_color));
+			draw_arrow (at, pl.unbound_transform_to_base (wing->drag_force()) * force_to_length, rigid_body::make_material (drag_color));
+			draw_arrow (at, pl.unbound_transform_to_base (wing->pitching_moment()) * torque_to_length, rigid_body::make_material (torque_color));
 		}
 	}
 
@@ -483,7 +483,7 @@ RigidBodyPainter::paint_angular_velocity (rigid_body::Body const& body)
 {
 	auto const angular_velocity_to_length = 0.1_m / 1_radps; // TODO unhardcode
 	// TODO auto const& cache = body.frame_cache();
-	auto const com = body.location().position() - followed_body_position();
+	auto const com = body.placement().position() - followed_body_position();
 	auto const omega = body.velocity_moments<rigid_body::WorldSpace>().angular_velocity();
 
 	draw_arrow (com, omega * angular_velocity_to_length, rigid_body::make_material (Qt::darkMagenta));
@@ -495,10 +495,10 @@ RigidBodyPainter::paint_angular_momentum (rigid_body::Body const& body)
 {
 	auto const angular_momentum_to_length = 0.001_m / (1_kg * 1_m2 / 1_s) / 1_rad; // TODO unhardcode
 	//TODO auto const& cache = body.frame_cache();
-	auto const com = body.location().position() - followed_body_position();
+	auto const com = body.placement().position() - followed_body_position();
 	auto const I = body.mass_moments<rigid_body::BodySpace>().moment_of_inertia();
 	auto const L = I * body.velocity_moments<rigid_body::BodySpace>().angular_velocity();
-	auto const L_world = body.location().unbound_transform_to_base (L);
+	auto const L_world = body.placement().unbound_transform_to_base (L);
 
 	draw_arrow (com, L_world * angular_momentum_to_length, rigid_body::make_material (Qt::darkBlue));
 }
@@ -613,7 +613,7 @@ SpaceLength<rigid_body::WorldSpace>
 RigidBodyPainter::followed_body_position() const
 {
 	if (_followed_body)
-		return _followed_body->location().position();
+		return _followed_body->placement().position();
 	else
 		return { 0_m, 0_m, 0_m };
 }

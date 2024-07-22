@@ -41,8 +41,8 @@ AngularSpringConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const
 											   si::Time const dt) const
 {
 	auto const angle = _hinge.data().angle;
-	auto const loc_1 = Constraint::body_1().location();
-	auto const hinge = loc_1.unbound_transform_to_base (_hinge.body_1_hinge()) / abs (_hinge.body_1_hinge());
+	auto const pl_1 = Constraint::body_1().placement();
+	auto const hinge = pl_1.unbound_transform_to_base (_hinge.body_1_hinge()) / abs (_hinge.body_1_hinge());
 	// body_1_hinge() and body_2_hinge() should be equal in WorldSpace coordinates.
 
 	auto const force_moments = ForceMoments<WorldSpace> (math::zero, hinge * _spring_torque (angle, hinge, vm1, fm1, vm2, fm2, dt));
