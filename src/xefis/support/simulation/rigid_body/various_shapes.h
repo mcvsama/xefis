@@ -17,6 +17,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/aerodynamics/airfoil_spline.h>
+#include <xefis/support/math/geometry.h>
 #include <xefis/support/simulation/rigid_body/shape.h>
 #include <xefis/support/simulation/rigid_body/shape_material.h>
 #include <xefis/support/simulation/rigid_body/various_materials.h>
@@ -36,6 +37,19 @@ using MakeSphereMaterialCallback	= std::function<void (ShapeMaterial&, si::Angle
  */
 Shape
 make_cube_shape (si::Length edge_length, ShapeMaterial const& material = {});
+
+/**
+ * Make a cube of given dimensions.
+ */
+Shape
+make_cube_shape (SpaceLength<BodySpace> const& dimensions, ShapeMaterial const& material = {});
+
+/**
+ * Make cube that represents given moments of inertia. Assumes that non-diagonal
+ * elements of the inertia matrix are 0.
+ */
+Shape
+make_cube_shape (xf::MassMoments<BodySpace> const&, ShapeMaterial const& material = {});
 
 /**
  * Make sphere of given radius.

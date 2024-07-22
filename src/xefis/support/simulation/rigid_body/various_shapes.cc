@@ -36,28 +36,37 @@ namespace xf::rigid_body {
 Shape
 make_cube_shape (si::Length const edge_length, ShapeMaterial const& material)
 {
+	return make_cube_shape (SpaceLength<BodySpace> { edge_length, edge_length, edge_length }, material);
+}
+
+
+Shape
+make_cube_shape (SpaceLength<BodySpace> const& dimensions, ShapeMaterial const& material)
+{
 	Shape shape;
-	auto const h = edge_length / 2;
+	auto const x = 0.5 * dimensions[0];
+	auto const y = 0.5 * dimensions[1];
+	auto const z = 0.5 * dimensions[2];
 
 	shape.triangles() = {
 		// Front:
-		{ { +h, +h, +h }, { -h, +h, +h }, { -h, -h, +h } },
-		{ { +h, +h, +h }, { -h, -h, +h }, { +h, -h, +h } },
+		{ { +x, +y, +z }, { -x, +y, +z }, { -x, -y, +z } },
+		{ { +x, +y, +z }, { -x, -y, +z }, { +x, -y, +z } },
 		// Right:
-		{ { +h, +h, +h }, { +h, -h, +h }, { +h, -h, -h } },
-		{ { +h, +h, +h }, { +h, -h, -h }, { +h, +h, -h } },
+		{ { +x, +y, +z }, { +x, -y, +z }, { +x, -y, -z } },
+		{ { +x, +y, +z }, { +x, -y, -z }, { +x, +y, -z } },
 		// Top:
-		{ { +h, +h, +h }, { +h, +h, -h }, { -h, +h, -h } },
-		{ { +h, +h, +h }, { -h, +h, -h }, { -h, +h, +h } },
+		{ { +x, +y, +z }, { +x, +y, -z }, { -x, +y, -z } },
+		{ { +x, +y, +z }, { -x, +y, -z }, { -x, +y, +z } },
 		// Back:
-		{ { -h, -h, -h }, { +h, +h, -h }, { +h, -h, -h } },
-		{ { -h, -h, -h }, { -h, +h, -h }, { +h, +h, -h } },
+		{ { -x, -y, -z }, { +x, +y, -z }, { +x, -y, -z } },
+		{ { -x, -y, -z }, { -x, +y, -z }, { +x, +y, -z } },
 		// Left:
-		{ { -h, -h, -h }, { -h, +h, +h }, { -h, +h, -h } },
-		{ { -h, -h, -h }, { -h, -h, +h }, { -h, +h, +h } },
+		{ { -x, -y, -z }, { -x, +y, +z }, { -x, +y, -z } },
+		{ { -x, -y, -z }, { -x, -y, +z }, { -x, +y, +z } },
 		// Bottom:
-		{ { -h, -h, -h }, { +h, -h, +h }, { -h, -h, +h } },
-		{ { -h, -h, -h }, { +h, -h, -h }, { +h, -h, +h } },
+		{ { -x, -y, -z }, { +x, -y, +z }, { -x, -y, +z } },
+		{ { -x, -y, -z }, { +x, -y, -z }, { +x, -y, +z } },
 	};
 
 	auto b = shape.triangles().begin();
