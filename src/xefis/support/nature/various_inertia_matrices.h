@@ -34,7 +34,7 @@ template<class Space = void>
 		auto const i00 = mass * (1.0 / 12.0) * (square (dimensions[1]) + square (dimensions[2]));
 		auto const i11 = mass * (1.0 / 12.0) * (square (dimensions[0]) + square (dimensions[2]));
 		auto const i22 = mass * (1.0 / 12.0) * (square (dimensions[0]) + square (dimensions[1]));
-		auto const zero = 1_kg * 1_m2;
+		auto const zero = 0_kg * 0_m2;
 
 		return {
 			i00, zero, zero,
@@ -49,7 +49,7 @@ template<class Space = void>
 	make_hollow_sphere_inertia_matrix (si::Mass const& mass, si::Length const radius)
 	{
 		auto const i = mass * (2.0 / 3.0) * square (radius);
-		auto const zero = 1_kg * 1_m2;
+		auto const zero = 0_kg * 0_m2;
 
 		return {
 			i, zero, zero,
@@ -64,7 +64,7 @@ template<class Space = void>
 	make_solid_sphere_inertia_matrix (si::Mass const& mass, si::Length const radius)
 	{
 		auto const i = mass * (2.0 / 5.0) * square (radius);
-		auto const zero = 1_kg * 1_m2;
+		auto const zero = 0_kg * 0_m2;
 
 		return {
 			i, zero, zero,
@@ -84,7 +84,7 @@ template<class Space = void>
 		auto const i00 = mass * (1.0 / 12.0) * (3.0 * square (radius) + square (length));
 		auto const i11 = mass * (1.0 / 12.0) * (3.0 * square (radius) + square (length));
 		auto const i22 = mass * (1.0 / 2.0) * square (radius);
-		auto const zero = 1_kg * 1_m2;
+		auto const zero = 0_kg * 0_m2;
 
 		return {
 			i00, zero, zero,
