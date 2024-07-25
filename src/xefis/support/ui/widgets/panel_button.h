@@ -16,7 +16,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/v1/socket.h>
+#include <xefis/core/sockets/socket.h>
 #include <xefis/support/ui/widgets/panel_widget.h>
 
 // Qt:
