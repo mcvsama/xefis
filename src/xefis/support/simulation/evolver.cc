@@ -12,7 +12,7 @@
  */
 
 // Local:
-#include "simulation.h"
+#include "evolver.h"
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -23,7 +23,7 @@
 
 namespace xf {
 
-Simulation::Simulation (si::Frequency const world_frequency, Logger const& logger, Evolve const evolve):
+Evolver::Evolver (si::Frequency const world_frequency, Logger const& logger, Evolve const evolve):
 	_logger (logger),
 	_frame_dt (1 / world_frequency),
 	_evolve (evolve)
@@ -34,7 +34,7 @@ Simulation::Simulation (si::Frequency const world_frequency, Logger const& logge
 
 
 void
-Simulation::evolve (si::Time dt, si::Time real_time_limit)
+Evolver::evolve (si::Time dt, si::Time real_time_limit)
 {
 	si::Time real_time_taken = 0_s;
 
@@ -48,7 +48,7 @@ Simulation::evolve (si::Time dt, si::Time real_time_limit)
 
 		if (real_time_taken >= real_time_limit)
 		{
-			_logger << "Simulation throttled: skipping " << (_real_time - _simulation_time) << " of real time." << std::endl;
+			_logger << "Evolution throttled: skipping " << (_real_time - _simulation_time) << " of real time." << std::endl;
 			_simulation_time = _real_time;
 		}
 		else

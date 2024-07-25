@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__SUPPORT__SIMULATION__SIMULATION_H__INCLUDED
-#define XEFIS__SUPPORT__SIMULATION__SIMULATION_H__INCLUDED
+#ifndef XEFIS__SUPPORT__SIMULATION__EVOLVER_H__INCLUDED
+#define XEFIS__SUPPORT__SIMULATION__EVOLVER_H__INCLUDED
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -30,8 +30,9 @@ namespace xf {
 
 /**
  * Generic simulation. Calls provided evolution function with configured Δt.
+ * TODO rename to Evolver
  */
-class Simulation
+class Evolver
 {
   public:
 	// Evolution function called on each simulation frame:
@@ -46,12 +47,12 @@ class Simulation
 	 *			Must not be nullptr.
 	 */
 	explicit
-	Simulation (si::Frequency world_frequency, Logger const&, Evolve);
+	Evolver (si::Frequency world_frequency, Logger const&, Evolve);
 
 	// Ctor
 	explicit
-	Simulation (si::Time const frame_dt, Logger const& logger, Evolve const evolve):
-		Simulation (1 / frame_dt, logger, evolve)
+	Evolver (si::Time const frame_dt, Logger const& logger, Evolve const evolve):
+		Evolver (1 / frame_dt, logger, evolve)
 	{ }
 
 	/**

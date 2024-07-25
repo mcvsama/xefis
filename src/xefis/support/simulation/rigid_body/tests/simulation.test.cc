@@ -21,7 +21,7 @@
 #include <xefis/support/simulation/rigid_body/impulse_solver.h>
 #include <xefis/support/simulation/rigid_body/system.h>
 #include <xefis/support/simulation/rigid_body/utility.h>
-#include <xefis/support/simulation/simulation.h>
+#include <xefis/support/simulation/evolver.h>
 
 // Neutrino:
 #include <neutrino/test/auto_test.h>
@@ -77,24 +77,24 @@ AutoTest t_1 ("rigid_body::System: 90-minute simulation of gravitational forces"
 	SpaceLength<rigid_body::WorldSpace> const iss_position_3_of_4 { 0_m, 0_m, -kISSHeight };
 	SpaceLength<rigid_body::WorldSpace> const iss_position_4_of_4 { +kISSHeight, 0_m, 0_m };
 
-	auto simulation = Simulation (50_Hz, g_null_logger, [&] (si::Time const dt) { rigid_body_solver.evolve (dt); });
+	auto evolver = Evolver (50_Hz, g_null_logger, [&] (si::Time const dt) { rigid_body_solver.evolve (dt); });
 
-	simulation.evolve (orbital_period / 4, real_time_limit);
+	evolver.evolve (orbital_period / 4, real_time_limit);
 
 	test_asserts::verify_equal_with_epsilon ("ISS traveled 1/4 of distance", iss.placement().position(), iss_position_1_of_4, interim_precision);
 	test_asserts::verify_equal_with_epsilon ("Earth didn't travel much", earth.placement().position(), earth_initial_position, 1_cm);
 
-	simulation.evolve (orbital_period / 4, real_time_limit);
+	evolver.evolve (orbital_period / 4, real_time_limit);
 
 	test_asserts::verify_equal_with_epsilon ("ISS traveled 2/4 of distance", iss.placement().position(), iss_position_2_of_4, interim_precision);
 	test_asserts::verify_equal_with_epsilon ("Earth didn't travel much", earth.placement().position(), earth_initial_position, 1_cm);
 
-	simulation.evolve (orbital_period / 4, real_time_limit);
+	evolver.evolve (orbital_period / 4, real_time_limit);
 
 	test_asserts::verify_equal_with_epsilon ("ISS traveled 3/4 of distance", iss.placement().position(), iss_position_3_of_4, interim_precision);
 	test_asserts::verify_equal_with_epsilon ("Earth didn't travel much", earth.placement().position(), earth_initial_position, 1_cm);
 
-	simulation.evolve (orbital_period / 4, real_time_limit);
+	evolver.evolve (orbital_period / 4, real_time_limit);
 
 	test_asserts::verify_equal_with_epsilon ("ISS is back at its original position", iss.placement().position(), iss_position_4_of_4, final_precision);
 	test_asserts::verify_equal_with_epsilon ("Earth didn't travel much", earth.placement().position(), earth_initial_position, 1_cm);

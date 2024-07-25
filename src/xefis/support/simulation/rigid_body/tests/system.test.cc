@@ -27,7 +27,7 @@
 #include <xefis/support/simulation/rigid_body/impulse_solver.h>
 #include <xefis/support/simulation/rigid_body/utility.h>
 #include <xefis/support/simulation/rigid_body/various_shapes.h>
-#include <xefis/support/simulation/simulation.h>
+#include <xefis/support/simulation/evolver.h>
 #include <xefis/support/ui/rigid_body_viewer.h>
 
 // Neutrino:
@@ -88,7 +88,7 @@ run (rigid_body::System& system, rigid_body::Body* followed_body, std::function<
 
 	neutrino::DummyQApplication app;
 
-	Simulation simulation (1200_Hz, g_null_logger, [&] (si::Time const dt) {
+	Evolver evolver (1200_Hz, g_null_logger, [&] (si::Time const dt) {
 		if (apply_forces)
 			apply_forces (dt);
 
@@ -100,7 +100,7 @@ run (rigid_body::System& system, rigid_body::Body* followed_body, std::function<
 
 	RigidBodyViewer viewer (nullptr, 60_Hz);
 	viewer.set_rigid_body_system (&system, [&] (si::Time const dt) {
-		simulation.evolve (dt, 1_s);
+		evolver.evolve (dt, 1_s);
 	});
 	viewer.resize (QSize (50 * lh, 50 * lh));
 	viewer.set_followed (followed_body);
