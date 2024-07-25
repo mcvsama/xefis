@@ -29,19 +29,15 @@
 
 namespace xf::rigid_body {
 
-/**
- * \param	triangle
- *			An indexable sequence of three ShapeVertex objects.
- */
 Shape
-make_cube_shape (si::Length const edge_length, ShapeMaterial const& material)
+make_centered_cube_shape (si::Length const edge_length, ShapeMaterial const& material)
 {
-	return make_cube_shape (SpaceLength<BodySpace> { edge_length, edge_length, edge_length }, material);
+	return make_centered_cube_shape (SpaceLength<BodySpace> { edge_length, edge_length, edge_length }, material);
 }
 
 
 Shape
-make_cube_shape (SpaceLength<BodySpace> const& dimensions, ShapeMaterial const& material)
+make_centered_cube_shape (SpaceLength<BodySpace> const& dimensions, ShapeMaterial const& material)
 {
 	Shape shape;
 	auto const x = 0.5 * dimensions[0];
@@ -80,9 +76,9 @@ make_cube_shape (SpaceLength<BodySpace> const& dimensions, ShapeMaterial const& 
 
 
 Shape
-make_sphere_shape (si::Length const radius, size_t slices, size_t stacks,
-				   Range<si::Angle> const h_range, Range<si::Angle> const v_range,
-				   ShapeMaterial const& material, MakeSphereMaterialCallback const setup_material)
+make_centered_sphere_shape (si::Length const radius, size_t slices, size_t stacks,
+							Range<si::Angle> const h_range, Range<si::Angle> const v_range,
+							ShapeMaterial const& material, MakeSphereMaterialCallback const setup_material)
 {
 	slices = std::max<size_t> (slices, 3);
 	stacks = std::max<size_t> (stacks, 2);
@@ -329,14 +325,14 @@ make_airfoil_shape (AirfoilSpline const& spline, si::Length const chord_length, 
 Shape
 make_center_of_mass_symbol_shape (si::Length const radius, ShapeMaterial const& a, ShapeMaterial const& b)
 {
-	return make_sphere_shape (radius, 8, 8, {   0_deg,  90_deg }, { -90_deg,   0_deg }, a)
-		 + make_sphere_shape (radius, 8, 8, {   0_deg,  90_deg }, {   0_deg, +90_deg }, b)
-		 + make_sphere_shape (radius, 8, 8, {  90_deg, 180_deg }, { -90_deg,   0_deg }, b)
-		 + make_sphere_shape (radius, 8, 8, {  90_deg, 180_deg }, {   0_deg, +90_deg }, a)
-		 + make_sphere_shape (radius, 8, 8, { 180_deg, 270_deg }, { -90_deg,   0_deg }, a)
-		 + make_sphere_shape (radius, 8, 8, { 180_deg, 270_deg }, {   0_deg, +90_deg }, b)
-		 + make_sphere_shape (radius, 8, 8, { 270_deg, 360_deg }, { -90_deg,   0_deg }, b)
-		 + make_sphere_shape (radius, 8, 8, { 270_deg, 360_deg }, {   0_deg, +90_deg }, a);
+	return make_centered_sphere_shape (radius, 8, 8, {   0_deg,  90_deg }, { -90_deg,   0_deg }, a)
+		 + make_centered_sphere_shape (radius, 8, 8, {   0_deg,  90_deg }, {   0_deg, +90_deg }, b)
+		 + make_centered_sphere_shape (radius, 8, 8, {  90_deg, 180_deg }, { -90_deg,   0_deg }, b)
+		 + make_centered_sphere_shape (radius, 8, 8, {  90_deg, 180_deg }, {   0_deg, +90_deg }, a)
+		 + make_centered_sphere_shape (radius, 8, 8, { 180_deg, 270_deg }, { -90_deg,   0_deg }, a)
+		 + make_centered_sphere_shape (radius, 8, 8, { 180_deg, 270_deg }, {   0_deg, +90_deg }, b)
+		 + make_centered_sphere_shape (radius, 8, 8, { 270_deg, 360_deg }, { -90_deg,   0_deg }, b)
+		 + make_centered_sphere_shape (radius, 8, 8, { 270_deg, 360_deg }, {   0_deg, +90_deg }, a);
 }
 
 } // namespace xf::rigid_body

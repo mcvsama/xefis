@@ -243,7 +243,7 @@ RigidBodyPainter::paint_planet()
 				material.emission_color = get_intermediate_color (std::pow (norm, 1.0 + 2 * normalized_altitude), sky_color, sky_fog_color);
 			};
 
-			auto sky = rigid_body::make_sphere_shape (kEarthMeanRadius + kSkyHeight, 20, 20, { 0_deg, 360_deg }, { 60_deg, 90_deg }, sky_material, configure_material);
+			auto sky = rigid_body::make_centered_sphere_shape (kEarthMeanRadius + kSkyHeight, 20, 20, { 0_deg, 360_deg }, { 60_deg, 90_deg }, sky_material, configure_material);
 			rigid_body::negate_normals (sky);
 
 			_gl.rotate (+_position_on_earth.lon(), 0, 0, 1);
@@ -274,7 +274,7 @@ RigidBodyPainter::paint_planet()
 			// Rotate sun shines when camera angle changes:
 			_gl.rotate (_camera_angles[0] - 2 * _camera_angles[1], 0, 0, 1);
 
-			auto sun = rigid_body::make_sphere_shape (kSunRadius, 9, 36, { 0_deg, 360_deg }, { 0_deg, 90_deg }, sun_material, configure_material);
+			auto sun = rigid_body::make_centered_sphere_shape (kSunRadius, 9, 36, { 0_deg, 360_deg }, { 0_deg, 90_deg }, sun_material, configure_material);
 			rigid_body::negate_normals (sun);
 
 			glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -372,7 +372,7 @@ RigidBodyPainter::paint_body (rigid_body::Body const& body)
 		else
 		{
 			auto const edge = _mass_scale * 1_kg * std::pow (body.mass_moments<rigid_body::BodySpace>().mass() / 1_kg, 1.0 / 3);
-			_gl.draw (rigid_body::make_cube_shape (edge));
+			_gl.draw (rigid_body::make_centered_cube_shape (edge));
 		}
 	});
 }
@@ -576,7 +576,7 @@ RigidBodyPainter::paint_ecef_basis (QOpenGLPaintDevice& canvas)
 			auto const kNumFaces = 12;
 
 			// Root ball:
-			_gl.draw (rigid_body::make_sphere_shape (2 * radius, 8, 8));
+			_gl.draw (rigid_body::make_centered_sphere_shape (2 * radius, 8, 8));
 			// X axis:
 			_gl.save_matrix ([&] {
 				_gl.rotate (+90_deg, 0.0, 1.0, 0.0);

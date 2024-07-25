@@ -42,34 +42,36 @@ struct CylinderShapeParameters
 
 
 /**
- * Make a cube of given size.
+ * Make cube centered around the [0, 0, 0] point.
  */
 Shape
-make_cube_shape (si::Length edge_length, ShapeMaterial const& material = {});
+make_centered_cube_shape (si::Length edge_length, ShapeMaterial const& material = {});
 
 /**
- * Make a cube of given dimensions.
+ * Make cube centered around the [0, 0, 0] point.
  */
 Shape
-make_cube_shape (SpaceLength<BodySpace> const& dimensions, ShapeMaterial const& material = {});
+make_centered_cube_shape (SpaceLength<BodySpace> const& dimensions, ShapeMaterial const& material = {});
 
 /**
- * Make cube that represents given moments of inertia. Assumes that non-diagonal
+ * Make cube that represents given moments of inertia. Assumes that off-diagonal
  * elements of the inertia matrix are 0.
+ * The cube is centered around the [0, 0, 0] point.
  */
 Shape
-make_cube_shape (xf::MassMoments<BodySpace> const&, ShapeMaterial const& material = {});
+make_centered_cube_shape (xf::MassMoments<BodySpace> const&, ShapeMaterial const& material = {});
 
 /**
  * Make sphere of given radius.
  */
 Shape
-make_sphere_shape (si::Length radius, size_t slices, size_t stacks,
-				   Range<si::Angle> h_range = { 0_deg, 360_deg }, Range<si::Angle> v_range = { -90_deg, +90_deg },
-				   ShapeMaterial const& material = {}, MakeSphereMaterialCallback = nullptr);
+make_centered_sphere_shape (si::Length radius, size_t slices, size_t stacks,
+							Range<si::Angle> h_range = { 0_deg, 360_deg }, Range<si::Angle> v_range = { -90_deg, +90_deg },
+							ShapeMaterial const& material = {}, MakeSphereMaterialCallback = nullptr);
 
 /**
  * Make a rod shape without bottom/top faces, placed along the Z axis.
+ * The beginning of the rod is at the [0, 0, 0] position.
  */
 Shape
 make_cylinder_shape (CylinderShapeParameters const&, ShapeMaterial const& = {});
