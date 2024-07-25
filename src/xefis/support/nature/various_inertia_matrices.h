@@ -27,9 +27,22 @@
 
 namespace xf {
 
+struct MassRadius {
+	si::Mass	mass;
+	si::Length	radius;
+};
+
+
+struct MassRadiusLength {
+	si::Mass	mass;
+	si::Length	radius;
+	si::Length	length;
+};
+
+
 template<class Space = void>
 	inline SpaceMatrix<si::MomentOfInertia, Space>
-	make_cube_inertia_matrix (si::Mass const& mass, SpaceVector<si::Length> const& dimensions)
+	make_cube_inertia_tensor (si::Mass const& mass, SpaceVector<si::Length> const& dimensions)
 	{
 		auto const i00 = mass * (1.0 / 12.0) * (square (dimensions[1]) + square (dimensions[2]));
 		auto const i11 = mass * (1.0 / 12.0) * (square (dimensions[0]) + square (dimensions[2]));
@@ -46,9 +59,9 @@ template<class Space = void>
 
 template<class Space = void>
 	inline SpaceMatrix<si::MomentOfInertia, Space>
-	make_hollow_sphere_inertia_matrix (si::Mass const& mass, si::Length const radius)
+	make_hollow_sphere_inertia_tensor (MassRadius const& params)
 	{
-		auto const i = mass * (2.0 / 3.0) * square (radius);
+		auto const i = params.mass * (2.0 / 3.0) * square (params.radius);
 		auto const zero = 0_kg * 0_m2;
 
 		return {
@@ -61,9 +74,9 @@ template<class Space = void>
 
 template<class Space = void>
 	inline SpaceMatrix<si::MomentOfInertia, Space>
-	make_solid_sphere_inertia_matrix (si::Mass const& mass, si::Length const radius)
+	make_solid_sphere_inertia_tensor (MassRadius const& params)
 	{
-		auto const i = mass * (2.0 / 5.0) * square (radius);
+		auto const i = params.mass * (2.0 / 5.0) * square (params.radius);
 		auto const zero = 0_kg * 0_m2;
 
 		return {
@@ -76,14 +89,15 @@ template<class Space = void>
 
 /**
  * The cylinder is considered to have length in the Z direction.
+ * The center of mass is at [0, 0, 0] position.
  */
 template<class Space = void>
 	inline SpaceMatrix<si::MomentOfInertia, Space>
-	make_solid_cylinder_inertia_matrix (si::Mass const& mass, si::Length const radius, si::Length const length)
+	make_centered_solid_cylinder_inertia_tensor (MassRadiusLength const& params)
 	{
-		auto const i00 = mass * (1.0 / 12.0) * (3.0 * square (radius) + square (length));
-		auto const i11 = mass * (1.0 / 12.0) * (3.0 * square (radius) + square (length));
-		auto const i22 = mass * (1.0 / 2.0) * square (radius);
+		auto const i00 = params.mass * (1.0 / 12.0) * (3.0 * square (params.radius) + square (params.length));
+		auto const i11 = params.mass * (1.0 / 12.0) * (3.0 * square (params.radius) + square (params.length));
+		auto const i22 = params.mass * (1.0 / 2.0) * square (params.radius);
 		auto const zero = 0_kg * 0_m2;
 
 		return {
