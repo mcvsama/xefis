@@ -57,7 +57,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	 * Pass nullptr to disable follow.
 	 */
 	void
-	set_followed (rigid_body::Body* followed_body) noexcept
+	set_followed (rigid_body::Body const* followed_body) noexcept
 		{ _followed_body = followed_body; }
 
 	/**
@@ -83,7 +83,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	 * Can be nullptr to disable planet rendering.
 	 */
 	void
-	set_planet (rigid_body::Body* planet_body) noexcept
+	set_planet (rigid_body::Body const* planet_body) noexcept
 		{ _planet_body = planet_body; }
 
 	/**
@@ -223,9 +223,9 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	EulerAngles							_camera_angles;
 	LonLatRadius						_position_on_earth			{ 0_deg, 0_deg, 0_m };
 	GLSpace								_gl;
-	rigid_body::Body*					_followed_body				{ nullptr };
+	rigid_body::Body const*				_followed_body				{ nullptr };
 	bool								_following_orientation		{ true };
-	rigid_body::Body*					_planet_body				{ nullptr };
+	rigid_body::Body const*				_planet_body				{ nullptr };
 	bool								_constraints_visible		{ false };
 	bool								_forces_visible				{ false };
 	bool								_angular_velocities_visible	{ false };

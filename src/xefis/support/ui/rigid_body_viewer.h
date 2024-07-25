@@ -83,7 +83,7 @@ class RigidBodyViewer: public GLAnimationWidget
 	 *			May be nullptr.
 	 */
 	void
-	set_rigid_body_system (rigid_body::System*, Evolve evolve_function = {});
+	set_rigid_body_system (rigid_body::System const*, Evolve evolve_function = {});
 
 	/**
 	 * Set related machine. Used to show configurator widget when pressing Esc.
@@ -97,14 +97,14 @@ class RigidBodyViewer: public GLAnimationWidget
 	 * Calls set_followed() on internal RigidBodyPainter.
 	 */
 	void
-	set_followed (rigid_body::Body* followed_body) noexcept
+	set_followed (rigid_body::Body const* followed_body) noexcept
 		{ _rigid_body_painter.set_followed (followed_body); }
 
 	/**
 	 * Calls set_planet() on internal RigidBodyPainter.
 	 */
 	void
-	set_planet (rigid_body::Body* planet_body) noexcept
+	set_planet (rigid_body::Body const* planet_body) noexcept
 		{ _rigid_body_painter.set_planet (planet_body); }
 
 	/**
@@ -175,7 +175,7 @@ class RigidBodyViewer: public GLAnimationWidget
 
   private:
 	Machine*							_machine						{ nullptr };
-	rigid_body::System*					_rigid_body_system				{ nullptr };
+	rigid_body::System const*			_rigid_body_system				{ nullptr };
 	RigidBodyPainter					_rigid_body_painter;
 	Evolve								_evolve;
 	QPoint								_last_pos;
@@ -193,7 +193,7 @@ class RigidBodyViewer: public GLAnimationWidget
 
 
 inline void
-RigidBodyViewer::set_rigid_body_system (rigid_body::System* system, Evolve evolve)
+RigidBodyViewer::set_rigid_body_system (rigid_body::System const* system, Evolve evolve)
 {
 	_rigid_body_system = system;
 	_evolve = evolve;
