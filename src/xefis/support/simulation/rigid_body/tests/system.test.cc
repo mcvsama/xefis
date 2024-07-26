@@ -99,7 +99,8 @@ run (rigid_body::System& system, rigid_body::Body* followed_body, std::function<
 	auto const lh = neutrino::default_line_height (&w);
 
 	RigidBodyViewer viewer (nullptr, 60_Hz);
-	viewer.set_rigid_body_system (&system, [&] (si::Time const dt) {
+	viewer.set_rigid_body_system (&system);
+	viewer.set_redraw_callback ([&evolver] (si::Time const dt) {
 		evolver.evolve (dt, 1_s);
 	});
 	viewer.resize (QSize (50 * lh, 50 * lh));

@@ -45,7 +45,7 @@ class RigidBodyViewer: public GLAnimationWidget
 {
   public:
 	// Evolution function called before each display frame:
-	using Evolve = std::function<void (si::Time dt)>;
+	using OnRedraw = std::function<void (si::Time dt)>;
 	using FPSMode = GLAnimationWidget::FPSMode;
 
 	enum class Playback
@@ -83,7 +83,17 @@ class RigidBodyViewer: public GLAnimationWidget
 	 *			May be nullptr.
 	 */
 	void
-	set_rigid_body_system (rigid_body::System const*, Evolve evolve_function = {});
+	set_rigid_body_system (rigid_body::System const* system)
+		{ _rigid_body_system = system; }
+
+	/**
+	 * Set the callback to be called on each UI frame.
+	 * Use it to evolve the rigid body system.
+	 * Pass nullptr to unset.
+	 */
+	void
+	set_redraw_callback (OnRedraw const on_redraw = {})
+		{ _on_redraw = on_redraw; }
 
 	/**
 	 * Set related machine. Used to show configurator widget when pressing Esc.
@@ -110,6 +120,7 @@ class RigidBodyViewer: public GLAnimationWidget
 	/**
 	 * Return current camera position.
 	 */
+	[[nodiscard]]
 	SpaceLength<rigid_body::WorldSpace> const&
 	position() const noexcept
 		{ return _position; }
@@ -117,6 +128,7 @@ class RigidBodyViewer: public GLAnimationWidget
 	/**
 	 * Return current camera rotation about the X axis.
 	 */
+	[[nodiscard]]
 	si::Angle
 	x_angle() const noexcept
 		{ return _x_angle; }
@@ -124,6 +136,7 @@ class RigidBodyViewer: public GLAnimationWidget
 	/**
 	 * Return current camera rotation about the Y axis.
 	 */
+	[[nodiscard]]
 	si::Angle
 	y_angle() const noexcept
 		{ return _y_angle; }
@@ -132,9 +145,23 @@ class RigidBodyViewer: public GLAnimationWidget
 	 * Return true if viewer is in "paused" state
 	 * (by the spacebar key).
 	 */
+	[[nodiscard]]
 	bool
 	paused() const noexcept
 		{ return _playback == Playback::Paused; }
+
+	/**
+	 * Toggle pause.
+	 */
+	void
+	toggle_pause();
+
+	/**
+	 * Go into stepping mode of the simulation and make a single
+	 * step forward.
+	 */
+	void
+	step();
 
 	// QWidget API
 	void
@@ -163,6 +190,7 @@ class RigidBodyViewer: public GLAnimationWidget
 	/**
 	 * Return 1.0 normally or kHighPrecision value when Shift is pressed on the keyboard.
 	 */
+	[[nodiscard]]
 	float
 	precision()
 		{ return (QGuiApplication::queryKeyboardModifiers() & Qt::ShiftModifier) ? kHighPrecision : 1.0; }
@@ -177,7 +205,7 @@ class RigidBodyViewer: public GLAnimationWidget
 	Machine*							_machine						{ nullptr };
 	rigid_body::System const*			_rigid_body_system				{ nullptr };
 	RigidBodyPainter					_rigid_body_painter;
-	Evolve								_evolve;
+	OnRedraw							_on_redraw;
 	QPoint								_last_pos;
 	bool								_changing_rotation: 1			{ false };
 	bool								_changing_translation: 1		{ false };
@@ -190,14 +218,6 @@ class RigidBodyViewer: public GLAnimationWidget
 	si::Angle							_x_angle						{ kDefaultXAngle };
 	si::Angle							_y_angle						{ kDefaultYAngle };
 };
-
-
-inline void
-RigidBodyViewer::set_rigid_body_system (rigid_body::System const* system, Evolve evolve)
-{
-	_rigid_body_system = system;
-	_evolve = evolve;
-}
 
 } // namespace xf
 

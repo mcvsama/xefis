@@ -49,6 +49,40 @@ RigidBodyViewer::RigidBodyViewer (QWidget* parent, RefreshRate const refresh_rat
 
 
 void
+RigidBodyViewer::toggle_pause()
+{
+	switch (_playback)
+	{
+		case Playback::Paused:
+		case Playback::Stepping:
+			_playback = Playback::Running;
+			break;
+
+		case Playback::Running:
+			_playback = Playback::Paused;
+			break;
+	}
+}
+
+
+void
+RigidBodyViewer::step()
+{
+	switch (_playback)
+	{
+		case Playback::Paused:
+		case Playback::Stepping:
+			_playback = Playback::Stepping;
+			break;
+
+		case Playback::Running:
+			_playback = Playback::Paused;
+			break;
+	}
+}
+
+
+void
 RigidBodyViewer::mousePressEvent (QMouseEvent* event)
 {
 	switch (event->button())
@@ -149,40 +183,16 @@ void
 RigidBodyViewer::keyPressEvent (QKeyEvent* event)
 {
 	if (event->key() == Qt::Key_Space)
-	{
-		switch (_playback)
-		{
-			case Playback::Paused:
-			case Playback::Stepping:
-				_playback = Playback::Running;
-				break;
-
-			case Playback::Running:
-				_playback = Playback::Paused;
-				break;
-		}
-	}
+		toggle_pause();
 	else if (event->key() == Qt::Key_Period)
-	{
-		switch (_playback)
-		{
-			case Playback::Paused:
-			case Playback::Stepping:
-				_playback = Playback::Stepping;
-				break;
-
-			case Playback::Running:
-				_playback = Playback::Paused;
-				break;
-		}
-	}
+		step();
 }
 
 
 void
 RigidBodyViewer::draw (QOpenGLPaintDevice& canvas)
 {
-	if (_evolve)
+	if (_on_redraw)
 	{
 		switch (_playback)
 		{
@@ -193,7 +203,7 @@ RigidBodyViewer::draw (QOpenGLPaintDevice& canvas)
 				_playback = Playback::Paused;
 				[[fallthrough]];
 			case Playback::Running:
-				_evolve (1 / refresh_rate());
+				_on_redraw (1 / refresh_rate());
 				break;
 		}
 	}
