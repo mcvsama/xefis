@@ -77,7 +77,7 @@ AutoTest t_1 ("rigid_body::System: 90-minute simulation of gravitational forces"
 	SpaceLength<rigid_body::WorldSpace> const iss_position_3_of_4 { 0_m, 0_m, -kISSHeight };
 	SpaceLength<rigid_body::WorldSpace> const iss_position_4_of_4 { +kISSHeight, 0_m, 0_m };
 
-	auto evolver = Evolver (50_Hz, g_null_logger, [&] (si::Time const dt) { rigid_body_solver.evolve (dt); });
+	auto evolver = Evolver (1 / 50_Hz, g_null_logger, [&] (si::Time const dt) { rigid_body_solver.evolve (dt); });
 
 	evolver.evolve (orbital_period / 4, real_time_limit);
 

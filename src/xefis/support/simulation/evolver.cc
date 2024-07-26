@@ -23,9 +23,9 @@
 
 namespace xf {
 
-Evolver::Evolver (si::Frequency const world_frequency, Logger const& logger, Evolve const evolve):
+Evolver::Evolver (si::Time const time_step, Logger const& logger, Evolve const evolve):
 	_logger (logger),
-	_frame_dt (1 / world_frequency),
+	_time_step (time_step),
 	_evolve (evolve)
 {
 	if (!_evolve)
@@ -34,16 +34,16 @@ Evolver::Evolver (si::Frequency const world_frequency, Logger const& logger, Evo
 
 
 void
-Evolver::evolve (si::Time dt, si::Time real_time_limit)
+Evolver::evolve (si::Time const simulation_time, si::Time const real_time_limit)
 {
 	si::Time real_time_taken = 0_s;
 
-	_real_time += dt;
+	_real_time += simulation_time;
 
 	while (_simulation_time < _real_time)
 	{
 		real_time_taken += TimeHelper::measure ([&] {
-			_evolve (_frame_dt);
+			_evolve (_time_step);
 		});
 
 		if (real_time_taken >= real_time_limit)
@@ -52,7 +52,7 @@ Evolver::evolve (si::Time dt, si::Time real_time_limit)
 			_simulation_time = _real_time;
 		}
 		else
-			_simulation_time += _frame_dt;
+			_simulation_time += _time_step;
 	}
 }
 

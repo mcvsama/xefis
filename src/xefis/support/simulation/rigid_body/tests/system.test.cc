@@ -88,7 +88,7 @@ run (rigid_body::System& system, rigid_body::Body* followed_body, std::function<
 
 	neutrino::DummyQApplication app;
 
-	Evolver evolver (1200_Hz, g_null_logger, [&] (si::Time const dt) {
+	Evolver evolver (1_ms, g_null_logger, [&] (si::Time const dt) {
 		if (apply_forces)
 			apply_forces (dt);
 

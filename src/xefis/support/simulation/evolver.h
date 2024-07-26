@@ -1,6 +1,6 @@
 /* vim:ts=4
  *
- * Copyleft 2019  Michał Gawron
+ * Copyleft 2024  Michał Gawron
  * Marduk Unix Labs, http://mulabs.org/
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,7 +16,6 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/support/nature/force_moments.h>
 
 // Neutrino:
 #include <neutrino/logger.h>
@@ -28,15 +27,23 @@
 
 namespace xf {
 
+struct EvolveParameters
+{
+	si::Time	time_step;
+	si::Time	real_time_limit;
+};
+
+
 /**
- * Generic simulation. Calls provided evolution function with configured Δt.
- * TODO rename to Evolver
+ * Helper for evolving simulations with configured time step.
+ * With configured time step 1_ms if we call evolve (1_s),
+ * it will cause evolution of 1000 frames.
  */
 class Evolver
 {
   public:
 	// Evolution function called on each simulation frame:
-	using Evolve = std::function<void (si::Time dt)>;
+	using Evolve = std::function<void (si::Time time_step)>;
 
   public:
 	/**
@@ -47,43 +54,22 @@ class Evolver
 	 *			Must not be nullptr.
 	 */
 	explicit
-	Evolver (si::Frequency world_frequency, Logger const&, Evolve);
-
-	// Ctor
-	explicit
-	Evolver (si::Time const frame_dt, Logger const& logger, Evolve const evolve):
-		Evolver (1 / frame_dt, logger, evolve)
-	{ }
+	Evolver (si::Time time_step, Logger const&, Evolve);
 
 	/**
 	 * Return current simulation frame Δt.
 	 */
 	[[nodiscard]]
 	si::Time
-	frame_dt() const noexcept
-		{ return _frame_dt; }
+	time_step() const noexcept
+		{ return _time_step; }
 
 	/**
 	 * Set new simulation frame Δt.
 	 */
 	void
-	set_frame_dt (si::Time const dt) noexcept
-		{ _frame_dt = dt; }
-
-	/**
-	 * Return current world frequency (equivalent to `1 / frame_dt()`).
-	 */
-	[[nodiscard]]
-	si::Frequency
-	world_frequency() const noexcept
-		{ return 1 / _frame_dt; }
-
-	/**
-	 * Set new world frequency (equivalent to `set_frame_dt (1 / frequency)`).
-	 */
-	void
-	set_world_frequency (si::Frequency const frequency)
-		{ _frame_dt = 1 / frequency; }
+	set_time_step (si::Time const dt) noexcept
+		{ _time_step = dt; }
 
 	/**
 	 * Return integrated simulation time.
@@ -92,29 +78,21 @@ class Evolver
 	 */
 	[[nodiscard]]
 	si::Time
-	time() const noexcept
+	simulation_time() const noexcept
 		{ return _simulation_time; }
-
-	/**
-	 * Return integrated real time (sum of Δt passed to evolve()).
-	 */
-	[[nodiscard]]
-	si::Time
-	real_time() const noexcept
-		{ return _real_time; }
 
 	/**
 	 * Evolve the rigid body system by given dt. Multiple evolve() calls will be made on the System.
 	 */
 	void
-	evolve (si::Time dt, si::Time real_time_limit);
+	evolve (si::Time simulation_time, si::Time real_time_limit);
 
   private:
 	xf::Logger	_logger;
+	si::Time	_time_step;
+	Evolve		_evolve;
 	si::Time	_real_time			{ 0_s };
 	si::Time	_simulation_time	{ 0_s };
-	si::Time	_frame_dt;
-	Evolve		_evolve;
 };
 
 } // namespace xf
