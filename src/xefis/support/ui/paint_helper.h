@@ -58,6 +58,13 @@ class PaintHelper
 	em_pixels (float ems = 1.0f) const;
 
 	/**
+	 * Like em_pixels(), but rounds to integers.
+	 */
+	int
+	em_pixels_int (float ems = 1.0f) const
+		{ return static_cast<int> (0.5 + em_pixels (ems)); }
+
+	/**
 	 * Setup painter with antialiasing and other typical features used in Xefis.
 	 */
 	static void

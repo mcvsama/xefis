@@ -38,6 +38,7 @@
 #include <memory>
 #include <mutex>
 #include <optional>
+#include <string>
 
 
 namespace xf::rigid_body {
@@ -91,6 +92,15 @@ class Body: public Noncopyable
 	// Dtor
 	virtual
 	~Body() = default;
+
+	[[nodiscard]]
+	std::string const&
+	label() const noexcept
+		{ return _label; }
+
+	void
+	set_label (std::string const& label)
+		{ _label = label; }
 
 	/**
 	 * Return mass moments at center-of-mass.
@@ -379,6 +389,7 @@ class Body: public Noncopyable
 	{ }
 
   private:
+	std::string												_label;
 	MassMoments<BodySpace>									_mass_moments;
 	mutable std::optional<MassMoments<WorldSpace>>			_world_space_mass_moments;
 	SpaceLength<BodySpace>									_saved_center_of_mass;

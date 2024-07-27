@@ -21,11 +21,12 @@
 #include <xefis/support/ui/paint_helper.h>
 
 // Qt:
-#include <QGridLayout>
 #include <QLabel>
+#include <QLayout>
 #include <QPushButton>
 #include <QSizePolicy>
 #include <QShortcut>
+#include <QSplitter>
 
 // Standard:
 #include <cstddef>
@@ -38,7 +39,27 @@ SimulatorWidget::SimulatorWidget (Simulator& simulator, QWidget* parent):
 	_simulator (simulator)
 {
 	setWindowTitle("Xefis simulator");
+	auto const ph = PaintHelper (*this, palette(), font());
 
+	auto* splitter = new QSplitter (this);
+	splitter->addWidget (make_viewer_widget());
+	splitter->addWidget (make_body_controls());
+	splitter->setHandleWidth (ph.em_pixels (0.5));
+	splitter->setStretchFactor (0, 4);
+	splitter->setStretchFactor (1, 2);
+	splitter->setSizes ({ ph.em_pixels_int (40), ph.em_pixels_int (20) });
+
+	auto* layout = new QVBoxLayout (this);
+	layout->addWidget (make_simulation_controls());
+	layout->addWidget (splitter);
+
+	resize (QSize (ph.em_pixels (70.0), ph.em_pixels (50.0)));
+}
+
+
+QWidget*
+SimulatorWidget::make_viewer_widget()
+{
 	_rigid_body_viewer.emplace (this, RigidBodyViewer::AutoFPS);
 	_rigid_body_viewer->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Expanding);
 	_rigid_body_viewer->set_rigid_body_system (&_simulator.rigid_body_system());
@@ -46,23 +67,32 @@ SimulatorWidget::SimulatorWidget (Simulator& simulator, QWidget* parent):
 		_simulator.evolve (frame_time, 100_ms);
 	});
 
-	auto* sim_controls = new QWidget (this);
-	sim_controls->setSizePolicy (QSizePolicy::Fixed, QSizePolicy::Fixed);
-
 	auto* viewer_frame = new QFrame (this);
 	viewer_frame->setFrameStyle (QFrame::StyledPanel | QFrame::Sunken);
+	viewer_frame->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Expanding);
+	viewer_frame->resize (QSize (3, 2));
 
-	auto* body_controls = new QLabel ("body controls", this);
-	sim_controls->setSizePolicy (QSizePolicy::Fixed, QSizePolicy::Fixed);
+	auto* layout = new QHBoxLayout (viewer_frame);
+	layout->addWidget (&*_rigid_body_viewer);
+	layout->setMargin (0);
 
+	return viewer_frame;
+}
+
+
+QWidget*
+SimulatorWidget::make_simulation_controls()
+{
 	auto* start_stop_sim_button = new QPushButton ("Start/stop simulation", this);
 	QObject::connect (start_stop_sim_button, &QPushButton::pressed, [this] {
-		_rigid_body_viewer->toggle_pause();
+		if (_rigid_body_viewer)
+			_rigid_body_viewer->toggle_pause();
 	});
 
 	auto* step_sim_button = new QPushButton ("Single step", this);
 	QObject::connect (step_sim_button, &QPushButton::pressed, [this] {
-		_rigid_body_viewer->step();
+		if (_rigid_body_viewer)
+			_rigid_body_viewer->step();
 	});
 
 	auto* show_configurator_button = new QPushButton ("Show machine config", this);
@@ -71,23 +101,58 @@ SimulatorWidget::SimulatorWidget (Simulator& simulator, QWidget* parent):
 			_machine->show_configurator();
 	});
 
-	auto* sim_controls_layout = new QHBoxLayout (sim_controls);
-	sim_controls_layout->setMargin (0);
-	sim_controls_layout->addWidget (start_stop_sim_button);
-	sim_controls_layout->addWidget (step_sim_button);
-	sim_controls_layout->addWidget (show_configurator_button);
+	auto* sim_controls = new QWidget (this);
+	sim_controls->setSizePolicy (QSizePolicy::Fixed, QSizePolicy::Fixed);
 
-	auto* viewer_frame_layout = new QHBoxLayout (viewer_frame);
-	viewer_frame_layout->addWidget (&*_rigid_body_viewer);
-	viewer_frame_layout->setMargin (0);
+	auto* layout = new QHBoxLayout (sim_controls);
+	layout->setMargin (0);
+	layout->addWidget (start_stop_sim_button);
+	layout->addWidget (step_sim_button);
+	layout->addWidget (show_configurator_button);
 
-	auto grid_layout = new QGridLayout (this);
-	grid_layout->addWidget (sim_controls, 0, 0, 1, 2);
-	grid_layout->addWidget (viewer_frame, 1, 0);
-	grid_layout->addWidget (body_controls, 1, 1);
+	return sim_controls;
+}
 
-	auto const ph = PaintHelper (*this, palette(), font());
-	resize (QSize (ph.em_pixels (80.0), ph.em_pixels (50.0)));
+
+QWidget*
+SimulatorWidget::make_body_controls()
+{
+	auto* bodies_tree = new QTreeWidget (this);
+	bodies_tree->setSizePolicy (QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+	bodies_tree->sortByColumn (0, Qt::AscendingOrder);
+	bodies_tree->setSortingEnabled (true);
+	bodies_tree->setSelectionMode (QTreeWidget::SingleSelection);
+	bodies_tree->setRootIsDecorated (true);
+	bodies_tree->setAllColumnsShowFocus (true);
+	bodies_tree->setAcceptDrops (false);
+	bodies_tree->setAutoScroll (true);
+	bodies_tree->setVerticalScrollMode (QAbstractItemView::ScrollPerPixel);
+	bodies_tree->setContextMenuPolicy (Qt::CustomContextMenu); // TODO?
+	bodies_tree->setHeaderLabels ({ "Body" });
+	populate_with_bodies_and_constraints (*bodies_tree, _simulator.rigid_body_system());
+
+	auto* body_controls = new QWidget (this);
+	body_controls->setSizePolicy (QSizePolicy::Fixed, QSizePolicy::Expanding);
+	body_controls->resize (QSize (1, 1));
+
+	auto* layout = new QHBoxLayout (body_controls);
+	layout->setMargin (0);
+	layout->addWidget (bodies_tree);
+	layout->addWidget (new QLabel ("body controls", this));
+
+	return body_controls;
+}
+
+
+void
+SimulatorWidget::populate_with_bodies_and_constraints (QTreeWidget& tree, rigid_body::System& system)
+{
+	tree.clear(); // TODO instead of clearing, update it
+
+	for (auto const& body: system.bodies())
+	{
+		auto* item = new QTreeWidgetItem (&tree, QStringList (QString::fromStdString (body->label())));
+	}
 }
 
 } // namespace xf

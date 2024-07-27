@@ -68,6 +68,14 @@ class Simulator: public Noncopyable
 		{ return _rigid_body_system; }
 
 	/**
+	 * Return rigid body system that's being simulated.
+	 */
+	[[nodiscard]]
+	rigid_body::System&
+	rigid_body_system() noexcept
+		{ return _rigid_body_system; }
+
+	/**
 	 * Evolve the rigid body system by given dt. Multiple evolve() calls will be made on the System.
 	 */
 	void

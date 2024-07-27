@@ -76,6 +76,22 @@ class SimulatorWidget: public QWidget
 		{ _rigid_body_viewer->set_redraw_callback (on_redraw); }
 
   private:
+	[[nodiscard]]
+	QWidget*
+	make_viewer_widget();
+
+	[[nodiscard]]
+	QWidget*
+	make_simulation_controls();
+
+	[[nodiscard]]
+	QWidget*
+	make_body_controls();
+
+	void
+	populate_with_bodies_and_constraints (QTreeWidget&, rigid_body::System&);
+
+  private:
 	Machine*						_machine { nullptr };
 	Simulator&						_simulator;
 	std::optional<RigidBodyViewer>	_rigid_body_viewer;
