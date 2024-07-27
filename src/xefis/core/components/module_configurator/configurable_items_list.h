@@ -30,9 +30,7 @@
 #include <cstddef>
 
 
-// TODO Fix this to xf::configurator when Qt MOC parsing bugs get fixed
-namespace xf {
-namespace configurator {
+namespace xf::configurator {
 
 class ConfigurableItemsList: public QWidget
 {
@@ -104,8 +102,7 @@ class ConfigurableItemsList: public QWidget
 	std::vector<Module*>			_tmp_module_ptrs;
 };
 
-} // namespce configurator
-} // namespace xf
+} // namespce xf::configurator
 
 #endif
 
