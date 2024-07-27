@@ -85,6 +85,7 @@ namespace xf::resources {
 		XEFIS_CONFIG_HAS_ICON_16 (led_white_on, "led-white-on.png")
 		XEFIS_CONFIG_HAS_ICON_16 (led_blue_on, "led-blue-on.png")
 		XEFIS_CONFIG_HAS_ICON_16 (led_off, "led-off.png")
+		XEFIS_CONFIG_HAS_ICON_16 (followed_body, "followed-body.png")
 
 #undef XEFIS_CONFIG_HAS_ICON_16
 	} // namespace icons16

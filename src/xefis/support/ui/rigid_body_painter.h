@@ -57,8 +57,16 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	 * Pass nullptr to disable follow.
 	 */
 	void
-	set_followed (rigid_body::Body const* followed_body) noexcept
+	set_followed_body (rigid_body::Body const* followed_body) noexcept
 		{ _followed_body = followed_body; }
+
+	/**
+	 * Return a followed body, if set, or nullptr.
+	 */
+	[[nodiscard]]
+	rigid_body::Body const*
+	followed_body() const noexcept
+		{ return _followed_body; }
 
 	/**
 	 * Enable camera orientation following the main body.

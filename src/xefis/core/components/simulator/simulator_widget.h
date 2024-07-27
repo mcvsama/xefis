@@ -58,8 +58,8 @@ class SimulatorWidget: public QWidget
 	 * Sets the followed body in the internal RigidBodyViewer.
 	 */
 	void
-	set_followed (rigid_body::Body const* followed_body) noexcept
-		{ _rigid_body_viewer->set_followed (followed_body); }
+	set_followed_body (rigid_body::Body const* followed_body) noexcept
+		{ _rigid_body_viewer->set_followed_body (followed_body); }
 
 	/**
 	 * Sets the planet body in the internal RigidBodyViewer.
@@ -95,6 +95,7 @@ class SimulatorWidget: public QWidget
 	Machine*						_machine { nullptr };
 	Simulator&						_simulator;
 	std::optional<RigidBodyViewer>	_rigid_body_viewer;
+	QIcon							_followed_body_icon;
 };
 
 

@@ -104,7 +104,7 @@ run (rigid_body::System& system, rigid_body::Body* followed_body, std::function<
 		evolver.evolve (dt, 1_s);
 	});
 	viewer.resize (QSize (50 * lh, 50 * lh));
-	viewer.set_followed (followed_body);
+	viewer.set_followed_body (followed_body);
 	viewer.show();
 
 	app->exec();

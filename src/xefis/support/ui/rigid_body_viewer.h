@@ -104,11 +104,19 @@ class RigidBodyViewer: public GLAnimationWidget
 		{ _machine = machine; }
 
 	/**
-	 * Calls set_followed() on internal RigidBodyPainter.
+	 * Calls set_followed_body() on internal RigidBodyPainter.
 	 */
 	void
-	set_followed (rigid_body::Body const* followed_body) noexcept
-		{ _rigid_body_painter.set_followed (followed_body); }
+	set_followed_body (rigid_body::Body const* followed_body) noexcept
+		{ _rigid_body_painter.set_followed_body (followed_body); }
+
+	/**
+	 * Return followed_body() from internal RigidBodyPainter.
+	 */
+	[[nodiscard]]
+	rigid_body::Body const*
+	followed_body() const noexcept
+		{ return _rigid_body_painter.followed_body(); }
 
 	/**
 	 * Calls set_planet() on internal RigidBodyPainter.
