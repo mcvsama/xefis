@@ -1,6 +1,6 @@
 /* vim:ts=4
  *
- * Copyleft 2019  Michał Gawron
+ * Copyleft 2024  Michał Gawron
  * Marduk Unix Labs, http://mulabs.org/
  *
  * This program is free software: you can redistribute it and/or modify
@@ -12,6 +12,7 @@
  */
 
 // Local:
+#include "bodies_tree.h"
 #include "simulator_widget.h"
 
 // Xefis:
@@ -130,19 +131,7 @@ SimulatorWidget::make_simulation_controls()
 QWidget*
 SimulatorWidget::make_body_controls()
 {
-	auto* bodies_tree = new QTreeWidget (this);
-	bodies_tree->setSizePolicy (QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
-	bodies_tree->sortByColumn (0, Qt::AscendingOrder);
-	bodies_tree->setSortingEnabled (true);
-	bodies_tree->setSelectionMode (QTreeWidget::SingleSelection);
-	bodies_tree->setRootIsDecorated (true);
-	bodies_tree->setAllColumnsShowFocus (true);
-	bodies_tree->setAcceptDrops (false);
-	bodies_tree->setAutoScroll (true);
-	bodies_tree->setVerticalScrollMode (QAbstractItemView::ScrollPerPixel);
-	bodies_tree->setContextMenuPolicy (Qt::CustomContextMenu); // TODO?
-	bodies_tree->setHeaderLabels ({ "Body" });
-	populate_with_bodies_and_constraints (*bodies_tree, _simulator.rigid_body_system());
+	_bodies_tree = new BodiesTree (this, _simulator.rigid_body_system(), *_rigid_body_viewer);
 
 	auto* body_controls = new QWidget (this);
 	body_controls->setSizePolicy (QSizePolicy::Fixed, QSizePolicy::Expanding);
@@ -150,22 +139,10 @@ SimulatorWidget::make_body_controls()
 
 	auto* layout = new QHBoxLayout (body_controls);
 	layout->setMargin (0);
-	layout->addWidget (bodies_tree);
+	layout->addWidget (_bodies_tree);
 	layout->addWidget (new QLabel ("body controls", this));
 
 	return body_controls;
-}
-
-
-void
-SimulatorWidget::populate_with_bodies_and_constraints (QTreeWidget& tree, rigid_body::System& system)
-{
-	tree.clear(); // TODO instead of clearing, update it
-
-	for (auto const& body: system.bodies())
-	{
-		auto* item = new QTreeWidgetItem (&tree, QStringList (QString::fromStdString (body->label())));
-	}
 }
 
 } // namespace xf

@@ -11,13 +11,17 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__SUPPORT__UI__SIMULATOR_WIDGET_H__INCLUDED
-#define XEFIS__SUPPORT__UI__SIMULATOR_WIDGET_H__INCLUDED
+#ifndef XEFIS__CORE__COMPONENTS__SIMULATOR__SIMULATOR_WIDGET_H__INCLUDED
+#define XEFIS__CORE__COMPONENTS__SIMULATOR__SIMULATOR_WIDGET_H__INCLUDED
+
+// Local:
+#include "bodies_tree.h"
 
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/simulation/rigid_body/system.h>
 #include <xefis/support/simulation/evolver.h>
+#include <xefis/support/simulation/simulator.h>
 #include <xefis/support/ui/rigid_body_viewer.h>
 
 // Qt:
@@ -59,8 +63,7 @@ class SimulatorWidget: public QWidget
 	 * Sets the followed body in the internal RigidBodyViewer.
 	 */
 	void
-	set_followed_body (rigid_body::Body const* followed_body) noexcept
-		{ _rigid_body_viewer->set_followed_body (followed_body); }
+	set_followed_body (rigid_body::Body const* followed_body) noexcept;
 
 	/**
 	 * Sets the planet body in the internal RigidBodyViewer.
@@ -90,15 +93,15 @@ class SimulatorWidget: public QWidget
 	make_body_controls();
 
 	void
-	populate_with_bodies_and_constraints (QTreeWidget&, rigid_body::System&);
+	toggle_pause();
 
   private:
 	Machine*						_machine				{ nullptr };
 	Simulator&						_simulator;
 	std::optional<RigidBodyViewer>	_rigid_body_viewer;
+	BodiesTree*						_bodies_tree			{ nullptr };
 	QIcon							_start_icon				{ resources::icons16::start() };
 	QIcon							_pause_icon				{ resources::icons16::pause() };
-	QIcon							_followed_body_icon;
 };
 
 
@@ -107,6 +110,14 @@ SimulatorWidget::set_machine (Machine* const machine)
 {
 	_machine = machine;
 	_rigid_body_viewer->set_machine (machine);
+}
+
+
+inline void
+SimulatorWidget::set_followed_body (rigid_body::Body const* followed_body) noexcept
+{
+	_rigid_body_viewer->set_followed_body (followed_body);
+	_bodies_tree->refresh();
 }
 
 } // namespace xf

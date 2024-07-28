@@ -92,6 +92,7 @@ namespace xf::resources {
 		XEFIS_CONFIG_HAS_ICON_16 (gravitating_body, "gravitating-body.png")
 		XEFIS_CONFIG_HAS_ICON_16 (followed_body, "followed-body.png")
 		XEFIS_CONFIG_HAS_ICON_16 (followed_gravitating_body, "followed-gravitating-body.png")
+		XEFIS_CONFIG_HAS_ICON_16 (constraint, "constraint.png")
 
 #undef XEFIS_CONFIG_HAS_ICON_16
 	} // namespace icons16
