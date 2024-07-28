@@ -28,7 +28,9 @@ namespace xf::rigid_body {
 SliderConstraint::SliderConstraint (SliderPrecalculation& slider_precalculation):
 	Constraint (slider_precalculation),
 	_slider_precalculation (slider_precalculation)
-{ }
+{
+	set_label ("slider");
+}
 
 
 ConstraintForces

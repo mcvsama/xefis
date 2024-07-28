@@ -28,7 +28,9 @@ AngularLimitsConstraint::AngularLimitsConstraint (HingePrecalculation& hinge_pre
 	_hinge_precalculation (hinge_precalculation),
 	_min_angle (min_angle),
 	_max_angle (max_angle)
-{ }
+{
+	set_label ("angular limits");
+}
 
 
 AngularLimitsConstraint::AngularLimitsConstraint (HingePrecalculation& hinge_precalculation, Range<si::Angle> const range):

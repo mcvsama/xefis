@@ -25,7 +25,9 @@ AngularMotorConstraint::AngularMotorConstraint (HingePrecalculation& hinge_preca
 	_hinge_precalculation (hinge_precalculation),
 	_max_angular_velocity (max_angular_velocity),
 	_force (abs (torque / 1_m))
-{ }
+{
+	set_label ("angular motor");
+}
 
 
 ConstraintForces

@@ -44,6 +44,7 @@ AngularServoConstraint::AngularServoConstraint (HingePrecalculation& hinge_preca
 	_torque_potential (torque_potential),
 	_motor_constraint (hinge_precalculation)
 {
+	set_label ("angular servo");
 	_pid_controller.set_integral_limit ({ -0.1_deg * 1_s, +0.1_deg * 1_s });
 	_pid_controller.set_output_limit ({ -1.0, +1.0 });
 }

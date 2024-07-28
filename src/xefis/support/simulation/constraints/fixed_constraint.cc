@@ -28,6 +28,7 @@ FixedConstraint::FixedConstraint (Body& body_1, Body& body_2):
 	Constraint (body_1, body_2),
 	_fixed_orientation (body_1.placement(), body_2.placement())
 {
+	set_label ("fixed constraint");
 	SpaceLength<WorldSpace> const origin (math::zero);
 	_anchor_1 = body_1.placement().bound_transform_to_body (origin);
 	_anchor_2 = body_2.placement().bound_transform_to_body (origin);

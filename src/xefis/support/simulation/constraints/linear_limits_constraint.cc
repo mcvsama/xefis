@@ -28,7 +28,9 @@ LinearLimitsConstraint::LinearLimitsConstraint (SliderPrecalculation& slider_pre
 	_slider_precalculation (slider_precalculation),
 	_min_distance (min_distance),
 	_max_distance (max_distance)
-{ }
+{
+	set_label ("linear limits");
+}
 
 
 LinearLimitsConstraint::LinearLimitsConstraint (SliderPrecalculation& slider_precalculation, Range<si::Length> const range):

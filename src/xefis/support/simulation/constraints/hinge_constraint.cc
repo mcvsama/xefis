@@ -28,7 +28,9 @@ namespace xf::rigid_body {
 HingeConstraint::HingeConstraint (HingePrecalculation& hinge_precalculation):
 	Constraint (hinge_precalculation),
 	_hinge_precalculation (hinge_precalculation)
-{ }
+{
+	set_label ("hinge");
+}
 
 
 ConstraintForces

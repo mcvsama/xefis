@@ -82,6 +82,15 @@ class Constraint: public ConnectedBodies
 	explicit
 	Constraint (ConnectedBodies const&);
 
+	[[nodiscard]]
+	std::string const&
+	label() const noexcept
+		{ return _label; }
+
+	void
+	set_label (std::string const& label)
+		{ _label = label; }
+
 	/**
 	 * Return true if constraint is enabled.
 	 * Constraint is enabled by default.
@@ -275,6 +284,7 @@ class Constraint: public ConnectedBodies
 					 JacobianW<N> const& Jw2) const;
 
   private:
+	std::string					_label;
 	bool						_enabled			{ true };
 	bool						_broken				{ false };
 	std::optional<si::Force>	_breaking_force;

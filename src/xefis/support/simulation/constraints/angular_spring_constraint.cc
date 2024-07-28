@@ -32,7 +32,9 @@ AngularSpringConstraint::AngularSpringConstraint (HingePrecalculation& hinge, Sp
 	Constraint (hinge),
 	_hinge (hinge),
 	_spring_torque (spring_torque)
-{ }
+{
+	set_label ("angular spring");
+}
 
 
 ConstraintForces
