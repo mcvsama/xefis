@@ -89,7 +89,9 @@ namespace xf::resources {
 		XEFIS_CONFIG_HAS_ICON_16 (led_blue_on, "led-blue-on.png")
 		XEFIS_CONFIG_HAS_ICON_16 (led_off, "led-off.png")
 		XEFIS_CONFIG_HAS_ICON_16 (body, "body.png")
+		XEFIS_CONFIG_HAS_ICON_16 (gravitating_body, "gravitating-body.png")
 		XEFIS_CONFIG_HAS_ICON_16 (followed_body, "followed-body.png")
+		XEFIS_CONFIG_HAS_ICON_16 (followed_gravitating_body, "followed-gravitating-body.png")
 
 #undef XEFIS_CONFIG_HAS_ICON_16
 	} // namespace icons16
