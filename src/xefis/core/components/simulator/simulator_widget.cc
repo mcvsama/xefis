@@ -110,7 +110,7 @@ SimulatorWidget::make_simulation_controls()
 	});
 
 	auto* show_configurator_button = new QPushButton ("Show machine config", this);
-	QObject::connect (show_configurator_button, &QPushButton::pressed, [this] {
+	QObject::connect (show_configurator_button, &QPushButton::clicked, [this] {
 		if (_machine)
 			_machine->show_configurator();
 	});
