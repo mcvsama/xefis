@@ -84,10 +84,23 @@ QWidget*
 SimulatorWidget::make_simulation_controls()
 {
 	auto* start_stop_sim_button = new QPushButton ("Start/stop simulation", this);
-	QObject::connect (start_stop_sim_button, &QPushButton::pressed, [this] {
+	auto const update_start_stop_icon = [this, start_stop_sim_button] {
+		if (_rigid_body_viewer)
+		{
+			auto const& icon = _rigid_body_viewer->paused()
+				? _start_icon
+				: _pause_icon;
+
+			start_stop_sim_button->setIcon (icon);
+		}
+	};
+	QObject::connect (start_stop_sim_button, &QPushButton::pressed, [this, update_start_stop_icon] {
 		if (_rigid_body_viewer)
 			_rigid_body_viewer->toggle_pause();
+
+		update_start_stop_icon();
 	});
+	update_start_stop_icon();
 
 	auto* step_sim_button = new QPushButton ("Single step", this);
 	QObject::connect (step_sim_button, &QPushButton::pressed, [this] {

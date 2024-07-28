@@ -21,6 +21,7 @@
 #include <xefis/support/ui/rigid_body_viewer.h>
 
 // Qt:
+#include <QIcon>
 #include <QWidget>
 
 // Standard:
@@ -92,9 +93,11 @@ class SimulatorWidget: public QWidget
 	populate_with_bodies_and_constraints (QTreeWidget&, rigid_body::System&);
 
   private:
-	Machine*						_machine { nullptr };
+	Machine*						_machine				{ nullptr };
 	Simulator&						_simulator;
 	std::optional<RigidBodyViewer>	_rigid_body_viewer;
+	QIcon							_start_icon				{ resources::icons16::start() };
+	QIcon							_pause_icon				{ resources::icons16::pause() };
 	QIcon							_followed_body_icon;
 };
 

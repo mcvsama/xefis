@@ -77,6 +77,9 @@ namespace xf::resources {
 #define XEFIS_CONFIG_HAS_ICON_16(key, file) \
 		XEFIS_CONFIG_HAS_ICON(key, XEFIS_SHARED_DIRECTORY "/images/16/" file)
 
+		XEFIS_CONFIG_HAS_ICON_16 (null, "null.png")
+		XEFIS_CONFIG_HAS_ICON_16 (start, "start.png")
+		XEFIS_CONFIG_HAS_ICON_16 (pause, "pause.png")
 		XEFIS_CONFIG_HAS_ICON_16 (socket_dir, "socket-dir.png")
 		XEFIS_CONFIG_HAS_ICON_16 (socket_value, "socket-value.png")
 		XEFIS_CONFIG_HAS_ICON_16 (led_green_on, "led-green-on.png")
@@ -85,6 +88,7 @@ namespace xf::resources {
 		XEFIS_CONFIG_HAS_ICON_16 (led_white_on, "led-white-on.png")
 		XEFIS_CONFIG_HAS_ICON_16 (led_blue_on, "led-blue-on.png")
 		XEFIS_CONFIG_HAS_ICON_16 (led_off, "led-off.png")
+		XEFIS_CONFIG_HAS_ICON_16 (body, "body.png")
 		XEFIS_CONFIG_HAS_ICON_16 (followed_body, "followed-body.png")
 
 #undef XEFIS_CONFIG_HAS_ICON_16
