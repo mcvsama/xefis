@@ -178,8 +178,8 @@ ManualTest t_2 ("rigid_body::System: fixed constraints", []{
 		body->rotate_about_world_origin (y_rotation<rigid_body::WorldSpace> (+90_deg));
 
 	run (system, &body1, [&] (si::Time const) {
-		body1.apply_force (ForceMoments<rigid_body::WorldSpace> ({ 0_N, +gravity_acceleration * (kMass5 + kMass6), 0_N }, kNoTorque));
-		body2.apply_force (ForceMoments<rigid_body::WorldSpace> ({ 0_N, -gravity_acceleration * kMass5, 0_N }, kNoTorque));
+		body1.apply_impulse (ForceMoments<rigid_body::WorldSpace> ({ 0_N, +gravity_acceleration * (kMass5 + kMass6), 0_N }, kNoTorque));
+		body2.apply_impulse (ForceMoments<rigid_body::WorldSpace> ({ 0_N, -gravity_acceleration * kMass5, 0_N }, kNoTorque));
 	});
 });
 
@@ -212,12 +212,12 @@ ManualTest t_2_1 ("rigid_body::System: more fixed constraints", []{
 	system.add<rigid_body::FixedConstraint> (body5, body6);
 
 	run (system, &body1, [&] (si::Time const) {
-		body1.apply_force (ForceMoments<rigid_body::WorldSpace> ({ 0_N, +gravity_acceleration * (kMass2 + kMass3 + kMass4 + kMass5 + kMass6), 0_N }, kNoTorque));
-		body2.apply_force (ForceMoments<rigid_body::WorldSpace> ({ 0_N, -gravity_acceleration * kMass2, 0_N }, kNoTorque));
-		body3.apply_force (ForceMoments<rigid_body::WorldSpace> ({ 0_N, -gravity_acceleration * kMass3, 0_N }, kNoTorque));
-		body4.apply_force (ForceMoments<rigid_body::WorldSpace> ({ 0_N, -gravity_acceleration * kMass4, 0_N }, kNoTorque));
-		body5.apply_force (ForceMoments<rigid_body::WorldSpace> ({ 0_N, -gravity_acceleration * kMass5, 0_N }, kNoTorque));
-		body6.apply_force (ForceMoments<rigid_body::WorldSpace> ({ 0_N, -gravity_acceleration * kMass6, 0_N }, kNoTorque));
+		body1.apply_impulse (ForceMoments<rigid_body::WorldSpace> ({ 0_N, +gravity_acceleration * (kMass2 + kMass3 + kMass4 + kMass5 + kMass6), 0_N }, kNoTorque));
+		body2.apply_impulse (ForceMoments<rigid_body::WorldSpace> ({ 0_N, -gravity_acceleration * kMass2, 0_N }, kNoTorque));
+		body3.apply_impulse (ForceMoments<rigid_body::WorldSpace> ({ 0_N, -gravity_acceleration * kMass3, 0_N }, kNoTorque));
+		body4.apply_impulse (ForceMoments<rigid_body::WorldSpace> ({ 0_N, -gravity_acceleration * kMass4, 0_N }, kNoTorque));
+		body5.apply_impulse (ForceMoments<rigid_body::WorldSpace> ({ 0_N, -gravity_acceleration * kMass5, 0_N }, kNoTorque));
+		body6.apply_impulse (ForceMoments<rigid_body::WorldSpace> ({ 0_N, -gravity_acceleration * kMass6, 0_N }, kNoTorque));
 	});
 });
 
@@ -247,10 +247,10 @@ ManualTest t_3 ("rigid_body::System: hinge constraints", []{
 	system.add<rigid_body::HingeConstraint> (h3);
 
 	run (system, &body1, [&] (si::Time const) {
-		body1.apply_force (ForceMoments<rigid_body::WorldSpace> ({ 0_N, +gravity_acceleration * (kMass2 + kMass3 + kMass4), 0_N }, kNoTorque));
-		body2.apply_force (ForceMoments<rigid_body::WorldSpace> ({ 0_N, -gravity_acceleration * kMass2, 0_N }, kNoTorque));
-		body3.apply_force (ForceMoments<rigid_body::WorldSpace> ({ 0_N, -gravity_acceleration * kMass3, 0_N }, kNoTorque));
-		body4.apply_force (ForceMoments<rigid_body::WorldSpace> ({ 0_N, -gravity_acceleration * kMass4, 0_N }, kNoTorque));
+		body1.apply_impulse (ForceMoments<rigid_body::WorldSpace> ({ 0_N, +gravity_acceleration * (kMass2 + kMass3 + kMass4), 0_N }, kNoTorque));
+		body2.apply_impulse (ForceMoments<rigid_body::WorldSpace> ({ 0_N, -gravity_acceleration * kMass2, 0_N }, kNoTorque));
+		body3.apply_impulse (ForceMoments<rigid_body::WorldSpace> ({ 0_N, -gravity_acceleration * kMass3, 0_N }, kNoTorque));
+		body4.apply_impulse (ForceMoments<rigid_body::WorldSpace> ({ 0_N, -gravity_acceleration * kMass4, 0_N }, kNoTorque));
 	});
 });
 
@@ -296,10 +296,10 @@ ManualTest t_4 ("rigid_body::System: multiple constraints", []{
 	system.add<rigid_body::FixedConstraint> (body5, body6);
 
 	run (system, &body1, [&] (si::Time const) {
-		body1.apply_force (ForceMoments<rigid_body::WorldSpace> ({ 0_N, +gravity_acceleration * (kMass2 + kMass3 + kMass4), 0_N }, kNoTorque));
-		body2.apply_force (ForceMoments<rigid_body::WorldSpace> ({ 0_N, -gravity_acceleration * kMass2, 0_N }, kNoTorque));
-		body3.apply_force (ForceMoments<rigid_body::WorldSpace> ({ 0_N, -gravity_acceleration * kMass3, 0_N }, kNoTorque));
-		body4.apply_force (ForceMoments<rigid_body::WorldSpace> ({ 0_N, -gravity_acceleration * kMass4, 0_N }, kNoTorque));
+		body1.apply_impulse (ForceMoments<rigid_body::WorldSpace> ({ 0_N, +gravity_acceleration * (kMass2 + kMass3 + kMass4), 0_N }, kNoTorque));
+		body2.apply_impulse (ForceMoments<rigid_body::WorldSpace> ({ 0_N, -gravity_acceleration * kMass2, 0_N }, kNoTorque));
+		body3.apply_impulse (ForceMoments<rigid_body::WorldSpace> ({ 0_N, -gravity_acceleration * kMass3, 0_N }, kNoTorque));
+		body4.apply_impulse (ForceMoments<rigid_body::WorldSpace> ({ 0_N, -gravity_acceleration * kMass4, 0_N }, kNoTorque));
 	});
 });
 
@@ -341,9 +341,9 @@ ManualTest t_5 ("rigid_body::System: intermediate axis of rotation", []{
 		// Apply torque for a while:
 		if (total_t < 0.7_s)
 		{
-			body_ox.apply_force (ForceMoments<rigid_body::WorldSpace> ({ 0_N, 0_N, 0_N }, { 1000_Nm, 0_Nm, 0_Nm }));
-			body_oy.apply_force (ForceMoments<rigid_body::WorldSpace> ({ 0_N, 0_N, 0_N }, { 0_Nm, 1000_Nm, 0_Nm }));
-			body_oz.apply_force (ForceMoments<rigid_body::WorldSpace> ({ 0_N, 0_N, 0_N }, { 0_Nm, 0_Nm, 1000_Nm }));
+			body_ox.apply_impulse (ForceMoments<rigid_body::WorldSpace> ({ 0_N, 0_N, 0_N }, { 1000_Nm, 0_Nm, 0_Nm }));
+			body_oy.apply_impulse (ForceMoments<rigid_body::WorldSpace> ({ 0_N, 0_N, 0_N }, { 0_Nm, 1000_Nm, 0_Nm }));
+			body_oz.apply_impulse (ForceMoments<rigid_body::WorldSpace> ({ 0_N, 0_N, 0_N }, { 0_Nm, 0_Nm, 1000_Nm }));
 		}
 
 		total_t += dt;

@@ -139,7 +139,7 @@ ImpulseSolver::update_external_forces()
 	for (auto& body: _system.bodies())
 	{
 		body->frame_cache().external_force_moments = body->external_force_moments<WorldSpace>();
-		body->reset_applied_forces();
+		body->reset_applied_impulses();
 	}
 }
 

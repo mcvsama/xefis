@@ -193,32 +193,32 @@ class Body: public Noncopyable
 	 */
 	template<CoordinateSystemConcept Space>
 		void
-		apply_force (ForceMoments<Space> const& force_moments);
+		apply_impulse (ForceMoments<Space> const& force_moments);
 
 	/**
 	 * Apply force at given position relative to the center-of-mass for the duration of the following simulation frame.
-	 * See remarks for apply_force (ForceMoments<Space>).
+	 * See remarks for apply_impulse (ForceMoments<Space>).
 	 * Use world frame of reference and provided Space coordinate system.
 	 */
 	template<CoordinateSystemConcept ForceSpace, CoordinateSystemConcept PositionSpace>
 		void
-		apply_force (ForceMoments<ForceSpace> const& force_moments, SpaceLength<PositionSpace> const& position);
+		apply_impulse (ForceMoments<ForceSpace> const& force_moments, SpaceLength<PositionSpace> const& position);
 
 	/**
 	 * Apply force for the duration of the following simulation frame.
 	 * Wrench should be relative to body's center-of-mass.
-	 * See remarks for apply_force (ForceMoments<Space>).
+	 * See remarks for apply_impulse (ForceMoments<Space>).
 	 * Use world frame of reference and provided Space coordinate system.
 	 */
 	template<CoordinateSystemConcept Space>
 		void
-		apply_force (Wrench<Space> const& wrench);
+		apply_impulse (Wrench<Space> const& wrench);
 
 	/**
-	 * Resets all applied forces.
+	 * Resets all applied impulses.
 	 */
 	void
-	reset_applied_forces() noexcept;
+	reset_applied_impulses() noexcept;
 
 	/**
 	 * Return body's shape.
@@ -382,7 +382,7 @@ class Body: public Noncopyable
 	{ }
 
 	/**
-	 * Ask body to update external force moments by calling apply_force() methods.
+	 * Ask body to update external force moments by calling apply_impulse() methods.
 	 */
 	virtual void
 	update_external_forces (Atmosphere const*)
@@ -403,8 +403,8 @@ class Body: public Noncopyable
 	AccelerationMoments<WorldSpace>							_acceleration_moments;
 	mutable std::optional<AccelerationMoments<BodySpace>>	_body_space_acceleration_moments;
 	// Impulses applied for the duration of the simulation frame:
-	mutable std::optional<ForceMoments<WorldSpace>>			_world_space_applied_forces;
-	ForceMoments<BodySpace>									_applied_forces;
+	mutable std::optional<ForceMoments<WorldSpace>>			_world_space_applied_impulses;
+	ForceMoments<BodySpace>									_applied_impulses;
 	// Stuff calculated when simulation is run:
 	BodyFrameCache											_frame_cache;
 	// Body shape:
@@ -542,34 +542,34 @@ template<CoordinateSystemConcept Space>
 		{
 			std::lock_guard lock (_optionals_mutex);
 
-			if (!_world_space_applied_forces)
-				_world_space_applied_forces = _placement.unbound_transform_to_base (_applied_forces);
+			if (!_world_space_applied_impulses)
+				_world_space_applied_impulses = _placement.unbound_transform_to_base (_applied_impulses);
 
-			return *_world_space_applied_forces;
+			return *_world_space_applied_impulses;
 		}
 		else if constexpr (std::is_same_v<Space, BodySpace>)
-			return _applied_forces;
+			return _applied_impulses;
 	}
 
 
 template<CoordinateSystemConcept Space>
 	inline void
-	Body::apply_force (ForceMoments<Space> const& force_moments)
+	Body::apply_impulse (ForceMoments<Space> const& force_moments)
 	{
-		_world_space_applied_forces.reset();
+		_world_space_applied_impulses.reset();
 
 		if constexpr (std::is_same_v<Space, WorldSpace>)
-			_applied_forces += _placement.unbound_transform_to_body (force_moments);
+			_applied_impulses += _placement.unbound_transform_to_body (force_moments);
 		else if constexpr (std::is_same_v<Space, BodySpace>)
-			_applied_forces += force_moments;
+			_applied_impulses += force_moments;
 	}
 
 
 template<CoordinateSystemConcept ForceSpace, CoordinateSystemConcept PositionSpace>
 	inline void
-	Body::apply_force (ForceMoments<ForceSpace> const& force_moments, SpaceLength<PositionSpace> const& position)
+	Body::apply_impulse (ForceMoments<ForceSpace> const& force_moments, SpaceLength<PositionSpace> const& position)
 	{
-		_world_space_applied_forces.reset();
+		_world_space_applied_impulses.reset();
 
 		ForceMoments<BodySpace> body_space_force_moments;
 		SpaceLength<BodySpace> body_space_position;
@@ -584,33 +584,33 @@ template<CoordinateSystemConcept ForceSpace, CoordinateSystemConcept PositionSpa
 		else
 			body_space_position = position;
 
-		apply_force (Wrench (body_space_force_moments, body_space_position));
+		apply_impulse (Wrench (body_space_force_moments, body_space_position));
 	}
 
 
 template<CoordinateSystemConcept Space>
 	inline void
-	Body::apply_force (Wrench<Space> const& wrench)
+	Body::apply_impulse (Wrench<Space> const& wrench)
 	{
-		_world_space_applied_forces.reset();
+		_world_space_applied_impulses.reset();
 
 		if constexpr (std::is_same_v<Space, WorldSpace>)
 		{
 			// The resultant_force() assumes origin as the center of mass, so for Wrenches in WorldSpace coordinates
 			// it gives incorrect results, since C.O.M. is rarely at the WorldSpace origin.
 			// So first transform Wrench with its position to BodySpace, only then calculate resultant force.
-			_applied_forces += resultant_force (_placement.bound_transform_to_body (wrench));
+			_applied_impulses += resultant_force (_placement.bound_transform_to_body (wrench));
 		}
 		else if constexpr (std::is_same_v<Space, BodySpace>)
-			_applied_forces += resultant_force (wrench);
+			_applied_impulses += resultant_force (wrench);
 	}
 
 
 inline void
-Body::reset_applied_forces() noexcept
+Body::reset_applied_impulses() noexcept
 {
-	_applied_forces = ForceMoments<BodySpace>();
-	_world_space_applied_forces.reset();
+	_applied_impulses = ForceMoments<BodySpace>();
+	_world_space_applied_impulses.reset();
 }
 
 

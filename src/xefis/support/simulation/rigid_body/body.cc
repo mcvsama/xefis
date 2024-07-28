@@ -31,7 +31,7 @@ Body::rotate_about_center_of_mass (RotationMatrix<WorldSpace> const& rotation)
 	_acceleration_moments = rotation * _acceleration_moments;
 
 	_world_space_mass_moments.reset();
-	_world_space_applied_forces.reset();
+	_world_space_applied_impulses.reset();
 }
 
 
@@ -43,7 +43,7 @@ Body::rotate_about_world_origin (RotationMatrix<WorldSpace> const& rotation)
 	_acceleration_moments = rotation * _acceleration_moments;
 
 	_world_space_mass_moments.reset();
-	_world_space_applied_forces.reset();
+	_world_space_applied_impulses.reset();
 }
 
 
@@ -57,7 +57,7 @@ Body::rotate_about_body_origin (RotationMatrix<WorldSpace> const& rotation)
 	_acceleration_moments = rotation * _acceleration_moments;
 
 	_world_space_mass_moments.reset();
-	_world_space_applied_forces.reset();
+	_world_space_applied_impulses.reset();
 }
 
 
