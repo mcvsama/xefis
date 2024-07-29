@@ -86,7 +86,7 @@ class VirtualJoystickWidget: public xf::Widget
 
   private:
 	std::optional<MouseControl>	_control;
-	xf::PaintHelper				_paint_helper	{ *this, palette(), font() };
+	xf::PaintHelper				_paint_helper	{ *this };
 };
 
 
@@ -148,7 +148,7 @@ class VirtualLinearWidget: public xf::Widget
 	Style						_style;
 	float						_value			{ 0.0 };
 	std::optional<MouseControl>	_control;
-	xf::PaintHelper				_paint_helper	{ *this, palette(), font() };
+	xf::PaintHelper				_paint_helper	{ *this };
 };
 
 

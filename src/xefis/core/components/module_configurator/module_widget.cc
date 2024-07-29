@@ -43,7 +43,7 @@ ModuleWidget::ModuleWidget (Module& module, QWidget* parent):
 	_instrument (dynamic_cast<Instrument*> (&_module))
 {
 	auto full_name_str = QString::fromStdString (identifier (module));
-	auto const ph = PaintHelper (*this, palette(), font());
+	auto const ph = PaintHelper (*this);
 
 	QString module_type = _instrument ? "Instrument " : "Module ";
 	QColor color = _instrument ? QColor (0xff, 0x66, 0xff) : QColor (0x50, 0x79, 0xff);

@@ -48,7 +48,7 @@ HistogramStatsWidget::HistogramStatsWidget (QWidget* parent):
 	_stddev_value = new QLabel (this);
 	_critical_value = new QLabel (this);
 
-	auto const ph = PaintHelper (*this, palette(), font());
+	auto const ph = PaintHelper (*this);
 
 	auto* layout = new QGridLayout (this);
 	layout->setHorizontalSpacing (ph.em_pixels (1.0f));

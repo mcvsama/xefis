@@ -38,7 +38,7 @@ ProcessingLoopWidget::ProcessingLoopWidget (ProcessingLoop& processing_loop, QWi
 	ConfigWidget (parent),
 	_processing_loop (processing_loop)
 {
-	auto const ph = PaintHelper (*this, palette(), font());
+	auto const ph = PaintHelper (*this);
 	auto [name_strip, name_label] = create_colored_strip_label (QString::fromStdString (_processing_loop.instance()).toHtmlEscaped(), QColor (0xff, 0xd7, 0), Qt::AlignBottom, this);
 
 	auto tabs = new QTabWidget (this);

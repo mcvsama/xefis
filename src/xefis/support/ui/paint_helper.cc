@@ -33,6 +33,13 @@ PaintHelper::PaintHelper (QPaintDevice const& canvas, QPalette const palette, QF
 { }
 
 
+PaintHelper::PaintHelper (QWidget const& widget):
+	_canvas (widget),
+	_palette (widget.palette()),
+	_font (widget.font())
+{ }
+
+
 void
 PaintHelper::setup_painter (QPainter& painter)
 {

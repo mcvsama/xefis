@@ -55,7 +55,7 @@ std::tuple<QWidget*, QLabel*>
 Widget::create_colored_strip_label (QString const& text, QColor color, Qt::Alignment strip_position, QWidget* parent)
 {
 	auto* widget = new QWidget (parent);
-	auto const ph = PaintHelper (*widget, widget->palette(), widget->font());
+	auto const ph = PaintHelper (*widget);
 
 	auto* strip = create_color_widget (color, widget);
 	strip->setFixedHeight (ph.em_pixels (0.3f));

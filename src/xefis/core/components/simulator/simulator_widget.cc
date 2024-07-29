@@ -41,7 +41,7 @@ SimulatorWidget::SimulatorWidget (Simulator& simulator, QWidget* parent):
 	_simulator (simulator)
 {
 	setWindowTitle("Xefis simulator");
-	auto const ph = PaintHelper (*this, palette(), font());
+	auto const ph = PaintHelper (*this);
 
 	auto* splitter = new QSplitter (this);
 	splitter->addWidget (make_viewer_widget());

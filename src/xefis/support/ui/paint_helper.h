@@ -25,6 +25,7 @@
 #include <QFont>
 #include <QPaintDevice>
 #include <QPalette>
+#include <QWidget>
 
 // Standard:
 #include <cstddef>
@@ -38,6 +39,10 @@ class PaintHelper
 	// Ctor
 	explicit
 	PaintHelper (QPaintDevice const& canvas, QPalette = {}, QFont = {});
+
+	// Ctor
+	explicit
+	PaintHelper (QWidget const&);
 
 	/**
 	 * Return current PixelDensity.

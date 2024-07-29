@@ -32,7 +32,7 @@ namespace xf::configurator {
 std::tuple<xf::HistogramWidget*, xf::HistogramStatsWidget*, QWidget*>
 ConfigWidget::create_performance_widget (QWidget* parent, QString const& title) const
 {
-	auto const ph = PaintHelper (*this, palette(), font());
+	auto const ph = PaintHelper (*this);
 	QMargins const margins (ph.em_pixels (0.5f), ph.em_pixels (0.25f), ph.em_pixels (0.5f), ph.em_pixels (0.25f));
 
 	auto* group_box = new QGroupBox (title, parent);

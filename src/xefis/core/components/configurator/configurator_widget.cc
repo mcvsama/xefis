@@ -34,7 +34,7 @@ ConfiguratorWidget::ConfiguratorWidget (Machine& machine, QWidget* parent):
 	Widget (parent),
 	_machine (machine)
 {
-	auto const ph = PaintHelper (*this, palette(), font());
+	auto const ph = PaintHelper (*this);
 
 	_module_configurator = new ModuleConfigurator (_machine, this);
 	_data_recorder = new DataRecorder (this);

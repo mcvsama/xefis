@@ -37,7 +37,7 @@ ScreenWidget::ScreenWidget (Screen& screen, QWidget* parent):
 	ConfigWidget (parent),
 	_screen (screen)
 {
-	auto const ph = PaintHelper (*this, palette(), font());
+	auto const ph = PaintHelper (*this);
 	auto [name_strip, name_label] = create_colored_strip_label (QString::fromStdString (_screen.instance()).toHtmlEscaped(), QColor (0xff, 0xaa, 0x00), Qt::AlignBottom, this);
 
 	auto tabs = new QTabWidget (this);
@@ -96,7 +96,7 @@ ScreenWidget::refresh()
 QWidget*
 ScreenWidget::create_performance_tab()
 {
-	auto const ph = PaintHelper (*this, palette(), font());
+	auto const ph = PaintHelper (*this);
 	auto* widget = new QWidget (this);
 
 	// Prepare list of Widgets objects for each WorkPerformer:
