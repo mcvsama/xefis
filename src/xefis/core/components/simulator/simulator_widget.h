@@ -19,6 +19,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/base/icons.h>
 #include <xefis/support/simulation/rigid_body/system.h>
 #include <xefis/support/simulation/evolver.h>
 #include <xefis/support/simulation/simulator.h>
@@ -100,8 +101,8 @@ class SimulatorWidget: public QWidget
 	Simulator&						_simulator;
 	std::optional<RigidBodyViewer>	_rigid_body_viewer;
 	BodiesTree*						_bodies_tree			{ nullptr };
-	QIcon							_start_icon				{ resources::icons16::start() };
-	QIcon							_pause_icon				{ resources::icons16::pause() };
+	QIcon							_start_icon				{ icons::start() };
+	QIcon							_pause_icon				{ icons::pause() };
 };
 
 

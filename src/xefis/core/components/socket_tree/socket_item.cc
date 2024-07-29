@@ -17,6 +17,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/base/icons.h>
 #include <xefis/core/sockets/socket_converter.h>
 
 // Qt:
@@ -41,8 +42,8 @@ void
 SocketItem::setup_appereance()
 {
 	setIcon (0, is_dir()
-		? resources::icons16::socket_dir()
-		: resources::icons16::socket_value());
+		? icons::socket_dir()
+		: icons::socket_value());
 }
 
 
