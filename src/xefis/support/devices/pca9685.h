@@ -23,6 +23,10 @@
 #include <neutrino/bus/i2c.h>
 #include <neutrino/logger.h>
 
+// Qt:
+#include <QObject>
+#include <QTimer>
+
 // Standard:
 #include <cstddef>
 #include <array>

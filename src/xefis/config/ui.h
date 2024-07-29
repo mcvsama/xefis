@@ -13,27 +13,18 @@
  * Here be basic, global functions and macros like asserts, debugging helpers, etc.
  */
 
-#ifndef XEFIS__CONFIG__RESOURCES_H__INCLUDED
-#define XEFIS__CONFIG__RESOURCES_H__INCLUDED
+#ifndef XEFIS__CONFIG__UI_H__INCLUDED
+#define XEFIS__CONFIG__UI_H__INCLUDED
 
-// Xefis:
-#include <xefis/config/all.h>
+namespace xf::config::ui {
 
-#ifndef XEFIS_PREFIX
-#define XEFIS_PREFIX ""
-#endif
+constexpr int Spacing		= 3;
+constexpr int Margin		= 2;
+constexpr int SmallSpacing	= 2;
+constexpr int WindowMargin	= 4;
+constexpr int DialogMargin	= 6;
 
-#ifndef XEFIS_SHARED_DIRECTORY
-#define XEFIS_SHARED_DIRECTORY XEFIS_PREFIX "share"
-#endif
-
-#ifndef XEFIS_XDG_SETTINGS_HOME
-#define XEFIS_XDG_SETTINGS_HOME "mulabs.org/xefis"
-#endif
-
-#ifndef XEFIS_XDG_DATA_HOME
-#define XEFIS_XDG_DATA_HOME "mulabs.org/xefis"
-#endif
+} // namespace xf::config::ui
 
 #endif
 

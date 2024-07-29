@@ -28,6 +28,7 @@ MIHAU.modules[xefis].products[xefis].sources				+= xefis/base/icons.h
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/config/all.h
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/config/core_types.h
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/config/resources.h
+MIHAU.modules[xefis].products[xefis].sources				+= xefis/config/ui.h
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/core/components/configurator/configurator_widget.cc
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/core/components/configurator/configurator_widget.h
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/core/components/data_recorder/data_recorder.cc

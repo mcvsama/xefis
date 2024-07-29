@@ -25,6 +25,9 @@
 // Neutrino:
 #include <neutrino/range.h>
 
+// Qt:
+#include <QTimer>
+
 // Standard:
 #include <cstddef>
 #include <set>

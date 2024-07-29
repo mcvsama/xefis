@@ -27,7 +27,8 @@
 #include <neutrino/logger.h>
 
 // Qt:
-#include <QtCore/QSocketNotifier>
+#include <QSocketNotifier>
+#include <QTimer>
 
 // Standard:
 #include <cstddef>

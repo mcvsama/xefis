@@ -20,6 +20,9 @@
 #include <xefis/support/simulation/rigid_body/shape_material.h>
 #include <xefis/support/simulation/rigid_body/shape_vertex.h>
 
+// Qt:
+#include <QSize>
+
 // System:
 #define GL_GLEXT_PROTOTYPES // What kind of joke is that?
 #include <GL/gl.h>

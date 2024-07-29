@@ -33,32 +33,47 @@ fron_svg_file (QString const& svg_file) noexcept;
 #define XEFIS_PNG_ICON(key, file)		\
 	static inline QPixmap key()			\
 	{									\
-		return from_png_file (XEFIS_SHARED_DIRECTORY "/images/16/" file);	\
+		return from_png_file (XEFIS_SHARED_DIRECTORY "/images/" file);	\
 	}
 
 #define XEFIS_SVG_ICON(key, file)		\
 	static inline QPixmap key()			\
 	{									\
-		return from_svg_file (XEFIS_SHARED_DIRECTORY "/images/16/" file);	\
+		return from_svg_file (XEFIS_SHARED_DIRECTORY "/images/" file);	\
 	}
 
 
-XEFIS_PNG_ICON (null, "null.png")
-XEFIS_PNG_ICON (start, "start.png")
-XEFIS_PNG_ICON (pause, "pause.png")
-XEFIS_PNG_ICON (socket_dir, "socket-dir.png")
-XEFIS_PNG_ICON (socket_value, "socket-value.png")
-XEFIS_PNG_ICON (led_green_on, "led-green-on.png")
-XEFIS_PNG_ICON (led_amber_on, "led-amber-on.png")
-XEFIS_PNG_ICON (led_red_on, "led-red-on.png")
-XEFIS_PNG_ICON (led_white_on, "led-white-on.png")
-XEFIS_PNG_ICON (led_blue_on, "led-blue-on.png")
-XEFIS_PNG_ICON (led_off, "led-off.png")
-XEFIS_PNG_ICON (body, "body.png")
-XEFIS_PNG_ICON (gravitating_body, "gravitating-body.png")
-XEFIS_PNG_ICON (followed_body, "followed-body.png")
-XEFIS_PNG_ICON (followed_gravitating_body, "followed-gravitating-body.png")
-XEFIS_PNG_ICON (constraint, "constraint.png")
+XEFIS_PNG_ICON (null, "icons/null.png")
+XEFIS_PNG_ICON (start, "icons/start.png")
+XEFIS_PNG_ICON (pause, "icons/pause.png")
+XEFIS_PNG_ICON (socket_dir, "icons/socket-dir.png")
+XEFIS_PNG_ICON (socket_value, "icons/socket-value.png")
+XEFIS_PNG_ICON (led_green_on, "icons/led-green-on.png")
+XEFIS_PNG_ICON (led_amber_on, "icons/led-amber-on.png")
+XEFIS_PNG_ICON (led_red_on, "icons/led-red-on.png")
+XEFIS_PNG_ICON (led_white_on, "icons/led-white-on.png")
+XEFIS_PNG_ICON (led_blue_on, "icons/led-blue-on.png")
+XEFIS_PNG_ICON (led_off, "icons/led-off.png")
+XEFIS_PNG_ICON (body, "icons/body.png")
+XEFIS_PNG_ICON (gravitating_body, "icons/gravitating-body.png")
+XEFIS_PNG_ICON (followed_body, "icons/followed-body.png")
+XEFIS_PNG_ICON (followed_gravitating_body, "icons/followed-gravitating-body.png")
+XEFIS_PNG_ICON (constraint, "icons/constraint.png")
+
+XEFIS_PNG_ICON (digit_0, "digits/digit-0.png")
+XEFIS_PNG_ICON (digit_1, "digits/digit-1.png")
+XEFIS_PNG_ICON (digit_2, "digits/digit-2.png")
+XEFIS_PNG_ICON (digit_3, "digits/digit-3.png")
+XEFIS_PNG_ICON (digit_4, "digits/digit-4.png")
+XEFIS_PNG_ICON (digit_5, "digits/digit-5.png")
+XEFIS_PNG_ICON (digit_6, "digits/digit-6.png")
+XEFIS_PNG_ICON (digit_7, "digits/digit-7.png")
+XEFIS_PNG_ICON (digit_8, "digits/digit-8.png")
+XEFIS_PNG_ICON (digit_9, "digits/digit-9.png")
+XEFIS_PNG_ICON (digit_minus, "digits/digit-minus.png")
+XEFIS_PNG_ICON (digit_empty, "digits/digit-empty.png")
+XEFIS_PNG_ICON (digit_full, "digits/digit-full.png")
+XEFIS_PNG_ICON (digit_dot, "digits/digit-dot.png")
 
 } // namespace xf::icons
 
