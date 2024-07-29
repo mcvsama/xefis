@@ -47,7 +47,7 @@ ModuleWidget::ModuleWidget (Module& module, QWidget* parent):
 
 	QString module_type = _instrument ? "Instrument " : "Module ";
 	QColor color = _instrument ? QColor (0xff, 0x66, 0xff) : QColor (0x50, 0x79, 0xff);
-	QWidget* name_label = create_colored_strip_label (module_type + full_name_str.toHtmlEscaped(), color, Qt::AlignBottom, this);
+	auto [name_strip, name_label] = create_colored_strip_label (module_type + full_name_str.toHtmlEscaped(), color, Qt::AlignBottom, this);
 
 	auto tabs = new QTabWidget (this);
 	tabs->addTab (create_performance_tab(), "Performance");
@@ -69,7 +69,7 @@ ModuleWidget::ModuleWidget (Module& module, QWidget* parent):
 
 	auto* layout = new QVBoxLayout (this);
 	layout->setMargin (0);
-	layout->addWidget (name_label);
+	layout->addWidget (name_strip);
 	layout->addItem (new QSpacerItem (0, ph.em_pixels (0.15f), QSizePolicy::Fixed, QSizePolicy::Fixed));
 	layout->addWidget (tabs);
 

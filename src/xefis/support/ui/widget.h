@@ -21,11 +21,13 @@
 #include <neutrino/qt/qutils.h>
 
 // Qt:
+#include <QLabel>
 #include <QWidget>
 
 // Standard:
 #include <cstddef>
 #include <memory>
+#include <tuple>
 
 
 namespace xf {
@@ -45,12 +47,14 @@ class Widget: public QWidget
 	create_color_widget (QColor, QWidget* parent);
 
 	/**
-	 * Return label with colored strip.
+	 * Return widget and label with colored strip.
+	 *
 	 * \param	strip_position
 	 *			Qt::AlignTop, Qt::AlignBottom, Qt::AlignLeft or Qt::AlignRight.
+	 * \returns	Top widget and internal label object.
 	 */
-	QWidget*
-	create_colored_strip_label (QString const& label, QColor color, Qt::Alignment strip_position, QWidget* parent) const;
+	static std::tuple<QWidget*, QLabel*>
+	create_colored_strip_label (QString const& label, QColor color, Qt::Alignment strip_position, QWidget* parent);
 };
 
 } // namespace xf

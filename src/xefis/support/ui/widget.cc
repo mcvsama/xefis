@@ -51,8 +51,8 @@ Widget::create_color_widget (QColor color, QWidget* parent)
 }
 
 
-QWidget*
-Widget::create_colored_strip_label (QString const& text, QColor color, Qt::Alignment strip_position, QWidget* parent) const
+std::tuple<QWidget*, QLabel*>
+Widget::create_colored_strip_label (QString const& text, QColor color, Qt::Alignment strip_position, QWidget* parent)
 {
 	auto* widget = new QWidget (parent);
 	auto const ph = PaintHelper (*widget, widget->palette(), widget->font());
@@ -93,7 +93,7 @@ Widget::create_colored_strip_label (QString const& text, QColor color, Qt::Align
 		layout->addWidget (label, 0, 0);
 	}
 
-	return widget;
+	return { widget, label };
 }
 
 } // namespace xf

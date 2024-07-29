@@ -38,14 +38,14 @@ ScreenWidget::ScreenWidget (Screen& screen, QWidget* parent):
 	_screen (screen)
 {
 	auto const ph = PaintHelper (*this, palette(), font());
-	auto* name_label = create_colored_strip_label (QString::fromStdString (_screen.instance()).toHtmlEscaped(), QColor (0xff, 0xaa, 0x00), Qt::AlignBottom, this);
+	auto [name_strip, name_label] = create_colored_strip_label (QString::fromStdString (_screen.instance()).toHtmlEscaped(), QColor (0xff, 0xaa, 0x00), Qt::AlignBottom, this);
 
 	auto tabs = new QTabWidget (this);
 	tabs->addTab (create_performance_tab(), "Performance");
 
 	auto* layout = new QVBoxLayout (this);
 	layout->setMargin (0);
-	layout->addWidget (name_label);
+	layout->addWidget (name_strip);
 	layout->addItem (new QSpacerItem (0, ph.em_pixels (0.15f), QSizePolicy::Fixed, QSizePolicy::Fixed));
 	layout->addWidget (tabs);
 
