@@ -134,9 +134,9 @@ QWidget*
 SimulatorWidget::make_body_controls()
 {
 	_body_editor.emplace (this);
-	_bodies_tree = new BodiesTree (this, _simulator.rigid_body_system(), *_rigid_body_viewer);
+	_bodies_tree.emplace (this, _simulator.rigid_body_system(), *_rigid_body_viewer);
 
-	QObject::connect (_bodies_tree, &QTreeWidget::currentItemChanged, [this] (QTreeWidgetItem* current, [[maybe_unused]] QTreeWidgetItem* previous) {
+	QObject::connect (&*_bodies_tree, &QTreeWidget::currentItemChanged, [this] (QTreeWidgetItem* current, [[maybe_unused]] QTreeWidgetItem* previous) {
 		if (_body_editor)
 		{
 			if (auto* body_item = dynamic_cast<BodyItem*> (current))
@@ -146,7 +146,7 @@ SimulatorWidget::make_body_controls()
 		}
 	});
 
-	QObject::connect (_bodies_tree, &QTreeWidget::itemChanged, [this] (QTreeWidgetItem* item, int column) {
+	QObject::connect (&*_bodies_tree, &QTreeWidget::itemChanged, [this] (QTreeWidgetItem* item, int column) {
 		if (column == 0)
 		{
 			if (auto* body_item = dynamic_cast<BodyItem*> (item))
@@ -166,7 +166,7 @@ SimulatorWidget::make_body_controls()
 
 	auto* layout = new QHBoxLayout (body_controls);
 	layout->setMargin (0);
-	layout->addWidget (_bodies_tree);
+	layout->addWidget (&*_bodies_tree);
 	layout->addWidget (&*_body_editor);
 
 	return body_controls;

@@ -102,7 +102,7 @@ class SimulatorWidget: public QWidget
 	Simulator&						_simulator;
 	std::optional<RigidBodyViewer>	_rigid_body_viewer;
 	std::optional<BodyEditor>		_body_editor;
-	BodiesTree*						_bodies_tree			{ nullptr };
+	std::optional<BodiesTree>		_bodies_tree;
 	QIcon							_start_icon				{ icons::start() };
 	QIcon							_pause_icon				{ icons::pause() };
 };
