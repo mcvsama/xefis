@@ -20,6 +20,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/base/icons.h>
 #include <xefis/support/simulation/rigid_body/system.h>
 #include <xefis/support/ui/rigid_body_viewer.h>
 
@@ -92,11 +93,11 @@ class BodiesTree: public QTreeWidget
 	std::set<rigid_body::Body const*> // TODO flat_set when compiler supports it
 							_gravitating_bodies;
 	// TODO make an common icon repository with loading directly from SVGs
-	QIcon					_body_icon						{ resources::icons16::body() };
-	QIcon					_gravitating_body_icon			{ resources::icons16::gravitating_body() };
-	QIcon					_followed_body_icon				{ resources::icons16::followed_body() };
-	QIcon					_followed_gravitating_body_icon	{ resources::icons16::followed_gravitating_body() };
-	QIcon					_constraint_icon				{ resources::icons16::constraint() };
+	QIcon					_body_icon						{ icons::body() };
+	QIcon					_gravitating_body_icon			{ icons::gravitating_body() };
+	QIcon					_followed_body_icon				{ icons::followed_body() };
+	QIcon					_followed_gravitating_body_icon	{ icons::followed_gravitating_body() };
+	QIcon					_constraint_icon				{ icons::constraint() };
 };
 
 } // namespace xf
