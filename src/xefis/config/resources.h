@@ -26,13 +26,11 @@
 
 namespace xf::config {
 
-enum {
-	Spacing			= 3,
-	Margin			= 2,
-	SmallSpacing	= 2,
-	WindowMargin	= 4,
-	DialogMargin	= 6
-};
+constexpr int Spacing		= 3;
+constexpr int Margin		= 2;
+constexpr int SmallSpacing	= 2;
+constexpr int WindowMargin	= 4;
+constexpr int DialogMargin	= 6;
 
 } // namespace xf::config
 
