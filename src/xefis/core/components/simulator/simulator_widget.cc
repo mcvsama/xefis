@@ -56,7 +56,7 @@ SimulatorWidget::SimulatorWidget (Simulator& simulator, QWidget* parent):
 	layout->addWidget (make_simulation_controls());
 	layout->addWidget (splitter);
 
-	resize (QSize (ph.em_pixels (70.0), ph.em_pixels (50.0)));
+	resize (QSize (ph.em_pixels (70.0), ph.em_pixels (40.0)));
 }
 
 
