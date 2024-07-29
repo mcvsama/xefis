@@ -16,6 +16,7 @@
 
 // Local:
 #include "bodies_tree.h"
+#include "body_editor.h"
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -36,8 +37,8 @@
 
 namespace xf {
 
+class BodyEditor;
 class Machine;
-class RigidBodyViewer;
 class Simulator;
 
 /**
@@ -100,6 +101,7 @@ class SimulatorWidget: public QWidget
 	Machine*						_machine				{ nullptr };
 	Simulator&						_simulator;
 	std::optional<RigidBodyViewer>	_rigid_body_viewer;
+	std::optional<BodyEditor>		_body_editor;
 	BodiesTree*						_bodies_tree			{ nullptr };
 	QIcon							_start_icon				{ icons::start() };
 	QIcon							_pause_icon				{ icons::pause() };

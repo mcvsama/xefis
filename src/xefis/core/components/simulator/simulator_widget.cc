@@ -13,6 +13,7 @@
 
 // Local:
 #include "bodies_tree.h"
+#include "body_editor.h"
 #include "body_item.h"
 #include "simulator_widget.h"
 
@@ -132,13 +133,29 @@ SimulatorWidget::make_simulation_controls()
 QWidget*
 SimulatorWidget::make_body_controls()
 {
+	_body_editor.emplace (this);
 	_bodies_tree = new BodiesTree (this, _simulator.rigid_body_system(), *_rigid_body_viewer);
+
+	QObject::connect (_bodies_tree, &QTreeWidget::currentItemChanged, [this] (QTreeWidgetItem* current, [[maybe_unused]] QTreeWidgetItem* previous) {
+		if (_body_editor)
+		{
+			if (auto* body_item = dynamic_cast<BodyItem*> (current))
+				_body_editor->edit_body (&body_item->body());
+			else
+				_body_editor->edit_body (nullptr);
+		}
+	});
 
 	QObject::connect (_bodies_tree, &QTreeWidget::itemChanged, [this] (QTreeWidgetItem* item, int column) {
 		if (column == 0)
 		{
 			if (auto* body_item = dynamic_cast<BodyItem*> (item))
+			{
 				body_item->backpropagate();
+
+				if (_body_editor)
+					_body_editor->refresh();
+			}
 			else if (auto* constraint_item = dynamic_cast<ConstraintItem*> (item))
 				constraint_item->backpropagate();
 		}
@@ -146,12 +163,11 @@ SimulatorWidget::make_body_controls()
 
 	auto* body_controls = new QWidget (this);
 	body_controls->setSizePolicy (QSizePolicy::Fixed, QSizePolicy::Expanding);
-	body_controls->resize (QSize (1, 1));
 
 	auto* layout = new QHBoxLayout (body_controls);
 	layout->setMargin (0);
 	layout->addWidget (_bodies_tree);
-	layout->addWidget (new QLabel ("body controls", this));
+	layout->addWidget (&*_body_editor);
 
 	return body_controls;
 }
