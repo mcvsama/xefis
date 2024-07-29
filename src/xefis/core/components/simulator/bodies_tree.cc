@@ -51,6 +51,9 @@ BodiesTree::BodiesTree (QWidget* parent, rigid_body::System& system, RigidBodyVi
 void
 BodiesTree::refresh()
 {
+	// Prevent sending itemChanged() signals when creating new items:
+	bool was_blocked = blockSignals (true);
+
 	auto bodies = std::set<rigid_body::Body*>();
 
 	for (auto const& body: _rigid_body_system.bodies())
@@ -69,6 +72,8 @@ BodiesTree::refresh()
 	recalculate_gravitating_bodies();
 	insert_new (bodies, constraints, body_to_item);
 	update_existing (body_items_to_update, constraint_items_to_update);
+
+	blockSignals (was_blocked);
 }
 
 
@@ -266,15 +271,26 @@ BodiesTree::contextMenuEvent (QContextMenuEvent* event)
 
 	{
 		QTreeWidgetItem* item = itemAt (event->pos());
-		auto* body_item = dynamic_cast<BodyItem*> (item);
 
-		if (body_item)
+		if (auto* body_item = dynamic_cast<BodyItem*> (item))
 		{
-			auto* action = menu.addAction ("&Follow this body", [this, body_item] {
-				_rigid_body_viewer.set_followed_body (&body_item->body());
-				refresh();
+			{
+				auto* action = menu.addAction ("&Follow this body", [this, body_item] {
+					_rigid_body_viewer.set_followed_body (&body_item->body());
+					refresh();
+				});
+				action->setIcon (_followed_body_icon);
+			}
+
+			menu.addAction ("&Edit name", [this, body_item] {
+				editItem (body_item, 0);
 			});
-			action->setIcon (_followed_body_icon);
+		}
+		else if (auto* constraint_item = dynamic_cast<ConstraintItem*> (item))
+		{
+			menu.addAction ("&Edit name", [this, constraint_item] {
+				editItem (constraint_item, 0);
+			});
 		}
 	}
 

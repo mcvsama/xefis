@@ -13,6 +13,7 @@
 
 // Local:
 #include "bodies_tree.h"
+#include "body_item.h"
 #include "simulator_widget.h"
 
 // Xefis:
@@ -132,6 +133,16 @@ QWidget*
 SimulatorWidget::make_body_controls()
 {
 	_bodies_tree = new BodiesTree (this, _simulator.rigid_body_system(), *_rigid_body_viewer);
+
+	QObject::connect (_bodies_tree, &QTreeWidget::itemChanged, [this] (QTreeWidgetItem* item, int column) {
+		if (column == 0)
+		{
+			if (auto* body_item = dynamic_cast<BodyItem*> (item))
+				body_item->backpropagate();
+			else if (auto* constraint_item = dynamic_cast<ConstraintItem*> (item))
+				constraint_item->backpropagate();
+		}
+	});
 
 	auto* body_controls = new QWidget (this);
 	body_controls->setSizePolicy (QSizePolicy::Fixed, QSizePolicy::Expanding);

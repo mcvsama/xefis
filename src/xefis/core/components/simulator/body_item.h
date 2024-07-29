@@ -33,17 +33,11 @@ class BodyItem: public QTreeWidgetItem
   public:
 	// Ctor
 	explicit
-	BodyItem (QTreeWidget& parent, rigid_body::Body& body):
-		QTreeWidgetItem (&parent, QStringList (QString::fromStdString (body.label()))),
-		_body (body)
-	{ }
+	BodyItem (QTreeWidget& parent, rigid_body::Body&);
 
 	// Ctor
 	explicit
-	BodyItem (QTreeWidgetItem& parent, rigid_body::Body& body):
-		QTreeWidgetItem (&parent, QStringList (QString::fromStdString (body.label()))),
-		_body (body)
-	{ }
+	BodyItem (QTreeWidgetItem& parent, rigid_body::Body&);
 
 	[[nodiscard]]
 	rigid_body::Body&
@@ -56,8 +50,10 @@ class BodyItem: public QTreeWidgetItem
 		{ return _body; }
 
 	void
-	refresh()
-		{ setText (0, QString::fromStdString (_body.label())); }
+	refresh();
+
+	void
+	backpropagate();
 
   private:
 	rigid_body::Body& _body;

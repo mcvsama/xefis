@@ -33,17 +33,11 @@ class ConstraintItem: public QTreeWidgetItem
   public:
 	// Ctor
 	explicit
-	ConstraintItem (QTreeWidget& parent, rigid_body::Constraint& constraint):
-		QTreeWidgetItem (&parent, QStringList (QString::fromStdString (constraint.label()))),
-		_constraint (constraint)
-	{ }
+	ConstraintItem (QTreeWidget& parent, rigid_body::Constraint&);
 
 	// Ctor
 	explicit
-	ConstraintItem (QTreeWidgetItem& parent, rigid_body::Constraint& constraint):
-		QTreeWidgetItem (&parent, QStringList (QString::fromStdString (constraint.label()))),
-		_constraint (constraint)
-	{ }
+	ConstraintItem (QTreeWidgetItem& parent, rigid_body::Constraint&);
 
 	[[nodiscard]]
 	rigid_body::Constraint&
@@ -56,8 +50,10 @@ class ConstraintItem: public QTreeWidgetItem
 		{ return _constraint; }
 
 	void
-	refresh()
-		{ setText (0, QString::fromStdString (_constraint.label())); }
+	refresh();
+
+	void
+	backpropagate();
 
   private:
 	rigid_body::Constraint& _constraint;
