@@ -50,7 +50,7 @@ SimulatorWidget::SimulatorWidget (Simulator& simulator, QWidget* parent):
 	splitter->setHandleWidth (ph.em_pixels (0.5));
 	splitter->setStretchFactor (0, 4);
 	splitter->setStretchFactor (1, 2);
-	splitter->setSizes ({ ph.em_pixels_int (40), ph.em_pixels_int (20) });
+	splitter->setSizes ({ ph.em_pixels_int (30), ph.em_pixels_int (40) });
 
 	auto* layout = new QVBoxLayout (this);
 	layout->addWidget (make_simulation_controls());
@@ -80,6 +80,7 @@ SimulatorWidget::make_viewer_widget()
 	auto* viewer_frame = new QFrame (this);
 	viewer_frame->setFrameStyle (QFrame::StyledPanel | QFrame::Sunken);
 	viewer_frame->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Expanding);
+	// Related to splitter's stretch factors:
 	viewer_frame->resize (QSize (3, 2));
 
 	auto* layout = new QHBoxLayout (viewer_frame);
