@@ -24,7 +24,7 @@
 namespace xf {
 
 BodyItem::BodyItem (QTreeWidget& parent, rigid_body::Body& body):
-	QTreeWidgetItem (&parent),//, QStringList (QString::fromStdString (body.label()))),
+	QTreeWidgetItem (&parent),
 	_body (body)
 {
 	setFlags (flags() | Qt::ItemIsEditable);
@@ -33,7 +33,7 @@ BodyItem::BodyItem (QTreeWidget& parent, rigid_body::Body& body):
 
 
 BodyItem::BodyItem (QTreeWidgetItem& parent, rigid_body::Body& body):
-	QTreeWidgetItem (&parent),//, QStringList (QString::fromStdString (body.label()))),
+	QTreeWidgetItem (&parent),
 	_body (body)
 {
 	setFlags (flags() | Qt::ItemIsEditable);

@@ -24,7 +24,7 @@
 namespace xf {
 
 ConstraintItem::ConstraintItem (QTreeWidget& parent, rigid_body::Constraint& constraint):
-	QTreeWidgetItem (&parent),//, QStringList (QString::fromStdString (constraint.label()))),
+	QTreeWidgetItem (&parent),
 	_constraint (constraint)
 {
 	setFlags (flags() | Qt::ItemIsEditable);
@@ -33,7 +33,7 @@ ConstraintItem::ConstraintItem (QTreeWidget& parent, rigid_body::Constraint& con
 
 
 ConstraintItem::ConstraintItem (QTreeWidgetItem& parent, rigid_body::Constraint& constraint):
-	QTreeWidgetItem (&parent),//, QStringList (QString::fromStdString (constraint.label()))),
+	QTreeWidgetItem (&parent),
 	_constraint (constraint)
 {
 	setFlags (flags() | Qt::ItemIsEditable);
