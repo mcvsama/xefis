@@ -101,7 +101,7 @@ AngularServoConstraint::flow_current (si::Time const dt)
 		!kAbsoluteMaximumTemperatureRange.includes (temperature()) ||
 		_failure_model.should_fail (temperature(), dt))
 	{
-		set_broken (true);
+		Element::set_broken (true);
 		set_resistance (0.1_Ohm);
 	}
 }

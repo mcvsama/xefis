@@ -371,7 +371,7 @@ class Body: public Noncopyable
 	 * system, it should simply be skipped when evolving the system, etc).
 	 */
 	void
-	set_broken()
+	set_broken() noexcept
 		{ _broken = true; }
 
 	/**

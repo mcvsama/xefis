@@ -152,6 +152,13 @@ class Constraint: public ConnectedBodies
 		{ return _broken; }
 
 	/**
+	 * Break the constraint.
+	 */
+	void
+	set_broken() noexcept
+		{ _broken = true; }
+
+	/**
 	 * Baumgarte stabilization factor.
 	 */
 	[[nodiscard]]
