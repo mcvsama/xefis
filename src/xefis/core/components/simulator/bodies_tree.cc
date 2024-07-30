@@ -74,6 +74,10 @@ BodiesTree::refresh()
 	update_existing (body_items_to_update, constraint_items_to_update);
 
 	blockSignals (was_blocked);
+
+	// Select first element by default:
+	if (selectedItems().empty() && topLevelItemCount() > 0)
+		setCurrentItem (topLevelItem (0));
 }
 
 
