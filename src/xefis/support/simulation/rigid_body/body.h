@@ -322,10 +322,16 @@ class Body: public Noncopyable
 		{ move_to (new_origin_position + origin_to_center_of_mass<WorldSpace>()); }
 
 	/**
-	 * Calculate total kinetic energy of the body in WorldSpace frame of reference.
+	 * Calculate translational kinetic energy of the body in WorldSpace frame of reference.
 	 */
 	si::Energy
-	kinetic_energy() const;
+	translational_kinetic_energy() const;
+
+	/**
+	 * Calculate rotational kinetic energy of the body in WorldSpace frame of reference.
+	 */
+	si::Energy
+	rotational_kinetic_energy() const;
 
 	/**
 	 * Return center of mass vector of the argument from the most recent call

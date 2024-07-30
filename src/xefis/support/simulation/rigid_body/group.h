@@ -90,10 +90,16 @@ class Group
 	translate (SpaceLength<WorldSpace> const&);
 
 	/**
-	 * Calculate total kinetic energy of the group in WorldSpace frame of reference.
+	 * Calculate translational kinetic energy of the group in WorldSpace frame of reference.
 	 */
 	si::Energy
-	kinetic_energy() const;
+	translational_kinetic_energy() const;
+
+	/**
+	 * Calculate rotational kinetic energy of the group in WorldSpace frame of reference.
+	 */
+	si::Energy
+	rotational_kinetic_energy() const;
 
   private:
 	System*				_system;

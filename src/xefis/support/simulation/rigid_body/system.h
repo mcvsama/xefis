@@ -173,11 +173,18 @@ class System: private Noncopyable
 		{ return _frame_precalculations; }
 
 	/**
-	 * Calculate total energy of all bodies in the system.
+	 * Calculate total translational energy of all bodies in the system.
 	 */
 	[[nodiscard]]
 	si::Energy
-	kinetic_energy() const;
+	translational_kinetic_energy() const;
+
+	/**
+	 * Calculate total rotational energy of all bodies in the system.
+	 */
+	[[nodiscard]]
+	si::Energy
+	rotational_kinetic_energy() const;
 
 	/**
 	 * Rotate whole system about space origin by provided rotation matrix.

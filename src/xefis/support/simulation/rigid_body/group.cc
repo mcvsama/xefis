@@ -48,12 +48,24 @@ Group::translate (SpaceLength<WorldSpace> const& translation)
 
 
 si::Energy
-Group::kinetic_energy() const
+Group::translational_kinetic_energy() const
 {
 	si::Energy e = 0_J;
 
 	for (auto const& body: _bodies)
-		e += body->kinetic_energy();
+		e += body->translational_kinetic_energy();
+
+	return e;
+}
+
+
+si::Energy
+Group::rotational_kinetic_energy() const
+{
+	si::Energy e = 0_J;
+
+	for (auto const& body: _bodies)
+		e += body->rotational_kinetic_energy();
 
 	return e;
 }

@@ -28,12 +28,24 @@
 namespace xf::rigid_body {
 
 si::Energy
-System::kinetic_energy() const
+System::translational_kinetic_energy() const
 {
 	si::Energy e = 0_J;
 
 	for (auto const& body: _bodies)
-		e += body->kinetic_energy();
+		e += body->translational_kinetic_energy();
+
+	return e;
+}
+
+
+si::Energy
+System::rotational_kinetic_energy() const
+{
+	si::Energy e = 0_J;
+
+	for (auto const& body: _bodies)
+		e += body->rotational_kinetic_energy();
 
 	return e;
 }

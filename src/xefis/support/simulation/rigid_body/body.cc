@@ -62,13 +62,20 @@ Body::rotate_about_body_origin (RotationMatrix<WorldSpace> const& rotation)
 
 
 si::Energy
-Body::kinetic_energy() const
+Body::translational_kinetic_energy() const
 {
 	auto const mm = mass_moments<WorldSpace>();
 	auto const vm = velocity_moments<WorldSpace>();
-	auto const twice_linear_energy = mm.mass() * square (abs (vm.velocity()));
-	auto const twice_angular_energy = ~vm.angular_velocity() * mm.moment_of_inertia() * vm.angular_velocity() / 1_rad / 1_rad;
-	return 0.5 * (twice_linear_energy + twice_angular_energy.scalar());
+	return 0.5 * mm.mass() * square (abs (vm.velocity()));
+}
+
+
+si::Energy
+Body::rotational_kinetic_energy() const
+{
+	auto const mm = mass_moments<WorldSpace>();
+	auto const vm = velocity_moments<WorldSpace>();
+	return 0.5 * (~vm.angular_velocity() * mm.moment_of_inertia() * vm.angular_velocity() / 1_rad / 1_rad).scalar();
 }
 
 } // namespace xf::rigid_body
