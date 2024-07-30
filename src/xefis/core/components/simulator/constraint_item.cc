@@ -51,6 +51,9 @@ ConstraintItem::refresh()
 
 	setText (0, QString::fromStdString (_constraint.label()));
 
+	if (_constraint.broken())
+		setForeground (0 , QBrush (Qt::gray));
+
 	if (auto* tree = treeWidget())
 		tree->blockSignals (was_blocked);
 }

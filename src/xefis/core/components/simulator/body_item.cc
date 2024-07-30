@@ -51,6 +51,9 @@ BodyItem::refresh()
 
 	setText (0, QString::fromStdString (_body.label()));
 
+	if (_body.broken())
+		setForeground (0 , QBrush (Qt::gray));
+
 	if (auto* tree = treeWidget())
 		tree->blockSignals (was_blocked);
 }
