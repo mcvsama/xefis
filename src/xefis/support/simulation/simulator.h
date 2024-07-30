@@ -47,7 +47,7 @@ class Simulator: public Noncopyable
 	[[nodiscard]]
 	si::Time
 	time_step() const noexcept
-		{ return _time_step; }
+		{ return _evolver->time_step(); }
 
 	/**
 	 * Return integrated simulation time.
@@ -82,9 +82,15 @@ class Simulator: public Noncopyable
 	evolve (si::Time const simulation_time, si::Time const real_time_limit)
 		{ _evolver->evolve (simulation_time, real_time_limit); }
 
+	/**
+	 * Evolve the rigid body system given number of steps (frames).
+	 */
+	void
+	evolve (std::size_t const frames)
+		{ _evolver->evolve (frames); }
+
   private:
 	xf::Logger						_logger;
-	si::Time const					_time_step;
 	rigid_body::System&				_rigid_body_system;
 	rigid_body::ImpulseSolver&		_rigid_body_solver;
 	std::optional<xf::Evolver>		_evolver;

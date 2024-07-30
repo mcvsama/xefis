@@ -66,8 +66,14 @@ SimulatorWidget::make_viewer_widget()
 	_rigid_body_viewer.emplace (this, RigidBodyViewer::AutoFPS);
 	_rigid_body_viewer->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Expanding);
 	_rigid_body_viewer->set_rigid_body_system (&_simulator.rigid_body_system());
-	_rigid_body_viewer->set_redraw_callback ([this] (si::Time const frame_time) {
-		_simulator.evolve (frame_time, 100_ms);
+	_rigid_body_viewer->set_redraw_callback ([this] (std::optional<si::Time> const simulation_time) {
+		if (simulation_time)
+			_simulator.evolve (*simulation_time, 100_ms);
+		else
+			_simulator.evolve (1);
+
+		update_simulation_time_label();
+		_body_editor->refresh();
 	});
 
 	auto* viewer_frame = new QFrame (this);
@@ -86,13 +92,15 @@ SimulatorWidget::make_viewer_widget()
 QWidget*
 SimulatorWidget::make_simulation_controls()
 {
+	auto const ph = PaintHelper (*this);
+
 	auto* start_stop_sim_button = new QPushButton ("Start/stop simulation", this);
 	auto const update_start_stop_icon = [this, start_stop_sim_button] {
 		if (_rigid_body_viewer)
 		{
-			auto const& icon = _rigid_body_viewer->paused()
-				? _start_icon
-				: _pause_icon;
+			auto const& icon = _rigid_body_viewer->playback() == RigidBodyViewer::Playback::Running
+				? _pause_icon
+				: _start_icon;
 
 			start_stop_sim_button->setIcon (icon);
 		}
@@ -106,9 +114,11 @@ SimulatorWidget::make_simulation_controls()
 	update_start_stop_icon();
 
 	auto* step_sim_button = new QPushButton ("Single step", this);
-	QObject::connect (step_sim_button, &QPushButton::pressed, [this] {
+	QObject::connect (step_sim_button, &QPushButton::pressed, [this, update_start_stop_icon] {
 		if (_rigid_body_viewer)
 			_rigid_body_viewer->step();
+
+		update_start_stop_icon();
 	});
 
 	auto* show_configurator_button = new QPushButton ("Show machine config", this);
@@ -120,11 +130,24 @@ SimulatorWidget::make_simulation_controls()
 	auto* sim_controls = new QWidget (this);
 	sim_controls->setSizePolicy (QSizePolicy::Fixed, QSizePolicy::Fixed);
 
+	auto time_step_text = std::format ("Δt = {} s", _simulator.time_step().in<si::Second>());
+	auto* time_step_label = new QLabel (QString::fromStdString (time_step_text), this);
+	time_step_label->setSizePolicy (QSizePolicy::Fixed, QSizePolicy::Fixed);
+
+	_simulation_time_label.emplace ("", this);
+	time_step_label->setSizePolicy (QSizePolicy::Fixed, QSizePolicy::Fixed);
+	update_simulation_time_label();
+
 	auto* layout = new QHBoxLayout (sim_controls);
 	layout->setMargin (0);
 	layout->addWidget (start_stop_sim_button);
 	layout->addWidget (step_sim_button);
 	layout->addWidget (show_configurator_button);
+	layout->addItem (new QSpacerItem (ph.em_pixels_int (1.0), 0, QSizePolicy::Fixed, QSizePolicy::Fixed));
+	layout->addWidget (time_step_label);
+	layout->addItem (new QSpacerItem (ph.em_pixels_int (1.0), 0, QSizePolicy::Fixed, QSizePolicy::Fixed));
+	layout->addWidget (&*_simulation_time_label);
+	layout->addItem (new QSpacerItem (0, 0, QSizePolicy::Expanding, QSizePolicy::Fixed));
 
 	return sim_controls;
 }
@@ -170,6 +193,14 @@ SimulatorWidget::make_body_controls()
 	layout->addWidget (&*_body_editor);
 
 	return body_controls;
+}
+
+
+void
+SimulatorWidget::update_simulation_time_label()
+{
+	auto text = std::format ("Simulation time: {:.6f} s", _simulator.simulation_time().in<si::Second>());
+	_simulation_time_label->setText (QString::fromStdString (text));
 }
 
 } // namespace xf

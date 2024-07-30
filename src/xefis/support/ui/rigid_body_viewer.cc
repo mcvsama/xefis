@@ -68,17 +68,8 @@ RigidBodyViewer::toggle_pause()
 void
 RigidBodyViewer::step()
 {
-	switch (_playback)
-	{
-		case Playback::Paused:
-		case Playback::Stepping:
-			_playback = Playback::Stepping;
-			break;
-
-		case Playback::Running:
-			_playback = Playback::Paused;
-			break;
-	}
+	_playback = Playback::Stepping;
+	_steps_to_do += 1;
 }
 
 
@@ -200,8 +191,13 @@ RigidBodyViewer::draw (QOpenGLPaintDevice& canvas)
 				break;
 
 			case Playback::Stepping:
-				_playback = Playback::Paused;
-				[[fallthrough]];
+				if (_steps_to_do > 0)
+				{
+					_steps_to_do -= 1;
+					_on_redraw (std::nullopt);
+				}
+				break;
+
 			case Playback::Running:
 				_on_redraw (1 / refresh_rate());
 				break;

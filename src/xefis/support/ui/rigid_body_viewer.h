@@ -31,6 +31,8 @@
 
 // Standard:
 #include <cstddef>
+#include <functional>
+#include <optional>
 
 
 namespace xf {
@@ -45,7 +47,7 @@ class RigidBodyViewer: public GLAnimationWidget
 {
   public:
 	// Evolution function called before each display frame:
-	using OnRedraw = std::function<void (si::Time dt)>;
+	using OnRedraw = std::function<void (std::optional<si::Time> simulation_time)>;
 	using FPSMode = GLAnimationWidget::FPSMode;
 
 	enum class Playback
@@ -150,13 +152,12 @@ class RigidBodyViewer: public GLAnimationWidget
 		{ return _y_angle; }
 
 	/**
-	 * Return true if viewer is in "paused" state
-	 * (by the spacebar key).
+	 * Return playback mode.
 	 */
 	[[nodiscard]]
-	bool
-	paused() const noexcept
-		{ return _playback == Playback::Paused; }
+	Playback
+	playback() const noexcept
+		{ return _playback; }
 
 	/**
 	 * Toggle pause.
@@ -222,6 +223,7 @@ class RigidBodyViewer: public GLAnimationWidget
 	// Prevents menu reappearing immediately when trying to close it with a right click:
 	bool								_prevent_menu_reappear: 1		{ false };
 	Playback							_playback						{ Playback::Paused };
+	std::size_t							_steps_to_do					{ 0 };
 	SpaceLength<rigid_body::WorldSpace>	_position						{ kDefaultPosition };
 	si::Angle							_x_angle						{ kDefaultXAngle };
 	si::Angle							_y_angle						{ kDefaultYAngle };

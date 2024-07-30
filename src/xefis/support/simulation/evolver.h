@@ -87,6 +87,12 @@ class Evolver
 	void
 	evolve (si::Time simulation_time, si::Time real_time_limit);
 
+	/**
+	 * Evolve the rigid body system given number of steps (frames).
+	 */
+	void
+	evolve (std::size_t frames);
+
   private:
 	xf::Logger	_logger;
 	si::Time	_time_step;

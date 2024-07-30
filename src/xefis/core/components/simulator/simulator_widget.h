@@ -22,7 +22,6 @@
 #include <xefis/config/all.h>
 #include <xefis/base/icons.h>
 #include <xefis/support/simulation/rigid_body/system.h>
-#include <xefis/support/simulation/evolver.h>
 #include <xefis/support/simulation/simulator.h>
 #include <xefis/support/ui/rigid_body_viewer.h>
 
@@ -37,7 +36,6 @@
 
 namespace xf {
 
-class BodyEditor;
 class Machine;
 class Simulator;
 
@@ -74,13 +72,6 @@ class SimulatorWidget: public QWidget
 	set_planet (rigid_body::Body const* planet_body) noexcept
 		{ _rigid_body_viewer->set_planet (planet_body); }
 
-	/**
-	 * Sets redraw callback on the internal RigidBodyViewer.
-	 */
-	void
-	set_redraw_callback (RigidBodyViewer::OnRedraw const on_redraw = {})
-		{ _rigid_body_viewer->set_redraw_callback (on_redraw); }
-
   private:
 	[[nodiscard]]
 	QWidget*
@@ -95,7 +86,7 @@ class SimulatorWidget: public QWidget
 	make_body_controls();
 
 	void
-	toggle_pause();
+	update_simulation_time_label();
 
   private:
 	Machine*						_machine				{ nullptr };
@@ -103,6 +94,7 @@ class SimulatorWidget: public QWidget
 	std::optional<RigidBodyViewer>	_rigid_body_viewer;
 	std::optional<BodyEditor>		_body_editor;
 	std::optional<BodiesTree>		_bodies_tree;
+	std::optional<QLabel>			_simulation_time_label;
 	QIcon							_start_icon				{ icons::start() };
 	QIcon							_pause_icon				{ icons::pause() };
 };

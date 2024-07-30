@@ -56,5 +56,17 @@ Evolver::evolve (si::Time const simulation_time, si::Time const real_time_limit)
 	}
 }
 
+
+void
+Evolver::evolve (std::size_t const frames)
+{
+	for (std::size_t i = 0; i < frames; ++i)
+	{
+		_evolve (_time_step);
+		_real_time += _time_step;
+		_simulation_time += _time_step;
+	}
+}
+
 } // namespace xf
 

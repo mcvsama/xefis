@@ -38,6 +38,7 @@
 // Standard:
 #include <cstddef>
 #include <memory>
+#include <optional>
 #include <string>
 
 
@@ -100,8 +101,11 @@ run (rigid_body::System& system, rigid_body::Body* followed_body, std::function<
 
 	RigidBodyViewer viewer (nullptr, 60_Hz);
 	viewer.set_rigid_body_system (&system);
-	viewer.set_redraw_callback ([&evolver] (si::Time const dt) {
-		evolver.evolve (dt, 1_s);
+	viewer.set_redraw_callback ([&evolver] (std::optional<si::Time> const simulation_time) {
+		if (simulation_time)
+			evolver.evolve (*simulation_time, 1_s);
+		else
+			evolver.evolve (1);
 	});
 	viewer.resize (QSize (50 * lh, 50 * lh));
 	viewer.set_followed_body (followed_body);
