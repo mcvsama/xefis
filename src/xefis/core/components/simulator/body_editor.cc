@@ -16,12 +16,13 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/base/icons.h>
 #include <xefis/support/ui/paint_helper.h>
 #include <xefis/support/ui/widget.h>
 
 // Qt:
-#include <QLabel>
 #include <QLayout>
+#include <QPushButton>
 
 // Standard:
 #include <cstddef>
@@ -34,18 +35,31 @@ BodyEditor::BodyEditor (QWidget* parent):
 {
 	auto const ph = PaintHelper (*this);
 
-	auto [top_strip, top_label] = Widget::create_colored_strip_label ("abc", Qt::blue, Qt::AlignBottom, this);
-	top_strip->setMinimumWidth (ph.em_pixels_int (20));
+	auto [top_strip, top_label] = Widget::create_colored_strip_label ("–", Qt::blue, Qt::AlignBottom, this);
+	top_strip->setMinimumWidth (ph.em_pixels_int (25));
 	_body_label = top_label;
+
+	_tool_box.emplace (this);
+	_tool_box->addItem (new QLabel ("TODO", this), icons::body(), "Placement");
+	_tool_box->addItem (new QLabel ("TODO", this), icons::body(), "Mass moments");
+	_tool_box->addItem (new QLabel ("TODO", this), icons::body(), "Velocity moments");
+	_tool_box->addItem (new QLabel ("TODO", this), icons::body(), "External force moments");
+	_tool_box->addItem (new QLabel ("TODO", this), icons::body(), "Custom impulses");
+	_tool_box->addItem (new QLabel ("Acceleration, kinetic energy, broken?", this), icons::body(), "Computed");
 
 	auto* layout = new QVBoxLayout (this);
 	layout->addWidget (top_strip);
+	layout->addWidget (create_basic_info_widget());
+	layout->addWidget (&*_tool_box);
 	layout->addItem (new QSpacerItem (0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
+
+	setEnabled (false);
+	refresh();
 }
 
 
 void
-BodyEditor::edit_body (rigid_body::Body* body_to_edit)
+BodyEditor::edit (rigid_body::Body* body_to_edit)
 {
 	_edited_body = body_to_edit;
 	refresh();
@@ -56,7 +70,51 @@ void
 BodyEditor::refresh()
 {
 	if (_edited_body)
+	{
+		setEnabled (true);
 		_body_label->setText (QString::fromStdString (_edited_body->label()));
+		_translational_kinetic_energy->setText (QString::fromStdString (std::format ("Translational kinetic energy: {:.6f} J", _edited_body->translational_kinetic_energy().in<si::Joule>())));
+		_rotational_kinetic_energy->setText (QString::fromStdString (std::format ("Rotational kinetic energy: {:.6f} J", _edited_body->rotational_kinetic_energy().in<si::Joule>())));
+		_body_is_visible->setChecked (false); // TODO
+		_show_com_and_origin->setChecked (false); // TODO
+	}
+	else
+	{
+		setEnabled (false);
+		_body_label->setText ("–");
+	}
+}
+
+
+QWidget*
+BodyEditor::create_basic_info_widget()
+{
+	auto* basic_info = new QWidget (this);
+	basic_info->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Fixed);
+
+	{
+		_translational_kinetic_energy.emplace (this);
+		_rotational_kinetic_energy.emplace (this);
+
+		_body_is_visible.emplace ("Visible", this);
+		QObject::connect (&*_body_is_visible, &QCheckBox::toggled, [this] (bool checked) {
+			// TODO
+		});
+
+		_show_com_and_origin.emplace ("Show center-of-mass and origin", this);
+		QObject::connect (&*_body_is_visible, &QCheckBox::toggled, [this] (bool checked) {
+			// TODO
+			// Also shows body coordinates at COM and at origin
+		});
+
+		auto* layout = new QVBoxLayout (basic_info);
+		layout->addWidget (&*_translational_kinetic_energy);
+		layout->addWidget (&*_rotational_kinetic_energy);
+		layout->addWidget (&*_body_is_visible);
+		layout->addWidget (&*_show_com_and_origin);
+	}
+
+	return basic_info;
 }
 
 } // namespace xf

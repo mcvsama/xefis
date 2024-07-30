@@ -289,11 +289,26 @@ BodiesTree::contextMenuEvent (QContextMenuEvent* event)
 			menu.addAction ("&Edit name", [this, body_item] {
 				editItem (body_item, 0);
 			});
+
+			{
+				auto *action = menu.addAction ("Break this body", [this, body_item] {
+					body_item->body().set_broken();
+					refresh();
+				});
+
+				if (body_item->body().broken())
+					action->setEnabled (false);
+			}
 		}
 		else if (auto* constraint_item = dynamic_cast<ConstraintItem*> (item))
 		{
 			menu.addAction ("&Edit name", [this, constraint_item] {
 				editItem (constraint_item, 0);
+			});
+
+			menu.addAction ("Break this constraint", [this, constraint_item] {
+				constraint_item->constraint().set_broken();
+				refresh();
 			});
 		}
 	}

@@ -74,6 +74,7 @@ SimulatorWidget::make_viewer_widget()
 
 		update_simulation_time_label();
 		_body_editor->refresh();
+		_constraint_editor->refresh();
 	});
 
 	auto* viewer_frame = new QFrame (this);
@@ -157,15 +158,31 @@ QWidget*
 SimulatorWidget::make_body_controls()
 {
 	_body_editor.emplace (this);
+	_constraint_editor.emplace (this);
 	_bodies_tree.emplace (this, _simulator.rigid_body_system(), *_rigid_body_viewer);
+
+	_editors_stack.emplace (this);
+	_editors_stack->addWidget (&*_body_editor);
+	_editors_stack->addWidget (&*_constraint_editor);
 
 	QObject::connect (&*_bodies_tree, &QTreeWidget::currentItemChanged, [this] (QTreeWidgetItem* current, [[maybe_unused]] QTreeWidgetItem* previous) {
 		if (_body_editor)
 		{
 			if (auto* body_item = dynamic_cast<BodyItem*> (current))
-				_body_editor->edit_body (&body_item->body());
+			{
+				_body_editor->edit (&body_item->body());
+				_editors_stack->setCurrentWidget (&*_body_editor);
+			}
+			else if (auto* constraint_item = dynamic_cast<ConstraintItem*> (current))
+			{
+				_constraint_editor->edit (&constraint_item->constraint());
+				_editors_stack->setCurrentWidget (&*_constraint_editor);
+			}
 			else
-				_body_editor->edit_body (nullptr);
+			{
+				_body_editor->edit (nullptr);
+				_constraint_editor->edit (nullptr);
+			}
 		}
 	});
 
@@ -175,6 +192,7 @@ SimulatorWidget::make_body_controls()
 			if (auto* body_item = dynamic_cast<BodyItem*> (item))
 			{
 				body_item->backpropagate();
+				_bodies_tree->refresh();
 
 				if (_body_editor)
 					_body_editor->refresh();
@@ -190,7 +208,7 @@ SimulatorWidget::make_body_controls()
 	auto* layout = new QHBoxLayout (body_controls);
 	layout->setMargin (0);
 	layout->addWidget (&*_bodies_tree);
-	layout->addWidget (&*_body_editor);
+	layout->addWidget (&*_editors_stack);
 
 	return body_controls;
 }

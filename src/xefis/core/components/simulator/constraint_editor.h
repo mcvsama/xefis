@@ -11,12 +11,12 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__CORE__COMPONENTS__SIMULATOR__BODY_EDITOR_H__INCLUDED
-#define XEFIS__CORE__COMPONENTS__SIMULATOR__BODY_EDITOR_H__INCLUDED
+#ifndef XEFIS__CORE__COMPONENTS__SIMULATOR__CONSTRAINT_EDITOR_H__INCLUDED
+#define XEFIS__CORE__COMPONENTS__SIMULATOR__CONSTRAINT_EDITOR_H__INCLUDED
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/support/simulation/rigid_body/body.h>
+#include <xefis/support/simulation/rigid_body/constraint.h>
 
 // Qt:
 #include <QCheckBox>
@@ -31,38 +31,32 @@
 
 namespace xf {
 
-class BodyEditor: public QWidget
+class ConstraintEditor: public QWidget
 {
   public:
 	// Ctor
 	explicit
-	BodyEditor (QWidget* parent);
+	ConstraintEditor (QWidget* parent);
 
 	/**
-	 * Sets body to edit. Pass nullptr to disable.
+	 * Sets constraint to edit. Pass nullptr to disable.
 	 */
 	void
-	edit (rigid_body::Body* body_to_edit);
+	edit (rigid_body::Constraint* constraint_to_edit);
 
 	/**
-	 * Update data about currently edited body.
+	 * Update data about currently edited constraint.
 	 */
 	void
 	refresh();
 
   private:
-	[[nodiscard]]
 	QWidget*
 	create_basic_info_widget();
 
   private:
-	rigid_body::Body*			_edited_body { nullptr };
-	QLabel*						_body_label;
-	std::optional<QToolBox>		_tool_box;
-	std::optional<QLabel>		_translational_kinetic_energy;
-	std::optional<QLabel>		_rotational_kinetic_energy;
-	std::optional<QCheckBox>	_body_is_visible;
-	std::optional<QCheckBox>	_show_com_and_origin;
+	rigid_body::Constraint*		_edited_constraint { nullptr };
+	QLabel*						_constraint_label;
 };
 
 } // namespace xf

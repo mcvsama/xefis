@@ -17,6 +17,7 @@
 // Local:
 #include "bodies_tree.h"
 #include "body_editor.h"
+#include "constraint_editor.h"
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -27,6 +28,7 @@
 
 // Qt:
 #include <QIcon>
+#include <QStackedWidget>
 #include <QWidget>
 
 // Standard:
@@ -92,7 +94,10 @@ class SimulatorWidget: public QWidget
 	Machine*						_machine				{ nullptr };
 	Simulator&						_simulator;
 	std::optional<RigidBodyViewer>	_rigid_body_viewer;
+	// Warning: QStackedWidget deletes widgets added to it in its destructor:
+	std::optional<QStackedWidget>	_editors_stack;
 	std::optional<BodyEditor>		_body_editor;
+	std::optional<ConstraintEditor>	_constraint_editor;
 	std::optional<BodiesTree>		_bodies_tree;
 	std::optional<QLabel>			_simulation_time_label;
 	QIcon							_start_icon				{ icons::start() };
