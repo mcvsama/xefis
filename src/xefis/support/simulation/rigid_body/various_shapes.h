@@ -29,7 +29,7 @@
 namespace xf::rigid_body {
 
 // Called by make_sphere to get material for vertices.
-using MakeSphereMaterialCallback	= std::function<void (ShapeMaterial&, si::Angle latitude)>;
+using MakeSphereMaterialCallback = std::function<void (ShapeMaterial&, si::Angle latitude)>;
 
 
 struct CylinderShapeParameters
@@ -51,7 +51,7 @@ make_centered_cube_shape (si::Length edge_length, ShapeMaterial const& material 
  * Make cube centered around the [0, 0, 0] point.
  */
 Shape
-make_centered_cube_shape (SpaceLength<BodySpace> const& dimensions, ShapeMaterial const& material = {});
+make_centered_cube_shape (SpaceLength<BodyOrigin> const& dimensions, ShapeMaterial const& material = {});
 
 /**
  * Make cube that represents given moments of inertia. Assumes that off-diagonal
@@ -59,7 +59,7 @@ make_centered_cube_shape (SpaceLength<BodySpace> const& dimensions, ShapeMateria
  * The cube is centered around the [0, 0, 0] point.
  */
 Shape
-make_centered_cube_shape (xf::MassMoments<BodySpace> const&, ShapeMaterial const& material = {});
+make_centered_cube_shape (xf::MassMoments<BodyCOM> const&, ShapeMaterial const& material = {});
 
 /**
  * Make sphere of given radius.

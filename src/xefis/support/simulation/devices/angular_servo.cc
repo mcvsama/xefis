@@ -29,7 +29,7 @@
 
 namespace xf::sim {
 
-AngularServo::AngularServo (rigid_body::AngularServoConstraint& constraint, Resolution const resolution, MassMoments<rigid_body::BodySpace> const& mass_moments):
+AngularServo::AngularServo (rigid_body::AngularServoConstraint& constraint, Resolution const resolution, MassMoments<rigid_body::BodyCOM> const& mass_moments):
 	Body (mass_moments),
 	_constraint (constraint),
 	_resolution (resolution)
@@ -46,15 +46,15 @@ AngularServo::set_setpoint (si::Angle const setpoint)
 std::unique_ptr<AngularServo>
 make_standard_9gram_servo (rigid_body::AngularServoConstraint& constraint)
 {
-	std::array<PointMass<rigid_body::BodySpace>, 8> masses;
+	std::array<PointMass<rigid_body::BodyCOM>, 8> masses;
 	std::size_t i = 0;
 
 	for (auto const x: { -11.5_mm, +11.5_mm })
 		for (auto const y: { -6_mm, +6_mm })
 			for (auto const z: { -14_mm, +14_mm })
-				masses[i++] = { 9_gr / masses.size(), SpaceLength<rigid_body::BodySpace> (0.5 * x, 0.5 * y, 0.5 * z), math::zero };
+				masses[i++] = { 9_gr / masses.size(), SpaceLength<rigid_body::BodyCOM> (0.5 * x, 0.5 * y, 0.5 * z), math::zero };
 
-	auto const mass_moments = MassMoments<rigid_body::BodySpace>::from_point_masses (begin (masses), end (masses));
+	auto const mass_moments = MassMoments<rigid_body::BodyCOM>::from_point_masses (begin (masses), end (masses));
 
 	return std::make_unique<AngularServo> (constraint, 2 / 1_deg, mass_moments);
 }

@@ -38,31 +38,31 @@ class ShapeVertex
 
 	// Ctor
 	explicit
-	ShapeVertex (SpaceLength<BodySpace> const& position);
+	ShapeVertex (SpaceLength<BodyOrigin> const& position);
 
 	// Ctor
 	explicit
-	ShapeVertex (SpaceLength<BodySpace> const& position, ShapeMaterial const&);
+	ShapeVertex (SpaceLength<BodyOrigin> const& position, ShapeMaterial const&);
 
 	/**
 	 * \param	normal
 	 *			Vector normal to the surface at the vertex position.
 	 */
 	explicit
-	ShapeVertex (SpaceLength<BodySpace> const& position, SpaceVector<double, BodySpace> const& normal);
+	ShapeVertex (SpaceLength<BodyOrigin> const& position, SpaceVector<double, BodyOrigin> const& normal);
 
 	/**
 	 * \param	normal
 	 *			Vector normal to the surface at the vertex position.
 	 */
 	explicit
-	ShapeVertex (SpaceLength<BodySpace> const& position, SpaceVector<double, BodySpace> const& normal, ShapeMaterial const&);
+	ShapeVertex (SpaceLength<BodyOrigin> const& position, SpaceVector<double, BodyOrigin> const& normal, ShapeMaterial const&);
 
 	/**
 	 * Return vertex position in space.
 	 */
 	[[nodiscard]]
-	SpaceLength<BodySpace> const&
+	SpaceLength<BodyOrigin> const&
 	position() const noexcept
 		{ return _position; }
 
@@ -70,14 +70,14 @@ class ShapeVertex
 	 * Set new vertex position.
 	 */
 	void
-	set_position (SpaceLength<BodySpace> const& position)
+	set_position (SpaceLength<BodyOrigin> const& position)
 		{ _position = position; }
 
 	/**
 	 * Return normalized normal vector (if exists).
 	 */
 	[[nodiscard]]
-	std::optional<SpaceVector<double, BodySpace>> const&
+	std::optional<SpaceVector<double, BodyOrigin>> const&
 	normal() const noexcept
 		{ return _normal; }
 
@@ -85,7 +85,7 @@ class ShapeVertex
 	 * Set new vertex normal.
 	 */
 	void
-	set_normal (std::optional<SpaceVector<double, BodySpace>> const& normal)
+	set_normal (std::optional<SpaceVector<double, BodyOrigin>> const& normal)
 		{ _normal = normal; }
 
 	/**
@@ -107,18 +107,18 @@ class ShapeVertex
 	 * Rotate the vertex about space origin by provided rotation matrix.
 	 */
 	void
-	rotate (RotationMatrix<BodySpace> const&);
+	rotate (RotationMatrix<BodyOrigin> const&);
 
 	/**
 	 * Translate the vertex by given vector.
 	 */
 	void
-	translate (SpaceLength<BodySpace> const& translation)
+	translate (SpaceLength<BodyOrigin> const& translation)
         { _position += translation; }
 
   private:
-	SpaceLength<BodySpace>							_position;
-	std::optional<SpaceVector<double, BodySpace>>	_normal;
+	SpaceLength<BodyOrigin>							_position;
+	std::optional<SpaceVector<double, BodyOrigin>>	_normal;
 	ShapeMaterial									_material;
 };
 
@@ -130,27 +130,27 @@ ShapeVertex::ShapeVertex (std::initializer_list<si::Length> coordinates):
 
 
 inline
-ShapeVertex::ShapeVertex (SpaceLength<BodySpace> const& position):
+ShapeVertex::ShapeVertex (SpaceLength<BodyOrigin> const& position):
 	_position (position)
 { }
 
 
 inline
-ShapeVertex::ShapeVertex (SpaceLength<BodySpace> const& position, ShapeMaterial const& material):
+ShapeVertex::ShapeVertex (SpaceLength<BodyOrigin> const& position, ShapeMaterial const& material):
 	_position (position),
 	_material (material)
 { }
 
 
 inline
-ShapeVertex::ShapeVertex (SpaceLength<BodySpace> const& position, SpaceVector<double, BodySpace> const& normal):
+ShapeVertex::ShapeVertex (SpaceLength<BodyOrigin> const& position, SpaceVector<double, BodyOrigin> const& normal):
 	_position (position),
 	_normal (normal)
 { }
 
 
 inline
-ShapeVertex::ShapeVertex (SpaceLength<BodySpace> const& position, SpaceVector<double, BodySpace> const& normal, ShapeMaterial const& material):
+ShapeVertex::ShapeVertex (SpaceLength<BodyOrigin> const& position, SpaceVector<double, BodyOrigin> const& normal, ShapeMaterial const& material):
 	_position (position),
 	_normal (normal),
 	_material (material)

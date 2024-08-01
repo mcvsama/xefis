@@ -32,12 +32,12 @@ namespace xf::rigid_body {
 Shape
 make_centered_cube_shape (si::Length const edge_length, ShapeMaterial const& material)
 {
-	return make_centered_cube_shape (SpaceLength<BodySpace> { edge_length, edge_length, edge_length }, material);
+	return make_centered_cube_shape (SpaceLength<BodyOrigin> { edge_length, edge_length, edge_length }, material);
 }
 
 
 Shape
-make_centered_cube_shape (SpaceLength<BodySpace> const& dimensions, ShapeMaterial const& material)
+make_centered_cube_shape (SpaceLength<BodyOrigin> const& dimensions, ShapeMaterial const& material)
 {
 	Shape shape;
 	auto const x = 0.5 * dimensions[0];
@@ -76,7 +76,7 @@ make_centered_cube_shape (SpaceLength<BodySpace> const& dimensions, ShapeMateria
 
 
 Shape
-make_centered_cube_shape (xf::MassMoments<BodySpace> const& mm, ShapeMaterial const& material)
+make_centered_cube_shape (xf::MassMoments<BodyCOM> const& mm, ShapeMaterial const& material)
 {
 	// Assuming center of mass position is 0.
 
@@ -91,7 +91,7 @@ make_centered_cube_shape (xf::MassMoments<BodySpace> const& mm, ShapeMaterial co
 	si::Length const y = sqrt ((+d0 -d1 +d2) * inv_double_k);
 	si::Length const z = sqrt ((+d0 +d1 -d2) * inv_double_k);
 
-	return make_centered_cube_shape (SpaceLength<BodySpace> { x, y, z }, material);
+	return make_centered_cube_shape (SpaceLength<BodyCOM> { x, y, z }, material);
 }
 
 
@@ -126,7 +126,7 @@ make_centered_sphere_shape (si::Length const radius, size_t slices, size_t stack
 				auto const y = w * cos (h);
 				auto const z = cos (v);
 
-				return SpaceVector<double, BodySpace> (x, y, z);
+				return SpaceVector<double, BodyOrigin> (x, y, z);
 			};
 
 			auto const p1 = get_vector (angle_v, angle_h);
@@ -174,9 +174,9 @@ make_cylinder_shape (CylinderShapeParameters const& params, ShapeMaterial const&
 	if (params.with_front_and_back)
 	{
 		face1.emplace();
-		face1->emplace_back (SpaceLength<BodySpace> (0_m, 0_m, 0_m), SpaceVector<double, BodySpace> (0.0, 0.0, -1.0), material);
+		face1->emplace_back (SpaceLength<BodyOrigin> (0_m, 0_m, 0_m), SpaceVector<double, BodyOrigin> (0.0, 0.0, -1.0), material);
 		face2.emplace();
-		face2->emplace_back (SpaceLength<BodySpace> (0_m, 0_m, params.length), SpaceVector<double, BodySpace> (0.0, 0.0, +1.0), material);
+		face2->emplace_back (SpaceLength<BodyOrigin> (0_m, 0_m, params.length), SpaceVector<double, BodyOrigin> (0.0, 0.0, +1.0), material);
 	}
 
 	si::Angle const da = 360_deg / num_faces;
@@ -188,17 +188,17 @@ make_cylinder_shape (CylinderShapeParameters const& params, ShapeMaterial const&
 		auto const y = cos (angle);
 		auto const x_len = params.radius * x;
 		auto const y_len = params.radius * y;
-		SpaceVector<double, BodySpace> const normal (x, y, 0);
-		SpaceLength<BodySpace> const p1 (x_len, y_len, 0_m);
-		SpaceLength<BodySpace> const p2 (x_len, y_len, params.length);
+		SpaceVector<double, BodyOrigin> const normal (x, y, 0);
+		SpaceLength<BodyOrigin> const p1 (x_len, y_len, 0_m);
+		SpaceLength<BodyOrigin> const p2 (x_len, y_len, params.length);
 
 		strip.emplace_back (p1, normal, material);
 		strip.emplace_back (p2, normal, material);
 
 		if (params.with_front_and_back)
 		{
-			face1->emplace_back (p1, SpaceVector<double, BodySpace> (0.0, 0.0, -1.0), material);
-			face2->emplace_back (p2, SpaceVector<double, BodySpace> (0.0, 0.0, +1.0), material);
+			face1->emplace_back (p1, SpaceVector<double, BodyOrigin> (0.0, 0.0, -1.0), material);
+			face2->emplace_back (p2, SpaceVector<double, BodyOrigin> (0.0, 0.0, +1.0), material);
 		}
 	}
 
@@ -227,7 +227,7 @@ make_cone_shape (si::Length const length, si::Length const radius, size_t num_fa
 	if (with_bottom)
 	{
 		bottom_fan.emplace();
-		bottom_fan->emplace_back (SpaceLength<BodySpace> (0_m, 0_m, 0_m), SpaceVector<double, BodySpace> (0.0, 0.0, -1.0), material);
+		bottom_fan->emplace_back (SpaceLength<BodyOrigin> (0_m, 0_m, 0_m), SpaceVector<double, BodyOrigin> (0.0, 0.0, -1.0), material);
 	}
 
 	si::Angle const da = 360_deg / num_faces;
@@ -241,15 +241,15 @@ make_cone_shape (si::Length const length, si::Length const radius, size_t num_fa
 		auto const y = cos (angle);
 		auto const x = sin (angle);
 		auto const z = sin (atan (radius / length));
-		SpaceVector<double, BodySpace> const normal (x, y, z);
-		SpaceLength<BodySpace> const p1 (x * radius, y * radius, 0_m);
-		SpaceLength<BodySpace> const p2 (0_m, 0_m, length);
+		SpaceVector<double, BodyOrigin> const normal (x, y, z);
+		SpaceLength<BodyOrigin> const p1 (x * radius, y * radius, 0_m);
+		SpaceLength<BodyOrigin> const p2 (0_m, 0_m, length);
 
 		cone_strip.emplace_back (p1, normal, material);
 		cone_strip.emplace_back (p2, normal, material);
 
 		if (with_bottom)
-			bottom_fan->emplace_back (p1, SpaceVector<double, BodySpace> (0.0, 0.0, -1.0), material);
+			bottom_fan->emplace_back (p1, SpaceVector<double, BodyOrigin> (0.0, 0.0, -1.0), material);
 	}
 
 	if (with_bottom)
@@ -267,7 +267,7 @@ make_solid_circle (si::Length const radius, size_t num_slices, ShapeMaterial con
 
 	Shape shape;
 	Shape::TriangleFan& fan = shape.triangle_fans().emplace_back();
-	fan.emplace_back (SpaceLength<BodySpace> (0_m, 0_m, 0_m), SpaceVector<double, BodySpace> (0.0, 0.0, 1.0), material);
+	fan.emplace_back (SpaceLength<BodyOrigin> (0_m, 0_m, 0_m), SpaceVector<double, BodyOrigin> (0.0, 0.0, 1.0), material);
 
 	si::Angle const da = 360_deg / num_slices;
 	si::Angle angle = 0_deg;
@@ -277,7 +277,7 @@ make_solid_circle (si::Length const radius, size_t num_slices, ShapeMaterial con
 		auto const y = sin (angle);
 		auto const x = cos (angle);
 
-		fan.emplace_back (SpaceLength<BodySpace> (x * radius, y * radius, 0_m), SpaceVector<double, BodySpace> (0.0, 0.0, +1.0), material);
+		fan.emplace_back (SpaceLength<BodyOrigin> (x * radius, y * radius, 0_m), SpaceVector<double, BodyOrigin> (0.0, 0.0, +1.0), material);
 	}
 
 	return shape;
@@ -296,9 +296,9 @@ make_airfoil_shape (AirfoilSpline const& spline, si::Length const chord_length, 
 	if (with_front_and_back)
 	{
 		face1.emplace();
-		face1->emplace_back (SpaceLength<BodySpace> (0_m, 0_m, 0_m), SpaceVector<double, BodySpace> (0.0, 0.0, -1.0), material);
+		face1->emplace_back (SpaceLength<BodyOrigin> (0_m, 0_m, 0_m), SpaceVector<double, BodyOrigin> (0.0, 0.0, -1.0), material);
 		face2.emplace();
-		face2->emplace_back (SpaceLength<BodySpace> (0_m, 0_m, wing_length), SpaceVector<double, BodySpace> (0.0, 0.0, +1.0), material);
+		face2->emplace_back (SpaceLength<BodyOrigin> (0_m, 0_m, wing_length), SpaceVector<double, BodyOrigin> (0.0, 0.0, +1.0), material);
 	}
 
 	auto const n_points = spline.points().size();
@@ -311,23 +311,23 @@ make_airfoil_shape (AirfoilSpline const& spline, si::Length const chord_length, 
 
 		auto const x_len = chord_length * point[0];
 		auto const y_len = chord_length * point[1];
-		SpaceLength<BodySpace> const p1 (x_len, y_len, 0_m);
-		SpaceLength<BodySpace> const p2 (x_len, y_len, wing_length);
+		SpaceLength<BodyOrigin> const p1 (x_len, y_len, 0_m);
+		SpaceLength<BodyOrigin> const p2 (x_len, y_len, wing_length);
 
-		SpaceVector<double, BodySpace> const z_versor (0, 0, 1);
-		SpaceVector<double, BodySpace> const k_towards_prev = SpaceVector<double, BodySpace> (prev_point[0], prev_point[1], 0) - SpaceVector<double, BodySpace> (point[0], point[1], 0);
-		SpaceVector<double, BodySpace> const k_towards_next = SpaceVector<double, BodySpace> (next_point[0], next_point[1], 0) - SpaceVector<double, BodySpace> (point[0], point[1], 0);
-		SpaceVector<double, BodySpace> const normal_with_prev (cross_product (z_versor, k_towards_prev));
-		SpaceVector<double, BodySpace> const normal_with_next (cross_product (k_towards_next, z_versor));
-		SpaceVector<double, BodySpace> const normal = normalized (normal_with_prev + normal_with_next);
+		SpaceVector<double, BodyOrigin> const z_versor (0, 0, 1);
+		SpaceVector<double, BodyOrigin> const k_towards_prev = SpaceVector<double, BodyOrigin> (prev_point[0], prev_point[1], 0) - SpaceVector<double, BodyOrigin> (point[0], point[1], 0);
+		SpaceVector<double, BodyOrigin> const k_towards_next = SpaceVector<double, BodyOrigin> (next_point[0], next_point[1], 0) - SpaceVector<double, BodyOrigin> (point[0], point[1], 0);
+		SpaceVector<double, BodyOrigin> const normal_with_prev (cross_product (z_versor, k_towards_prev));
+		SpaceVector<double, BodyOrigin> const normal_with_next (cross_product (k_towards_next, z_versor));
+		SpaceVector<double, BodyOrigin> const normal = normalized (normal_with_prev + normal_with_next);
 
 		strip.emplace_back (p1, normal, material);
 		strip.emplace_back (p2, normal, material);
 
 		if (with_front_and_back)
 		{
-			face1->emplace_back (p1, SpaceVector<double, BodySpace> (0.0, 0.0, -1.0), material);
-			face2->emplace_back (p2, SpaceVector<double, BodySpace> (0.0, 0.0, +1.0), material);
+			face1->emplace_back (p1, SpaceVector<double, BodyOrigin> (0.0, 0.0, -1.0), material);
+			face2->emplace_back (p2, SpaceVector<double, BodyOrigin> (0.0, 0.0, +1.0), material);
 		}
 	}
 

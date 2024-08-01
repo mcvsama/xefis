@@ -48,7 +48,7 @@ class AngularServo:
 	 *			Servo mass moments.
 	 */
 	explicit
-	AngularServo (rigid_body::AngularServoConstraint&, Resolution resolution_per_radian, MassMoments<rigid_body::BodySpace> const&);
+	AngularServo (rigid_body::AngularServoConstraint&, Resolution resolution_per_radian, MassMoments<rigid_body::BodyCOM> const&);
 
 	// Servo API
 	void

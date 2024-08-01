@@ -68,28 +68,28 @@ class SliderPrecalculation: public FramePrecalculation<SliderPrecalculationData>
 	/**
 	 * Return anchor as visible from the first body.
 	 */
-	SpaceLength<BodySpace> const&
+	SpaceLength<BodyCOM> const&
 	body_1_anchor() const noexcept
 		{ return _anchor_1; }
 
 	/**
 	 * Return anchor as visible from the second body.
 	 */
-	SpaceLength<BodySpace> const&
+	SpaceLength<BodyCOM> const&
 	body_2_anchor() const noexcept
 		{ return _anchor_2; }
 
 	/**
 	 * Return hinge as visible from the first body.
 	 */
-	SpaceVector<double, BodySpace> const&
+	SpaceVector<double, BodyCOM> const&
 	body_1_axis() const noexcept
 		{ return _axis_1; }
 
 	/**
 	 * Return hinge as visible from the second body.
 	 */
-	SpaceVector<double, BodySpace> const&
+	SpaceVector<double, BodyCOM> const&
 	body_2_axis() const noexcept
 		{ return _axis_2; }
 
@@ -99,10 +99,10 @@ class SliderPrecalculation: public FramePrecalculation<SliderPrecalculationData>
 	calculate (SliderPrecalculationData&) override;
 
   private:
-	SpaceLength<BodySpace>			_anchor_1;
-	SpaceLength<BodySpace>			_anchor_2;
-	SpaceVector<double, BodySpace>	_axis_1;
-	SpaceVector<double, BodySpace>	_axis_2;
+	SpaceLength<BodyCOM>			_anchor_1;
+	SpaceLength<BodyCOM>			_anchor_2;
+	SpaceVector<double, BodyCOM>	_axis_1;
+	SpaceVector<double, BodyCOM>	_axis_2;
 	FixedOrientationHelper			_fixed_orientation;
 };
 

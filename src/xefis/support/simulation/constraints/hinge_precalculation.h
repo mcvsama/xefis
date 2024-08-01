@@ -63,8 +63,8 @@ class HingePrecalculation: public FramePrecalculation<HingePrecalculationData>
 	 * Hinge vector/axis is given relative to the first body.
 	 */
 	explicit
-	HingePrecalculation (SpaceLength<BodySpace> const& anchor_point_1,
-						 SpaceLength<BodySpace> const& anchor_point_2,
+	HingePrecalculation (SpaceLength<BodyCOM> const& anchor_point_1,
+						 SpaceLength<BodyCOM> const& anchor_point_2,
 						 Body& body_1,
 						 Body& body_2);
 
@@ -75,8 +75,8 @@ class HingePrecalculation: public FramePrecalculation<HingePrecalculationData>
 	explicit
 	HingePrecalculation (Body& body_1,
 						 Body& body_2,
-						 SpaceLength<BodySpace> const& anchor_point_1,
-						 SpaceLength<BodySpace> const& anchor_point_2);
+						 SpaceLength<BodyCOM> const& anchor_point_1,
+						 SpaceLength<BodyCOM> const& anchor_point_2);
 
 	/**
 	 * Create a hinge between two bodies.
@@ -95,28 +95,28 @@ class HingePrecalculation: public FramePrecalculation<HingePrecalculationData>
 	/**
 	 * Return anchor as visible from the first body.
 	 */
-	SpaceLength<BodySpace> const&
+	SpaceLength<BodyCOM> const&
 	body_1_anchor() const noexcept
 		{ return _anchor_1; }
 
 	/**
 	 * Return anchor as visible from the second body.
 	 */
-	SpaceLength<BodySpace> const&
+	SpaceLength<BodyCOM> const&
 	body_2_anchor() const noexcept
 		{ return _anchor_2; }
 
 	/**
 	 * Return hinge as visible from the first body.
 	 */
-	SpaceLength<BodySpace> const&
+	SpaceLength<BodyCOM> const&
 	body_1_hinge() const noexcept
 		{ return _hinge_1; }
 
 	/**
 	 * Return hinge as visible from the second body.
 	 */
-	SpaceLength<BodySpace> const&
+	SpaceLength<BodyCOM> const&
 	body_2_hinge() const noexcept
 		{ return _hinge_2; }
 
@@ -127,11 +127,11 @@ class HingePrecalculation: public FramePrecalculation<HingePrecalculationData>
 
   private:
 	// Anchor as visible from each body:
-	SpaceLength<BodySpace>	_anchor_1;
-	SpaceLength<BodySpace>	_anchor_2;
+	SpaceLength<BodyCOM>	_anchor_1;
+	SpaceLength<BodyCOM>	_anchor_2;
 	// Hinge as visible from each body:
-	SpaceLength<BodySpace>	_hinge_1;
-	SpaceLength<BodySpace>	_hinge_2;
+	SpaceLength<BodyCOM>	_hinge_1;
+	SpaceLength<BodyCOM>	_hinge_2;
 	FixedOrientationHelper	_fixed_orientation;
 };
 

@@ -382,7 +382,7 @@ RigidBodyPainter::paint_body (rigid_body::Body const& body)
 			_gl.draw (*shape);
 		else
 		{
-			auto const edge = _mass_scale * 1_kg * std::pow (body.mass_moments<rigid_body::BodySpace>().mass() / 1_kg, 1.0 / 3);
+			auto const edge = _mass_scale * 1_kg * std::pow (body.mass_moments<rigid_body::BodyCOM>().mass() / 1_kg, 1.0 / 3);
 			_gl.draw (rigid_body::make_centered_cube_shape (edge));
 		}
 	});
@@ -513,8 +513,8 @@ RigidBodyPainter::paint_angular_momentum (rigid_body::Body const& body)
 	auto const angular_momentum_to_length = 0.001_m / (1_kg * 1_m2 / 1_s) / 1_rad; // TODO unhardcode
 	//TODO auto const& cache = body.frame_cache();
 	auto const com = body.placement().position() - followed_body_position();
-	auto const I = body.mass_moments<rigid_body::BodySpace>().moment_of_inertia();
-	auto const L = I * body.velocity_moments<rigid_body::BodySpace>().angular_velocity();
+	auto const I = body.mass_moments<rigid_body::BodyCOM>().moment_of_inertia();
+	auto const L = I * body.velocity_moments<rigid_body::BodyCOM>().angular_velocity();
 	auto const L_world = body.placement().unbound_transform_to_base (L);
 
 	draw_arrow (com, L_world * angular_momentum_to_length, rigid_body::make_material (Qt::darkBlue));
@@ -525,7 +525,7 @@ void
 RigidBodyPainter::paint_moments_of_inertia_cuboid (rigid_body::Body const& body)
 {
 	auto const com_material = rigid_body::make_material ({ 0x00, 0x44, 0x99 });
-	auto const com_shape = make_centered_cube_shape (body.mass_moments<rigid_body::BodySpace>(), com_material);
+	auto const com_shape = make_centered_cube_shape (body.mass_moments<rigid_body::BodyCOM>(), com_material);
 
 	_gl.save_matrix ([&] {
 		_gl.translate (body.placement().position() - followed_body_position());

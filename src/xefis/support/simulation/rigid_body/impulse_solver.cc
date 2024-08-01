@@ -70,7 +70,7 @@ ImpulseSolver::update_mass_moments()
 {
 	for (auto& body: _system.bodies())
 	{
-		auto const mass_moments = body->mass_moments<BodySpace>();
+		auto const mass_moments = body->mass_moments<BodyCOM>();
 
 		body->frame_cache().inv_M = (1.0 / mass_moments.mass()) * SpaceMatrix<double, WorldSpace> (math::unit);
 		body->frame_cache().inv_I = body->placement().unbound_transform_to_base (mass_moments).inversed_moment_of_inertia();
@@ -100,8 +100,8 @@ ImpulseSolver::update_gravitational_forces()
 void
 ImpulseSolver::update_gravitational_forces (Body& b1, Body& b2)
 {
-	auto const m1 = b1.mass_moments<BodySpace>().mass();
-	auto const m2 = b2.mass_moments<BodySpace>().mass();
+	auto const m1 = b1.mass_moments<BodyCOM>().mass();
+	auto const m2 = b2.mass_moments<BodyCOM>().mass();
 	auto const c1 = b1.placement().position();
 	auto const c2 = b2.placement().position();
 
@@ -242,8 +242,8 @@ AccelerationMoments<WorldSpace>
 ImpulseSolver::acceleration_moments (Body const& body, ForceMoments<WorldSpace> const& force_moments)
 {
 	auto const fm = body.placement().unbound_transform_to_body (force_moments);
-	auto const mm = body.mass_moments<BodySpace>();
-	auto const am = AccelerationMoments<BodySpace> (fm.force() / mm.mass(), 1_rad * mm.inversed_moment_of_inertia() * fm.torque());
+	auto const mm = body.mass_moments<BodyCOM>();
+	auto const am = AccelerationMoments<BodyCOM> (fm.force() / mm.mass(), 1_rad * mm.inversed_moment_of_inertia() * fm.torque());
 	return body.placement().unbound_transform_to_base (am);
 }
 

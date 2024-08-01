@@ -88,13 +88,13 @@ class Shape
 	 * Rotate the shape about space origin by provided rotation matrix.
 	 */
 	void
-	rotate (RotationMatrix<BodySpace> const&);
+	rotate (RotationMatrix<BodyOrigin> const&);
 
 	/**
 	 * Translate the shape by given vector.
 	 */
 	void
-	translate (SpaceLength<BodySpace> const&);
+	translate (SpaceLength<BodyOrigin> const&);
 
 	/**
 	 * Apply given function for all vertices.

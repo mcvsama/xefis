@@ -24,7 +24,7 @@
 namespace xf::rigid_body {
 
 void
-Shape::rotate (RotationMatrix<BodySpace> const& rotation)
+Shape::rotate (RotationMatrix<BodyOrigin> const& rotation)
 {
 	for_all_vertices ([&] (ShapeVertex& vertex) {
 		vertex.rotate (rotation);
@@ -33,7 +33,7 @@ Shape::rotate (RotationMatrix<BodySpace> const& rotation)
 
 
 void
-Shape::translate (SpaceLength<BodySpace> const& translation)
+Shape::translate (SpaceLength<BodyOrigin> const& translation)
 {
 	for_all_vertices ([&] (ShapeVertex& vertex) {
 		vertex.translate (translation);

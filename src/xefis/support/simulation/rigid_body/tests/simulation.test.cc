@@ -47,12 +47,12 @@ make_iss()
 	xf::RotationMatrix<rigid_body::WorldSpace> const iss_ecef_rotation = math::reframe<rigid_body::WorldSpace, rigid_body::WorldSpace> (xf::airframe_to_ecef_rotation (xf::TaitBryanAngles { 0_deg, 0_deg, 0_deg }, iss_ecef_position));
 	xf::SpaceVector<si::Velocity, rigid_body::WorldSpace> const iss_velocity { 0_mps, 0_mps, 27'600_kph };
 	xf::SpaceVector<si::AngularVelocity, rigid_body::WorldSpace> const iss_angular_velocity (math::zero);
-	xf::MassMoments<rigid_body::BodySpace> const iss_mass_moments (419'725_kg, math::zero, math::unit);
+	xf::MassMoments<rigid_body::BodyCOM> const iss_mass_moments (419'725_kg, math::zero, math::unit);
 
 	auto body = std::make_unique<rigid_body::Body> (iss_mass_moments);
 	auto pl = body->placement();
 	pl.set_position (math::reframe<rigid_body::WorldSpace, void> (iss_ecef_position));
-	pl.set_body_to_base_rotation (math::reframe<rigid_body::WorldSpace, rigid_body::BodySpace> (iss_ecef_rotation));
+	pl.set_body_to_base_rotation (math::reframe<rigid_body::WorldSpace, rigid_body::BodyCOM> (iss_ecef_rotation));
 	body->set_placement (pl);
 	body->set_velocity_moments (VelocityMoments<rigid_body::WorldSpace> { iss_velocity, iss_angular_velocity });
 

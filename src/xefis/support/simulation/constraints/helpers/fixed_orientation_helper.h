@@ -35,35 +35,35 @@ class FixedOrientationHelper
 	 *			References to connected bodies. Helper must not outlive bodys.
 	 */
 	explicit
-	FixedOrientationHelper (Placement<WorldSpace, BodySpace> const& location_1,
-							Placement<WorldSpace, BodySpace> const& location_2);
+	FixedOrientationHelper (Placement<WorldSpace, BodyCOM> const& location_1,
+							Placement<WorldSpace, BodyCOM> const& location_2);
 
 	/**
 	 * Return value to put inside location constraint matrix as the rotation values.
 	 */
 	[[nodiscard]]
 	SpaceLength<WorldSpace>
-	rotation_constraint_value (Placement<WorldSpace, BodySpace> const& location_1,
-							   Placement<WorldSpace, BodySpace> const& location_2) const;
+	rotation_constraint_value (Placement<WorldSpace, BodyCOM> const& location_1,
+							   Placement<WorldSpace, BodyCOM> const& location_2) const;
 
   private:
-	RotationMatrix<BodySpace, BodySpace> _initial_relative_rotation;
+	RotationMatrix<BodyCOM, BodyCOM> _initial_relative_rotation;
 };
 
 
 inline
-FixedOrientationHelper::FixedOrientationHelper (Placement<WorldSpace, BodySpace> const& location_1,
-												Placement<WorldSpace, BodySpace> const& location_2):
+FixedOrientationHelper::FixedOrientationHelper (Placement<WorldSpace, BodyCOM> const& location_1,
+												Placement<WorldSpace, BodyCOM> const& location_2):
 	_initial_relative_rotation (relative_rotation (location_1, location_2))
 { }
 
 
 inline SpaceLength<WorldSpace>
-FixedOrientationHelper::rotation_constraint_value (Placement<WorldSpace, BodySpace> const& location_1,
-												   Placement<WorldSpace, BodySpace> const& location_2) const
+FixedOrientationHelper::rotation_constraint_value (Placement<WorldSpace, BodyCOM> const& location_1,
+												   Placement<WorldSpace, BodyCOM> const& location_2) const
 {
-	RotationMatrix<BodySpace, BodySpace> const current_relative_rotation = relative_rotation (location_1, location_2);
-	RotationMatrix<BodySpace, BodySpace> const body_rotation_error = ~_initial_relative_rotation * current_relative_rotation;
+	RotationMatrix<BodyCOM, BodyCOM> const current_relative_rotation = relative_rotation (location_1, location_2);
+	RotationMatrix<BodyCOM, BodyCOM> const body_rotation_error = ~_initial_relative_rotation * current_relative_rotation;
 	SpaceVector<si::Angle, WorldSpace> const world_rotation_error = location_2.body_to_base_rotation() * to_rotation_vector (body_rotation_error);
 	return world_rotation_error * 1_m / 1_rad;
 }

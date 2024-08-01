@@ -46,8 +46,8 @@ class FixedConstraint: public Constraint
 						  si::Time dt) const override;
 
   private:
-	SpaceLength<BodySpace>	_anchor_1;
-	SpaceLength<BodySpace>	_anchor_2;
+	SpaceLength<BodyCOM>	_anchor_1;
+	SpaceLength<BodyCOM>	_anchor_2;
 	FixedOrientationHelper	_fixed_orientation;
 };
 

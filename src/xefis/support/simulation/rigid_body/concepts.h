@@ -32,8 +32,11 @@ class BasicFramePrecalculation;
 // World (aka global aka absolute) space coordinate system:
 struct WorldSpace;
 
-// Body space coordinate system:
-struct BodySpace;
+// Body space coordinate system, origin at body's center of mass:
+struct BodyCOM;
+
+// Body space coordinate system, origin at body-origin:
+using BodyOrigin = BodyCOM;
 
 
 template<class T>
@@ -49,7 +52,7 @@ template<class T>
 
 
 template<class T>
-	concept CoordinateSystemConcept = std::is_same_v<T, WorldSpace> || std::is_same_v<T, BodySpace>;
+	concept CoordinateSystemConcept = std::is_same_v<T, WorldSpace> || std::is_same_v<T, BodyCOM> || std::is_same_v<T, BodyOrigin>;
 
 } // namespace xf::rigid_body
 

@@ -32,8 +32,8 @@ HingePrecalculation::HingePrecalculation (Body& body_1, Body& body_2):
 { }
 
 
-HingePrecalculation::HingePrecalculation (SpaceLength<BodySpace> const& anchor_point_1,
-										  SpaceLength<BodySpace> const& anchor_point_2,
+HingePrecalculation::HingePrecalculation (SpaceLength<BodyCOM> const& anchor_point_1,
+										  SpaceLength<BodyCOM> const& anchor_point_2,
 										  Body& body_1,
 										  Body& body_2):
 	HingePrecalculation (body_1, body_2)
@@ -51,8 +51,8 @@ HingePrecalculation::HingePrecalculation (SpaceLength<BodySpace> const& anchor_p
 
 HingePrecalculation::HingePrecalculation (Body& body_1,
 										  Body& body_2,
-										  SpaceLength<BodySpace> const& anchor_point_1,
-										  SpaceLength<BodySpace> const& anchor_point_2):
+										  SpaceLength<BodyCOM> const& anchor_point_1,
+										  SpaceLength<BodyCOM> const& anchor_point_2):
 	HingePrecalculation (body_1, body_2)
 {
 	auto const pl_1 = body_1.placement();

@@ -43,28 +43,28 @@ class Wing: public rigid_body::Body
 	/**
 	 * Return last calculated lift force vector.
 	 */
-	SpaceForce<rigid_body::BodySpace>
+	SpaceForce<rigid_body::BodyCOM>
 	lift_force() const noexcept
 		{ return _lift_force; }
 
 	/**
 	 * Return last calculated drag force vector.
 	 */
-	SpaceForce<rigid_body::BodySpace>
+	SpaceForce<rigid_body::BodyCOM>
 	drag_force() const noexcept
 		{ return _drag_force; }
 
 	/**
-	 * Return last calculated pitching moment vector.
+	 * Return last calculated pitching moment vector (about the center of mass).
 	 */
-	SpaceTorque<rigid_body::BodySpace>
+	SpaceTorque<rigid_body::BodyCOM>
 	pitching_moment() const noexcept
 		{ return _pitching_moment; }
 
 	/**
 	 * Return last calculated center of pressure.
 	 */
-	SpaceLength<rigid_body::BodySpace>
+	SpaceLength<rigid_body::BodyCOM>
 	center_of_pressure() const noexcept
 		{ return _center_of_pressure; }
 
@@ -73,25 +73,25 @@ class Wing: public rigid_body::Body
 	update_external_forces (Atmosphere const*) override;
 
   private:
-	static MassMoments<rigid_body::BodySpace>
-	calculate_body_space_mass_moments (Airfoil const&, si::Density material_density);
+	static MassMoments<rigid_body::BodyCOM>
+	calculate_body_com_mass_moments (Airfoil const&, si::Density material_density);
 
   private:
 	Airfoil								_airfoil;
-	SpaceForce<rigid_body::BodySpace>	_lift_force;
-	SpaceForce<rigid_body::BodySpace>	_drag_force;
-	SpaceTorque<rigid_body::BodySpace>	_pitching_moment;
-	SpaceLength<rigid_body::BodySpace>	_center_of_pressure;
-	SpaceLength<rigid_body::BodySpace>	_com_to_planar_origin;
+	SpaceForce<rigid_body::BodyCOM>		_lift_force;
+	SpaceForce<rigid_body::BodyCOM>		_drag_force;
+	SpaceTorque<rigid_body::BodyCOM>	_pitching_moment;
+	SpaceLength<rigid_body::BodyCOM>	_center_of_pressure;
+	SpaceLength<rigid_body::BodyCOM>	_com_to_planar_origin;
 };
 
 
-inline MassMoments<rigid_body::BodySpace>
-Wing::calculate_body_space_mass_moments (Airfoil const& airfoil, si::Density const material_density)
+inline MassMoments<rigid_body::BodyCOM>
+Wing::calculate_body_com_mass_moments (Airfoil const& airfoil, si::Density const material_density)
 {
-	// Well, let AirfoilSplineSpace and BodySpace be actually the same, so an unit matrix:
-	auto const rotate_to_body_space = RotationMatrix<rigid_body::BodySpace, AirfoilSplineSpace> (math::unit);
-	return rotate_to_body_space * calculate_mass_moments<AirfoilSplineSpace> (airfoil, material_density);
+	// Well, let AirfoilSplineSpace and BodyCOM be actually the same, so an unit matrix:
+	auto const rotate_to_body_com = RotationMatrix<rigid_body::BodyCOM, AirfoilSplineSpace> (math::unit);
+	return rotate_to_body_com * calculate_mass_moments<AirfoilSplineSpace> (airfoil, material_density);
 }
 
 } // namespace xf::sim

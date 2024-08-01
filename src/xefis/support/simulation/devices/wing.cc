@@ -28,15 +28,13 @@
 namespace xf::sim {
 
 Wing::Wing (Airfoil const& airfoil, si::Density const material_density):
-	Body (calculate_body_space_mass_moments (airfoil, material_density)),
+	Body (calculate_body_com_mass_moments (airfoil, material_density)),
 	_airfoil (airfoil)
 {
-	auto const com = last_center_of_mass();
-	set_origin_at (-com);
-	_com_to_planar_origin = -com;
+	_com_to_planar_origin = -origin_to_center_of_mass<rigid_body::BodyCOM>();
 
 	auto shape = rigid_body::make_airfoil_shape (_airfoil.spline(), _airfoil.chord_length(), _airfoil.wing_length(), true, {});
-	shape.translate (-com);
+	shape.translate (_com_to_planar_origin);
 	set_shape (shape);
 }
 
@@ -49,9 +47,9 @@ Wing::update_external_forces (Atmosphere const* atmosphere)
 		// TODO Create special UnitMatrix<TF, SF> which only changes the frame, and operator* that doesn't really compute anything
 		// Rotations:
 		auto const world_to_ecef = RotationMatrix<ECEFSpace, rigid_body::WorldSpace> (math::unit);
-		auto const body_to_airfoil_spline = RotationMatrix<AirfoilSplineSpace, rigid_body::BodySpace> (math::unit);
+		auto const body_to_airfoil_spline = RotationMatrix<AirfoilSplineSpace, rigid_body::BodyCOM> (math::unit);
 		auto const world_to_body = placement().base_to_body_rotation();
-		// ECEF → WorldSpace → BodySpace → AirfoilSplineSpace:
+		// ECEF → WorldSpace → BodyCOM → AirfoilSplineSpace:
 		RotationMatrix<AirfoilSplineSpace, ECEFSpace> ecef_to_spline_transform = body_to_airfoil_spline * world_to_body * ~world_to_ecef;
 
 		auto const body_position_in_ecef = world_to_ecef * placement().position();
@@ -78,8 +76,8 @@ Wing::update_external_forces (Atmosphere const* atmosphere)
 		_pitching_moment = body_aeroforces_at_origin.pitching_moment;
 		_center_of_pressure = body_aeroforces_at_origin.center_of_pressure + _com_to_planar_origin;
 
-		apply_impulse (ForceMoments<rigid_body::BodySpace> (_lift_force, _pitching_moment), _center_of_pressure);
-		apply_impulse (ForceMoments<rigid_body::BodySpace> (_drag_force, math::zero), _center_of_pressure);
+		apply_impulse (ForceMoments<rigid_body::BodyCOM> (_lift_force, _pitching_moment), _center_of_pressure);
+		apply_impulse (ForceMoments<rigid_body::BodyCOM> (_drag_force, math::zero), _center_of_pressure);
 	}
 }
 

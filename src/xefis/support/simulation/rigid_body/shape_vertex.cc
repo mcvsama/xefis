@@ -24,7 +24,7 @@
 namespace xf::rigid_body {
 
 void
-ShapeVertex::rotate (RotationMatrix<BodySpace> const& rotation)
+ShapeVertex::rotate (RotationMatrix<BodyOrigin> const& rotation)
 {
 	_position = rotation * _position;
 
