@@ -510,14 +510,8 @@ template<class Point>
 	area_2d (Point const& a, Point const& b, Point const& c)
 	{
 		using std::abs;
-		using std::sqrt;
 
-		auto const len_ab = abs (b - a);
-		auto const len_ac = abs (c - a);
-		auto const len_bc = abs (c - b);
-		auto const s = 0.5 * (len_ab + len_ac + len_bc);
-
-		return sqrt (s * (s - len_ab) * (s - len_ac) * (s - len_bc));
+		return 0.5 * abs (a[0] * (b[1] - c[1]) + b[0] * (c[1] - a[1]) + c[0] * (a[1] - b[1]));
 	}
 
 

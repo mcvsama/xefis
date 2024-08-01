@@ -195,6 +195,9 @@ template<class TF, class SF>
 	}
 
 
+/**
+ * Calculate mass moments of a wing for its origin (not center of mass).
+ */
 template<class Space>
 	MassMoments<Space>
 	calculate_mass_moments (Airfoil const& airfoil, si::Density const material_density)

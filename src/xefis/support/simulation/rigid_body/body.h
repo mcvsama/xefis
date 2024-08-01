@@ -252,7 +252,7 @@ class Body: public Noncopyable
 		{ return _shape_type == ShapeIsConstant; }
 
 	/**
-	 * Origin vector in chosen Space coordinate system and world frame of reference.
+	 * Position of origin in chosen Space coordinate system and world frame of reference.
 	 */
 	template<CoordinateSystemConcept Space>
 		[[nodiscard]]
@@ -399,6 +399,7 @@ class Body: public Noncopyable
 	MassMoments<BodySpace>									_mass_moments;
 	mutable std::optional<MassMoments<WorldSpace>>			_world_space_mass_moments;
 	SpaceLength<BodySpace>									_saved_center_of_mass;
+	// Position of body origin relative to the center-of-mass:
 	SpaceLength<BodySpace>									_origin_position;
 	// Location of center-of-mass:
 	Placement<WorldSpace, BodySpace>						_placement;

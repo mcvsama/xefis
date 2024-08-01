@@ -40,13 +40,17 @@ struct MassRadiusLength {
 };
 
 
+/**
+ * Center-of-mass is at the center of the cuboid.
+ */
 template<class Space = void>
 	inline SpaceMatrix<si::MomentOfInertia, Space>
-	make_cube_inertia_tensor (si::Mass const& mass, SpaceVector<si::Length> const& dimensions)
+	make_cuboid_inertia_tensor (si::Mass const& mass, SpaceVector<si::Length> const& dimensions)
 	{
-		auto const i00 = mass * (1.0 / 12.0) * (square (dimensions[1]) + square (dimensions[2]));
-		auto const i11 = mass * (1.0 / 12.0) * (square (dimensions[0]) + square (dimensions[2]));
-		auto const i22 = mass * (1.0 / 12.0) * (square (dimensions[0]) + square (dimensions[1]));
+		auto const k = mass / 12.0;
+		auto const i00 = k * (square (dimensions[1]) + square (dimensions[2]));
+		auto const i11 = k * (square (dimensions[0]) + square (dimensions[2]));
+		auto const i22 = k * (square (dimensions[0]) + square (dimensions[1]));
 		auto const zero = 0_kg * 0_m2;
 
 		return {

@@ -90,7 +90,7 @@ Shape
 make_solid_circle (si::Length radius, size_t num_slices, ShapeMaterial const& = {});
 
 /**
- * Make a wing shape.
+ * Make a wing shape. Extrude airfoil spline (defined in X-Y axes) along +Z axis.
  */
 Shape
 make_airfoil_shape (AirfoilSpline const& spline, si::Length chord_length, si::Length wing_length, bool with_front_and_back = true,

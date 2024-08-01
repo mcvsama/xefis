@@ -311,6 +311,10 @@ template<class Space>
 	}
 
 
+/**
+ * Calculate mass moments of a wing viewed from origin.
+ * Assuming the wing is extruded along +Z axis and chord length scales X and Y axes.
+ */
 template<class Scalar, class Space>
 	inline MassMoments<Space>
 	calculate_mass_moments (std::vector<PlaneTriangle<Scalar, Space>> const& polygon_triangulation, si::Length const chord_length, si::Length const wing_length, si::Density const material_density)
@@ -323,14 +327,16 @@ template<class Scalar, class Space>
 
 		for (auto const& triangle: polygon_triangulation)
 		{
-			auto const s = chord_length;
-			auto const centroid = s * triangle_centroid (triangle);
-			auto const mass = 0.5 * wing_length * (s * s) * area_2d (triangle) * material_density;
+			auto const scaler = chord_length;
+			auto const centroid = scaler * triangle_centroid (triangle);
+			auto const area = scaler * scaler * area_2d (triangle);
+			auto const volume = area * wing_length;
+			auto const mass = volume * material_density;
 			auto const position_1 = SpaceLength<Space> (centroid[0], centroid[1], 0.25 * wing_length);
 			auto const position_2 = SpaceLength<Space> (centroid[0], centroid[1], 0.75 * wing_length);
 
-			point_masses.push_back (PointMass<Space> { mass, position_1, math::zero });
-			point_masses.push_back (PointMass<Space> { mass, position_2, math::zero });
+			point_masses.push_back (PointMass<Space> { 0.5 * mass, position_1, math::zero });
+			point_masses.push_back (PointMass<Space> { 0.5 * mass, position_2, math::zero });
 		}
 
 		return MassMoments<Space>::from_point_masses (begin (point_masses), end (point_masses));

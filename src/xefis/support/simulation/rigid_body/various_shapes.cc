@@ -78,19 +78,20 @@ make_centered_cube_shape (SpaceLength<BodySpace> const& dimensions, ShapeMateria
 Shape
 make_centered_cube_shape (xf::MassMoments<BodySpace> const& mm, ShapeMaterial const& material)
 {
-	auto const k = 12.0 / mm.mass();
-	auto const I = mm.moment_of_inertia();
-	auto const d0 = k * I[0, 0];
-	auto const d1 = k * I[1, 1];
-	auto const d2 = k * I[2, 2];
+	// Assuming center of mass position is 0.
 
-	si::Length const x = sqrt (d2 - 0.5 * (d0 - d1 + d2));
-	si::Length const y = sqrt (0.5 * (d0 - d1 + d2));
-	si::Length const z = sqrt (d0 - 0.5 * (d0 - d1 + d2));
+	auto const k = mm.mass() / 12;
+	auto const inv_double_k = 1 / (2 * k);
+	auto const I = mm.moment_of_inertia(); // Assuming it's ortogonalized
+	auto const d0 = I[0, 0];
+	auto const d1 = I[1, 1];
+	auto const d2 = I[2, 2];
 
-	auto shape = make_centered_cube_shape (SpaceLength<BodySpace> { x, y, z }, material);
-	shape.translate (-mm.center_of_mass_position()); // TODO not sure if sign is correct
-	return shape;
+	si::Length const x = sqrt ((-d0 +d1 +d2) * inv_double_k);
+	si::Length const y = sqrt ((+d0 -d1 +d2) * inv_double_k);
+	si::Length const z = sqrt ((+d0 +d1 -d2) * inv_double_k);
+
+	return make_centered_cube_shape (SpaceLength<BodySpace> { x, y, z }, material);
 }
 
 
