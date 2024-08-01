@@ -73,6 +73,16 @@ RigidBodyPainter::paint (rigid_body::System const& system, QOpenGLPaintDevice& c
 
 
 void
+RigidBodyPainter::set_show_moments_of_inertia_cuboid (rigid_body::Body const& body, bool show)
+{
+	if (show)
+		_bodies_showing_moments_of_inertia.insert (&body);
+	else
+		_bodies_showing_moments_of_inertia.erase (&body);
+}
+
+
+void
 RigidBodyPainter::setup (QOpenGLPaintDevice& canvas)
 {
 	auto const size = canvas.size();
@@ -354,6 +364,9 @@ RigidBodyPainter::paint_system (rigid_body::System const& system, QOpenGLPaintDe
 		if (angular_momenta_visible())
 			for (auto const& body: system.bodies())
 				paint_angular_momentum (*body);
+
+		for (auto const* body: _bodies_showing_moments_of_inertia)
+			paint_moments_of_inertia_cuboid (*body);
 	});
 }
 
@@ -362,9 +375,7 @@ void
 RigidBodyPainter::paint_body (rigid_body::Body const& body)
 {
 	_gl.save_matrix ([&] {
-		auto const translation = body.placement().position() - followed_body_position();
-
-		_gl.translate (translation);
+		_gl.translate (body.placement().position() - followed_body_position());
 		_gl.rotate (body.placement().base_to_body_rotation());
 
 		if (auto const& shape = body.shape())
@@ -507,6 +518,20 @@ RigidBodyPainter::paint_angular_momentum (rigid_body::Body const& body)
 	auto const L_world = body.placement().unbound_transform_to_base (L);
 
 	draw_arrow (com, L_world * angular_momentum_to_length, rigid_body::make_material (Qt::darkBlue));
+}
+
+
+void
+RigidBodyPainter::paint_moments_of_inertia_cuboid (rigid_body::Body const& body)
+{
+	auto const com_material = rigid_body::make_material ({ 0x00, 0x44, 0x99 });
+	auto const com_shape = make_centered_cube_shape (body.mass_moments<rigid_body::BodySpace>(), com_material);
+
+	_gl.save_matrix ([&] {
+		_gl.translate (body.placement().position() - followed_body_position());
+		_gl.rotate (body.placement().base_to_body_rotation());
+		_gl.draw (com_shape);
+	});
 }
 
 

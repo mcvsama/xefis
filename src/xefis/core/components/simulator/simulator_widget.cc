@@ -158,7 +158,7 @@ SimulatorWidget::make_simulation_controls()
 QWidget*
 SimulatorWidget::make_body_controls()
 {
-	_body_editor.emplace (this);
+	_body_editor.emplace (this, *_rigid_body_viewer);
 	_constraint_editor.emplace (this);
 	_bodies_tree.emplace (this, _simulator.rigid_body_system(), *_rigid_body_viewer);
 

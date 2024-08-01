@@ -28,6 +28,7 @@
 
 // Standard:
 #include <cstddef>
+#include <set>
 
 
 namespace xf {
@@ -168,6 +169,20 @@ class RigidBodyPainter: protected QOpenGLFunctions
 		{ _angular_momenta_visible = visible; }
 
 	/**
+	 * Show/hide moments of inertia tensor cuboid for given body.
+	 */
+	void
+	set_show_moments_of_inertia_cuboid (rigid_body::Body const&, bool show);
+
+	/**
+	 * Return true if given body is set to show its moments of inertia tensor cuboid.
+	 */
+	[[nodiscard]]
+	bool
+	showing_moments_of_inertia_cuboid (rigid_body::Body& body) const
+		{ return _bodies_showing_moments_of_inertia.contains (&body); }
+
+	/**
 	 * Paint the system.
 	 */
 	void
@@ -218,6 +233,9 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	paint_angular_momentum (rigid_body::Body const&);
 
 	void
+	paint_moments_of_inertia_cuboid (rigid_body::Body const&);
+
+	void
 	draw_arrow (SpaceLength<rigid_body::WorldSpace> const& origin, SpaceLength<rigid_body::WorldSpace> const& vector, rigid_body::ShapeMaterial const& material = {});
 
 	[[nodiscard]]
@@ -238,6 +256,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	bool								_forces_visible				{ false };
 	bool								_angular_velocities_visible	{ false };
 	bool								_angular_momenta_visible	{ false };
+	std::set<rigid_body::Body const*>	_bodies_showing_moments_of_inertia;
 };
 
 

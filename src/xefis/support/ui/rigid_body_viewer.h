@@ -172,6 +172,16 @@ class RigidBodyViewer: public GLAnimationWidget
 	void
 	step();
 
+	void
+	set_show_moments_of_inertia_cuboid (rigid_body::Body& body, bool show)
+		{ _rigid_body_painter.set_show_moments_of_inertia_cuboid (body, show); }
+
+	[[nodiscard]]
+	bool
+	showing_moments_of_inertia_cuboid (rigid_body::Body& body) const
+		{ return _rigid_body_painter.showing_moments_of_inertia_cuboid (body); }
+
+  protected:
 	// QWidget API
 	void
 	mousePressEvent (QMouseEvent*) override;

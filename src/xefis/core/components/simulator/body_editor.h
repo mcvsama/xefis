@@ -31,12 +31,15 @@
 
 namespace xf {
 
+class RigidBodyViewer;
+
+
 class BodyEditor: public QWidget
 {
   public:
 	// Ctor
 	explicit
-	BodyEditor (QWidget* parent);
+	BodyEditor (QWidget* parent, RigidBodyViewer& viewer);
 
 	/**
 	 * Sets body to edit. Pass nullptr to disable.
@@ -56,6 +59,7 @@ class BodyEditor: public QWidget
 	create_basic_info_widget();
 
   private:
+	RigidBodyViewer&			_rigid_body_viewer;
 	rigid_body::Body*			_edited_body { nullptr };
 	QLabel*						_body_label;
 	std::optional<QToolBox>		_tool_box;

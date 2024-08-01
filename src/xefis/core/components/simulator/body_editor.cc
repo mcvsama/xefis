@@ -18,7 +18,11 @@
 #include <xefis/config/all.h>
 #include <xefis/base/icons.h>
 #include <xefis/support/ui/paint_helper.h>
+#include <xefis/support/ui/rigid_body_viewer.h>
 #include <xefis/support/ui/widget.h>
+
+// Neutrino:
+#include <neutrino/format.h>
 
 // Qt:
 #include <QLayout>
@@ -30,8 +34,9 @@
 
 namespace xf {
 
-BodyEditor::BodyEditor (QWidget* parent):
-	QWidget (parent)
+BodyEditor::BodyEditor (QWidget* parent, RigidBodyViewer& viewer):
+	QWidget (parent),
+	_rigid_body_viewer (viewer)
 {
 	auto const ph = PaintHelper (*this);
 
@@ -73,10 +78,12 @@ BodyEditor::refresh()
 	{
 		setEnabled (true);
 		_body_label->setText (QString::fromStdString (_edited_body->label()));
-		_translational_kinetic_energy->setText (QString::fromStdString (std::format ("Translational kinetic energy: {:.6f} J", _edited_body->translational_kinetic_energy().in<si::Joule>())));
-		_rotational_kinetic_energy->setText (QString::fromStdString (std::format ("Rotational kinetic energy: {:.6f} J", _edited_body->rotational_kinetic_energy().in<si::Joule>())));
+		auto const translational_energy = neutrino::format_unit (_edited_body->translational_kinetic_energy().in<si::Joule>(), 6, "J");
+		auto const rotational_energy = neutrino::format_unit (_edited_body->rotational_kinetic_energy().in<si::Joule>(), 6, "J");
+		_translational_kinetic_energy->setText (QString::fromStdString (std::format ("Translational kinetic energy: {}", translational_energy)));
+		_rotational_kinetic_energy->setText (QString::fromStdString (std::format ("Rotational kinetic energy: {}", rotational_energy)));
 		_body_is_visible->setChecked (false); // TODO
-		_show_com_and_origin->setChecked (false); // TODO
+		_show_com_and_origin->setChecked (_rigid_body_viewer.showing_moments_of_inertia_cuboid (*_edited_body));
 	}
 	else
 	{
@@ -102,9 +109,10 @@ BodyEditor::create_basic_info_widget()
 		});
 
 		_show_com_and_origin.emplace ("Show center-of-mass and origin", this);
-		QObject::connect (&*_body_is_visible, &QCheckBox::toggled, [this] (bool checked) {
-			// TODO
-			// Also shows body coordinates at COM and at origin
+		QObject::connect (&*_show_com_and_origin, &QCheckBox::toggled, [this] (bool checked) {
+			if (_edited_body)
+				_rigid_body_viewer.set_show_moments_of_inertia_cuboid (*_edited_body, checked);
+			// TODO also shows body coordinates at COM and at origin
 		});
 
 		auto* layout = new QVBoxLayout (basic_info);
