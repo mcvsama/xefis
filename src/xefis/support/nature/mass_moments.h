@@ -104,12 +104,12 @@ template<class pSpace = void>
 			{ return _center_of_mass_position; }
 
 		/**
-		 * Moment of inertia tensor about the center of mass.
+		 * Moment of inertia tensor viewed from the point defined by
+		 * -center_of_mass_position().
 		 */
 		[[nodiscard]]
 		SpaceMatrix<si::MomentOfInertia, Space> const&
 		moment_of_inertia() const noexcept
-		// TODO rozdziel na MOI@zero i na MOI@COM
 			{ return _moment_of_inertia; }
 
 		/**
@@ -330,13 +330,13 @@ template<class Scalar, class Space>
 			auto const scaler = chord_length;
 			auto const centroid = scaler * triangle_centroid (triangle);
 			auto const area = scaler * scaler * area_2d (triangle);
-			auto const volume = area * wing_length;
+			auto const volume = area * 0.5 * wing_length;
 			auto const mass = volume * material_density;
 			auto const position_1 = SpaceLength<Space> (centroid[0], centroid[1], 0.25 * wing_length);
 			auto const position_2 = SpaceLength<Space> (centroid[0], centroid[1], 0.75 * wing_length);
 
-			point_masses.push_back (PointMass<Space> { 0.5 * mass, position_1, math::zero });
-			point_masses.push_back (PointMass<Space> { 0.5 * mass, position_2, math::zero });
+			point_masses.push_back (PointMass<Space> { mass, position_1, math::zero });
+			point_masses.push_back (PointMass<Space> { mass, position_2, math::zero });
 		}
 
 		return MassMoments<Space>::from_point_masses (begin (point_masses), end (point_masses));

@@ -54,7 +54,7 @@ template<class pBaseSpace = void, class pSpace = pBaseSpace>
 		Placement (Position const&, RotationToBase const&);
 
 		/**
-		 * Body position relative to the BaseSpace frame of reference.
+		 * Body position viewed from the BaseSpace coordinate system.
 		 */
 		[[nodiscard]]
 		Position const&

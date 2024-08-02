@@ -244,7 +244,6 @@ class Body: public Noncopyable
 
 	/**
 	 * Position of origin in chosen Space coordinate system.
-	 * For BodySpace it's equivalent to -origin_to_center_of_mass().
 	 */
 	template<CoordinateSystemConcept Space>
 		[[nodiscard]]
