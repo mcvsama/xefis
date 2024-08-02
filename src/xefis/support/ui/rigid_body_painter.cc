@@ -73,16 +73,6 @@ RigidBodyPainter::paint (rigid_body::System const& system, QOpenGLPaintDevice& c
 
 
 void
-RigidBodyPainter::set_show_moments_of_inertia_cuboid (rigid_body::Body const& body, bool show)
-{
-	if (show)
-		_bodies_showing_moments_of_inertia.insert (&body);
-	else
-		_bodies_showing_moments_of_inertia.erase (&body);
-}
-
-
-void
 RigidBodyPainter::setup (QOpenGLPaintDevice& canvas)
 {
 	auto const size = canvas.size();
@@ -340,6 +330,8 @@ RigidBodyPainter::paint_planet()
 void
 RigidBodyPainter::paint_system (rigid_body::System const& system, QOpenGLPaintDevice&)
 {
+	static auto const default_body_rendering = BodyRendering();
+
 	glDisable (GL_FOG);
 
 	_gl.save_matrix ([&] {
@@ -347,7 +339,23 @@ RigidBodyPainter::paint_system (rigid_body::System const& system, QOpenGLPaintDe
 		setup_light();
 
 		for (auto const& body: system.bodies())
-			paint_body (*body);
+		{
+			BodyRendering const* rendering = &default_body_rendering;
+
+			if (auto const rendering_it = _body_rendering.find (body.get());
+				rendering_it != _body_rendering.end())
+			{
+				rendering = &rendering_it->second;
+			}
+
+			paint_body (*body, rendering->body_visible, rendering->origin_visible);
+
+			if (rendering->center_of_mass_visible)
+				paint_center_of_mass (*body);
+
+			if (rendering->moments_of_inertia_visible)
+				paint_moments_of_inertia_cuboid (*body);
+		}
 
 		if (constraints_visible())
 			for (auto const& constraint: system.constraints())
@@ -364,27 +372,74 @@ RigidBodyPainter::paint_system (rigid_body::System const& system, QOpenGLPaintDe
 		if (angular_momenta_visible())
 			for (auto const& body: system.bodies())
 				paint_angular_momentum (*body);
-
-		for (auto const* body: _bodies_showing_moments_of_inertia)
-			paint_moments_of_inertia_cuboid (*body);
 	});
 }
 
 
 void
-RigidBodyPainter::paint_body (rigid_body::Body const& body)
+RigidBodyPainter::paint_body (rigid_body::Body const& body, bool paint_body, bool paint_origin)
 {
 	_gl.save_matrix ([&] {
 		_gl.translate (body.placement().position() - followed_body_position());
 		_gl.rotate (body.placement().base_to_body_rotation());
+		// Body shapes are defined relative to BodyOrigin coordinates, so transform again:
+		_gl.translate (body.origin_placement().position());
+		_gl.rotate (body.origin_placement().base_to_body_rotation());
 
-		if (auto const& shape = body.shape())
-			_gl.draw (*shape);
-		else
+		if (paint_body)
 		{
-			auto const edge = _mass_scale * 1_kg * std::pow (body.mass_moments<rigid_body::BodyCOM>().mass() / 1_kg, 1.0 / 3);
-			_gl.draw (rigid_body::make_centered_cube_shape (edge));
+			_gl.save_matrix ([&] {
+				if (_focused_body == &body)
+					_gl.additional_parameters().color_override = QColor::fromRgb (0x00, 0xaa, 0x7f);
+				else if (_hovered_body == &body)
+					_gl.additional_parameters().color_override = QColor::fromRgb (0x00, 0xaa, 0x7f).lighter (150);
+
+				if (auto const& shape = body.shape())
+					_gl.draw (*shape);
+				else
+				{
+					auto const edge = _mass_scale * 1_kg * std::pow (body.mass_moments<rigid_body::BodyCOM>().mass() / 1_kg, 1.0 / 3);
+					_gl.draw (rigid_body::make_centered_cube_shape (edge));
+				}
+			});
 		}
+
+		if (paint_origin)
+		{
+			auto const origin_material = rigid_body::make_material ({ 0xff, 0xff, 0x00 });
+			// TODO make the sphere zoom-independent (distance from the camera-independent):
+			auto const origin_shape = make_centered_sphere_shape (10_cm, 8, 8, { 0_deg, 360_deg }, { -90_deg, +90_deg }, origin_material);
+			_gl.draw (origin_shape);
+		}
+	});
+}
+
+
+void
+RigidBodyPainter::paint_center_of_mass (rigid_body::Body const& body)
+{
+	auto const com_material = rigid_body::make_material ({ 0xff, 0x00, 0x00 });
+	// TODO make the sphere zoom-independent (distance from the camera-independent):
+	auto const com_shape = make_centered_sphere_shape (10_cm, 8, 8, { 0_deg, 360_deg }, { -90_deg, +90_deg }, com_material);
+
+	_gl.save_matrix ([&] {
+		_gl.translate (body.placement().position() - followed_body_position());
+		_gl.rotate (body.placement().base_to_body_rotation());
+		_gl.draw (com_shape);
+	});
+}
+
+
+void
+RigidBodyPainter::paint_moments_of_inertia_cuboid (rigid_body::Body const& body)
+{
+	auto const com_material = rigid_body::make_material ({ 0x00, 0x44, 0x99 });
+	auto const com_shape = make_centered_cube_shape (body.mass_moments<rigid_body::BodyCOM>(), com_material);
+
+	_gl.save_matrix ([&] {
+		_gl.translate (body.placement().position() - followed_body_position());
+		_gl.rotate (body.placement().base_to_body_rotation());
+		_gl.draw (com_shape);
 	});
 }
 
@@ -518,20 +573,6 @@ RigidBodyPainter::paint_angular_momentum (rigid_body::Body const& body)
 	auto const L_world = body.placement().unbound_transform_to_base (L);
 
 	draw_arrow (com, L_world * angular_momentum_to_length, rigid_body::make_material (Qt::darkBlue));
-}
-
-
-void
-RigidBodyPainter::paint_moments_of_inertia_cuboid (rigid_body::Body const& body)
-{
-	auto const com_material = rigid_body::make_material ({ 0x00, 0x44, 0x99 });
-	auto const com_shape = make_centered_cube_shape (body.mass_moments<rigid_body::BodyCOM>(), com_material);
-
-	_gl.save_matrix ([&] {
-		_gl.translate (body.placement().position() - followed_body_position());
-		_gl.rotate (body.placement().base_to_body_rotation());
-		_gl.draw (com_shape);
-	});
 }
 
 

@@ -28,7 +28,7 @@
 
 // Standard:
 #include <cstddef>
-#include <set>
+#include <map>
 
 
 namespace xf {
@@ -47,6 +47,16 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	static constexpr auto		kHorizonRadius				= 500_km;
 	static constexpr auto		kSunDistance				= 10_km;
 	static constexpr auto		kSunRadius					= 200_km;
+
+  public:
+	struct BodyRendering
+	{
+		bool	body_visible { true };
+		bool	origin_visible { false };
+		bool	center_of_mass_visible { false };
+		bool	moments_of_inertia_visible { false };
+		// TODO forces_visible, angular_velocities visible, etc
+	};
 
   public:
 	// Ctor
@@ -94,6 +104,22 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	void
 	set_planet (rigid_body::Body const* planet_body) noexcept
 		{ _planet_body = planet_body; }
+
+	/**
+	 * Set the hovered body. It's painted with different color.
+	 * Pass nullptr to set none as focused.
+	 */
+	void
+	set_hovered (rigid_body::Body const* hovered_body) noexcept
+		{ _hovered_body = hovered_body; }
+
+	/**
+	 * Set the focused body. It's painted with different color.
+	 * Pass nullptr to set none as focused.
+	 */
+	void
+	set_focused (rigid_body::Body const* focused_body) noexcept
+		{ _focused_body = focused_body; }
 
 	/**
 	 * Set camera focus point.
@@ -169,18 +195,12 @@ class RigidBodyPainter: protected QOpenGLFunctions
 		{ _angular_momenta_visible = visible; }
 
 	/**
-	 * Show/hide moments of inertia tensor cuboid for given body.
-	 */
-	void
-	set_show_moments_of_inertia_cuboid (rigid_body::Body const&, bool show);
-
-	/**
-	 * Return true if given body is set to show its moments of inertia tensor cuboid.
+	 * Return config object for given body.
 	 */
 	[[nodiscard]]
-	bool
-	showing_moments_of_inertia_cuboid (rigid_body::Body& body) const
-		{ return _bodies_showing_moments_of_inertia.contains (&body); }
+	BodyRendering&
+	get_body_rendering_config (rigid_body::Body const& body)
+		{ return _body_rendering[&body]; }
 
 	/**
 	 * Paint the system.
@@ -218,7 +238,13 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	paint_system (rigid_body::System const&, QOpenGLPaintDevice&);
 
 	void
-	paint_body (rigid_body::Body const&);
+	paint_body (rigid_body::Body const&, bool body_visible, bool origin_visible);
+
+	void
+	paint_center_of_mass (rigid_body::Body const&);
+
+	void
+	paint_moments_of_inertia_cuboid (rigid_body::Body const&);
 
 	void
 	paint_constraint (rigid_body::Constraint const&);
@@ -231,9 +257,6 @@ class RigidBodyPainter: protected QOpenGLFunctions
 
 	void
 	paint_angular_momentum (rigid_body::Body const&);
-
-	void
-	paint_moments_of_inertia_cuboid (rigid_body::Body const&);
 
 	void
 	draw_arrow (SpaceLength<rigid_body::WorldSpace> const& origin, SpaceLength<rigid_body::WorldSpace> const& vector, rigid_body::ShapeMaterial const& material = {});
@@ -252,11 +275,14 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	rigid_body::Body const*				_followed_body				{ nullptr };
 	bool								_following_orientation		{ true };
 	rigid_body::Body const*				_planet_body				{ nullptr };
+	rigid_body::Body const*				_hovered_body				{ nullptr };
+	rigid_body::Body const*				_focused_body				{ nullptr };
 	bool								_constraints_visible		{ false };
 	bool								_forces_visible				{ false };
 	bool								_angular_velocities_visible	{ false };
 	bool								_angular_momenta_visible	{ false };
-	std::set<rigid_body::Body const*>	_bodies_showing_moments_of_inertia;
+	std::map<rigid_body::Body const*, BodyRendering>
+										_body_rendering;
 };
 
 

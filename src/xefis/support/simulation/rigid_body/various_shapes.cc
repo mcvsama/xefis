@@ -91,7 +91,7 @@ make_centered_cube_shape (xf::MassMoments<BodyCOM> const& mm, ShapeMaterial cons
 	si::Length const y = sqrt ((+d0 -d1 +d2) * inv_double_k);
 	si::Length const z = sqrt ((+d0 +d1 -d2) * inv_double_k);
 
-	return make_centered_cube_shape (SpaceLength<BodyCOM> { x, y, z }, material);
+	return make_centered_cube_shape (SpaceLength<BodyOrigin> { x, y, z }, material);
 }
 
 

@@ -65,8 +65,6 @@ class BodyEditor: public QWidget
 	std::optional<QToolBox>		_tool_box;
 	std::optional<QLabel>		_translational_kinetic_energy;
 	std::optional<QLabel>		_rotational_kinetic_energy;
-	std::optional<QCheckBox>	_body_is_visible;
-	std::optional<QCheckBox>	_show_com_and_origin;
 };
 
 } // namespace xf

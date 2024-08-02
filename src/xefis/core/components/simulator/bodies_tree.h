@@ -83,8 +83,13 @@ class BodiesTree: public QTreeWidget
 	void
 	add_constraint_item_to (BodyItem&, rigid_body::Constraint&);
 
+	// QWidget API
 	void
 	contextMenuEvent (QContextMenuEvent*);
+
+	// QWidget API
+	void
+	leaveEvent (QEvent*);
 
   private:
 	rigid_body::System&		_rigid_body_system;

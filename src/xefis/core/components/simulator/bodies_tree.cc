@@ -278,6 +278,8 @@ BodiesTree::contextMenuEvent (QContextMenuEvent* event)
 
 		if (auto* body_item = dynamic_cast<BodyItem*> (item))
 		{
+			auto& rendering = _rigid_body_viewer.get_body_rendering_config (body_item->body());
+
 			{
 				auto* action = menu.addAction ("&Follow this body", [this, body_item] {
 					_rigid_body_viewer.set_followed_body (&body_item->body());
@@ -291,7 +293,7 @@ BodiesTree::contextMenuEvent (QContextMenuEvent* event)
 			});
 
 			{
-				auto *action = menu.addAction ("Break this body", [this, body_item] {
+				auto* action = menu.addAction ("Break this body", [this, body_item] {
 					body_item->body().set_broken();
 					refresh();
 				});
@@ -299,6 +301,42 @@ BodiesTree::contextMenuEvent (QContextMenuEvent* event)
 				if (body_item->body().broken())
 					action->setEnabled (false);
 			}
+
+			menu.addSeparator();
+
+			{
+				auto* action = menu.addAction ("Body visible", [this, body_item, &rendering] {
+					rendering.body_visible = !rendering.body_visible;
+				});
+				action->setCheckable (true);
+				action->setChecked (rendering.body_visible);
+			}
+
+			{
+				auto* action = menu.addAction ("Origin visible", [this, body_item, &rendering] {
+					rendering.origin_visible = !rendering.origin_visible;
+				});
+				action->setCheckable (true);
+				action->setChecked (rendering.origin_visible);
+			}
+
+			{
+				auto* action = menu.addAction ("Center of mass visible", [this, body_item, &rendering] {
+					rendering.center_of_mass_visible = !rendering.center_of_mass_visible;
+				});
+				action->setCheckable (true);
+				action->setChecked (rendering.center_of_mass_visible);
+			}
+
+			{
+				auto* action = menu.addAction ("Moments of inertia cuboid visible", [this, body_item, &rendering] {
+					rendering.moments_of_inertia_visible = !rendering.moments_of_inertia_visible;
+				});
+				action->setCheckable (true);
+				action->setChecked (rendering.moments_of_inertia_visible);
+			}
+
+			// TODO For Wings - "Neutral point visible" (green or light blue?)
 		}
 		else if (auto* constraint_item = dynamic_cast<ConstraintItem*> (item))
 		{
@@ -314,6 +352,13 @@ BodiesTree::contextMenuEvent (QContextMenuEvent* event)
 	}
 
 	menu.exec (event->globalPos());
+}
+
+
+void
+BodiesTree::leaveEvent (QEvent*)
+{
+	itemEntered (nullptr, 0);
 }
 
 } // namespace xf

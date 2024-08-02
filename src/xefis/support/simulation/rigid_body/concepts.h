@@ -36,7 +36,7 @@ struct WorldSpace;
 struct BodyCOM;
 
 // Body space coordinate system, origin at body-origin:
-using BodyOrigin = BodyCOM;
+struct BodyOrigin;
 
 
 template<class T>

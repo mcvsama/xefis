@@ -167,25 +167,34 @@ SimulatorWidget::make_body_controls()
 	_editors_stack->addWidget (&*_constraint_editor);
 
 	QObject::connect (&*_bodies_tree, &QTreeWidget::currentItemChanged, [this] (QTreeWidgetItem* current, [[maybe_unused]] QTreeWidgetItem* previous) {
-		if (_body_editor)
+		if (auto* body_item = dynamic_cast<BodyItem*> (current))
 		{
-			if (auto* body_item = dynamic_cast<BodyItem*> (current))
-			{
-				_body_editor->edit (&body_item->body());
-				_editors_stack->setCurrentWidget (&*_body_editor);
-			}
-			else if (auto* constraint_item = dynamic_cast<ConstraintItem*> (current))
-			{
-				_constraint_editor->edit (&constraint_item->constraint());
-				_editors_stack->setCurrentWidget (&*_constraint_editor);
-			}
-			else
-			{
-				_body_editor->edit (nullptr);
-				_constraint_editor->edit (nullptr);
-			}
+			auto& body = body_item->body();
+			_body_editor->edit (&body);
+			_editors_stack->setCurrentWidget (&*_body_editor);
+			_rigid_body_viewer->set_focused (&body);
+		}
+		else if (auto* constraint_item = dynamic_cast<ConstraintItem*> (current))
+		{
+			_constraint_editor->edit (&constraint_item->constraint());
+			_editors_stack->setCurrentWidget (&*_constraint_editor);
+		}
+		else
+		{
+			_body_editor->edit (nullptr);
+			_constraint_editor->edit (nullptr);
 		}
 	});
+
+	QObject::connect (&*_bodies_tree, &QTreeWidget::itemEntered, [this] (QTreeWidgetItem* current, [[maybe_unused]] int column) {
+		if (!current)
+			_rigid_body_viewer->set_hovered (nullptr);
+		else if (auto* body_item = dynamic_cast<BodyItem*> (current))
+			_rigid_body_viewer->set_hovered (&body_item->body());
+		else
+			_rigid_body_viewer->set_hovered (nullptr);
+	});
+	_bodies_tree->setMouseTracking (true);
 
 	QObject::connect (&*_bodies_tree, &QTreeWidget::itemChanged, [this] (QTreeWidgetItem* item, int column) {
 		if (column == 0)

@@ -31,6 +31,8 @@
 #include <cstddef>
 #include <initializer_list>
 #include <memory>
+#include <optional>
+#include <stack>
 
 
 namespace xf {
@@ -84,6 +86,13 @@ template<class Value>
 class GLSpace
 {
   public:
+	struct AdditionalParameters
+	{
+		float					light_scale { 1.0f };
+		std::optional<QColor>	color_override;
+	};
+
+  public:
 	// Ctor
 	GLSpace (decltype (1 / 1_m) position_scale);
 
@@ -97,7 +106,7 @@ class GLSpace
 	 * Store current OpenGL matrix, call the lambda and restore matrix.
 	 * Exception-safe.
 	 */
-	static void
+	void
 	save_matrix (auto&& lambda);
 
 	/**
@@ -179,13 +188,13 @@ class GLSpace
 	/**
 	 * Set current OpenGL material parameters.
 	 */
-	static void
+	void
 	set_material (rigid_body::ShapeMaterial const&);
 
 	/**
 	 * Set current OpenGL material/normal from vertex parameters.
 	 */
-	static void
+	void
 	set_vertex (rigid_body::ShapeVertex const&);
 
 	/**
@@ -207,15 +216,30 @@ class GLSpace
 	add_vertex (SpaceVector<si::Length, auto> position);
 
 	/**
+	 * Return reference to current additional parameters struct.
+	 * It gets saved/restored with save_matrix().
+	 */
+	AdditionalParameters&
+	additional_parameters();
+
+	/**
 	 * Draw given shape in OpenGL.
 	 */
 	void
 	draw (rigid_body::Shape const& shape);
 
   private:
+	void
+	push_context();
+
+	void
+	pop_context();
+
+  private:
 	SpaceLength<rigid_body::BodyOrigin>			_global_offset;
 	SpaceVector<double, rigid_body::BodyOrigin>	_global_offset_float;
-	decltype (1 / 1_m)							_position_scale			{ 1 };
+	decltype (1 / 1_m)							_position_scale { 1 };
+	std::stack<AdditionalParameters>			_additional_parameters_stack;
 };
 
 
@@ -226,12 +250,6 @@ template<class Value>
 		_ptr = std::make_unique<Value[]> (list.size());
 		std::copy (list.begin(), list.end(), _ptr.get());
 	}
-
-
-inline
-GLSpace::GLSpace (decltype (1 / 1_m) position_scale):
-	_position_scale (position_scale)
-{ }
 
 
 inline void
@@ -246,13 +264,13 @@ inline void
 GLSpace::save_matrix (auto&& lambda)
 {
 	try {
-		glPushMatrix();
+		push_context();
 		lambda();
-		glPopMatrix();
+		pop_context();
 	}
 	catch (...)
 	{
-		glPopMatrix();
+		pop_context();
 		throw;
 	}
 }

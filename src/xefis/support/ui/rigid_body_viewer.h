@@ -49,6 +49,7 @@ class RigidBodyViewer: public GLAnimationWidget
 	// Evolution function called before each display frame:
 	using OnRedraw = std::function<void (std::optional<si::Time> simulation_time)>;
 	using FPSMode = GLAnimationWidget::FPSMode;
+	using BodyRendering = RigidBodyPainter::BodyRendering;
 
 	enum class Playback
 	{
@@ -128,6 +129,20 @@ class RigidBodyViewer: public GLAnimationWidget
 		{ _rigid_body_painter.set_planet (planet_body); }
 
 	/**
+	 * Calls set_hovered() on internal RigidBodyPainter.
+	 */
+	void
+	set_hovered (rigid_body::Body const* hovered_body) noexcept
+		{ _rigid_body_painter.set_hovered (hovered_body); }
+
+	/**
+	 * Calls set_focused() on internal RigidBodyPainter.
+	 */
+	void
+	set_focused (rigid_body::Body const* focused_body) noexcept
+		{ _rigid_body_painter.set_focused (focused_body); }
+
+	/**
 	 * Return current camera position.
 	 */
 	[[nodiscard]]
@@ -172,14 +187,10 @@ class RigidBodyViewer: public GLAnimationWidget
 	void
 	step();
 
-	void
-	set_show_moments_of_inertia_cuboid (rigid_body::Body& body, bool show)
-		{ _rigid_body_painter.set_show_moments_of_inertia_cuboid (body, show); }
-
 	[[nodiscard]]
-	bool
-	showing_moments_of_inertia_cuboid (rigid_body::Body& body) const
-		{ return _rigid_body_painter.showing_moments_of_inertia_cuboid (body); }
+	BodyRendering&
+	get_body_rendering_config (rigid_body::Body const& body)
+		{ return _rigid_body_painter.get_body_rendering_config (body); }
 
   protected:
 	// QWidget API

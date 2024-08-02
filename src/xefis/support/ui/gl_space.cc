@@ -24,6 +24,13 @@
 
 namespace xf {
 
+GLSpace::GLSpace (decltype (1 / 1_m) position_scale):
+	_position_scale (position_scale)
+{
+	_additional_parameters_stack.push({});
+}
+
+
 void
 GLSpace::set_hfov_perspective (QSize const size, si::Angle hfov, float near_plane, float far_plane)
 {
@@ -40,12 +47,15 @@ GLSpace::set_hfov_perspective (QSize const size, si::Angle hfov, float near_plan
 void
 GLSpace::set_material (rigid_body::ShapeMaterial const& material)
 {
+	auto const& params = additional_parameters();
+	auto const darker_factor = 100 / params.light_scale;
+
 	glFogCoordf (material.fog_distance);
-	glColor4fv (to_opengl (material.emission_color));
-	glMaterialfv (GL_FRONT, GL_EMISSION, to_opengl (material.emission_color));
-	glMaterialfv (GL_FRONT, GL_AMBIENT, to_opengl (material.ambient_color));
-	glMaterialfv (GL_FRONT, GL_DIFFUSE, to_opengl (material.diffuse_color));
-	glMaterialfv (GL_FRONT, GL_SPECULAR, to_opengl (material.specular_color));
+	glColor4fv (to_opengl (material.emission_color.darker (darker_factor)));
+	glMaterialfv (GL_FRONT, GL_EMISSION, to_opengl (material.emission_color.darker (darker_factor)));
+	glMaterialfv (GL_FRONT, GL_AMBIENT, to_opengl (params.color_override.value_or (material.ambient_color.darker (darker_factor))));
+	glMaterialfv (GL_FRONT, GL_DIFFUSE, to_opengl (params.color_override.value_or (material.diffuse_color.darker (darker_factor))));
+	glMaterialfv (GL_FRONT, GL_SPECULAR, to_opengl (params.color_override.value_or (material.specular_color.darker (darker_factor))));
 	glMaterialf (GL_FRONT, GL_SHININESS, material.shininess * 127);
 }
 
@@ -87,6 +97,38 @@ GLSpace::draw (rigid_body::Shape const& shape)
 			}
 		}
 	});
+}
+
+
+void
+GLSpace::push_context()
+{
+	if (_additional_parameters_stack.empty())
+		_additional_parameters_stack.push ({});
+	else
+		_additional_parameters_stack.push (_additional_parameters_stack.top());
+
+	glPushMatrix();
+}
+
+
+void
+GLSpace::pop_context()
+{
+	glPopMatrix();
+
+	if (!_additional_parameters_stack.empty())
+		_additional_parameters_stack.pop();
+}
+
+
+GLSpace::AdditionalParameters&
+GLSpace::additional_parameters()
+{
+	if (_additional_parameters_stack.empty())
+		_additional_parameters_stack.push ({});
+
+	return _additional_parameters_stack.top();
 }
 
 } // namespace xf

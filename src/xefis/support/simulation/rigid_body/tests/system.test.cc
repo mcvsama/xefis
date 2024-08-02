@@ -147,13 +147,13 @@ ManualTest t_1 ("rigid_body::System: airplane", []{
 	auto& tail_h = system.add<rigid_body::Body> (MassMoments<rigid_body::BodyCOM> (0.01_kg, math::zero, kMOI1));
 	tail_h.set_shape (tail_h_shape);
 	tail_h.rotate_about_body_origin (wing_to_normal_rotation);
-	tail_h.translate ({ 0_m, -1.5_m, 0_m });
+	tail_h.translate<rigid_body::WorldSpace> ({ 0_m, -1.5_m, 0_m });
 
 	auto tail_v_shape = rigid_body::make_airfoil_shape (kSpline, 40_cm, 0.5_m, true, {});
 	auto& tail_v = system.add<rigid_body::Body> (MassMoments<rigid_body::BodyCOM> (0.005_kg, math::zero, kMOI1));
 	tail_v.set_shape (tail_v_shape);
 	tail_v.rotate_about_body_origin (z_minus_90_rotation);
-	tail_v.translate ({ 0_m, -1.5_m, 0_m });
+	tail_v.translate<rigid_body::WorldSpace> ({ 0_m, -1.5_m, 0_m });
 
 	system.add<rigid_body::FixedConstraint> (wing, tail_h);
 	system.add<rigid_body::FixedConstraint> (tail_h, tail_v);

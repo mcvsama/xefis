@@ -82,8 +82,6 @@ BodyEditor::refresh()
 		auto const rotational_energy = neutrino::format_unit (_edited_body->rotational_kinetic_energy().in<si::Joule>(), 6, "J");
 		_translational_kinetic_energy->setText (QString::fromStdString (std::format ("Translational kinetic energy: {}", translational_energy)));
 		_rotational_kinetic_energy->setText (QString::fromStdString (std::format ("Rotational kinetic energy: {}", rotational_energy)));
-		_body_is_visible->setChecked (false); // TODO
-		_show_com_and_origin->setChecked (_rigid_body_viewer.showing_moments_of_inertia_cuboid (*_edited_body));
 	}
 	else
 	{
@@ -103,23 +101,9 @@ BodyEditor::create_basic_info_widget()
 		_translational_kinetic_energy.emplace (this);
 		_rotational_kinetic_energy.emplace (this);
 
-		_body_is_visible.emplace ("Visible", this);
-		QObject::connect (&*_body_is_visible, &QCheckBox::toggled, [this] (bool checked) {
-			// TODO
-		});
-
-		_show_com_and_origin.emplace ("Show center-of-mass and origin", this);
-		QObject::connect (&*_show_com_and_origin, &QCheckBox::toggled, [this] (bool checked) {
-			if (_edited_body)
-				_rigid_body_viewer.set_show_moments_of_inertia_cuboid (*_edited_body, checked);
-			// TODO also shows body coordinates at COM and at origin
-		});
-
 		auto* layout = new QVBoxLayout (basic_info);
 		layout->addWidget (&*_translational_kinetic_energy);
 		layout->addWidget (&*_rotational_kinetic_energy);
-		layout->addWidget (&*_body_is_visible);
-		layout->addWidget (&*_show_com_and_origin);
 	}
 
 	return basic_info;
