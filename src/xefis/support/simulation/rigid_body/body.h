@@ -133,6 +133,21 @@ class Body: public Noncopyable
 		{ _placement = placement; }
 
 	/**
+	 * Return placement of origin point (relative to center-of-mass).
+	 */
+	[[nodiscard]]
+	Placement<BodyCOM, BodyOrigin> const&
+	origin_placement() const noexcept
+		{ return _origin_placement; }
+
+	/**
+	 * Set new placement of origin (relative to center-of-mass).
+	 */
+	void
+	set_origin_placement (Placement<BodyCOM, BodyOrigin> const& origin_placement) noexcept
+		{ _origin_placement = origin_placement; }
+
+	/**
 	 * Return velocity moments of the center of mass in World coordinate system.
 	 */
 	template<CoordinateSystemConcept Space>
@@ -251,22 +266,6 @@ class Body: public Noncopyable
 		origin() const;
 
 	/**
-	 * Unbound origin to center-of-mass vector in Space coordinate system.
-	 * For BodySpace it's equivalent to -origin();
-	 */
-	template<CoordinateSystemConcept Space>
-		[[nodiscard]]
-		SpaceLength<Space>
-		origin_to_center_of_mass() const noexcept;
-
-	/**
-	 * Set origin at given point (relative to center-of-mass).
-	 */
-	void
-	set_origin_at (SpaceLength<BodyCOM> const& vector)
-		{ _origin_position = vector; }
-
-	/**
 	 * Rotate the body about it's center of mass by provided rotation matrix.
 	 */
 	void
@@ -294,9 +293,9 @@ class Body: public Noncopyable
 	/**
 	 * Translate the body by given vector.
 	 */
-	void
-	translate (SpaceLength<WorldSpace> const& translation)
-		{ _placement.translate_frame (translation); }
+	template<CoordinateSystemConcept Space = WorldSpace>
+		void
+		translate (SpaceLength<Space> const& translation);
 
 	/**
 	 * Translate the body so that its center of mass is at newly given point.
@@ -309,18 +308,19 @@ class Body: public Noncopyable
 	 * Translate the body so that its origin is at newly given point.
 	 */
 	void
-	move_origin_to (SpaceLength<WorldSpace> const& new_origin_position)
-		{ move_to (new_origin_position + origin_to_center_of_mass<WorldSpace>()); }
+	move_origin_to (SpaceLength<WorldSpace> const&);
 
 	/**
 	 * Calculate translational kinetic energy of the body in WorldSpace frame of reference.
 	 */
+	[[nodiscard]]
 	si::Energy
 	translational_kinetic_energy() const;
 
 	/**
 	 * Calculate rotational kinetic energy of the body in WorldSpace frame of reference.
 	 */
+	[[nodiscard]]
 	si::Energy
 	rotational_kinetic_energy() const;
 
@@ -377,10 +377,10 @@ class Body: public Noncopyable
 	std::string											_label;
 	MassMoments<BodyCOM>								_mass_moments;
 	mutable std::optional<MassMoments<WorldSpace>>		_world_space_mass_moments;
-	// Position of body origin relative to the center-of-mass:
-	SpaceLength<BodyCOM>								_origin_position;
 	// Location of center-of-mass:
 	Placement<WorldSpace, BodyCOM>						_placement;
+	// Location of origin:
+	Placement<BodyCOM, BodyOrigin>						_origin_placement;
 	// Velocity of center-of-mass:
 	VelocityMoments<WorldSpace>							_velocity_moments;
 	mutable std::optional<VelocityMoments<BodyCOM>>		_body_space_velocity_moments;
@@ -437,16 +437,20 @@ template<CoordinateSystemConcept Space>
 	{
 		_world_space_mass_moments.reset();
 
-		if constexpr (std::is_same_v<Space, WorldSpace>)
-			_mass_moments = _placement.bound_transform_to_body (mass_moments);
-		else if constexpr (std::is_same_v<Space, BodyCOM>)
+		if constexpr (std::is_same_v<Space, BodyCOM>)
 			_mass_moments = mass_moments;
 		else
 			static_assert (false, "Unsupported coordinate system");
 
-		_origin_position = -_mass_moments.center_of_mass_position();
-		// Make a correction so that _mass_moments are viewed from the center-of-mass:
-		_mass_moments = _mass_moments - _origin_position;
+		auto const com_position = _mass_moments.center_of_mass_position();
+		// We want mass moments to be viewed from the center of mass, so translate if necessary
+		// (this should transform the inertia tensor accordingly):
+		_mass_moments = _mass_moments - com_position;
+		// Move the body so that the placement().position() points to the current center of mass:
+		translate<BodyCOM> (com_position);
+		// Because the origin is defined as relative to center of mass, and we just moved center of mass
+		// while not wanting to move origin, move the origin back:
+		_origin_placement.translate_frame (-com_position);
 	}
 
 
@@ -636,9 +640,9 @@ template<CoordinateSystemConcept Space>
 	Body::origin() const
 	{
 		if constexpr (std::is_same_v<Space, WorldSpace>)
-			return _placement.bound_transform_to_base (_origin_position);
+			return _placement.bound_transform_to_base (_origin_placement.position());
 		else if constexpr (std::is_same_v<Space, BodyCOM>)
-			return _origin_position;
+			return _origin_placement.position();
 		else if constexpr (std::is_same_v<Space, BodyOrigin>)
 			return math::zero;
 		else
@@ -647,15 +651,13 @@ template<CoordinateSystemConcept Space>
 
 
 template<CoordinateSystemConcept Space>
-	inline SpaceLength<Space>
-	Body::origin_to_center_of_mass() const noexcept
+	inline void
+	Body::translate (SpaceLength<Space> const& translation)
 	{
 		if constexpr (std::is_same_v<Space, WorldSpace>)
-			return _placement.unbound_transform_to_base (-_origin_position);
+			_placement.translate_frame (translation);
 		else if constexpr (std::is_same_v<Space, BodyCOM>)
-			return -_origin_position;
-		else if constexpr (std::is_same_v<Space, BodyOrigin>)
-			return -_origin_position;
+			_placement.translate_frame (placement().body_to_base_rotation() * translation);
 		else
 			static_assert (false, "Unsupported coordinate system");
 	}

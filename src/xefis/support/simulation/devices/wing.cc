@@ -31,10 +31,7 @@ Wing::Wing (Airfoil const& airfoil, si::Density const material_density):
 	Body (calculate_body_com_mass_moments (airfoil, material_density)),
 	_airfoil (airfoil)
 {
-	_com_to_planar_origin = -origin_to_center_of_mass<rigid_body::BodyCOM>();
-
 	auto shape = rigid_body::make_airfoil_shape (_airfoil.spline(), _airfoil.chord_length(), _airfoil.wing_length(), true, {});
-	shape.translate (_com_to_planar_origin);
 	set_shape (shape);
 }
 
@@ -74,11 +71,20 @@ Wing::update_external_forces (Atmosphere const* atmosphere)
 		_lift_force = body_aeroforces_at_origin.lift;
 		_drag_force = body_aeroforces_at_origin.drag;
 		_pitching_moment = body_aeroforces_at_origin.pitching_moment;
-		_center_of_pressure = body_aeroforces_at_origin.center_of_pressure + _com_to_planar_origin;
+		_center_of_pressure = body_aeroforces_at_origin.center_of_pressure + origin<rigid_body::BodyCOM>();;
 
 		apply_impulse (ForceMoments<rigid_body::BodyCOM> (_lift_force, _pitching_moment), _center_of_pressure);
 		apply_impulse (ForceMoments<rigid_body::BodyCOM> (_drag_force, math::zero), _center_of_pressure);
 	}
+}
+
+
+MassMoments<rigid_body::BodyCOM>
+Wing::calculate_body_com_mass_moments (Airfoil const& airfoil, si::Density const material_density)
+{
+	// Well, let AirfoilSplineSpace and BodyCOM be actually the same, so an unit matrix:
+	auto const rotation = RotationMatrix<rigid_body::BodyCOM, AirfoilSplineSpace> (math::unit);
+	return rotation * calculate_mass_moments<AirfoilSplineSpace> (airfoil, material_density);
 }
 
 } // namespace xf::sim

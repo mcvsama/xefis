@@ -50,7 +50,7 @@ Body::rotate_about_world_origin (RotationMatrix<WorldSpace> const& rotation)
 void
 Body::rotate_about_body_origin (RotationMatrix<WorldSpace> const& rotation)
 {
-	auto const about_point = _placement.bound_transform_to_base (_origin_position);
+	SpaceLength<WorldSpace> const about_point = _placement.bound_transform_to_base (_origin_placement.position());
 
 	_placement.rotate_base_frame_about (about_point, rotation);
 	_velocity_moments = rotation * _velocity_moments;
@@ -58,6 +58,17 @@ Body::rotate_about_body_origin (RotationMatrix<WorldSpace> const& rotation)
 
 	_world_space_mass_moments.reset();
 	_world_space_applied_impulses.reset();
+}
+
+
+void
+Body::move_origin_to (SpaceLength<WorldSpace> const& new_origin_position)
+{
+	SpaceLength<BodyCOM> const old_origin_position_in_BodyCOM = _origin_placement.position();
+	SpaceLength<BodyCOM> const new_origin_position_in_BodyCOM = _placement.bound_transform_to_body (new_origin_position);
+	SpaceLength<BodyCOM> const new_com_position_in_BodyCOM = new_origin_position_in_BodyCOM - old_origin_position_in_BodyCOM;
+	SpaceLength<WorldSpace> const new_com_position_in_WorldSpace = _placement.bound_transform_to_base (new_com_position_in_BodyCOM);
+	move_to (new_com_position_in_WorldSpace);
 }
 
 
