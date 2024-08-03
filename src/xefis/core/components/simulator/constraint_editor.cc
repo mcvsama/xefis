@@ -78,11 +78,6 @@ ConstraintEditor::create_basic_info_widget()
 {
 	auto* basic_info = new QWidget (this);
 	basic_info->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Fixed);
-
-	{
-		auto* layout = new QVBoxLayout (basic_info);
-	}
-
 	return basic_info;
 }
 
