@@ -150,6 +150,21 @@ class RigidBodyPainter: protected QOpenGLFunctions
 		{ _constraints_visible = visible; }
 
 	/**
+	 * Return true if gravity forces are set to be visible.
+	 */
+	[[nodiscard]]
+	bool
+	gravity_visible() const noexcept
+		{ return _gravity_visible; }
+
+	/**
+	 * Show/hide gravity forces.
+	 */
+	void
+	set_gravity_visible (bool visible) noexcept
+		{ _gravity_visible = visible; }
+
+	/**
 	 * Return true if forces are set to be visible.
 	 */
 	[[nodiscard]]
@@ -278,6 +293,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	rigid_body::Body const*				_hovered_body				{ nullptr };
 	rigid_body::Body const*				_focused_body				{ nullptr };
 	bool								_constraints_visible		{ false };
+	bool								_gravity_visible			{ false };
 	bool								_forces_visible				{ false };
 	bool								_angular_velocities_visible	{ false };
 	bool								_angular_momenta_visible	{ false };

@@ -361,7 +361,7 @@ RigidBodyPainter::paint_system (rigid_body::System const& system, QOpenGLPaintDe
 			for (auto const& constraint: system.constraints())
 				paint_constraint (*constraint);
 
-		if (forces_visible())
+		if (forces_visible() || gravity_visible())
 			for (auto const& body: system.bodies())
 				paint_forces (*body);
 
@@ -508,8 +508,7 @@ RigidBodyPainter::paint_constraint (rigid_body::Constraint const& constraint)
 void
 RigidBodyPainter::paint_forces (rigid_body::Body const& body)
 {
-	bool const show_gravity = false;
-	bool const show_aerodynamic_forces = true;
+	bool const show_aerodynamic_forces = _forces_visible;
 
 	auto const gravity_color = Qt::magenta;
 	auto const lift_color = Qt::green;
@@ -527,7 +526,7 @@ RigidBodyPainter::paint_forces (rigid_body::Body const& body)
 	auto const fbp = followed_body_position();
 	auto const com = body.placement().position() - fbp;
 
-	if (show_gravity)
+	if (_gravity_visible)
 		draw_arrow (com, gfm.force() * force_to_length, rigid_body::make_material (gravity_color));
 
 	if (auto const* wing = dynamic_cast<sim::Wing const*> (&body))

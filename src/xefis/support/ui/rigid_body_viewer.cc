@@ -228,6 +228,15 @@ RigidBodyViewer::display_menu()
 		action->setChecked (_rigid_body_painter.constraints_visible());
 	}
 
+	// "Show gravity"
+	{
+		auto* action = menu.addAction ("Show &gravity", [&] {
+			_rigid_body_painter.set_gravity_visible (!_rigid_body_painter.gravity_visible());
+		});
+		action->setCheckable (true);
+		action->setChecked (_rigid_body_painter.gravity_visible());
+	}
+
 	// "Show forces"
 	{
 		auto* action = menu.addAction ("Show &forces", [&] {
