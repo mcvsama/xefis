@@ -418,9 +418,8 @@ RigidBodyPainter::paint_body (rigid_body::Body const& body, bool paint_body, boo
 void
 RigidBodyPainter::paint_center_of_mass (rigid_body::Body const& body)
 {
-	auto const com_material = rigid_body::make_material ({ 0xff, 0x00, 0x00 });
 	// TODO make the sphere zoom-independent (distance from the camera-independent):
-	auto const com_shape = make_centered_sphere_shape (10_cm, 8, 8, { 0_deg, 360_deg }, { -90_deg, +90_deg }, com_material);
+	auto const com_shape = rigid_body::make_center_of_mass_symbol_shape (5_cm);
 
 	_gl.save_matrix ([&] {
 		_gl.translate (body.placement().position() - followed_body_position());
