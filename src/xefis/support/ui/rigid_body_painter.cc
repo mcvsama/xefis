@@ -156,7 +156,7 @@ RigidBodyPainter::setup_light()
 	glLightfv (GL_LIGHT0, GL_DIFFUSE, GLArray { 0.5f, 0.5f, 0.5f, 1.0f });
 	glLightfv (GL_LIGHT0, GL_SPECULAR, GLArray { 0.75f, 0.75f, 0.75f, 1.0f });
 
-	_gl.save_matrix ([&] {
+	_gl.save_context ([&] {
 		if (_planet_body)
 			// For planetary system, try to be sun:
 			_gl.translate (kSunDistance, 0_m, 0_m);
@@ -222,7 +222,7 @@ RigidBodyPainter::paint_planet()
 	auto const low_ground_fog_color = low_fog_color;
 	auto const ground_fog_density = renormalize (normalized_altitude, Range { 0.0f, 1.0f }, Range { 0.001f, 0.0015f });
 
-	_gl.save_matrix ([&] {
+	_gl.save_context ([&] {
 		setup_camera();
 		setup_light();
 
@@ -230,7 +230,7 @@ RigidBodyPainter::paint_planet()
 		// In other words match ECEF coordinates with standard OpenGL screen coordinates.
 
 		// Sky:
-		_gl.save_matrix ([&] {
+		_gl.save_context ([&] {
 			auto const sky_color = get_intermediate_color (normalized_altitude, sky_low_color, sky_high_color);
 			auto const sky_fog_color = get_intermediate_color (normalized_altitude, low_sky_fog_color, high_sky_fog_color);
 
@@ -257,7 +257,7 @@ RigidBodyPainter::paint_planet()
 		});
 
 		// Sun:
-		_gl.save_matrix ([&] {
+		_gl.save_context ([&] {
 			auto sun_material = rigid_body::kBlackMatte;
 
 			auto const configure_material = [&] (rigid_body::ShapeMaterial& material, si::Angle const latitude)
@@ -292,7 +292,7 @@ RigidBodyPainter::paint_planet()
 		});
 
 		// Ground:
-		_gl.save_matrix ([&] {
+		_gl.save_context ([&] {
 			auto const ground_fog_color = get_intermediate_color (normalized_altitude, low_ground_fog_color, high_ground_fog_color);
 
 			rigid_body::ShapeMaterial ground_material;
@@ -320,7 +320,7 @@ RigidBodyPainter::paint_planet()
 		});
 
 		// Ground haze that reflects sun a bit:
-		_gl.save_matrix ([&] {
+		_gl.save_context ([&] {
 			// TODO semi-transparent layer between us and the ground with strong reflection of light
 		});
 	});
@@ -334,7 +334,7 @@ RigidBodyPainter::paint_system (rigid_body::System const& system, QOpenGLPaintDe
 
 	glDisable (GL_FOG);
 
-	_gl.save_matrix ([&] {
+	_gl.save_context ([&] {
 		setup_camera();
 		setup_light();
 
@@ -380,7 +380,7 @@ RigidBodyPainter::paint_system (rigid_body::System const& system, QOpenGLPaintDe
 void
 RigidBodyPainter::paint_body (rigid_body::Body const& body, bool paint_body, bool paint_origin)
 {
-	_gl.save_matrix ([&] {
+	_gl.save_context ([&] {
 		_gl.translate (body.placement().position() - followed_body_position());
 		_gl.rotate (body.placement().base_to_body_rotation());
 		// Body shapes are defined relative to BodyOrigin coordinates, so transform again:
@@ -389,7 +389,7 @@ RigidBodyPainter::paint_body (rigid_body::Body const& body, bool paint_body, boo
 
 		if (paint_body)
 		{
-			_gl.save_matrix ([&] {
+			_gl.save_context ([&] {
 				if (_focused_body == &body)
 					_gl.additional_parameters().color_override = QColor::fromRgb (0x00, 0xaa, 0x7f);
 				else if (_hovered_body == &body)
@@ -422,7 +422,7 @@ RigidBodyPainter::paint_center_of_mass (rigid_body::Body const& body)
 	// TODO make the sphere zoom-independent (distance from the camera-independent):
 	auto const com_shape = rigid_body::make_center_of_mass_symbol_shape (5_cm);
 
-	_gl.save_matrix ([&] {
+	_gl.save_context ([&] {
 		_gl.translate (body.placement().position() - followed_body_position());
 		_gl.rotate (body.placement().base_to_body_rotation());
 		_gl.draw (com_shape);
@@ -436,7 +436,7 @@ RigidBodyPainter::paint_moments_of_inertia_cuboid (rigid_body::Body const& body)
 	auto const com_material = rigid_body::make_material ({ 0x00, 0x44, 0x99 });
 	auto const com_shape = make_centered_cube_shape (body.mass_moments<rigid_body::BodyCOM>(), com_material);
 
-	_gl.save_matrix ([&] {
+	_gl.save_context ([&] {
 		_gl.translate (body.placement().position() - followed_body_position());
 		_gl.rotate (body.placement().base_to_body_rotation());
 		_gl.draw (com_shape);
@@ -449,7 +449,7 @@ RigidBodyPainter::paint_constraint (rigid_body::Constraint const& constraint)
 {
 	if (constraint.enabled() && !constraint.broken())
 	{
-		_gl.save_matrix ([&] {
+		_gl.save_context ([&] {
 			auto fcorr = followed_body_position();
 			auto const& b1 = constraint.body_1();
 			auto const& b2 = constraint.body_2();
@@ -458,7 +458,7 @@ RigidBodyPainter::paint_constraint (rigid_body::Constraint const& constraint)
 
 			auto const rod_from_to = [this] (si::Length const radius, auto const& from, auto const& to, bool front_back_faces, rigid_body::ShapeMaterial const& material)
 			{
-				_gl.save_matrix ([&] {
+				_gl.save_context ([&] {
 					auto const diff = to - from;
 					_gl.translate (from);
 
@@ -578,7 +578,7 @@ RigidBodyPainter::paint_angular_momentum (rigid_body::Body const& body)
 void
 RigidBodyPainter::draw_arrow (SpaceLength<rigid_body::WorldSpace> const& origin, SpaceLength<rigid_body::WorldSpace> const& vector, rigid_body::ShapeMaterial const& material)
 {
-	_gl.save_matrix ([&] {
+	_gl.save_context ([&] {
 		auto const length = abs (vector);
 
 		if (length > 0_m)
@@ -628,7 +628,7 @@ RigidBodyPainter::paint_ecef_basis (QOpenGLPaintDevice& canvas)
 	auto const green = rigid_body::make_material (Qt::green);
 
 	auto const draw_basis = [&] {
-		_gl.save_matrix ([&] {
+		_gl.save_context ([&] {
 			glEnable (GL_LIGHT1);
 			glLightfv (GL_LIGHT1, GL_POSITION, GLArray { 0.0f, 0.0f, 0.0f, 0.5f });
 			glLightfv (GL_LIGHT1, GL_AMBIENT, GLArray { 0.25f, 0.25f, 0.25f, 1.0f });
@@ -643,21 +643,21 @@ RigidBodyPainter::paint_ecef_basis (QOpenGLPaintDevice& canvas)
 			// Root ball:
 			_gl.draw (rigid_body::make_centered_sphere_shape (2 * radius, 8, 8));
 			// X axis:
-			_gl.save_matrix ([&] {
+			_gl.save_context ([&] {
 				_gl.rotate (+90_deg, 0.0, 1.0, 0.0);
 				_gl.draw (rigid_body::make_cylinder_shape ({ .length = length, .radius = radius, .num_faces = kNumFaces, .with_front_and_back = false }, red));
 				_gl.translate (0_m, 0_m, length);
 				_gl.draw (rigid_body::make_cone_shape (cone_length, cone_radius, kNumFaces, true, red));
 			});
 			// Y axis:
-			_gl.save_matrix ([&] {
+			_gl.save_context ([&] {
 				_gl.rotate (-90_deg, 1.0, 0.0, 0.0);
 				_gl.draw (rigid_body::make_cylinder_shape ({ .length = length, .radius = radius, .num_faces = kNumFaces, .with_front_and_back = false }, green));
 				_gl.translate (0_m, 0_m, length);
 				_gl.draw (rigid_body::make_cone_shape (cone_length, cone_radius, kNumFaces, true, green));
 			});
 			// Z axis:
-			_gl.save_matrix ([&] {
+			_gl.save_context ([&] {
 				_gl.draw (rigid_body::make_cylinder_shape ({ .length = length, .radius = radius, .num_faces = kNumFaces, .with_front_and_back = false }, blue));
 				_gl.translate (0_m, 0_m, length);
 				_gl.draw (rigid_body::make_cone_shape (cone_length, cone_radius, kNumFaces, true, blue));

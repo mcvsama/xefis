@@ -107,7 +107,7 @@ class GLSpace
 	 * Exception-safe.
 	 */
 	void
-	save_matrix (auto&& lambda);
+	save_context (auto&& lambda);
 
 	/**
 	 * Convert QColor to array of floats for OpenGL functions.
@@ -217,7 +217,7 @@ class GLSpace
 
 	/**
 	 * Return reference to current additional parameters struct.
-	 * It gets saved/restored with save_matrix().
+	 * It gets saved/restored with save_context().
 	 */
 	AdditionalParameters&
 	additional_parameters();
@@ -261,7 +261,7 @@ GLSpace::set_global_offset (SpaceLength<rigid_body::BodyOrigin> const& offset) n
 
 
 inline void
-GLSpace::save_matrix (auto&& lambda)
+GLSpace::save_context (auto&& lambda)
 {
 	try {
 		push_context();

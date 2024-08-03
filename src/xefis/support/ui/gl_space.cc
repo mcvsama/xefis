@@ -63,7 +63,7 @@ GLSpace::set_material (rigid_body::ShapeMaterial const& material)
 void
 GLSpace::draw (rigid_body::Shape const& shape)
 {
-	save_matrix ([&] {
+	save_context ([&] {
 		if (!shape.triangles().empty())
 		{
 			for (auto const& triangle: shape.triangles())
