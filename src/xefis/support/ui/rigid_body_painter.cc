@@ -340,6 +340,7 @@ RigidBodyPainter::paint_system (rigid_body::System const& system, QOpenGLPaintDe
 
 		for (auto const& body: system.bodies())
 		{
+			auto const focused = _focused_body == body.get();
 			BodyRendering const* rendering = &default_body_rendering;
 
 			if (auto const rendering_it = _body_rendering.find (body.get());
@@ -350,7 +351,7 @@ RigidBodyPainter::paint_system (rigid_body::System const& system, QOpenGLPaintDe
 
 			paint_body (*body, rendering->body_visible, rendering->origin_visible);
 
-			if (rendering->center_of_mass_visible)
+			if (focused || rendering->center_of_mass_visible)
 				paint_center_of_mass (*body);
 
 			if (rendering->moments_of_inertia_visible)
@@ -404,11 +405,11 @@ RigidBodyPainter::paint_body (rigid_body::Body const& body, bool paint_body, boo
 			});
 		}
 
-		if (paint_origin)
+		if (paint_origin || _focused_body == &body)
 		{
 			auto const origin_material = rigid_body::make_material ({ 0xff, 0xff, 0x00 });
 			// TODO make the sphere zoom-independent (distance from the camera-independent):
-			auto const origin_shape = make_centered_sphere_shape (10_cm, 8, 8, { 0_deg, 360_deg }, { -90_deg, +90_deg }, origin_material);
+			auto const origin_shape = rigid_body::make_centered_sphere_shape (5_cm, 8, 8, { 0_deg, 360_deg }, { -90_deg, +90_deg }, origin_material);
 			_gl.draw (origin_shape);
 		}
 	});
