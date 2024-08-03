@@ -453,8 +453,8 @@ RigidBodyPainter::paint_constraint (rigid_body::Constraint const& constraint)
 			auto fcorr = followed_body_position();
 			auto const& b1 = constraint.body_1();
 			auto const& b2 = constraint.body_2();
-			auto x1 = b1.placement().position() - fcorr;
-			auto x2 = b2.placement().position() - fcorr;
+			auto com1 = b1.placement().position() - fcorr;
+			auto com2 = b2.placement().position() - fcorr;
 
 			auto const rod_from_to = [this] (si::Length const radius, auto const& from, auto const& to, bool front_back_faces, rigid_body::ShapeMaterial const& material)
 			{
@@ -479,26 +479,23 @@ RigidBodyPainter::paint_constraint (rigid_body::Constraint const& constraint)
 
 			if (auto const* hinge = dynamic_cast<rigid_body::HingeConstraint const*> (&constraint))
 			{
-				auto const r1 = b1.placement().unbound_transform_to_base (hinge->hinge_precalculation().body_1_anchor());
-				auto const r2 = b2.placement().unbound_transform_to_base (hinge->hinge_precalculation().body_2_anchor());
-				auto const t1 = x1 + r1;
-				auto const t2 = x2 + r2;
+				auto const a1 = b1.placement().unbound_transform_to_base (hinge->hinge_precalculation().body_1_anchor());
+				auto const hinge_1 = b1.placement().unbound_transform_to_base (hinge->hinge_precalculation().body_1_hinge());
+				auto const hinge_start_1 = com1 + a1;
+				auto const hinge_end_1 = hinge_start_1 + hinge_1;
+				auto const hinge_center = hinge_start_1 + 0.5 * hinge_1;
 				auto const material = rigid_body::make_material (QColor (0xff, 0x99, 0x00));
 
-				rod_from_to (kDefaultConstraintDiameter, x1, t1, false, material);
-				rod_from_to (kDefaultConstraintDiameter, x2, t2, false, material);
-
+				// Lines from COM to hinge center:
+				rod_from_to (kDefaultConstraintDiameter, com1, hinge_center, false, material);
+				rod_from_to (kDefaultConstraintDiameter, com2, hinge_center, false, material);
 				// Hinge:
-				if (auto const& data = hinge->hinge_precalculation().data())
-				{
-					auto const h = 1.5 * kDefaultConstraintDiameter * normalized (data->a1);
-					rod_from_to (kDefaultHingeDiameter, t1 - h, t1 + h, true, material);
-				}
+				rod_from_to (kDefaultHingeDiameter, hinge_start_1, hinge_end_1, true, material);
 			}
 			else if (dynamic_cast<rigid_body::FixedConstraint const*> (&constraint))
 			{
 				auto const material = rigid_body::make_material (QColor (0xff, 0x00, 0x99));
-				rod_from_to (kDefaultConstraintDiameter, x1, x2, false, material);
+				rod_from_to (kDefaultConstraintDiameter, com1, com2, false, material);
 			}
 		});
 	}

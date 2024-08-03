@@ -120,6 +120,20 @@ class HingePrecalculation: public FramePrecalculation<HingePrecalculationData>
 	body_2_hinge() const noexcept
 		{ return _hinge_2; }
 
+	/**
+	 * Return hinge as visible from the first body.
+	 */
+	SpaceLength<BodyCOM> const&
+	body_1_normalized_hinge() const noexcept
+		{ return _normalized_hinge_1; }
+
+	/**
+	 * Return hinge as visible from the second body.
+	 */
+	SpaceLength<BodyCOM> const&
+	body_2_normalized_hinge() const noexcept
+		{ return _normalized_hinge_2; }
+
   protected:
 	// FramePrecalculation API
 	void
@@ -132,6 +146,8 @@ class HingePrecalculation: public FramePrecalculation<HingePrecalculationData>
 	// Hinge as visible from each body:
 	SpaceLength<BodyCOM>	_hinge_1;
 	SpaceLength<BodyCOM>	_hinge_2;
+	SpaceLength<BodyCOM>	_normalized_hinge_1;
+	SpaceLength<BodyCOM>	_normalized_hinge_2;
 	FixedOrientationHelper	_fixed_orientation;
 };
 

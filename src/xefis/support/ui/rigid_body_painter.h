@@ -40,8 +40,8 @@ class RigidBodyPainter: protected QOpenGLFunctions
 {
 	static constexpr auto		kDefaultPositionScale		= 0.0025_mm / 1_m;
 	static constexpr auto		kDefaultMassScale			= 20_cm / 1_kg;
-	static constexpr si::Length	kDefaultConstraintDiameter	= 2_cm;
-	static constexpr si::Length	kDefaultHingeDiameter		= 6_cm;
+	static constexpr si::Length	kDefaultConstraintDiameter	= 1.5_cm;
+	static constexpr si::Length	kDefaultHingeDiameter		= 3_cm;
 
 	static constexpr auto		kSkyHeight					= 500_km;
 	static constexpr auto		kHorizonRadius				= 500_km;

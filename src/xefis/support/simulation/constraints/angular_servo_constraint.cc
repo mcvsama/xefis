@@ -111,7 +111,7 @@ void
 AngularServoConstraint::update_velocity_and_torque()
 {
 	auto const pl_1 = Constraint::body_1().placement();
-	auto const hinge = pl_1.unbound_transform_to_base (_hinge.body_1_hinge()) / abs (_hinge.body_1_hinge());
+	auto const hinge = pl_1.unbound_transform_to_base (_hinge.body_1_normalized_hinge()) / abs (_hinge.body_1_normalized_hinge());
 
 	auto const w1_about_hinge = projection_onto_normalized (Constraint::body_1().velocity_moments<WorldSpace>().angular_velocity(), hinge);
 	auto const w2_about_hinge = projection_onto_normalized (Constraint::body_2().velocity_moments<WorldSpace>().angular_velocity(), hinge);
