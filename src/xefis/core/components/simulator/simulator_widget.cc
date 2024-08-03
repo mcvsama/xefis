@@ -140,11 +140,15 @@ SimulatorWidget::make_simulation_controls()
 	time_step_label->setSizePolicy (QSizePolicy::Fixed, QSizePolicy::Fixed);
 	update_simulation_time_label();
 
+	auto* basis_colors_label = new QLabel ("<b><span style='color: red'>X</span> <span style='color: green'>Y</span> <span style='color: blue'>Z</span></b>", this);
+
 	auto* layout = new QHBoxLayout (sim_controls);
 	layout->setMargin (0);
 	layout->addWidget (start_stop_sim_button);
 	layout->addWidget (step_sim_button);
 	layout->addWidget (show_configurator_button);
+	layout->addItem (new QSpacerItem (ph.em_pixels_int (1.0), 0, QSizePolicy::Fixed, QSizePolicy::Fixed));
+	layout->addWidget (basis_colors_label);
 	layout->addItem (new QSpacerItem (ph.em_pixels_int (1.0), 0, QSizePolicy::Fixed, QSizePolicy::Fixed));
 	layout->addWidget (time_step_label);
 	layout->addItem (new QSpacerItem (ph.em_pixels_int (1.0), 0, QSizePolicy::Fixed, QSizePolicy::Fixed));
