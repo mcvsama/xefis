@@ -97,7 +97,6 @@ class BodiesTree: public QTreeWidget
 	rigid_body::Body const*	_followed_body					{ nullptr };
 	std::set<rigid_body::Body const*> // TODO flat_set when compiler supports it
 							_gravitating_bodies;
-	// TODO make an common icon repository with loading directly from SVGs
 	QIcon					_body_icon						{ icons::body() };
 	QIcon					_gravitating_body_icon			{ icons::gravitating_body() };
 	QIcon					_followed_body_icon				{ icons::followed_body() };
