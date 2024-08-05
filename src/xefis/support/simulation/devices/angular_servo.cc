@@ -17,6 +17,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/math/geometry.h>
+#include <xefis/support/nature/various_inertia_tensors.h>
 #include <xefis/support/simulation/constraints/angular_servo_constraint.h>
 
 // Neutrino:
@@ -46,16 +47,8 @@ AngularServo::set_setpoint (si::Angle const setpoint)
 std::unique_ptr<AngularServo>
 make_standard_9gram_servo (rigid_body::AngularServoConstraint& constraint)
 {
-	std::array<PointMass<rigid_body::BodyCOM>, 8> masses;
-	std::size_t i = 0;
-
-	for (auto const x: { -11.5_mm, +11.5_mm })
-		for (auto const y: { -6_mm, +6_mm })
-			for (auto const z: { -14_mm, +14_mm })
-				masses[i++] = { 9_gr / masses.size(), SpaceLength<rigid_body::BodyCOM> (0.5 * x, 0.5 * y, 0.5 * z), math::zero };
-
-	auto const mass_moments = MassMoments<rigid_body::BodyCOM>::from_point_masses (begin (masses), end (masses));
-
+	auto const mass = 9_gr;
+	auto const mass_moments = MassMoments<rigid_body::BodyCOM> (mass, math::zero, make_cuboid_inertia_tensor<rigid_body::BodyCOM> (mass, { 24_mm, 12_mm, 28_mm }));
 	return std::make_unique<AngularServo> (constraint, 2 / 1_deg, mass_moments);
 }
 

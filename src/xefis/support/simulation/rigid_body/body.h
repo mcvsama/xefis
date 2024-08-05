@@ -425,17 +425,18 @@ template<CoordinateSystemConcept Space>
 	inline void
 	Body::set_mass_moments (MassMoments<Space> const& mass_moments)
 	{
+		auto const com_position = mass_moments.center_of_mass_position();
+
+		// We want mass moments to be viewed from the center of mass, so translate if necessary
+		// (this should transform the inertia tensor accordingly):
 		if constexpr (std::is_same_v<Space, BodyCOM>)
-			_mass_moments = mass_moments;
+			_mass_moments = mass_moments.centered_at_center_of_mass();
 		else
 			static_assert (false, "Unsupported coordinate system");
 
-		auto const com_position = _mass_moments.center_of_mass_position();
-		// We want mass moments to be viewed from the center of mass, so translate if necessary
-		// (this should transform the inertia tensor accordingly):
-		_mass_moments = _mass_moments - com_position;
 		// Move the body so that the placement().position() points to the current center of mass:
 		translate<BodyCOM> (com_position);
+
 		// Because the origin is defined as relative to center of mass, and we just moved center of mass
 		// while not wanting to move origin, move the origin back:
 		_origin_placement.translate_frame (-com_position);

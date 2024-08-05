@@ -34,22 +34,6 @@
 
 namespace xf {
 
-template<class pSpace = void>
-	class PointMass
-	{
-	  public:
-		using Space = pSpace;
-
-	  public:
-		// Monopole moment:
-		si::Mass								mass;
-		// Dipole moment:
-		SpaceVector<si::Length, Space>			position;
-		// Quadrupole moment:
-		SpaceMatrix<si::MomentOfInertia, Space>	moment_of_inertia	{ math::zero };
-	};
-
-
 /**
  * Represents three moments of mass:
  *  • 0th = mass (monopole)
@@ -60,15 +44,17 @@ template<class pSpace = void>
 	class MassMoments
 	{
 	  public:
-		using Space		= pSpace;
-		using PointMass	= xf::PointMass<Space>;
+		using Space = pSpace;
 
 	  public:
 		// Ctor
 		MassMoments() = default;
 
 		// Ctor
-		MassMoments (si::Mass, SpaceVector<si::Length, Space> const& center_of_mass_position, SpaceMatrix<si::MomentOfInertia, Space> const& moment_of_inertia);
+		MassMoments (si::Mass, SpaceMatrix<si::MomentOfInertia, Space> const& inertia_tensor_at_com);
+
+		// Ctor
+		MassMoments (si::Mass, SpaceVector<si::Length, Space> const& center_of_mass_position, SpaceMatrix<si::MomentOfInertia, Space> const& inertia_tensor_at_origin);
 
 		// Ctor method
 		static MassMoments<Space>
@@ -81,9 +67,14 @@ template<class pSpace = void>
 
 		// Ctor method
 		static MassMoments
-		from_point_masses (std::initializer_list<PointMass> point_masses)
+		from_point_masses (std::initializer_list<MassMoments<Space>> point_masses)
 			{ return from_point_masses (point_masses.begin(), point_masses.end()); }
 
+		/**
+		 * Add another mass moments and thus create mass moments for the system of the two bodies
+		 * like they were one.Assumes that the origin for both bodies is the same point in space
+		 * (doesn't have to be center of mass or anything).
+		 */
 		MassMoments&
 		operator+= (MassMoments const& other);
 
@@ -104,13 +95,13 @@ template<class pSpace = void>
 			{ return _center_of_mass_position; }
 
 		/**
-		 * Moment of inertia tensor viewed from the point defined by
-		 * -center_of_mass_position().
+		 * Moment of inertia tensor viewed from the origin point,
+		 * not from the center of mass.
 		 */
 		[[nodiscard]]
 		SpaceMatrix<si::MomentOfInertia, Space> const&
 		moment_of_inertia() const noexcept
-			{ return _moment_of_inertia; }
+			{ return _inertia_tensor; }
 
 		/**
 		 * Inversed moment of inertia.
@@ -118,99 +109,23 @@ template<class pSpace = void>
 		[[nodiscard]]
 		typename SpaceMatrix<si::MomentOfInertia, Space>::InversedMatrix const&
 		inversed_moment_of_inertia() const noexcept
-		// TODO rozdziel na MOI@zero i na MOI@COM
-			{ return _inversed_moment_of_inertia; }
+			{ return _inverse_inertia_tensor; }
+
+		/**
+		 * Return the same mass moments but viewed from the center of mass.
+		 * Result will have center of mass at [0, 0, 0] and updated inertia tensor.
+		 */
+		[[nodiscard]]
+		MassMoments
+		centered_at_center_of_mass() const;
 
 	  private:
 		si::Mass															_mass						{ 0_kg };
 		SpaceVector<si::Length, Space>										_center_of_mass_position	{ 0_m, 0_m, 0_m };
-		SpaceMatrix<si::MomentOfInertia, Space>								_moment_of_inertia			{ math::zero };
-		typename SpaceMatrix<si::MomentOfInertia, Space>::InversedMatrix	_inversed_moment_of_inertia	{ math::zero };
+		SpaceMatrix<si::MomentOfInertia, Space>								_inertia_tensor				{ math::zero };
+		// TODO consider making this optional (+std::mutex and mutable keyword):
+		typename SpaceMatrix<si::MomentOfInertia, Space>::InversedMatrix	_inverse_inertia_tensor		{ math::zero };
 	};
-
-
-// Forward
-template<class Space>
-	SpaceMatrix<si::MomentOfInertia, Space>
-	parallel_axis_theorem (SpaceMatrix<si::MomentOfInertia, Space> const& moi_at_com, si::Mass mass, SpaceVector<si::Length, Space> const& displacement);
-
-
-template<class S>
-	inline
-	MassMoments<S>::MassMoments (si::Mass mass, SpaceVector<si::Length, Space> const& center_of_mass_position, SpaceMatrix<si::MomentOfInertia, Space> const& moment_of_inertia):
-		_mass (mass),
-		_center_of_mass_position (center_of_mass_position),
-		_moment_of_inertia (moment_of_inertia),
-		_inversed_moment_of_inertia (inv (moment_of_inertia))
-	{ }
-
-
-template<class S>
-	inline MassMoments<S>
-	MassMoments<S>::from_point_masses (std::forward_iterator auto begin, std::forward_iterator auto end)
-	{
-		size_t count = 0;
-
-		// TODO what really is needed: skipping pointmasses with mass == 0_kg.
-		SpaceMatrix<double, Space> const unit (math::unit);
-
-		si::Mass computed_mass = 0_kg;
-		SpaceVector<decltype (si::Length{} * si::Mass{}), Space> computed_center (math::zero);
-		SpaceMatrix<si::MomentOfInertia, Space> computed_moment_of_inertia (math::zero);
-
-		// Center of mass formula: R = 1/M * Σ m[i] * r[i]; where M is total mass.
-
-		for (auto const& point_mass: boost::make_iterator_range (begin, end))
-		{
-			auto const m = point_mass.mass;
-			auto const r = point_mass.position;
-			auto const i = point_mass.moment_of_inertia;
-
-			if (m != 0_kg)
-			{
-				++count;
-				computed_mass += m;
-				computed_center += m * r;
-				computed_moment_of_inertia += parallel_axis_theorem (i, m, r);
-			}
-		}
-
-		// Override values if we actually only used one point mass, or none at all:
-		if (count == 0)
-			return MassMoments();
-		else if (count == 1)
-			return MassMoments (begin->mass, begin->position, begin->moment_of_inertia);
-		else
-			return MassMoments (computed_mass, computed_center / computed_mass, computed_moment_of_inertia);
-	}
-
-
-template<class S>
-	inline MassMoments<S>&
-	MassMoments<S>::operator+= (MassMoments const& other)
-	{
-		auto const& mm1 = *this;
-		auto const& mm2 = other;
-
-		MassMoments<S> result;
-		result._mass = mm1._mass + mm2._mass;
-
-		if (result._mass != 0_kg)
-		{
-			// New center of mass:
-			result._center_of_mass_position = 1.0 / result._mass * (mm1._mass * mm1._center_of_mass_position + mm2._mass * mm2._center_of_mass_position);
-			// Tensor parallel axis theorem: <https://en.wikipedia.org/wiki/Parallel_axis_theorem#Tensor_generalization>
-			// FIXME the original mass_moments.moment_of_inertia() must go through COM; that is done. But make sure that result._moment_of_inertia also goes through
-			// COM of the result.
-			result._moment_of_inertia = parallel_axis_theorem (mm1._moment_of_inertia, mm1._mass, mm1._center_of_mass_position - result._center_of_mass_position)
-									  + parallel_axis_theorem (mm2._moment_of_inertia, mm2._mass, mm2._center_of_mass_position - result._center_of_mass_position);
-			result._inversed_moment_of_inertia = inv (result._moment_of_inertia);
-
-			*this = result;
-		}
-
-		return *this;
-	}
 
 
 /*
@@ -239,75 +154,61 @@ template<class TargetSpace, class SourceSpace>
 	}
 
 
-template<class Space>
-	constexpr MassMoments<Space>
-	operator+ (MassMoments<Space> a)
-	{
-		return a;
-	}
-
-
-// TODO perhaps just like velocity-moments, can't use +, but need add (other, arm) to correctly add moment_of_inertia?
-// TODO and what would arm mean? Arm to center-of-mass, right?
-template<class Space>
-	inline MassMoments<Space>
-	operator+ (SpaceVector<si::Length, Space> const& offset,
-			   MassMoments<Space> const& mass_moments)
-	{
-		return {
-			mass_moments.mass(),
-			mass_moments.center_of_mass_position() + offset,
-			parallel_axis_theorem (mass_moments.moment_of_inertia(), mass_moments.mass(), offset),
-		};
-	}
-
-
-template<class Space>
-	inline MassMoments<Space>
-	operator+ (MassMoments<Space> const& mass_moments,
-			   SpaceVector<si::Length, Space> const& offset)
-	{
-		return offset + mass_moments;
-	}
-
-
-template<class Space>
-	inline MassMoments<Space>
-	operator- (SpaceVector<si::Length, Space> const& offset,
-			   MassMoments<Space> const& mass_moments)
-	{
-        return -offset + mass_moments;
-    }
-
-
-template<class Space>
-	inline MassMoments<Space>
-	operator- (MassMoments<Space> const& mass_moments,
-			   SpaceVector<si::Length, Space> const& offset)
-	{
-        return -offset + mass_moments;
-    }
-
-
-/*
- * Global functions
+/**
+ * Return inertia tensor resulting from a spacial displacement.
+ * Doesn't include the own (center of mass) inertia tensor part.
+ * The displacement vector R can be negated without changing the result.
  */
-
-
 template<class Space>
 	SpaceMatrix<si::MomentOfInertia, Space>
-	parallel_axis_theorem_arm (si::Mass mass, SpaceVector<si::Length, Space> const& displacement)
+	displacement_inertia_tensor (si::Mass const mass, SpaceVector<si::Length, Space> const& R)
 	{
-		SpaceMatrix<double, Space> const unit (math::unit);
-		return mass * (unit * (~displacement * displacement).scalar() - displacement * ~displacement);
+		SpaceMatrix<double, Space> const E (math::unit);
+		// m * [(R ⋅ R) E3 - R ⊗ R]
+		return mass * (dot_product (R, R) * E - outer_product (R, R));
 	}
 
 
+/**
+ * Converts inertia tensor as seen from the center of mass to seen from given point.
+ * The displacement is relative to center of mass position.
+ */
 template<class Space>
 	SpaceMatrix<si::MomentOfInertia, Space>
-	parallel_axis_theorem (SpaceMatrix<si::MomentOfInertia, Space> const& moi_at_com, si::Mass mass, SpaceVector<si::Length, Space> const& displacement)
+	inertia_tensor_com_to_point (si::Mass const mass,
+								 SpaceMatrix<si::MomentOfInertia, Space> const& inertia_tensor_at_center_of_mass,
+								 SpaceLength<Space> const& displacement_from_com)
 	{
-		return moi_at_com + parallel_axis_theorem_arm (mass, displacement);
+		return inertia_tensor_at_center_of_mass + displacement_inertia_tensor (mass, displacement_from_com);
+	}
+
+
+/**
+ * Converts inertia tensor as seen from any point to seen from center of mass.
+ * The displacement is relative to center of mass position.
+ */
+template<class Space>
+	SpaceMatrix<si::MomentOfInertia, Space>
+	inertia_tensor_point_to_com (si::Mass const mass,
+								 SpaceMatrix<si::MomentOfInertia, Space> const& inertia_tensor_at_point,
+								 SpaceLength<Space> const& displacement_from_com)
+	{
+		return inertia_tensor_at_point - displacement_inertia_tensor (mass, displacement_from_com);
+	}
+
+
+/**
+ * Converts inertia tensor as seen from one point to seen from another point.
+ * The displacements are relative to center of mass position.
+ */
+template<class Space>
+	SpaceMatrix<si::MomentOfInertia, Space>
+	inertia_tensor_point_to_point (si::Mass const mass,
+								   SpaceMatrix<si::MomentOfInertia, Space> const& old_inertia_tensor_at_point,
+								   SpaceLength<Space> const& old_displacement_from_com,
+								   SpaceLength<Space> const& new_displacement_from_com)
+	{
+        return old_inertia_tensor_at_point - displacement_inertia_tensor (mass, old_displacement_from_com) + displacement_inertia_tensor (mass, new_displacement_from_com);
 	}
 
 
@@ -322,7 +223,7 @@ template<class Scalar, class Space>
 		// Have 2D triangulation points, make two sets of them, split the virtual wing into two identical-length parts,
 		// make the points at the center of each wing part. This way we'll get correct MOI for all 3D axes.
 
-		std::vector<PointMass<Space>> point_masses;
+		std::vector<MassMoments<Space>> point_masses;
 		point_masses.reserve (2 * polygon_triangulation.size());
 
 		for (auto const& triangle: polygon_triangulation)
@@ -331,15 +232,80 @@ template<class Scalar, class Space>
 			auto const centroid = scaler * triangle_centroid (triangle);
 			auto const area = scaler * scaler * area_2d (triangle);
 			auto const volume = area * 0.5 * wing_length;
-			auto const mass = volume * material_density;
+			auto const point_mass = volume * material_density;
 			auto const position_1 = SpaceLength<Space> (centroid[0], centroid[1], 0.25 * wing_length);
 			auto const position_2 = SpaceLength<Space> (centroid[0], centroid[1], 0.75 * wing_length);
+			auto const inertia_tensor_1 = displacement_inertia_tensor (point_mass, position_1);
+			auto const inertia_tensor_2 = displacement_inertia_tensor (point_mass, position_2);
 
-			point_masses.push_back (PointMass<Space> { mass, position_1, math::zero });
-			point_masses.push_back (PointMass<Space> { mass, position_2, math::zero });
+			point_masses.push_back (MassMoments<Space> { point_mass, position_1, inertia_tensor_1 });
+			point_masses.push_back (MassMoments<Space> { point_mass, position_2, inertia_tensor_2 });
 		}
 
 		return MassMoments<Space>::from_point_masses (begin (point_masses), end (point_masses));
+	}
+
+
+/*
+ * MassMoments functions
+ */
+
+
+template<class S>
+	inline
+	MassMoments<S>::MassMoments (si::Mass mass, SpaceMatrix<si::MomentOfInertia, Space> const& inertia_tensor_at_origin):
+		MassMoments (mass, math::zero, inertia_tensor_at_origin) // Origin is the same as center-of-mass here.
+	{ }
+
+
+template<class S>
+	inline
+	MassMoments<S>::MassMoments (si::Mass mass, SpaceVector<si::Length, Space> const& center_of_mass_position, SpaceMatrix<si::MomentOfInertia, Space> const& inertia_tensor_at_origin):
+		_mass (mass),
+		_center_of_mass_position (center_of_mass_position),
+		_inertia_tensor (inertia_tensor_at_origin),
+		_inverse_inertia_tensor (inv (inertia_tensor_at_origin))
+	{ }
+
+
+template<class S>
+	inline MassMoments<S>
+	MassMoments<S>::from_point_masses (std::forward_iterator auto begin, std::forward_iterator auto end)
+	{
+		MassMoments<S> result;
+
+		for (auto const& point_mass: boost::make_iterator_range (begin, end))
+			result += point_mass;
+
+		return result;
+	}
+
+
+template<class S>
+	inline MassMoments<S>&
+	MassMoments<S>::operator+= (MassMoments const& other)
+	{
+		auto const m1 = _mass;
+		auto const m2 = other._mass;
+		auto const& r1 = _center_of_mass_position;
+		auto const& r2 = other._center_of_mass_position;
+		auto const& I1 = _inertia_tensor;
+		auto const& I2 = other._inertia_tensor;
+
+		_mass = m1 + m2;
+		_center_of_mass_position = (m1 * r1 + m2 * r2) / (m1 + m2);
+		_inertia_tensor = I1 + I2;
+		_inverse_inertia_tensor = inv (_inertia_tensor);
+
+		return *this;
+	}
+
+
+template<class S>
+	inline MassMoments<S>
+	MassMoments<S>::centered_at_center_of_mass() const
+	{
+		return MassMoments<S> (_mass, { 0_m, 0_m, 0_m }, inertia_tensor_point_to_com (_mass, _inertia_tensor, -_center_of_mass_position));
 	}
 
 } // namespace xf
