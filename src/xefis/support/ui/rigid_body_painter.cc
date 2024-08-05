@@ -362,7 +362,7 @@ RigidBodyPainter::paint_system (rigid_body::System const& system, QOpenGLPaintDe
 			for (auto const& constraint: system.constraints())
 				paint_constraint (*constraint);
 
-		if (forces_visible() || gravity_visible())
+		if (gravity_visible() || aerodynamic_forces_visible() || external_forces_visible())
 			for (auto const& body: system.bodies())
 				paint_forces (*body);
 
@@ -505,8 +505,6 @@ RigidBodyPainter::paint_constraint (rigid_body::Constraint const& constraint)
 void
 RigidBodyPainter::paint_forces (rigid_body::Body const& body)
 {
-	bool const show_aerodynamic_forces = _forces_visible;
-
 	auto const gravity_color = Qt::magenta;
 	auto const lift_color = Qt::green;
 	auto const drag_color = Qt::red;
@@ -526,23 +524,24 @@ RigidBodyPainter::paint_forces (rigid_body::Body const& body)
 	if (_gravity_visible)
 		draw_arrow (com, gfm.force() * force_to_length, rigid_body::make_material (gravity_color));
 
-	if (auto const* wing = dynamic_cast<sim::Wing const*> (&body))
+	if (_aerodynamic_forces_visible)
 	{
-		auto const& pl = wing->placement();
-		auto const at = pl.bound_transform_to_base (wing->center_of_pressure()) - fbp;
-
-		if (show_aerodynamic_forces)
+		if (auto const* wing = dynamic_cast<sim::Wing const*> (&body))
 		{
+			auto const& pl = wing->placement();
+			auto const at = pl.bound_transform_to_base (wing->center_of_pressure()) - fbp;
+
 			draw_arrow (at, pl.unbound_transform_to_base (wing->lift_force()) * force_to_length, rigid_body::make_material (lift_color));
 			draw_arrow (at, pl.unbound_transform_to_base (wing->drag_force()) * force_to_length, rigid_body::make_material (drag_color));
 			draw_arrow (at, pl.unbound_transform_to_base (wing->pitching_moment()) * torque_to_length, rigid_body::make_material (torque_color));
 		}
 	}
 
-	if (!show_aerodynamic_forces)
+	if (_external_forces_visible)
+	{
 		draw_arrow (com, efm.force() * force_to_length, rigid_body::make_material (external_force_color));
-
-	draw_arrow (com, efm.torque() * torque_to_length, rigid_body::make_material (external_torque_color));
+		draw_arrow (com, efm.torque() * torque_to_length, rigid_body::make_material (external_torque_color));
+	}
 }
 
 

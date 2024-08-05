@@ -237,18 +237,27 @@ RigidBodyViewer::display_menu()
 		action->setChecked (_rigid_body_painter.gravity_visible());
 	}
 
-	// "Show forces"
+	// "Show aerodynamic forces"
 	{
-		auto* action = menu.addAction ("Show &forces", [&] {
-			_rigid_body_painter.set_forces_visible (!_rigid_body_painter.forces_visible());
+		auto* action = menu.addAction ("Show &aerodynamic forces", [&] {
+			_rigid_body_painter.set_aerodynamic_forces_visible (!_rigid_body_painter.aerodynamic_forces_visible());
 		});
 		action->setCheckable (true);
-		action->setChecked (_rigid_body_painter.forces_visible());
+		action->setChecked (_rigid_body_painter.aerodynamic_forces_visible());
+	}
+
+	// "Show external forces"
+	{
+		auto* action = menu.addAction ("Show &external forces", [&] {
+			_rigid_body_painter.set_external_forces_visible (!_rigid_body_painter.external_forces_visible());
+		});
+		action->setCheckable (true);
+		action->setChecked (_rigid_body_painter.external_forces_visible());
 	}
 
 	// "Show angular velocities"
 	{
-		auto* action = menu.addAction ("Show &angular velocities", [&] {
+		auto* action = menu.addAction ("Show angula&r velocities", [&] {
 			_rigid_body_painter.set_angular_velocities_visible (!_rigid_body_painter.angular_velocities_visible());
 		});
 		action->setCheckable (true);

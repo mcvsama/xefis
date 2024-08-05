@@ -165,19 +165,34 @@ class RigidBodyPainter: protected QOpenGLFunctions
 		{ _gravity_visible = visible; }
 
 	/**
-	 * Return true if forces are set to be visible.
+	 * Return true if aerodynamic forces are set to be visible.
 	 */
 	[[nodiscard]]
 	bool
-	forces_visible() const noexcept
-		{ return _forces_visible; }
+	aerodynamic_forces_visible() const noexcept
+		{ return _aerodynamic_forces_visible; }
 
 	/**
-	 * Show/hide forces.
+	 * Show/hide aerodynamic forces.
 	 */
 	void
-	set_forces_visible (bool visible) noexcept
-		{ _forces_visible = visible; }
+	set_aerodynamic_forces_visible (bool visible) noexcept
+		{ _aerodynamic_forces_visible = visible; }
+
+	/**
+	 * Return true if external forces are set to be visible.
+	 */
+	[[nodiscard]]
+	bool
+	external_forces_visible() const noexcept
+		{ return _external_forces_visible; }
+
+	/**
+	 * Show/hide external forces.
+	 */
+	void
+	set_external_forces_visible (bool visible) noexcept
+		{ _external_forces_visible = visible; }
 
 	/**
 	 * Return true if angular velocity are set to be visible.
@@ -294,7 +309,8 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	rigid_body::Body const*				_focused_body				{ nullptr };
 	bool								_constraints_visible		{ false };
 	bool								_gravity_visible			{ false };
-	bool								_forces_visible				{ false };
+	bool								_external_forces_visible	{ false };
+	bool								_aerodynamic_forces_visible	{ false };
 	bool								_angular_velocities_visible	{ false };
 	bool								_angular_momenta_visible	{ false };
 	std::map<rigid_body::Body const*, BodyRendering>
