@@ -47,7 +47,7 @@ AutoTest t1 ("Nature: MassMoments calculations", []{
 												 SpaceLength<> { 1_m, 2_m, 3_m },
 												 1e-9_m);
 		test_asserts::verify_equal_with_epsilon ("(0.2) moment of inertia summed correctly",
-												 m3.moment_of_inertia(),
+												 m3.inertia_tensor(),
 												 moi2,
 												 1e-9_kgm2);
 
@@ -59,8 +59,8 @@ AutoTest t1 ("Nature: MassMoments calculations", []{
 												 SpaceLength<> { 0_m, 0_m, 0_m },
 												 1e-12_m);
 		test_asserts::verify_equal_with_epsilon ("(1.2) moment of inertia is unchanged",
-												 m1.moment_of_inertia(),
-												 m4.moment_of_inertia(),
+												 m1.inertia_tensor(),
+												 m4.inertia_tensor(),
 												 1e-12_kgm2);
 	}
 

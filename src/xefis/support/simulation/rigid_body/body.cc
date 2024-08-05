@@ -83,7 +83,7 @@ Body::rotational_kinetic_energy() const
 {
 	auto const mm = mass_moments<BodyCOM>();
 	auto const vm = velocity_moments<BodyCOM>();
-	return 0.5 * (~vm.angular_velocity() * mm.moment_of_inertia() * vm.angular_velocity() / 1_rad / 1_rad).scalar();
+	return 0.5 * (~vm.angular_velocity() * mm.inertia_tensor() * vm.angular_velocity() / 1_rad / 1_rad).scalar();
 }
 
 } // namespace xf::rigid_body

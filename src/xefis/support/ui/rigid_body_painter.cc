@@ -564,7 +564,7 @@ RigidBodyPainter::paint_angular_momentum (rigid_body::Body const& body)
 	auto const angular_momentum_to_length = 0.001_m / (1_kg * 1_m2 / 1_s) / 1_rad; // TODO unhardcode
 	//TODO auto const& cache = body.frame_cache();
 	auto const com = body.placement().position() - followed_body_position();
-	auto const I = body.mass_moments<rigid_body::BodyCOM>().moment_of_inertia();
+	auto const I = body.mass_moments<rigid_body::BodyCOM>().inertia_tensor();
 	auto const L = I * body.velocity_moments<rigid_body::BodyCOM>().angular_velocity();
 	auto const L_world = body.placement().unbound_transform_to_base (L);
 

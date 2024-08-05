@@ -73,7 +73,7 @@ ImpulseSolver::update_mass_moments()
 		auto const mass_moments = body->mass_moments<BodyCOM>();
 
 		body->frame_cache().inv_M = (1.0 / mass_moments.mass()) * SpaceMatrix<double, WorldSpace> (math::unit);
-		body->frame_cache().inv_I = body->placement().unbound_transform_to_base (mass_moments).inversed_moment_of_inertia();
+		body->frame_cache().inv_I = body->placement().unbound_transform_to_base (mass_moments).inverse_inertia_tensor();
 	}
 }
 
@@ -243,7 +243,7 @@ ImpulseSolver::acceleration_moments (Body const& body, ForceMoments<WorldSpace> 
 {
 	auto const fm = body.placement().unbound_transform_to_body (force_moments);
 	auto const mm = body.mass_moments<BodyCOM>();
-	auto const am = AccelerationMoments<BodyCOM> (fm.force() / mm.mass(), 1_rad * mm.inversed_moment_of_inertia() * fm.torque());
+	auto const am = AccelerationMoments<BodyCOM> (fm.force() / mm.mass(), 1_rad * mm.inverse_inertia_tensor() * fm.torque());
 	return body.placement().unbound_transform_to_base (am);
 }
 

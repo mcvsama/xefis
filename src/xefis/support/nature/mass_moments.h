@@ -38,7 +38,7 @@ namespace xf {
  * Represents three moments of mass:
  *  • 0th = mass (monopole)
  *  • 1st = center of mass (dipole)
- *  • 2nd = moment of inertia at the center of mass (quadrupole)
+ *  • 2nd = moments of inertia tensor at the center of mass (quadrupole)
  */
 template<class pSpace = void>
 	class MassMoments
@@ -95,20 +95,20 @@ template<class pSpace = void>
 			{ return _center_of_mass_position; }
 
 		/**
-		 * Moment of inertia tensor viewed from the origin point,
+		 * Moments of inertia tensor viewed from the origin point,
 		 * not from the center of mass.
 		 */
 		[[nodiscard]]
 		SpaceMatrix<si::MomentOfInertia, Space> const&
-		moment_of_inertia() const noexcept
+		inertia_tensor() const noexcept
 			{ return _inertia_tensor; }
 
 		/**
-		 * Inversed moment of inertia.
+		 * Inversed moments of inertia tensor.
 		 */
 		[[nodiscard]]
 		typename SpaceMatrix<si::MomentOfInertia, Space>::InversedMatrix const&
-		inversed_moment_of_inertia() const noexcept
+		inverse_inertia_tensor() const noexcept
 			{ return _inverse_inertia_tensor; }
 
 		/**
@@ -149,7 +149,7 @@ template<class TargetSpace, class SourceSpace>
 		return {
 			mass_moments.mass(),
 			transformation * mass_moments.center_of_mass_position(),
-			transformation * mass_moments.moment_of_inertia() * ~transformation, // TODO is this okay? <https://hepweb.ucsd.edu/ph110b/110b_notes/node24.html>
+			transformation * mass_moments.inertia_tensor() * ~transformation,
 		};
 	}
 

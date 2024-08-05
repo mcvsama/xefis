@@ -82,7 +82,7 @@ make_centered_cube_shape (xf::MassMoments<BodyCOM> const& mm, ShapeMaterial cons
 
 	auto const k = mm.mass() / 12;
 	auto const inv_double_k = 1 / (2 * k);
-	auto const I = mm.moment_of_inertia(); // Assuming it's ortogonalized
+	auto const I = mm.inertia_tensor(); // Assuming it's ortogonalized
 	auto const d0 = I[0, 0];
 	auto const d1 = I[1, 1];
 	auto const d2 = I[2, 2];
