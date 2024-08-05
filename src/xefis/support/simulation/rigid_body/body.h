@@ -376,7 +376,6 @@ class Body: public Noncopyable
   private:
 	std::string											_label;
 	MassMoments<BodyCOM>								_mass_moments;
-	mutable std::optional<MassMoments<WorldSpace>>		_world_space_mass_moments;
 	// Location of center-of-mass:
 	Placement<WorldSpace, BodyCOM>						_placement;
 	// Location of origin:
@@ -415,16 +414,7 @@ template<CoordinateSystemConcept Space>
 	inline MassMoments<Space>
 	Body::mass_moments() const
 	{
-		if constexpr (std::is_same_v<Space, WorldSpace>)
-		{
-			std::lock_guard lock (_optionals_mutex);
-
-			if (!_world_space_mass_moments)
-				_world_space_mass_moments = _placement.bound_transform_to_base (_mass_moments);
-
-			return *_world_space_mass_moments;
-		}
-		else if constexpr (std::is_same_v<Space, BodyCOM>)
+		if constexpr (std::is_same_v<Space, BodyCOM>)
 			return _mass_moments;
 		else
 			static_assert (false, "Unsupported coordinate system");
@@ -435,8 +425,6 @@ template<CoordinateSystemConcept Space>
 	inline void
 	Body::set_mass_moments (MassMoments<Space> const& mass_moments)
 	{
-		_world_space_mass_moments.reset();
-
 		if constexpr (std::is_same_v<Space, BodyCOM>)
 			_mass_moments = mass_moments;
 		else

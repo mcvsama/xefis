@@ -30,7 +30,6 @@ Body::rotate_about_center_of_mass (RotationMatrix<WorldSpace> const& rotation)
 	_velocity_moments = rotation * _velocity_moments;
 	_acceleration_moments = rotation * _acceleration_moments;
 
-	_world_space_mass_moments.reset();
 	_world_space_applied_impulses.reset();
 }
 
@@ -42,7 +41,6 @@ Body::rotate_about_world_origin (RotationMatrix<WorldSpace> const& rotation)
 	_velocity_moments = rotation * _velocity_moments;
 	_acceleration_moments = rotation * _acceleration_moments;
 
-	_world_space_mass_moments.reset();
 	_world_space_applied_impulses.reset();
 }
 
@@ -56,7 +54,6 @@ Body::rotate_about_body_origin (RotationMatrix<WorldSpace> const& rotation)
 	_velocity_moments = rotation * _velocity_moments;
 	_acceleration_moments = rotation * _acceleration_moments;
 
-	_world_space_mass_moments.reset();
 	_world_space_applied_impulses.reset();
 }
 
@@ -75,7 +72,7 @@ Body::move_origin_to (SpaceLength<WorldSpace> const& new_origin_position)
 si::Energy
 Body::translational_kinetic_energy() const
 {
-	auto const mm = mass_moments<WorldSpace>();
+	auto const mm = mass_moments<BodyCOM>();
 	auto const vm = velocity_moments<WorldSpace>();
 	return 0.5 * mm.mass() * square (abs (vm.velocity()));
 }
@@ -84,8 +81,8 @@ Body::translational_kinetic_energy() const
 si::Energy
 Body::rotational_kinetic_energy() const
 {
-	auto const mm = mass_moments<WorldSpace>();
-	auto const vm = velocity_moments<WorldSpace>();
+	auto const mm = mass_moments<BodyCOM>();
+	auto const vm = velocity_moments<BodyCOM>();
 	return 0.5 * (~vm.angular_velocity() * mm.moment_of_inertia() * vm.angular_velocity() / 1_rad / 1_rad).scalar();
 }
 
