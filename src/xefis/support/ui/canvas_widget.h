@@ -40,6 +40,7 @@ class CanvasWidget: public QWidget
 	explicit
 	CanvasWidget (QWidget* parent = nullptr, Qt::WindowFlags = Qt::Widget);
 
+  protected:
 	// QWidget API
 	void
 	resizeEvent (QResizeEvent*) override;
@@ -52,7 +53,6 @@ class CanvasWidget: public QWidget
 	void
 	changeEvent (QEvent*) override;
 
-  protected:
 	/**
 	 * This method should repaint the canvas when called.
 	 */
@@ -70,8 +70,7 @@ class CanvasWidget: public QWidget
 	 * Mark object as need-to-be-repainted.
 	 */
 	void
-	mark_dirty()
-		{ _dirty = true; }
+	mark_dirty();
 
   private:
 	void
@@ -81,6 +80,14 @@ class CanvasWidget: public QWidget
 	std::optional<QImage>	_canvas;
 	bool					_dirty		{ false };
 };
+
+
+inline void
+CanvasWidget::mark_dirty()
+{
+	_dirty = true;
+	update();
+}
 
 } // namespace xf
 
