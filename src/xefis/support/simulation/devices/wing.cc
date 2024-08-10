@@ -71,7 +71,7 @@ Wing::update_external_forces (Atmosphere const* atmosphere)
 		_lift_force = body_aeroforces_at_origin.lift;
 		_drag_force = body_aeroforces_at_origin.drag;
 		_pitching_moment = body_aeroforces_at_origin.pitching_moment;
-		_center_of_pressure = body_aeroforces_at_origin.center_of_pressure + origin<rigid_body::BodyCOM>();;
+		_center_of_pressure = body_aeroforces_at_origin.center_of_pressure + origin<rigid_body::BodyCOM>();
 
 		apply_impulse (ForceMoments<rigid_body::BodyCOM> (_lift_force, _pitching_moment), _center_of_pressure);
 		apply_impulse (ForceMoments<rigid_body::BodyCOM> (_drag_force, math::zero), _center_of_pressure);
