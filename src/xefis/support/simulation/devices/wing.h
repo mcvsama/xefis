@@ -62,7 +62,7 @@ class Wing: public rigid_body::Body
 		{ return _pitching_moment; }
 
 	/**
-	 * Return last calculated center of pressure.
+	 * Return last calculated center of pressure relative to the center of mass.
 	 */
 	SpaceLength<rigid_body::BodyCOM>
 	center_of_pressure() const noexcept

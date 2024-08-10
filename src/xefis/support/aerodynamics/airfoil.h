@@ -140,7 +140,7 @@ class Airfoil
 	/**
 	 * Return lift/drag Wrenches relative to the origin of AirfoilSplineSpace (their force position is at center of pressure of the wing, but at 0 in Z-axis).
 	 * Lift is perpendicular to the wind, drag is parallel to the wind.
-	 * Also compute angle of attack and put result into @result_aoa.
+	 * Also compute angle of attack and put result into @result.angle_of_attack.
 	 */
 	[[nodiscard]]
 	AerodynamicForcesAndAOA<AirfoilSplineSpace>
