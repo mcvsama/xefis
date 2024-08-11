@@ -506,7 +506,7 @@ RigidBodyPainter::paint_forces (rigid_body::Body const& body)
 	auto const lift_color = Qt::green;
 	auto const drag_color = Qt::red;
 	auto const torque_color = Qt::blue;
-	auto const external_force_color = Qt::green;
+	auto const external_force_color = Qt::darkYellow;
 	auto const external_torque_color = Qt::cyan;
 
 	auto const force_to_length = 0.1_m / 1_N; // TODO unhardcode
