@@ -170,12 +170,6 @@ class InstrumentAids
 	centrify (QRectF& rectf);
 
 	/**
-	 * Convert angle to units proper for QPainter::drawArc (...) and QPainter::drawChord (...) functions.
-	 */
-	static constexpr float
-	angle_for_qpainter (si::Angle deg);
-
-	/**
 	 * Return default shadow.
 	 */
 	Shadow
@@ -277,13 +271,6 @@ InstrumentAids::centrify (QRectF& rectf)
 }
 
 
-constexpr float
-InstrumentAids::angle_for_qpainter (si::Angle deg)
-{
-	return 16 * deg.in<si::Degree>();
-}
-
-
 inline Shadow
 InstrumentAids::default_shadow() const
 {
@@ -292,28 +279,6 @@ InstrumentAids::default_shadow() const
 	return shadow;
 }
 
-
-/*
- * Global functions
- */
-
-
-namespace literals {
-
-constexpr float
-operator"" _qdeg (long double angle)
-{
-	return InstrumentAids::angle_for_qpainter (1_deg * angle);
-}
-
-
-constexpr float
-operator"" _qdeg (unsigned long long angle)
-{
-	return InstrumentAids::angle_for_qpainter (1_deg * angle);
-}
-
-} // namespace literals
 } // namespace xf
 
 #endif

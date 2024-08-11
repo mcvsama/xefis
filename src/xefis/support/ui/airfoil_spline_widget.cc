@@ -22,6 +22,7 @@
 
 // Neutrino:
 #include <neutrino/stdexcept.h>
+#include <neutrino/qt/painter.h>
 
 // Qt:
 #include <QPainter>
@@ -150,8 +151,6 @@ AirfoilSplineWidget::setup_painting_transform()
 void
 AirfoilSplineWidget::update_canvas()
 {
-	using namespace xf::literals;
-
 	auto& canvas = this->canvas();
 	canvas.fill (QColor::fromRgb (0xff, 0xfe, 0xf2));
 
@@ -189,16 +188,18 @@ AirfoilSplineWidget::update_canvas()
 
 	// Center of mass:
 	{
+		using namespace neutrino::painter_literals;
+
 		auto const r = ph.em_pixels (0.5) / _scale;
 		painter.save();
 		painter.translate (_center_of_mass_position);
 		painter.setPen (_center_of_mass_black_pen);
 		painter.setBrush (Qt::black);
-		painter.drawPie (QRectF (QPointF (-r, +r), QPointF (+r, -r)), 0_qdeg, -90_qdeg);
-		painter.drawPie (QRectF (QPointF (-r, +r), QPointF (+r, -r)), -180_qdeg, -90_qdeg);
+		painter.drawPie (QRectF (QPointF (-r, +r), QPointF (+r, -r)), 0_qarcdeg, -90_qarcdeg);
+		painter.drawPie (QRectF (QPointF (-r, +r), QPointF (+r, -r)), -180_qarcdeg, -90_qarcdeg);
 		painter.setBrush (Qt::white);
-		painter.drawPie (QRectF (QPointF (-r, +r), QPointF (+r, -r)), -90_qdeg, -90_qdeg);
-		painter.drawPie (QRectF (QPointF (-r, +r), QPointF (+r, -r)), -270_qdeg, -90_qdeg);
+		painter.drawPie (QRectF (QPointF (-r, +r), QPointF (+r, -r)), -90_qarcdeg, -90_qarcdeg);
+		painter.drawPie (QRectF (QPointF (-r, +r), QPointF (+r, -r)), -270_qarcdeg, -90_qarcdeg);
 		painter.restore();
 	}
 

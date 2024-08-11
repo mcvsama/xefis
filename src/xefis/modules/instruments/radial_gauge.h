@@ -26,6 +26,7 @@
 #include <xefis/support/sockets/socket_observer.h>
 
 // Neutrino:
+#include <neutrino/qt/painter.h>
 #include <neutrino/synchronized.h>
 
 // Standard:
@@ -324,11 +325,11 @@ template<class Value>
 						zero_point_pen.setColor (BasicGauge::kWarningColor.lighter (120));
 					}
 
-					using namespace xf::literals;
+					using namespace neutrino::painter_literals;
 
 					painter.setPen (Qt::NoPen);
 					painter.setBrush (brush);
-					painter.drawPie (rect, 0_qdeg, -aids.angle_for_qpainter (*value_angle));
+					painter.drawPie (rect, 0_qarcdeg, -neutrino::angle_for_qpainter (*value_angle));
 					painter.setPen (zero_point_pen);
 					painter.drawLine (QPointF (0.f, 0.f), QPointF (r, 0.f));
 				});
@@ -382,7 +383,7 @@ template<class Value>
 						if (next.zone == PointInfo::Minimums)
 						{
 							painter.setPen (next.pen);
-							painter.drawArc (rect, -aids.angle_for_qpainter (angle_0), -aids.angle_for_qpainter (span));
+							painter.drawArc (rect, -neutrino::angle_for_qpainter (angle_0), -neutrino::angle_for_qpainter (span));
 							painter.rotate (angle_1.template in<si::Degree>());
 							painter.drawLine (QPointF (r, 0.f), QPointF (r + next.tick_len, 0.f));
 						}
@@ -395,12 +396,12 @@ template<class Value>
 							else
 								painter.setPen (silver_pen);
 
-							painter.drawArc (rect, -aids.angle_for_qpainter (angle_0), -aids.angle_for_qpainter (span));
+							painter.drawArc (rect, -neutrino::angle_for_qpainter (angle_0), -neutrino::angle_for_qpainter (span));
 						}
 						else if (prev.zone == PointInfo::Maximums)
 						{
 							painter.setPen (prev.pen);
-							painter.drawArc (rect, -aids.angle_for_qpainter (angle_0), -aids.angle_for_qpainter (span));
+							painter.drawArc (rect, -neutrino::angle_for_qpainter (angle_0), -neutrino::angle_for_qpainter (span));
 							painter.rotate (angle_0.template in<si::Degree>());
 							painter.drawLine (QPointF (r, 0.f), QPointF (r + prev.tick_len, 0.f));
 						}
@@ -435,8 +436,8 @@ template<class Value>
 							painter.rotate ((angle - *value_angle).template in<si::Degree>());
 							painter.drawLine (QPointF (intr, 0.0), QPointF (extr, 0.0));
 							painter.drawArc (rect.adjusted (-ext_adj, -ext_adj, +ext_adj, +ext_adj),
-											 -aids.angle_for_qpainter (0_deg),
-											 -aids.angle_for_qpainter (*value_angle - angle));
+											 -neutrino::angle_for_qpainter (0_deg),
+											 -neutrino::angle_for_qpainter (*value_angle - angle));
 						});
 					});
 				};
