@@ -22,6 +22,7 @@
 // Qt:
 #include <QCheckBox>
 #include <QLabel>
+#include <QLineEdit>
 #include <QPushButton>
 #include <QToolBox>
 #include <QWidget>
@@ -60,6 +61,9 @@ class BodyEditor: public QWidget
 	QWidget*
 	create_basic_info_widget();
 
+	QWidget*
+	create_mass_moments_widget();
+
   private:
 	RigidBodyViewer&					_rigid_body_viewer;
 	rigid_body::Body*					_edited_body { nullptr };
@@ -69,6 +73,7 @@ class BodyEditor: public QWidget
 	std::optional<QToolBox>				_tool_box;
 	std::optional<QLabel>				_translational_kinetic_energy;
 	std::optional<QLabel>				_rotational_kinetic_energy;
+	std::optional<QLineEdit>			_mass_value;
 };
 
 } // namespace xf

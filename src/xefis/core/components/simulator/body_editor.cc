@@ -59,7 +59,7 @@ BodyEditor::BodyEditor (QWidget* parent, RigidBodyViewer& viewer):
 
 	_tool_box.emplace();
 	_tool_box->addItem (new QLabel ("TODO", this), icons::body(), "Placement");
-	_tool_box->addItem (new QLabel ("TODO", this), icons::body(), "Mass moments");
+	_tool_box->addItem (create_mass_moments_widget(), icons::body(), "Mass moments");
 	_tool_box->addItem (new QLabel ("TODO", this), icons::body(), "Velocity moments");
 	_tool_box->addItem (new QLabel ("TODO", this), icons::body(), "External force moments");
 	_tool_box->addItem (new QLabel ("TODO", this), icons::body(), "Custom impulses");
@@ -96,6 +96,7 @@ BodyEditor::refresh()
 		auto const rotational_energy = neutrino::format_unit (_edited_body->rotational_kinetic_energy().in<si::Joule>(), 6, "J");
 		_translational_kinetic_energy->setText (QString::fromStdString (std::format ("Translational kinetic energy: {}", translational_energy)));
 		_rotational_kinetic_energy->setText (QString::fromStdString (std::format ("Rotational kinetic energy: {}", rotational_energy)));
+		_mass_value->setText (QString("%1").arg (_edited_body->mass_moments<rigid_body::BodyCOM>().mass().in<si::Kilogram>()));
 
 		if (auto* wing = dynamic_cast<sim::Wing*> (_edited_body))
 		{
@@ -139,6 +140,26 @@ BodyEditor::create_basic_info_widget()
 
 	return widget;
 }
+
+
+QWidget*
+BodyEditor::create_mass_moments_widget()
+{
+	auto* widget = new QWidget (this);
+	widget->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Fixed);
+
+	_mass_value.emplace ("–");
+	_mass_value->setAlignment (Qt::AlignRight);
+
+	// TODO add_editable (math::Matrix<...>) // Depending on size works as vector or matrix or whatever
+	// TODO add_editable (Scalar)
+	// ...
+	auto* layout = new QGridLayout (widget);
+	layout->addWidget (new QLabel ("Mass", widget), 0, 0);
+	layout->addWidget (&*_mass_value, 0, 1);
+	layout->addWidget (new QLabel ("kg", widget), 0, 2);
+
+	return widget;
 }
 
 } // namespace xf
