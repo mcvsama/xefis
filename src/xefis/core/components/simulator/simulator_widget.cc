@@ -68,7 +68,7 @@ SimulatorWidget::make_viewer_widget()
 	_rigid_body_viewer->set_rigid_body_system (&_simulator.rigid_body_system());
 	_rigid_body_viewer->set_redraw_callback ([this] (std::optional<si::Time> const simulation_time) {
 		if (simulation_time)
-			_simulator.evolve (*simulation_time, 100_ms);
+			_simulator.evolve (*simulation_time, 1000_ms);
 		else
 			_simulator.evolve (1);
 
