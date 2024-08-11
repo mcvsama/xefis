@@ -17,6 +17,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/simulation/rigid_body/body.h>
+#include <xefis/support/ui/airfoil_spline_widget.h>
 
 // Qt:
 #include <QCheckBox>
@@ -27,6 +28,7 @@
 
 // Standard:
 #include <cstddef>
+#include <optional>
 
 
 namespace xf {
@@ -59,12 +61,14 @@ class BodyEditor: public QWidget
 	create_basic_info_widget();
 
   private:
-	RigidBodyViewer&			_rigid_body_viewer;
-	rigid_body::Body*			_edited_body { nullptr };
-	QLabel*						_body_label;
-	std::optional<QToolBox>		_tool_box;
-	std::optional<QLabel>		_translational_kinetic_energy;
-	std::optional<QLabel>		_rotational_kinetic_energy;
+	RigidBodyViewer&					_rigid_body_viewer;
+	rigid_body::Body*					_edited_body { nullptr };
+	QLabel*								_body_label;
+	std::optional<QFrame>				_airfoil_frame;
+	std::optional<AirfoilSplineWidget>	_airfoil_spline_widget;
+	std::optional<QToolBox>				_tool_box;
+	std::optional<QLabel>				_translational_kinetic_energy;
+	std::optional<QLabel>				_rotational_kinetic_energy;
 };
 
 } // namespace xf

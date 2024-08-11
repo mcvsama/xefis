@@ -17,6 +17,8 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/base/icons.h>
+#include <xefis/support/simulation/rigid_body/concepts.h>
+#include <xefis/support/simulation/devices/wing.h>
 #include <xefis/support/ui/paint_helper.h>
 #include <xefis/support/ui/rigid_body_viewer.h>
 #include <xefis/support/ui/widget.h>
@@ -44,7 +46,18 @@ BodyEditor::BodyEditor (QWidget* parent, RigidBodyViewer& viewer):
 	top_strip->setMinimumWidth (ph.em_pixels_int (25));
 	_body_label = top_label;
 
-	_tool_box.emplace (this);
+	_airfoil_spline_widget.emplace();
+	_airfoil_spline_widget->setSizePolicy (QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
+	_airfoil_spline_widget->setMinimumSize (ph.em_pixels (20), ph.em_pixels (10));// TODO
+
+	_airfoil_frame.emplace();
+	_airfoil_frame->setFrameStyle (QFrame::StyledPanel | QFrame::Sunken);
+
+	auto* airfoil_frame_layout = new QHBoxLayout (&*_airfoil_frame);
+	airfoil_frame_layout->addWidget (&*_airfoil_spline_widget);
+	airfoil_frame_layout->setMargin (0);
+
+	_tool_box.emplace();
 	_tool_box->addItem (new QLabel ("TODO", this), icons::body(), "Placement");
 	_tool_box->addItem (new QLabel ("TODO", this), icons::body(), "Mass moments");
 	_tool_box->addItem (new QLabel ("TODO", this), icons::body(), "Velocity moments");
@@ -54,6 +67,7 @@ BodyEditor::BodyEditor (QWidget* parent, RigidBodyViewer& viewer):
 
 	auto* layout = new QVBoxLayout (this);
 	layout->addWidget (top_strip);
+	layout->addWidget (&*_airfoil_frame);
 	layout->addWidget (create_basic_info_widget());
 	layout->addWidget (&*_tool_box);
 	layout->addItem (new QSpacerItem (0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
@@ -82,6 +96,23 @@ BodyEditor::refresh()
 		auto const rotational_energy = neutrino::format_unit (_edited_body->rotational_kinetic_energy().in<si::Joule>(), 6, "J");
 		_translational_kinetic_energy->setText (QString::fromStdString (std::format ("Translational kinetic energy: {}", translational_energy)));
 		_rotational_kinetic_energy->setText (QString::fromStdString (std::format ("Rotational kinetic energy: {}", rotational_energy)));
+
+		if (auto* wing = dynamic_cast<sim::Wing*> (_edited_body))
+		{
+			auto const xy = []<class Value, class Space> (SpaceVector<Value, Space> const& vector3) {
+				return PlaneVector<Value, Space> (vector3.x(), vector3.y());
+			};
+
+			auto const center_of_pressure_3d = wing->center_of_pressure() / wing->airfoil().chord_length();
+			_airfoil_spline_widget->set_airfoil (wing->airfoil());
+			_airfoil_spline_widget->set_center_of_pressure_position (xy (center_of_pressure_3d));
+			_airfoil_spline_widget->set_lift_force (xy (wing->lift_force()));
+			_airfoil_spline_widget->set_drag_force (xy (wing->drag_force()));
+			_airfoil_spline_widget->set_pitching_moment (xy (wing->pitching_moment()));
+			_airfoil_frame->show();
+		}
+		else
+			_airfoil_frame->hide();
 	}
 	else
 	{
@@ -94,19 +125,20 @@ BodyEditor::refresh()
 QWidget*
 BodyEditor::create_basic_info_widget()
 {
-	auto* basic_info = new QWidget (this);
-	basic_info->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Fixed);
+	auto* widget = new QWidget (this);
+	widget->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Fixed);
 
 	{
-		_translational_kinetic_energy.emplace (this);
-		_rotational_kinetic_energy.emplace (this);
+		_translational_kinetic_energy.emplace();
+		_rotational_kinetic_energy.emplace();
 
-		auto* layout = new QVBoxLayout (basic_info);
+		auto* layout = new QVBoxLayout (widget);
 		layout->addWidget (&*_translational_kinetic_energy);
 		layout->addWidget (&*_rotational_kinetic_energy);
 	}
 
-	return basic_info;
+	return widget;
+}
 }
 
 } // namespace xf
