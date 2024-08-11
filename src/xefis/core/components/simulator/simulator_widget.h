@@ -39,7 +39,6 @@
 namespace xf {
 
 class Machine;
-class Simulator;
 
 /**
  * Widget for Simulator.
