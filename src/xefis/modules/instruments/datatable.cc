@@ -158,7 +158,7 @@ Datatable::async_paint (xf::PaintRequest const& paint_request) const
 		painter.setPen (aids->get_pen (line.value_color, 1.0));
 		QString str_to_paint;
 
-		auto error = xf::handle_format_exception([&] {
+		auto error = xf::describe_boost_format_exception([&] {
 			str_to_paint = line.stringified();
 		});
 
