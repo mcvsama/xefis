@@ -21,6 +21,9 @@
 // Neutrino:
 #include <neutrino/math/field.h>
 
+// Qt:
+#include <QDomElement>
+
 // Standard:
 #include <cstddef>
 
