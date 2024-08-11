@@ -398,10 +398,7 @@ RigidBodyPainter::paint_body (rigid_body::Body const& body, bool paint_body, boo
 				if (auto const& shape = body.shape())
 					_gl.draw (*shape);
 				else
-				{
-					auto const edge = _mass_scale * 1_kg * std::pow (body.mass_moments<rigid_body::BodyCOM>().mass() / 1_kg, 1.0 / 3);
-					_gl.draw (rigid_body::make_centered_cube_shape (edge));
-				}
+					_gl.draw (make_centered_cube_shape (body.mass_moments<rigid_body::BodyCOM>()));
 			});
 		}
 

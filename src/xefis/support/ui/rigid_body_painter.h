@@ -39,7 +39,6 @@ namespace xf {
 class RigidBodyPainter: protected QOpenGLFunctions
 {
 	static constexpr auto		kDefaultPositionScale		= 0.0025_mm / 1_m;
-	static constexpr auto		kDefaultMassScale			= 20_cm / 1_kg;
 	static constexpr si::Length	kDefaultConstraintDiameter	= 1.5_cm;
 	static constexpr si::Length	kDefaultHingeDiameter		= 3_cm;
 
@@ -297,7 +296,6 @@ class RigidBodyPainter: protected QOpenGLFunctions
 
   private:
 	si::PixelDensity					_pixel_density;
-	decltype (1_m / 1_kg)				_mass_scale					{ kDefaultMassScale };
 	SpaceLength<rigid_body::WorldSpace>	_camera_position;
 	EulerAngles							_camera_angles;
 	LonLatRadius						_position_on_earth			{ 0_deg, 0_deg, 0_m };
