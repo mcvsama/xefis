@@ -25,6 +25,7 @@
 // Standard:
 #include <cstddef>
 #include <algorithm>
+#include <format>
 
 
 namespace adi_detail {
@@ -775,7 +776,7 @@ ArtificialHorizon::paint_heading (AdiPaintRequest& pr) const
 						pr.painter.drawLine (QPointF (d05, -w / 36.f), QPointF (d05, 0.f));
 					});
 
-					QString text = QString::fromStdString ((boost::format ("%02d") % (xf::floored_mod (1.f * deg, 360.f) / 10)).str());
+					QString text = QString::fromStdString (std::format ("{:02.0f}", xf::floored_mod (1.f * deg, 360.f) / 10));
 					if (text == "00")
 						text = "N";
 					else if (text == "09")
@@ -1366,7 +1367,7 @@ VelocityLadder::paint_ap_setting (AdiPaintRequest& pr) const
 		// Mach info has priority:
 		if (pr.params.cmd_mach)
 		{
-			value = QString::fromStdString ((boost::format ("%5.3f") % *pr.params.cmd_mach).str());
+			value = QString::fromStdString (std::format ("{:5.3f}", *pr.params.cmd_mach));
 
 			if (value.size() > 0 && value[0] == '0')
 				value = value.mid (1);
@@ -2634,7 +2635,7 @@ PaintingWork::paint_nav (AdiPaintRequest& pr) const
 			int course_int = xf::symmetric_round (pr.params.navaid_course_magnetic->in<si::Degree>());
 			if (course_int == 0)
 				course_int = 360;
-			loc_str += QString::fromStdString ((boost::format ("/%03d°") % course_int).str());
+			loc_str += QString::fromStdString (std::format ("/{:03d}°", course_int));
 		}
 
 		pr.painter.setPen (Qt::white);
@@ -2650,7 +2651,7 @@ PaintingWork::paint_nav (AdiPaintRequest& pr) const
 
 		QString dme_val = "DME ---";
 		if (pr.params.navaid_distance)
-			dme_val = QString::fromStdString ((boost::format ("DME %.1f") % pr.params.navaid_distance->in<si::NauticalMile>()).str());
+			dme_val = QString::fromStdString (std::format ("DME {:.1f}", pr.params.navaid_distance->in<si::NauticalMile>()));
 
 		pr.painter.setPen (Qt::white);
 		pr.painter.setFont (pr.aids.font_1.font);

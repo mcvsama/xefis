@@ -1,6 +1,6 @@
 /* vim:ts=4
  *
- * Copyleft 2012…2016  Michał Gawron
+ * Copyleft 2024  Michał Gawron
  * Marduk Unix Labs, http://mulabs.org/
  *
  * This program is free software: you can redistribute it and/or modify
@@ -25,7 +25,6 @@
 
 // Lib:
 #include <boost/circular_buffer.hpp>
-#include <boost/format.hpp>
 
 // Standard:
 #include <cstddef>
@@ -105,7 +104,7 @@ ProcessingLoop::execute_cycle (si::Time const now)
 	}));
 
 	if (latency > kLatencyFactorLogThreshold * _loop_period)
-		_logger << boost::format ("Latency! %.0f%% delay.\n") % (latency / _loop_period * 100.0);
+		_logger << std::format ("Latency! {:.0f}% delay.\n", latency / _loop_period * 100.0);
 
 	_previous_timestamp = now;
 	_current_cycle.reset();
@@ -116,7 +115,7 @@ std::optional<std::string>
 ProcessingLoop::logger_tag() const
 {
 	if (auto cycle = current_cycle())
-		return (boost::format ("cycle=%08d") % cycle->number()).str();
+		return std::format ("cycle={:08d}", cycle->number());
 	else
 		return "cycle=--------";
 }

@@ -23,11 +23,11 @@
 #include <neutrino/stdexcept.h>
 
 // Lib:
-#include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
 
 // Standard:
 #include <cstddef>
+#include <format>
 #include <string>
 
 
@@ -143,7 +143,7 @@ make_checksum (std::string const& data)
 	uint8_t sum = 0;
 	for (auto c: data)
 		sum ^= static_cast<uint8_t> (c);
-	return (boost::format ("%02X") % static_cast<int> (sum)).str();
+	return std::format ("{:02X}", sum);
 }
 
 

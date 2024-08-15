@@ -17,11 +17,9 @@
 // Xefis:
 #include <xefis/config/all.h>
 
-// Lib:
-#include <boost/format.hpp>
-
 // Standard:
 #include <cstddef>
+#include <format>
 #include <string>
 
 
@@ -54,7 +52,7 @@ class InvalidChecksum: public Exception
   public:
 	InvalidChecksum (uint8_t expected_checksum, uint8_t actual_checksum):
 		// static_cast because of boost bug when formatting uint8_ts:
-		Exception ((boost::format ("invalid NMEA sentence checksum '%02x', should be '%02x'") % static_cast<int> (actual_checksum) % static_cast<int> (expected_checksum)).str())
+		Exception (std::format ("invalid NMEA sentence checksum '{:02x}', should be '{:02x}'", actual_checksum, expected_checksum))
 	{ }
 };
 

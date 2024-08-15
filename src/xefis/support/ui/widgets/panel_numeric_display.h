@@ -25,6 +25,7 @@
 
 // Standard:
 #include <cstddef>
+#include <format>
 #include <array>
 
 
@@ -81,13 +82,13 @@ class PanelNumericDisplay: public PanelWidget
 	convert_to_digits (double value);
 
   private:
-	unsigned int			_num_digits = 0;
-	std::string				_unit;
-	boost::format			_static_format;
-	Socket<std::string>		_dynamic_format;
-	std::vector<QPixmap*>	_digits_to_display;	// Pointers not owned.
-	BasicSocket				_value_socket;
-	std::array<QPixmap, 13>	_digit_images;		// [10] is minus sign, [11] is empty, [12] is dot.
+	unsigned int				_num_digits { 0 };
+	std::string					_unit;
+	std::format_string<double>	_static_format { "{}" }; // TODO std::variant with _dynamic_format
+	Socket<std::string>			_dynamic_format;
+	std::vector<QPixmap*>		_digits_to_display;	// Pointers not owned.
+	BasicSocket					_value_socket;
+	std::array<QPixmap, 13>		_digit_images;		// [10] is minus sign, [11] is empty, [12] is dot.
 };
 
 } // namespace xf

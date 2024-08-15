@@ -20,11 +20,9 @@
 // Neutrino:
 #include <neutrino/numeric.h>
 
-// Lib:
-#include <boost/format.hpp>
-
 // Standard:
 #include <cstddef>
+#include <format>
 
 
 HorizontalTrim::HorizontalTrim (xf::ProcessingLoop& loop, xf::Graphics const& graphics, std::string_view const& instance):
@@ -179,7 +177,7 @@ HorizontalTrim::async_paint (xf::PaintRequest const& paint_request, PaintingPara
 QString
 HorizontalTrim::stringify (double value)
 {
-	QString result = QString::fromStdString ((boost::format ("%+03d") % (std::round (100.0 * value))).str());
+	QString result = QString::fromStdString (std::format ("{:+03d}", static_cast<int> (std::round (100.0 * value))));
 	// Remove +/- sign when 00:
 	if (result.mid (1, 2) == "00")
 		result[0] = ' ';

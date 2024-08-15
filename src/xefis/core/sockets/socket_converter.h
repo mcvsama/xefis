@@ -17,11 +17,9 @@
 // Xefis:
 #include <xefis/config/all.h>
 
-// Boost:
-#include <boost/format.hpp>
-
 // Standard:
 #include <cstddef>
+#include <format>
 #include <vector>
 
 
@@ -34,14 +32,16 @@ class SocketConversionSettings
 
   public:
 	// Common settings:
-	std::string						nil_value				{ kDefaultNilValue };
+	std::string						nil_value			{ kDefaultNilValue };
 
 	// Bool sockets:
-	std::string						true_value				{ "true" };
-	std::string						false_value				{ "false" };
+	std::string						true_value			{ "true" };
+	std::string						false_value			{ "false" };
 
 	// int64_t, double and SI sockets:
-	boost::format					numeric_format			{ "%1%" };
+	std::format_string<double>		numeric_format_double	{ "{}" };
+	std::format_string<int64_t>		numeric_format_int64_t	{ "{}" };
+	std::format_string<uint64_t>	numeric_format_uint64_t	{ "{}" };
 
 	// Preferred unit:
 	std::vector<si::DynamicUnit>	preferred_units;

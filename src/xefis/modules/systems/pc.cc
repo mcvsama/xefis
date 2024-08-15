@@ -30,6 +30,7 @@
 
 // Standard:
 #include <cstddef>
+#include <format>
 #include <limits>
 
 
@@ -185,7 +186,7 @@ PerformanceComputer::compute_glide_ratio()
 				arr = "";
 
 			if (std::abs (ratio) > 0)
-				_io.glide_ratio_string = arr + (boost::format ("%02d:1") % std::abs (ratio)).str();
+				_io.glide_ratio_string = arr + std::format ("{:02d}:1", std::abs (ratio));
 			else
 				_io.glide_ratio_string = "=";
 		}

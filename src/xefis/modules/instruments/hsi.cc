@@ -1080,7 +1080,7 @@ PaintingWork::paint_home_direction()
 
 		std::string vert_str = "---";
 		if (_p.dist_to_home_vert)
-			vert_str = (boost::format ("%+d") % static_cast<int> (_p.dist_to_home_vert->in<si::Foot>())).str();
+			vert_str = std::format ("{:+d}", static_cast<int> (_p.dist_to_home_vert->in<si::Foot>()));
 		layout.add_fragment ("↑", font_b, Qt::gray);
 		layout.add_fragment (vert_str, font_b, Qt::white);
 		layout.add_fragment ("FT", font_a, xf::InstrumentAids::kCyan);
@@ -1257,7 +1257,7 @@ PaintingWork::paint_selected_navaid_info()
 		int course_int = xf::symmetric_round (_p.navaid_selected_course_magnetic->in<si::Degree>());
 		if (course_int == 0)
 			course_int = 360;
-		course_str = (boost::format ("/%03d°") % course_int).str();
+		course_str = std::format ("/{:03d}°", course_int);
 	}
 
 	std::string eta_min = "--";
@@ -1265,13 +1265,13 @@ PaintingWork::paint_selected_navaid_info()
 	if (_p.navaid_selected_eta)
 	{
 		int s_int = _p.navaid_selected_eta->in<si::Second>();
-		eta_min = (boost::format ("%02d") % (s_int / 60)).str();
-		eta_sec = (boost::format ("%02d") % (s_int % 60)).str();
+		eta_min = std::format ("{:02d}", s_int / 60);
+		eta_sec = std::format ("{:02d}", s_int % 60);
 	}
 
 	std::string distance_str = "---";
 	if (_p.navaid_selected_distance)
-		distance_str = (boost::format ("%3.1f") % _p.navaid_selected_distance->in<si::NauticalMile>()).str();
+		distance_str = std::format ("{:3.1f}", _p.navaid_selected_distance->in<si::NauticalMile>());
 
 	xf::TextLayout layout;
 	layout.set_background (Qt::black, { _c.hmargin, 0.0 });
@@ -1326,7 +1326,7 @@ PaintingWork::paint_tcas_and_navaid_info()
 		layout.add_fragment (identifier.isEmpty() ? "---" : identifier, font_b, color);
 		layout.add_new_line();
 		layout.add_fragment ("DME ", font_a, color);
-		layout.add_fragment (distance ? (boost::format ("%.1f") % distance->in<si::NauticalMile>()).str() : std::string ("---"), font_b, color);
+		layout.add_fragment (distance ? std::format ("{:.1f}", distance->in<si::NauticalMile>()) : std::string ("---"), font_b, color);
 	};
 
 	xf::TextLayout left_layout;
@@ -1489,9 +1489,9 @@ PaintingWork::paint_range()
 		QString r;
 
 		if (_p.range < 1_nmi)
-			r = QString::fromStdString ((boost::format ("%.1f") % _p.range.in<si::NauticalMile>()).str());
+			r = QString::fromStdString (std::format ("{:.1f}", _p.range.in<si::NauticalMile>()));
 		else
-			r = QString::fromStdString ((boost::format ("%d") % _p.range.in<si::NauticalMile>()).str());
+			r = QString::fromStdString (std::format ("{:d}", static_cast<int> (_p.range.in<si::NauticalMile>())));
 
 		QRectF rect (0.f, 0.f, std::max (metr_a.width (s), metr_b.width (r)) + 0.4f * _c.q, metr_a.height() + metr_b.height());
 

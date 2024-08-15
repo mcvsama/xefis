@@ -20,12 +20,10 @@
 // Neutrino:
 #include <neutrino/numeric.h>
 
-// Boost:
-#include <boost/format.hpp>
-
 // Standard:
 #include <cstddef>
 #include <cmath>
+#include <format>
 #include <algorithm>
 
 
@@ -98,9 +96,9 @@ to_dms (si::Angle const a, bool const three_digits)
 	auto const secs = 60.0 * std::abs (remainder - mins);
 
 	char const* fmt = three_digits
-		? "%03d°%02d'%02d\""
-		: "%02d°%02d'%02d\"";
-	return (boost::format (fmt) % static_cast<int> (degs) % static_cast<int> (mins) % static_cast<int> (secs)).str();
+		? "{:03d}°{:02d}'{:02d}\""
+		: "{:02d}°{:02d}'{:02d}\"";
+	return std::vformat (fmt, std::make_format_args (degs, mins, secs));
 }
 
 

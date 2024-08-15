@@ -1,6 +1,6 @@
 /* vim:ts=4
  *
- * Copyleft 2012…2016  Michał Gawron
+ * Copyleft 2024  Michał Gawron
  * Marduk Unix Labs, http://mulabs.org/
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,27 +20,29 @@
 #include <xefis/core/setting.h>
 #include <xefis/core/sockets/socket.h>
 
-// Boost:
-#include <boost/format.hpp>
-
 // Standard:
 #include <cstddef>
+#include <format>
 #include <cmath>
 
 
 class BasicGauge: public xf::Instrument
 {
   public:
+	using FloatingPoint = double;
+
+  public:
 	/**
 	 * How the value should be printed as text.
 	 */
-	xf::Setting<boost::format>	format					{ this, "format", boost::format ("%1%") };
+	xf::Setting<std::format_string<FloatingPoint>>
+									format					{ this, "format", std::format_string<FloatingPoint> ("{:f}") };
 
 	/**
 	 * Set precision. If provided, value will be converted to int, divided
 	 * by n and the multipled by n again.
 	 */
-	xf::Setting<int32_t>		precision				{ this, "precision", xf::BasicSetting::Optional };
+	xf::Setting<int32_t>			precision				{ this, "precision", xf::BasicSetting::Optional };
 
   public:
 	using Instrument::Instrument;
@@ -52,15 +54,15 @@ class BasicGauge: public xf::Instrument
 	class GaugeValues
 	{
 	  public:
-		boost::format				format;
-		std::optional<std::string>	value_str;
-		std::optional<float>		normalized_value;
-		std::optional<float>		normalized_minimum_critical;
-		std::optional<float>		normalized_minimum_warning;
-		std::optional<float>		normalized_maximum_warning;
-		std::optional<float>		normalized_maximum_critical;
-		bool						critical_condition		{ false };
-		bool						warning_condition		{ false };
+		std::format_string<FloatingPoint>	format					{ "{:f}" };
+		std::optional<std::string>			value_str;
+		std::optional<FloatingPoint>		normalized_value;
+		std::optional<FloatingPoint>		normalized_minimum_critical;
+		std::optional<FloatingPoint>		normalized_minimum_warning;
+		std::optional<FloatingPoint>		normalized_maximum_warning;
+		std::optional<FloatingPoint>		normalized_maximum_critical;
+		bool								critical_condition		{ false };
+		bool								warning_condition		{ false };
 
 	  public:
 		void
@@ -68,14 +70,14 @@ class BasicGauge: public xf::Instrument
 	};
 
   protected:
-	static constexpr	xf::Range<float>	kNormalizedRange	{ 0.0f, 1.0f };
-	static inline		QColor const		kSilver				{ 0xbb, 0xbd, 0xbf };
-	static inline		QColor const		kWarningColor		{ 255, 200, 0 };
-	static inline		QColor const		kCriticalColor		{ 255, 35, 35 };
+	static constexpr	xf::Range<FloatingPoint>	kNormalizedRange	{ 0.0f, 1.0f };
+	static inline		QColor const				kSilver				{ 0xbb, 0xbd, 0xbf };
+	static inline		QColor const				kWarningColor		{ 255, 200, 0 };
+	static inline		QColor const				kCriticalColor		{ 255, 35, 35 };
 
   protected:
 	static std::string
-	stringify (auto value, boost::format const& format, xf::Setting<int32_t> const& precision);
+	stringify (auto value, std::format_string<FloatingPoint> const& format, xf::Setting<int32_t> const& precision);
 };
 
 
@@ -98,7 +100,7 @@ template<class Value>
 inline void
 BasicGauge::GaugeValues::get_from (auto const& module, auto const& range, std::optional<float128_t> floating_point_value)
 {
-	format = *module.format;
+	this->format = *module.format;
 
 	if (module.value)
 	{
@@ -131,7 +133,7 @@ BasicGauge::GaugeValues::get_from (auto const& module, auto const& range, std::o
 
 
 inline std::string
-BasicGauge::stringify (auto value, boost::format const& format, xf::Setting<int32_t> const& precision)
+BasicGauge::stringify (auto value, std::format_string<FloatingPoint> const& format, xf::Setting<int32_t> const& precision)
 {
 	if (value)
 	{
@@ -141,7 +143,7 @@ BasicGauge::stringify (auto value, boost::format const& format, xf::Setting<int3
 			value = std::llround (*value + 0.5f * prec) / prec * prec;
 		}
 
-		return (boost::format (format) % *value).str();
+		return std::format (format, static_cast<FloatingPoint> (*value));
 	}
 	else
 		return {};

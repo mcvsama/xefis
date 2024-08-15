@@ -1,6 +1,6 @@
 /* vim:ts=4
  *
- * Copyleft 2012…2016  Michał Gawron
+ * Copyleft 2024  Michał Gawron
  * Marduk Unix Labs, http://mulabs.org/
  *
  * This program is free software: you can redistribute it and/or modify
@@ -31,6 +31,7 @@
 
 // Standard:
 #include <cstddef>
+#include <format>
 #include <optional>
 
 
@@ -359,7 +360,7 @@ template<class Value>
 		auto const note_distance = 0.5f * char_width;
 		QPointF text_position;
 		QPointF note_position;
-		QString const sample_text = QString::fromStdString ((boost::format (values.format) % 0.0).str());
+		QString const sample_text = QString::fromStdString (std::format (values.format, 0.0));
 		painter.setFont (font);
 		QRectF text_rect = painter.get_text_box (QPointF (p0.x() - 1.25 * q, aids.height() / 2.f), Qt::AlignRight | Qt::AlignVCenter, sample_text);
 		text_rect.adjust (-2 * value_box_inner_margin, 0, 0.f, -2.f * hcorr);

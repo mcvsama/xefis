@@ -29,6 +29,7 @@
 
 // Standard:
 #include <cstddef>
+#include <format>
 #include <memory>
 #include <string>
 #include <ctime>
@@ -407,7 +408,7 @@ GPS::Connection::get_nmea_frequencies_setup_messages (unsigned int baud_rate)
 	}
 
 	unsigned int fix_interval_rounded_to_100ms = static_cast<unsigned int> (fix_interval.in<si::Millisecond>()) / 100 * 100;
-	std::string mtk_set_nmea_frequencies_body = (boost::format ("%s,0,%d,0,%d,%d,0,0,0,0,0,0,0,0,0,0,0,0,0,0") % MTK_SET_NMEA_FREQUENCIES % rmc_period % gga_period % gsa_period).str();
+	std::string mtk_set_nmea_frequencies_body = std::format ("{},0,{},0,{},{},0,0,0,0,0,0,0,0,0,0,0,0,0,0", MTK_SET_NMEA_FREQUENCIES, rmc_period, gga_period, gsa_period);
 	std::string mtk_set_nmea_frequencies = xf::nmea::make_mtk_sentence (mtk_set_nmea_frequencies_body);
 	std::string mtk_set_nmea_position_fix_interval_body = std::string (MTK_SET_NMEA_POSITION_FIX_INTERVAL) + "," + std::to_string (fix_interval_rounded_to_100ms);
 	std::string mtk_set_nmea_position_fix_interval = xf::nmea::make_mtk_sentence (mtk_set_nmea_position_fix_interval_body);

@@ -25,6 +25,7 @@
 
 // Standard:
 #include <cstddef>
+#include <format>
 
 
 namespace xf {
@@ -53,7 +54,7 @@ SocketItem::read()
 	if (_socket)
 	{
 		SocketConversionSettings conv_settings;
-		conv_settings.numeric_format = boost::format ("%.12f");
+		conv_settings.numeric_format_double = "{:.12f}";
 		conv_settings.preferred_units = {
 			si::Celsius::dynamic_unit(),
 			si::Degree::dynamic_unit(),

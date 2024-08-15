@@ -52,10 +52,10 @@ PanelNumericDisplay::PanelNumericDisplay (QWidget* parent, Panel* panel, unsigne
 }
 
 
-PanelNumericDisplay::PanelNumericDisplay (QWidget* parent, Panel* panel, unsigned int num_digits, std::string unit, ModuleSocketPath const& value_socket_path, std::string const& format):
+PanelNumericDisplay::PanelNumericDisplay (QWidget* parent, Panel* panel, unsigned int num_digits, std::string unit, ModuleSocketPath const& value_socket_path, std::format_string<double> const& format):
 	PanelNumericDisplay (parent, panel, num_digits, unit, value_socket_path)
 {
-	_static_format = boost::format (format);
+	_static_format = format;
 	read();
 }
 
@@ -171,10 +171,10 @@ PanelNumericDisplay::convert_to_digits (double value)
 		if (_dynamic_format.configured())
 		{
 			if (_dynamic_format.valid())
-				result = (boost::format (*_dynamic_format) % value).str();
+				result = std::vformat (*_dynamic_format, value);
 		}
 		else
-			result = (_static_format % value).str();
+			result = std::format (_static_format, value);
 
 		std::size_t allowed_size = _num_digits;
 		if (result.find ('.') != std::string::npos)
@@ -191,7 +191,7 @@ PanelNumericDisplay::convert_to_digits (double value)
 				result = '-' + std::string (_num_digits - 1, '9');
 		}
 	}
-	catch (boost::io::format_error&)
+	catch (std::format_error&)
 	{
 		result = "-.";
 	}

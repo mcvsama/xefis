@@ -28,6 +28,7 @@
 
 // Standard:
 #include <cstddef>
+#include <format>
 #include <string>
 
 
@@ -411,24 +412,13 @@ to_unix_time (xf::nmea::GPSDate const& date, xf::nmea::GPSTimeOfDay const& time)
 std::string
 to_string (xf::nmea::GPSDate const& date)
 {
-	// Need static_casting due to boost::format bug (?) that prints out uint8_t as characters even
-	// though the format was explicitly %02d:
-	return (boost::format ("%d-%02d-%02d")
-			% static_cast<int> (date.year)
-			% static_cast<int> (date.month)
-			% static_cast<int> (date.day)).str();
+	return std::format ("{:d}-{:02d}-{:02d}", date.year, date.month, date.day);
 }
 
 std::string
 to_string (xf::nmea::GPSTimeOfDay const& time)
 {
-	// Need static_casting due to boost::format bug (?) that prints out uint8_t as characters even
-	// though the format was explicitly %02d:
-	return (boost::format ("%02d:%02d:%02d.%d")
-			% static_cast<int> (time.hours)
-			% static_cast<int> (time.minutes)
-			% static_cast<int> (time.seconds)
-			% static_cast<int> (time.seconds_fraction)).str();
+	return std::format ("{:02d}:{:02d}:{:09f}", time.hours, time.minutes, time.seconds + time.seconds_fraction);
 }
 
 } // namespace xf::nmea

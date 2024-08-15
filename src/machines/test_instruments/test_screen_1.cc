@@ -229,25 +229,25 @@ TestScreen1::connect_instruments()
 	this->hsi.arpt_runway_extension_length				= 10_nmi;
 
 	this->engine_l_thrust.dial_scale					= 0.9;
-	this->engine_l_thrust.format						= boost::format ("%5.2f");
+	this->engine_l_thrust.format						= "{:5.2f}";
 	this->engine_l_thrust.value_minimum					= 0_N;
 	this->engine_l_thrust.value_maximum_warning			= 4.5_N;
 	this->engine_l_thrust.value_maximum					= 4.5_N;
 
 	this->engine_l_speed.dial_scale						= 0.9;
-	this->engine_l_speed.format							= boost::format ("%5.1f");
+	this->engine_l_speed.format							= "{:5.1f}";
 	this->engine_l_speed.value_minimum					= 0.0_rpm;
 	this->engine_l_speed.value_maximum_warning			= 12'000_rpm;
 	this->engine_l_speed.value_maximum_critical			= 13'000_rpm;
 	this->engine_l_speed.value_maximum					= 13'000_rpm;
 
 	this->engine_l_power.dial_scale						= 0.9;
-	this->engine_l_power.format							= boost::format ("%3.0f");
+	this->engine_l_power.format							= "{:3.0f}";
 	this->engine_l_power.value_minimum					= 0_W;
 	this->engine_l_power.value_maximum_warning			= 280_W;
 	this->engine_l_power.value_maximum					= 280_W;
 
-	this->engine_l_current.format						= boost::format ("%4.1f");
+	this->engine_l_current.format						= "{:4.1f}";
 	this->engine_l_current.value_minimum				= -1_A;
 	this->engine_l_current.value_maximum_warning		= 28_A;
 	this->engine_l_current.value_maximum_critical		= 32_A;
@@ -255,7 +255,7 @@ TestScreen1::connect_instruments()
 	this->engine_l_current.mirrored_style				= false;
 	this->engine_l_current.line_hidden					= true;
 
-	this->engine_l_temperature.format					= boost::format ("%5.1f");
+	this->engine_l_temperature.format					= "{:5.1f}";
 	this->engine_l_temperature.font_scale				= 0.75;
 	this->engine_l_temperature.value_minimum			= 25_degC;
 	this->engine_l_temperature.value_maximum_warning	= 60_degC;
@@ -263,7 +263,7 @@ TestScreen1::connect_instruments()
 	this->engine_l_temperature.value_maximum			= 65_degC;
 	this->engine_l_temperature.mirrored_style			= false;
 
-	this->engine_l_voltage.format						= boost::format ("%4.1f");
+	this->engine_l_voltage.format						= "{:4.1f}";
 	this->engine_l_voltage.font_scale					= 0.75;
 	this->engine_l_voltage.value_minimum				= 12.0_V;
 	this->engine_l_voltage.value_minimum_critical		= 12.0_V;
@@ -271,7 +271,7 @@ TestScreen1::connect_instruments()
 	this->engine_l_voltage.value_maximum				= 16.8_V;
 	this->engine_l_voltage.mirrored_style				= false;
 
-	this->engine_l_vibration.format						= boost::format ("%3.1f");
+	this->engine_l_vibration.format						= "{:3.1f}";
 	this->engine_l_vibration.font_scale					= 0.75;
 	this->engine_l_vibration.value_minimum				= 0_g;
 	this->engine_l_vibration.value_maximum_warning		= 1_g;
@@ -280,25 +280,25 @@ TestScreen1::connect_instruments()
 	this->engine_l_vibration.note						= "N₂";
 
 	this->engine_r_thrust.dial_scale					= 0.9;
-	this->engine_r_thrust.format						= boost::format ("%5.2f");
+	this->engine_r_thrust.format						= "{:5.2f}";
 	this->engine_r_thrust.value_minimum					= 0_N;
 	this->engine_r_thrust.value_maximum_warning			= 4.5_N;
 	this->engine_r_thrust.value_maximum					= 4.5_N;
 
 	this->engine_r_speed.dial_scale						= 0.9;
-	this->engine_r_speed.format							= boost::format ("%5.1f");
+	this->engine_r_speed.format							= "{:5.1f}";
 	this->engine_r_speed.value_minimum					= 0.0_rpm;
 	this->engine_r_speed.value_maximum_warning			= 12'000_rpm;
 	this->engine_r_speed.value_maximum_critical			= 13'000_rpm;
 	this->engine_r_speed.value_maximum					= 13'000_rpm;
 
 	this->engine_r_power.dial_scale						= 0.9;
-	this->engine_r_power.format							= boost::format ("%3.0f");
+	this->engine_r_power.format							= "{:3.0f}";
 	this->engine_r_power.value_minimum					= 0_W;
 	this->engine_r_power.value_maximum_warning			= 280_W;
 	this->engine_r_power.value_maximum					= 280_W;
 
-	this->engine_r_current.format						= boost::format ("%4.1f");
+	this->engine_r_current.format						= "{:4.1f}";
 	this->engine_r_current.value_minimum				= -1_A;
 	this->engine_r_current.value_maximum_warning		= 28_A;
 	this->engine_r_current.value_maximum_critical		= 32_A;
@@ -306,7 +306,7 @@ TestScreen1::connect_instruments()
 	this->engine_r_current.mirrored_style				= true;
 	this->engine_r_current.line_hidden					= true;
 
-	this->engine_r_temperature.format					= boost::format ("%5.1f");
+	this->engine_r_temperature.format					= "{:5.1f}";
 	this->engine_r_temperature.font_scale				= 0.75;
 	this->engine_r_temperature.value_minimum			= 25_degC;
 	this->engine_r_temperature.value_maximum_warning	= 60_degC;
@@ -314,7 +314,7 @@ TestScreen1::connect_instruments()
 	this->engine_r_temperature.value_maximum			= 65_degC;
 	this->engine_r_temperature.mirrored_style			= true;
 
-	this->engine_r_voltage.format						= boost::format ("%4.1f");
+	this->engine_r_voltage.format						= "{:4.1f}";
 	this->engine_r_voltage.font_scale					= 0.75;
 	this->engine_r_voltage.value_minimum				= 12.0_V;
 	this->engine_r_voltage.value_minimum_critical		= 12.0_V;
@@ -322,7 +322,7 @@ TestScreen1::connect_instruments()
 	this->engine_r_voltage.value_maximum				= 16.8_V;
 	this->engine_r_voltage.mirrored_style				= true;
 
-	this->engine_r_vibration.format						= boost::format ("%3.1f");
+	this->engine_r_vibration.format						= "{:3.1f}";
 	this->engine_r_vibration.font_scale					= 0.75;
 	this->engine_r_vibration.value_minimum				= 0_g;
 	this->engine_r_vibration.value_maximum_warning		= 1_g;
@@ -363,7 +363,7 @@ TestScreen1::connect_instruments()
 
 	this->horizontal_trim.label							= "RUDDER TRIM";
 
-	this->glide_ratio.format							= boost::format ("%3.0f");
+	this->glide_ratio.format							= "{:3.0f}";
 	this->glide_ratio.font_scale						= 0.75;
 	this->glide_ratio.value_minimum						= 0.0;
 	this->glide_ratio.value_maximum						= 100.0;
@@ -373,7 +373,7 @@ TestScreen1::connect_instruments()
 	this->glide_ratio_label.color						= xf::InstrumentAids::kCyan;
 	this->glide_ratio_label.font_scale					= 1.3;
 
-	this->load_factor.format							= boost::format ("%1.1f");
+	this->load_factor.format							= "{:1.1f}";
 	this->load_factor.font_scale						= 0.75;
 	this->load_factor.value_minimum						= -1.0;
 	this->load_factor.value_maximum_warning				= +2.0;

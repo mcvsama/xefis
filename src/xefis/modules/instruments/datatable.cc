@@ -20,9 +20,6 @@
 // Neutrino:
 #include <neutrino/exception_support.h>
 
-// Lib:
-#include <boost/format.hpp>
-
 // Qt:
 #include <QtWidgets/QLayout>
 
@@ -156,19 +153,7 @@ Datatable::async_paint (xf::PaintRequest const& paint_request) const
 		// Valu
 		painter.setFont (value_font);
 		painter.setPen (aids->get_pen (line.value_color, 1.0));
-		QString str_to_paint;
-
-		auto error = xf::describe_boost_format_exception([&] {
-			str_to_paint = line.stringified();
-		});
-
-		if (error)
-		{
-			painter.setPen (aids->get_pen (Qt::red, 1.0));
-			str_to_paint = QString::fromStdString (*error);
-		}
-
-		painter.fast_draw_text (right, Qt::AlignRight | Qt::AlignBottom, str_to_paint);
+		painter.fast_draw_text (right, Qt::AlignRight | Qt::AlignBottom, line.stringified());
 	}
 }
 

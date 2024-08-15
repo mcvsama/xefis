@@ -23,11 +23,11 @@
 #include <neutrino/c++20.h>
 #include <neutrino/stdexcept.h>
 
-// Boost:
-#include <boost/lexical_cast.hpp>
-
 // Standard:
+#include <charconv>
 #include <cstddef>
+#include <concepts>
+#include <format>
 #include <string>
 #include <utility>
 
@@ -105,13 +105,13 @@ template<class Value, template<class> class AnySocket>
 			assign (socket, xf::nil);
 		else
 		{
-			try {
-				assign (socket, boost::lexical_cast<Value> (str));
-			}
-			catch (boost::bad_lexical_cast&)
-			{
+			Value value;
+			auto [ptr, error_code] = std::from_chars (str.begin(), str.end(), value);
+
+			if (error_code == std::errc())
+				assign (socket, value);
+			else
 				assign (socket, xf::nil);
-			}
 		}
 	}
 
@@ -234,7 +234,7 @@ template<class Enum>
 	};
 
 
-template<class Integer>
+template<std::integral Integer>
 	struct IntegerSocketTraits
 	{
 		static constexpr bool
@@ -254,7 +254,12 @@ template<class Integer>
 		to_string (Socket<Integer> const& socket, SocketConversionSettings const& settings)
 		{
 			if (socket)
-				return (boost::format (settings.numeric_format) % *socket).str();
+			{
+				if constexpr (std::is_signed<Integer>())
+					return std::format (settings.numeric_format_int64_t, static_cast<int64_t> (*socket)); // static_cast<> removes C/V reference.
+				else
+					return std::format (settings.numeric_format_uint64_t, static_cast<uint64_t> (*socket));
+			}
 			else
 				return settings.nil_value;
 		}
@@ -288,7 +293,7 @@ template<class Integer>
 	};
 
 
-template<class FloatingPoint>
+template<std::floating_point FloatingPoint>
 	struct FloatingPointSocketTraits
 	{
 		static constexpr bool
@@ -608,14 +613,14 @@ template<class Unit>
 			if (socket)
 			{
 				if (settings.preferred_units.empty())
-					return (boost::format (settings.numeric_format) % *socket).str();
+					return std::format (settings.numeric_format_double, socket->value()) + ' ' + neutrino::si::unit_to_string (*socket);
 				else
 				{
 					for (si::DynamicUnit const& du: settings.preferred_units)
 						if (si::is_convertible (Unit::dynamic_unit(), du))
-							return (boost::format (settings.numeric_format) % si::convert (Unit::dynamic_unit(), socket->value(), du)).str() + " " + du.symbol();
+							return std::format (settings.numeric_format_double, si::convert (Unit::dynamic_unit(), socket->value(), du)) + " " + du.symbol();
 
-					return (boost::format (settings.numeric_format) % *socket).str();
+					return std::format (settings.numeric_format_double, socket->value()) + ' ' + neutrino::si::unit_to_string (*socket);
 				}
 			}
 			else

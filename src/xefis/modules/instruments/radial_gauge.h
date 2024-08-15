@@ -1,6 +1,6 @@
 /* vim:ts=4
  *
- * Copyleft 2012…2016  Michał Gawron
+ * Copyleft 2024  Michał Gawron
  * Marduk Unix Labs, http://mulabs.org/
  *
  * This program is free software: you can redistribute it and/or modify
@@ -31,6 +31,7 @@
 
 // Standard:
 #include <cstddef>
+#include <format>
 #include <string>
 #include <optional>
 
@@ -229,7 +230,7 @@ template<class Value>
 
 			if (paint_request.size_changed() || !*box_text_width)
 			{
-				QString const sample_text = QString::fromStdString ((boost::format (values.format) % 0.0).str());
+				QString const sample_text = QString::fromStdString (std::format (values.format, 0.0));
 				*box_text_width = metrics.width (sample_text);
 			}
 
