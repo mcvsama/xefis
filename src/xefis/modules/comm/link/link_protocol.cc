@@ -17,10 +17,10 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/modules/comm/link/input_link.h>
-#include <xefis/utility/blob.h>
 #include <xefis/utility/hextable.h>
 
 // Neutrino:
+#include <neutrino/blob.h>
 #include <neutrino/crypto/hmac.h>
 #include <neutrino/qt/qdom.h>
 #include <neutrino/qt/qdom_iterator.h>

@@ -34,21 +34,21 @@ Transport::Transport (Params const& params):
 	_hmac_key = calculate_hkdf<kSignatureHMACHashAlgorithm> ({
 		.salt = params.authentication_secret,
 		.key_material = params.ephemeral_session_key,
-		.info = params.hkdf_user_info + value_to_blob ("hmac_key"),
+		.info = params.hkdf_user_info + to_blob ("hmac_key"),
 		.result_length = 32,
 	});
 
 	_data_encryption_key = calculate_hkdf<kDataEncryptionKeyHKDFHashAlgorithm> ({
 		.salt = params.data_encryption_secret,
 		.key_material = params.ephemeral_session_key,
-		.info = params.hkdf_user_info + value_to_blob ("data_encryption_key"),
+		.info = params.hkdf_user_info + to_blob ("data_encryption_key"),
 		.result_length = 32,
 	});
 
 	_seq_num_encryption_key = calculate_hkdf<kSeqNumEncryptionKeyHKDFHashAlgorithm> ({
 		.salt = params.seq_num_encryption_secret,
 		.key_material = params.ephemeral_session_key,
-		.info = params.hkdf_user_info + value_to_blob ("seq_num_encryption_key"),
+		.info = params.hkdf_user_info + to_blob ("seq_num_encryption_key"),
 		.result_length = 32,
 	});
 }
@@ -79,8 +79,8 @@ Transmitter::encrypt_packet (BlobView const data)
 {
 	++_sequence_number;
 
-	// It's required that value_to_blob() gives little-endian encoding:
-	auto const binary_sequence_number = value_to_blob (_sequence_number);
+	// It's required that to_blob() gives little-endian encoding:
+	auto const binary_sequence_number = to_blob (_sequence_number);
 	auto const salt = random_blob (kDataSaltSize, _random_device);
 	auto const full_hmac = calculate_hmac<kSignatureHMACHashAlgorithm> ({
 		.data = data + salt + binary_sequence_number,
@@ -143,8 +143,7 @@ Receiver::decrypt_packet (BlobView const encrypted_packet, std::optional<Sequenc
 
 		if (calculated_hmac == hmac)
 		{
-			SequenceNumber sequence_number;
-			blob_to_value (binary_sequence_number, sequence_number);
+			auto const sequence_number = parse<SequenceNumber> (binary_sequence_number);
 
 			if (sequence_number <= _sequence_number)
 				throw DecryptionFailure (ErrorCode::SeqNumFromPast, "sequence number from past is invalid");

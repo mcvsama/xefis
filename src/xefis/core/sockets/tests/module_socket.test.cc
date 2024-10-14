@@ -65,16 +65,17 @@ to_string (TestEnum value)
 }
 
 
-void
-parse (std::string_view const& str, TestEnum& value)
-{
-	if (str == "Value1")
-		value = TestEnum::Value1;
-	else if (str == "Value2")
-		value = TestEnum::Value2;
-	else
-		throw Exception ("invalid enum string \"" + std::string (str) + "\"");
-}
+template<std::same_as<TestEnum> Enum>
+	Enum
+	parse (std::string_view const str)
+	{
+		if (str == "Value1")
+			return TestEnum::Value1;
+		else if (str == "Value2")
+			return TestEnum::Value2;
+		else
+			throw Exception ("invalid enum string \"" + std::string (str) + "\"");
+	}
 
 
 constexpr std::string_view
@@ -91,18 +92,19 @@ to_string (TestEnumWithNil value)
 }
 
 
-void
-parse (std::string_view const& str, TestEnumWithNil& value)
-{
-	if (str == "Value1")
-		value = TestEnumWithNil::Value1;
-	else if (str == "Value2")
-		value = TestEnumWithNil::Value2;
-	else if (str == "")
-		value = TestEnumWithNil::xf_nil_value;
-	else
-		throw Exception ("invalid enum string \"" + std::string (str) + "\"");
-}
+template<std::same_as<TestEnumWithNil> Enum>
+	Enum
+	parse (std::string_view const str)
+	{
+		if (str == "Value1")
+			return TestEnumWithNil::Value1;
+		else if (str == "Value2")
+			return TestEnumWithNil::Value2;
+		else if (str == "")
+			return TestEnumWithNil::xf_nil_value;
+		else
+			throw Exception ("invalid enum string \"" + std::string (str) + "\"");
+	}
 
 } // namespace test_enum
 

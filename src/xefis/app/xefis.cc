@@ -27,6 +27,7 @@
 // Neutrino:
 #include <neutrino/demangle.h>
 #include <neutrino/fail.h>
+#include <neutrino/string.h>
 #include <neutrino/time_helper.h>
 #include <neutrino/work_performer.h>
 
@@ -163,14 +164,14 @@ Xefis::parse_args (int argc, char** argv)
 			if (arg_value.empty())
 				throw MissingValueException (arg_name);
 
-			_options.watchdog_write_fd = boost::lexical_cast<int> (arg_value);
+			_options.watchdog_write_fd = neutrino::parse<int> (arg_value);
 		}
 		else if (arg_name == "--watchdog-read-fd")
 		{
 			if (arg_value.empty())
 				throw MissingValueException (arg_name);
 
-			_options.watchdog_read_fd = boost::lexical_cast<int> (arg_value);
+			_options.watchdog_read_fd = neutrino::parse<int> (arg_value);
 		}
 		else
 			throw Exception ("unrecognized option '" + arg_name + "', try --help");

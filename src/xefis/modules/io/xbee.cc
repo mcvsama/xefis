@@ -16,7 +16,6 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/utility/blob.h>
 #include <xefis/utility/string.h>
 
 // Neutrino:

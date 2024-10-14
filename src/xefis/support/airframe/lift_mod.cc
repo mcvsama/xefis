@@ -33,13 +33,12 @@ namespace xf {
 LiftMod::Setting::Setting (QDomElement const& config)
 {
 	_label = config.attribute ("label");
-
-	si::parse (config.attribute ("angle").toStdString(), _angle);
+	_angle = si::parse<si::Angle> (config.attribute ("angle").toStdString());
 
 	_speed_range.set_min (si::parse<si::Velocity> (config.attribute ("minimum-speed").toStdString()));
 	_speed_range.set_max (si::parse<si::Velocity> (config.attribute ("maximum-speed").toStdString()));
 
-	si::parse (config.attribute ("aoa-correction").toStdString(), _aoa_correction);
+	_aoa_correction = si::parse<si::Angle> (config.attribute ("aoa-correction").toStdString());
 	_cl_correction = config.attribute ("lift-coefficient-correction").toDouble();
 }
 

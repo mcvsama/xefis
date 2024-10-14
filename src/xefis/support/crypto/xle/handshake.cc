@@ -74,8 +74,8 @@ Blob
 HandshakeMaster::make_master_handshake_blob (MasterHandshake const& master_handshake)
 {
 	Blob const salt = random_blob (8, _random_device);
-	Blob const handshake_id_blob = value_to_blob (master_handshake.handshake_id);
-	Blob const handshake_data = salt + handshake_id_blob + value_to_blob (master_handshake.unix_timestamp_ms) + master_handshake.dhe_exchange_blob;
+	Blob const handshake_id_blob = to_blob (master_handshake.handshake_id);
+	Blob const handshake_data = salt + handshake_id_blob + to_blob (master_handshake.unix_timestamp_ms) + master_handshake.dhe_exchange_blob;
 	Blob const signature = calculate_hmac<kHashAlgorithm> ({ .data = handshake_data, .key = *_master_signature_key }).substr (0, _hmac_size);
 
 	return handshake_data + signature;
@@ -95,8 +95,8 @@ HandshakeMaster::parse_and_verify_slave_handshake_blob (BlobView const slave_han
 	Blob const calculated_signature = calculate_hmac<kHashAlgorithm> ({ .data = extracted_handshake_data, .key = *_slave_signature_key }).substr (0, _hmac_size);
 
 	SlaveHandshake extracted;
-	blob_to_value (slave_handshake_blob.substr (8, 8), extracted.handshake_id);
-	blob_to_value (slave_handshake_blob.substr (16, 8), extracted.unix_timestamp_ms);
+	extracted.handshake_id = neutrino::parse<decltype (extracted.handshake_id)> (slave_handshake_blob.substr (8, 8));
+	extracted.unix_timestamp_ms = neutrino::parse<decltype (extracted.unix_timestamp_ms)> (slave_handshake_blob.substr (16, 8));
 	extracted.dhe_exchange_blob = extracted_dhe_exchange_blob;
 
 	if (extracted_signature != calculated_signature)
@@ -153,8 +153,8 @@ Blob
 HandshakeSlave::make_slave_handshake_blob (SlaveHandshake const& slave_handshake)
 {
 	Blob const salt = random_blob (8, _random_device);
-	Blob const handshake_id_blob = value_to_blob (slave_handshake.handshake_id);
-	Blob const handshake_data = salt + handshake_id_blob + value_to_blob (slave_handshake.unix_timestamp_ms) + slave_handshake.dhe_exchange_blob;
+	Blob const handshake_id_blob = to_blob (slave_handshake.handshake_id);
+	Blob const handshake_data = salt + handshake_id_blob + to_blob (slave_handshake.unix_timestamp_ms) + slave_handshake.dhe_exchange_blob;
 	Blob const signature = calculate_hmac<kHashAlgorithm> ({ .data = handshake_data, .key = *_slave_signature_key }).substr (0, _hmac_size);
 
 	return handshake_data + signature;
@@ -175,8 +175,8 @@ HandshakeSlave::parse_and_verify_master_handshake_blob (BlobView const master_ha
 	Blob const calculated_signature = calculate_hmac<kHashAlgorithm> ({ .data = extracted_handshake_data, .key = *_master_signature_key }).substr (0, _hmac_size);
 
 	MasterHandshake extracted;
-	blob_to_value (master_handshake.substr (8, 8), extracted.handshake_id);
-	blob_to_value (master_handshake.substr (16, 8), extracted.unix_timestamp_ms);
+	extracted.handshake_id = neutrino::parse<decltype (extracted.handshake_id)> (master_handshake.substr (8, 8));
+	extracted.unix_timestamp_ms = neutrino::parse<decltype (extracted.unix_timestamp_ms)> (master_handshake.substr (16, 8));
 	extracted.dhe_exchange_blob = extracted_dhe_exchange_blob;
 
 	if (extracted_signature != calculated_signature)
