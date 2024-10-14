@@ -18,7 +18,6 @@
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
 #include <xefis/core/sockets/module_socket_path.h>
-#include <xefis/utility/blob.h>
 
 // Neutrino:
 #include <neutrino/time.h>
@@ -108,9 +107,10 @@ template<class pValue>
 	  public:
 		typedef pValue Value;
 
-		class Uninitialized: public xf::FastException
+		class Uninitialized: public xf::Exception
 		{
-			using FastException::FastException;
+		  public:
+			using Exception::Exception;
 		};
 
 	  public:

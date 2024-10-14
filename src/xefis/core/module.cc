@@ -32,7 +32,7 @@
 namespace xf {
 
 UninitializedSettings::UninitializedSettings (std::vector<BasicSetting*> settings):
-	FastException (make_message (settings))
+	Exception (make_message (settings), false)
 { }
 
 

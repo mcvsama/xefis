@@ -118,7 +118,7 @@ class HandshakeMaster: public Handshake
 		InvalidHandshakeID,
 	};
 
-	class Exception: public neutrino::FastException
+	class Exception: public neutrino::Exception
 	{
 	  public:
 		Exception (ErrorCode, std::string_view message);
@@ -181,7 +181,7 @@ class HandshakeSlave: public Handshake
 		DeltaTimeTooHigh,
 	};
 
-	class Exception: public neutrino::FastException
+	class Exception: public neutrino::Exception
 	{
 	  public:
 		Exception (ErrorCode, std::string_view message);
@@ -228,14 +228,14 @@ class HandshakeSlave: public Handshake
 
 inline
 HandshakeMaster::Exception::Exception (ErrorCode const error_code, std::string_view const message):
-	neutrino::FastException (message),
+	neutrino::Exception (message, false),
 	_error_code (error_code)
 { }
 
 
 inline
 HandshakeSlave::Exception::Exception (ErrorCode const error_code, std::string_view const message):
-	neutrino::FastException (message),
+	neutrino::Exception (message, false),
 	_error_code (error_code)
 { }
 

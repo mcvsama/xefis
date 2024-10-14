@@ -61,7 +61,7 @@ class Transport
 		SeqNumFromFarFuture,
 	};
 
-	class DecryptionFailure: public neutrino::FastException
+	class DecryptionFailure: public neutrino::Exception
 	{
 	  public:
 		DecryptionFailure (ErrorCode, std::string_view const message);
@@ -158,7 +158,7 @@ class Receiver: public Transport
 
 inline
 Transport::DecryptionFailure::DecryptionFailure (ErrorCode const error_code, std::string_view const message):
-	neutrino::FastException (message),
+	neutrino::Exception (message, false),
 	_error_code (error_code)
 { }
 

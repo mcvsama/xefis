@@ -103,13 +103,13 @@ Transceiver::encrypt_packet (BlobView const packet)
 				if (fallback)
 					return fallback();
 				else
-					throw FastException (std::format ("{}: {} thrown an exception; fallback unavailable", role_name(), session_name), std::current_exception());
+					std::throw_with_nested (Exception (std::format ("{}: {} thrown an exception; fallback unavailable", role_name(), session_name), false));
 			}
 		}
 		else if (fallback)
 			return fallback();
 		else
-			throw FastException (std::format ("{}: {} is unavailable; fallback is unavailable", role_name(), session_name));
+			throw Exception (std::format ("{}: {} is unavailable; fallback is unavailable", role_name(), session_name), false);
 	};
 
 	return try_session (first_session_to_try, first_session_role, _role == Role::Master, [&] {
@@ -140,19 +140,19 @@ Transceiver::decrypt_packet (BlobView const packet, std::optional<Transport::Seq
 				if (fallback)
 					return fallback (std::format ("{}: {}", session_name, neutrino::describe_exception (std::current_exception())));
 				else
-					throw FastException (std::format ("{}: {} thrown an exception, fallback unavailable", role_name(), session_name), std::current_exception());
+					std::throw_with_nested (Exception (std::format ("{}: {} thrown an exception, fallback unavailable", role_name(), session_name), false));
 			}
 		}
 		else if (fallback)
 			return fallback (std::format ("{} unavailable", session_name));
 		else
-			throw FastException (std::format ("{}: {} is unavailable; fallback is unavailable", role_name(), session_name));
+			throw Exception (std::format ("{}: {} is unavailable; fallback is unavailable", role_name(), session_name), false);
 	};
 
 	return try_session (active_session(), "active session", false, true, [&] (std::string const active_fallback_reason) -> Blob {
 		return try_session (previous_session(), "previous session", false, false, [&] (std::string const previous_fallback_reason) -> Blob {
 			return try_session (next_session_candidate(), "next session candidate", true, false, [&] (std::string const next_fallback_reason) -> Blob {
-				throw FastException (std::format ("{}: {}; {}; {}", role_name(), active_fallback_reason, previous_fallback_reason, next_fallback_reason));
+				throw Exception (std::format ("{}: {}; {}; {}", role_name(), active_fallback_reason, previous_fallback_reason, next_fallback_reason), false);
 			});
 		});
 	});
@@ -239,7 +239,7 @@ MasterTransceiver::Session::set_handshake_response (Blob const& handshake_respon
 		_session_prepared_promise.set_value();
 	}
 	else
-		throw FastException ("unexpected MasterTransceiver::Session::set_handshake_response() when not waiting for it");
+		throw Exception ("unexpected MasterTransceiver::Session::set_handshake_response() when not waiting for it", false);
 }
 
 
@@ -280,7 +280,7 @@ MasterTransceiver::Session::transmitter()
 	if (auto* connected = std::get_if<Connected> (&_state))
 		return connected->transmitter;
 	else
-		throw FastException ("failed to encrypt packet: master transceiver not connected (handshake not finalized)");
+		throw Exception ("failed to encrypt packet: master transceiver not connected (handshake not finalized)", false);
 }
 
 
@@ -290,7 +290,7 @@ MasterTransceiver::Session::receiver()
 	if (auto* connected = std::get_if<Connected> (&_state))
 		return connected->receiver;
 	else
-		throw FastException ("failed to decrypt packet: master transceiver not connected (handshake not finalized)");
+		throw Exception ("failed to decrypt packet: master transceiver not connected (handshake not finalized)", false);
 }
 
 

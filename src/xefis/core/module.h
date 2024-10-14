@@ -48,7 +48,7 @@ class ProcessingLoop;
 /**
  * Exception thrown when some settings in a module have not been initialized as required.
  */
-class UninitializedSettings: public FastException
+class UninitializedSettings: public Exception
 {
   public:
 	// Ctor
