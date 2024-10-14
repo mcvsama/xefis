@@ -36,6 +36,7 @@ class Wing: public rigid_body::Body
 	/**
 	 * Reference to the internal Airfoil object.
 	 */
+	[[nodiscard]]
 	Airfoil const&
 	airfoil() const noexcept
 		{ return _airfoil; }
@@ -43,6 +44,7 @@ class Wing: public rigid_body::Body
 	/**
 	 * Return last calculated lift force vector.
 	 */
+	[[nodiscard]]
 	SpaceForce<rigid_body::BodyCOM>
 	lift_force() const noexcept
 		{ return _lift_force; }
@@ -50,6 +52,7 @@ class Wing: public rigid_body::Body
 	/**
 	 * Return last calculated drag force vector.
 	 */
+	[[nodiscard]]
 	SpaceForce<rigid_body::BodyCOM>
 	drag_force() const noexcept
 		{ return _drag_force; }
@@ -57,6 +60,7 @@ class Wing: public rigid_body::Body
 	/**
 	 * Return last calculated pitching moment vector (about the center of mass).
 	 */
+	[[nodiscard]]
 	SpaceTorque<rigid_body::BodyCOM>
 	pitching_moment() const noexcept
 		{ return _pitching_moment; }
@@ -64,6 +68,7 @@ class Wing: public rigid_body::Body
 	/**
 	 * Return last calculated center of pressure relative to the center of mass.
 	 */
+	[[nodiscard]]
 	SpaceLength<rigid_body::BodyCOM>
 	center_of_pressure() const noexcept
 		{ return _center_of_pressure; }
@@ -73,6 +78,7 @@ class Wing: public rigid_body::Body
 	update_external_forces (Atmosphere const*) override;
 
   private:
+	[[nodiscard]]
 	static MassMoments<rigid_body::BodyCOM>
 	calculate_body_com_mass_moments (Airfoil const&, si::Density material_density);
 
