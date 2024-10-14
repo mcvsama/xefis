@@ -86,9 +86,9 @@ class Handshake
 	class SlaveHandshake
 	{
 	  public:
-		HandshakeID		handshake_id;
-		uint64_t		unix_timestamp_ms;
-		Blob			dhe_exchange_blob;
+		HandshakeID	handshake_id;
+		uint64_t	unix_timestamp_ms;
+		Blob		dhe_exchange_blob;
 	};
 
   public:
