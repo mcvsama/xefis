@@ -96,6 +96,7 @@ GPGGA::GPGGA (std::string const& sentence):
 	// Fix time (UTC):
 	if (!read_next())
 		return;
+
 	if (!val().empty())
 		this->fix_time = GPSTimeOfDay (val());
 
@@ -110,6 +111,7 @@ GPGGA::GPGGA (std::string const& sentence):
 	// Fix quality:
 	if (!read_next())
 		return;
+
 	if (val().size() == 1 && std::isdigit (val()[0]))
 	{
 		int fq = digit_from_ascii (val()[0]);
@@ -124,6 +126,7 @@ GPGGA::GPGGA (std::string const& sentence):
 	// Number of tracked satellites:
 	if (!read_next())
 		return;
+
 	try {
 		this->tracked_satellites = neutrino::parse<unsigned int> (val());
 	}
@@ -133,6 +136,7 @@ GPGGA::GPGGA (std::string const& sentence):
 	// Horizontal dilution of position:
 	if (!read_next())
 		return;
+
 	try {
 		this->hdop = neutrino::parse<double> (val());
 	}
@@ -142,11 +146,13 @@ GPGGA::GPGGA (std::string const& sentence):
 	// Altitude above mean sea level (in meters):
 	if (!read_next())
 		return;
+
 	try {
 		this->altitude_amsl = 1_m * neutrino::parse<double> (val());
 	}
 	catch (ParseException&)
 	{ }
+
 	// Ensure that unit is 'M' (meters):
 	if (!read_next())
 	{
@@ -160,11 +166,13 @@ GPGGA::GPGGA (std::string const& sentence):
 	// Height above WGS84 geoid (in meters):
 	if (!read_next())
 		return;
+
 	try {
 		this->geoid_height = 1_m * neutrino::parse<double> (val());
 	}
 	catch (ParseException&)
 	{ }
+
 	// Ensure that unit is 'M' (meters):
 	if (!read_next())
 	{
@@ -178,6 +186,7 @@ GPGGA::GPGGA (std::string const& sentence):
 	// Time since last DGPS update (in seconds):
 	if (!read_next())
 		return;
+
 	try {
 		this->dgps_last_update_time = 1_s * neutrino::parse<double> (val());
 	}
@@ -187,6 +196,7 @@ GPGGA::GPGGA (std::string const& sentence):
 	// DGPS station identifier:
 	if (!read_next())
 		return;
+
 	try {
 		this->dgps_station_id = neutrino::parse<std::decay_t<decltype (*this->dgps_station_id)>> (val());
 	}
@@ -249,6 +259,7 @@ GPGSA::GPGSA (std::string const& sentence):
 	{
 		if (!read_next())
 			return;
+
 		try {
 			if (!val().empty())
 				this->satellites[i] = neutrino::parse<unsigned int> (val());
@@ -260,6 +271,7 @@ GPGSA::GPGSA (std::string const& sentence):
 	// PDOP:
 	if (!read_next())
 		return;
+
 	try {
 		this->pdop = neutrino::parse<double> (val());
 	}
@@ -269,6 +281,7 @@ GPGSA::GPGSA (std::string const& sentence):
 	// HDOP:
 	if (!read_next())
 		return;
+
 	try {
 		this->hdop = neutrino::parse<double> (val());
 	}
@@ -278,6 +291,7 @@ GPGSA::GPGSA (std::string const& sentence):
 	// VDOP:
 	if (!read_next())
 		return;
+
 	try {
 		this->vdop = neutrino::parse<double> (val());
 	}
@@ -295,6 +309,7 @@ GPRMC::GPRMC (std::string const& sentence):
 	// Fix time (UTC):
 	if (!read_next())
 		return;
+
 	if (!val().empty())
 		this->fix_time = GPSTimeOfDay (val());
 
@@ -318,6 +333,7 @@ GPRMC::GPRMC (std::string const& sentence):
 	// Ground-speed:
 	if (!read_next())
 		return;
+
 	try {
 		this->ground_speed = 1_kt * neutrino::parse<double> (val());
 	}
@@ -327,6 +343,7 @@ GPRMC::GPRMC (std::string const& sentence):
 	// Track angle in degrees True:
 	if (!read_next())
 		return;
+
 	try {
 		this->track_true = 1_deg * neutrino::parse<double> (val());
 	}
@@ -336,17 +353,20 @@ GPRMC::GPRMC (std::string const& sentence):
 	// Fix date:
 	if (!read_next())
 		return;
+
 	if (!val().empty())
 		this->fix_date = GPSDate (val());
 
 	// Magnetic variation:
 	if (!read_next())
 		return;
+
 	try {
 		this->magnetic_variation = 1_deg * neutrino::parse<double> (val());
 	}
 	catch (ParseException&)
 	{ }
+
 	// East/West:
 	if (!read_next())
 	{
