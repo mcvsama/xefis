@@ -22,9 +22,6 @@
 #include <neutrino/numeric.h>
 #include <neutrino/stdexcept.h>
 
-// Lib:
-#include <boost/lexical_cast.hpp>
-
 // Standard:
 #include <cstddef>
 #include <format>
@@ -81,9 +78,9 @@ Sentence::read_latitude (std::optional<si::Angle>& latitude)
 		auto lat = 1_deg * (digit_from_ascii (val()[0]) * 10 +
 							digit_from_ascii (val()[1]));
 		try {
-			latitude = lat + 1_deg * boost::lexical_cast<double> (val().substr (2)) / 60.0;
+			latitude = lat + 1_deg * neutrino::parse<double> (val().substr (2)) / 60.0;
 		}
-		catch (boost::bad_lexical_cast&)
+		catch (ParseException&)
 		{ }
 	}
 
@@ -115,9 +112,9 @@ Sentence::read_longitude (std::optional<si::Angle>& longitude)
 							digit_from_ascii (val()[1]) * 10 +
 							digit_from_ascii (val()[2]));
 		try {
-			longitude = lon + 1_deg * boost::lexical_cast<double> (val().substr (3)) / 60.0;
+			longitude = lon + 1_deg * neutrino::parse<double> (val().substr (3)) / 60.0;
 		}
-		catch (boost::bad_lexical_cast&)
+		catch (ParseException&)
 		{ }
 	}
 

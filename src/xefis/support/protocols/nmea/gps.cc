@@ -23,9 +23,6 @@
 #include <neutrino/numeric.h>
 #include <neutrino/stdexcept.h>
 
-// Boost:
-#include <boost/lexical_cast.hpp>
-
 // Standard:
 #include <cstddef>
 #include <format>
@@ -64,7 +61,7 @@ GPSTimeOfDay::GPSTimeOfDay (std::string const& gps_time)
 		hours = mknum (gps_time[0], gps_time[1]);
 		minutes = mknum (gps_time[2], gps_time[3]);
 		seconds = mknum (gps_time[4], gps_time[5]);
-		seconds_fraction = boost::lexical_cast<double> ("0" + gps_time.substr (6));
+		seconds_fraction = neutrino::parse<double> (gps_time.substr (6));
 	}
 	catch (InvalidFormat& e)
 	{
@@ -128,27 +125,27 @@ GPGGA::GPGGA (std::string const& sentence):
 	if (!read_next())
 		return;
 	try {
-		this->tracked_satellites = boost::lexical_cast<unsigned int> (val());
+		this->tracked_satellites = neutrino::parse<unsigned int> (val());
 	}
-	catch (boost::bad_lexical_cast&)
+	catch (ParseException&)
 	{ }
 
 	// Horizontal dilution of position:
 	if (!read_next())
 		return;
 	try {
-		this->hdop = boost::lexical_cast<double> (val());
+		this->hdop = neutrino::parse<double> (val());
 	}
-	catch (boost::bad_lexical_cast&)
+	catch (ParseException&)
 	{ }
 
 	// Altitude above mean sea level (in meters):
 	if (!read_next())
 		return;
 	try {
-		this->altitude_amsl = 1_m * boost::lexical_cast<double> (val());
+		this->altitude_amsl = 1_m * neutrino::parse<double> (val());
 	}
-	catch (boost::bad_lexical_cast&)
+	catch (ParseException&)
 	{ }
 	// Ensure that unit is 'M' (meters):
 	if (!read_next())
@@ -164,9 +161,9 @@ GPGGA::GPGGA (std::string const& sentence):
 	if (!read_next())
 		return;
 	try {
-		this->geoid_height = 1_m * boost::lexical_cast<double> (val());
+		this->geoid_height = 1_m * neutrino::parse<double> (val());
 	}
-	catch (boost::bad_lexical_cast&)
+	catch (ParseException&)
 	{ }
 	// Ensure that unit is 'M' (meters):
 	if (!read_next())
@@ -182,18 +179,18 @@ GPGGA::GPGGA (std::string const& sentence):
 	if (!read_next())
 		return;
 	try {
-		this->dgps_last_update_time = 1_s * boost::lexical_cast<double> (val());
+		this->dgps_last_update_time = 1_s * neutrino::parse<double> (val());
 	}
-	catch (boost::bad_lexical_cast&)
+	catch (ParseException&)
 	{ }
 
 	// DGPS station identifier:
 	if (!read_next())
 		return;
 	try {
-		this->dgps_station_id = boost::lexical_cast<std::decay_t<decltype (*this->dgps_station_id)>> (val());
+		this->dgps_station_id = neutrino::parse<std::decay_t<decltype (*this->dgps_station_id)>> (val());
 	}
-	catch (boost::bad_lexical_cast&)
+	catch (ParseException&)
 	{ }
 }
 
@@ -254,9 +251,9 @@ GPGSA::GPGSA (std::string const& sentence):
 			return;
 		try {
 			if (!val().empty())
-				this->satellites[i] = boost::lexical_cast<unsigned int> (val());
+				this->satellites[i] = neutrino::parse<unsigned int> (val());
 		}
-		catch (boost::bad_lexical_cast&)
+		catch (ParseException&)
 		{ }
 	}
 
@@ -264,27 +261,27 @@ GPGSA::GPGSA (std::string const& sentence):
 	if (!read_next())
 		return;
 	try {
-		this->pdop = boost::lexical_cast<double> (val());
+		this->pdop = neutrino::parse<double> (val());
 	}
-	catch (boost::bad_lexical_cast&)
+	catch (ParseException&)
 	{ }
 
 	// HDOP:
 	if (!read_next())
 		return;
 	try {
-		this->hdop = boost::lexical_cast<double> (val());
+		this->hdop = neutrino::parse<double> (val());
 	}
-	catch (boost::bad_lexical_cast&)
+	catch (ParseException&)
 	{ }
 
 	// VDOP:
 	if (!read_next())
 		return;
 	try {
-		this->vdop = boost::lexical_cast<double> (val());
+		this->vdop = neutrino::parse<double> (val());
 	}
-	catch (boost::bad_lexical_cast&)
+	catch (ParseException&)
 	{ }
 }
 
@@ -322,18 +319,18 @@ GPRMC::GPRMC (std::string const& sentence):
 	if (!read_next())
 		return;
 	try {
-		this->ground_speed = 1_kt * boost::lexical_cast<double> (val());
+		this->ground_speed = 1_kt * neutrino::parse<double> (val());
 	}
-	catch (boost::bad_lexical_cast&)
+	catch (ParseException&)
 	{ }
 
 	// Track angle in degrees True:
 	if (!read_next())
 		return;
 	try {
-		this->track_true = 1_deg * boost::lexical_cast<double> (val());
+		this->track_true = 1_deg * neutrino::parse<double> (val());
 	}
-	catch (boost::bad_lexical_cast&)
+	catch (ParseException&)
 	{ }
 
 	// Fix date:
@@ -346,9 +343,9 @@ GPRMC::GPRMC (std::string const& sentence):
 	if (!read_next())
 		return;
 	try {
-		this->magnetic_variation = 1_deg * boost::lexical_cast<double> (val());
+		this->magnetic_variation = 1_deg * neutrino::parse<double> (val());
 	}
-	catch (boost::bad_lexical_cast&)
+	catch (ParseException&)
 	{ }
 	// East/West:
 	if (!read_next())

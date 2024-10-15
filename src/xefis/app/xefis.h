@@ -28,9 +28,6 @@
 #include <QTimer>
 #include <QApplication>
 
-// Lib:
-#include <boost/lexical_cast.hpp>
-
 // Standard:
 #include <cstddef>
 #include <string>

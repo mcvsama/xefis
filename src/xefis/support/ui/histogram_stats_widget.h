@@ -25,9 +25,6 @@
 #include <QWidget>
 #include <QLabel>
 
-// Lib:
-#include <boost/lexical_cast.hpp>
-
 // Standard:
 #include <cstddef>
 #include <optional>
@@ -66,17 +63,20 @@ template<class HistogramValue, class CriticalValue>
 	inline void
 	HistogramStatsWidget::set_data (Histogram<HistogramValue> const& histogram, std::optional<CriticalValue> critical_value)
 	{
+		using std::to_string;
+		using neutrino::si::to_string;
+
 		_num_samples_value->setText (QString::number (histogram.n_samples()));
-		_min_value->setText (QString::fromStdString (boost::lexical_cast<std::string> (histogram.min())));
-		_max_value->setText (QString::fromStdString (boost::lexical_cast<std::string> (histogram.max())));
-		_mean_value->setText (QString::fromStdString (boost::lexical_cast<std::string> (histogram.mean())));
-		_median_value->setText (QString::fromStdString (boost::lexical_cast<std::string> (histogram.median())));
-		_stddev_value->setText (QString::fromStdString (boost::lexical_cast<std::string> (histogram.stddev())));
+		_min_value->setText (QString::fromStdString (to_string (histogram.min())));
+		_max_value->setText (QString::fromStdString (to_string (histogram.max())));
+		_mean_value->setText (QString::fromStdString (to_string (histogram.mean())));
+		_median_value->setText (QString::fromStdString (to_string (histogram.median())));
+		_stddev_value->setText (QString::fromStdString (to_string (histogram.stddev())));
 
 		if (critical_value)
 		{
-			_critical_label->setText (QString::fromStdString ("> " + boost::lexical_cast<std::string> (*critical_value) + ": "));
-			_critical_value->setText (QString::fromStdString (boost::lexical_cast<std::string> (100 * histogram.normalized_percentile_for (*critical_value))) + "%");
+			_critical_label->setText (QString::fromStdString ("> " + to_string (*critical_value) + ": "));
+			_critical_value->setText (QString::fromStdString (to_string (100 * histogram.normalized_percentile_for (*critical_value))) + "%");
 		}
 		else
 		{
