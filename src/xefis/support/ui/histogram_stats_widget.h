@@ -63,20 +63,17 @@ template<class HistogramValue, class CriticalValue>
 	inline void
 	HistogramStatsWidget::set_data (Histogram<HistogramValue> const& histogram, std::optional<CriticalValue> critical_value)
 	{
-		using std::to_string;
-		using neutrino::si::to_string;
-
 		_num_samples_value->setText (QString::number (histogram.n_samples()));
-		_min_value->setText (QString::fromStdString (to_string (histogram.min())));
-		_max_value->setText (QString::fromStdString (to_string (histogram.max())));
-		_mean_value->setText (QString::fromStdString (to_string (histogram.mean())));
-		_median_value->setText (QString::fromStdString (to_string (histogram.median())));
-		_stddev_value->setText (QString::fromStdString (to_string (histogram.stddev())));
+		_min_value->setText (QString::fromStdString (std::format ("{:.6f}", histogram.min())));
+		_max_value->setText (QString::fromStdString (std::format ("{:.6f}", histogram.max())));
+		_mean_value->setText (QString::fromStdString (std::format ("{:.6f}", histogram.mean())));
+		_median_value->setText (QString::fromStdString (std::format ("{:.6f}", histogram.median())));
+		_stddev_value->setText (QString::fromStdString (std::format ("{:.6f}", histogram.stddev())));
 
 		if (critical_value)
 		{
-			_critical_label->setText (QString::fromStdString ("> " + to_string (*critical_value) + ": "));
-			_critical_value->setText (QString::fromStdString (to_string (100 * histogram.normalized_percentile_for (*critical_value))) + "%");
+			_critical_label->setText (QString::fromStdString (std::format ("> {:.6f}: ", *critical_value)));
+			_critical_value->setText (QString::fromStdString (std::format ("{:.3f}%", 100 * histogram.normalized_percentile_for (*critical_value))));
 		}
 		else
 		{

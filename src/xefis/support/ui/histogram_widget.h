@@ -94,15 +94,12 @@ template<class Value>
 	inline void
 	HistogramWidget::set_data (Histogram<Value> const& histogram, std::vector<Value> marks)
 	{
-		using std::to_string;
-		using neutrino::si::to_string;
-
 		_bins = histogram.bins();
 		_y_max = histogram.y_max();
-		_x_min_str = QString::fromStdString (to_string (histogram.x_min()));
-		_x_mid_str = QString::fromStdString (to_string (0.5f * (histogram.x_min() + histogram.x_max())));
-		_x_max_str = QString::fromStdString (to_string (histogram.x_max()));
-		_y_max_str = QString::fromStdString (to_string (histogram.y_max()));
+		_x_min_str = QString::fromStdString (std::format ("{:.6f}", histogram.x_min()));
+		_x_mid_str = QString::fromStdString (std::format ("{:.6f}", 0.5f * (histogram.x_min() + histogram.x_max())));
+		_x_max_str = QString::fromStdString (std::format ("{:.6f}", histogram.x_max()));
+		_y_max_str = QString::fromStdString (std::format ("{}", histogram.y_max()));
 
 		_marks.reserve (marks.size());
 		_marks.clear();
