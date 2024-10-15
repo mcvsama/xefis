@@ -695,7 +695,8 @@ template<class Unit>
  * Automatically applies EnumSocketTraits to all enum types.
  */
 template<class Enum>
-	struct SocketTraits<Enum, std::enable_if_t<std::is_enum_v<Enum>>>: public EnumSocketTraits<Enum>
+	requires (std::is_enum_v<Enum>)
+	struct SocketTraits<Enum>: public EnumSocketTraits<Enum>
 	{ };
 
 } // namespace xf
