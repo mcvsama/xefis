@@ -31,7 +31,7 @@
 
 ETSAirspeed::ETSAirspeed (xf::ProcessingLoop& loop, xf::i2c::Device&& device, xf::Logger const& logger, std::string_view const& instance):
 	ETSAirspeedIO (loop, instance),
-	_logger (logger.with_scope (std::string (kLoggerScope) + "#" + instance)),
+	_logger (logger.with_context (std::string (kLoggerScope) + "#" + instance)),
 	_device (std::move (device))
 {
 	_calibration_data.reserve (kOffsetCalculationSamples);

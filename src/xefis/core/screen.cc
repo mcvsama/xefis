@@ -66,7 +66,7 @@ Screen::Screen (ScreenSpec const& spec, Graphics const& graphics, Machine& machi
 	QWidget (nullptr),
 	NamedInstance (instance),
 	_machine (machine),
-	_logger (logger.with_scope ("<screen>")),
+	_logger (logger.with_context ("<screen>")),
 	_screen_spec (spec),
 	_frame_time (1 / spec.refresh_rate())
 {

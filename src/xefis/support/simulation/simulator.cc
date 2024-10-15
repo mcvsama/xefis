@@ -31,7 +31,7 @@ Simulator::Simulator (rigid_body::System& rigid_body_system,
 	_rigid_body_system (rigid_body_system),
 	_rigid_body_solver (rigid_body_solver)
 {
-	_evolver.emplace (time_step, logger.with_scope ("Evolver"), [this] (si::Time const dt) {
+	_evolver.emplace (time_step, logger.with_context ("Evolver"), [this] (si::Time const dt) {
 		_rigid_body_solver.evolve (dt);
 	});
 }

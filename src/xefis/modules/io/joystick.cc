@@ -175,7 +175,7 @@ JoystickInput::Axis::set_value (float value)
 
 JoystickInput::JoystickInput (xf::ProcessingLoop& loop, QDomElement const& config, xf::Logger const& logger, std::string_view const& instance):
 	JoystickInputIO (loop, instance),
-	_logger (logger.with_scope (std::string (kLoggerScope) + "#" + instance))
+	_logger (logger.with_context (std::string (kLoggerScope) + "#" + instance))
 {
 	for (std::size_t handler_id = 0; handler_id < kMaxEventID; ++handler_id)
 		_button_sockets[handler_id] = std::make_unique<xf::ModuleOut<bool>> (&_io, "buttons/" + std::to_string (handler_id));

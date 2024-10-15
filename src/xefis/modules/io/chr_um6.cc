@@ -42,7 +42,7 @@
 
 CHRUM6::CHRUM6 (xf::ProcessingLoop& loop, xf::SerialPort&& serial_port, xf::Logger const& logger, std::string_view const& instance):
 	CHRUM6_IO (loop, instance),
-	_logger (logger.with_scope (std::string (kLoggerScope) + "#" + instance)),
+	_logger (logger.with_context (std::string (kLoggerScope) + "#" + instance)),
 	_serial_port (std::move (serial_port))
 {
 	_serial_port.set_max_read_failures (3);
@@ -67,7 +67,7 @@ CHRUM6::CHRUM6 (xf::ProcessingLoop& loop, xf::SerialPort&& serial_port, xf::Logg
 	_initialization_timer->setSingleShot (true);
 	QObject::connect (_initialization_timer.get(), SIGNAL (timeout()), this, SLOT (initialization_timeout()));
 
-	_sensor = std::make_unique<xf::CHRUM6> (&_serial_port, _logger.with_scope ("serial port"));
+	_sensor = std::make_unique<xf::CHRUM6> (&_serial_port, _logger.with_context ("serial port"));
 	_sensor->set_logger (_logger);
 	_sensor->set_alive_check_callback (std::bind (&CHRUM6::alive_check, this));
 	_sensor->set_communication_failure_callback (std::bind (&CHRUM6::communication_failure, this));

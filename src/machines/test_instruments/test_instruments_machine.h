@@ -49,7 +49,7 @@ class TestInstrumentsMachine: public xf::Machine
 	xf::Logger							_logger;
 	std::unique_ptr<xf::NavaidStorage>	_navaid_storage;
 	std::unique_ptr<xf::WorkPerformer>	_work_performer;
-	xf::ProcessingLoop					_test_loop		{ "Main loop", 120_Hz, _logger.with_scope ("short computations loop") };
+	xf::ProcessingLoop					_test_loop		{ "Main loop", 120_Hz, _logger.with_context ("short computations loop") };
 	std::optional<TestScreen1>			_test_screen_1;
 	std::optional<TestScreen2>			_test_screen_2;
 	std::optional<TestGenerator>		_test_generator;

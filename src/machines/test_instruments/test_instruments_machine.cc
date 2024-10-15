@@ -46,10 +46,10 @@ TestInstrumentsMachine::TestInstrumentsMachine (xf::Xefis& xefis):
 	xf::ScreenSpec spec { QRect { 0, 0, 1366, 768 }, 15_in, 30_Hz, line_width, font_height };
 	spec.set_scale (1.25f);
 
-	auto& test_screen_1 = _test_screen_1.emplace (_test_loop, spec, xefis.graphics(), *_navaid_storage, *this, _logger.with_scope ("test screen"));
+	auto& test_screen_1 = _test_screen_1.emplace (_test_loop, spec, xefis.graphics(), *_navaid_storage, *this, _logger.with_context ("test screen"));
 	test_screen_1.set_paint_bounding_boxes (false);
 
-	auto& test_screen_2 = _test_screen_2.emplace (_test_loop, spec, xefis.graphics(), *_navaid_storage, *this, _logger.with_scope ("test screen"));
+	auto& test_screen_2 = _test_screen_2.emplace (_test_loop, spec, xefis.graphics(), *_navaid_storage, *this, _logger.with_context ("test screen"));
 	test_screen_2.set_paint_bounding_boxes (false);
 
 	auto& test_generator = _test_generator.emplace (_test_loop, "test generator");

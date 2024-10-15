@@ -58,7 +58,7 @@ GPS::Connection::Connection (GPS& gps_module, PowerCycle& power_cycle, unsigned 
 	_serial_port = std::make_unique<xf::SerialPort> (std::bind (&GPS::Connection::serial_data_ready, this),
 													 std::bind (&GPS::Connection::serial_failure, this));
 	_serial_port->set_max_read_failures (3);
-	_serial_port->set_logger (_gps_module.logger().with_scope ("serial port"));
+	_serial_port->set_logger (_gps_module.logger().with_context ("serial port"));
 
 	open_device();
 }
@@ -512,7 +512,7 @@ GPS::PowerCycle::notify_connection_established()
 
 GPS::GPS (xf::ProcessingLoop& loop, xf::System* system, xf::SerialPort::Configuration const& serial_port_config, xf::Logger const& logger, std::string_view const& instance):
 	GPS_IO (loop, instance),
-	_logger (logger.with_scope (std::string (kLoggerScope) + "#" + instance)),
+	_logger (logger.with_context (std::string (kLoggerScope) + "#" + instance)),
 	_system (system),
 	_serial_port_config (serial_port_config)
 {

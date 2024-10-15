@@ -132,7 +132,7 @@ NavaidStorage::NavaidStorage (Logger const& logger,
 							  std::string_view const& nav_file,
 							  std::string_view const& fix_file,
 							  std::string_view const& apt_file):
-	_logger (logger.with_scope ("<navaid storage>")),
+	_logger (logger.with_context ("<navaid storage>")),
 	_nav_dat_file (nav_file),
 	_fix_dat_file (fix_file),
 	_apt_dat_file (apt_file),

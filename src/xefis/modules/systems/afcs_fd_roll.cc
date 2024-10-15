@@ -28,7 +28,7 @@
 
 AFCS_FD_Roll::AFCS_FD_Roll (xf::ProcessingLoop& loop, xf::Logger const& logger, std::string_view const& instance):
 	AFCS_FD_Roll_IO (loop, instance),
-	_logger (logger.with_scope (std::string (kLoggerScope) + "#" + instance))
+	_logger (logger.with_context (std::string (kLoggerScope) + "#" + instance))
 {
 	constexpr auto sec = 1.0_s;
 

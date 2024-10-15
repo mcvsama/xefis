@@ -20,7 +20,7 @@ using namespace neutrino::si::literals;
 
 OutputLink::OutputLink (xf::ProcessingLoop& loop, std::unique_ptr<LinkProtocol> protocol, si::Frequency const send_frequency, xf::Logger const& logger, std::string_view const& instance):
 	Module (loop, instance),
-	_logger (logger.with_scope (std::string (kLoggerScope) + "#" + instance)),
+	_logger (logger.with_context (std::string (kLoggerScope) + "#" + instance)),
 	_protocol (std::move (protocol)),
 	_send_period (1 / send_frequency)
 {

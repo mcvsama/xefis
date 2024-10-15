@@ -31,7 +31,7 @@ VirtualPressureSensor::VirtualPressureSensor (xf::sim::FlightSimulation const& f
 											  xf::Logger const& logger,
 											  std::string_view const& instance):
 	VirtualPressureSensorIO (instance),
-	_logger (logger.with_scope (std::string (kLoggerScope) + "#" + instance)),
+	_logger (logger.with_context (std::string (kLoggerScope) + "#" + instance)),
 	_flight_simulation (flight_simulation),
 	_probe (probe),
 	_mount_location (mount_location),

@@ -41,7 +41,7 @@ to_g (si::Acceleration acceleration)
 
 
 TestScreen1::TestScreen1 (xf::ProcessingLoop& loop, xf::ScreenSpec const& spec, xf::Graphics const& graphics, xf::NavaidStorage const& navaid_storage, xf::Machine& machine, xf::Logger const& logger):
-	Screen (spec, graphics, machine, "Test Screen 1", logger.with_scope ("TestScreen1")),
+	Screen (spec, graphics, machine, "Test Screen 1", logger.with_context ("TestScreen1")),
 	_logger (logger),
 	_graphics (graphics),
 	_navaid_storage (navaid_storage),
@@ -77,9 +77,9 @@ TestScreen1::TestScreen1 (xf::ProcessingLoop& loop, xf::ScreenSpec const& spec, 
 	glide_ratio_label (loop, _graphics, "eicas.label.glide-ratio"),
 	load_factor (loop, _graphics, nullptr, "eicas.load-factor"),
 	load_factor_label (loop, _graphics, "eicas.label.load-factor"),
-	_adi_work_performer (1, _logger.with_scope ("ADI")),
-	_hsi_work_performer (1, _logger.with_scope ("HSI")),
-	_others_work_performer (1, _logger.with_scope ("generic"))
+	_adi_work_performer (1, _logger.with_context ("ADI")),
+	_hsi_work_performer (1, _logger.with_context ("HSI")),
+	_others_work_performer (1, _logger.with_context ("generic"))
 {
 	register_instruments();
 	place_instruments();

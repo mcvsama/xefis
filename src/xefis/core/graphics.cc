@@ -28,7 +28,7 @@
 namespace xf {
 
 Graphics::Graphics (Logger const& logger):
-	_logger (logger.with_scope ("<graphics>"))
+	_logger (logger.with_context ("<graphics>"))
 {
 	setup_fonts();
 }

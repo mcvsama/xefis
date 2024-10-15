@@ -31,7 +31,7 @@
 namespace xf {
 
 System::System (Logger const& logger):
-	_logger (logger.with_scope ("<system>"))
+	_logger (logger.with_context ("<system>"))
 {
 	_logger << "Creating System object" << std::endl;
 }

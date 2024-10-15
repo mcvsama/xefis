@@ -278,7 +278,7 @@ auto constinit crypto_params = xle::Transceiver::CryptoParams {
 xle::MasterTransceiver
 get_ground_transceiver (xf::ProcessingLoop& loop)
 {
-	return xle::MasterTransceiver (loop, crypto_params, g_logger.with_scope ("ground-transceiver"), "ground/transceiver");
+	return xle::MasterTransceiver (loop, crypto_params, g_logger.with_context ("ground-transceiver"), "ground/transceiver");
 }
 
 
@@ -286,7 +286,7 @@ xle::SlaveTransceiver
 get_air_transceiver (xf::ProcessingLoop& loop)
 {
 	auto handshake_id_reuse_check = [](xle::HandshakeID) { return false; };
-	return xle::SlaveTransceiver (loop, crypto_params, handshake_id_reuse_check, g_logger.with_scope ("air-transceiver"), "air/transceiver");
+	return xle::SlaveTransceiver (loop, crypto_params, handshake_id_reuse_check, g_logger.with_context ("air-transceiver"), "air/transceiver");
 }
 
 
@@ -600,10 +600,10 @@ AutoTest t6 ("modules/io/link: protocol: encrypted channel works", []{
 	auto air_tx_protocol = std::make_unique<AirToGroundLinkProtocol> (air_tx_data, &air_transceiver);
 	auto air_rx_protocol = std::make_unique<GroundToAirLinkProtocol> (air_rx_data, &air_transceiver);
 
-	auto ground_tx_link = OutputLink (loop, std::move (ground_tx_protocol), 30_Hz, g_logger.with_scope ("ground-tx-link"), "ground/tx-link");
-	auto ground_rx_link = InputLink (loop, std::move (ground_rx_protocol), {}, g_logger.with_scope ("ground-rx-link"), "ground/rx-link");
-	auto air_tx_link = OutputLink (loop, std::move (air_tx_protocol), 30_Hz, g_logger.with_scope ("air-tx-link"), "air/tx-link");
-	auto air_rx_link = InputLink (loop, std::move (air_rx_protocol), {}, g_logger.with_scope ("air-rx-link"), "air/rx-link");
+	auto ground_tx_link = OutputLink (loop, std::move (ground_tx_protocol), 30_Hz, g_logger.with_context ("ground-tx-link"), "ground/tx-link");
+	auto ground_rx_link = InputLink (loop, std::move (ground_rx_protocol), {}, g_logger.with_context ("ground-rx-link"), "ground/rx-link");
+	auto air_tx_link = OutputLink (loop, std::move (air_tx_protocol), 30_Hz, g_logger.with_context ("air-tx-link"), "air/tx-link");
+	auto air_rx_link = InputLink (loop, std::move (air_rx_protocol), {}, g_logger.with_context ("air-rx-link"), "air/rx-link");
 
 	ground_tx_data.handshake_request << ground_transceiver.handshake_request;
 	ground_transceiver.handshake_response << ground_rx_data.handshake_response;

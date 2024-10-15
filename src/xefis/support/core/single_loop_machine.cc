@@ -27,7 +27,7 @@ namespace xf {
 SingleLoopMachine::SingleLoopMachine (Xefis& xefis, xf::Logger const& logger, si::Frequency const loop_frequency):
 	xf::Machine (xefis),
 	_logger (logger),
-	_loop ("Main loop", loop_frequency, _logger.with_scope ("main loop"))
+	_loop ("Main loop", loop_frequency, _logger.with_context ("main loop"))
 { }
 
 

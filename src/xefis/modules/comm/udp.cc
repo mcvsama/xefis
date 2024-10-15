@@ -35,7 +35,7 @@
 UDP::UDP (xf::ProcessingLoop& loop, Parameters const parameters, xf::Logger const& logger, std::string_view const& instance):
 	Module (loop, instance),
 	_parameters (parameters),
-	_logger (logger.with_scope (std::string (kLoggerScope) + "#" + instance))
+	_logger (logger.with_context (std::string (kLoggerScope) + "#" + instance))
 {
 	if (_parameters.tx_udp_address)
 	{
