@@ -16,7 +16,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/support/aerodynamics/reynolds.h>
+#include <xefis/support/aerodynamics/reynolds_number.h>
 
 // Neutrino:
 #include <neutrino/numeric.h>

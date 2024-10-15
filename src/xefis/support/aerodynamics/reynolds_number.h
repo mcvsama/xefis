@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__SUPPORT__AERODYNAMICS__REYNOLDS_H__INCLUDED
-#define XEFIS__SUPPORT__AERODYNAMICS__REYNOLDS_H__INCLUDED
+#ifndef XEFIS__SUPPORT__AERODYNAMICS__REYNOLDS_NUMBER_H__INCLUDED
+#define XEFIS__SUPPORT__AERODYNAMICS__REYNOLDS_NUMBER_H__INCLUDED
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -27,20 +27,20 @@
 
 namespace xf {
 
-using Reynolds = StrongType<double, struct ReynoldsType>;
+using ReynoldsNumber = StrongType<double, struct ReynoldsType>;
 
 
-constexpr Reynolds
+constexpr ReynoldsNumber
 reynolds_number (si::Density fluid_density, si::Velocity fluid_speed, si::Length characteristic_dimension, si::DynamicViscosity mu)
 {
-	return Reynolds (fluid_density * fluid_speed * characteristic_dimension / mu);
+	return ReynoldsNumber (fluid_density * fluid_speed * characteristic_dimension / mu);
 }
 
 
-constexpr Reynolds
+constexpr ReynoldsNumber
 reynolds_number (si::Velocity fluid_speed, si::Length characteristic_dimension, si::KinematicViscosity nu)
 {
-	return Reynolds (fluid_speed * characteristic_dimension / nu);
+	return ReynoldsNumber (fluid_speed * characteristic_dimension / nu);
 }
 
 } // namespace xf

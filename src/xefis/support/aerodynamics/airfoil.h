@@ -17,7 +17,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/aerodynamics/airfoil_characteristics.h>
-#include <xefis/support/aerodynamics/reynolds.h>
+#include <xefis/support/aerodynamics/reynolds_number.h>
 #include <xefis/support/earth/air/air.h>
 #include <xefis/support/math/geometry.h>
 #include <xefis/support/nature/wrench.h>
@@ -121,21 +121,21 @@ class Airfoil
 	 */
 	[[nodiscard]]
 	si::Force
-	lift_force (si::Angle alpha, si::Angle beta, Reynolds reynolds_number, si::Pressure dynamic_pressure, std::optional<si::Area> lifting_area) const;
+	lift_force (si::Angle alpha, si::Angle beta, ReynoldsNumber reynolds_number, si::Pressure dynamic_pressure, std::optional<si::Area> lifting_area) const;
 
 	/**
 	 * Calculate the drag force of the airfoil.
 	 */
 	[[nodiscard]]
 	si::Force
-	drag_force (si::Angle alpha, si::Angle beta, Reynolds reynolds_number, si::Pressure dynamic_pressure, std::optional<si::Area> dragging_area) const;
+	drag_force (si::Angle alpha, si::Angle beta, ReynoldsNumber reynolds_number, si::Pressure dynamic_pressure, std::optional<si::Area> dragging_area) const;
 
 	/**
 	 * Calculate the pitching moment of the airfoil.
 	 */
 	[[nodiscard]]
 	si::Torque
-	pitching_moment (si::Angle alpha, Reynolds reynolds_number, si::Pressure dynamic_pressure) const;
+	pitching_moment (si::Angle alpha, ReynoldsNumber reynolds_number, si::Pressure dynamic_pressure) const;
 
 	/**
 	 * Return lift/drag Wrenches relative to the origin of AirfoilSplineSpace (their force position is at center of pressure of the wing, but at 0 in Z-axis).

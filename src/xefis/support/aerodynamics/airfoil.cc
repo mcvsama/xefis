@@ -35,7 +35,7 @@ Airfoil::Airfoil (AirfoilCharacteristics const& airfoil_characteristics,
 
 
 si::Force
-Airfoil::lift_force (si::Angle alpha, si::Angle beta, Reynolds re, si::Pressure dynamic_pressure, std::optional<si::Area> lifting_area) const
+Airfoil::lift_force (si::Angle alpha, si::Angle beta, ReynoldsNumber re, si::Pressure dynamic_pressure, std::optional<si::Area> lifting_area) const
 {
 	auto const cl = _airfoil_characteristics.lift_coefficient (*re, wrap_angle_for_field (alpha));
 
@@ -47,7 +47,7 @@ Airfoil::lift_force (si::Angle alpha, si::Angle beta, Reynolds re, si::Pressure 
 
 
 si::Force
-Airfoil::drag_force (si::Angle alpha, si::Angle beta, Reynolds re, si::Pressure dynamic_pressure, std::optional<si::Area> dragging_area) const
+Airfoil::drag_force (si::Angle alpha, si::Angle beta, ReynoldsNumber re, si::Pressure dynamic_pressure, std::optional<si::Area> dragging_area) const
 {
 	auto const cd = _airfoil_characteristics.drag_coefficient (*re, wrap_angle_for_field (alpha));
 
@@ -59,7 +59,7 @@ Airfoil::drag_force (si::Angle alpha, si::Angle beta, Reynolds re, si::Pressure 
 
 
 si::Torque
-Airfoil::pitching_moment (si::Angle alpha, Reynolds re, si::Pressure dynamic_pressure) const
+Airfoil::pitching_moment (si::Angle alpha, ReynoldsNumber re, si::Pressure dynamic_pressure) const
 {
 	auto const cm = _airfoil_characteristics.pitching_moment_coefficient (*re, wrap_angle_for_field (alpha));
 	auto const wing_planform = _wing_length * _chord_length;
@@ -79,13 +79,13 @@ Airfoil::planar_aerodynamic_forces (Air<AirfoilSplineSpace> const& air) const
 		};
 
 		SpaceVector<si::Velocity, AirfoilSplineSpace> const planar_wind { air.velocity[0], air.velocity[1], 0_mps };
-		si::Velocity const	planar_tas				= abs (planar_wind);
-		si::Pressure const	planar_dp				= dynamic_pressure (air.density, planar_tas);
-		Reynolds const		planar_re				= reynolds_number (air.density, planar_tas, _chord_length, air.dynamic_viscosity);
-		auto const			[lift_area, drag_area]	= lift_drag_areas (aoa.alpha, aoa.beta);
-		si::Force const		lift					= lift_force (aoa.alpha, aoa.beta, planar_re, planar_dp, lift_area);
-		si::Force const		drag					= drag_force (aoa.alpha, aoa.beta, planar_re, planar_dp, drag_area);
-		si::Torque const	torque					= pitching_moment (aoa.alpha, planar_re, planar_dp);
+		si::Velocity const		planar_tas				= abs (planar_wind);
+		si::Pressure const		planar_dp				= dynamic_pressure (air.density, planar_tas);
+		ReynoldsNumber const	planar_re				= reynolds_number (air.density, planar_tas, _chord_length, air.dynamic_viscosity);
+		auto const				[lift_area, drag_area]	= lift_drag_areas (aoa.alpha, aoa.beta);
+		si::Force const			lift					= lift_force (aoa.alpha, aoa.beta, planar_re, planar_dp, lift_area);
+		si::Force const			drag					= drag_force (aoa.alpha, aoa.beta, planar_re, planar_dp, drag_area);
+		si::Torque const		torque					= pitching_moment (aoa.alpha, planar_re, planar_dp);
 
 		// Lift force is always perpendicular to relative wind.
 		// Drag is always parallel to relative wind.
