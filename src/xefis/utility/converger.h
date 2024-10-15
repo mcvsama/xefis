@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__UTILITY__CONVERGENCE_H__INCLUDED
-#define XEFIS__UTILITY__CONVERGENCE_H__INCLUDED
+#ifndef XEFIS__UTILITY__CONVERGER_H__INCLUDED
+#define XEFIS__UTILITY__CONVERGER_H__INCLUDED
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -28,7 +28,7 @@ namespace xf {
  * or iterations limit is reached.
  */
 template<class tValueType>
-	class Convergence
+	class Converger
 	{
 	  public:
 		typedef tValueType								ValueType;
@@ -37,7 +37,7 @@ template<class tValueType>
 	  public:
 		// Ctor
 		explicit
-		Convergence (ValueType delta, unsigned int max_iterations, FormulaFunction formula) noexcept;
+		Converger (ValueType delta, unsigned int max_iterations, FormulaFunction formula) noexcept;
 
 		/**
 		 * Run iterations until convergence or iterations limit.
@@ -72,7 +72,7 @@ template<class tValueType>
 
 template<class V>
 	inline
-	Convergence<V>::Convergence (ValueType delta, unsigned int max_iterations, FormulaFunction formula) noexcept:
+	Converger<V>::Converger (ValueType delta, unsigned int max_iterations, FormulaFunction formula) noexcept:
 		_delta (delta),
 		_max_iterations (max_iterations),
 		_formula (formula)
@@ -81,7 +81,7 @@ template<class V>
 
 template<class V>
 	inline bool
-	Convergence<V>::converge (ValueType initial_value)
+	Converger<V>::converge (ValueType initial_value)
 	{
 		unsigned int i = 0;
 		ValueType rp = _formula (initial_value);
@@ -103,8 +103,8 @@ template<class V>
 
 
 template<class V>
-	inline typename Convergence<V>::ValueType
-	Convergence<V>::result() const noexcept
+	inline typename Converger<V>::ValueType
+	Converger<V>::result() const noexcept
 	{
 		return _result;
 	}
@@ -112,20 +112,20 @@ template<class V>
 
 template<class V>
 	inline unsigned int
-	Convergence<V>::iterations() const noexcept
+	Converger<V>::iterations() const noexcept
 	{
 		return _actual_iterations;
 	}
 
 
 /**
- * Simpler API for convergence.
+ * Simpler API for converger.
  */
 template<class ValueType>
 	inline std::optional<ValueType>
 	converge (ValueType initial_value, ValueType delta, unsigned int max_iterations, std::function<ValueType (ValueType)> formula) noexcept
 	{
-		Convergence<ValueType> comp (delta, max_iterations, formula);
+		Converger<ValueType> comp (delta, max_iterations, formula);
 		if (comp.converge (initial_value))
 			return comp.result();
 		return { };

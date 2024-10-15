@@ -20,7 +20,7 @@
 #include <xefis/support/airframe/airframe.h>
 #include <xefis/support/earth/air/standard_atmosphere.h>
 #include <xefis/support/nature/constants.h>
-#include <xefis/utility/convergence.h>
+#include <xefis/utility/converger.h>
 
 // Neutrino:
 #include <neutrino/exception.h>
