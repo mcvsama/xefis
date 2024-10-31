@@ -330,7 +330,7 @@ RigidBodyPainter::paint_planet()
 void
 RigidBodyPainter::paint_system (rigid_body::System const& system, QOpenGLPaintDevice&)
 {
-	static auto const default_body_rendering = BodyRendering();
+	static auto const default_body_rendering = BodyRenderingConfig();
 
 	glDisable (GL_FOG);
 
@@ -341,10 +341,10 @@ RigidBodyPainter::paint_system (rigid_body::System const& system, QOpenGLPaintDe
 		for (auto const& body: system.bodies())
 		{
 			auto const focused = _focused_body == body.get();
-			BodyRendering const* rendering = &default_body_rendering;
+			BodyRenderingConfig const* rendering = &default_body_rendering;
 
-			if (auto const rendering_it = _body_rendering.find (body.get());
-				rendering_it != _body_rendering.end())
+			if (auto const rendering_it = _body_rendering_config.find (body.get());
+				rendering_it != _body_rendering_config.end())
 			{
 				rendering = &rendering_it->second;
 			}

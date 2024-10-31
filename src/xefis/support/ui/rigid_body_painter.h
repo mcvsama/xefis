@@ -48,7 +48,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	static constexpr auto		kSunRadius					= 200_km;
 
   public:
-	struct BodyRendering
+	struct BodyRenderingConfig
 	{
 		bool	body_visible { true };
 		bool	origin_visible { false };
@@ -227,9 +227,9 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	 * Return config object for given body.
 	 */
 	[[nodiscard]]
-	BodyRendering&
+	BodyRenderingConfig&
 	get_body_rendering_config (rigid_body::Body const& body)
-		{ return _body_rendering[&body]; }
+		{ return _body_rendering_config[&body]; }
 
 	/**
 	 * Paint the system.
@@ -311,8 +311,8 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	bool								_aerodynamic_forces_visible	{ false };
 	bool								_angular_velocities_visible	{ false };
 	bool								_angular_momenta_visible	{ false };
-	std::map<rigid_body::Body const*, BodyRendering>
-										_body_rendering;
+	std::map<rigid_body::Body const*, BodyRenderingConfig>
+										_body_rendering_config;
 };
 
 
