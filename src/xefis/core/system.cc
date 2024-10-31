@@ -32,15 +32,7 @@ namespace xf {
 
 System::System (Logger const& logger):
 	_logger (logger.with_context ("<system>"))
-{
-	_logger << "Creating System object" << std::endl;
-}
-
-
-System::~System()
-{
-	_logger << "Destroying System" << std::endl;
-}
+{ }
 
 
 bool

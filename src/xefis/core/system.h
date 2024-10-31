@@ -34,9 +34,6 @@ class System
 	explicit
 	System (Logger const&);
 
-	// Dtor
-	~System();
-
 	/**
 	 * Set system clock.
 	 * Return true on success.
