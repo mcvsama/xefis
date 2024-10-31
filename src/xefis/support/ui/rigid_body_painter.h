@@ -29,6 +29,7 @@
 // Standard:
 #include <cstddef>
 #include <map>
+#include <random>
 
 
 namespace xf {
@@ -264,6 +265,8 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	paint_planet();
 
 	void
+	paint_air_particles();
+
 	void
 	paint_system (rigid_body::System const&);
 
@@ -297,6 +300,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 
   private:
 	si::PixelDensity					_pixel_density;
+	// Camera position is relative to the followed body:
 	SpaceLength<rigid_body::WorldSpace>	_camera_position;
 	EulerAngles							_camera_angles;
 	LonLatRadius						_position_on_earth			{ 0_deg, 0_deg, 0_m };
@@ -314,6 +318,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	bool								_angular_momenta_visible	{ false };
 	std::map<rigid_body::Body const*, BodyRenderingConfig>
 										_body_rendering_config;
+	std::minstd_rand0					_air_particles_prng;
 };
 
 

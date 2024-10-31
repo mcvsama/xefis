@@ -41,6 +41,7 @@
 
 // Standard:
 #include <cstddef>
+#include <random>
 
 
 namespace xf {
@@ -180,6 +181,7 @@ RigidBodyPainter::paint_world (rigid_body::System const& system)
 		setup_light();
 
 		paint_planet();
+		paint_air_particles();
 		paint_system (system);
 	});
 }
@@ -327,6 +329,51 @@ RigidBodyPainter::paint_planet()
 }
 
 
+void
+RigidBodyPainter::paint_air_particles()
+{
+	_gl.save_context ([&] {
+		// Air 'particles' only appear if we have a planet:
+		auto const ball_size = 2_cm;
+		auto const grid_size = 5_m;
+		auto ball_material = rigid_body::kWhiteMatte;
+		ball_material.emission_color = Qt::white;
+		auto const ball = rigid_body::make_centered_sphere_shape (ball_size, 3, 3, { 0_deg, 360_deg }, { -90_deg, +90_deg }, ball_material);
+		auto const range = 3 * grid_size;
+
+		// Figure out nearest 3D grid points.
+		// Then wiggle each one pseudo-randomly.
+		auto const body_pos = followed_body_position();
+		auto const inv_grid_size = 1 / grid_size;
+		auto const rounded_to_grid = body_pos.transformed ([inv_grid_size, grid_size] (auto const value) {
+			return std::round (value * inv_grid_size) * grid_size;
+		});
+		auto const prng_factor = grid_size / _air_particles_prng.max();
+		auto const half_grid_size = 0.5 * grid_size;
+
+		// Paint a grid of little balls around the camera position:
+		for (auto x = rounded_to_grid.x() - range; x <= rounded_to_grid.x() + range; x += grid_size)
+		{
+			for (auto y = rounded_to_grid.y() - range; y <= rounded_to_grid.y() + range; y += grid_size)
+			{
+				for (auto z = rounded_to_grid.z() - range; z <= rounded_to_grid.z() + range; z += grid_size)
+				{
+					// (x + y + z) makes adjacent points to be wiggled the same amount, so multiply other axes by 2 and 3:
+					_air_particles_prng.seed ((x + 2 * y + 3 * z).in<si::Meter>());
+					_gl.save_context ([&] {
+						// OpenGL's center of the view [0, 0, 0] is at body_pos, hence subtracting body_pos from
+						// absolute values (in WorldOrigin space) x, y, z here:
+						auto const wiggled_x = x - body_pos.x() + prng_factor * _air_particles_prng() - half_grid_size;
+						auto const wiggled_y = y - body_pos.y() + prng_factor * _air_particles_prng() - half_grid_size;
+						auto const wiggled_z = z - body_pos.z() + prng_factor * _air_particles_prng() - half_grid_size;
+						_gl.translate (wiggled_x, wiggled_y, wiggled_z);
+						_gl.draw (ball);
+					});
+				}
+			}
+		}
+	});
+}
 
 
 void
