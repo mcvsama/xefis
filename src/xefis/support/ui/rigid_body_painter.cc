@@ -548,15 +548,15 @@ RigidBodyPainter::paint_constraint (rigid_body::Constraint const& constraint)
 void
 RigidBodyPainter::paint_forces (rigid_body::Body const& body)
 {
-	auto const gravity_color = Qt::magenta;
-	auto const lift_color = Qt::green;
-	auto const drag_color = Qt::red;
-	auto const torque_color = Qt::blue;
-	auto const external_force_color = Qt::darkYellow;
-	auto const external_torque_color = Qt::cyan;
+	auto constexpr gravity_color = Qt::magenta;
+	auto constexpr lift_color = Qt::green;
+	auto constexpr drag_color = Qt::red;
+	auto constexpr torque_color = Qt::blue;
+	auto constexpr external_force_color = Qt::darkYellow;
+	auto constexpr external_torque_color = Qt::cyan;
 
-	auto const force_to_length = 0.1_m / 1_N; // TODO unhardcode
-	auto const torque_to_length = force_to_length / 1_m; // TODO unhardcode
+	auto constexpr force_to_length = 0.1_m / 1_N; // TODO unhardcode
+	auto constexpr torque_to_length = force_to_length / 1_m; // TODO unhardcode
 
 	auto const& cache = body.frame_cache();
 	auto const gfm = cache.gravitational_force_moments;
@@ -596,7 +596,7 @@ RigidBodyPainter::paint_forces (rigid_body::Body const& body)
 void
 RigidBodyPainter::paint_angular_velocity (rigid_body::Body const& body)
 {
-	auto const angular_velocity_to_length = 0.1_m / 1_radps; // TODO unhardcode
+	auto constexpr angular_velocity_to_length = 0.1_m / 1_radps; // TODO unhardcode
 	// TODO auto const& cache = body.frame_cache();
 	auto const com = body.placement().position() - followed_body_position();
 	auto const omega = body.velocity_moments<rigid_body::WorldSpace>().angular_velocity();
@@ -608,7 +608,7 @@ RigidBodyPainter::paint_angular_velocity (rigid_body::Body const& body)
 void
 RigidBodyPainter::paint_angular_momentum (rigid_body::Body const& body)
 {
-	auto const angular_momentum_to_length = 0.001_m / (1_kg * 1_m2 / 1_s) / 1_rad; // TODO unhardcode
+	auto constexpr angular_momentum_to_length = 0.001_m / (1_kg * 1_m2 / 1_s) / 1_rad; // TODO unhardcode
 	//TODO auto const& cache = body.frame_cache();
 	auto const com = body.placement().position() - followed_body_position();
 	auto const I = body.mass_moments<rigid_body::BodyCOM>().inertia_tensor();
