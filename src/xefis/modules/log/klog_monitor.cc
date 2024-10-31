@@ -56,19 +56,19 @@ KLogMonitor::check_klog()
 		std::transform (buffer.begin(), buffer.end(), buffer.begin(), tolower);
 
 		// Search for OOMs:
-		if (buffer.find ("oom-killer") != std::string::npos)
+		if (buffer.contains ("oom-killer"))
 			_io.flag_oom = true;
 
 		// Search for I/O errors:
-		if (buffer.find ("I/O error") != std::string::npos)
+		if (buffer.contains ("I/O error"))
 			_io.flag_io = true;
 
 		// Search for Oopses:
-		if (buffer.find (" oops") != std::string::npos)
+		if (buffer.contains (" oops"))
 			_io.flag_oops = true;
 
 		// Search for BUGs:
-		if (buffer.find (" bug") != std::string::npos)
+		if (buffer.contains (" bug"))
 			_io.flag_bug = true;
 	}
 }

@@ -177,7 +177,8 @@ PanelNumericDisplay::convert_to_digits (double value)
 			result = std::format (_static_format, value);
 
 		std::size_t allowed_size = _num_digits;
-		if (result.find ('.') != std::string::npos)
+
+		if (result.contains ('.'))
 			allowed_size += 1;
 
 		if (value >= 0)
