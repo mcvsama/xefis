@@ -17,6 +17,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/aerodynamics/airfoil.h>
+#include <xefis/support/aerodynamics/airfoil_aerodynamic_parameters.h>
 #include <xefis/support/simulation/rigid_body/body.h>
 #include <xefis/support/simulation/rigid_body/concepts.h>
 
@@ -41,37 +42,10 @@ class Wing: public rigid_body::Body
 	airfoil() const noexcept
 		{ return _airfoil; }
 
-	/**
-	 * Return last calculated lift force vector.
-	 */
 	[[nodiscard]]
-	SpaceForce<rigid_body::BodyCOM>
-	lift_force() const noexcept
-		{ return _lift_force; }
-
-	/**
-	 * Return last calculated drag force vector.
-	 */
-	[[nodiscard]]
-	SpaceForce<rigid_body::BodyCOM>
-	drag_force() const noexcept
-		{ return _drag_force; }
-
-	/**
-	 * Return last calculated pitching moment vector (about the center of mass).
-	 */
-	[[nodiscard]]
-	SpaceTorque<rigid_body::BodyCOM>
-	pitching_moment() const noexcept
-		{ return _pitching_moment; }
-
-	/**
-	 * Return last calculated center of pressure relative to the center of mass.
-	 */
-	[[nodiscard]]
-	SpaceLength<rigid_body::BodyCOM>
-	center_of_pressure() const noexcept
-		{ return _center_of_pressure; }
+	std::optional<AirfoilAerodynamicParameters<rigid_body::BodyCOM>> const&
+	airfoil_aerodynamic_parameters() const noexcept
+		{ return _airfoil_aerodynamic_parameters; }
 
 	// Body API
 	void
@@ -83,11 +57,8 @@ class Wing: public rigid_body::Body
 	calculate_body_com_mass_moments (Airfoil const&, si::Density material_density);
 
   private:
-	Airfoil								_airfoil;
-	SpaceForce<rigid_body::BodyCOM>		_lift_force;
-	SpaceForce<rigid_body::BodyCOM>		_drag_force;
-	SpaceTorque<rigid_body::BodyCOM>	_pitching_moment;
-	SpaceLength<rigid_body::BodyCOM>	_center_of_pressure;
+	Airfoil																_airfoil;
+	std::optional<AirfoilAerodynamicParameters<rigid_body::BodyCOM>>	_airfoil_aerodynamic_parameters;
 };
 
 } // namespace xf::sim

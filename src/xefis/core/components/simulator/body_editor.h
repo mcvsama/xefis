@@ -18,6 +18,7 @@
 #include <xefis/config/all.h>
 #include <xefis/support/simulation/rigid_body/body.h>
 #include <xefis/support/ui/airfoil_spline_widget.h>
+#include <xefis/support/ui/paint_helper.h>
 
 // Qt:
 #include <QCheckBox>
@@ -30,6 +31,7 @@
 // Standard:
 #include <cstddef>
 #include <optional>
+#include <vector>
 
 
 namespace xf {
@@ -57,10 +59,18 @@ class BodyEditor: public QWidget
 	refresh();
 
   private:
+	void
+	refresh_wing_specific_data();
+
 	[[nodiscard]]
 	QWidget*
 	create_basic_info_widget();
 
+	[[nodiscard]]
+	QWidget*
+	create_airfoil_info_widget (PaintHelper const&);
+
+	[[nodiscard]]
 	QWidget*
 	create_mass_moments_widget();
 
@@ -70,10 +80,16 @@ class BodyEditor: public QWidget
 	QLabel*								_body_label;
 	std::optional<QFrame>				_airfoil_frame;
 	std::optional<AirfoilSplineWidget>	_airfoil_spline_widget;
+	QWidget*							_airfoil_info_widget;
 	std::optional<QToolBox>				_tool_box;
+	std::optional<QLineEdit>			_mass_value;
 	std::optional<QLabel>				_translational_kinetic_energy;
 	std::optional<QLabel>				_rotational_kinetic_energy;
-	std::optional<QLineEdit>			_mass_value;
+	std::optional<QLabel>				_true_air_speed;
+	std::optional<QLabel>				_static_air_temperature;
+	std::optional<QLabel>				_air_density;
+	std::optional<QLabel>				_dynamic_viscosity;
+	std::optional<QLabel>				_reynolds_number;
 };
 
 } // namespace xf

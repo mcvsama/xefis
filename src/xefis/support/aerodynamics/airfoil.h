@@ -17,10 +17,10 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/aerodynamics/airfoil_characteristics.h>
+#include <xefis/support/aerodynamics/airfoil_aerodynamic_parameters.h>
 #include <xefis/support/aerodynamics/reynolds_number.h>
 #include <xefis/support/earth/air/air.h>
 #include <xefis/support/math/geometry.h>
-#include <xefis/support/nature/wrench.h>
 
 // Standard:
 #include <cstddef>
@@ -28,33 +28,6 @@
 
 
 namespace xf {
-
-/**
- * Used for computed values by Airfoil.
- */
-template<class Space>
-	class AerodynamicForces
-	{
-	  public:
-		SpaceForce<Space>	lift;
-		SpaceForce<Space>	drag;
-		SpaceTorque<Space>	pitching_moment;
-		SpaceLength<Space>	center_of_pressure;
-
-	  public:
-		Wrench<Space>
-		wrench() const
-			{ return { ForceMoments<Space> (lift + drag, pitching_moment), center_of_pressure }; }
-	};
-
-
-template<class Space>
-	struct AerodynamicForcesAndAOA
-	{
-		AerodynamicForces<Space>	forces;
-		AngleOfAttack				angle_of_attack;
-	};
-
 
 /**
  * Airfoil represents an airfoil, which is an airfoil characteristics combined with chord length and wing length.
@@ -143,16 +116,16 @@ class Airfoil
 	 * Also compute angle of attack and put result into @result.angle_of_attack.
 	 */
 	[[nodiscard]]
-	AerodynamicForcesAndAOA<AirfoilSplineSpace>
-	planar_aerodynamic_forces (Air<AirfoilSplineSpace> const&) const;
+	AirfoilAerodynamicParameters<AirfoilSplineSpace>
+	planar_aerodynamic_forces (Air<AirfoilSplineSpace> const& relative_air) const;
 
 	/**
 	 * Like planar_aerodynamic_forces(), except it corrects the center of pressure position (returned Wrench's position) in the Z axis, to be in the center of
 	 * the airfoil (half the length).
 	 */
 	[[nodiscard]]
-	AerodynamicForcesAndAOA<AirfoilSplineSpace>
-	aerodynamic_forces (Air<AirfoilSplineSpace> const&) const;
+	AirfoilAerodynamicParameters<AirfoilSplineSpace>
+	aerodynamic_forces (Air<AirfoilSplineSpace> const& relative_air) const;
 
   private:
 	/**
@@ -183,10 +156,10 @@ class Airfoil
 
 
 template<class TF, class SF>
-	AerodynamicForces<TF>
-	operator* (RotationMatrix<TF, SF> const& rotation, AerodynamicForces<SF> const& source)
+	AirfoilAerodynamicForces<TF>
+	operator* (RotationMatrix<TF, SF> const& rotation, AirfoilAerodynamicForces<SF> const& source)
 	{
-		AerodynamicForces<TF> result;
+		AirfoilAerodynamicForces<TF> result;
 		result.lift = rotation * source.lift;
 		result.drag = rotation * source.drag;
 		result.pitching_moment = rotation * source.pitching_moment;

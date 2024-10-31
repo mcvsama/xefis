@@ -79,6 +79,13 @@ class RigidBodyViewer: public GLAnimationWidget
 	RigidBodyViewer (QWidget* parent, RefreshRate);
 
 	/**
+	 * Return used rigid body system. Might be nullptr.
+	 */
+	rigid_body::System const*
+	rigid_body_system() const noexcept
+		{ return _rigid_body_system; }
+
+	/**
 	 * Assign a rigid body system. Pass nullptr to unassign.
 	 *
 	 * \param	evolve

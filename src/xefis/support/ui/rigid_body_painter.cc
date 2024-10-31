@@ -525,12 +525,17 @@ RigidBodyPainter::paint_forces (rigid_body::Body const& body)
 	{
 		if (auto const* wing = dynamic_cast<sim::Wing const*> (&body))
 		{
-			auto const& pl = wing->placement();
-			auto const at = pl.bound_transform_to_base (wing->center_of_pressure()) - fbp;
+			if (auto const params = wing->airfoil_aerodynamic_parameters();
+				params)
+			{
+				auto const& forces = params->forces;
+				auto const& pl = wing->placement();
+				auto const at = pl.bound_transform_to_base (forces.center_of_pressure) - fbp;
 
-			draw_arrow (at, pl.unbound_transform_to_base (wing->lift_force()) * force_to_length, rigid_body::make_material (lift_color));
-			draw_arrow (at, pl.unbound_transform_to_base (wing->drag_force()) * force_to_length, rigid_body::make_material (drag_color));
-			draw_arrow (at, pl.unbound_transform_to_base (wing->pitching_moment()) * torque_to_length, rigid_body::make_material (torque_color));
+				draw_arrow (at, pl.unbound_transform_to_base (forces.lift) * force_to_length, rigid_body::make_material (lift_color));
+				draw_arrow (at, pl.unbound_transform_to_base (forces.drag) * force_to_length, rigid_body::make_material (drag_color));
+				draw_arrow (at, pl.unbound_transform_to_base (forces.pitching_moment) * torque_to_length, rigid_body::make_material (torque_color));
+			}
 		}
 	}
 

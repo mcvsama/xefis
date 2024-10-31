@@ -17,7 +17,6 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/earth/air/air.h>
-#include <xefis/support/nature/wrench.h>
 
 // Standard:
 #include <cstddef>
@@ -67,59 +66,65 @@ Airfoil::pitching_moment (si::Angle alpha, ReynoldsNumber re, si::Pressure dynam
 }
 
 
-AerodynamicForcesAndAOA<AirfoilSplineSpace>
-Airfoil::planar_aerodynamic_forces (Air<AirfoilSplineSpace> const& air) const
+AirfoilAerodynamicParameters<AirfoilSplineSpace>
+Airfoil::planar_aerodynamic_forces (Air<AirfoilSplineSpace> const& relative_air) const
 {
 	// Wind vector will be normalized, so make sure it's not near 0:
-	if (abs (air.velocity) > 1e-6_mps)
+	if (abs (relative_air.velocity) > 1e-6_mps)
 	{
 		auto const aoa = AngleOfAttack {
-			.alpha	= 1_rad * atan2 (air.velocity[1], air.velocity[0]),
-			.beta	= 1_rad * atan2 (air.velocity[2], air.velocity[0]),
+			.alpha	= 1_rad * atan2 (relative_air.velocity[1], relative_air.velocity[0]),
+			.beta	= 1_rad * atan2 (relative_air.velocity[2], relative_air.velocity[0]),
 		};
 
-		SpaceVector<si::Velocity, AirfoilSplineSpace> const planar_wind { air.velocity[0], air.velocity[1], 0_mps };
+		SpaceVector<si::Velocity, AirfoilSplineSpace> const planar_wind { relative_air.velocity[0], relative_air.velocity[1], 0_mps };
 		si::Velocity const		planar_tas				= abs (planar_wind);
-		si::Pressure const		planar_dp				= dynamic_pressure (air.density, planar_tas);
-		ReynoldsNumber const	planar_re				= reynolds_number (air.density, planar_tas, _chord_length, air.dynamic_viscosity);
+		si::Pressure const		planar_dp				= dynamic_pressure (relative_air.density, planar_tas);
+		ReynoldsNumber const	re						= reynolds_number (relative_air.density, planar_tas, _chord_length, relative_air.dynamic_viscosity);
 		auto const				[lift_area, drag_area]	= lift_drag_areas (aoa.alpha, aoa.beta);
-		si::Force const			lift					= lift_force (aoa.alpha, aoa.beta, planar_re, planar_dp, lift_area);
-		si::Force const			drag					= drag_force (aoa.alpha, aoa.beta, planar_re, planar_dp, drag_area);
-		si::Torque const		torque					= pitching_moment (aoa.alpha, planar_re, planar_dp);
+		si::Force const			lift					= lift_force (aoa.alpha, aoa.beta, re, planar_dp, lift_area);
+		si::Force const			drag					= drag_force (aoa.alpha, aoa.beta, re, planar_dp, drag_area);
+		si::Torque const		torque					= pitching_moment (aoa.alpha, re, planar_dp);
 
 		// Lift force is always perpendicular to relative wind.
 		// Drag is always parallel to relative wind.
 		// Pitching moment is always perpendicular to lift and drag forces.
 
-		SpaceVector<si::Length, AirfoilSplineSpace> const	cp_position			{ _airfoil_characteristics.center_of_pressure_position (*planar_re, wrap_angle_for_field (aoa.alpha)) * _chord_length, 0_m, 0_m };
+		SpaceVector<si::Length, AirfoilSplineSpace> const	cp_position			{ _airfoil_characteristics.center_of_pressure_position (*re, wrap_angle_for_field (aoa.alpha)) * _chord_length, 0_m, 0_m };
 		// If air.velocity is 0, normalized will be nan³, but we're guarded by the if above.
-		SpaceVector<double, AirfoilSplineSpace> const		drag_direction		= normalized (air.velocity) / 1_mps;
-		SpaceVector<double, AirfoilSplineSpace> const		lift_direction		= normalized (cross_product (SpaceVector<double, AirfoilSplineSpace> { 0.0, 0.0, +1.0 }, air.velocity)) / 1_mps;
+		SpaceVector<double, AirfoilSplineSpace> const		drag_direction		= normalized (relative_air.velocity) / 1_mps;
+		SpaceVector<double, AirfoilSplineSpace> const		lift_direction		= normalized (cross_product (SpaceVector<double, AirfoilSplineSpace> { 0.0, 0.0, +1.0 }, relative_air.velocity)) / 1_mps;
 		SpaceVector<si::Torque, AirfoilSplineSpace> const	pitching_moment_vec	{ 0_Nm, 0_Nm, torque };
 
 		// TODO drag should be 3D, that is also in Z direction
 		// TODO maybe lift, too?
 		return {
-			.forces = {
-				lift * lift_direction,
-				drag * drag_direction,
-				pitching_moment_vec,
-				cp_position,
-			},
+			.air = relative_air,
+			.reynolds_number = re,
+			.true_air_speed = planar_tas,
 			.angle_of_attack = aoa,
+			.forces = {
+				.lift = lift * lift_direction,
+				.drag = drag * drag_direction,
+				.pitching_moment = pitching_moment_vec,
+				.center_of_pressure = cp_position,
+			},
 		};
 	}
 	else
 	{
 		return {
-			.forces = {},
+			.air = relative_air,
+			.reynolds_number = {},
+			.true_air_speed = 0_mps,
 			.angle_of_attack = { 0_deg, 0_deg },
+			.forces = {},
 		};
 	}
 }
 
 
-AerodynamicForcesAndAOA<AirfoilSplineSpace>
+AirfoilAerodynamicParameters<AirfoilSplineSpace>
 Airfoil::aerodynamic_forces (Air<AirfoilSplineSpace> const& air) const
 {
 	auto planar = planar_aerodynamic_forces (air);

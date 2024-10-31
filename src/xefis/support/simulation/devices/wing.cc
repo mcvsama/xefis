@@ -44,17 +44,19 @@ Wing::update_external_forces (Atmosphere const* atmosphere)
 		// TODO Create special UnitMatrix<TF, SF> which only changes the frame, and operator* that doesn't really compute anything
 		// Rotations:
 		auto const world_to_ecef = RotationMatrix<ECEFSpace, rigid_body::WorldSpace> (math::unit);
+		auto const ecef_to_world = RotationMatrix<rigid_body::WorldSpace, ECEFSpace> (math::unit);
 		auto const body_to_airfoil_spline = RotationMatrix<AirfoilSplineSpace, rigid_body::BodyCOM> (math::unit);
+		auto const airfoil_spline_to_body = RotationMatrix<rigid_body::BodyCOM, AirfoilSplineSpace> (math::unit);
 		auto const world_to_body = placement().base_to_body_rotation();
 		// ECEF → WorldSpace → BodyCOM → AirfoilSplineSpace:
-		RotationMatrix<AirfoilSplineSpace, ECEFSpace> ecef_to_spline_transform = body_to_airfoil_spline * world_to_body * ~world_to_ecef;
+		RotationMatrix<AirfoilSplineSpace, ECEFSpace> ecef_to_spline_transform = body_to_airfoil_spline * world_to_body * ecef_to_world;
 
 		auto const body_position_in_ecef = world_to_ecef * placement().position();
 		auto const body_velocity_in_ecef = world_to_ecef * velocity_moments<rigid_body::WorldSpace>().velocity();
 
 		auto ecef_air = atmosphere->air_at (body_position_in_ecef);
 		ecef_air.velocity -= body_velocity_in_ecef;
-		auto const body_air = Air<AirfoilSplineSpace> {
+		auto const airfoil_spline_air = Air<AirfoilSplineSpace> {
 			.density = ecef_air.density,
 			.pressure = ecef_air.pressure,
 			.temperature = ecef_air.temperature,
@@ -62,19 +64,41 @@ Wing::update_external_forces (Atmosphere const* atmosphere)
 			.speed_of_sound = ecef_air.speed_of_sound,
 			.velocity = ecef_to_spline_transform * ecef_air.velocity,
 		};
+		auto const body_air = Air<rigid_body::BodyCOM> {
+			.density = ecef_air.density,
+			.pressure = ecef_air.pressure,
+			.temperature = ecef_air.temperature,
+			.dynamic_viscosity = ecef_air.dynamic_viscosity,
+			.speed_of_sound = ecef_air.speed_of_sound,
+			.velocity = airfoil_spline_to_body * airfoil_spline_air.velocity,
+		};
 
 		// Center of pressure Wrench:
-		auto const spline_aeroforces_at_origin = _airfoil.aerodynamic_forces (body_air);
-		auto const body_aeroforces_at_origin = ~body_to_airfoil_spline * spline_aeroforces_at_origin.forces;
+		auto const spline_aeroforces_at_origin = _airfoil.aerodynamic_forces (airfoil_spline_air);
+		auto const body_aeroforces_at_origin = airfoil_spline_to_body * spline_aeroforces_at_origin.forces;
 
 		// Compute 'at COM' values:
-		_lift_force = body_aeroforces_at_origin.lift;
-		_drag_force = body_aeroforces_at_origin.drag;
-		_pitching_moment = body_aeroforces_at_origin.pitching_moment;
-		_center_of_pressure = body_aeroforces_at_origin.center_of_pressure + origin<rigid_body::BodyCOM>();
+		auto const lift_force = body_aeroforces_at_origin.lift;
+		auto const drag_force = body_aeroforces_at_origin.drag;
+		auto const pitching_moment = body_aeroforces_at_origin.pitching_moment;
+		auto const center_of_pressure = body_aeroforces_at_origin.center_of_pressure + origin<rigid_body::BodyCOM>();
 
-		apply_impulse (ForceMoments<rigid_body::BodyCOM> (_lift_force, _pitching_moment), _center_of_pressure);
-		apply_impulse (ForceMoments<rigid_body::BodyCOM> (_drag_force, math::zero), _center_of_pressure);
+		// New parameters converted to rigid_body::BodyCOM:
+		_airfoil_aerodynamic_parameters = {
+			.air = body_air,
+			.reynolds_number = spline_aeroforces_at_origin.reynolds_number,
+			.true_air_speed = spline_aeroforces_at_origin.true_air_speed,
+			.angle_of_attack = spline_aeroforces_at_origin.angle_of_attack,
+			.forces = {
+				.lift = lift_force,
+				.drag = drag_force,
+				.pitching_moment = pitching_moment,
+				.center_of_pressure = center_of_pressure,
+			},
+		};
+
+		apply_impulse (ForceMoments<rigid_body::BodyCOM> (lift_force, pitching_moment), center_of_pressure);
+		apply_impulse (ForceMoments<rigid_body::BodyCOM> (drag_force, math::zero), center_of_pressure);
 	}
 }
 
