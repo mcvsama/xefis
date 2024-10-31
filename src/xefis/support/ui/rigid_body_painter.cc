@@ -66,7 +66,7 @@ RigidBodyPainter::paint (rigid_body::System const& system, QOpenGLPaintDevice& c
 	painter.translate (center);
 	painter.beginNativePainting();
 	setup (canvas);
-	paint_world (system, canvas);
+	paint_world (system);
 	paint_ecef_basis (canvas);
 	painter.endNativePainting();
 }
@@ -173,10 +173,15 @@ RigidBodyPainter::setup_light()
 
 
 void
-RigidBodyPainter::paint_world (rigid_body::System const& system, QOpenGLPaintDevice& canvas)
+RigidBodyPainter::paint_world (rigid_body::System const& system)
 {
-	paint_planet();
-	paint_system (system, canvas);
+	_gl.save_context ([&] {
+		setup_camera();
+		setup_light();
+
+		paint_planet();
+		paint_system (system);
+	});
 }
 
 
@@ -222,122 +227,116 @@ RigidBodyPainter::paint_planet()
 	auto const low_ground_fog_color = low_fog_color;
 	auto const ground_fog_density = renormalize (normalized_altitude, Range { 0.0f, 1.0f }, Range { 0.001f, 0.0015f });
 
+	// Draw stuff like we were located at Lon/Lat 0°/0° looking towards south pole.
+	// In other words match ECEF coordinates with standard OpenGL screen coordinates.
+
+	// Sky:
 	_gl.save_context ([&] {
-		setup_camera();
-		setup_light();
+		auto const sky_color = get_intermediate_color (normalized_altitude, sky_low_color, sky_high_color);
+		auto const sky_fog_color = get_intermediate_color (normalized_altitude, low_sky_fog_color, high_sky_fog_color);
 
-		// Draw stuff like we were located at Lon/Lat 0°/0° looking towards south pole.
-		// In other words match ECEF coordinates with standard OpenGL screen coordinates.
+		auto sky_material = rigid_body::kBlackMatte;
 
-		// Sky:
-		_gl.save_context ([&] {
-			auto const sky_color = get_intermediate_color (normalized_altitude, sky_low_color, sky_high_color);
-			auto const sky_fog_color = get_intermediate_color (normalized_altitude, low_sky_fog_color, high_sky_fog_color);
+		auto const configure_material = [&] (rigid_body::ShapeMaterial& material, si::Angle const latitude)
+		{
+			// Set dome color (fog simulation) depending on latitude:
+			float const norm = std::clamp<float> (renormalize<si::Angle> (latitude, Range { 67.5_deg, 90_deg }, Range { 1.0f, 0.0f }), 0.0f, 1.0f);
+			material.emission_color = get_intermediate_color (std::pow (norm, 1.0 + 2 * normalized_altitude), sky_color, sky_fog_color);
+		};
 
-			auto sky_material = rigid_body::kBlackMatte;
+		auto sky = rigid_body::make_centered_sphere_shape (kEarthMeanRadius + kSkyHeight, 20, 20, { 0_deg, 360_deg }, { 60_deg, 90_deg }, sky_material, configure_material);
+		rigid_body::negate_normals (sky);
 
-			auto const configure_material = [&] (rigid_body::ShapeMaterial& material, si::Angle const latitude)
-			{
-				// Set dome color (fog simulation) depending on latitude:
-				float const norm = std::clamp<float> (renormalize<si::Angle> (latitude, Range { 67.5_deg, 90_deg }, Range { 1.0f, 0.0f }), 0.0f, 1.0f);
-				material.emission_color = get_intermediate_color (std::pow (norm, 1.0 + 2 * normalized_altitude), sky_color, sky_fog_color);
-			};
+		_gl.rotate (+_position_on_earth.lon(), 0, 0, 1);
+		_gl.rotate (-_position_on_earth.lat(), 0, 1, 0);
+		_gl.translate (-kEarthMeanRadius - altitude_amsl, 0_m, 0_m);
+		_gl.rotate (+90_deg, 0, 1, 0);
 
-			auto sky = rigid_body::make_centered_sphere_shape (kEarthMeanRadius + kSkyHeight, 20, 20, { 0_deg, 360_deg }, { 60_deg, 90_deg }, sky_material, configure_material);
-			rigid_body::negate_normals (sky);
+		glFrontFace (GL_CW);
+		_gl.draw (sky);
+		glFrontFace (GL_CCW);
+	});
 
-			_gl.rotate (+_position_on_earth.lon(), 0, 0, 1);
-			_gl.rotate (-_position_on_earth.lat(), 0, 1, 0);
-			_gl.translate (-kEarthMeanRadius - altitude_amsl, 0_m, 0_m);
-			_gl.rotate (+90_deg, 0, 1, 0);
+	// Sun:
+	_gl.save_context ([&] {
+		auto sun_material = rigid_body::kBlackMatte;
 
-			glFrontFace (GL_CW);
-			_gl.draw (sky);
-			glFrontFace (GL_CCW);
-		});
+		auto const configure_material = [&] (rigid_body::ShapeMaterial& material, si::Angle const latitude)
+		{
+			float const actual_radius = 0.025;
+			float const norm = renormalize<si::Angle> (latitude, Range { 0_deg, 90_deg }, Range { 0.0f, 1.0f });
+			float const alpha = std::clamp<float> (std::pow (norm + actual_radius, 6.0f), 0.0f, 1.0f);
+			material.emission_color = QColor (0xff, 0xff, 0xff, 0xff * alpha);
+		};
 
-		// Sun:
-		_gl.save_context ([&] {
-			auto sun_material = rigid_body::kBlackMatte;
+		// Assume it's noon at Lon/Lat 0°/0° right now.
+		_gl.translate (kSunDistance, 0_m, 0_km);
+		_gl.rotate (+90_deg, 0, 1, 0);
+		// Rotate sun shines when camera angle changes:
+		_gl.rotate (_camera_angles[0] - 2 * _camera_angles[1], 0, 0, 1);
 
-			auto const configure_material = [&] (rigid_body::ShapeMaterial& material, si::Angle const latitude)
-			{
-				float const actual_radius = 0.025;
-				float const norm = renormalize<si::Angle> (latitude, Range { 0_deg, 90_deg }, Range { 0.0f, 1.0f });
-				float const alpha = std::clamp<float> (std::pow (norm + actual_radius, 6.0f), 0.0f, 1.0f);
-				material.emission_color = QColor (0xff, 0xff, 0xff, 0xff * alpha);
-			};
+		auto sun = rigid_body::make_centered_sphere_shape (kSunRadius, 9, 36, { 0_deg, 360_deg }, { 0_deg, 90_deg }, sun_material, configure_material);
+		rigid_body::negate_normals (sun);
 
-			// Assume it's noon at Lon/Lat 0°/0° right now.
-			_gl.translate (kSunDistance, 0_m, 0_km);
-			_gl.rotate (+90_deg, 0, 1, 0);
-			// Rotate sun shines when camera angle changes:
-			_gl.rotate (_camera_angles[0] - 2 * _camera_angles[1], 0, 0, 1);
+		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glDisable (GL_ALPHA_TEST);
 
-			auto sun = rigid_body::make_centered_sphere_shape (kSunRadius, 9, 36, { 0_deg, 360_deg }, { 0_deg, 90_deg }, sun_material, configure_material);
-			rigid_body::negate_normals (sun);
+		glDisable (GL_DEPTH_TEST);
+		glEnable (GL_BLEND);
+		glDisable (GL_LIGHTING);
+		glFrontFace (GL_CW);
+		_gl.draw (sun);
+		glFrontFace (GL_CCW);
+		glEnable (GL_DEPTH_TEST);
+		glDisable (GL_BLEND);
+		glEnable (GL_LIGHTING);
+	});
 
-			glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-			glDisable (GL_ALPHA_TEST);
+	// Ground:
+	_gl.save_context ([&] {
+		auto const ground_fog_color = get_intermediate_color (normalized_altitude, low_ground_fog_color, high_ground_fog_color);
 
-			glDisable (GL_DEPTH_TEST);
-			glEnable (GL_BLEND);
-			glDisable (GL_LIGHTING);
-			glFrontFace (GL_CW);
-			_gl.draw (sun);
-			glFrontFace (GL_CCW);
-			glEnable (GL_DEPTH_TEST);
-			glDisable (GL_BLEND);
-			glEnable (GL_LIGHTING);
-		});
+		rigid_body::ShapeMaterial ground_material;
+		ground_material.emission_color = ground_color;
+		ground_material.ambient_color = Qt::black;
+		ground_material.diffuse_color = Qt::black;
+		ground_material.specular_color = Qt::black;
+		ground_material.shininess = 0.0;
 
-		// Ground:
-		_gl.save_context ([&] {
-			auto const ground_fog_color = get_intermediate_color (normalized_altitude, low_ground_fog_color, high_ground_fog_color);
+		glFogi (GL_FOG_MODE, GL_EXP);
+		glFogi (GL_FOG_COORD_SRC, GL_FRAGMENT_DEPTH);
+		glFogf (GL_FOG_DENSITY, ground_fog_density);
+		glFogf (GL_FOG_START, _gl.to_opengl (0_m));
+		glFogf (GL_FOG_END, _gl.to_opengl (kHorizonRadius));
+		glFogfv (GL_FOG_COLOR, _gl.to_opengl (ground_fog_color));
 
-			rigid_body::ShapeMaterial ground_material;
-			ground_material.emission_color = ground_color;
-			ground_material.ambient_color = Qt::black;
-			ground_material.diffuse_color = Qt::black;
-			ground_material.specular_color = Qt::black;
-			ground_material.shininess = 0.0;
+		_gl.rotate (+_position_on_earth.lon(), 0, 0, 1);
+		_gl.rotate (-_position_on_earth.lat(), 0, 1, 0);
+		_gl.translate (-altitude_amsl, 0_m, 0_m);
+		_gl.rotate (+90_deg, 0, 1, 0);
 
-			glFogi (GL_FOG_MODE, GL_EXP);
-			glFogi (GL_FOG_COORD_SRC, GL_FRAGMENT_DEPTH);
-			glFogf (GL_FOG_DENSITY, ground_fog_density);
-			glFogf (GL_FOG_START, _gl.to_opengl (0_m));
-			glFogf (GL_FOG_END, _gl.to_opengl (kHorizonRadius));
-			glFogfv (GL_FOG_COLOR, _gl.to_opengl (ground_fog_color));
+		glEnable (GL_FOG);
+		_gl.draw (rigid_body::make_solid_circle (kHorizonRadius, 10, ground_material));
+		glDisable (GL_FOG);
+	});
 
-			_gl.rotate (+_position_on_earth.lon(), 0, 0, 1);
-			_gl.rotate (-_position_on_earth.lat(), 0, 1, 0);
-			_gl.translate (-altitude_amsl, 0_m, 0_m);
-			_gl.rotate (+90_deg, 0, 1, 0);
-
-			glEnable (GL_FOG);
-			_gl.draw (rigid_body::make_solid_circle (kHorizonRadius, 10, ground_material));
-			glDisable (GL_FOG);
-		});
-
-		// Ground haze that reflects sun a bit:
-		_gl.save_context ([&] {
-			// TODO semi-transparent layer between us and the ground with strong reflection of light
-		});
+	// Ground haze that reflects sun a bit:
+	_gl.save_context ([&] {
+		// TODO semi-transparent layer between us and the ground with strong reflection of light
 	});
 }
 
 
+
+
 void
-RigidBodyPainter::paint_system (rigid_body::System const& system, QOpenGLPaintDevice&)
+RigidBodyPainter::paint_system (rigid_body::System const& system)
 {
 	static auto const default_body_rendering = BodyRenderingConfig();
 
 	glDisable (GL_FOG);
 
 	_gl.save_context ([&] {
-		setup_camera();
-		setup_light();
-
 		for (auto const& body: system.bodies())
 		{
 			auto const focused = _focused_body == body.get();
@@ -378,7 +377,7 @@ RigidBodyPainter::paint_system (rigid_body::System const& system, QOpenGLPaintDe
 
 
 void
-RigidBodyPainter::paint_body (rigid_body::Body const& body, bool paint_body, bool paint_origin)
+RigidBodyPainter::paint_body (rigid_body::Body const& body, bool body_visible, bool origin_visible)
 {
 	_gl.save_context ([&] {
 		_gl.translate (body.placement().position() - followed_body_position());
@@ -387,7 +386,7 @@ RigidBodyPainter::paint_body (rigid_body::Body const& body, bool paint_body, boo
 		_gl.translate (body.origin_placement().position());
 		_gl.rotate (body.origin_placement().base_to_body_rotation());
 
-		if (paint_body)
+		if (body_visible)
 		{
 			_gl.save_context ([&] {
 				if (_focused_body == &body)
@@ -402,7 +401,7 @@ RigidBodyPainter::paint_body (rigid_body::Body const& body, bool paint_body, boo
 			});
 		}
 
-		if (paint_origin || _focused_body == &body)
+		if (origin_visible || _focused_body == &body)
 		{
 			auto const origin_material = rigid_body::make_material ({ 0xff, 0xff, 0x00 });
 			// TODO make the sphere zoom-independent (distance from the camera-independent):

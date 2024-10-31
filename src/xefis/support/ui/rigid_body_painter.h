@@ -251,7 +251,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	setup_light();
 
 	void
-	paint_world (rigid_body::System const&, QOpenGLPaintDevice&);
+	paint_world (rigid_body::System const&);
 
 	/**
 	 * Red - X, Green - Y, Blue - Z
@@ -264,7 +264,8 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	paint_planet();
 
 	void
-	paint_system (rigid_body::System const&, QOpenGLPaintDevice&);
+	void
+	paint_system (rigid_body::System const&);
 
 	void
 	paint_body (rigid_body::Body const&, bool body_visible, bool origin_visible);
