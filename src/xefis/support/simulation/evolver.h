@@ -27,13 +27,6 @@
 
 namespace xf {
 
-struct EvolveParameters
-{
-	si::Time	time_step;
-	si::Time	real_time_limit;
-};
-
-
 /**
  * Helper for evolving simulations with configured time step.
  * With configured time step 1_ms if we call evolve (1_s),
@@ -43,7 +36,13 @@ class Evolver
 {
   public:
 	// Evolution function called on each simulation frame:
-	using Evolve = std::function<void (si::Time time_step)>;
+	using Evolve = std::function<void (si::Time frame_duration)>;
+
+	struct EvolutionResult
+	{
+		si::Time	real_time_taken;
+		std::size_t	evolved_frames;
+	};
 
   public:
 	/**
@@ -54,22 +53,22 @@ class Evolver
 	 *			Must not be nullptr.
 	 */
 	explicit
-	Evolver (si::Time time_step, Logger const&, Evolve);
+	Evolver (si::Time frame_duration, Logger const&, Evolve);
 
 	/**
 	 * Return current simulation frame Δt.
 	 */
 	[[nodiscard]]
 	si::Time
-	time_step() const noexcept
-		{ return _time_step; }
+	frame_duration() const noexcept
+		{ return _frame_duration; }
 
 	/**
 	 * Set new simulation frame Δt.
 	 */
 	void
-	set_time_step (si::Time const dt) noexcept
-		{ _time_step = dt; }
+	set_frame_duration (si::Time const dt) noexcept
+		{ _frame_duration = dt; }
 
 	/**
 	 * Return integrated simulation time.
@@ -82,23 +81,33 @@ class Evolver
 		{ return _simulation_time; }
 
 	/**
-	 * Evolve the rigid body system by given dt. Multiple evolve() calls will be made on the System.
+	 * Evolve the rigid body system by given simulation time. Multiple evolve() calls will be made on the System.
 	 */
-	void
-	evolve (si::Time simulation_time, si::Time real_time_limit);
+	EvolutionResult
+	evolve (si::Time duration);
 
 	/**
 	 * Evolve the rigid body system given number of steps (frames).
 	 */
-	void
+	EvolutionResult
 	evolve (std::size_t frames);
+
+	/**
+	 * Return performance factor. It tells how much simulation time has passed per real time.
+	 * 1.0 or more is desired, values below 1.0 mean that the system can't simulate in real time.
+	 */
+	[[nodiscard]]
+	float
+	performance() const noexcept
+		{ return _performance; }
 
   private:
 	xf::Logger	_logger;
-	si::Time	_time_step;
+	si::Time	_frame_duration;
 	Evolve		_evolve;
-	si::Time	_real_time			{ 0_s };
+	si::Time	_target_time		{ 0_s };
 	si::Time	_simulation_time	{ 0_s };
+	float		_performance		{ 1.0 };
 };
 
 } // namespace xf

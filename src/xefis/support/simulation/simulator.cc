@@ -25,13 +25,13 @@ namespace xf {
 
 Simulator::Simulator (rigid_body::System& rigid_body_system,
 					  rigid_body::ImpulseSolver& rigid_body_solver,
-					  si::Time const time_step,
+					  si::Time const frame_duration,
 					  Logger const& logger):
 	_logger (logger),
 	_rigid_body_system (rigid_body_system),
 	_rigid_body_solver (rigid_body_solver)
 {
-	_evolver.emplace (time_step, logger.with_context ("Evolver"), [this] (si::Time const dt) {
+	_evolver.emplace (frame_duration, logger.with_context ("Evolver"), [this] (si::Time const dt) {
 		_rigid_body_solver.evolve (dt);
 	});
 }

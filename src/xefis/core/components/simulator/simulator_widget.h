@@ -89,6 +89,9 @@ class SimulatorWidget: public QWidget
 	void
 	update_simulation_time_label();
 
+	void
+	update_simulation_performance_label();
+
   private:
 	Machine*						_machine				{ nullptr };
 	Simulator&						_simulator;
@@ -99,6 +102,7 @@ class SimulatorWidget: public QWidget
 	std::optional<ConstraintEditor>	_constraint_editor;
 	std::optional<BodiesTree>		_bodies_tree;
 	std::optional<QLabel>			_simulation_time_label;
+	std::optional<QLabel>			_simulation_performance_label;
 	QIcon							_start_icon				{ icons::start() };
 	QIcon							_pause_icon				{ icons::pause() };
 };

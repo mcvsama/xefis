@@ -66,7 +66,6 @@ AutoTest t_1 ("rigid_body::System: 90-minute simulation of gravitational forces"
 	auto const& iss = rigid_body_system.add (make_iss());
 	auto const& earth = rigid_body_system.add_gravitating (rigid_body::make_earth());
 
-	auto const real_time_limit = 10_s;
 	auto const orbital_period = 92.28532_min;
 	auto const interim_precision = 20_km;
 	auto const final_precision = 50_m;
@@ -79,22 +78,22 @@ AutoTest t_1 ("rigid_body::System: 90-minute simulation of gravitational forces"
 
 	auto evolver = Evolver (1 / 50_Hz, g_null_logger, [&] (si::Time const dt) { rigid_body_solver.evolve (dt); });
 
-	evolver.evolve (orbital_period / 4, real_time_limit);
+	evolver.evolve (orbital_period / 4);
 
 	test_asserts::verify_equal_with_epsilon ("ISS traveled 1/4 of distance", iss.placement().position(), iss_position_1_of_4, interim_precision);
 	test_asserts::verify_equal_with_epsilon ("Earth didn't travel much", earth.placement().position(), earth_initial_position, 1_cm);
 
-	evolver.evolve (orbital_period / 4, real_time_limit);
+	evolver.evolve (orbital_period / 4);
 
 	test_asserts::verify_equal_with_epsilon ("ISS traveled 2/4 of distance", iss.placement().position(), iss_position_2_of_4, interim_precision);
 	test_asserts::verify_equal_with_epsilon ("Earth didn't travel much", earth.placement().position(), earth_initial_position, 1_cm);
 
-	evolver.evolve (orbital_period / 4, real_time_limit);
+	evolver.evolve (orbital_period / 4);
 
 	test_asserts::verify_equal_with_epsilon ("ISS traveled 3/4 of distance", iss.placement().position(), iss_position_3_of_4, interim_precision);
 	test_asserts::verify_equal_with_epsilon ("Earth didn't travel much", earth.placement().position(), earth_initial_position, 1_cm);
 
-	evolver.evolve (orbital_period / 4, real_time_limit);
+	evolver.evolve (orbital_period / 4);
 
 	test_asserts::verify_equal_with_epsilon ("ISS is back at its original position", iss.placement().position(), iss_position_4_of_4, final_precision);
 	test_asserts::verify_equal_with_epsilon ("Earth didn't travel much", earth.placement().position(), earth_initial_position, 1_cm);

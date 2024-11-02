@@ -23,9 +23,9 @@
 
 namespace xf {
 
-Evolver::Evolver (si::Time const time_step, Logger const& logger, Evolve const evolve):
+Evolver::Evolver (si::Time const frame_duration, Logger const& logger, Evolve const evolve):
 	_logger (logger),
-	_time_step (time_step),
+	_frame_duration (frame_duration),
 	_evolve (evolve)
 {
 	if (!_evolve)
@@ -33,39 +33,49 @@ Evolver::Evolver (si::Time const time_step, Logger const& logger, Evolve const e
 }
 
 
-void
-Evolver::evolve (si::Time const simulation_time, si::Time const real_time_limit)
+Evolver::EvolutionResult
+Evolver::evolve (si::Time const duration)
 {
-	si::Time real_time_taken = 0_s;
-
-	_real_time += simulation_time;
-
-	while (_simulation_time < _real_time)
-	{
-		real_time_taken += TimeHelper::measure ([&] {
-			_evolve (_time_step);
-		});
-
-		if (real_time_taken >= real_time_limit)
+	_target_time += duration;
+	auto frames = 0u;
+	auto const prev_simulation_time = _simulation_time;
+	auto const real_time_taken = TimeHelper::measure ([&] {
+		while (_simulation_time < _target_time)
 		{
-			_logger << "Evolution throttled: skipping " << (_real_time - _simulation_time) << " of real time." << std::endl;
-			_simulation_time = _real_time;
+			_evolve (_frame_duration);
+			_simulation_time += _frame_duration;
+			++frames;
 		}
-		else
-			_simulation_time += _time_step;
-	}
+	});
+
+	_performance = (_simulation_time - prev_simulation_time) / real_time_taken;
+
+	return {
+		.real_time_taken = real_time_taken,
+		.evolved_frames = frames,
+	};
 }
 
 
-void
+Evolver::EvolutionResult
 Evolver::evolve (std::size_t const frames)
 {
-	for (std::size_t i = 0; i < frames; ++i)
-	{
-		_evolve (_time_step);
-		_real_time += _time_step;
-		_simulation_time += _time_step;
-	}
+	auto const prev_simulation_time = _simulation_time;
+	auto const real_time_taken = TimeHelper::measure ([&] {
+		for (std::size_t i = 0; i < frames; ++i)
+		{
+			_evolve (_frame_duration);
+			_target_time += _frame_duration;
+			_simulation_time += _frame_duration;
+		}
+	});
+
+	_performance = (_simulation_time - prev_simulation_time) / real_time_taken;
+
+	return {
+		.real_time_taken = real_time_taken,
+		.evolved_frames = frames,
+	};
 }
 
 } // namespace xf

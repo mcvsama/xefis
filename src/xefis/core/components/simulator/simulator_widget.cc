@@ -68,11 +68,12 @@ SimulatorWidget::make_viewer_widget()
 	_rigid_body_viewer->set_rigid_body_system (&_simulator.rigid_body_system());
 	_rigid_body_viewer->set_redraw_callback ([this] (std::optional<si::Time> const simulation_time) {
 		if (simulation_time)
-			_simulator.evolve (*simulation_time, 1000_ms);
+			_simulator.evolve (*simulation_time);
 		else
 			_simulator.evolve (1);
 
 		update_simulation_time_label();
+		update_simulation_performance_label();
 		_body_editor->refresh();
 		_constraint_editor->refresh();
 	});
@@ -132,13 +133,17 @@ SimulatorWidget::make_simulation_controls()
 	auto* sim_controls = new QWidget (this);
 	sim_controls->setSizePolicy (QSizePolicy::Fixed, QSizePolicy::Fixed);
 
-	auto time_step_text = std::format ("Δt = {} s", _simulator.time_step().in<si::Second>());
+	auto time_step_text = std::format ("Δt = {} s", _simulator.frame_duration().in<si::Second>());
 	auto* time_step_label = new QLabel (QString::fromStdString (time_step_text), this);
 	time_step_label->setSizePolicy (QSizePolicy::Fixed, QSizePolicy::Fixed);
 
 	_simulation_time_label.emplace ("", this);
-	time_step_label->setSizePolicy (QSizePolicy::Fixed, QSizePolicy::Fixed);
+	_simulation_time_label->setSizePolicy (QSizePolicy::Fixed, QSizePolicy::Fixed);
 	update_simulation_time_label();
+
+	_simulation_performance_label.emplace ("", this);
+	_simulation_performance_label->setSizePolicy (QSizePolicy::Fixed, QSizePolicy::Fixed);
+	update_simulation_performance_label();
 
 	auto* basis_colors_label = new QLabel ("<b><span style='color: red'>X</span> <span style='color: green'>Y</span> <span style='color: blue'>Z</span></b>", this);
 
@@ -153,6 +158,8 @@ SimulatorWidget::make_simulation_controls()
 	layout->addWidget (time_step_label);
 	layout->addItem (new QSpacerItem (ph.em_pixels_int (1.0), 0, QSizePolicy::Fixed, QSizePolicy::Fixed));
 	layout->addWidget (&*_simulation_time_label);
+	layout->addItem (new QSpacerItem (ph.em_pixels_int (1.0), 0, QSizePolicy::Fixed, QSizePolicy::Fixed));
+	layout->addWidget (&*_simulation_performance_label);
 	layout->addItem (new QSpacerItem (0, 0, QSizePolicy::Expanding, QSizePolicy::Fixed));
 
 	return sim_controls;
@@ -231,8 +238,19 @@ SimulatorWidget::make_body_controls()
 void
 SimulatorWidget::update_simulation_time_label()
 {
-	auto text = std::format ("Simulation time: {:.6f} s", _simulator.simulation_time().in<si::Second>());
+	auto const text = std::format ("Simulation time: {:.6f} s", _simulator.simulation_time().in<si::Second>());
 	_simulation_time_label->setText (QString::fromStdString (text));
+}
+
+
+void
+SimulatorWidget::update_simulation_performance_label()
+{
+	auto const perf = _simulator.performance();
+	auto const text = std::format ("Performance: {:.0f}%", 100.0f * perf);
+	auto const prefix = perf < 1.0 ? "<span style='color: red'>" : "";
+	auto const suffix = perf < 1.0 ? "</span>" : "";
+	_simulation_performance_label->setText (prefix + QString::fromStdString (text) + suffix);
 }
 
 } // namespace xf

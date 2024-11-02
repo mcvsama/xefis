@@ -103,7 +103,7 @@ run (rigid_body::System& system, rigid_body::Body* followed_body, std::function<
 	viewer.set_rigid_body_system (&system);
 	viewer.set_redraw_callback ([&evolver] (std::optional<si::Time> const simulation_time) {
 		if (simulation_time)
-			evolver.evolve (*simulation_time, 1_s);
+			evolver.evolve (*simulation_time);
 		else
 			evolver.evolve (1);
 	});

@@ -39,15 +39,15 @@ class Simulator: public Noncopyable
   public:
 	// Ctor
 	explicit
-	Simulator (rigid_body::System&, rigid_body::ImpulseSolver&, si::Time time_step, Logger const&);
+	Simulator (rigid_body::System&, rigid_body::ImpulseSolver&, si::Time frame_duration, Logger const&);
 
 	/**
 	 * Return current simulation frame Δt.
 	 */
 	[[nodiscard]]
 	si::Time
-	time_step() const noexcept
-		{ return _evolver->time_step(); }
+	frame_duration() const noexcept
+		{ return _evolver->frame_duration(); }
 
 	/**
 	 * Return integrated simulation time.
@@ -79,8 +79,8 @@ class Simulator: public Noncopyable
 	 * Evolve the rigid body system by given dt. Multiple evolve() calls will be made on the System.
 	 */
 	void
-	evolve (si::Time const simulation_time, si::Time const real_time_limit)
-		{ _evolver->evolve (simulation_time, real_time_limit); }
+	evolve (si::Time const simulation_time)
+		{ _evolver->evolve (simulation_time); }
 
 	/**
 	 * Evolve the rigid body system given number of steps (frames).
@@ -88,6 +88,14 @@ class Simulator: public Noncopyable
 	void
 	evolve (std::size_t const frames)
 		{ _evolver->evolve (frames); }
+
+	/**
+	 * Return Evolver::performance().
+	 */
+	[[nodiscard]]
+	float
+	performance() const noexcept
+		{ return _evolver->performance(); }
 
   private:
 	xf::Logger						_logger;
