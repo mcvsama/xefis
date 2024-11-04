@@ -261,6 +261,9 @@ RigidBodyPainter::paint_planet()
 		_gl.translate (-kEarthMeanRadius - altitude_amsl, 0_m, 0_m);
 		_gl.rotate (+90_deg, 0, 1, 0);
 
+		// Normally the outside of the sphere shape is rendered, inside is culled.
+		// But here we're inside the sphere, so tell OpenGL that the front faces are the
+		// inside faces:
 		glFrontFace (GL_CW);
 		_gl.draw (sky);
 		glFrontFace (GL_CCW);
@@ -300,6 +303,7 @@ RigidBodyPainter::paint_planet()
 		glDisable (GL_DEPTH_TEST);
 		glEnable (GL_BLEND);
 		glDisable (GL_LIGHTING);
+		// Same remark as for sky rendering about what's considered the front face here:
 		glFrontFace (GL_CW);
 		_gl.draw (sun);
 		glFrontFace (GL_CCW);
