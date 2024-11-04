@@ -25,6 +25,8 @@
 // Standard:
 #include <algorithm>
 #include <cstddef>
+#include <numbers>
+#include <ranges>
 
 
 namespace xf::rigid_body {
@@ -336,6 +338,59 @@ make_airfoil_shape (AirfoilSpline const& spline, si::Length const chord_length, 
 		// Reverse order to keep the face facing outside:
 		std::reverse (std::next (face2->begin()), face2->end());
 		shape.triangle_fans() = { std::move (*face1), std::move (*face2) };
+	}
+
+	return shape;
+}
+
+
+Shape
+make_propeller_shape (PropellerShapeParameters const& params)
+{
+	Shape shape;
+	// Reserve strips for each blade (front and back side).
+	shape.triangle_strips().reserve (2 * params.blades);
+	auto const blade_length = 0.5 * params.diameter;
+	auto const angle_between_blades = 360_deg / params.blades;
+	auto const max_pitch_radius = 0.292 * blade_length;
+	auto const width = blade_length / 15; // Looks good like this.
+	auto const pitch_height = width * params.pitch / (2 * std::numbers::pi * max_pitch_radius);
+	auto const point_spacing = 1.0 / params.points_per_blade;
+	auto const rotation_direction_factor = (params.rotation_direction == ClockWise) ? +1.0 : -1.0;
+
+	for (uint16_t b = 0; b < params.blades; ++b)
+	{
+		if (b > 0)
+			shape.rotate (xf::z_rotation<BodyOrigin> (angle_between_blades));
+
+		auto strip = Shape::TriangleStrip();
+		// Center of the blade:
+		strip.emplace_back (SpaceLength<BodyOrigin> { 0_m, 0_m, 0_m }, params.material);
+
+		for (uint32_t p = 0; p < params.points_per_blade; ++p)
+		{
+			auto const p_norm = p * point_spacing;
+			auto const y = p_norm * blade_length;
+			auto const x = width * std::pow (std::sin (p_norm * std::numbers::pi), 0.5) * rotation_direction_factor;
+			auto const z = pitch_height * square (std::sin (std::sqrt (p_norm) * std::numbers::pi));
+			strip.emplace_back (SpaceLength<BodyOrigin> { x, y, -z }, params.material);
+			strip.emplace_back (SpaceLength<BodyOrigin> { 0_m, y, +z }, params.material);
+		}
+
+		// Tip of the blade:
+		strip.emplace_back (SpaceLength<BodyOrigin> { 0_m, blade_length, -0.01 * width }, params.material);
+		strip.emplace_back (SpaceLength<BodyOrigin> { 0_m, blade_length, 0_m }, params.material);
+
+		for (auto triangle: strip | std::views::slide (3))
+			set_planar_normal (triangle);
+
+		// For back faces, add the same points in the reverse order:
+		auto back_strip = strip;
+		std::ranges::reverse (back_strip);
+		back_strip.pop_back();
+
+		shape.triangle_strips().push_back (strip);
+		shape.triangle_strips().push_back (back_strip);
 	}
 
 	return shape;

@@ -488,6 +488,20 @@ template<class TF = void, class SF = TF>
 /**
  * Return normal vector for given triangle (front face is defined by CCW vertex order).
  */
+template<class Scalar, class Space>
+	inline auto
+	triangle_surface_normal (SpaceVector<Scalar, Space> const& a,
+							 SpaceVector<Scalar, Space> const& b,
+							 SpaceVector<Scalar, Space> const& c)
+	{
+		auto const scalar_1 = decltype (a[0]) { 1 };
+		return normalized (cross_product (b - a, c - a) / scalar_1 / scalar_1);
+	}
+
+
+/**
+ * Return normal vector for given triangle (front face is defined by CCW vertex order).
+ */
 template<class Triangle>
 	inline auto
 	triangle_surface_normal (Triangle const& triangle)

@@ -32,12 +32,30 @@ namespace xf::rigid_body {
 using MakeSphereMaterialCallback = std::function<void (ShapeMaterial&, si::Angle latitude)>;
 
 
+enum RotationDirection
+{
+	ClockWise,
+	CounterClockWise,
+};
+
+
 struct CylinderShapeParameters
 {
 	si::Length	length;
 	si::Length	radius;
 	size_t		num_faces;
 	bool		with_front_and_back;
+};
+
+
+struct PropellerShapeParameters
+{
+	uint8_t					blades				{ };
+	RotationDirection		rotation_direction	{ ClockWise };
+	si::Length				diameter;
+	si::Length				pitch;
+	ShapeMaterial const&	material			{ };
+	uint32_t				points_per_blade	{ 20 };
 };
 
 
@@ -95,6 +113,15 @@ make_solid_circle (si::Length radius, size_t num_slices, ShapeMaterial const& = 
 Shape
 make_airfoil_shape (AirfoilSpline const& spline, si::Length chord_length, si::Length wing_length, bool with_front_and_back = true,
 					ShapeMaterial const& = {});
+/**
+ * Make a "typical" propeller shape. The front of the propeller (where it creates a force) is towards the positive Z axis.
+ *
+ * \param	pitch
+ *			Propeller pitch. Positive for CW propellers, negative for CCW ones.
+ */
+Shape
+make_propeller_shape (PropellerShapeParameters const&);
+
 
 /**
  * Make a center-of-mass symbol.
@@ -119,6 +146,40 @@ template<class TriangleIterator>
 				vertex.set_normal (normal);
 		}
 	}
+
+
+/**
+ * Set planar normals for triangles, that is make each vertex' normal
+ * perpendicular to the surface of the triangle.
+ */
+inline void
+set_planar_normal (Shape::Triangle& triangle)
+{
+	if (triangle.size() != 3)
+		throw InvalidArgument ("set_planar_normal (Shape::Triangle&): std::size (triangle) must be 3");
+
+	auto const normal = triangle_surface_normal (triangle[0].position(),
+												 triangle[1].position(),
+												 triangle[2].position());
+
+	for (auto& vertex: triangle)
+		vertex.set_normal (normal);
+}
+
+
+inline void
+set_planar_normal (std::span<ShapeVertex> triangle)
+{
+	if (triangle.size() != 3)
+		throw InvalidArgument ("set_planar_normal (span<>): std::size (triangle) must be 3");
+
+	auto const normal = triangle_surface_normal (triangle[0].position(),
+												 triangle[1].position(),
+												 triangle[2].position());
+
+	for (auto& vertex: triangle)
+		vertex.set_normal (normal);
+}
 
 
 /**
