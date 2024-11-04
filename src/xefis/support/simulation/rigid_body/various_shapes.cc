@@ -98,23 +98,21 @@ make_centered_cube_shape (xf::MassMoments<BodyCOM> const& mm, ShapeMaterial cons
 
 
 Shape
-make_centered_sphere_shape (si::Length const radius, size_t slices, size_t stacks,
-							Range<si::Angle> const h_range, Range<si::Angle> const v_range,
-							ShapeMaterial const& material, MakeSphereMaterialCallback const setup_material)
+make_centered_sphere_shape (SphereShapeParameters const& params)
 {
-	slices = std::max<size_t> (slices, 3);
-	stacks = std::max<size_t> (stacks, 2);
+	auto const slices = std::max<size_t> (params.slices, 3);
+	auto const stacks = std::max<size_t> (params.stacks, 2);
 
-	si::Angle const dh = h_range.extent() / slices;
-	si::Angle const dv = v_range.extent() / stacks;
+	si::Angle const dh = params.h_range.extent() / slices;
+	si::Angle const dv = params.v_range.extent() / stacks;
 
 	Shape shape;
-	si::Angle angle_v = v_range.min();
+	si::Angle angle_v = params.v_range.min();
 
 	for (size_t iv = 0; iv < stacks; ++iv, angle_v += dv)
 	{
 		Shape::TriangleStrip& strip = shape.triangle_strips().emplace_back();
-		si::Angle angle_h = h_range.max();
+		si::Angle angle_h = params.h_range.max();
 
 		for (size_t ih = 0; ih < slices + 1; ++ih, angle_h += dh)
 		{
@@ -134,20 +132,20 @@ make_centered_sphere_shape (si::Length const radius, size_t slices, size_t stack
 			auto const p1 = get_vector (angle_v, angle_h);
 			auto const p2 = get_vector (angle_v + dv, angle_h);
 
-			if (setup_material)
+			if (params.setup_material)
 			{
-				auto p1_material = material;
-				setup_material (p1_material, angle_v);
-				strip.emplace_back (p1 * radius, p1, p1_material);
+				auto p1_material = params.material;
+				params.setup_material (p1_material, angle_v);
+				strip.emplace_back (p1 * params.radius, p1, p1_material);
 
-				auto p2_material = material;
-				setup_material (p2_material, angle_v + dv);
-				strip.emplace_back (p2 * radius, p2, p2_material);
+				auto p2_material = params.material;
+				params.setup_material (p2_material, angle_v + dv);
+				strip.emplace_back (p2 * params.radius, p2, p2_material);
 			}
 			else
 			{
-				strip.emplace_back (p1 * radius, p1, material);
-				strip.emplace_back (p2 * radius, p2, material);
+				strip.emplace_back (p1 * params.radius, p1, params.material);
+				strip.emplace_back (p2 * params.radius, p2, params.material);
 			}
 		}
 	}
@@ -161,13 +159,9 @@ make_centered_sphere_shape (si::Length const radius, size_t slices, size_t stack
 
 
 Shape
-make_cylinder_shape (CylinderShapeParameters const& params, ShapeMaterial const& material)
+make_cylinder_shape (CylinderShapeParameters const& params)
 {
-	auto num_faces = params.num_faces;
-
-	if (num_faces < 3)
-		num_faces = 3;
-
+	auto const num_faces = params.num_faces < 3u ? 3u : params.num_faces;
 	Shape shape;
 	Shape::TriangleStrip& strip = shape.triangle_strips().emplace_back();
 	std::optional<Shape::TriangleFan> face1;
@@ -176,9 +170,9 @@ make_cylinder_shape (CylinderShapeParameters const& params, ShapeMaterial const&
 	if (params.with_front_and_back)
 	{
 		face1.emplace();
-		face1->emplace_back (SpaceLength<BodyOrigin> (0_m, 0_m, 0_m), SpaceVector<double, BodyOrigin> (0.0, 0.0, -1.0), material);
+		face1->emplace_back (SpaceLength<BodyOrigin> (0_m, 0_m, 0_m), SpaceVector<double, BodyOrigin> (0.0, 0.0, -1.0), params.material);
 		face2.emplace();
-		face2->emplace_back (SpaceLength<BodyOrigin> (0_m, 0_m, params.length), SpaceVector<double, BodyOrigin> (0.0, 0.0, +1.0), material);
+		face2->emplace_back (SpaceLength<BodyOrigin> (0_m, 0_m, params.length), SpaceVector<double, BodyOrigin> (0.0, 0.0, +1.0), params.material);
 	}
 
 	si::Angle const da = 360_deg / num_faces;
@@ -194,13 +188,13 @@ make_cylinder_shape (CylinderShapeParameters const& params, ShapeMaterial const&
 		SpaceLength<BodyOrigin> const p1 (x_len, y_len, 0_m);
 		SpaceLength<BodyOrigin> const p2 (x_len, y_len, params.length);
 
-		strip.emplace_back (p1, normal, material);
-		strip.emplace_back (p2, normal, material);
+		strip.emplace_back (p1, normal, params.material);
+		strip.emplace_back (p2, normal, params.material);
 
 		if (params.with_front_and_back)
 		{
-			face1->emplace_back (p1, SpaceVector<double, BodyOrigin> (0.0, 0.0, -1.0), material);
-			face2->emplace_back (p2, SpaceVector<double, BodyOrigin> (0.0, 0.0, +1.0), material);
+			face1->emplace_back (p1, SpaceVector<double, BodyOrigin> (0.0, 0.0, -1.0), params.material);
+			face2->emplace_back (p2, SpaceVector<double, BodyOrigin> (0.0, 0.0, +1.0), params.material);
 		}
 	}
 
@@ -216,20 +210,17 @@ make_cylinder_shape (CylinderShapeParameters const& params, ShapeMaterial const&
 
 
 Shape
-make_cone_shape (si::Length const length, si::Length const radius, size_t num_faces, bool with_bottom,
-				 ShapeMaterial const& material)
+make_cone_shape (ConeShapeParameters const& params)
 {
-	if (num_faces < 3)
-		num_faces = 3;
-
+	auto const num_faces = params.num_faces < 3u ? 3u : params.num_faces;
 	Shape shape;
 	Shape::TriangleStrip& cone_strip = shape.triangle_strips().emplace_back();
 	std::optional<Shape::TriangleFan> bottom_fan;
 
-	if (with_bottom)
+	if (params.with_bottom)
 	{
 		bottom_fan.emplace();
-		bottom_fan->emplace_back (SpaceLength<BodyOrigin> (0_m, 0_m, 0_m), SpaceVector<double, BodyOrigin> (0.0, 0.0, -1.0), material);
+		bottom_fan->emplace_back (SpaceLength<BodyOrigin> (0_m, 0_m, 0_m), SpaceVector<double, BodyOrigin> (0.0, 0.0, -1.0), params.material);
 	}
 
 	si::Angle const da = 360_deg / num_faces;
@@ -242,19 +233,19 @@ make_cone_shape (si::Length const length, si::Length const radius, size_t num_fa
 
 		auto const y = cos (angle);
 		auto const x = sin (angle);
-		auto const z = sin (atan (radius / length));
+		auto const z = sin (atan (params.radius / params.length));
 		SpaceVector<double, BodyOrigin> const normal (x, y, z);
-		SpaceLength<BodyOrigin> const p1 (x * radius, y * radius, 0_m);
-		SpaceLength<BodyOrigin> const p2 (0_m, 0_m, length);
+		SpaceLength<BodyOrigin> const p1 (x * params.radius, y * params.radius, 0_m);
+		SpaceLength<BodyOrigin> const p2 (0_m, 0_m, params.length);
 
-		cone_strip.emplace_back (p1, normal, material);
-		cone_strip.emplace_back (p2, normal, material);
+		cone_strip.emplace_back (p1, normal, params.material);
+		cone_strip.emplace_back (p2, normal, params.material);
 
-		if (with_bottom)
-			bottom_fan->emplace_back (p1, SpaceVector<double, BodyOrigin> (0.0, 0.0, -1.0), material);
+		if (params.with_bottom)
+			bottom_fan->emplace_back (p1, SpaceVector<double, BodyOrigin> (0.0, 0.0, -1.0), params.material);
 	}
 
-	if (with_bottom)
+	if (params.with_bottom)
 		shape.triangle_fans() = { std::move (*bottom_fan) };
 
 	return shape;
@@ -287,34 +278,33 @@ make_solid_circle (si::Length const radius, size_t num_slices, ShapeMaterial con
 
 
 Shape
-make_airfoil_shape (AirfoilSpline const& spline, si::Length const chord_length, si::Length wing_length, bool with_front_and_back,
-					ShapeMaterial const& material)
+make_airfoil_shape (AirfoilShapeParameters const& params)
 {
 	Shape shape;
 	Shape::TriangleStrip& strip = shape.triangle_strips().emplace_back();
 	std::optional<Shape::TriangleFan> face1;
 	std::optional<Shape::TriangleFan> face2;
 
-	if (with_front_and_back)
+	if (params.with_front_and_back)
 	{
 		face1.emplace();
-		face1->emplace_back (SpaceLength<BodyOrigin> (0_m, 0_m, 0_m), SpaceVector<double, BodyOrigin> (0.0, 0.0, -1.0), material);
+		face1->emplace_back (SpaceLength<BodyOrigin> (0_m, 0_m, 0_m), SpaceVector<double, BodyOrigin> (0.0, 0.0, -1.0), params.material);
 		face2.emplace();
-		face2->emplace_back (SpaceLength<BodyOrigin> (0_m, 0_m, wing_length), SpaceVector<double, BodyOrigin> (0.0, 0.0, +1.0), material);
+		face2->emplace_back (SpaceLength<BodyOrigin> (0_m, 0_m, params.wing_length), SpaceVector<double, BodyOrigin> (0.0, 0.0, +1.0), params.material);
 	}
 
-	auto const n_points = spline.points().size();
+	auto const n_points = params.spline.points().size();
 
 	for (ptrdiff_t i = neutrino::to_signed (n_points) + 1; i > 0; --i)
 	{
-		auto const prev_point = spline.points()[wrap_array_index (i - 1, n_points)];
-		auto const point = spline.points()[to_unsigned (i) % n_points];
-		auto const next_point = spline.points()[wrap_array_index (i + 1, n_points)];
+		auto const prev_point = params.spline.points()[wrap_array_index (i - 1, n_points)];
+		auto const point = params.spline.points()[to_unsigned (i) % n_points];
+		auto const next_point = params.spline.points()[wrap_array_index (i + 1, n_points)];
 
-		auto const x_len = chord_length * point[0];
-		auto const y_len = chord_length * point[1];
+		auto const x_len = params.chord_length * point[0];
+		auto const y_len = params.chord_length * point[1];
 		SpaceLength<BodyOrigin> const p1 (x_len, y_len, 0_m);
-		SpaceLength<BodyOrigin> const p2 (x_len, y_len, wing_length);
+		SpaceLength<BodyOrigin> const p2 (x_len, y_len, params.wing_length);
 
 		SpaceVector<double, BodyOrigin> const z_versor (0, 0, 1);
 		SpaceVector<double, BodyOrigin> const k_towards_prev = SpaceVector<double, BodyOrigin> (prev_point[0], prev_point[1], 0) - SpaceVector<double, BodyOrigin> (point[0], point[1], 0);
@@ -323,17 +313,17 @@ make_airfoil_shape (AirfoilSpline const& spline, si::Length const chord_length, 
 		SpaceVector<double, BodyOrigin> const normal_with_next (cross_product (k_towards_next, z_versor));
 		SpaceVector<double, BodyOrigin> const normal = normalized (normal_with_prev + normal_with_next);
 
-		strip.emplace_back (p1, normal, material);
-		strip.emplace_back (p2, normal, material);
+		strip.emplace_back (p1, normal, params.material);
+		strip.emplace_back (p2, normal, params.material);
 
-		if (with_front_and_back)
+		if (params.with_front_and_back)
 		{
-			face1->emplace_back (p1, SpaceVector<double, BodyOrigin> (0.0, 0.0, -1.0), material);
-			face2->emplace_back (p2, SpaceVector<double, BodyOrigin> (0.0, 0.0, +1.0), material);
+			face1->emplace_back (p1, SpaceVector<double, BodyOrigin> (0.0, 0.0, -1.0), params.material);
+			face2->emplace_back (p2, SpaceVector<double, BodyOrigin> (0.0, 0.0, +1.0), params.material);
 		}
 	}
 
-	if (with_front_and_back)
+	if (params.with_front_and_back)
 	{
 		// Reverse order to keep the face facing outside:
 		std::reverse (std::next (face2->begin()), face2->end());
@@ -400,14 +390,14 @@ make_propeller_shape (PropellerShapeParameters const& params)
 Shape
 make_center_of_mass_symbol_shape (si::Length const radius, ShapeMaterial const& a, ShapeMaterial const& b)
 {
-	return make_centered_sphere_shape (radius, 8, 8, {   0_deg,  90_deg }, { -90_deg,   0_deg }, a)
-		 + make_centered_sphere_shape (radius, 8, 8, {   0_deg,  90_deg }, {   0_deg, +90_deg }, b)
-		 + make_centered_sphere_shape (radius, 8, 8, {  90_deg, 180_deg }, { -90_deg,   0_deg }, b)
-		 + make_centered_sphere_shape (radius, 8, 8, {  90_deg, 180_deg }, {   0_deg, +90_deg }, a)
-		 + make_centered_sphere_shape (radius, 8, 8, { 180_deg, 270_deg }, { -90_deg,   0_deg }, a)
-		 + make_centered_sphere_shape (radius, 8, 8, { 180_deg, 270_deg }, {   0_deg, +90_deg }, b)
-		 + make_centered_sphere_shape (radius, 8, 8, { 270_deg, 360_deg }, { -90_deg,   0_deg }, b)
-		 + make_centered_sphere_shape (radius, 8, 8, { 270_deg, 360_deg }, {   0_deg, +90_deg }, a);
+	return make_centered_sphere_shape ({ .radius = radius, .slices = 8, .stacks = 8, .h_range = {   0_deg,  90_deg }, .v_range = { -90_deg,   0_deg }, .material = a })
+		 + make_centered_sphere_shape ({ .radius = radius, .slices = 8, .stacks = 8, .h_range = {   0_deg,  90_deg }, .v_range = {   0_deg, +90_deg }, .material = b })
+		 + make_centered_sphere_shape ({ .radius = radius, .slices = 8, .stacks = 8, .h_range = {  90_deg, 180_deg }, .v_range = { -90_deg,   0_deg }, .material = b })
+		 + make_centered_sphere_shape ({ .radius = radius, .slices = 8, .stacks = 8, .h_range = {  90_deg, 180_deg }, .v_range = {   0_deg, +90_deg }, .material = a })
+		 + make_centered_sphere_shape ({ .radius = radius, .slices = 8, .stacks = 8, .h_range = { 180_deg, 270_deg }, .v_range = { -90_deg,   0_deg }, .material = a })
+		 + make_centered_sphere_shape ({ .radius = radius, .slices = 8, .stacks = 8, .h_range = { 180_deg, 270_deg }, .v_range = {   0_deg, +90_deg }, .material = b })
+		 + make_centered_sphere_shape ({ .radius = radius, .slices = 8, .stacks = 8, .h_range = { 270_deg, 360_deg }, .v_range = { -90_deg,   0_deg }, .material = b })
+		 + make_centered_sphere_shape ({ .radius = radius, .slices = 8, .stacks = 8, .h_range = { 270_deg, 360_deg }, .v_range = {   0_deg, +90_deg }, .material = a });
 }
 
 } // namespace xf::rigid_body

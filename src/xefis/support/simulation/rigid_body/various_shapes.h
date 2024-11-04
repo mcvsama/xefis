@@ -39,12 +39,45 @@ enum RotationDirection
 };
 
 
+struct SphereShapeParameters
+{
+	si::Length					radius;
+	std::size_t					slices;
+	std::size_t					stacks;
+	Range<si::Angle>			h_range			{ 0_deg, 360_deg };
+	Range<si::Angle>			v_range			{ -90_deg, +90_deg };
+	ShapeMaterial const&		material		{ };
+	MakeSphereMaterialCallback	setup_material	{ nullptr };
+};
+
+
 struct CylinderShapeParameters
 {
-	si::Length	length;
-	si::Length	radius;
-	size_t		num_faces;
-	bool		with_front_and_back;
+	si::Length				length;
+	si::Length				radius;
+	std::size_t				num_faces			{ 10 };
+	bool					with_front_and_back	{ false };
+	ShapeMaterial const&	material			{ };
+};
+
+
+struct ConeShapeParameters
+{
+	si::Length				length;
+	si::Length				radius;
+	size_t					num_faces			{ 10 };
+	bool					with_bottom			{ false };
+	ShapeMaterial const&	material			{ };
+};
+
+
+struct AirfoilShapeParameters
+{
+	AirfoilSpline const&	spline;
+	si::Length				chord_length;
+	si::Length				wing_length;
+	bool					with_front_and_back	{ true };
+	ShapeMaterial const&	material			{ };
 };
 
 
@@ -83,36 +116,33 @@ make_centered_cube_shape (xf::MassMoments<BodyCOM> const&, ShapeMaterial const& 
  * Make sphere of given radius.
  */
 Shape
-make_centered_sphere_shape (si::Length radius, size_t slices, size_t stacks,
-							Range<si::Angle> h_range = { 0_deg, 360_deg }, Range<si::Angle> v_range = { -90_deg, +90_deg },
-							ShapeMaterial const& material = {}, MakeSphereMaterialCallback = nullptr);
+make_centered_sphere_shape (SphereShapeParameters const&);
 
 /**
  * Make a rod shape without bottom/top faces, placed along the Z axis.
  * The beginning of the rod is at the [0, 0, 0] position.
  */
 Shape
-make_cylinder_shape (CylinderShapeParameters const&, ShapeMaterial const& = {});
+make_cylinder_shape (CylinderShapeParameters const&);
 
 /**
  * Make a cone shape placed along the Z axis with pointy part pointing towards positive Z values.
  */
 Shape
-make_cone_shape (si::Length length, si::Length radius, size_t num_faces, bool with_bottom = true,
-				 ShapeMaterial const& = {});
+make_cone_shape (ConeShapeParameters const&);
 
 /**
  * Make a solid circle placed on X-Y plane.
  */
 Shape
-make_solid_circle (si::Length radius, size_t num_slices, ShapeMaterial const& = {});
+make_solid_circle (si::Length radius, std::size_t num_slices, ShapeMaterial const& = {});
 
 /**
  * Make a wing shape. Extrude airfoil spline (defined in X-Y axes) along +Z axis.
  */
 Shape
-make_airfoil_shape (AirfoilSpline const& spline, si::Length chord_length, si::Length wing_length, bool with_front_and_back = true,
-					ShapeMaterial const& = {});
+make_airfoil_shape (AirfoilShapeParameters const&);
+
 /**
  * Make a "typical" propeller shape. The front of the propeller (where it creates a force) is towards the positive Z axis.
  *

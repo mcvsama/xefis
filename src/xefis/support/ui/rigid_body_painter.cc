@@ -246,7 +246,14 @@ RigidBodyPainter::paint_planet()
 			material.emission_color = get_intermediate_color (std::pow (norm, 1.0 + 2 * normalized_altitude), sky_color, sky_fog_color);
 		};
 
-		auto sky = rigid_body::make_centered_sphere_shape (kEarthMeanRadius + kSkyHeight, 20, 20, { 0_deg, 360_deg }, { 60_deg, 90_deg }, sky_material, configure_material);
+		auto sky = rigid_body::make_centered_sphere_shape ({
+			.radius = kEarthMeanRadius + kSkyHeight,
+			.slices = 20,
+			.stacks = 20,
+			.v_range = { 60_deg, 90_deg },
+			.material = sky_material,
+			.setup_material = configure_material,
+		});
 		rigid_body::negate_normals (sky);
 
 		_gl.rotate (+_position_on_earth.lon(), 0, 0, 1);
@@ -277,7 +284,14 @@ RigidBodyPainter::paint_planet()
 		// Rotate sun shines when camera angle changes:
 		_gl.rotate (_camera_angles[0] - 2 * _camera_angles[1], 0, 0, 1);
 
-		auto sun = rigid_body::make_centered_sphere_shape (kSunRadius, 9, 36, { 0_deg, 360_deg }, { 0_deg, 90_deg }, sun_material, configure_material);
+		auto sun = rigid_body::make_centered_sphere_shape ({
+			.radius = kSunRadius,
+			.slices = 9,
+			.stacks = 36,
+			.v_range = { 0_deg, 90_deg },
+			.material = sun_material,
+			.setup_material = configure_material,
+		});
 		rigid_body::negate_normals (sun);
 
 		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -338,7 +352,7 @@ RigidBodyPainter::paint_air_particles()
 		auto const grid_size = 5_m;
 		auto ball_material = rigid_body::kWhiteMatte;
 		ball_material.emission_color = Qt::white;
-		auto const ball = rigid_body::make_centered_sphere_shape (ball_size, 3, 3, { 0_deg, 360_deg }, { -90_deg, +90_deg }, ball_material);
+		auto const ball = rigid_body::make_centered_sphere_shape ({ .radius = ball_size, .slices = 3, .stacks = 3, .material = ball_material });
 		auto const range = 3 * grid_size;
 
 		// Figure out nearest 3D grid points.
@@ -452,7 +466,7 @@ RigidBodyPainter::paint_body (rigid_body::Body const& body, bool body_visible, b
 		{
 			auto const origin_material = rigid_body::make_material ({ 0xff, 0xff, 0x00 });
 			// TODO make the sphere zoom-independent (distance from the camera-independent):
-			auto const origin_shape = rigid_body::make_centered_sphere_shape (5_cm, 8, 8, { 0_deg, 360_deg }, { -90_deg, +90_deg }, origin_material);
+			auto const origin_shape = rigid_body::make_centered_sphere_shape ({ .radius = 5_cm, .slices = 8, .stacks = 8, .material = origin_material });
 			_gl.draw (origin_shape);
 		}
 	});
@@ -515,7 +529,8 @@ RigidBodyPainter::paint_constraint (rigid_body::Constraint const& constraint)
 						.radius = radius,
 						.num_faces = 16,
 						.with_front_and_back = front_back_faces,
-					}, material);
+						.material = material,
+					});
 					_gl.draw (shape);
 				});
 			};
@@ -638,9 +653,9 @@ RigidBodyPainter::draw_arrow (SpaceLength<rigid_body::WorldSpace> const& origin,
 			_gl.rotate (alpha_beta[0], 0, 0, 1);
 			_gl.rotate (alpha_beta[1], 0, 1, 0);
 			_gl.rotate (90_deg, 0, 1, 0);
-			_gl.draw (rigid_body::make_cylinder_shape ({ .length = length, .radius = radius, .num_faces = kNumFaces, .with_front_and_back = true }, material));
+			_gl.draw (rigid_body::make_cylinder_shape ({ .length = length, .radius = radius, .num_faces = kNumFaces, .with_front_and_back = true, .material = material }));
 			_gl.translate (0_m, 0_m, length);
-			_gl.draw (rigid_body::make_cone_shape (cone_length, cone_radius, kNumFaces, true, material));
+			_gl.draw (rigid_body::make_cone_shape ({ .length = cone_length, .radius = cone_radius, .num_faces = kNumFaces, .with_bottom = true, .material = material }));
 		}
 	});
 }
@@ -685,26 +700,26 @@ RigidBodyPainter::paint_ecef_basis (QOpenGLPaintDevice& canvas)
 			auto const kNumFaces = 12;
 
 			// Root ball:
-			_gl.draw (rigid_body::make_centered_sphere_shape (2 * radius, 8, 8));
+			_gl.draw (rigid_body::make_centered_sphere_shape ({ .radius = 2 * radius, .slices = 8, .stacks = 8 }));
 			// X axis:
 			_gl.save_context ([&] {
 				_gl.rotate (+90_deg, 0.0, 1.0, 0.0);
-				_gl.draw (rigid_body::make_cylinder_shape ({ .length = length, .radius = radius, .num_faces = kNumFaces, .with_front_and_back = false }, red));
+				_gl.draw (rigid_body::make_cylinder_shape ({ .length = length, .radius = radius, .num_faces = kNumFaces, .with_front_and_back = false, .material = red }));
 				_gl.translate (0_m, 0_m, length);
-				_gl.draw (rigid_body::make_cone_shape (cone_length, cone_radius, kNumFaces, true, red));
+				_gl.draw (rigid_body::make_cone_shape ({ .length = cone_length, .radius = cone_radius, .num_faces = kNumFaces, .with_bottom = true, .material = red }));
 			});
 			// Y axis:
 			_gl.save_context ([&] {
 				_gl.rotate (-90_deg, 1.0, 0.0, 0.0);
-				_gl.draw (rigid_body::make_cylinder_shape ({ .length = length, .radius = radius, .num_faces = kNumFaces, .with_front_and_back = false }, green));
+				_gl.draw (rigid_body::make_cylinder_shape ({ .length = length, .radius = radius, .num_faces = kNumFaces, .with_front_and_back = false, .material = green }));
 				_gl.translate (0_m, 0_m, length);
-				_gl.draw (rigid_body::make_cone_shape (cone_length, cone_radius, kNumFaces, true, green));
+				_gl.draw (rigid_body::make_cone_shape ({ .length = cone_length, .radius = cone_radius, .num_faces = kNumFaces, .with_bottom = true, .material = green }));
 			});
 			// Z axis:
 			_gl.save_context ([&] {
-				_gl.draw (rigid_body::make_cylinder_shape ({ .length = length, .radius = radius, .num_faces = kNumFaces, .with_front_and_back = false }, blue));
+				_gl.draw (rigid_body::make_cylinder_shape ({ .length = length, .radius = radius, .num_faces = kNumFaces, .with_front_and_back = false, .material = blue }));
 				_gl.translate (0_m, 0_m, length);
-				_gl.draw (rigid_body::make_cone_shape (cone_length, cone_radius, kNumFaces, true, blue));
+				_gl.draw (rigid_body::make_cone_shape ({ .length = cone_length, .radius = cone_radius, .num_faces = kNumFaces, .with_bottom = true, .material = blue }));
 			});
 
 			glDisable (GL_LIGHT1);
