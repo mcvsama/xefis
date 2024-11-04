@@ -124,7 +124,7 @@ template<class pSpace = void>
 		SpaceVector<si::Length, Space>										_center_of_mass_position	{ 0_m, 0_m, 0_m };
 		SpaceMatrix<si::MomentOfInertia, Space>								_inertia_tensor				{ math::zero };
 		// TODO consider making this optional (+std::mutex and mutable keyword):
-		typename SpaceMatrix<si::MomentOfInertia, Space>::InversedMatrix	_inverse_inertia_tensor		{ math::zero };
+		decltype (_inertia_tensor)::InversedMatrix							_inverse_inertia_tensor		{ math::zero };
 	};
 
 
