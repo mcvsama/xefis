@@ -39,6 +39,15 @@ struct NEDSpace;
 struct AirframeSpace;
 
 
+template<class Triangle>
+	concept TriangleConcept = requires (Triangle const& t) {
+		std::size (t);
+		t[0];
+		t[1];
+		t[2];
+	};
+
+
 template<class Scalar = double, class Space = void>
 	using PlaneVector = math::Vector<Scalar, 2, Space, void>;
 
@@ -57,11 +66,14 @@ template<class TargetSpace = void, class SourceSpace = TargetSpace>
 template<class TargetSpace = void, class SourceSpace = TargetSpace>
 	RotationMatrix<TargetSpace, SourceSpace> const kNoRotation = math::unit;
 
-template<class Scalar = double, class Space = void>
-	using PlaneTriangle = std::array<PlaneVector<Scalar, Space>, 3>;
+template<class Scalar, std::size_t N, class Space = void>
+	using Triangle = std::array<math::Vector<Scalar, N, Space>, 3>;
 
-template<class Scalar = double, class Space = void>
-	using SpaceTriangle = std::array<SpaceVector<Scalar, Space>, 3>;
+template<class Scalar, class Space = void>
+	using PlaneTriangle = Triangle<Scalar, 2, Space>;
+
+template<class Scalar, class Space = void>
+	using SpaceTriangle = Triangle<Scalar, 3, Space>;
 
 // Typical units used in space:
 
@@ -502,17 +514,14 @@ template<class Scalar, class Space>
 /**
  * Return normal vector for given triangle (front face is defined by CCW vertex order).
  */
-template<class Triangle>
+template<TriangleConcept Triangle>
 	inline auto
 	triangle_surface_normal (Triangle const& triangle)
 	{
 		if (std::size (triangle) != 3)
 			throw InvalidArgument ("triangle_surface_normal(): std::size (triangle) must be 3");
 
-		auto const scalar = decltype (triangle[0].position()[0]) { 1 };
-
-		return normalized (cross_product (triangle[1].position() - triangle[0].position(),
-										  triangle[2].position() - triangle[0].position()) / scalar / scalar);
+		return triangle_surface_normal (triangle[0], triangle[1], triangle[2]);
 	}
 
 

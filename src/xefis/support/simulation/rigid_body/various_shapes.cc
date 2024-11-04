@@ -67,11 +67,11 @@ make_centered_cube_shape (SpaceLength<BodyOrigin> const& dimensions, ShapeMateri
 		{ { -x, -y, -z }, { +x, -y, -z }, { +x, -y, +z } },
 	};
 
-	auto b = shape.triangles().begin();
-	auto e = shape.triangles().end();
-
-	set_planar_normals (b, e);
-	set_material (b, e, material);
+	for (auto& triangle: shape.triangles())
+	{
+		set_planar_normal (triangle);
+		set_material (triangle, material);
+	}
 
 	return shape;
 }

@@ -195,42 +195,31 @@ negate_normals (std::vector<ShapeVertex>& vertices)
 
 
 /**
- * Negate normals for all given triangles.
- */
-template<class TriangleIterator>
-	inline void
-	negate_normals (TriangleIterator begin, TriangleIterator end)
-	{
-		for (auto triangle = begin; triangle != end; ++triangle)
-			for (auto& vertex: *triangle)
-				if (auto normal = vertex.normal())
-					vertex.set_normal (-*normal);
-	}
-
-
-/**
  * Negate all normals in given shape.
  */
 inline void
 negate_normals (Shape& shape)
 {
-	negate_normals (shape.triangles().begin(), shape.triangles().end());
-	negate_normals (shape.triangle_strips().begin(), shape.triangle_strips().end());
-	negate_normals (shape.triangle_fans().begin(), shape.triangle_fans().end());
+	for (auto& triangle: shape.triangles())
+		negate_normals (triangle);
+
+	for (auto& strip: shape.triangle_strips())
+		negate_normals (strip);
+
+	for (auto& fan: shape.triangle_fans())
+		negate_normals (fan);
 }
 
 
 /**
- * Set given material for all vertices in all triangles.
+ * Set given material for all given vertices.
  */
-template<class TriangleIterator>
-	inline void
-	set_material (TriangleIterator begin, TriangleIterator end, ShapeMaterial const& material)
-	{
-		for (auto triangle = begin; triangle != end; ++triangle)
-			for (auto& vertex: *triangle)
-				vertex.set_material (material);
-	}
+inline void
+set_material (std::vector<ShapeVertex>& vertices, ShapeMaterial const& material)
+{
+	for (auto& vertex: vertices)
+		vertex.set_material (material);
+}
 
 } // namespace xf::rigid_body
 

@@ -23,19 +23,19 @@
 
 namespace xf {
 
-template<class Scalar, class Space>
-	inline PlaneVector<Scalar, Space>
-	triangle_centroid (PlaneVector<Scalar, Space> const& a,
-					   PlaneVector<Scalar, Space> const& b,
-					   PlaneVector<Scalar, Space> const& c)
+template<class Scalar, std::size_t N, class Space>
+	inline math::Vector<Scalar, N, Space>
+	triangle_centroid (math::Vector<Scalar, N, Space> const& a,
+					   math::Vector<Scalar, N, Space> const& b,
+					   math::Vector<Scalar, N, Space> const& c)
 	{
 		return 1.0 / 3 * (a + b + c);
 	}
 
 
-template<class Scalar, class Space>
-	inline PlaneVector<Scalar, Space>
-	triangle_centroid (PlaneTriangle<Scalar, Space> const& triangle)
+template<class Scalar, std::size_t N, class Space>
+	inline math::Vector<Scalar, N, Space>
+	triangle_centroid (Triangle<Scalar, N, Space> const& triangle)
 	{
 		return triangle_centroid (triangle[0], triangle[1], triangle[2]);
 	}
