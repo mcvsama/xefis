@@ -104,19 +104,18 @@ BodyEditor::refresh()
 void
 BodyEditor::refresh_wing_specific_data()
 {
-	auto const not_applicable = QString ("N/A");
-	auto const not_computed = QString ("–");
-
-	auto const set_wing_values = [this](QString const& value) {
-		_true_air_speed->setText (value);
-		_static_air_temperature->setText (value);
-		_air_density->setText (value);
-		_dynamic_viscosity->setText (value);
-		_reynolds_number->setText (value);
-	};
-
 	if (auto* wing = dynamic_cast<sim::Wing*> (_edited_body))
 	{
+		auto const not_computed = QString ("–");
+
+		auto const set_wing_values = [this](QString const& value) {
+			_true_air_speed->setText (value);
+			_static_air_temperature->setText (value);
+			_air_density->setText (value);
+			_dynamic_viscosity->setText (value);
+			_reynolds_number->setText (value);
+		};
+
 		auto const* rigid_body_system = _rigid_body_viewer.rigid_body_system();
 		auto const* atmosphere = rigid_body_system ? rigid_body_system->atmosphere() : nullptr;
 
