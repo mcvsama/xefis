@@ -35,28 +35,57 @@ class AngularServo:
 	// TODO and electrial device
 {
   public:
-	using Resolution = decltype (1 / 1_rad);
-
-  public:
 	/**
 	 * Ctor
 	 * \param	AngularVelocityPotential, TorquePotential
 	 *			See AngularServoConstraint.
 	 * \param	resolution
-	 *			Number of recognized steps per radian of movement.
+	 *			Angle per step. Usually between 0.5° (digital) to 2° (analog).
 	 * \param	MassMoments
 	 *			Servo mass moments.
 	 */
 	explicit
-	AngularServo (rigid_body::AngularServoConstraint&, Resolution resolution_per_radian, MassMoments<rigid_body::BodyCOM> const&);
+	AngularServo (rigid_body::AngularServoConstraint&, si::Angle resolution, MassMoments<rigid_body::BodyCOM> const&);
+
+	[[nodiscard]]
+	si::Angle
+	resolution() const noexcept
+		{ return _resolution; }
+
+	// Servo API
+	[[nodiscard]]
+	xf::sim::ServoOrientation
+	orientation() const noexcept override
+		{ return _constraint.orientation(); }
+
+	// Servo API
+	void
+	set_orientation (xf::sim::ServoOrientation const orientation) override
+		{ _constraint.set_orientation (orientation); }
+
+	// Servo API
+	[[nodiscard]]
+	virtual si::Angle
+	setpoint() const noexcept override
+		{ return _constraint.setpoint(); }
 
 	// Servo API
 	void
 	set_setpoint (si::Angle) override;
 
+	[[nodiscard]]
+	rigid_body::AngularServoConstraint const&
+	constraint() const noexcept
+		{ return _constraint; }
+
+	[[nodiscard]]
+	rigid_body::AngularServoConstraint&
+	constraint() noexcept
+		{ return _constraint; }
+
   private:
 	rigid_body::AngularServoConstraint&	_constraint;
-	Resolution							_resolution;
+	si::Angle							_resolution;
 };
 
 

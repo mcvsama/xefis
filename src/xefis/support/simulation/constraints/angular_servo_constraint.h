@@ -79,8 +79,13 @@ class AngularServoConstraint:
 	explicit
 	AngularServoConstraint (HingePrecalculation&, Range<si::Angle> angle_range, si::Angle backlash, AngularVelocityPotential, TorquePotential);
 
+	[[nodiscard]]
+	xf::sim::ServoOrientation
+	orientation() const noexcept override
+		{ return _orientation; }
+
 	void
-	set_orientation (xf::sim::ServoOrientation const orientation)
+	set_orientation (xf::sim::ServoOrientation const orientation) override
 		{ _orientation = orientation; }
 
 	/**
@@ -94,15 +99,16 @@ class AngularServoConstraint:
 	/**
 	 * Return servo setpoint.
 	 */
+	[[nodiscard]]
 	si::Angle
-	setpoint() const noexcept
+	setpoint() const noexcept override
 		{ return _setpoint; }
 
 	/**
 	 * Set servo setpoint.
 	 */
 	void
-	set_setpoint (si::Angle const setpoint)
+	set_setpoint (si::Angle const setpoint) override
 		{ _setpoint = std::to_underlying (_orientation) * std::clamp (setpoint, _angle_range.min(), _angle_range.max()); }
 
 	/**
@@ -130,6 +136,7 @@ class AngularServoConstraint:
 	/**
 	 * Return current relative arm velocity.
 	 */
+	[[nodiscard]]
 	si::AngularVelocity
 	arm_angular_velocity() const
 		{ return _arm_angular_velocity; }
@@ -137,6 +144,7 @@ class AngularServoConstraint:
 	/**
 	 * Return current arm torque.
 	 */
+	[[nodiscard]]
 	si::Torque
 	arm_torque() const
 		{ return _arm_torque; }

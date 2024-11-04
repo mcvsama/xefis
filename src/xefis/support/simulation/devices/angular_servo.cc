@@ -30,7 +30,7 @@
 
 namespace xf::sim {
 
-AngularServo::AngularServo (rigid_body::AngularServoConstraint& constraint, Resolution const resolution, MassMoments<rigid_body::BodyCOM> const& mass_moments):
+AngularServo::AngularServo (rigid_body::AngularServoConstraint& constraint, si::Angle const resolution, MassMoments<rigid_body::BodyCOM> const& mass_moments):
 	Body (mass_moments),
 	_constraint (constraint),
 	_resolution (resolution)
@@ -40,7 +40,7 @@ AngularServo::AngularServo (rigid_body::AngularServoConstraint& constraint, Reso
 void
 AngularServo::set_setpoint (si::Angle const setpoint)
 {
-	_constraint.set_setpoint (neutrino::quantized (setpoint, _resolution, _constraint.angle_range()));
+	_constraint.set_setpoint (neutrino::quantized (setpoint, 1 / _resolution, _constraint.angle_range()));
 }
 
 
@@ -49,7 +49,7 @@ make_standard_9gram_servo (rigid_body::AngularServoConstraint& constraint)
 {
 	auto const mass = 9_gr;
 	auto const mass_moments = MassMoments<rigid_body::BodyCOM> (mass, math::zero, make_cuboid_inertia_tensor<rigid_body::BodyCOM> (mass, { 24_mm, 12_mm, 28_mm }));
-	return std::make_unique<AngularServo> (constraint, 2 / 1_deg, mass_moments);
+	return std::make_unique<AngularServo> (constraint, 0.5_deg, mass_moments);
 }
 
 } // namespace xf::sim

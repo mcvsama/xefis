@@ -44,6 +44,20 @@ class AngularServo
 	virtual
 	~AngularServo() = default;
 
+	[[nodiscard]]
+	virtual xf::sim::ServoOrientation
+	orientation() const noexcept = 0;
+
+	virtual void
+	set_orientation (xf::sim::ServoOrientation const) = 0;
+
+	/**
+	 * Return the setpoint.
+	 */
+	[[nodiscard]]
+	virtual si::Angle
+	setpoint() const noexcept = 0;
+
 	/**
 	 * Set servo setpoint in range [0, 1].
 	 * Values outside allowed range should be clamped.
