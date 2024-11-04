@@ -313,7 +313,7 @@ BodiesTree::contextMenuEvent (QContextMenuEvent* event)
 			}
 
 			{
-				auto* action = menu.addAction ("Origin visible", [this, body_item, &rendering] {
+				auto* action = menu.addAction ("Origin always visible", [this, body_item, &rendering] {
 					rendering.origin_visible = !rendering.origin_visible;
 				});
 				action->setCheckable (true);
@@ -321,7 +321,7 @@ BodiesTree::contextMenuEvent (QContextMenuEvent* event)
 			}
 
 			{
-				auto* action = menu.addAction ("Center of mass visible", [this, body_item, &rendering] {
+				auto* action = menu.addAction ("Center of mass always visible", [this, body_item, &rendering] {
 					rendering.center_of_mass_visible = !rendering.center_of_mass_visible;
 				});
 				action->setCheckable (true);
@@ -336,7 +336,7 @@ BodiesTree::contextMenuEvent (QContextMenuEvent* event)
 				action->setChecked (rendering.moments_of_inertia_visible);
 			}
 
-			// TODO For Wings - "Neutral point visible" (green or light blue?)
+			// TODO For airfoils - "Center of pressure visible" (green or light blue?)
 		}
 		else if (auto* constraint_item = dynamic_cast<ConstraintItem*> (item))
 		{
