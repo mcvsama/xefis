@@ -56,7 +56,8 @@ struct CylinderShapeParameters
 	si::Length				length;
 	si::Length				radius;
 	std::size_t				num_faces			{ 10 };
-	bool					with_front_and_back	{ false };
+	bool					with_bottom			{ false };
+	bool					with_top			{ false };
 	ShapeMaterial const&	material			{ };
 };
 
@@ -88,7 +89,8 @@ struct AirfoilShapeParameters
 	AirfoilSpline const&	spline;
 	si::Length				chord_length;
 	si::Length				wing_length;
-	bool					with_front_and_back	{ true };
+	bool					with_bottom			{ true };
+	bool					with_top			{ true };
 	ShapeMaterial const&	material			{ };
 };
 

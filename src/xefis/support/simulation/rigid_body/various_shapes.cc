@@ -164,15 +164,19 @@ make_cylinder_shape (CylinderShapeParameters const& params)
 	auto const num_faces = params.num_faces < 3u ? 3u : params.num_faces;
 	Shape shape;
 	Shape::TriangleStrip& strip = shape.triangle_strips().emplace_back();
-	std::optional<Shape::TriangleFan> face1;
-	std::optional<Shape::TriangleFan> face2;
+	std::optional<Shape::TriangleFan> bottom;
+	std::optional<Shape::TriangleFan> top;
 
-	if (params.with_front_and_back)
+	if (params.with_bottom)
 	{
-		face1.emplace();
-		face1->emplace_back (SpaceLength<BodyOrigin> (0_m, 0_m, 0_m), SpaceVector<double, BodyOrigin> (0.0, 0.0, -1.0), params.material);
-		face2.emplace();
-		face2->emplace_back (SpaceLength<BodyOrigin> (0_m, 0_m, params.length), SpaceVector<double, BodyOrigin> (0.0, 0.0, +1.0), params.material);
+		bottom.emplace();
+		bottom->emplace_back (SpaceLength<BodyOrigin> (0_m, 0_m, 0_m), SpaceVector<double, BodyOrigin> (0.0, 0.0, -1.0), params.material);
+	}
+
+	if (params.with_top)
+	{
+		top.emplace();
+		top->emplace_back (SpaceLength<BodyOrigin> (0_m, 0_m, params.length), SpaceVector<double, BodyOrigin> (0.0, 0.0, +1.0), params.material);
 	}
 
 	si::Angle const da = 360_deg / num_faces;
@@ -191,18 +195,21 @@ make_cylinder_shape (CylinderShapeParameters const& params)
 		strip.emplace_back (p1, normal, params.material);
 		strip.emplace_back (p2, normal, params.material);
 
-		if (params.with_front_and_back)
-		{
-			face1->emplace_back (p1, SpaceVector<double, BodyOrigin> (0.0, 0.0, -1.0), params.material);
-			face2->emplace_back (p2, SpaceVector<double, BodyOrigin> (0.0, 0.0, +1.0), params.material);
-		}
+		if (params.with_bottom)
+			bottom->emplace_back (p1, SpaceVector<double, BodyOrigin> (0.0, 0.0, -1.0), params.material);
+
+		if (params.with_top)
+			top->emplace_back (p2, SpaceVector<double, BodyOrigin> (0.0, 0.0, +1.0), params.material);
 	}
 
-	if (params.with_front_and_back)
+	if (params.with_bottom)
+		shape.triangle_fans().push_back (std::move (*bottom));
+
+	if (params.with_top)
 	{
 		// Reverse order to keep the face facing outside:
-		std::reverse (std::next (face2->begin()), face2->end());
-		shape.triangle_fans() = { std::move (*face1), std::move (*face2) };
+		std::reverse (std::next (top->begin()), top->end());
+		shape.triangle_fans().push_back (std::move (*top));
 	}
 
 	return shape;
@@ -316,15 +323,19 @@ make_airfoil_shape (AirfoilShapeParameters const& params)
 {
 	Shape shape;
 	Shape::TriangleStrip& strip = shape.triangle_strips().emplace_back();
-	std::optional<Shape::TriangleFan> face1;
-	std::optional<Shape::TriangleFan> face2;
+	std::optional<Shape::TriangleFan> bottom;
+	std::optional<Shape::TriangleFan> top;
 
-	if (params.with_front_and_back)
+	if (params.with_bottom)
 	{
-		face1.emplace();
-		face1->emplace_back (SpaceLength<BodyOrigin> (0_m, 0_m, 0_m), SpaceVector<double, BodyOrigin> (0.0, 0.0, -1.0), params.material);
-		face2.emplace();
-		face2->emplace_back (SpaceLength<BodyOrigin> (0_m, 0_m, params.wing_length), SpaceVector<double, BodyOrigin> (0.0, 0.0, +1.0), params.material);
+		bottom.emplace();
+		bottom->emplace_back (SpaceLength<BodyOrigin> (0_m, 0_m, 0_m), SpaceVector<double, BodyOrigin> (0.0, 0.0, -1.0), params.material);
+	}
+
+	if (params.with_top)
+	{
+		top.emplace();
+		top->emplace_back (SpaceLength<BodyOrigin> (0_m, 0_m, params.wing_length), SpaceVector<double, BodyOrigin> (0.0, 0.0, +1.0), params.material);
 	}
 
 	auto const n_points = params.spline.points().size();
@@ -350,18 +361,21 @@ make_airfoil_shape (AirfoilShapeParameters const& params)
 		strip.emplace_back (p1, normal, params.material);
 		strip.emplace_back (p2, normal, params.material);
 
-		if (params.with_front_and_back)
-		{
-			face1->emplace_back (p1, SpaceVector<double, BodyOrigin> (0.0, 0.0, -1.0), params.material);
-			face2->emplace_back (p2, SpaceVector<double, BodyOrigin> (0.0, 0.0, +1.0), params.material);
-		}
+		if (params.with_bottom)
+			bottom->emplace_back (p1, SpaceVector<double, BodyOrigin> (0.0, 0.0, -1.0), params.material);
+
+		if (params.with_top)
+			top->emplace_back (p2, SpaceVector<double, BodyOrigin> (0.0, 0.0, +1.0), params.material);
 	}
 
-	if (params.with_front_and_back)
+	if (params.with_bottom)
+		shape.triangle_fans().push_back (std::move (*bottom));
+
+	if (params.with_top)
 	{
 		// Reverse order to keep the face facing outside:
-		std::reverse (std::next (face2->begin()), face2->end());
-		shape.triangle_fans() = { std::move (*face1), std::move (*face2) };
+		std::reverse (std::next (top->begin()), top->end());
+		shape.triangle_fans().push_back (std::move (*top));
 	}
 
 	return shape;
@@ -428,7 +442,8 @@ make_propeller_cone_shape (PropellerConeShapeParameters const& params)
 		.length = params.base_length,
 		.radius = params.radius,
 		.num_faces = params.num_faces,
-		.with_front_and_back = false,
+		.with_bottom = true,
+		.with_top = false,
 		.material = params.material,
 	});
 

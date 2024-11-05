@@ -35,7 +35,8 @@ Wing::Wing (Airfoil const& airfoil, si::Density const material_density):
 		.spline = _airfoil.spline(),
 		.chord_length = _airfoil.chord_length(),
 		.wing_length = _airfoil.wing_length(),
-		.with_front_and_back = true,
+		.with_bottom = true,
+		.with_top = true,
 	}));
 }
 

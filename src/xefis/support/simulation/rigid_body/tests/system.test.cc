@@ -136,20 +136,20 @@ ManualTest t_1 ("rigid_body::System: airplane", []{
 	auto const z_minus_90_rotation = z_rotation<rigid_body::WorldSpace> (-90_deg);
 	auto const wing_to_normal_rotation = z_minus_90_rotation * x_rotation<rigid_body::WorldSpace> (+90_deg);
 
-	auto wing_shape = rigid_body::make_airfoil_shape ({ .spline = kSpline, .chord_length = 50_cm, .wing_length = 4_m, .with_front_and_back = true });
+	auto wing_shape = rigid_body::make_airfoil_shape ({ .spline = kSpline, .chord_length = 50_cm, .wing_length = 4_m, .with_bottom = true, .with_top = true });
 	wing_shape.translate ({ -25_cm, 0_m, -2_m });
 	auto& wing = system.add<rigid_body::Body> (MassMoments<rigid_body::BodyCOM> (0.1_kg, math::zero, kMOI1));
 	wing.set_shape (wing_shape);
 	wing.rotate_about_body_origin (wing_to_normal_rotation);
 
-	auto tail_h_shape = rigid_body::make_airfoil_shape ({ .spline = kSpline, .chord_length = 40_cm, .wing_length = 1_m, .with_front_and_back = true });
+	auto tail_h_shape = rigid_body::make_airfoil_shape ({ .spline = kSpline, .chord_length = 40_cm, .wing_length = 1_m, .with_bottom = true, .with_top = true });
 	tail_h_shape.translate ({ 0_m, 0_m, -0.5_m });
 	auto& tail_h = system.add<rigid_body::Body> (MassMoments<rigid_body::BodyCOM> (0.01_kg, math::zero, kMOI1));
 	tail_h.set_shape (tail_h_shape);
 	tail_h.rotate_about_body_origin (wing_to_normal_rotation);
 	tail_h.translate<rigid_body::WorldSpace> ({ 0_m, -1.5_m, 0_m });
 
-	auto tail_v_shape = rigid_body::make_airfoil_shape ({ .spline = kSpline, .chord_length = 40_cm, .wing_length = 0.5_m, .with_front_and_back = true });
+	auto tail_v_shape = rigid_body::make_airfoil_shape ({ .spline = kSpline, .chord_length = 40_cm, .wing_length = 0.5_m, .with_bottom = true, .with_top = true });
 	auto& tail_v = system.add<rigid_body::Body> (MassMoments<rigid_body::BodyCOM> (0.005_kg, math::zero, kMOI1));
 	tail_v.set_shape (tail_v_shape);
 	tail_v.rotate_about_body_origin (z_minus_90_rotation);
