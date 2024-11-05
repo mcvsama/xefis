@@ -506,6 +506,7 @@ make_motor_shape (MotorShapeParameters const& params)
 		.length = back_shaft_length,
 		.radius = params.shaft_radius,
 		.num_faces = 6,
+		.with_bottom = true,
 		.material = params.shaft_material,
 	});
 	back_shaft_shape.translate ({ 0_m, 0_m, -back_shaft_length - params.back_cone_length - params.center_length - params.front_cone_length });
