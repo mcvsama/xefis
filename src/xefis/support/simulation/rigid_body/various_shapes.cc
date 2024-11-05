@@ -439,6 +439,7 @@ make_propeller_shape (PropellerShapeParameters const& params)
 		shape.triangle_strips().push_back (back_strip);
 	}
 
+	shape.translate ({ 0_m, 0_m, pitch_height_b });
 	return shape;
 }
 
