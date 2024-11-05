@@ -104,6 +104,12 @@ class ShapeVertex
 		{ _material = material; }
 
 	/**
+	 * Transform the vertex.
+	 */
+	void
+	transform (AffineTransform<BodyOrigin> const&);
+
+	/**
 	 * Rotate the vertex about space origin by provided rotation matrix.
 	 */
 	void

@@ -24,6 +24,15 @@
 namespace xf::rigid_body {
 
 void
+Shape::transform (AffineTransform<BodyOrigin> const& transform)
+{
+	for_all_vertices ([&] (ShapeVertex& vertex) {
+		vertex.transform (transform);
+	});
+}
+
+
+void
 Shape::rotate (RotationMatrix<BodyOrigin> const& rotation)
 {
 	for_all_vertices ([&] (ShapeVertex& vertex) {

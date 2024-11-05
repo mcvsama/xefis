@@ -24,6 +24,16 @@
 namespace xf::rigid_body {
 
 void
+ShapeVertex::transform (AffineTransform<BodyOrigin> const& transformation)
+{
+	_position = transformation * _position;
+
+	if (_normal)
+		_normal = transformation * *_normal;
+}
+
+
+void
 ShapeVertex::rotate (RotationMatrix<BodyOrigin> const& rotation)
 {
 	_position = rotation * _position;

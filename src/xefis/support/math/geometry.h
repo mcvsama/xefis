@@ -66,6 +66,11 @@ template<class TargetSpace = void, class SourceSpace = TargetSpace>
 template<class TargetSpace = void, class SourceSpace = TargetSpace>
 	RotationMatrix<TargetSpace, SourceSpace> const kNoRotation = math::unit;
 
+// Essentially same as RotationMatrix but use RotationMatrix for intended rotations,
+// and AffineTransform for everything.
+template<class TargetSpace = void, class SourceSpace = TargetSpace>
+	using AffineTransform = SpaceMatrix<double, TargetSpace, SourceSpace>;
+
 template<class Scalar, std::size_t N, class Space = void>
 	using Triangle = std::array<math::Vector<Scalar, N, Space>, 3>;
 

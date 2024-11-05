@@ -85,6 +85,12 @@ class Shape
 		{ return _triangle_fans; }
 
 	/**
+	 * Transform each point by given matrix.
+	 */
+	void
+	transform (AffineTransform<BodyOrigin> const&);
+
+	/**
 	 * Rotate the shape about space origin by provided rotation matrix.
 	 */
 	void
