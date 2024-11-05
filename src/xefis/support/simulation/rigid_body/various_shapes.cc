@@ -212,15 +212,40 @@ make_cylinder_shape (CylinderShapeParameters const& params)
 Shape
 make_cone_shape (ConeShapeParameters const& params)
 {
+	return make_truncated_cone_shape ({
+		.length = params.length,
+		.bottom_radius = params.radius,
+		.top_radius = 0_m,
+		.num_faces = params.num_faces,
+		.with_bottom = params.with_bottom,
+		.with_top = false,
+		.material = params.material,
+	});
+}
+
+
+Shape
+make_truncated_cone_shape (TruncatedConeShapeParameters const& params)
+{
 	auto const num_faces = params.num_faces < 3u ? 3u : params.num_faces;
 	Shape shape;
 	Shape::TriangleStrip& cone_strip = shape.triangle_strips().emplace_back();
+	std::optional<Shape::TriangleFan> top_fan;
 	std::optional<Shape::TriangleFan> bottom_fan;
+
+	if (params.with_top || params.with_bottom)
+		shape.triangle_fans().reserve (2);
 
 	if (params.with_bottom)
 	{
 		bottom_fan.emplace();
 		bottom_fan->emplace_back (SpaceLength<BodyOrigin> (0_m, 0_m, 0_m), SpaceVector<double, BodyOrigin> (0.0, 0.0, -1.0), params.material);
+	}
+
+	if (params.with_top)
+	{
+		top_fan.emplace();
+		top_fan->emplace_back (SpaceLength<BodyOrigin> (0_m, 0_m, params.length), SpaceVector<double, BodyOrigin> (0.0, 0.0, +1.0), params.material);
 	}
 
 	si::Angle const da = 360_deg / num_faces;
@@ -233,20 +258,29 @@ make_cone_shape (ConeShapeParameters const& params)
 
 		auto const y = cos (angle);
 		auto const x = sin (angle);
-		auto const z = sin (atan (params.radius / params.length));
+		auto const z = sin (atan ((params.bottom_radius - params.top_radius) / params.length));
 		SpaceVector<double, BodyOrigin> const normal (x, y, z);
-		SpaceLength<BodyOrigin> const p1 (x * params.radius, y * params.radius, 0_m);
-		SpaceLength<BodyOrigin> const p2 (0_m, 0_m, params.length);
+		SpaceLength<BodyOrigin> const p_bottom (x * params.bottom_radius, y * params.bottom_radius, 0_m);
+		SpaceLength<BodyOrigin> const p_top (x * params.top_radius, y * params.top_radius, params.length);
 
-		cone_strip.emplace_back (p1, normal, params.material);
-		cone_strip.emplace_back (p2, normal, params.material);
+		cone_strip.emplace_back (p_bottom, normal, params.material);
+		cone_strip.emplace_back (p_top, normal, params.material);
+
+		if (params.with_top)
+			top_fan->emplace_back (p_top, SpaceVector<double, BodyOrigin> (0.0, 0.0, +1.0), params.material);
 
 		if (params.with_bottom)
-			bottom_fan->emplace_back (p1, SpaceVector<double, BodyOrigin> (0.0, 0.0, -1.0), params.material);
+			bottom_fan->emplace_back (p_bottom, SpaceVector<double, BodyOrigin> (0.0, 0.0, -1.0), params.material);
 	}
 
 	if (params.with_bottom)
-		shape.triangle_fans() = { std::move (*bottom_fan) };
+		shape.triangle_fans().push_back (std::move (*bottom_fan));
+
+	if (top_fan)
+		std::ranges::reverse (*top_fan);
+
+	if (params.with_top)
+		shape.triangle_fans().push_back (std::move (*top_fan));
 
 	return shape;
 }
@@ -384,6 +418,75 @@ make_propeller_shape (PropellerShapeParameters const& params)
 	}
 
 	return shape;
+}
+
+
+Shape
+make_propeller_cone_shape (PropellerConeShapeParameters const& params)
+{
+	auto const cylinder_shape = make_cylinder_shape ({
+		.length = params.base_length,
+		.radius = params.radius,
+		.num_faces = params.num_faces,
+		.with_front_and_back = false,
+		.material = params.material,
+	});
+
+	auto cone_shape = make_cone_shape ({ .length = params.cone_length, .radius = params.radius, .num_faces = params.num_faces, .with_bottom = false, .material = params.material });
+	cone_shape.translate ({ 0_m, 0_m, params.base_length });
+
+	return cylinder_shape + cone_shape;
+}
+
+
+Shape
+make_motor_shape (MotorShapeParameters const& params)
+{
+	auto back_cone_shape = make_truncated_cone_shape ({
+		.length = params.back_cone_length,
+		.bottom_radius = params.back_radius,
+		.top_radius = params.center_radius,
+		.num_faces = params.num_faces,
+		.with_bottom = true,
+		.material = params.cones_material,
+	});
+	back_cone_shape.translate ({ 0_m, 0_m, -params.back_cone_length - params.center_length - params.front_cone_length });
+
+	auto cylinder_shape = make_cylinder_shape ({
+		.length = params.center_length,
+		.radius = params.center_radius,
+		.num_faces = params.num_faces,
+		.material = params.center_material,
+	});
+	cylinder_shape.translate ({ 0_m, 0_m, -params.center_length - params.front_cone_length });
+
+	auto front_cone_shape = make_truncated_cone_shape ({
+		.length = params.front_cone_length,
+		.bottom_radius = params.center_radius,
+		.top_radius = params.front_radius,
+		.num_faces = params.num_faces,
+		.with_top = true,
+		.material = params.cones_material,
+	});
+	front_cone_shape.translate ({ 0_m, 0_m, -params.front_cone_length });
+
+	auto shaft_shape = make_cylinder_shape ({
+		.length = params.shaft_length,
+		.radius = params.shaft_radius,
+		.num_faces = 6,
+		.material = params.shaft_material,
+	});
+
+	auto const back_shaft_length = 0.5 * params.back_cone_length;
+	auto back_shaft_shape = make_cylinder_shape ({
+		.length = back_shaft_length,
+		.radius = params.shaft_radius,
+		.num_faces = 6,
+		.material = params.shaft_material,
+	});
+	back_shaft_shape.translate ({ 0_m, 0_m, -back_shaft_length - params.back_cone_length - params.center_length - params.front_cone_length });
+
+	return back_cone_shape + cylinder_shape + front_cone_shape + shaft_shape + back_shaft_shape;
 }
 
 

@@ -71,6 +71,18 @@ struct ConeShapeParameters
 };
 
 
+struct TruncatedConeShapeParameters
+{
+	si::Length				length;
+	si::Length				bottom_radius;
+	si::Length				top_radius;
+	size_t					num_faces			{ 10 };
+	bool					with_bottom			{ false };
+	bool					with_top			{ false };
+	ShapeMaterial const&	material			{ };
+};
+
+
 struct AirfoilShapeParameters
 {
 	AirfoilSpline const&	spline;
@@ -89,6 +101,33 @@ struct PropellerShapeParameters
 	si::Length				pitch;
 	ShapeMaterial const&	material			{ };
 	uint32_t				points_per_blade	{ 20 };
+};
+
+
+struct PropellerConeShapeParameters
+{
+	std::size_t				num_faces			{ 10 };
+	si::Length				radius;
+	si::Length				base_length;
+	si::Length				cone_length;
+	ShapeMaterial const&	material			{ };
+};
+
+
+struct MotorShapeParameters
+{
+	std::size_t				num_faces			{ 10 };
+	si::Length				back_radius;
+	si::Length				back_cone_length;
+	si::Length				center_radius;
+	si::Length				center_length;
+	si::Length				front_radius;
+	si::Length				front_cone_length;
+	si::Length				shaft_radius;
+	si::Length				shaft_length;
+	ShapeMaterial const&	cones_material		{ };
+	ShapeMaterial const&	center_material		{ };
+	ShapeMaterial const&	shaft_material		{ };
 };
 
 
@@ -132,6 +171,12 @@ Shape
 make_cone_shape (ConeShapeParameters const&);
 
 /**
+ * Make a truncated cone shape placed along the Z axis with back at X, Y = 0 and front towards positive Z.
+ */
+Shape
+make_truncated_cone_shape (TruncatedConeShapeParameters const&);
+
+/**
  * Make a solid circle placed on X-Y plane.
  */
 Shape
@@ -152,6 +197,17 @@ make_airfoil_shape (AirfoilShapeParameters const&);
 Shape
 make_propeller_shape (PropellerShapeParameters const&);
 
+/**
+ * Make a cone for a propeller. Positive Z towards the front of the propeller.
+ */
+Shape
+make_propeller_cone_shape (PropellerConeShapeParameters const&);
+
+/**
+ * Make a motor shape with two cones and stuff.
+ */
+Shape
+make_motor_shape (MotorShapeParameters const&);
 
 /**
  * Make a center-of-mass symbol.
