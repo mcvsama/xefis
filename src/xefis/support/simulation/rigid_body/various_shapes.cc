@@ -385,20 +385,24 @@ make_airfoil_shape (AirfoilShapeParameters const& params)
 Shape
 make_propeller_shape (PropellerShapeParameters const& params)
 {
+	using std::numbers::pi;
+
 	Shape shape;
 	// Reserve strips for each blade (front and back side).
 	shape.triangle_strips().reserve (2 * params.blades);
 	auto const blade_length = 0.5 * params.diameter;
 	auto const angle_between_blades = 360_deg / params.blades;
 	auto const max_pitch_radius = 0.292 * blade_length;
-	auto const width = blade_length / 15; // Looks good like this.
-	auto const pitch_height = width * params.pitch / (2 * std::numbers::pi * max_pitch_radius);
+	auto const width = blade_length / 10; // Looks good like this.
+	auto const pitch_height = width * params.pitch / (2 * pi * max_pitch_radius);
+	auto const pitch_height_b = 0.65 * pitch_height;
+	auto const pitch_height_f = 0.35 * pitch_height;
 	auto const point_spacing = 1.0 / params.points_per_blade;
 	auto const rotation_direction_factor = (params.rotation_direction == ClockWise) ? +1.0 : -1.0;
 
-	for (uint16_t b = 0; b < params.blades; ++b)
+	for (uint16_t blade = 0; blade < params.blades; ++blade)
 	{
-		if (b > 0)
+		if (blade > 0)
 			shape.rotate (xf::z_rotation<BodyOrigin> (angle_between_blades));
 
 		auto strip = Shape::TriangleStrip();
@@ -407,12 +411,16 @@ make_propeller_shape (PropellerShapeParameters const& params)
 
 		for (uint32_t p = 0; p < params.points_per_blade; ++p)
 		{
-			auto const p_norm = p * point_spacing;
+			// More triangles at the center and at the tip than on the center:
+			auto const p_norm = 0.5 + 0.5 * -std::cos (p * point_spacing * pi);
+
 			auto const y = p_norm * blade_length;
-			auto const x = width * std::pow (std::sin (p_norm * std::numbers::pi), 0.5) * rotation_direction_factor;
-			auto const z = pitch_height * square (std::sin (std::sqrt (p_norm) * std::numbers::pi));
-			strip.emplace_back (SpaceLength<BodyOrigin> { x, y, -z }, params.material);
-			strip.emplace_back (SpaceLength<BodyOrigin> { 0_m, y, +z }, params.material);
+			auto const x_l = width * std::pow (std::sin (p_norm * pi), 0.5) * rotation_direction_factor;
+			auto const x_t = x_l * 0.5; // Trailing edge is flatter.
+			auto const z_b = pitch_height_b * std::pow (std::sin (std::pow (p_norm, 0.7) * pi), 3.0);
+			auto const z_f = pitch_height_f * square (std::sin (p_norm * pi));
+			strip.emplace_back (SpaceLength<BodyOrigin> { -x_t, y, -z_b }, params.material);
+			strip.emplace_back (SpaceLength<BodyOrigin> { +x_l, y, +z_f }, params.material);
 		}
 
 		// Tip of the blade:
