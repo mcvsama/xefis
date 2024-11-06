@@ -121,7 +121,6 @@ struct PropellerConeShapeParameters
 
 struct MotorShapeParameters
 {
-	std::size_t				num_faces			{ 10 };
 	si::Length				back_radius;
 	si::Length				back_cone_length;
 	si::Length				center_radius;
@@ -130,9 +129,11 @@ struct MotorShapeParameters
 	si::Length				front_cone_length;
 	si::Length				shaft_radius;
 	si::Length				shaft_length;
+	std::size_t				num_faces			{ 16 };
 	ShapeMaterial const&	cones_material		{ };
 	ShapeMaterial const&	center_material		{ };
 	ShapeMaterial const&	shaft_material		{ };
+	ShapeMaterial const&	sticker_material	{ };
 };
 
 

@@ -466,6 +466,16 @@ make_propeller_cone_shape (PropellerConeShapeParameters const& params)
 Shape
 make_motor_shape (MotorShapeParameters const& params)
 {
+	auto const back_shaft_length = 0.5 * params.back_cone_length;
+	auto back_shaft_shape = make_cylinder_shape ({
+		.length = back_shaft_length,
+		.radius = params.shaft_radius,
+		.num_faces = 6,
+		.with_bottom = true,
+		.material = params.shaft_material,
+	});
+	back_shaft_shape.translate ({ 0_m, 0_m, -back_shaft_length - params.back_cone_length - params.center_length - params.front_cone_length });
+
 	auto back_cone_shape = make_truncated_cone_shape ({
 		.length = params.back_cone_length,
 		.bottom_radius = params.back_radius,
@@ -501,17 +511,18 @@ make_motor_shape (MotorShapeParameters const& params)
 		.material = params.shaft_material,
 	});
 
-	auto const back_shaft_length = 0.5 * params.back_cone_length;
-	auto back_shaft_shape = make_cylinder_shape ({
-		.length = back_shaft_length,
-		.radius = params.shaft_radius,
-		.num_faces = 6,
-		.with_bottom = true,
-		.material = params.shaft_material,
+	auto const sticker_length = 0.6 * params.center_length;
+	auto const sticker_faces = std::max<std::size_t> (3u, params.num_faces / 3u);
+	auto sticker_shape = make_cylinder_shape ({
+		.length = 0.6 * params.center_length,
+		.radius = params.center_radius + 0.1_mm,
+		.range = { 0_deg, 360_deg / params.num_faces * sticker_faces },
+		.num_faces = sticker_faces,
+		.material = params.sticker_material,
 	});
-	back_shaft_shape.translate ({ 0_m, 0_m, -back_shaft_length - params.back_cone_length - params.center_length - params.front_cone_length });
+	sticker_shape.translate ({ 0_m, 0_m, -0.5 * sticker_length - 0.5 * params.center_length - params.front_cone_length });
 
-	return back_cone_shape + cylinder_shape + front_cone_shape + shaft_shape + back_shaft_shape;
+	return back_cone_shape + cylinder_shape + front_cone_shape + shaft_shape + back_shaft_shape + sticker_shape;
 }
 
 
