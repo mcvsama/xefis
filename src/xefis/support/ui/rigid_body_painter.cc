@@ -336,7 +336,7 @@ RigidBodyPainter::paint_planet()
 		_gl.rotate (+90_deg, 0, 1, 0);
 
 		glEnable (GL_FOG);
-		_gl.draw (rigid_body::make_solid_circle (kHorizonRadius, 10, ground_material));
+		_gl.draw (rigid_body::make_solid_circle (kHorizonRadius, { 0_deg, 360_deg }, 10, ground_material));
 		glDisable (GL_FOG);
 	});
 

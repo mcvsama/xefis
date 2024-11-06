@@ -179,10 +179,10 @@ make_cylinder_shape (CylinderShapeParameters const& params)
 		top->emplace_back (SpaceLength<BodyOrigin> (0_m, 0_m, params.length), SpaceVector<double, BodyOrigin> (0.0, 0.0, +1.0), params.material);
 	}
 
-	si::Angle const da = 360_deg / num_faces;
-	si::Angle angle = 0_deg;
+	si::Angle const delta = params.range.extent() / num_faces;
+	si::Angle angle = params.range.min();
 
-	for (size_t i = 0; i < num_faces + 1; ++i, angle += da)
+	for (size_t i = 0; i < num_faces + 1; ++i, angle += delta)
 	{
 		auto const x = sin (angle);
 		auto const y = cos (angle);
@@ -255,10 +255,10 @@ make_truncated_cone_shape (TruncatedConeShapeParameters const& params)
 		top_fan->emplace_back (SpaceLength<BodyOrigin> (0_m, 0_m, params.length), SpaceVector<double, BodyOrigin> (0.0, 0.0, +1.0), params.material);
 	}
 
-	si::Angle const da = 360_deg / num_faces;
-	si::Angle angle = 0_deg;
+	si::Angle const delta = params.range.extent() / num_faces;
+	si::Angle angle = params.range.min();
 
-	for (size_t i = 0; i < num_faces + 1; ++i, angle += da)
+	for (size_t i = 0; i < num_faces + 1; ++i, angle += delta)
 	{
 		using std::sin;
 		using std::atan;
@@ -294,7 +294,7 @@ make_truncated_cone_shape (TruncatedConeShapeParameters const& params)
 
 
 Shape
-make_solid_circle (si::Length const radius, size_t num_slices, ShapeMaterial const& material)
+make_solid_circle (si::Length const radius, Range<si::Angle> const range, size_t num_slices, ShapeMaterial const& material)
 {
 	if (num_slices < 3)
 		num_slices = 3;
@@ -303,10 +303,10 @@ make_solid_circle (si::Length const radius, size_t num_slices, ShapeMaterial con
 	Shape::TriangleFan& fan = shape.triangle_fans().emplace_back();
 	fan.emplace_back (SpaceLength<BodyOrigin> (0_m, 0_m, 0_m), SpaceVector<double, BodyOrigin> (0.0, 0.0, 1.0), material);
 
-	si::Angle const da = 360_deg / num_slices;
-	si::Angle angle = 0_deg;
+	si::Angle const delta = range.extent() / num_slices;
+	si::Angle angle = range.min();
 
-	for (size_t i = 0; i < num_slices + 1; ++i, angle += da)
+	for (size_t i = 0; i < num_slices + 1; ++i, angle += delta)
 	{
 		auto const y = sin (angle);
 		auto const x = cos (angle);

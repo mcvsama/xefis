@@ -55,6 +55,7 @@ struct CylinderShapeParameters
 {
 	si::Length				length;
 	si::Length				radius;
+	Range<si::Angle>		range				{ 0_deg, 360_deg };
 	std::size_t				num_faces			{ 10 };
 	bool					with_bottom			{ false };
 	bool					with_top			{ false };
@@ -66,6 +67,7 @@ struct ConeShapeParameters
 {
 	si::Length				length;
 	si::Length				radius;
+	Range<si::Angle>		range				{ 0_deg, 360_deg };
 	size_t					num_faces			{ 10 };
 	bool					with_bottom			{ false };
 	ShapeMaterial const&	material			{ };
@@ -77,6 +79,7 @@ struct TruncatedConeShapeParameters
 	si::Length				length;
 	si::Length				bottom_radius;
 	si::Length				top_radius;
+	Range<si::Angle>		range				{ 0_deg, 360_deg };
 	size_t					num_faces			{ 10 };
 	bool					with_bottom			{ false };
 	bool					with_top			{ false };
@@ -182,7 +185,7 @@ make_truncated_cone_shape (TruncatedConeShapeParameters const&);
  * Make a solid circle placed on X-Y plane.
  */
 Shape
-make_solid_circle (si::Length radius, std::size_t num_slices, ShapeMaterial const& = {});
+make_solid_circle (si::Length radius, Range<si::Angle> range, std::size_t num_slices, ShapeMaterial const& = {});
 
 /**
  * Make a wing shape. Extrude airfoil spline (defined in X-Y axes) along +Z axis.
