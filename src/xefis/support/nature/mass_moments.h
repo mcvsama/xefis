@@ -34,6 +34,10 @@
 
 namespace xf {
 
+template<class Space>
+	using InertiaTensor = SpaceMatrix<si::MomentOfInertia, Space>;
+
+
 /**
  * Represents three moments of mass:
  *  • 0th = mass (monopole)
@@ -51,10 +55,10 @@ template<class pSpace = void>
 		MassMoments() = default;
 
 		// Ctor
-		MassMoments (si::Mass, SpaceMatrix<si::MomentOfInertia, Space> const& inertia_tensor_at_com);
+		MassMoments (si::Mass, InertiaTensor<Space> const& inertia_tensor_at_com);
 
 		// Ctor
-		MassMoments (si::Mass, SpaceVector<si::Length, Space> const& center_of_mass_position, SpaceMatrix<si::MomentOfInertia, Space> const& inertia_tensor_at_origin);
+		MassMoments (si::Mass, SpaceLength<Space> const& center_of_mass_position, InertiaTensor<Space> const& inertia_tensor_at_origin);
 
 		// Ctor method
 		static MassMoments<Space>
@@ -90,7 +94,7 @@ template<class pSpace = void>
 		 * Position of center of mass.
 		 */
 		[[nodiscard]]
-		SpaceVector<si::Length, Space> const&
+		SpaceLength<Space> const&
 		center_of_mass_position() const noexcept
 			{ return _center_of_mass_position; }
 
@@ -99,7 +103,7 @@ template<class pSpace = void>
 		 * not from the center of mass.
 		 */
 		[[nodiscard]]
-		SpaceMatrix<si::MomentOfInertia, Space> const&
+		InertiaTensor<Space> const&
 		inertia_tensor() const noexcept
 			{ return _inertia_tensor; }
 
@@ -107,7 +111,7 @@ template<class pSpace = void>
 		 * Inversed moments of inertia tensor.
 		 */
 		[[nodiscard]]
-		typename SpaceMatrix<si::MomentOfInertia, Space>::InversedMatrix const&
+		typename InertiaTensor<Space>::InversedMatrix const&
 		inverse_inertia_tensor() const noexcept
 			{ return _inverse_inertia_tensor; }
 
@@ -120,11 +124,11 @@ template<class pSpace = void>
 		centered_at_center_of_mass() const;
 
 	  private:
-		si::Mass															_mass						{ 0_kg };
-		SpaceVector<si::Length, Space>										_center_of_mass_position	{ 0_m, 0_m, 0_m };
-		SpaceMatrix<si::MomentOfInertia, Space>								_inertia_tensor				{ math::zero };
+		si::Mass									_mass						{ 0_kg };
+		SpaceLength<Space>							_center_of_mass_position	{ 0_m, 0_m, 0_m };
+		InertiaTensor<Space>						_inertia_tensor				{ math::zero };
 		// TODO consider making this optional (+std::mutex and mutable keyword):
-		decltype (_inertia_tensor)::InversedMatrix							_inverse_inertia_tensor		{ math::zero };
+		decltype (_inertia_tensor)::InversedMatrix	_inverse_inertia_tensor		{ math::zero };
 	};
 
 
@@ -160,8 +164,8 @@ template<class TargetSpace, class SourceSpace>
  * The displacement vector R can be negated without changing the result.
  */
 template<class Space>
-	SpaceMatrix<si::MomentOfInertia, Space>
-	displacement_inertia_tensor (si::Mass const mass, SpaceVector<si::Length, Space> const& R)
+	InertiaTensor<Space>
+	displacement_inertia_tensor (si::Mass const mass, SpaceLength<Space> const& R)
 	{
 		SpaceMatrix<double, Space> const E (math::unit);
 		// m * [(R ⋅ R) E3 - R ⊗ R]
@@ -174,9 +178,9 @@ template<class Space>
  * The displacement is relative to center of mass position.
  */
 template<class Space>
-	SpaceMatrix<si::MomentOfInertia, Space>
+	InertiaTensor<Space>
 	inertia_tensor_com_to_point (si::Mass const mass,
-								 SpaceMatrix<si::MomentOfInertia, Space> const& inertia_tensor_at_center_of_mass,
+								 InertiaTensor<Space> const& inertia_tensor_at_center_of_mass,
 								 SpaceLength<Space> const& displacement_from_com)
 	{
 		return inertia_tensor_at_center_of_mass + displacement_inertia_tensor (mass, displacement_from_com);
@@ -188,9 +192,9 @@ template<class Space>
  * The displacement is relative to center of mass position.
  */
 template<class Space>
-	SpaceMatrix<si::MomentOfInertia, Space>
+	InertiaTensor<Space>
 	inertia_tensor_point_to_com (si::Mass const mass,
-								 SpaceMatrix<si::MomentOfInertia, Space> const& inertia_tensor_at_point,
+								 InertiaTensor<Space> const& inertia_tensor_at_point,
 								 SpaceLength<Space> const& displacement_from_com)
 	{
 		return inertia_tensor_at_point - displacement_inertia_tensor (mass, displacement_from_com);
@@ -202,9 +206,9 @@ template<class Space>
  * The displacements are relative to center of mass position.
  */
 template<class Space>
-	SpaceMatrix<si::MomentOfInertia, Space>
+	InertiaTensor<Space>
 	inertia_tensor_point_to_point (si::Mass const mass,
-								   SpaceMatrix<si::MomentOfInertia, Space> const& old_inertia_tensor_at_point,
+								   InertiaTensor<Space> const& old_inertia_tensor_at_point,
 								   SpaceLength<Space> const& old_displacement_from_com,
 								   SpaceLength<Space> const& new_displacement_from_com)
 	{
@@ -253,14 +257,14 @@ template<class Scalar, class Space>
 
 template<class S>
 	inline
-	MassMoments<S>::MassMoments (si::Mass mass, SpaceMatrix<si::MomentOfInertia, Space> const& inertia_tensor_at_origin):
-		MassMoments (mass, math::zero, inertia_tensor_at_origin) // Origin is the same as center-of-mass here.
+	MassMoments<S>::MassMoments (si::Mass mass, InertiaTensor<Space> const& inertia_tensor_at_com):
+		MassMoments (mass, math::zero, inertia_tensor_at_com) // Origin is the same as center-of-mass here.
 	{ }
 
 
 template<class S>
 	inline
-	MassMoments<S>::MassMoments (si::Mass mass, SpaceVector<si::Length, Space> const& center_of_mass_position, SpaceMatrix<si::MomentOfInertia, Space> const& inertia_tensor_at_origin):
+	MassMoments<S>::MassMoments (si::Mass mass, SpaceLength<Space> const& center_of_mass_position, InertiaTensor<Space> const& inertia_tensor_at_origin):
 		_mass (mass),
 		_center_of_mass_position (center_of_mass_position),
 		_inertia_tensor (inertia_tensor_at_origin),
