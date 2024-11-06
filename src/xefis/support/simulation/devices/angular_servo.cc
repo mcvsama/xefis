@@ -19,6 +19,7 @@
 #include <xefis/support/math/geometry.h>
 #include <xefis/support/nature/various_inertia_tensors.h>
 #include <xefis/support/simulation/constraints/angular_servo_constraint.h>
+#include <xefis/support/simulation/rigid_body/various_shapes.h>
 
 // Neutrino:
 #include <neutrino/numeric.h>
@@ -34,7 +35,9 @@ AngularServo::AngularServo (rigid_body::AngularServoConstraint& constraint, si::
 	Body (mass_moments),
 	_constraint (constraint),
 	_resolution (resolution)
-{ }
+{
+	set_shape (make_centered_cube_shape (mass_moments));
+}
 
 
 void
