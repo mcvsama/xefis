@@ -22,6 +22,7 @@
 #include <xefis/support/nature/acceleration_moments.h>
 #include <xefis/support/nature/force_moments.h>
 #include <xefis/support/nature/mass_moments.h>
+#include <xefis/support/nature/mass_moments_at_com.h>
 #include <xefis/support/nature/velocity_moments.h>
 #include <xefis/support/nature/wrench.h>
 #include <xefis/support/simulation/rigid_body/concepts.h>
@@ -107,7 +108,7 @@ class Body: public Noncopyable
 	 */
 	template<CoordinateSystemConcept Space>
 		[[nodiscard]]
-		MassMoments<Space>
+		MassMomentsAtCOM<Space>
 		mass_moments() const;
 
 	/**
@@ -375,7 +376,7 @@ class Body: public Noncopyable
 
   private:
 	std::string											_label;
-	MassMoments<BodyCOM>								_mass_moments;
+	MassMomentsAtCOM<BodyCOM>							_mass_moments;
 	// Location of center-of-mass:
 	Placement<WorldSpace, BodyCOM>						_placement;
 	// Location of origin:
@@ -411,7 +412,7 @@ template<class MassMomentsSpace>
 
 
 template<CoordinateSystemConcept Space>
-	inline MassMoments<Space>
+	inline MassMomentsAtCOM<Space>
 	Body::mass_moments() const
 	{
 		if constexpr (std::is_same_v<Space, BodyCOM>)

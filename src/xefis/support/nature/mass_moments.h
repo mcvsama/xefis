@@ -1,6 +1,6 @@
 /* vim:ts=4
  *
- * Copyleft 2008…2018  Michał Gawron
+ * Copyleft 2024  Michał Gawron
  * Marduk Unix Labs, http://mulabs.org/
  *
  * This program is free software: you can redistribute it and/or modify
@@ -36,6 +36,10 @@ namespace xf {
 
 template<class Space>
 	using InertiaTensor = SpaceMatrix<si::MomentOfInertia, Space>;
+
+
+template<class Space>
+	class MassMomentsAtCOM;
 
 
 /**
@@ -126,8 +130,9 @@ template<class pSpace = void>
 		 * Result will have center of mass at [0, 0, 0] and updated inertia tensor.
 		 */
 		[[nodiscard]]
-		MassMoments
-		centered_at_center_of_mass() const;
+		MassMomentsAtCOM<Space>
+		centered_at_center_of_mass() const
+			{ return { *this }; }
 
 	  private:
 		si::Mass									_mass						{ 0_kg };
@@ -308,14 +313,6 @@ template<class S>
 		_inverse_inertia_tensor = inv (_inertia_tensor);
 
 		return *this;
-	}
-
-
-template<class S>
-	inline MassMoments<S>
-	MassMoments<S>::centered_at_center_of_mass() const
-	{
-		return MassMoments<S> (_mass, { 0_m, 0_m, 0_m }, inertia_tensor_point_to_com (_mass, _inertia_tensor, -_center_of_mass_position));
 	}
 
 } // namespace xf
