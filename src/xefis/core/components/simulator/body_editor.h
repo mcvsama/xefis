@@ -30,8 +30,6 @@
 
 // Standard:
 #include <cstddef>
-#include <optional>
-#include <vector>
 
 
 namespace xf {
@@ -78,18 +76,22 @@ class BodyEditor: public QWidget
 	RigidBodyViewer&					_rigid_body_viewer;
 	rigid_body::Body*					_edited_body { nullptr };
 	QLabel*								_body_label;
-	std::optional<QFrame>				_airfoil_frame;
-	std::optional<AirfoilSplineWidget>	_airfoil_spline_widget;
+	QFrame								_airfoil_frame;
+	AirfoilSplineWidget					_airfoil_spline_widget;
 	QWidget*							_airfoil_info_widget;
-	std::optional<QToolBox>				_tool_box;
-	std::optional<QLineEdit>			_mass_value;
-	std::optional<QLabel>				_translational_kinetic_energy;
-	std::optional<QLabel>				_rotational_kinetic_energy;
-	std::optional<QLabel>				_true_air_speed;
-	std::optional<QLabel>				_static_air_temperature;
-	std::optional<QLabel>				_air_density;
-	std::optional<QLabel>				_dynamic_viscosity;
-	std::optional<QLabel>				_reynolds_number;
+	QToolBox							_tool_box;
+	// Position:
+	QLabel								_latitude;
+	QLabel								_longitude;
+	QLabel								_altitude_amsl;
+	QLineEdit							_mass_value;
+	QLabel								_translational_kinetic_energy;
+	QLabel								_rotational_kinetic_energy;
+	QLabel								_true_air_speed;
+	QLabel								_static_air_temperature;
+	QLabel								_air_density;
+	QLabel								_dynamic_viscosity;
+	QLabel								_reynolds_number;
 };
 
 } // namespace xf

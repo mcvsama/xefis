@@ -47,13 +47,11 @@ BodyEditor::BodyEditor (QWidget* parent, RigidBodyViewer& viewer):
 	top_strip->setMinimumWidth (ph.em_pixels_int (25));
 	_body_label = top_label;
 
-	_tool_box.emplace();
-	_tool_box->addItem (new QLabel ("TODO", this), icons::body(), "Placement");
-	_tool_box->addItem (create_mass_moments_widget(), icons::body(), "Mass moments");
-	_tool_box->addItem (new QLabel ("TODO", this), icons::body(), "Velocity moments");
-	_tool_box->addItem (new QLabel ("TODO", this), icons::body(), "External force moments");
-	_tool_box->addItem (new QLabel ("TODO", this), icons::body(), "Custom impulses");
-	_tool_box->addItem (new QLabel ("Acceleration, kinetic energy, broken?", this), icons::body(), "Computed");
+	_tool_box.addItem (create_mass_moments_widget(), icons::body(), "Mass moments");
+	_tool_box.addItem (new QLabel ("TODO", this), icons::body(), "Velocity moments");
+	_tool_box.addItem (new QLabel ("TODO", this), icons::body(), "External force moments");
+	_tool_box.addItem (new QLabel ("TODO", this), icons::body(), "Custom impulses");
+	_tool_box.addItem (new QLabel ("Acceleration, kinetic energy, broken?", this), icons::body(), "Computed");
 
 	_airfoil_info_widget = create_airfoil_info_widget (ph);
 
@@ -61,7 +59,7 @@ BodyEditor::BodyEditor (QWidget* parent, RigidBodyViewer& viewer):
 	layout->addWidget (top_strip);
 	layout->addWidget (create_basic_info_widget());
 	layout->addWidget (_airfoil_info_widget);
-	layout->addWidget (&*_tool_box);
+	layout->addWidget (&_tool_box);
 	layout->addItem (new QSpacerItem (0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
 	setEnabled (false);
@@ -87,9 +85,9 @@ BodyEditor::refresh()
 
 		setEnabled (true);
 		_body_label->setText (QString::fromStdString (_edited_body->label()));
-		_mass_value->setText (QString ("%1").arg (_edited_body->mass_moments<rigid_body::BodyCOM>().mass().in<si::Kilogram>()));
-		_translational_kinetic_energy->setText (QString::fromStdString (std::format ("{}", translational_energy)));
-		_rotational_kinetic_energy->setText (QString::fromStdString (std::format ("{}", rotational_energy)));
+		_mass_value.setText (QString ("%1").arg (_edited_body->mass_moments<rigid_body::BodyCOM>().mass().in<si::Kilogram>()));
+		_translational_kinetic_energy.setText (QString::fromStdString (std::format ("{}", translational_energy)));
+		_rotational_kinetic_energy.setText (QString::fromStdString (std::format ("{}", rotational_energy)));
 
 		refresh_wing_specific_data();
 	}
@@ -109,11 +107,11 @@ BodyEditor::refresh_wing_specific_data()
 		auto const not_computed = QString ("–");
 
 		auto const set_wing_values = [this](QString const& value) {
-			_true_air_speed->setText (value);
-			_static_air_temperature->setText (value);
-			_air_density->setText (value);
-			_dynamic_viscosity->setText (value);
-			_reynolds_number->setText (value);
+			_true_air_speed.setText (value);
+			_static_air_temperature.setText (value);
+			_air_density.setText (value);
+			_dynamic_viscosity.setText (value);
+			_reynolds_number.setText (value);
 		};
 
 		auto const* rigid_body_system = _rigid_body_viewer.rigid_body_system();
@@ -128,11 +126,11 @@ BodyEditor::refresh_wing_specific_data()
 				auto const& air = aerodynamic_parameters->air;
 				auto const& forces = aerodynamic_parameters->forces;
 
-				_true_air_speed->setText (QString::fromStdString (std::format ("{:.3f}", aerodynamic_parameters->true_air_speed)));
-				_static_air_temperature->setText (QString::fromStdString (std::format ("{:.1f}", air.temperature.to<si::Celsius>())));
-				_air_density->setText (QString::fromStdString (std::format ("{:.3f}", air.density)));
-				_dynamic_viscosity->setText (QString::fromStdString (std::format ("{:.4g}", air.dynamic_viscosity)));
-				_reynolds_number->setText (QString::fromStdString (std::format ("{:.0f}", *aerodynamic_parameters->reynolds_number)));
+				_true_air_speed.setText (QString::fromStdString (std::format ("{:.3f}", aerodynamic_parameters->true_air_speed)));
+				_static_air_temperature.setText (QString::fromStdString (std::format ("{:.1f}", air.temperature.to<si::Celsius>())));
+				_air_density.setText (QString::fromStdString (std::format ("{:.3f}", air.density)));
+				_dynamic_viscosity.setText (QString::fromStdString (std::format ("{:.4g}", air.dynamic_viscosity)));
+				_reynolds_number.setText (QString::fromStdString (std::format ("{:.0f}", *aerodynamic_parameters->reynolds_number)));
 
 				// Airfoil spline widget:
 				{
@@ -142,11 +140,11 @@ BodyEditor::refresh_wing_specific_data()
 
 					auto const center_of_pressure_3d = forces.center_of_pressure / wing->airfoil().chord_length();
 
-					_airfoil_spline_widget->set_airfoil (wing->airfoil());
-					_airfoil_spline_widget->set_center_of_pressure_position (xy (center_of_pressure_3d));
-					_airfoil_spline_widget->set_lift_force (xy (forces.lift));
-					_airfoil_spline_widget->set_drag_force (xy (forces.drag));
-					_airfoil_spline_widget->set_pitching_moment (xy (forces.pitching_moment));
+					_airfoil_spline_widget.set_airfoil (wing->airfoil());
+					_airfoil_spline_widget.set_center_of_pressure_position (xy (center_of_pressure_3d));
+					_airfoil_spline_widget.set_lift_force (xy (forces.lift));
+					_airfoil_spline_widget.set_drag_force (xy (forces.drag));
+					_airfoil_spline_widget.set_pitching_moment (xy (forces.pitching_moment));
 					_airfoil_info_widget->setVisible (true);
 				}
 			}
@@ -167,17 +165,13 @@ BodyEditor::create_basic_info_widget()
 	auto* widget = new QWidget (this);
 	widget->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Fixed);
 
-	_mass_value.emplace(); // TODO changeable
-	_translational_kinetic_energy.emplace();
-	_rotational_kinetic_energy.emplace();
-
 	auto* layout = new QGridLayout (widget);
 	layout->addWidget (new QLabel ("Mass:"), 0, 0);
-	layout->addWidget (&*_mass_value, 0, 1);
+	layout->addWidget (&_mass_value, 0, 1);
 	layout->addWidget (new QLabel ("Translational kinetic energy:"), 1, 0);
-	layout->addWidget (&*_translational_kinetic_energy, 1, 1);
+	layout->addWidget (&_translational_kinetic_energy, 1, 1);
 	layout->addWidget (new QLabel ("Rotational kinetic energy:"), 2, 0);
-	layout->addWidget (&*_rotational_kinetic_energy, 2, 1);
+	layout->addWidget (&_rotational_kinetic_energy, 2, 1);
 
 	return widget;
 }
@@ -189,36 +183,28 @@ BodyEditor::create_airfoil_info_widget (PaintHelper const& ph)
 	auto* widget = new QWidget (this);
 	widget->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Fixed);
 
-	_airfoil_spline_widget.emplace();
-	_airfoil_spline_widget->setSizePolicy (QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
-	_airfoil_spline_widget->setMinimumSize (ph.em_pixels (20), ph.em_pixels (10));// TODO
+	_airfoil_spline_widget.setSizePolicy (QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
+	_airfoil_spline_widget.setMinimumSize (ph.em_pixels (20), ph.em_pixels (10));// TODO
 
-	_airfoil_frame.emplace();
-	_airfoil_frame->setFrameStyle (QFrame::StyledPanel | QFrame::Sunken);
+	_airfoil_frame.setFrameStyle (QFrame::StyledPanel | QFrame::Sunken);
 
-	_true_air_speed.emplace();
-	_static_air_temperature.emplace();
-	_air_density.emplace();
-	_dynamic_viscosity.emplace();
-	_reynolds_number.emplace();
-
-	auto* airfoil_frame_layout = new QHBoxLayout (&*_airfoil_frame);
-	airfoil_frame_layout->addWidget (&*_airfoil_spline_widget);
+	auto* airfoil_frame_layout = new QHBoxLayout (&_airfoil_frame);
+	airfoil_frame_layout->addWidget (&_airfoil_spline_widget);
 	airfoil_frame_layout->setMargin (0);
 
-	int row = 0;
+	auto row = 0;
 	auto* layout = new QGridLayout (widget);
-	layout->addWidget (&*_airfoil_frame, row++, 0, 1, 2);
+	layout->addWidget (&_airfoil_frame, row++, 0, 1, 2);
 	layout->addWidget (new QLabel ("True air speed:"), row, 0);
-	layout->addWidget (&*_true_air_speed, row++, 1);
+	layout->addWidget (&_true_air_speed, row++, 1);
 	layout->addWidget (new QLabel ("Static air temperature:"), row, 0);
-	layout->addWidget (&*_static_air_temperature, row++, 1);
+	layout->addWidget (&_static_air_temperature, row++, 1);
 	layout->addWidget (new QLabel ("Air density:"), row, 0);
-	layout->addWidget (&*_air_density, row++, 1);
+	layout->addWidget (&_air_density, row++, 1);
 	layout->addWidget (new QLabel ("Dynamic viscosity:"), row, 0);
-	layout->addWidget (&*_dynamic_viscosity, row++, 1);
+	layout->addWidget (&_dynamic_viscosity, row++, 1);
 	layout->addWidget (new QLabel ("Reynolds number:"), row, 0);
-	layout->addWidget (&*_reynolds_number, row++, 1);
+	layout->addWidget (&_reynolds_number, row++, 1);
 
 	return widget;
 }
@@ -230,16 +216,16 @@ BodyEditor::create_mass_moments_widget()
 	auto* widget = new QWidget (this);
 	widget->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Fixed);
 
-	_mass_value.emplace ("–");
-	_mass_value->setAlignment (Qt::AlignRight);
+	_mass_value.setAlignment (Qt::AlignRight);
 
 	// TODO add_editable (math::Matrix<...>) // Depending on size works as vector or matrix or whatever
 	// TODO add_editable (Scalar)
 	// ...
+	auto row = 0;
 	auto* layout = new QGridLayout (widget);
-	layout->addWidget (new QLabel ("Mass", widget), 0, 0);
-	layout->addWidget (&*_mass_value, 0, 1);
-	layout->addWidget (new QLabel ("kg", widget), 0, 2);
+	layout->addWidget (new QLabel ("Mass"), row, 0);
+	layout->addWidget (&_mass_value, row, 1);
+	layout->addWidget (new QLabel ("kg", widget), row++, 2);
 
 	return widget;
 }
