@@ -243,74 +243,29 @@ template<class TriangleIterator>
  * Set planar normals for triangles, that is make each vertex' normal
  * perpendicular to the surface of the triangle.
  */
-inline void
-set_planar_normal (Shape::Triangle& triangle)
-{
-	if (triangle.size() != 3)
-		throw InvalidArgument ("set_planar_normal (Shape::Triangle&): std::size (triangle) must be 3");
+void
+set_planar_normal (Shape::Triangle& triangle);
 
-	auto const normal = triangle_surface_normal (triangle[0].position(),
-												 triangle[1].position(),
-												 triangle[2].position());
-
-	for (auto& vertex: triangle)
-		vertex.set_normal (normal);
-}
-
-
-inline void
-set_planar_normal (std::span<ShapeVertex> triangle)
-{
-	if (triangle.size() != 3)
-		throw InvalidArgument ("set_planar_normal (span<>): std::size (triangle) must be 3");
-
-	auto const normal = triangle_surface_normal (triangle[0].position(),
-												 triangle[1].position(),
-												 triangle[2].position());
-
-	for (auto& vertex: triangle)
-		vertex.set_normal (normal);
-}
-
+void
+set_planar_normal (std::span<ShapeVertex> triangle);
 
 /**
  * Negate normals for all given vertices.
  */
-inline void
-negate_normals (std::vector<ShapeVertex>& vertices)
-{
-	for (auto& vertex: vertices)
-		if (auto normal = vertex.normal())
-			vertex.set_normal (-*normal);
-}
-
+void
+negate_normals (std::vector<ShapeVertex>& vertices);
 
 /**
  * Negate all normals in given shape.
  */
-inline void
-negate_normals (Shape& shape)
-{
-	for (auto& triangle: shape.triangles())
-		negate_normals (triangle);
-
-	for (auto& strip: shape.triangle_strips())
-		negate_normals (strip);
-
-	for (auto& fan: shape.triangle_fans())
-		negate_normals (fan);
-}
-
+void
+negate_normals (Shape& shape);
 
 /**
  * Set given material for all given vertices.
  */
-inline void
-set_material (std::vector<ShapeVertex>& vertices, ShapeMaterial const& material)
-{
-	for (auto& vertex: vertices)
-		vertex.set_material (material);
-}
+void
+set_material (std::vector<ShapeVertex>& vertices, ShapeMaterial const& material);
 
 } // namespace xf::rigid_body
 

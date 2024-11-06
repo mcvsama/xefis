@@ -528,5 +528,66 @@ make_center_of_mass_symbol_shape (si::Length const radius, ShapeMaterial const& 
 		 + make_centered_sphere_shape ({ .radius = radius, .slices = 8, .stacks = 8, .h_range = { 270_deg, 360_deg }, .v_range = {   0_deg, +90_deg }, .material = a });
 }
 
+
+void
+set_planar_normal (Shape::Triangle& triangle)
+{
+	if (triangle.size() != 3)
+		throw InvalidArgument ("set_planar_normal (Shape::Triangle&): std::size (triangle) must be 3");
+
+	auto const normal = triangle_surface_normal (triangle[0].position(),
+												 triangle[1].position(),
+												 triangle[2].position());
+
+	for (auto& vertex: triangle)
+		vertex.set_normal (normal);
+}
+
+
+void
+set_planar_normal (std::span<ShapeVertex> triangle)
+{
+	if (triangle.size() != 3)
+		throw InvalidArgument ("set_planar_normal (span<>): std::size (triangle) must be 3");
+
+	auto const normal = triangle_surface_normal (triangle[0].position(),
+												 triangle[1].position(),
+												 triangle[2].position());
+
+	for (auto& vertex: triangle)
+		vertex.set_normal (normal);
+}
+
+
+void
+negate_normals (std::vector<ShapeVertex>& vertices)
+{
+	for (auto& vertex: vertices)
+		if (auto normal = vertex.normal())
+			vertex.set_normal (-*normal);
+}
+
+
+void
+negate_normals (Shape& shape)
+{
+	for (auto& triangle: shape.triangles())
+		negate_normals (triangle);
+
+	for (auto& strip: shape.triangle_strips())
+		negate_normals (strip);
+
+	for (auto& fan: shape.triangle_fans())
+		negate_normals (fan);
+}
+
+
+void
+set_material (std::vector<ShapeVertex>& vertices, ShapeMaterial const& material)
+{
+	for (auto& vertex: vertices)
+		vertex.set_material (material);
+}
+
 } // namespace xf::rigid_body
 
