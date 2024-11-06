@@ -63,7 +63,7 @@ template<class pSpace = void>
 		// Ctor method
 		static MassMoments<Space>
 		zero()
-			{ return MassMoments<Space> (0_kg, math::zero, math::zero); }
+			{ return {}; }
 
 		// Ctor method
 		static MassMoments
