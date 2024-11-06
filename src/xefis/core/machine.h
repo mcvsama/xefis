@@ -50,7 +50,7 @@ class Machine: private Noncopyable
 	 * (that is Machine).
 	 */
 	virtual
-	~Machine() = default;
+	~Machine();
 
 	/**
 	 * Return main Xefis object.

@@ -16,7 +16,6 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/components/configurator/configurator_widget.h>
 
 // Standard:
 #include <cstddef>

@@ -29,6 +29,10 @@ Machine::Machine (Xefis& xefis):
 { }
 
 
+Machine::~Machine()
+{ }
+
+
 void
 Machine::show_configurator()
 {
