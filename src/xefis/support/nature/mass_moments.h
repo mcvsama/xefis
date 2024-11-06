@@ -57,7 +57,13 @@ template<class pSpace = void>
 		// Ctor
 		MassMoments (si::Mass, InertiaTensor<Space> const& inertia_tensor_at_com);
 
-		// Ctor
+		/**
+		 * Create a mass moments with an inertia tensor viewed from different place than center of mass.
+		 * To use a mass moments with (more useful) inertia tensor at COM, transform it with .
+		 *
+		 * \param	inertia_tensor_at_origin
+		 *			Inertia tensor as viewed from the -center_of_mass_position (named origin here).
+		 */
 		MassMoments (si::Mass, SpaceLength<Space> const& center_of_mass_position, InertiaTensor<Space> const& inertia_tensor_at_origin);
 
 		// Ctor method
@@ -76,8 +82,8 @@ template<class pSpace = void>
 
 		/**
 		 * Add another mass moments and thus create mass moments for the system of the two bodies
-		 * like they were one.Assumes that the origin for both bodies is the same point in space
-		 * (doesn't have to be center of mass or anything).
+		 * like they were one. Assumes that the origin for both bodies is the same point in space
+		 * (doesn't have to be center of mass or anything specific).
 		 */
 		MassMoments&
 		operator+= (MassMoments const& other);
@@ -159,7 +165,7 @@ template<class TargetSpace, class SourceSpace>
 
 
 /**
- * Return inertia tensor resulting from a spacial displacement.
+ * Return inertia tensor resulting from a spatial displacement.
  * Doesn't include the own (center of mass) inertia tensor part.
  * The displacement vector R can be negated without changing the result.
  */
