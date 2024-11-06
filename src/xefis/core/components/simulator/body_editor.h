@@ -70,6 +70,10 @@ class BodyEditor: public QWidget
 
 	[[nodiscard]]
 	QWidget*
+	create_position_widget();
+
+	[[nodiscard]]
+	QWidget*
 	create_mass_moments_widget();
 
   private:

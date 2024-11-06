@@ -17,7 +17,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/base/icons.h>
-#include <xefis/support/simulation/rigid_body/concepts.h>
+#include <xefis/support/nature/constants.h>
 #include <xefis/support/simulation/devices/wing.h>
 #include <xefis/support/ui/paint_helper.h>
 #include <xefis/support/ui/rigid_body_viewer.h>
@@ -47,6 +47,7 @@ BodyEditor::BodyEditor (QWidget* parent, RigidBodyViewer& viewer):
 	top_strip->setMinimumWidth (ph.em_pixels_int (25));
 	_body_label = top_label;
 
+	_tool_box.addItem (create_position_widget(), icons::body(), "Position");
 	_tool_box.addItem (create_mass_moments_widget(), icons::body(), "Mass moments");
 	_tool_box.addItem (new QLabel ("TODO", this), icons::body(), "Velocity moments");
 	_tool_box.addItem (new QLabel ("TODO", this), icons::body(), "External force moments");
@@ -88,6 +89,23 @@ BodyEditor::refresh()
 		_mass_value.setText (QString ("%1").arg (_edited_body->mass_moments<rigid_body::BodyCOM>().mass().in<si::Kilogram>()));
 		_translational_kinetic_energy.setText (QString::fromStdString (std::format ("{}", translational_energy)));
 		_rotational_kinetic_energy.setText (QString::fromStdString (std::format ("{}", rotational_energy)));
+
+		if (auto const* planet_body = _rigid_body_viewer.planet())
+		{
+			auto const position_on_planet = _edited_body->placement().position() - planet_body->placement().position();
+
+			// Assuming the planet is in ECEF orientation.
+			auto const polar_location = xf::polar (math::reframe<ECEFSpace, void> (position_on_planet));
+			_longitude.setText (QString::fromStdString (std::format ("{:.6f}", polar_location.lon().to<si::Degree>())));
+			_latitude.setText (QString::fromStdString (std::format ("{:.6f}", polar_location.lat().to<si::Degree>())));
+			_altitude_amsl.setText (QString::fromStdString (std::format ("{:.3f}", polar_location.radius() - xf::kEarthMeanRadius)));
+		}
+		else
+		{
+			_latitude.setText ("–");
+			_longitude.setText ("–");
+			_altitude_amsl.setText ("–");
+		}
 
 		refresh_wing_specific_data();
 	}
@@ -205,6 +223,25 @@ BodyEditor::create_airfoil_info_widget (PaintHelper const& ph)
 	layout->addWidget (&_dynamic_viscosity, row++, 1);
 	layout->addWidget (new QLabel ("Reynolds number:"), row, 0);
 	layout->addWidget (&_reynolds_number, row++, 1);
+
+	return widget;
+}
+
+
+QWidget*
+BodyEditor::create_position_widget()
+{
+	auto* widget = new QWidget (this);
+	widget->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Fixed);
+
+	auto row = 0;
+	auto* layout = new QGridLayout (widget);
+	layout->addWidget (new QLabel ("Latitude:"), row, 0);
+	layout->addWidget (&_latitude, row++, 1);
+	layout->addWidget (new QLabel ("Longitude:" ), row, 0);
+	layout->addWidget (&_longitude, row++, 1);
+	layout->addWidget (new QLabel ("AMSL height:"), row, 0);
+	layout->addWidget (&_altitude_amsl, row++, 1);
 
 	return widget;
 }
