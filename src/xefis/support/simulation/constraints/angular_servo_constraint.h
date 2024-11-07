@@ -43,10 +43,12 @@ using AngularVelocityPotential	= decltype (1_rad / 1_s / 1_V);
 using TorquePotential			= decltype (1_Nm / 1_V);
 
 // Typical microservo angular velocity potential:
-static constexpr auto k9gramAngularVelocityPotential	= 500_deg / 1_s / 6_V;
+static constexpr auto k9gramAngularVelocityPotential	= 60_deg / 0.15_s / 6_V;
+static constexpr auto kStandardAngularVelocityPotential	= 60_deg / 0.20_s / 6_V;
 
 // Typical microservo torque potential:
 static constexpr auto k9gramTorquePotential				= 0.144_Nm / 6_V;
+static constexpr auto kStandardTorquePotential			= 0.4_Nm / 6_V;
 
 
 /**
@@ -193,6 +195,15 @@ class AngularServoConstraint:
  * Global functions
  */
 
+
+/**
+ * Return standard servo constraint.
+ *
+ * \param	scale
+ *			Scales up the torque, and scales down the speed.
+ */
+std::unique_ptr<AngularServoConstraint>
+make_standard_servo_constraint (HingePrecalculation&, float scale = 1.0);
 
 /**
  * Return typical 9-gram servo constraint.

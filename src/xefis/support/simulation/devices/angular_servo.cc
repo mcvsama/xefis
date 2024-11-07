@@ -48,6 +48,15 @@ AngularServo::set_setpoint (si::Angle const setpoint)
 
 
 std::unique_ptr<AngularServo>
+make_standard_servo (rigid_body::AngularServoConstraint& constraint, float scale)
+{
+	auto const mass = 40_gr * scale;
+	auto const mass_moments = MassMoments<rigid_body::BodyCOM> (mass, math::zero, make_cuboid_inertia_tensor<rigid_body::BodyCOM> (mass, { 40_mm * scale, 20_mm * scale, 36_mm * scale }));
+	return std::make_unique<AngularServo> (constraint, 0.5_deg, mass_moments);
+}
+
+
+std::unique_ptr<AngularServo>
 make_standard_9gram_servo (rigid_body::AngularServoConstraint& constraint)
 {
 	auto const mass = 9_gr;

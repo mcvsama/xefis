@@ -147,6 +147,15 @@ AngularServoConstraint::update_pid_controller (si::Time const dt)
 
 
 std::unique_ptr<AngularServoConstraint>
+make_standard_servo_constraint (HingePrecalculation& hinge_precalculation, float scale)
+{
+	auto const angular_velocity_potential = kStandardAngularVelocityPotential / std::pow (scale, 0.25); // More or less, not being precise here.
+	auto const torque_potential = kStandardTorquePotential * scale;
+	return std::make_unique<AngularServoConstraint> (hinge_precalculation, Range { -90_deg, +90_deg }, 0.5_deg, angular_velocity_potential, torque_potential);
+}
+
+
+std::unique_ptr<AngularServoConstraint>
 make_standard_9gram_servo_constraint (HingePrecalculation& hinge_precalculation, float scale)
 {
 	auto const angular_velocity_potential = k9gramAngularVelocityPotential / std::pow (scale, 0.25); // More or less, not being precise here.

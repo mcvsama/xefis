@@ -95,6 +95,9 @@ class AngularServo:
 
 
 std::unique_ptr<AngularServo>
+make_standard_servo (rigid_body::AngularServoConstraint& constraint, float scale = 1.0);
+
+std::unique_ptr<AngularServo>
 make_standard_9gram_servo (rigid_body::AngularServoConstraint& constraint);
 
 } // namespace xf::sim
