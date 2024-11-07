@@ -61,22 +61,8 @@ Wing::update_external_forces (Atmosphere const* atmosphere)
 
 		auto ecef_air = atmosphere->air_at (body_position_in_ecef);
 		ecef_air.velocity -= body_velocity_in_ecef;
-		auto const airfoil_spline_air = Air<AirfoilSplineSpace> {
-			.density = ecef_air.density,
-			.pressure = ecef_air.pressure,
-			.temperature = ecef_air.temperature,
-			.dynamic_viscosity = ecef_air.dynamic_viscosity,
-			.speed_of_sound = ecef_air.speed_of_sound,
-			.velocity = ecef_to_spline_transform * ecef_air.velocity,
-		};
-		auto const body_air = Air<rigid_body::BodyCOM> {
-			.density = ecef_air.density,
-			.pressure = ecef_air.pressure,
-			.temperature = ecef_air.temperature,
-			.dynamic_viscosity = ecef_air.dynamic_viscosity,
-			.speed_of_sound = ecef_air.speed_of_sound,
-			.velocity = airfoil_spline_to_body * airfoil_spline_air.velocity,
-		};
+		auto const airfoil_spline_air = ecef_to_spline_transform * ecef_air;
+		auto const body_air = airfoil_spline_to_body * airfoil_spline_air;
 
 		// Center of pressure Wrench:
 		auto const spline_aeroforces_at_origin = _airfoil.aerodynamic_forces (airfoil_spline_air);

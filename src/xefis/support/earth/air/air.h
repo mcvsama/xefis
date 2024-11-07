@@ -43,6 +43,21 @@ template<class Space>
 	};
 
 
+template<class TargetSpace, class SourceSpace>
+	constexpr Air<TargetSpace>
+	operator* (RotationMatrix<TargetSpace, SourceSpace> const& rotation, Air<SourceSpace> const& air)
+	{
+		return {
+			.density = air.density,
+			.pressure = air.pressure,
+			.temperature = air.temperature,
+			.dynamic_viscosity = air.dynamic_viscosity,
+			.speed_of_sound = air.speed_of_sound,
+			.velocity = rotation * air.velocity,
+		};
+	}
+
+
 [[nodiscard]]
 constexpr si::Velocity
 speed_of_sound (si::Temperature static_air_temperature)
