@@ -87,8 +87,10 @@ class Body: public Noncopyable
 
   public:
 	// Ctor
-	template<class MassMomentsSpace>
-		Body (MassMoments<MassMomentsSpace> const&, ShapeType = ShapeIsConstant);
+	Body (MassMomentsAtCOM<BodyCOM> const&, ShapeType = ShapeIsConstant);
+
+	// Ctor
+	Body (MassMoments<BodyCOM> const&, ShapeType = ShapeIsConstant);
 
 	// Dtor
 	virtual
@@ -106,17 +108,23 @@ class Body: public Noncopyable
 	/**
 	 * Return mass moments at center-of-mass.
 	 */
-	template<CoordinateSystemConcept Space>
-		[[nodiscard]]
-		MassMomentsAtCOM<Space>
-		mass_moments() const;
+	[[nodiscard]]
+	MassMomentsAtCOM<BodyCOM>
+	mass_moments() const
+		{ return _mass_moments; }
 
 	/**
 	 * Set new mass moments at center-of-mass.
 	 */
-	template<CoordinateSystemConcept Space>
-		void
-		set_mass_moments (MassMoments<Space> const&);
+	void
+	set_mass_moments (MassMomentsAtCOM<BodyCOM> const& mass_moments)
+		{ _mass_moments = mass_moments; }
+
+	/**
+	 * Set new mass moments at center-of-mass.
+	 */
+	void
+	set_mass_moments (MassMoments<BodyCOM> const&);
 
 	/**
 	 * Return placement of center-of-mass.
@@ -400,48 +408,6 @@ class Body: public Noncopyable
 	// The body is not valid for computation anymore (eg. has NaNs in physical quantities):
 	bool												_broken { false };
 };
-
-
-template<class MassMomentsSpace>
-	inline
-	Body::Body (MassMoments<MassMomentsSpace> const& mass_moments, ShapeType const shape_type):
-		_shape_type (shape_type)
-	{
-		set_mass_moments (mass_moments);
-	}
-
-
-template<CoordinateSystemConcept Space>
-	inline MassMomentsAtCOM<Space>
-	Body::mass_moments() const
-	{
-		if constexpr (std::is_same_v<Space, BodyCOM>)
-			return _mass_moments;
-		else
-			static_assert (false, "Unsupported coordinate system");
-	}
-
-
-template<CoordinateSystemConcept Space>
-	inline void
-	Body::set_mass_moments (MassMoments<Space> const& mass_moments)
-	{
-		auto const com_position = mass_moments.center_of_mass_position();
-
-		// We want mass moments to be viewed from the center of mass, so translate if necessary
-		// (this should transform the inertia tensor accordingly):
-		if constexpr (std::is_same_v<Space, BodyCOM>)
-			_mass_moments = mass_moments.centered_at_center_of_mass();
-		else
-			static_assert (false, "Unsupported coordinate system");
-
-		// Move the body so that the placement().position() points to the current center of mass:
-		translate<BodyCOM> (com_position);
-
-		// Because the origin is defined as relative to center of mass, and we just moved center of mass
-		// while not wanting to move origin, move the origin back:
-		_origin_placement.translate_frame (-com_position);
-	}
 
 
 template<CoordinateSystemConcept Space>

@@ -462,7 +462,7 @@ RigidBodyPainter::paint_body (rigid_body::Body const& body, bool body_visible, b
 				if (auto const& shape = body.shape())
 					_gl.draw (*shape);
 				else
-					_gl.draw (make_centered_cube_shape (body.mass_moments<rigid_body::BodyCOM>()));
+					_gl.draw (make_centered_cube_shape (body.mass_moments()));
 			});
 		}
 
@@ -495,7 +495,7 @@ void
 RigidBodyPainter::paint_moments_of_inertia_cuboid (rigid_body::Body const& body)
 {
 	auto const com_material = rigid_body::make_material ({ 0x00, 0x44, 0x99 });
-	auto const com_shape = make_centered_cube_shape (body.mass_moments<rigid_body::BodyCOM>(), com_material);
+	auto const com_shape = make_centered_cube_shape (body.mass_moments(), com_material);
 
 	_gl.save_context ([&] {
 		_gl.translate (body.placement().position() - followed_body_position());
@@ -631,7 +631,7 @@ RigidBodyPainter::paint_angular_momentum (rigid_body::Body const& body)
 	auto constexpr angular_momentum_to_length = 0.001_m / (1_kg * 1_m2 / 1_s) / 1_rad; // TODO unhardcode
 	//TODO auto const& cache = body.frame_cache();
 	auto const com = body.placement().position() - followed_body_position();
-	auto const I = body.mass_moments<rigid_body::BodyCOM>().inertia_tensor();
+	auto const I = body.mass_moments().inertia_tensor();
 	auto const L = I * body.velocity_moments<rigid_body::BodyCOM>().angular_velocity();
 	auto const L_world = body.placement().unbound_transform_to_base (L);
 

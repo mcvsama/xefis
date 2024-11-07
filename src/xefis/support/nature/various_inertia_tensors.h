@@ -17,6 +17,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/math/geometry.h>
+#include <xefis/support/nature/mass_moments.h>
 
 // Neutrino:
 #include <neutrino/numeric.h>
@@ -44,8 +45,8 @@ struct MassRadiusLength {
  * Center-of-mass is at the center of the cuboid.
  */
 template<class Space = void>
-	inline SpaceMatrix<si::MomentOfInertia, Space>
-	make_cuboid_inertia_tensor (si::Mass const& mass, SpaceVector<si::Length> const& dimensions)
+	inline InertiaTensor<Space>
+	make_cuboid_inertia_tensor (si::Mass const& mass, SpaceLength<> const& dimensions)
 	{
 		auto const k = mass / 12.0;
 		auto const i00 = k * (square (dimensions[1]) + square (dimensions[2]));
@@ -62,7 +63,15 @@ template<class Space = void>
 
 
 template<class Space = void>
-	inline SpaceMatrix<si::MomentOfInertia, Space>
+	inline InertiaTensor<Space>
+	make_cuboid_inertia_tensor (si::Mass const& mass, si::Length const edge_length)
+	{
+		return make_cuboid_inertia_tensor<Space> (mass, SpaceLength<> { edge_length, edge_length, edge_length });
+	}
+
+
+template<class Space = void>
+	inline InertiaTensor<Space>
 	make_hollow_sphere_inertia_tensor (MassRadius const& params)
 	{
 		auto const i = params.mass * (2.0 / 3.0) * square (params.radius);
@@ -77,7 +86,7 @@ template<class Space = void>
 
 
 template<class Space = void>
-	inline SpaceMatrix<si::MomentOfInertia, Space>
+	inline InertiaTensor<Space>
 	make_solid_sphere_inertia_tensor (MassRadius const& params)
 	{
 		auto const i = params.mass * (2.0 / 5.0) * square (params.radius);
@@ -96,7 +105,7 @@ template<class Space = void>
  * The center of mass is at [0, 0, 0] position.
  */
 template<class Space = void>
-	inline SpaceMatrix<si::MomentOfInertia, Space>
+	inline InertiaTensor<Space>
 	make_centered_solid_cylinder_inertia_tensor (MassRadiusLength const& params)
 	{
 		auto const i00 = params.mass * (1.0 / 12.0) * (3.0 * square (params.radius) + square (params.length));

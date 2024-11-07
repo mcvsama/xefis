@@ -23,6 +23,38 @@
 
 namespace xf::rigid_body {
 
+Body::Body (MassMomentsAtCOM<BodyCOM> const& mass_moments, ShapeType const shape_type):
+	_shape_type (shape_type)
+{
+	set_mass_moments (mass_moments);
+}
+
+
+Body::Body (MassMoments<BodyCOM> const& mass_moments, ShapeType const shape_type):
+	_shape_type (shape_type)
+{
+	set_mass_moments (mass_moments);
+}
+
+
+void
+Body::set_mass_moments (MassMoments<BodyCOM> const& mass_moments)
+{
+	auto const com_position = mass_moments.center_of_mass_position();
+
+	// We want mass moments to be viewed from the center of mass, so translate if necessary
+	// (this should transform the inertia tensor accordingly):
+	_mass_moments = mass_moments.centered_at_center_of_mass();
+
+	// Move the body so that the placement().position() points to the current center of mass:
+	translate<BodyCOM> (com_position);
+
+	// Because the origin is defined as relative to center of mass, and we just moved center of mass
+	// while not wanting to move origin, move the origin back:
+	_origin_placement.translate_frame (-com_position);
+}
+
+
 void
 Body::rotate_about_center_of_mass (RotationMatrix<WorldSpace> const& rotation)
 {
@@ -72,7 +104,7 @@ Body::move_origin_to (SpaceLength<WorldSpace> const& new_origin_position)
 si::Energy
 Body::translational_kinetic_energy() const
 {
-	auto const mm = mass_moments<BodyCOM>();
+	auto const mm = mass_moments();
 	auto const vm = velocity_moments<WorldSpace>();
 	return 0.5 * mm.mass() * square (abs (vm.velocity()));
 }
@@ -81,7 +113,7 @@ Body::translational_kinetic_energy() const
 si::Energy
 Body::rotational_kinetic_energy() const
 {
-	auto const mm = mass_moments<BodyCOM>();
+	auto const mm = mass_moments();
 	auto const vm = velocity_moments<BodyCOM>();
 	return 0.5 * (~vm.angular_velocity() * mm.inertia_tensor() * vm.angular_velocity() / 1_rad / 1_rad).scalar();
 }

@@ -86,7 +86,7 @@ BodyEditor::refresh()
 
 		setEnabled (true);
 		_body_label->setText (QString::fromStdString (_edited_body->label()));
-		_mass_value.setText (QString ("%1").arg (_edited_body->mass_moments<rigid_body::BodyCOM>().mass().in<si::Kilogram>()));
+		_mass_value.setText (QString ("%1").arg (_edited_body->mass_moments().mass().in<si::Kilogram>()));
 		_translational_kinetic_energy.setText (QString::fromStdString (std::format ("{}", translational_energy)));
 		_rotational_kinetic_energy.setText (QString::fromStdString (std::format ("{}", rotational_energy)));
 
