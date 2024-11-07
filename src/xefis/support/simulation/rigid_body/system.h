@@ -210,6 +210,12 @@ class System: private Noncopyable
 	void
 	set_constraint_force_mixing_factor (double factor) noexcept;
 
+	/**
+	 * Apply velocity damping factors to all constraints.
+	 */
+	void
+	set_friction_factor (double factor) noexcept;
+
   private:
 	FramePrecalculations	_frame_precalculations;
 	Bodies					_bodies;

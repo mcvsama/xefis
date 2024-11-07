@@ -197,6 +197,23 @@ class Constraint: public ConnectedBodies
 		{ _constraint_force_mixing_factor = factor; }
 
 	/**
+	 * Return the friction factor.
+	 */
+	[[nodiscard]]
+	double
+	friction_factor() const noexcept
+		{ return _friction_factor; }
+
+	/**
+	 * Apply friction factor to simulate energy dissipation on the constraint.
+	 * The factor should be small, usually between 0.001 and 0.01 for realism.
+	 * By default it's 0.
+	 */
+	void
+	set_friction_factor (double factor) noexcept
+		{ _friction_factor = factor; }
+
+	/**
 	 * Return constraint forces to apply to the two bodies.
 	 *
 	 * Call do_constraint_forces() and check if constraint needs to be broken
@@ -322,6 +339,7 @@ class Constraint: public ConnectedBodies
 	std::optional<si::Torque>	_breaking_torque;
 	double						_baumgarte_factor				{ kDefaultBaumgarteFactor };
 	double						_constraint_force_mixing_factor { 0.0 };
+	double						_friction_factor				{ 0.0 };
 	std::optional<ForceMoments<WorldSpace>>
 								_previous_calculation_force_moments;
 };
