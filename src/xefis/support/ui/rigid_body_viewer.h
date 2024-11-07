@@ -129,6 +129,14 @@ class RigidBodyViewer: public GLAnimationWidget
 		{ return _rigid_body_painter.followed_body(); }
 
 	/**
+	 * Return the planet body.
+	 */
+	[[nodiscard]]
+	rigid_body::Body const*
+	planet() const noexcept
+		{ return _rigid_body_painter.planet(); }
+
+	/**
 	 * Calls set_planet() on internal RigidBodyPainter.
 	 */
 	void

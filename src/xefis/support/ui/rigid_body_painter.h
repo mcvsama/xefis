@@ -93,6 +93,14 @@ class RigidBodyPainter: protected QOpenGLFunctions
 		{ return _following_orientation; }
 
 	/**
+	 * Return the planet body or nullptr.
+	 */
+	[[nodiscard]]
+	rigid_body::Body const*
+	planet() const noexcept
+		{ return _planet_body; }
+
+	/**
 	 * Set planet body.
 	 *
 	 * It's used to correctly display ground and sky location
