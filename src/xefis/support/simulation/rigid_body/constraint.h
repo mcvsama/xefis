@@ -74,6 +74,9 @@ class Constraint: public ConnectedBodies
 	template<std::size_t N>
 		using ConstraintMassMatrix = math::SquareMatrix<decltype (1 / 1_kg), N, WorldSpace, WorldSpace>;
 
+	template<std::size_t N>
+		using InverseConstraintMassMatrix = math::SquareMatrix<decltype (1 / 1_kg), N, WorldSpace, WorldSpace>;
+
   public:
 	// Ctor
 	using ConnectedBodies::ConnectedBodies;
@@ -174,6 +177,26 @@ class Constraint: public ConnectedBodies
 		{ _baumgarte_factor = factor; }
 
 	/**
+	 * Constraint Force Mixing (CFM) factor.
+	 * It effectively introduces a tiny compliance in constraints, causing them
+	 * to dissipate energy through minor deviations rather than perfectly rigid enforcement.
+	 * Makes simulation a bit more stable numerically and also can be used to remove
+	 * bits of energy from the system.
+	 */
+	[[nodiscard]]
+	double
+	constraint_force_mixing_factor() const noexcept
+		{ return _constraint_force_mixing_factor; }
+
+	/**
+	 * Set Constraint Force Mixing factor.
+	 * By default it's set to 0.
+	 */
+	void
+	set_constraint_force_mixing_factor (double factor) noexcept
+		{ _constraint_force_mixing_factor = factor; }
+
+	/**
 	 * Return constraint forces to apply to the two bodies.
 	 *
 	 * Call do_constraint_forces() and check if constraint needs to be broken
@@ -263,6 +286,7 @@ class Constraint: public ConnectedBodies
 
 	/**
 	 * Calculate mass matrix K in a generic way.
+	 * It's also called the "constraint matrix".
 	 */
 	template<std::size_t N>
 		[[nodiscard]]
@@ -292,11 +316,12 @@ class Constraint: public ConnectedBodies
 
   private:
 	std::string					_label;
-	bool						_enabled			{ true };
-	bool						_broken				{ false };
+	bool						_enabled						{ true };
+	bool						_broken							{ false };
 	std::optional<si::Force>	_breaking_force;
 	std::optional<si::Torque>	_breaking_torque;
-	double						_baumgarte_factor	{ kDefaultBaumgarteFactor };
+	double						_baumgarte_factor				{ kDefaultBaumgarteFactor };
+	double						_constraint_force_mixing_factor { 0.0 };
 	std::optional<ForceMoments<WorldSpace>>
 								_previous_calculation_force_moments;
 };
@@ -409,13 +434,15 @@ template<std::size_t N>
 		auto const inv_I1 = body_1().frame_cache().inv_I;
 		auto const inv_M2 = body_2().frame_cache().inv_M;
 		auto const inv_I2 = body_2().frame_cache().inv_I;
+		auto const CFM = _constraint_force_mixing_factor * InverseConstraintMassMatrix <N> (math::unit);
 
 		// Unfolded expression: J * inv(M) * ~J.
 		// This has to be unfolded because of two distinct scalar types held by Jacobians.
 		return Jv1 * inv_M1 * ~Jv1
 			 + Jw1 * inv_I1 * ~Jw1
 			 + Jv2 * inv_M2 * ~Jv2
-			 + Jw2 * inv_I2 * ~Jw2;
+			 + Jw2 * inv_I2 * ~Jw2
+			 + CFM;
 	}
 
 
@@ -426,10 +453,12 @@ template<std::size_t N>
 	{
 		auto const inv_M1 = body_1().frame_cache().inv_M;
 		auto const inv_M2 = body_2().frame_cache().inv_M;
+		auto const CFM = _constraint_force_mixing_factor * InverseConstraintMassMatrix <N> (math::unit);
 
 		// Unfolded expression: J * inv(M) * ~J.
 		return Jv1 * inv_M1 * ~Jv1
-			 + Jv2 * inv_M2 * ~Jv2;
+			 + Jv2 * inv_M2 * ~Jv2
+			 + CFM;
 	}
 
 
@@ -440,10 +469,12 @@ template<std::size_t N>
 	{
 		auto const inv_I1 = body_1().frame_cache().inv_I;
 		auto const inv_I2 = body_2().frame_cache().inv_I;
+		auto const CFM = _constraint_force_mixing_factor * InverseConstraintMassMatrix <N> (math::unit);
 
 		// Unfolded expression: J * inv(M) * ~J.
 		return Jw1 * inv_I1 * ~Jw1
-			 + Jw2 * inv_I2 * ~Jw2;
+			 + Jw2 * inv_I2 * ~Jw2
+			 + CFM;
 	}
 
 

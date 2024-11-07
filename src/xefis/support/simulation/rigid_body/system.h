@@ -204,6 +204,12 @@ class System: private Noncopyable
 	void
 	set_baumgarte_factor (double factor) noexcept;
 
+	/**
+	 * Apply given Constraint Force Mixing factor to all constraints.
+	 */
+	void
+	set_constraint_force_mixing_factor (double factor) noexcept;
+
   private:
 	FramePrecalculations	_frame_precalculations;
 	Bodies					_bodies;

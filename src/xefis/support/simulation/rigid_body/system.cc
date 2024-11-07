@@ -74,5 +74,13 @@ System::set_baumgarte_factor (double factor) noexcept
 		c->set_baumgarte_factor (factor);
 }
 
+
+void
+System::set_constraint_force_mixing_factor (double factor) noexcept
+{
+	for (auto& c: _constraints)
+		c->set_constraint_force_mixing_factor (factor);
+}
+
 } // namespace xf::rigid_body
 
