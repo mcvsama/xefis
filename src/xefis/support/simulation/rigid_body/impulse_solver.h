@@ -77,12 +77,6 @@ class ImpulseSolver: private Noncopyable
 	ImpulseSolver (System&, uint32_t max_iterations = kDefaultMaxIterations);
 
 	/**
-	 * Evolve the system physically by given Δt.
-	 */
-	EvolutionDetails
-	evolve (si::Time dt);
-
-	/**
 	 * Set limits applied during evolution.
 	 */
 	void
@@ -101,6 +95,12 @@ class ImpulseSolver: private Noncopyable
 	 */
 	 void
 	 set_required_precision (std::optional<si::Force>, std::optional<si::Torque>);
+
+	/**
+	 * Evolve the system physically by given Δt.
+	 */
+	EvolutionDetails
+	evolve (si::Time dt);
 
   private:
 	void
