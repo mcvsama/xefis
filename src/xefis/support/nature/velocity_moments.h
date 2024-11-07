@@ -45,10 +45,10 @@ template<class Space = void>
 						 SpaceVector<si::AngularVelocity, Space> const& angular_velocity);
 
 		constexpr VelocityMoments&
-		inline_add (VelocityMoments const& other, SpaceLength<Space> const& arm);
+		inplace_add (VelocityMoments const& other, SpaceLength<Space> const& arm);
 
 		constexpr VelocityMoments&
-		inline_subtract (VelocityMoments const& other, SpaceLength<Space> const& arm);
+		inplace_subtract (VelocityMoments const& other, SpaceLength<Space> const& arm);
 
 		[[nodiscard]]
 		constexpr SpaceVector<si::Velocity, Space> const&
@@ -90,7 +90,7 @@ template<class Space>
 
 template<class Space>
 	constexpr VelocityMoments<Space>&
-	VelocityMoments<Space>::inline_add (VelocityMoments const& other, SpaceLength<Space> const& arm)
+	VelocityMoments<Space>::inplace_add (VelocityMoments const& other, SpaceLength<Space> const& arm)
 	{
 		_velocity += other._velocity + tangential_velocity (_angular_velocity, arm);
 		_angular_velocity += other._angular_velocity;
@@ -100,7 +100,7 @@ template<class Space>
 
 template<class Space>
 	constexpr VelocityMoments<Space>&
-	VelocityMoments<Space>::inline_subtract (VelocityMoments const& other, SpaceLength<Space> const& arm)
+	VelocityMoments<Space>::inplace_subtract (VelocityMoments const& other, SpaceLength<Space> const& arm)
 	{
 		_velocity -= other._velocity + tangential_velocity (_angular_velocity, arm);
 		_angular_velocity -= other._angular_velocity;
@@ -125,7 +125,7 @@ template<class Space>
 	constexpr VelocityMoments<Space>
 	add (VelocityMoments<Space> a, VelocityMoments<Space> const& b, SpaceLength<Space> const& arm)
 	{
-		return a.inline_add (b, arm);
+		return a.inplace_add (b, arm);
 	}
 
 
@@ -144,7 +144,7 @@ template<class Space>
 	constexpr VelocityMoments<Space>
 	subtract (VelocityMoments<Space> a, VelocityMoments<Space> const& b, SpaceLength<Space> const& arm)
 	{
-		return a.inline_subtract (b, arm);
+		return a.inplace_subtract (b, arm);
 	}
 
 
