@@ -19,6 +19,7 @@
 #include <xefis/base/icons.h>
 #include <xefis/support/nature/constants.h>
 #include <xefis/support/simulation/devices/wing.h>
+#include <xefis/support/simulation/rigid_body/concepts.h>
 #include <xefis/support/ui/paint_helper.h>
 #include <xefis/support/ui/rigid_body_viewer.h>
 #include <xefis/support/ui/widget.h>
@@ -79,6 +80,8 @@ BodyEditor::edit (rigid_body::Body* body_to_edit)
 void
 BodyEditor::refresh()
 {
+	using rigid_body::WorldSpace;
+
 	if (_edited_body)
 	{
 		auto const translational_energy = neutrino::format_unit (_edited_body->translational_kinetic_energy().in<si::Joule>(), 6, "J");
@@ -93,18 +96,23 @@ BodyEditor::refresh()
 		if (auto const* planet_body = _rigid_body_viewer.planet())
 		{
 			auto const position_on_planet = _edited_body->placement().position() - planet_body->placement().position();
-
 			// Assuming the planet is in ECEF orientation.
 			auto const polar_location = xf::polar (math::reframe<ECEFSpace, void> (position_on_planet));
+			auto const velocity_moments = _edited_body->velocity_moments<WorldSpace>() - planet_body->velocity_moments<WorldSpace>();
+
 			_longitude.setText (QString::fromStdString (std::format ("{:.6f}", polar_location.lon().to<si::Degree>())));
 			_latitude.setText (QString::fromStdString (std::format ("{:.6f}", polar_location.lat().to<si::Degree>())));
 			_altitude_amsl.setText (QString::fromStdString (std::format ("{:.3f}", polar_location.radius() - xf::kEarthMeanRadius)));
+			_velocity.setText (QString::fromStdString (std::format ("{:.3f}", abs (velocity_moments.velocity()))));
+			_angular_velocity.setText (QString::fromStdString (std::format ("{:.3f}", abs (velocity_moments.angular_velocity()))));
 		}
 		else
 		{
 			_latitude.setText ("–");
 			_longitude.setText ("–");
 			_altitude_amsl.setText ("–");
+			_velocity.setText ("–");
+			_angular_velocity.setText ("–");
 		}
 
 		refresh_wing_specific_data();
@@ -242,6 +250,10 @@ BodyEditor::create_position_widget()
 	layout->addWidget (&_longitude, row++, 1);
 	layout->addWidget (new QLabel ("AMSL height:"), row, 0);
 	layout->addWidget (&_altitude_amsl, row++, 1);
+	layout->addWidget (new QLabel ("Velocity:"), row, 0);
+	layout->addWidget (&_velocity, row++, 1);
+	layout->addWidget (new QLabel ("Angular velocity:"), row, 0);
+	layout->addWidget (&_angular_velocity, row++, 1);
 
 	return widget;
 }

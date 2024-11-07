@@ -88,6 +88,9 @@ class BodyEditor: public QWidget
 	QLabel								_latitude;
 	QLabel								_longitude;
 	QLabel								_altitude_amsl;
+	// Velocities:
+	QLabel								_velocity;
+	QLabel								_angular_velocity;
 	QLineEdit							_mass_value;
 	QLabel								_translational_kinetic_energy;
 	QLabel								_rotational_kinetic_energy;
