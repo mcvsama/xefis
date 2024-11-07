@@ -91,6 +91,8 @@ class BodyEditor: public QWidget
 	// Velocities:
 	QLabel								_velocity;
 	QLabel								_angular_velocity;
+	// Accelerations:
+	QLabel								_load_factor;
 	QLineEdit							_mass_value;
 	QLabel								_translational_kinetic_energy;
 	QLabel								_rotational_kinetic_energy;

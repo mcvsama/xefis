@@ -80,6 +80,7 @@ BodyEditor::edit (rigid_body::Body* body_to_edit)
 void
 BodyEditor::refresh()
 {
+	using rigid_body::BodyCOM;
 	using rigid_body::WorldSpace;
 
 	if (_edited_body)
@@ -99,20 +100,20 @@ BodyEditor::refresh()
 			// Assuming the planet is in ECEF orientation.
 			auto const polar_location = xf::polar (math::reframe<ECEFSpace, void> (position_on_planet));
 			auto const velocity_moments = _edited_body->velocity_moments<WorldSpace>() - planet_body->velocity_moments<WorldSpace>();
+			// Wing's down in BodyCOM (airfoil coordinates) is negative Y:
+			auto const load_factor_except_gravity = _edited_body->acceleration_moments_except_gravity<BodyCOM>().acceleration().y() / xf::kStdGravitationalAcceleration;
 
 			_longitude.setText (QString::fromStdString (std::format ("{:.6f}", polar_location.lon().to<si::Degree>())));
 			_latitude.setText (QString::fromStdString (std::format ("{:.6f}", polar_location.lat().to<si::Degree>())));
 			_altitude_amsl.setText (QString::fromStdString (std::format ("{:.3f}", polar_location.radius() - xf::kEarthMeanRadius)));
 			_velocity.setText (QString::fromStdString (std::format ("{:.3f}", abs (velocity_moments.velocity()))));
 			_angular_velocity.setText (QString::fromStdString (std::format ("{:.3f}", abs (velocity_moments.angular_velocity()))));
+			_load_factor.setText (QString::fromStdString (std::format ("{:.2f}", load_factor_except_gravity)));
 		}
 		else
 		{
-			_latitude.setText ("–");
-			_longitude.setText ("–");
-			_altitude_amsl.setText ("–");
-			_velocity.setText ("–");
-			_angular_velocity.setText ("–");
+			for (auto* w: { &_latitude, &_longitude, &_altitude_amsl, &_velocity, &_angular_velocity, &_load_factor })
+				w->setText ("–");
 		}
 
 		refresh_wing_specific_data();
@@ -254,6 +255,8 @@ BodyEditor::create_position_widget()
 	layout->addWidget (&_velocity, row++, 1);
 	layout->addWidget (new QLabel ("Angular velocity:"), row, 0);
 	layout->addWidget (&_angular_velocity, row++, 1);
+	layout->addWidget (new QLabel ("Load factor:"), row, 0);
+	layout->addWidget (&_load_factor, row++, 1);
 
 	return widget;
 }
