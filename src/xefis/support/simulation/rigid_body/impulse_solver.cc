@@ -34,6 +34,14 @@ ImpulseSolver::ImpulseSolver (System& system, uint32_t const max_iterations):
 { }
 
 
+void
+ImpulseSolver::set_required_precision (std::optional<si::Force> const force, std::optional<si::Torque> const torque)
+{
+	_required_force_precision = force;
+	_required_torque_precision = torque;
+}
+
+
 EvolutionDetails
 ImpulseSolver::evolve (si::Time const dt)
 {
@@ -180,14 +188,23 @@ ImpulseSolver::update_constraint_forces (si::Time const dt)
 																				  fc2.velocity_moments, total_ext_forces_2,
 																				  dt);
 
-                    if (constraint->previous_calculation_force_moments())
+                    if (auto prev = constraint->previous_calculation_force_moments())
                     {
-                        auto const& prev = *constraint->previous_calculation_force_moments();
-                        auto const dF = abs (constraint_forces[0].force() - prev.force());
-                        auto const dT = abs (constraint_forces[0].torque() - prev.torque());
+						if (_required_force_precision)
+						{
+							auto const dF = abs (constraint_forces[0].force() - prev->force());
 
-                        if (dF > 0.001_N || dT > 0.001_Nm) // TODO configurable
-                            precise_enough = false;
+							if (dF > *_required_force_precision)
+								precise_enough = false;
+						}
+
+						if (_required_torque_precision)
+						{
+							auto const dT = abs (constraint_forces[0].torque() - prev->torque());
+
+							if (dT > *_required_torque_precision)
+								precise_enough = false;
+						}
                     }
                     else
                         precise_enough = false;

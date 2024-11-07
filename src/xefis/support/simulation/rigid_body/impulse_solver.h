@@ -96,6 +96,12 @@ class ImpulseSolver: private Noncopyable
 	set_max_iterations (size_t const max_iterations) noexcept
 		{ _max_iterations = max_iterations; }
 
+	/**
+	 * Set required precision for calculated force moments of constraints.
+	 */
+	 void
+	 set_required_precision (std::optional<si::Force>, std::optional<si::Torque>);
+
   private:
 	void
 	update_mass_moments();
@@ -139,10 +145,12 @@ class ImpulseSolver: private Noncopyable
 		apply_limits (VelocityMoments<Space>&) const;
 
   private:
-	System&					_system;
-	std::optional<Limits>	_limits;
-	size_t					_max_iterations		{ kDefaultMaxIterations };
-	uint64_t				_processed_frames	{ 0 };
+	System&						_system;
+	std::optional<Limits>		_limits;
+	size_t						_max_iterations		{ kDefaultMaxIterations };
+	uint64_t					_processed_frames	{ 0 };
+	std::optional<si::Force>	_required_force_precision;
+	std::optional<si::Torque>	_required_torque_precision;
 };
 
 
