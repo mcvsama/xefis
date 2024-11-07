@@ -409,10 +409,12 @@ template<std::size_t N>
 									JacobianW<N> const& Jw2,
 									si::Time dt) const
 	{
+		constexpr auto inv_radian = decltype (1.0 / 1_rad) { 1 };
+
 		auto const v1 = vm_1.velocity();
-		auto const w1 = vm_1.angular_velocity() / 1_rad;
+		auto const w1 = vm_1.angular_velocity() * inv_radian;
 		auto const v2 = vm_2.velocity();
-		auto const w2 = vm_2.angular_velocity() / 1_rad;
+		auto const w2 = vm_2.angular_velocity() * inv_radian;
 
 		auto const inv_M1 = body_1().frame_cache().inv_M;
 		auto const inv_I1 = body_1().frame_cache().inv_I;
@@ -436,8 +438,9 @@ template<std::size_t N>
 								  ConstraintMassMatrix<N> const& K,
 								  si::Time const dt) const
 	{
-		auto const stabilization_bias = baumgarte_factor() / dt * location_constraint;
-		return (-inv (K) * (J + stabilization_bias)) / dt;
+		auto const inv_dt = 1 / dt;
+		auto const stabilization_bias = baumgarte_factor() * inv_dt * location_constraint;
+		return (-inv (K) * (J + stabilization_bias)) * inv_dt;
 	}
 
 
