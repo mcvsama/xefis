@@ -123,6 +123,17 @@ template<class Space>
 
 template<class Space>
 	constexpr VelocityMoments<Space>
+	operator+ (VelocityMoments<Space> a, VelocityMoments<Space> b)
+	{
+		return {
+			a.velocity() + b.velocity(),
+			a.angular_velocity() + b.angular_velocity(),
+		};
+	}
+
+
+template<class Space>
+	constexpr VelocityMoments<Space>
 	add (VelocityMoments<Space> a, VelocityMoments<Space> const& b, SpaceLength<Space> const& arm)
 	{
 		return a.inplace_add (b, arm);
@@ -136,6 +147,17 @@ template<class Space>
 		return {
 			-a.velocity(),
 			-a.angular_velocity(),
+		};
+	}
+
+
+template<class Space>
+	constexpr VelocityMoments<Space>
+	operator- (VelocityMoments<Space> a, VelocityMoments<Space> b)
+	{
+		return {
+			a.velocity() - b.velocity(),
+			a.angular_velocity() - b.angular_velocity(),
 		};
 	}
 
