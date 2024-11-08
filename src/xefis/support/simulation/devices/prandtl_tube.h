@@ -18,6 +18,7 @@
 #include <xefis/config/all.h>
 #include <xefis/support/earth/air/atmosphere.h>
 #include <xefis/support/simulation/rigid_body/body.h>
+#include <xefis/support/ui/body_widget.h>
 
 // Standard:
 #include <cstddef>
@@ -37,7 +38,9 @@ struct PrandtlTubeParameters
  * Also called Pitot-static tube, measures both dynamic and static pressures.
  * The body's X-axis points into the wind (X-axis is sensor's surface normal vector).
  */
-class PrandtlTube: public rigid_body::Body
+class PrandtlTube:
+	public rigid_body::Body,
+	public HasBodyWidget
 {
   public:
 	/**

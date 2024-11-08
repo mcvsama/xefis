@@ -1,6 +1,6 @@
 /* vim:ts=4
  *
- * Copyleft 2019  Michał Gawron
+ * Copyleft 2024  Michał Gawron
  * Marduk Unix Labs, http://mulabs.org/
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,6 +18,7 @@
 #include <xefis/config/all.h>
 #include <xefis/support/aerodynamics/airfoil.h>
 #include <xefis/support/aerodynamics/airfoil_aerodynamic_parameters.h>
+#include <xefis/support/simulation/devices/wing_widget.h>
 #include <xefis/support/simulation/rigid_body/body.h>
 #include <xefis/support/simulation/rigid_body/concepts.h>
 
@@ -27,7 +28,9 @@
 
 namespace xf::sim {
 
-class Wing: public rigid_body::Body
+class Wing:
+	public rigid_body::Body,
+	public HasBodyWidget
 {
   public:
 	// Ctor
@@ -50,6 +53,12 @@ class Wing: public rigid_body::Body
 	// Body API
 	void
 	update_external_forces (Atmosphere const*) override;
+
+	// HasBodyWidget API
+	[[nodiscard]]
+	std::unique_ptr<BodyWidget>
+	create_body_widget()
+		{ return std::make_unique<WingWidget> (*this); }
 
   private:
 	[[nodiscard]]

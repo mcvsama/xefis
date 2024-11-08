@@ -17,7 +17,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/simulation/rigid_body/body.h>
-#include <xefis/support/ui/airfoil_spline_widget.h>
+#include <xefis/support/ui/body_widget.h>
 #include <xefis/support/ui/paint_helper.h>
 
 // Qt:
@@ -57,50 +57,25 @@ class BodyEditor: public QWidget
 	refresh();
 
   private:
-	void
-	refresh_wing_specific_data();
-
-	[[nodiscard]]
-	QWidget*
-	create_basic_info_widget();
-
-	[[nodiscard]]
-	QWidget*
-	create_airfoil_info_widget (PaintHelper const&);
-
 	[[nodiscard]]
 	QWidget*
 	create_position_widget();
 
-	[[nodiscard]]
-	QWidget*
-	create_mass_moments_widget();
-
   private:
-	RigidBodyViewer&					_rigid_body_viewer;
-	rigid_body::Body*					_edited_body { nullptr };
-	QLabel*								_body_label;
-	QFrame								_airfoil_frame;
-	AirfoilSplineWidget					_airfoil_spline_widget;
-	QWidget*							_airfoil_info_widget;
-	QToolBox							_tool_box;
-	// Position:
-	QLabel								_latitude;
-	QLabel								_longitude;
-	QLabel								_altitude_amsl;
-	// Velocities:
-	QLabel								_velocity;
-	QLabel								_angular_velocity;
-	// Accelerations:
-	QLabel								_load_factor;
-	QLineEdit							_mass_value;
-	QLabel								_translational_kinetic_energy;
-	QLabel								_rotational_kinetic_energy;
-	QLabel								_true_air_speed;
-	QLabel								_static_air_temperature;
-	QLabel								_air_density;
-	QLabel								_dynamic_viscosity;
-	QLabel								_reynolds_number;
+	QVBoxLayout					_layout				{ this };
+	RigidBodyViewer&			_rigid_body_viewer;
+	rigid_body::Body*			_edited_body		{ nullptr };
+	std::unique_ptr<BodyWidget>	_edited_body_widget;
+	QVBoxLayout					_edited_body_widget_layout;
+	QLabel*						_body_label;
+	QToolBox					_tool_box;
+	// Position on the planet:
+	QLabel						_latitude;
+	QLabel						_longitude;
+	QLabel						_altitude_amsl;
+	// Velocities relative to the planet:
+	QLabel						_velocity;
+	QLabel						_angular_velocity;
 };
 
 } // namespace xf
