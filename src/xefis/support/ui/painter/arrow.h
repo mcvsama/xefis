@@ -28,7 +28,7 @@
 namespace xf {
 
 void
-draw_arrow (QPainter&, QPointF const& from, QPointF const& to, double arrowhead_size = 3.0);
+draw_arrow (QPainter&, QPointF const& from, QPointF const& to, double arrowhead_size = 2.0);
 
 } // namespace xf
 
