@@ -98,7 +98,7 @@ template<class Space = void>
 template<class TargetSpace = void, class SourceSpace = TargetSpace>
 	[[nodiscard]]
 	constexpr RotationMatrix<TargetSpace, SourceSpace>
-	x_rotation (si::Angle const angle)
+	x_rotation_matrix (si::Angle const angle)
 	{
 		double const sin_a = sin (angle);
 		double const cos_a = cos (angle);
@@ -117,7 +117,7 @@ template<class TargetSpace = void, class SourceSpace = TargetSpace>
 template<class TargetSpace = void, class SourceSpace = TargetSpace>
 	[[nodiscard]]
 	constexpr RotationMatrix<TargetSpace, SourceSpace>
-	y_rotation (si::Angle const angle)
+	y_rotation_matrix (si::Angle const angle)
 	{
 		double const sin_a = sin (angle);
 		double const cos_a = cos (angle);
@@ -136,7 +136,7 @@ template<class TargetSpace = void, class SourceSpace = TargetSpace>
 template<class TargetSpace = void, class SourceSpace = TargetSpace>
 	[[nodiscard]]
 	constexpr RotationMatrix<TargetSpace, SourceSpace>
-	z_rotation (si::Angle const angle)
+	z_rotation_matrix (si::Angle const angle)
 	{
 		double const sin_a = sin (angle);
 		double const cos_a = cos (angle);
@@ -149,34 +149,53 @@ template<class TargetSpace = void, class SourceSpace = TargetSpace>
 	}
 
 
+template<class TargetSpace = void, class SourceSpace = TargetSpace>
+	[[nodiscard]]
+	constexpr RotationMatrix<TargetSpace, SourceSpace>
+	x_rotation (si::Angle const angle)
+		{ return x_rotation_matrix<TargetSpace, SourceSpace> (angle); }
+
+
+template<class TargetSpace = void, class SourceSpace = TargetSpace>
+	[[nodiscard]]
+	constexpr RotationMatrix<TargetSpace, SourceSpace>
+	y_rotation (si::Angle const angle)
+		{ return y_rotation_matrix<TargetSpace, SourceSpace> (angle); }
+
+
+template<class TargetSpace = void, class SourceSpace = TargetSpace>
+	[[nodiscard]]
+	constexpr RotationMatrix<TargetSpace, SourceSpace>
+	z_rotation (si::Angle const angle)
+		{ return z_rotation_matrix<TargetSpace, SourceSpace> (angle); }
 
 
 template<class TargetSpace, class SourceSpace>
-	static auto const kXRotationPlus45	= x_rotation_matrix<TargetSpace, SourceSpace> (45_deg);
+	static auto const kXRotationPlus45	= x_rotation<TargetSpace, SourceSpace> (45_deg);
 
 template<class TargetSpace, class SourceSpace>
-	static auto const kYRotationPlus45	= y_rotation_matrix<TargetSpace, SourceSpace> (45_deg);
+	static auto const kYRotationPlus45	= y_rotation<TargetSpace, SourceSpace> (45_deg);
 
 template<class TargetSpace, class SourceSpace>
-	static auto const kZRotationPlus45	= z_rotation_matrix<TargetSpace, SourceSpace> (45_deg);
+	static auto const kZRotationPlus45	= z_rotation<TargetSpace, SourceSpace> (45_deg);
 
 template<class TargetSpace, class SourceSpace>
-	static auto const kXRotationPlus90	= x_rotation_matrix<TargetSpace, SourceSpace> (90_deg);
+	static auto const kXRotationPlus90	= x_rotation<TargetSpace, SourceSpace> (90_deg);
 
 template<class TargetSpace, class SourceSpace>
-	static auto const kYRotationPlus90	= y_rotation_matrix<TargetSpace, SourceSpace> (90_deg);
+	static auto const kYRotationPlus90	= y_rotation<TargetSpace, SourceSpace> (90_deg);
 
 template<class TargetSpace, class SourceSpace>
-	static auto const kZRotationPlus90	= z_rotation_matrix<TargetSpace, SourceSpace> (90_deg);
+	static auto const kZRotationPlus90	= z_rotation<TargetSpace, SourceSpace> (90_deg);
 
 template<class TargetSpace, class SourceSpace>
-	static auto const kXRotationPlus180	= x_rotation_matrix<TargetSpace, SourceSpace> (180_deg);
+	static auto const kXRotationPlus180	= x_rotation<TargetSpace, SourceSpace> (180_deg);
 
 template<class TargetSpace, class SourceSpace>
-	static auto const kYRotationPlus180	= y_rotation_matrix<TargetSpace, SourceSpace> (180_deg);
+	static auto const kYRotationPlus180	= y_rotation<TargetSpace, SourceSpace> (180_deg);
 
 template<class TargetSpace, class SourceSpace>
-	static auto const kZRotationPlus180	= z_rotation_matrix<TargetSpace, SourceSpace> (180_deg);
+	static auto const kZRotationPlus180	= z_rotation<TargetSpace, SourceSpace> (180_deg);
 
 
 // Forward:
