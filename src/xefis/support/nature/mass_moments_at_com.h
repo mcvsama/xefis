@@ -94,10 +94,10 @@ template<class pSpace = void>
 			{ return _inertia_tensor; }
 
 		/**
-		 * Inversed moments of inertia tensor.
+		 * Inverse moments of inertia tensor.
 		 */
 		[[nodiscard]]
-		typename InertiaTensor<Space>::InversedMatrix const&
+		typename InertiaTensor<Space>::InverseMatrix const&
 		inverse_inertia_tensor() const noexcept
 			{ return _inverse_inertia_tensor; }
 
@@ -106,7 +106,7 @@ template<class pSpace = void>
 		SpaceLength<Space>							_zero_length				{ 0_m, 0_m, 0_m };
 		InertiaTensor<Space>						_inertia_tensor				{ math::zero };
 		// TODO consider making this optional (+std::mutex and mutable keyword):
-		decltype (_inertia_tensor)::InversedMatrix	_inverse_inertia_tensor		{ math::zero };
+		decltype (_inertia_tensor)::InverseMatrix	_inverse_inertia_tensor		{ math::zero };
 	};
 
 

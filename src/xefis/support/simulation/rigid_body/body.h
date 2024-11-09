@@ -50,15 +50,15 @@ namespace xf::rigid_body {
 class BodyFrameCache
 {
   public:
-	SpaceMatrix<si::Mass, WorldSpace>::InversedMatrix				inv_M;
-	SpaceMatrix<si::MomentOfInertia, WorldSpace>::InversedMatrix	inv_I;
-	ForceMoments<WorldSpace>										gravitational_force_moments;
-	ForceMoments<WorldSpace>										external_force_moments; // Excluding gravitation.
-	ForceMoments<WorldSpace>										constraint_force_moments;
+	SpaceMatrix<si::Mass, WorldSpace>::InverseMatrix			inv_M;
+	SpaceMatrix<si::MomentOfInertia, WorldSpace>::InverseMatrix	inv_I;
+	ForceMoments<WorldSpace>									gravitational_force_moments;
+	ForceMoments<WorldSpace>									external_force_moments; // Excluding gravitation.
+	ForceMoments<WorldSpace>									constraint_force_moments;
 	// Those are used temporarily when converging constraint_force_moments:
-	AccelerationMoments<WorldSpace>									acceleration_moments;
-	AccelerationMoments<WorldSpace>									acceleration_moments_except_gravity;
-	VelocityMoments<WorldSpace>										velocity_moments;
+	AccelerationMoments<WorldSpace>								acceleration_moments;
+	AccelerationMoments<WorldSpace>								acceleration_moments_except_gravity;
+	VelocityMoments<WorldSpace>									velocity_moments;
 
   public:
 	[[nodiscard]]
