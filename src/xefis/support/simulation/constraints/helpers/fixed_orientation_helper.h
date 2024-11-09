@@ -63,9 +63,9 @@ FixedOrientationHelper::rotation_constraint_value (Placement<WorldSpace, BodyCOM
 												   Placement<WorldSpace, BodyCOM> const& location_2) const
 {
 	RotationMatrix<BodyCOM, BodyCOM> const current_relative_rotation = relative_rotation (location_1, location_2);
-	RotationMatrix<BodyCOM, BodyCOM> const body_rotation_error = ~_initial_relative_rotation * current_relative_rotation;
-	SpaceVector<si::Angle, WorldSpace> const world_rotation_error = location_2.body_to_base_rotation() * to_rotation_vector (body_rotation_error);
-	return world_rotation_error * 1_m / 1_rad;
+	RotationMatrix<BodyCOM, BodyCOM> const body_error = ~_initial_relative_rotation * current_relative_rotation;
+	SpaceVector<si::Angle, WorldSpace> const world_error = location_2.body_to_base_rotation() * to_rotation_vector (body_error);
+	return world_error * 1_m / 1_rad;
 }
 
 } // namespace xf::rigid_body
