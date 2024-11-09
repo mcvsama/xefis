@@ -350,9 +350,9 @@ ManualTest t_5 ("rigid_body::System: intermediate axis of rotation", []{
 		// Apply torque for a while:
 		if (total_t < 0.7_s)
 		{
-			body_ox.apply_impulse (ForceMoments<rigid_body::WorldSpace> ({ 0_N, 0_N, 0_N }, { 10_Nm, 0_Nm, 0_Nm }));
-			body_oy.apply_impulse (ForceMoments<rigid_body::WorldSpace> ({ 0_N, 0_N, 0_N }, { 0_Nm, 10_Nm, 0_Nm }));
-			body_oz.apply_impulse (ForceMoments<rigid_body::WorldSpace> ({ 0_N, 0_N, 0_N }, { 0_Nm, 0_Nm, 10_Nm }));
+			body_ox.apply_impulse (ForceMoments<rigid_body::WorldSpace> ({ 0_N, 0_N, 0_N }, { 1000_Nm, 0_Nm, 0_Nm }));
+			body_oy.apply_impulse (ForceMoments<rigid_body::WorldSpace> ({ 0_N, 0_N, 0_N }, { 0_Nm, 1000_Nm, 0_Nm }));
+			body_oz.apply_impulse (ForceMoments<rigid_body::WorldSpace> ({ 0_N, 0_N, 0_N }, { 0_Nm, 0_Nm, 1000_Nm }));
 		}
 
 		total_t += dt;
