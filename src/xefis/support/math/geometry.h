@@ -95,9 +95,9 @@ template<class Space = void>
 /**
  * Return rotation matrix along the axis X for given angle.
  */
-template<class TF = void, class SF = TF>
+template<class TargetSpace = void, class SourceSpace = TargetSpace>
 	[[nodiscard]]
-	constexpr RotationMatrix<TF, SF>
+	constexpr RotationMatrix<TargetSpace, SourceSpace>
 	x_rotation (si::Angle const angle)
 	{
 		double const sin_a = sin (angle);
@@ -114,9 +114,9 @@ template<class TF = void, class SF = TF>
 /**
  * Return rotation matrix along the axis Y for given angle.
  */
-template<class TF = void, class SF = TF>
+template<class TargetSpace = void, class SourceSpace = TargetSpace>
 	[[nodiscard]]
-	constexpr RotationMatrix<TF, SF>
+	constexpr RotationMatrix<TargetSpace, SourceSpace>
 	y_rotation (si::Angle const angle)
 	{
 		double const sin_a = sin (angle);
@@ -133,9 +133,9 @@ template<class TF = void, class SF = TF>
 /**
  * Return rotation matrix along the axis Z for given angle.
  */
-template<class TF = void, class SF = TF>
+template<class TargetSpace = void, class SourceSpace = TargetSpace>
 	[[nodiscard]]
-	constexpr RotationMatrix<TF, SF>
+	constexpr RotationMatrix<TargetSpace, SourceSpace>
 	z_rotation (si::Angle const angle)
 	{
 		double const sin_a = sin (angle);
@@ -149,39 +149,41 @@ template<class TF = void, class SF = TF>
 	}
 
 
-template<class TF, class SF>
-	static auto const kXRotationPlus45	= x_rotation<TF, SF> (45_deg);
 
-template<class TF, class SF>
-	static auto const kYRotationPlus45	= y_rotation<TF, SF> (45_deg);
 
-template<class TF, class SF>
-	static auto const kZRotationPlus45	= z_rotation<TF, SF> (45_deg);
+template<class TargetSpace, class SourceSpace>
+	static auto const kXRotationPlus45	= x_rotation_matrix<TargetSpace, SourceSpace> (45_deg);
 
-template<class TF, class SF>
-	static auto const kXRotationPlus90	= x_rotation<TF, SF> (90_deg);
+template<class TargetSpace, class SourceSpace>
+	static auto const kYRotationPlus45	= y_rotation_matrix<TargetSpace, SourceSpace> (45_deg);
 
-template<class TF, class SF>
-	static auto const kYRotationPlus90	= y_rotation<TF, SF> (90_deg);
+template<class TargetSpace, class SourceSpace>
+	static auto const kZRotationPlus45	= z_rotation_matrix<TargetSpace, SourceSpace> (45_deg);
 
-template<class TF, class SF>
-	static auto const kZRotationPlus90	= z_rotation<TF, SF> (90_deg);
+template<class TargetSpace, class SourceSpace>
+	static auto const kXRotationPlus90	= x_rotation_matrix<TargetSpace, SourceSpace> (90_deg);
 
-template<class TF, class SF>
-	static auto const kXRotationPlus180	= x_rotation<TF, SF> (180_deg);
+template<class TargetSpace, class SourceSpace>
+	static auto const kYRotationPlus90	= y_rotation_matrix<TargetSpace, SourceSpace> (90_deg);
 
-template<class TF, class SF>
-	static auto const kYRotationPlus180	= y_rotation<TF, SF> (180_deg);
+template<class TargetSpace, class SourceSpace>
+	static auto const kZRotationPlus90	= z_rotation_matrix<TargetSpace, SourceSpace> (90_deg);
 
-template<class TF, class SF>
-	static auto const kZRotationPlus180	= z_rotation<TF, SF> (180_deg);
+template<class TargetSpace, class SourceSpace>
+	static auto const kXRotationPlus180	= x_rotation_matrix<TargetSpace, SourceSpace> (180_deg);
+
+template<class TargetSpace, class SourceSpace>
+	static auto const kYRotationPlus180	= y_rotation_matrix<TargetSpace, SourceSpace> (180_deg);
+
+template<class TargetSpace, class SourceSpace>
+	static auto const kZRotationPlus180	= z_rotation_matrix<TargetSpace, SourceSpace> (180_deg);
 
 
 // Forward:
-template<class S, std::size_t C, std::size_t R, class TF, class SF>
+template<class S, std::size_t C, std::size_t R, class TargetSpace, class SourceSpace>
 	[[nodiscard]]
-	constexpr math::Matrix<S, C, R, TF, SF>
-	vector_normalized (math::Matrix<S, C, R, TF, SF> matrix);
+	constexpr math::Matrix<S, C, R, TargetSpace, SourceSpace>
+	vector_normalized (math::Matrix<S, C, R, TargetSpace, SourceSpace> matrix);
 
 
 /**
@@ -200,10 +202,10 @@ template<class Space>
  * Make a skew-symmetric matrix (pseudotensor) W from vector v⃗, so that it acts as it was v⃗× operator:
  * v⃗ × Z = W * Z.
  */
-template<class S, class TF = void, class SF = TF>
+template<class S, class TargetSpace = void, class SourceSpace = TargetSpace>
 	[[nodiscard]]
-	constexpr SpaceMatrix<S, TF, SF>
-	make_pseudotensor (SpaceVector<S, TF> const& v)
+	constexpr SpaceMatrix<S, TargetSpace, SourceSpace>
+	make_pseudotensor (SpaceVector<S, TargetSpace> const& v)
 	{
 		return {
 			S (0), -v[2], +v[1],
@@ -216,10 +218,10 @@ template<class S, class TF = void, class SF = TF>
 /**
  * Lay given vector as diagonal of the newly created matrix.
  */
-template<class S, class TF = void, class SF = TF>
+template<class S, class TargetSpace = void, class SourceSpace = TargetSpace>
 	[[nodiscard]]
-	constexpr SpaceMatrix<S, TF, SF>
-	make_diagonal_matrix (SpaceVector<S, TF> const& v)
+	constexpr SpaceMatrix<S, TargetSpace, SourceSpace>
+	make_diagonal_matrix (SpaceVector<S, TargetSpace> const& v)
 	{
 		return {
 			v[0],    0,    0,
@@ -233,9 +235,9 @@ template<class S, class TF = void, class SF = TF>
  * Normalize vectors in matrix.
  * Use for orientation matrices.
  */
-template<class S, std::size_t C, std::size_t R, class TF, class SF>
+template<class S, std::size_t C, std::size_t R, class TargetSpace, class SourceSpace>
 	constexpr void
-	normalize_vectors (math::Matrix<S, C, R, TF, SF>& matrix)
+	normalize_vectors (math::Matrix<S, C, R, TargetSpace, SourceSpace>& matrix)
 	{
 		for (std::size_t c = 0; c < C; ++c)
 		{
@@ -251,10 +253,10 @@ template<class S, std::size_t C, std::size_t R, class TF, class SF>
  * Normalize vectors in matrix.
  * Use for orientation matrices.
  */
-template<class S, std::size_t C, std::size_t R, class TF, class SF>
+template<class S, std::size_t C, std::size_t R, class TargetSpace, class SourceSpace>
 	[[nodiscard]]
-	constexpr math::Matrix<S, C, R, TF, SF>
-	vector_normalized (math::Matrix<S, C, R, TF, SF> matrix)
+	constexpr math::Matrix<S, C, R, TargetSpace, SourceSpace>
+	vector_normalized (math::Matrix<S, C, R, TargetSpace, SourceSpace> matrix)
 	{
 		normalize_vectors (matrix);
 		return matrix;
@@ -276,10 +278,10 @@ template<class S, class F>
 /**
  * Make matrix orthogonal so that X stays unchanged.
  */
-template<class S, class TF, class SF>
+template<class S, class TargetSpace, class SourceSpace>
 	[[nodiscard]]
-	constexpr SpaceMatrix<S, TF, SF>
-	orthogonalized (SpaceMatrix<S, TF, SF> const& m)
+	constexpr SpaceMatrix<S, TargetSpace, SourceSpace>
+	orthogonalized (SpaceMatrix<S, TargetSpace, SourceSpace> const& m)
 	{
 		auto const new_y = orthogonalized (m.column (1), m.column (0));
 		auto const new_z = cross_product (m.column (0), new_y);
@@ -374,15 +376,15 @@ template<class T, class F>
  * Create orthonormal basis matrix from given vector Z.
  * Two orthonormal vectors to Z will be chosen randomly.
  */
-template<class Scalar, class TF, class SF = TF>
+template<class Scalar, class TargetSpace, class SourceSpace = TargetSpace>
 	[[nodiscard]]
-	constexpr RotationMatrix<TF, SF>
-	make_basis_from_z (SpaceVector<Scalar, TF> const& z)
+	constexpr RotationMatrix<TargetSpace, SourceSpace>
+	make_basis_from_z (SpaceVector<Scalar, TargetSpace> const& z)
 	{
 		auto const x = normalized (find_any_perpendicular (z));
 		auto const y = normalized (cross_product (z, x));
 
-		return RotationMatrix<TF, SF> {
+		return RotationMatrix<TargetSpace, SourceSpace> {
 			x[0], y[0], z[0],
 			x[1], y[1], z[1],
 			x[2], y[2], z[2],
@@ -393,10 +395,10 @@ template<class Scalar, class TF, class SF = TF>
 /**
  * Return rotation matrix about the given axis vector for given angle.
  */
-template<class TF = void, class SF = TF>
+template<class TargetSpace = void, class SourceSpace = TargetSpace>
 	[[nodiscard]]
-	constexpr RotationMatrix<TF, SF>
-	rotation_about (SpaceVector<double, TF> const& axis, si::Angle const angle)
+	constexpr RotationMatrix<TargetSpace, SourceSpace>
+	rotation_about (SpaceVector<double, TargetSpace> const& axis, si::Angle const angle)
 	{
 		auto const sin_a = sin (angle);
 		auto const cos_a = cos (angle);
@@ -423,12 +425,12 @@ template<class TF = void, class SF = TF>
  * Determine the non-normalized rotation axis from the matrix.
  * FIXME has problems with 0° (nans) and 180° (also nans)
  */
-template<class TF = void, class SF = TF>
+template<class TargetSpace = void, class SourceSpace = TargetSpace>
 	[[nodiscard]]
-	inline SpaceVector<double, TF>
-	rotation_axis (RotationMatrix<TF, SF> const& m)
+	inline SpaceVector<double, TargetSpace>
+	rotation_axis (RotationMatrix<TargetSpace, SourceSpace> const& m)
 	{
-		SpaceVector<double, TF> result {
+		SpaceVector<double, TargetSpace> result {
 			m[1, 2] - m[2, 1],
 			m[2, 0] - m[0, 2],
 			m[0, 1] - m[1, 0],
@@ -445,9 +447,9 @@ template<class TF = void, class SF = TF>
 /**
  * Determine the rotation angle about any axis from the matrix.
  */
-template<class TF = void, class SF = TF>
+template<class TargetSpace = void, class SourceSpace = TargetSpace>
 	inline si::Angle
-	rotation_angle_about_matrix_axis (RotationMatrix<TF, SF> const& m, SpaceVector<double, TF> normalized_axis)
+	rotation_angle_about_matrix_axis (RotationMatrix<TargetSpace, SourceSpace> const& m, SpaceVector<double, TargetSpace> normalized_axis)
 	{
 		SpaceVector<double> const x = math::reframe<void, void> (normalized (find_any_perpendicular (normalized_axis)));
 		SpaceVector<double> const y = math::reframe<void, void> (m) * x;
@@ -462,9 +464,9 @@ template<class TF = void, class SF = TF>
 /**
  * Determine the rotation angle about the rotaion axis of the matrix.
  */
-template<class TF = void, class SF = TF>
+template<class TargetSpace = void, class SourceSpace = TargetSpace>
 	inline si::Angle
-	rotation_angle (RotationMatrix<TF, SF> const& m)
+	rotation_angle (RotationMatrix<TargetSpace, SourceSpace> const& m)
 	{
 		auto const axis = normalized (rotation_axis (m));
 		return rotation_angle_about_matrix_axis (m, axis);
@@ -477,10 +479,10 @@ template<class TF = void, class SF = TF>
  * expressed in radians.
  * FIXME has numerical instabilities at small rotations
  */
-template<class TF = void, class SF = TF>
+template<class TargetSpace = void, class SourceSpace = TargetSpace>
 	[[nodiscard]]
-	constexpr RotationMatrix<TF, SF>
-	to_rotation_matrix (SpaceVector<si::Angle, TF> const& rotation_vector)
+	constexpr RotationMatrix<TargetSpace, SourceSpace>
+	to_rotation_matrix (SpaceVector<si::Angle, TargetSpace> const& rotation_vector)
 	{
 		if (abs (rotation_vector) > 0.0_rad)
 			return rotation_about (vector_normalized (rotation_vector) / 1_rad, abs (rotation_vector));
@@ -492,10 +494,10 @@ template<class TF = void, class SF = TF>
 /**
  * Return rotation vector from rotation matrix.
  */
-template<class TF = void, class SF = TF>
+template<class TargetSpace = void, class SourceSpace = TargetSpace>
 	[[nodiscard]]
-	constexpr SpaceVector<si::Angle, TF>
-	to_rotation_vector (RotationMatrix<TF, SF> const& matrix)
+	constexpr SpaceVector<si::Angle, TargetSpace>
+	to_rotation_vector (RotationMatrix<TargetSpace, SourceSpace> const& matrix)
 	{
 		auto const axis = normalized (rotation_axis (matrix));
 		return rotation_angle_about_matrix_axis (matrix, axis) * axis;

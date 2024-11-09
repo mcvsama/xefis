@@ -55,10 +55,10 @@ struct EulerAngles: public SpaceVector<si::Angle>
  * Uses formula Tr(M) = 1 + 2cos(theta).
  * Returns theta.
  */
-template<class S, class TF1, class TF2, class SF1, class SF2>
+template<class S, class TargetSpace1, class TargetSpace2, class SourceSpace1, class SourceSpace2>
 	[[nodiscard]]
 	inline si::Angle
-	angle_difference (SpaceMatrix<S, TF1, SF1> const& a, SpaceMatrix<S, TF2, SF2> const& b)
+	angle_difference (SpaceMatrix<S, TargetSpace1, SourceSpace1> const& a, SpaceMatrix<S, TargetSpace2, SourceSpace2> const& b)
 	{
 		S const unit { 1.0 };
 		decltype (unit * unit) const unitsq { 1.0 };
@@ -71,10 +71,10 @@ template<class S, class TF1, class TF2, class SF1, class SF2>
  * Return a set of Euler angles as difference in rotation between two bases.
  * Order of vector columns in resulting matrix: pitch, roll, yaw.
  */
-template<class S, class TF1, class TF2, class SF1, class SF2>
+template<class S, class TargetSpace1, class TargetSpace2, class SourceSpace1, class SourceSpace2>
 	[[nodiscard]]
 	inline EulerAngles
-	euler_angle_difference (SpaceMatrix<S, TF1, SF1> const& base_a, SpaceMatrix<S, TF2, SF2> const& base_b)
+	euler_angle_difference (SpaceMatrix<S, TargetSpace1, SourceSpace1> const& base_a, SpaceMatrix<S, TargetSpace2, SourceSpace2> const& base_b)
 	{
 		using std::atan2;
 		using std::sqrt;
@@ -98,12 +98,12 @@ template<class S, class TF1, class TF2, class SF1, class SF2>
 	}
 
 
-template<class S, class SF1, class SF2>
+template<class S, class SourceSpace1, class SourceSpace2>
 	[[nodiscard]]
 	inline EulerAngles
-	euler_angles (SpaceMatrix<S, SF1, SF2> const& matrix)
+	euler_angles (SpaceMatrix<S, SourceSpace1, SourceSpace2> const& matrix)
 	{
-		return euler_angle_difference (SpaceMatrix<S, SF1, SF2> (math::unit), matrix);
+		return euler_angle_difference (SpaceMatrix<S, SourceSpace1, SourceSpace2> (math::unit), matrix);
 	}
 
 

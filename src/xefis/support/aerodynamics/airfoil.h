@@ -155,11 +155,11 @@ class Airfoil
  */
 
 
-template<class TF, class SF>
-	AirfoilAerodynamicForces<TF>
-	operator* (RotationMatrix<TF, SF> const& rotation, AirfoilAerodynamicForces<SF> const& source)
+template<class TargetSpace, class SourceSpace>
+	AirfoilAerodynamicForces<TargetSpace>
+	operator* (RotationMatrix<TargetSpace, SourceSpace> const& rotation, AirfoilAerodynamicForces<SourceSpace> const& source)
 	{
-		AirfoilAerodynamicForces<TF> result;
+		AirfoilAerodynamicForces<TargetSpace> result;
 		result.lift = rotation * source.lift;
 		result.drag = rotation * source.drag;
 		result.pitching_moment = rotation * source.pitching_moment;
