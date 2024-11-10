@@ -41,6 +41,8 @@ template<class pBaseSpace = void, class pSpace = pBaseSpace>
 		using Position			= SpaceVector<si::Length, BaseSpace>;
 		using RotationToBase	= RotationMatrix<BaseSpace, Space>;
 		using RotationToBody	= RotationMatrix<Space, BaseSpace>;
+		using RotationToBaseQ	= RotationQuaternion<BaseSpace, Space>;//XXX
+		using RotationToBodyQ	= RotationQuaternion<Space, BaseSpace>;//XXX
 
 	  public:
 		// Ctor
@@ -72,7 +74,7 @@ template<class pBaseSpace = void, class pSpace = pBaseSpace>
 		 * Body rotation matrix transforming from BaseSpace to Space.
 		 */
 		[[nodiscard]]
-		RotationToBody const&
+		RotationToBody // TODO const&
 		base_to_body_rotation() const noexcept
 			{ return _base_to_body_rotation; }
 
@@ -81,7 +83,7 @@ template<class pBaseSpace = void, class pSpace = pBaseSpace>
 		 * Same as base_to_body_rotation().
 		 */
 		[[nodiscard]]
-		RotationToBody const&
+		RotationToBody // TODO const&
 		base_coordinates() const noexcept
 			{ return _base_to_body_rotation; }
 
@@ -95,7 +97,7 @@ template<class pBaseSpace = void, class pSpace = pBaseSpace>
 		 * Body rotation matrix transforming from Space to BaseSpace.
 		 */
 		[[nodiscard]]
-		RotationToBase const&
+		RotationToBase // TODO const&
 		body_to_base_rotation() const noexcept
 			{ return _body_to_base_rotation; }
 
@@ -104,7 +106,7 @@ template<class pBaseSpace = void, class pSpace = pBaseSpace>
 		 * Same as body_to_base_rotation().
 		 */
 		[[nodiscard]]
-		RotationToBase const&
+		RotationToBase // TODO const&
 		body_coordinates() const noexcept
 			{ return _body_to_base_rotation; }
 
@@ -196,9 +198,9 @@ template<class pBaseSpace = void, class pSpace = pBaseSpace>
 				{ return reinterpret_cast<Placement<NewBaseSpace, NewSpace> const&> (*this); }
 
 	  private:
-		SpaceVector<si::Length, BaseSpace>	_position				{ math::zero };
-		RotationMatrix<Space, BaseSpace>	_base_to_body_rotation	{ math::unit };
-		RotationMatrix<BaseSpace, Space>	_body_to_base_rotation	{ math::unit };
+		SpaceVector<si::Length, BaseSpace>		_position				{ math::zero };
+		RotationQuaternion<Space, BaseSpace>	_base_to_body_rotation	{ math::identity };
+		RotationQuaternion<BaseSpace, Space>	_body_to_base_rotation	{ math::identity };
 	};
 
 
@@ -243,7 +245,7 @@ template<class B, class F>
 	inline void
 	Placement<B, F>::rotate_body_frame (RotationMatrix<BaseSpace> const& rotation_matrix)
 	{
-		_body_to_base_rotation = rotation_matrix * _body_to_base_rotation;
+		_body_to_base_rotation = RotationQuaternion (rotation_matrix) * _body_to_base_rotation;
 		_base_to_body_rotation = ~_body_to_base_rotation;
 	}
 

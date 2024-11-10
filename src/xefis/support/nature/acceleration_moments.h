@@ -145,24 +145,37 @@ template<class Space>
 
 template<class TargetSpace, class SourceSpace>
 	constexpr AccelerationMoments<TargetSpace>
-	operator* (SpaceMatrix<double, TargetSpace, SourceSpace> const& transformation,
+	operator* (RotationMatrix<TargetSpace, SourceSpace> const& rotation,
 			   AccelerationMoments<SourceSpace> const& acceleration_moments)
 	{
 		return {
-			transformation * acceleration_moments.acceleration(),
-			transformation * acceleration_moments.angular_acceleration(),
+			rotation * acceleration_moments.acceleration(),
+			rotation * acceleration_moments.angular_acceleration(),
+		};
+	}
+
+
+template<class TargetSpace, class SourceSpace>
+	constexpr AccelerationMoments<TargetSpace>
+	operator* (RotationQuaternion<TargetSpace, SourceSpace> const& rotation,
+			   AccelerationMoments<SourceSpace> const& acceleration_moments)
+	{
+		return {
+			rotation * acceleration_moments.acceleration(),
+			rotation * acceleration_moments.angular_acceleration(),
 		};
 	}
 
 
 template<class Multiplier, class Space>
+	[[deprecated]]
 	constexpr AccelerationMoments<Space>
 	operator* (Multiplier const& multiplier,
-			   AccelerationMoments<Space> const& acceleration_moments)
+			  AccelerationMoments<Space> const& acceleration_moments)
 	{
 		return {
-			multiplier * acceleration_moments.acceleration(),
-			multiplier * acceleration_moments.angular_acceleration(),
+		   multiplier * acceleration_moments.acceleration(),
+		   multiplier * acceleration_moments.angular_acceleration(),
 		};
 	}
 

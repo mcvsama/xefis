@@ -30,14 +30,14 @@ namespace {
 
 AutoTest t1 ("Nature: MassMoments calculations", []{
 	{
-		SpaceMatrix<double> const unit = math::unit;
+		auto identity = SpaceMatrix<double> (math::identity);
 		SpaceMatrix<si::MomentOfInertia> const moi2 {
 			2_kgm2, 0_kgm2, 0_kgm2,
 			0_kgm2, 2_kgm2, 0_kgm2,
 			0_kgm2, 0_kgm2, 2_kgm2,
 		};
-		MassMoments<> const m1 (1_kg, { 0_m, 0_m, 0_m }, math::unit);
-		MassMoments<> const m2 (1_kg, { 2_m, 4_m, 6_m }, math::unit);
+		MassMoments<> const m1 (1_kg, { 0_m, 0_m, 0_m }, math::identity);
+		MassMoments<> const m2 (1_kg, { 2_m, 4_m, 6_m }, math::identity);
 
 		auto const m3 = m1 + m2;
 
@@ -51,7 +51,7 @@ AutoTest t1 ("Nature: MassMoments calculations", []{
 												 moi2,
 												 1e-9_kgm2);
 
-		auto const m4 = unit * m1;
+		auto const m4 = identity * m1;
 
 		test_asserts::verify_equal_with_epsilon ("(1.0) mass is unchanged", m1.mass(), m4.mass(), 1e-12_kg);
 		test_asserts::verify_equal_with_epsilon ("(1.1) center of mass is unchanged",
@@ -65,8 +65,8 @@ AutoTest t1 ("Nature: MassMoments calculations", []{
 	}
 
 	{
-		MassMoments<> const m1 (9_kg, { -2_m, 0_m, 0_m }, math::unit);
-		MassMoments<> const m2 (1_kg, { +7_m, 0_m, 0_m }, math::unit);
+		MassMoments<> const m1 (9_kg, { -2_m, 0_m, 0_m }, math::identity);
+		MassMoments<> const m2 (1_kg, { +7_m, 0_m, 0_m }, math::identity);
 
 		auto const m3 = m1 + m2;
 

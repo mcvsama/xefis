@@ -64,6 +64,9 @@ template<class TargetSpace = void, class SourceSpace = TargetSpace>
 	using RotationMatrix = SpaceMatrix<double, TargetSpace, SourceSpace>;
 
 template<class TargetSpace = void, class SourceSpace = TargetSpace>
+	using RotationQuaternion = math::Quaternion<double, TargetSpace, SourceSpace>;
+
+template<class TargetSpace = void, class SourceSpace = TargetSpace>
 	RotationMatrix<TargetSpace, SourceSpace> const kNoRotation = math::unit;
 
 // Essentially same as RotationMatrix but use RotationMatrix for intended rotations,

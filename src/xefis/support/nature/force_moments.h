@@ -259,14 +259,27 @@ template<class TargetSpace, class SourceSpace>
 	}
 
 
-template<class Multiplier, class Space>
-	constexpr ForceMoments<Space>
-	operator* (Multiplier const& multiplier,
-			   ForceMoments<Space> const& force_torque)
+template<class TargetSpace, class SourceSpace>
+	constexpr ForceMoments<TargetSpace>
+	operator* (RotationQuaternion<TargetSpace, SourceSpace> const& rotation,
+			   ForceMoments<SourceSpace> const& force_moments)
 	{
 		return {
-			multiplier * force_torque.force(),
-			multiplier * force_torque.torque(),
+			rotation * force_moments.force(),
+			rotation * force_moments.torque(),
+		};
+	}
+
+
+template<class Multiplier, class Space>
+	[[deprecated]]
+	constexpr ForceMoments<Space>
+	operator* (Multiplier const& multiplier,
+			   ForceMoments<Space> const& force_moments)
+	{
+		return {
+			multiplier * force_moments.force(),
+			multiplier * force_moments.torque(),
 		};
 	}
 

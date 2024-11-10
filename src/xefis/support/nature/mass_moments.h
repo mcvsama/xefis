@@ -158,13 +158,26 @@ template<class Space>
 
 template<class TargetSpace, class SourceSpace>
 	inline MassMoments<TargetSpace>
-	operator* (SpaceMatrix<double, TargetSpace, SourceSpace> const& transformation,
+	operator* (RotationMatrix<TargetSpace, SourceSpace> const& rotation,
 			   MassMoments<SourceSpace> const& mass_moments)
 	{
 		return {
 			mass_moments.mass(),
-			transformation * mass_moments.center_of_mass_position(),
-			transformation * mass_moments.inertia_tensor() * ~transformation,
+			rotation * mass_moments.center_of_mass_position(),
+			rotation * mass_moments.inertia_tensor() * ~rotation,
+		};
+	}
+
+
+template<class TargetSpace, class SourceSpace>
+	inline MassMoments<TargetSpace>
+	operator* (RotationQuaternion<TargetSpace, SourceSpace> const& rotation,
+			   MassMoments<SourceSpace> const& mass_moments)
+	{
+		return {
+			mass_moments.mass(),
+			rotation * mass_moments.center_of_mass_position(),
+			rotation * mass_moments.inertia_tensor() * ~rotation,
 		};
 	}
 

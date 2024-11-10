@@ -172,12 +172,24 @@ template<class Space>
 
 template<class TargetSpace, class SourceSpace>
 	constexpr VelocityMoments<TargetSpace>
-	operator* (SpaceMatrix<double, TargetSpace, SourceSpace> const& transformation,
+	operator* (RotationMatrix<TargetSpace, SourceSpace> const& rotation,
 			   VelocityMoments<SourceSpace> const& velocity_moments)
 	{
 		return {
-			transformation * velocity_moments.velocity(),
-			transformation * velocity_moments.angular_velocity(),
+			rotation * velocity_moments.velocity(),
+			rotation * velocity_moments.angular_velocity(),
+		};
+	}
+
+
+template<class TargetSpace, class SourceSpace>
+	constexpr VelocityMoments<TargetSpace>
+	operator* (RotationQuaternion<TargetSpace, SourceSpace> const& rotation,
+			   VelocityMoments<SourceSpace> const& velocity_moments)
+	{
+		return {
+			rotation * velocity_moments.velocity(),
+			rotation * velocity_moments.angular_velocity(),
 		};
 	}
 
