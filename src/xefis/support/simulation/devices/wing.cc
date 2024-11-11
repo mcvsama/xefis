@@ -46,7 +46,6 @@ Wing::update_external_forces (Atmosphere const* atmosphere)
 {
 	if (atmosphere)
 	{
-		// TODO Create special UnitMatrix<TF, SF> which only changes the frame, and operator* that doesn't really compute anything
 		// Rotations:
 		auto const world_to_ecef = RotationMatrix<ECEFSpace, rigid_body::WorldSpace> (math::unit);
 		auto const ecef_to_world = RotationMatrix<rigid_body::WorldSpace, ECEFSpace> (math::unit);
