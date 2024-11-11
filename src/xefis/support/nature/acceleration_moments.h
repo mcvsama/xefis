@@ -166,19 +166,6 @@ template<class TargetSpace, class SourceSpace>
 		};
 	}
 
-
-template<class Multiplier, class Space>
-	[[deprecated]]
-	constexpr AccelerationMoments<Space>
-	operator* (Multiplier const& multiplier,
-			  AccelerationMoments<Space> const& acceleration_moments)
-	{
-		return {
-		   multiplier * acceleration_moments.acceleration(),
-		   multiplier * acceleration_moments.angular_acceleration(),
-		};
-	}
-
 } // namespace xf
 
 #endif

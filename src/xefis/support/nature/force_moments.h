@@ -270,19 +270,6 @@ template<class TargetSpace, class SourceSpace>
 		};
 	}
 
-
-template<class Multiplier, class Space>
-	[[deprecated]]
-	constexpr ForceMoments<Space>
-	operator* (Multiplier const& multiplier,
-			   ForceMoments<Space> const& force_moments)
-	{
-		return {
-			multiplier * force_moments.force(),
-			multiplier * force_moments.torque(),
-		};
-	}
-
 } // namespace xf
 
 #endif
