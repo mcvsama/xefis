@@ -1,6 +1,6 @@
 /* vim:ts=4
  *
- * Copyleft 2012…2018  Michał Gawron
+ * Copyleft 2024  Michał Gawron
  * Marduk Unix Labs, http://mulabs.org/
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,6 +21,7 @@
 // Standard:
 #include <cstddef>
 #include <cmath>
+#include <numbers>
 
 
 namespace xf {
@@ -50,21 +51,46 @@ struct EulerAngles: public SpaceVector<si::Angle>
 };
 
 
+template<class SourceSpace1, class SourceSpace2>
+	[[nodiscard]]
+	inline EulerAngles
+	euler_angles (RotationMatrix<SourceSpace1, SourceSpace2> const& matrix)
+	{
+		return euler_angle_difference (RotationMatrix<SourceSpace1, SourceSpace2> (math::identity), matrix);
+	}
+
+
+template<class SourceSpace1, class SourceSpace2>
+	[[nodiscard]]
+	inline EulerAngles
+	euler_angles (RotationQuaternion<SourceSpace1, SourceSpace2> const& quaternion)
+	{
+		using std::atan2;
+		using std::sqrt;
+		using std::numbers::pi;
+
+		auto const [qw, qx, qy, qz] = quaternion.components();
+
+		// <https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Quaternion_to_Euler_angles_(in_3-2-1_sequence)_conversion>
+		auto const phi = 1_rad * atan2 (2 * (qw * qx + qy * qz), 1 - 2 * (square (qx) + square (qy)));
+		auto const theta = 1_rad * (-0.5 * pi + 2 * (atan2 (sqrt (1 + 2 * (qw * qy - qx * qz)), sqrt (1 - 2 * (qw * qy - qx * qz)))));
+		auto const psi = 1_rad * atan2 (2 * (qw * qz + qx * qy), 1 - 2 * (square (qy) + square (qz)));
+
+		return { theta, phi, psi };
+	}
+
+
 /**
- * Angle difference between two rotation matrices.
- * Uses formula Tr(M) = 1 + 2cos(theta).
- * Returns theta.
+ * Return a set of Euler angles as difference in rotation between two bases.
+ * Order of vector columns in resulting matrix: pitch, roll, yaw.
  */
 template<class TargetSpace1, class TargetSpace2, class SourceSpace1, class SourceSpace2>
 	[[nodiscard]]
-	inline si::Angle
-	angle_difference (RotationMatrix<TargetSpace1, SourceSpace1> const& a,
-					  RotationMatrix<TargetSpace2, SourceSpace2> const& b)
+	inline EulerAngles
+	euler_angle_difference (RotationQuaternion<TargetSpace1, SourceSpace1> const& base_a,
+							RotationQuaternion<TargetSpace2, SourceSpace2> const& base_b)
 	{
-		S const unit { 1.0 };
-		decltype (unit * unit) const unitsq { 1.0 };
-
-		return 1_rad * std::acos (((trace (~a * b) - unitsq) / 2.0) / unitsq);
+		return euler_angles (base_b / base_a);
 	}
 
 
@@ -96,34 +122,6 @@ template<class TargetSpace1, class TargetSpace2, class SourceSpace1, class Sourc
 		auto const phi = 1_rad * atan2 ((~y3 * z2).scalar(), (~y3 * y2).scalar());
 
 		return { theta, phi, psi };
-	}
-
-
-template<class SourceSpace1, class SourceSpace2>
-	[[nodiscard]]
-	inline EulerAngles
-	euler_angles (RotationMatrix<SourceSpace1, SourceSpace2> const& matrix)
-	{
-		return euler_angle_difference (RotationMatrix<SourceSpace1, SourceSpace2> (math::unit), matrix);
-	}
-
-
-/**
- * Return alpha and beta angles required to transform versor x to given vector.
- * Alpha is the X-Y plane angle, beta is X-Z plane angle.
- */
-template<class T, class F>
-	[[nodiscard]]
-	std::array<si::Angle, 2>
-	alpha_beta_from_x_to (SpaceVector<T, F> const& vector)
-	{
-		using std::atan2;
-
-		auto const alpha = 1_rad * atan2 (vector[1], vector[0]);
-		auto const r = T (1) * std::sqrt (square (vector[0] / T (1)) + square (vector[1] / T (1)));
-		auto const beta = 1_rad * -atan2 (vector[2], r);
-
-		return { alpha, beta };
 	}
 
 } // namespace xf
