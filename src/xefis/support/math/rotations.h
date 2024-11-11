@@ -33,7 +33,7 @@ namespace xf {
 // Forward:
 template<math::Scalar S, math::CoordinateSystem Space>
 	[[nodiscard]]
-	constexpr auto
+	constexpr SpaceVector<S, Space>
 	normalized (SpaceVector<S, Space> const& vector);
 
 // Forward:

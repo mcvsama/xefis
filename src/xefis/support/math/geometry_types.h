@@ -27,15 +27,6 @@
 
 namespace xf {
 
-template<class Triangle>
-	concept TriangleConcept = requires (Triangle const& t) {
-		std::size (t);
-		t[0];
-		t[1];
-		t[2];
-	};
-
-
 template<class Scalar = double, math::CoordinateSystem Space = void>
 	using PlaneVector = math::Vector<Scalar, 2, Space, void>;
 
