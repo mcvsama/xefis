@@ -55,10 +55,11 @@ struct EulerAngles: public SpaceVector<si::Angle>
  * Uses formula Tr(M) = 1 + 2cos(theta).
  * Returns theta.
  */
-template<class S, class TargetSpace1, class TargetSpace2, class SourceSpace1, class SourceSpace2>
+template<class TargetSpace1, class TargetSpace2, class SourceSpace1, class SourceSpace2>
 	[[nodiscard]]
 	inline si::Angle
-	angle_difference (SpaceMatrix<S, TargetSpace1, SourceSpace1> const& a, SpaceMatrix<S, TargetSpace2, SourceSpace2> const& b)
+	angle_difference (RotationMatrix<TargetSpace1, SourceSpace1> const& a,
+					  RotationMatrix<TargetSpace2, SourceSpace2> const& b)
 	{
 		S const unit { 1.0 };
 		decltype (unit * unit) const unitsq { 1.0 };
@@ -71,10 +72,10 @@ template<class S, class TargetSpace1, class TargetSpace2, class SourceSpace1, cl
  * Return a set of Euler angles as difference in rotation between two bases.
  * Order of vector columns in resulting matrix: pitch, roll, yaw.
  */
-template<class S, class TargetSpace1, class TargetSpace2, class SourceSpace1, class SourceSpace2>
+template<class TargetSpace1, class TargetSpace2, class SourceSpace1, class SourceSpace2>
 	[[nodiscard]]
 	inline EulerAngles
-	euler_angle_difference (SpaceMatrix<S, TargetSpace1, SourceSpace1> const& base_a, SpaceMatrix<S, TargetSpace2, SourceSpace2> const& base_b)
+	euler_angle_difference (RotationMatrix<TargetSpace1, SourceSpace1> const& base_a, RotationMatrix<TargetSpace2, SourceSpace2> const& base_b)
 	{
 		using std::atan2;
 		using std::sqrt;
@@ -98,12 +99,12 @@ template<class S, class TargetSpace1, class TargetSpace2, class SourceSpace1, cl
 	}
 
 
-template<class S, class SourceSpace1, class SourceSpace2>
+template<class SourceSpace1, class SourceSpace2>
 	[[nodiscard]]
 	inline EulerAngles
-	euler_angles (SpaceMatrix<S, SourceSpace1, SourceSpace2> const& matrix)
+	euler_angles (RotationMatrix<SourceSpace1, SourceSpace2> const& matrix)
 	{
-		return euler_angle_difference (SpaceMatrix<S, SourceSpace1, SourceSpace2> (math::unit), matrix);
+		return euler_angle_difference (RotationMatrix<SourceSpace1, SourceSpace2> (math::unit), matrix);
 	}
 
 
