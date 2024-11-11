@@ -113,13 +113,13 @@ template<class TargetSpace1, class TargetSpace2, class SourceSpace1, class Sourc
 		auto const y3 = base_b.column (1); // Pitch
 
 		// Heading:
-		auto const psi = 1_rad * atan2 ((~x3 * y0).scalar(), (~x3 * x0).scalar());
+		auto const psi = 1_rad * atan2 (dot_product (x3, y0), dot_product (x3, x0));
 		// Pitch:
-		auto const theta = 1_rad * atan2 ((-~x3 * z0).scalar(), sqrt (square ((~x3 * x0).scalar()) + square ((~x3 * y0).scalar())));
+		auto const theta = 1_rad * atan2 (dot_product (-x3, z0), sqrt (square (dot_product (x3, x0)) + square (dot_product (x3, y0))));
 		// Roll:
 		auto const y2 = rotation_about (z0, psi) * y0;
 		auto const z2 = rotation_about (y2, theta) * z0;
-		auto const phi = 1_rad * atan2 ((~y3 * z2).scalar(), (~y3 * y2).scalar());
+		auto const phi = 1_rad * atan2 (dot_product (y3, z2), dot_product (y3, y2));
 
 		return { theta, phi, psi };
 	}
