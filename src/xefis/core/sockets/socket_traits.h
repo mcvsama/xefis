@@ -19,7 +19,6 @@
 #include <xefis/core/sockets/socket.h>
 
 // Neutrino:
-#include <neutrino/c++20.h>
 #include <neutrino/blob.h>
 #include <neutrino/stdexcept.h>
 #include <neutrino/string.h>

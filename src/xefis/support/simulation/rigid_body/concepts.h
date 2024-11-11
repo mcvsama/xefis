@@ -17,6 +17,9 @@
 // Xefis:
 #include <xefis/config/all.h>
 
+// Neutrino:
+#include <neutrino/math/concepts.h>
+
 // Standard:
 #include <concepts>
 #include <cstddef>
@@ -30,13 +33,16 @@ class BasicFramePrecalculation;
 
 
 // World (aka global aka absolute) space coordinate system:
-struct WorldSpace;
+struct WorldSpace: public math::CoordinateSystemBase
+{ };
 
 // Body space coordinate system, origin at body's center of mass:
-struct BodyCOM;
+struct BodyCOM: public math::CoordinateSystemBase
+{ };
 
 // Body space coordinate system, origin at body-origin:
-struct BodyOrigin;
+struct BodyOrigin: public math::CoordinateSystemBase
+{ };
 
 
 template<class T>

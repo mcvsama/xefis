@@ -51,7 +51,7 @@ struct EulerAngles: public SpaceVector<si::Angle>
 };
 
 
-template<class SourceSpace1, class SourceSpace2>
+template<math::CoordinateSystem SourceSpace1, math::CoordinateSystem SourceSpace2>
 	[[nodiscard]]
 	inline EulerAngles
 	euler_angles (RotationMatrix<SourceSpace1, SourceSpace2> const& matrix)
@@ -60,7 +60,7 @@ template<class SourceSpace1, class SourceSpace2>
 	}
 
 
-template<class SourceSpace1, class SourceSpace2>
+template<math::CoordinateSystem SourceSpace1, math::CoordinateSystem SourceSpace2>
 	[[nodiscard]]
 	inline EulerAngles
 	euler_angles (RotationQuaternion<SourceSpace1, SourceSpace2> const& quaternion)
@@ -84,7 +84,7 @@ template<class SourceSpace1, class SourceSpace2>
  * Return a set of Euler angles as difference in rotation between two bases.
  * Order of vector columns in resulting matrix: pitch, roll, yaw.
  */
-template<class TargetSpace1, class TargetSpace2, class SourceSpace1, class SourceSpace2>
+template<math::CoordinateSystem TargetSpace1, math::CoordinateSystem TargetSpace2, math::CoordinateSystem SourceSpace1, math::CoordinateSystem SourceSpace2>
 	[[nodiscard]]
 	inline EulerAngles
 	euler_angle_difference (RotationQuaternion<TargetSpace1, SourceSpace1> const& base_a,
@@ -98,7 +98,7 @@ template<class TargetSpace1, class TargetSpace2, class SourceSpace1, class Sourc
  * Return a set of Euler angles as difference in rotation between two bases.
  * Order of vector columns in resulting matrix: pitch, roll, yaw.
  */
-template<class TargetSpace1, class TargetSpace2, class SourceSpace1, class SourceSpace2>
+template<math::CoordinateSystem TargetSpace1, math::CoordinateSystem TargetSpace2, math::CoordinateSystem SourceSpace1, math::CoordinateSystem SourceSpace2>
 	[[nodiscard]]
 	inline EulerAngles
 	euler_angle_difference (RotationMatrix<TargetSpace1, SourceSpace1> const& base_a, RotationMatrix<TargetSpace2, SourceSpace2> const& base_b)

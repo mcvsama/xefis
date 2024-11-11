@@ -20,6 +20,9 @@
 #include <xefis/support/math/geometry.h>
 #include <xefis/support/nature/mass_moments.h>
 
+// Neutrino:
+#include <neutrino/math/concepts.h>
+
 // Standard:
 #include <cstddef>
 #include <initializer_list>
@@ -33,7 +36,8 @@ namespace xf {
  * Points defining an airfoil lie on X-Y plane, where X is parallel to the airfoil's chord,
  * positive X is at the trailing edge, positive Y is at the top of the airfoil.
  */
-struct AirfoilSplineSpace;
+struct AirfoilSplineSpace: public math::CoordinateSystemBase
+{ };
 
 
 /**

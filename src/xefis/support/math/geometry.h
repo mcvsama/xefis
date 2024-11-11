@@ -16,6 +16,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/support/math/coordinate_systems.h>
 #include <xefis/support/math/lonlat_radius.h>
 #include <xefis/support/math/geometry_types.h>
 #include <xefis/support/math/rotations.h>
@@ -31,17 +32,10 @@
 
 namespace xf {
 
-// Forward:
-template<class S, std::size_t C, std::size_t R, class TargetSpace, class SourceSpace>
-	[[nodiscard]]
-	constexpr math::Matrix<S, C, R, TargetSpace, SourceSpace>
-	vector_normalized (math::Matrix<S, C, R, TargetSpace, SourceSpace> matrix);
-
-
 /**
  * Return tangential velocity for given angular velocity and arm.
  */
-template<class Space>
+template<math::CoordinateSystem Space>
 	[[nodiscard]]
 	inline SpaceVector<si::Velocity, Space>
 	tangential_velocity (SpaceVector<si::AngularVelocity, Space> const& w, SpaceLength<Space> const& r)
@@ -54,7 +48,7 @@ template<class Space>
  * Make a skew-symmetric matrix (pseudotensor) W from vector v⃗, so that it acts as it was v⃗× operator:
  * v⃗ × Z = W * Z.
  */
-template<class S, class TargetSpace = void, class SourceSpace = TargetSpace>
+template<math::Scalar S, math::CoordinateSystem TargetSpace = void, math::CoordinateSystem SourceSpace = TargetSpace>
 	[[nodiscard]]
 	constexpr SpaceMatrix<S, TargetSpace, SourceSpace>
 	make_pseudotensor (SpaceVector<S, TargetSpace> const& v)
@@ -70,7 +64,7 @@ template<class S, class TargetSpace = void, class SourceSpace = TargetSpace>
 /**
  * Lay given vector as diagonal of the newly created matrix.
  */
-template<class S, class TargetSpace = void, class SourceSpace = TargetSpace>
+template<math::Scalar S, math::CoordinateSystem TargetSpace = void, math::CoordinateSystem SourceSpace = TargetSpace>
 	[[nodiscard]]
 	constexpr SpaceMatrix<S, TargetSpace, SourceSpace>
 	make_diagonal_matrix (SpaceVector<S, TargetSpace> const& v)
@@ -87,7 +81,7 @@ template<class S, class TargetSpace = void, class SourceSpace = TargetSpace>
  * Normalize vectors in matrix.
  * Use for orientation matrices.
  */
-template<class S, std::size_t C, std::size_t R, class TargetSpace, class SourceSpace>
+template<math::Scalar S, std::size_t C, std::size_t R, math::CoordinateSystem TargetSpace, math::CoordinateSystem SourceSpace>
 	constexpr void
 	normalize_vectors (math::Matrix<S, C, R, TargetSpace, SourceSpace>& matrix)
 	{
@@ -105,7 +99,7 @@ template<class S, std::size_t C, std::size_t R, class TargetSpace, class SourceS
  * Normalize vectors in matrix.
  * Use for orientation matrices.
  */
-template<class S, std::size_t C, std::size_t R, class TargetSpace, class SourceSpace>
+template<math::Scalar S, std::size_t C, std::size_t R, math::CoordinateSystem TargetSpace, math::CoordinateSystem SourceSpace>
 	[[nodiscard]]
 	constexpr math::Matrix<S, C, R, TargetSpace, SourceSpace>
 	vector_normalized (math::Matrix<S, C, R, TargetSpace, SourceSpace> matrix)
@@ -118,10 +112,10 @@ template<class S, std::size_t C, std::size_t R, class TargetSpace, class SourceS
 /**
  * Return vector orthogonalized onto another vector.
  */
-template<class S, class F>
+template<math::Scalar S, math::CoordinateSystem Space>
 	[[nodiscard]]
-	constexpr SpaceVector<S, F>
-	orthogonalized (SpaceVector<S, F> const& vector, SpaceVector<S, F> const& onto)
+	constexpr SpaceVector<S, Space>
+	orthogonalized (SpaceVector<S, Space> const& vector, SpaceVector<S, Space> const& onto)
 	{
 		return vector - (dot_product (vector, onto) * onto / square (abs (onto)));
 	}
@@ -130,7 +124,7 @@ template<class S, class F>
 /**
  * Make matrix orthogonal so that X stays unchanged.
  */
-template<class S, class TargetSpace, class SourceSpace>
+template<math::Scalar S, math::CoordinateSystem TargetSpace, math::CoordinateSystem SourceSpace>
 	[[nodiscard]]
 	constexpr SpaceMatrix<S, TargetSpace, SourceSpace>
 	orthogonalized (SpaceMatrix<S, TargetSpace, SourceSpace> const& m)
@@ -146,10 +140,10 @@ template<class S, class TargetSpace, class SourceSpace>
  * Ensure that the length of a vector does not exceed a specified maximum,
  * adjusting the vector's magnitude if necessary while preserving its direction.
  */
-template<class T, class F>
+template<math::Scalar S, math::CoordinateSystem Space>
 	[[nodiscard]]
-	constexpr SpaceVector<T, F>
-	length_limited (SpaceVector<T, F> vector, T const& max_length)
+	constexpr SpaceVector<S, Space>
+	length_limited (SpaceVector<S, Space> vector, S const& max_length)
 	{
 		auto const length = abs (vector);
 
@@ -160,46 +154,46 @@ template<class T, class F>
 	}
 
 
-template<class T, class F>
+template<math::Scalar S, math::CoordinateSystem Space>
 	[[nodiscard]]
-	constexpr auto
-	normalized (SpaceVector<T, F> const& vector)
+	constexpr SpaceVector<S, Space>
+	normalized (SpaceVector<S, Space> const& vector)
 	{
-		return T (1) * vector / abs (vector);
+		return S (1) * vector / abs (vector);
 	}
 
 
 /**
  * Project vector "vector" onto "onto" vector.
  */
-template<class T1, class T2, class Space>
+template<math::Scalar S1, math::Scalar S2, math::CoordinateSystem Space>
 	[[nodiscard]]
 	constexpr auto
-	projection (SpaceVector<T1, Space> const& vector, SpaceVector<T2, Space> const& onto)
+	projection (SpaceVector<S1, Space> const& vector, SpaceVector<S2, Space> const& onto)
 	{
-		return (~vector * normalized (onto)).scalar() * onto;
+		return dot_product (vector, normalized (onto)) * onto;
 	}
 
 
 /**
  * This version takes normalized "onto" vector, if caller has one, to save on computing time.
  */
-template<class T1, class T2, class Space>
+template<math::Scalar S1, math::Scalar S2, math::CoordinateSystem Space>
 	[[nodiscard]]
 	constexpr auto
-	projection_onto_normalized (SpaceVector<T1, Space> const& vector, SpaceVector<T2, Space> const& normalized_onto)
+	projection_onto_normalized (SpaceVector<S1, Space> const& vector, SpaceVector<S2, Space> const& normalized_onto)
 	{
-		return (~vector * normalized_onto).scalar() * normalized_onto;
+		return dot_product (vector, normalized_onto) * normalized_onto;
 	}
 
 
 /**
  * Find a vector that is non-colinear with given input vector.
  */
-template<class Scalar, class Space>
+template<math::Scalar S, math::CoordinateSystem Space>
 	[[nodiscard]]
-	constexpr SpaceVector<Scalar, Space>
-	find_non_colinear (SpaceVector<Scalar, Space> input)
+	constexpr SpaceVector<S, Space>
+	find_non_colinear (SpaceVector<S, Space> input)
 	{
 		input = normalized (input);
 
@@ -215,10 +209,10 @@ template<class Scalar, class Space>
 /**
  * Find any non-normalized perpendicular vector to given vector.
  */
-template<class T, class F>
+template<math::Scalar S, math::CoordinateSystem Space>
 	[[nodiscard]]
-	constexpr SpaceVector<T, F>
-	find_any_perpendicular (SpaceVector<T, F> const& input)
+	constexpr SpaceVector<S, Space>
+	find_any_perpendicular (SpaceVector<S, Space> const& input)
 	{
 		return cross_product (input, find_non_colinear (input));
 	}
@@ -228,10 +222,10 @@ template<class T, class F>
  * Create orthonormal basis matrix from given vector Z.
  * Two orthonormal vectors to Z will be chosen randomly.
  */
-template<class Scalar, class TargetSpace, class SourceSpace = TargetSpace>
+template<math::Scalar S, math::CoordinateSystem TargetSpace, math::CoordinateSystem SourceSpace = TargetSpace>
 	[[nodiscard]]
 	constexpr RotationMatrix<TargetSpace, SourceSpace>
-	make_basis_from_z (SpaceVector<Scalar, TargetSpace> const& z)
+	make_basis_from_z (SpaceVector<S, TargetSpace> const& z)
 	{
 		auto const x = normalized (find_any_perpendicular (z));
 		auto const y = normalized (cross_product (z, x));
@@ -247,11 +241,11 @@ template<class Scalar, class TargetSpace, class SourceSpace = TargetSpace>
 /**
  * Return normal vector for given triangle (front face is defined by CCW vertex order).
  */
-template<class Scalar, class Space>
+template<math::Scalar S, math::CoordinateSystem Space>
 	inline auto
-	triangle_surface_normal (SpaceVector<Scalar, Space> const& a,
-							 SpaceVector<Scalar, Space> const& b,
-							 SpaceVector<Scalar, Space> const& c)
+	triangle_surface_normal (SpaceVector<S, Space> const& a,
+							 SpaceVector<S, Space> const& b,
+							 SpaceVector<S, Space> const& c)
 	{
 		auto const scalar_1 = decltype (a[0]) { 1 };
 		return normalized (cross_product (b - a, c - a) / scalar_1 / scalar_1);

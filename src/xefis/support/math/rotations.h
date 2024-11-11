@@ -16,11 +16,12 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/support/math/geometry.h>
 #include <xefis/support/math/geometry_types.h>
 
 // Neutrino:
+#include <neutrino/math/concepts.h>
 #include <neutrino/math/math.h>
+#include <neutrino/numeric.h>
 
 // Standard:
 #include <cstddef>
@@ -29,10 +30,29 @@
 
 namespace xf {
 
+// Forward:
+template<math::Scalar S, math::CoordinateSystem Space>
+	[[nodiscard]]
+	constexpr auto
+	normalized (SpaceVector<S, Space> const& vector);
+
+// Forward:
+template<math::Scalar S, std::size_t C, std::size_t R, math::CoordinateSystem TargetSpace, math::CoordinateSystem SourceSpace>
+	[[nodiscard]]
+	constexpr math::Matrix<S, C, R, TargetSpace, SourceSpace>
+	vector_normalized (math::Matrix<S, C, R, TargetSpace, SourceSpace> matrix);
+
+// Forward
+template<math::Scalar S, math::CoordinateSystem Space>
+	[[nodiscard]]
+	constexpr SpaceVector<S, Space>
+	find_any_perpendicular (SpaceVector<S, Space> const& input);
+
+
 /**
  * Return rotation matrix along the axis X for given angle.
  */
-template<class TargetSpace = void, class SourceSpace = TargetSpace>
+template<math::CoordinateSystem TargetSpace = void, math::CoordinateSystem SourceSpace = TargetSpace>
 	[[nodiscard]]
 	constexpr RotationMatrix<TargetSpace, SourceSpace>
 	x_rotation_matrix (si::Angle const angle)
@@ -51,7 +71,7 @@ template<class TargetSpace = void, class SourceSpace = TargetSpace>
 /**
  * Return rotation matrix along the axis Y for given angle.
  */
-template<class TargetSpace = void, class SourceSpace = TargetSpace>
+template<math::CoordinateSystem TargetSpace = void, math::CoordinateSystem SourceSpace = TargetSpace>
 	[[nodiscard]]
 	constexpr RotationMatrix<TargetSpace, SourceSpace>
 	y_rotation_matrix (si::Angle const angle)
@@ -70,7 +90,7 @@ template<class TargetSpace = void, class SourceSpace = TargetSpace>
 /**
  * Return rotation matrix along the axis Z for given angle.
  */
-template<class TargetSpace = void, class SourceSpace = TargetSpace>
+template<math::CoordinateSystem TargetSpace = void, math::CoordinateSystem SourceSpace = TargetSpace>
 	[[nodiscard]]
 	constexpr RotationMatrix<TargetSpace, SourceSpace>
 	z_rotation_matrix (si::Angle const angle)
@@ -86,59 +106,59 @@ template<class TargetSpace = void, class SourceSpace = TargetSpace>
 	}
 
 
-template<class TargetSpace = void, class SourceSpace = TargetSpace>
+template<math::CoordinateSystem TargetSpace = void, math::CoordinateSystem SourceSpace = TargetSpace>
 	[[nodiscard]]
 	constexpr RotationMatrix<TargetSpace, SourceSpace>
 	x_rotation (si::Angle const angle)
 		{ return x_rotation_matrix<TargetSpace, SourceSpace> (angle); }
 
 
-template<class TargetSpace = void, class SourceSpace = TargetSpace>
+template<math::CoordinateSystem TargetSpace = void, math::CoordinateSystem SourceSpace = TargetSpace>
 	[[nodiscard]]
 	constexpr RotationMatrix<TargetSpace, SourceSpace>
 	y_rotation (si::Angle const angle)
 		{ return y_rotation_matrix<TargetSpace, SourceSpace> (angle); }
 
 
-template<class TargetSpace = void, class SourceSpace = TargetSpace>
+template<math::CoordinateSystem TargetSpace = void, math::CoordinateSystem SourceSpace = TargetSpace>
 	[[nodiscard]]
 	constexpr RotationMatrix<TargetSpace, SourceSpace>
 	z_rotation (si::Angle const angle)
 		{ return z_rotation_matrix<TargetSpace, SourceSpace> (angle); }
 
 
-template<class TargetSpace, class SourceSpace>
+template<math::CoordinateSystem TargetSpace, math::CoordinateSystem SourceSpace>
 	static auto const kXRotationPlus45	= x_rotation<TargetSpace, SourceSpace> (45_deg);
 
-template<class TargetSpace, class SourceSpace>
+template<math::CoordinateSystem TargetSpace, math::CoordinateSystem SourceSpace>
 	static auto const kYRotationPlus45	= y_rotation<TargetSpace, SourceSpace> (45_deg);
 
-template<class TargetSpace, class SourceSpace>
+template<math::CoordinateSystem TargetSpace, math::CoordinateSystem SourceSpace>
 	static auto const kZRotationPlus45	= z_rotation<TargetSpace, SourceSpace> (45_deg);
 
-template<class TargetSpace, class SourceSpace>
+template<math::CoordinateSystem TargetSpace, math::CoordinateSystem SourceSpace>
 	static auto const kXRotationPlus90	= x_rotation<TargetSpace, SourceSpace> (90_deg);
 
-template<class TargetSpace, class SourceSpace>
+template<math::CoordinateSystem TargetSpace, math::CoordinateSystem SourceSpace>
 	static auto const kYRotationPlus90	= y_rotation<TargetSpace, SourceSpace> (90_deg);
 
-template<class TargetSpace, class SourceSpace>
+template<math::CoordinateSystem TargetSpace, math::CoordinateSystem SourceSpace>
 	static auto const kZRotationPlus90	= z_rotation<TargetSpace, SourceSpace> (90_deg);
 
-template<class TargetSpace, class SourceSpace>
+template<math::CoordinateSystem TargetSpace, math::CoordinateSystem SourceSpace>
 	static auto const kXRotationPlus180	= x_rotation<TargetSpace, SourceSpace> (180_deg);
 
-template<class TargetSpace, class SourceSpace>
+template<math::CoordinateSystem TargetSpace, math::CoordinateSystem SourceSpace>
 	static auto const kYRotationPlus180	= y_rotation<TargetSpace, SourceSpace> (180_deg);
 
-template<class TargetSpace, class SourceSpace>
+template<math::CoordinateSystem TargetSpace, math::CoordinateSystem SourceSpace>
 	static auto const kZRotationPlus180	= z_rotation<TargetSpace, SourceSpace> (180_deg);
 
 
 /**
  * Angle difference between two rotation quaternions.
  */
-template<class TargetSpace, class SourceSpace>
+template<math::CoordinateSystem TargetSpace, math::CoordinateSystem SourceSpace>
 	[[nodiscard]]
 	inline si::Angle
 	angle_difference (RotationQuaternion<TargetSpace, SourceSpace> const& a,
@@ -152,7 +172,7 @@ template<class TargetSpace, class SourceSpace>
  * Angle difference between two rotation matrices.
  * Uses formula Tr(M) = 1 + 2cos(theta). Returns theta.
  */
-template<class TargetSpace1, class TargetSpace2, class SourceSpace1, class SourceSpace2>
+template<math::CoordinateSystem TargetSpace1, math::CoordinateSystem TargetSpace2, math::CoordinateSystem SourceSpace1, math::CoordinateSystem SourceSpace2>
 	[[nodiscard]]
 	inline si::Angle
 	angle_difference (RotationMatrix<TargetSpace1, SourceSpace1> const& a,
@@ -166,15 +186,15 @@ template<class TargetSpace1, class TargetSpace2, class SourceSpace1, class Sourc
  * Return alpha and beta angles required to transform versor x to given vector.
  * Alpha is the X-Y plane angle, beta is X-Z plane angle.
  */
-template<class T, class F>
+template<math::Scalar S, math::CoordinateSystem Space>
 	[[nodiscard]]
 	std::array<si::Angle, 2>
-	alpha_beta_from_x_to (SpaceVector<T, F> const& vector)
+	alpha_beta_from_x_to (SpaceVector<S, Space> const& vector)
 	{
 		using std::atan2;
 
 		auto const alpha = 1_rad * atan2 (vector[1], vector[0]);
-		auto const r = T (1) * std::sqrt (square (vector[0] / T (1)) + square (vector[1] / T (1)));
+		auto const r = S (1) * std::sqrt (square (vector[0] / S (1)) + square (vector[1] / S (1)));
 		auto const beta = 1_rad * -atan2 (vector[2], r);
 
 		return { alpha, beta };
@@ -184,7 +204,7 @@ template<class T, class F>
 /**
  * Return rotation matrix about the given axis vector for given angle.
  */
-template<class TargetSpace = void, class SourceSpace = TargetSpace>
+template<math::CoordinateSystem TargetSpace = void, math::CoordinateSystem SourceSpace = TargetSpace>
 	[[nodiscard]]
 	constexpr RotationMatrix<TargetSpace, SourceSpace>
 	rotation_about (SpaceVector<double, TargetSpace> const& axis, si::Angle const angle)
@@ -214,7 +234,7 @@ template<class TargetSpace = void, class SourceSpace = TargetSpace>
  * Determine the non-normalized rotation axis from the matrix.
  * FIXME has problems with 0° (nans) and 180° (also nans)
  */
-template<class TargetSpace = void, class SourceSpace = TargetSpace>
+template<math::CoordinateSystem TargetSpace = void, math::CoordinateSystem SourceSpace = TargetSpace>
 	[[nodiscard]]
 	inline SpaceVector<double, TargetSpace>
 	rotation_axis (RotationMatrix<TargetSpace, SourceSpace> const& m)
@@ -236,7 +256,7 @@ template<class TargetSpace = void, class SourceSpace = TargetSpace>
 /**
  * Determine the rotation angle about any axis from the matrix.
  */
-template<class TargetSpace = void, class SourceSpace = TargetSpace>
+template<math::CoordinateSystem TargetSpace = void, math::CoordinateSystem SourceSpace = TargetSpace>
 	inline si::Angle
 	rotation_angle_about_matrix_axis (RotationMatrix<TargetSpace, SourceSpace> const& m, SpaceVector<double, TargetSpace> normalized_axis)
 	{
@@ -253,7 +273,7 @@ template<class TargetSpace = void, class SourceSpace = TargetSpace>
 /**
  * Determine the rotation angle about the rotaion axis of the matrix.
  */
-template<class TargetSpace = void, class SourceSpace = TargetSpace>
+template<math::CoordinateSystem TargetSpace = void, math::CoordinateSystem SourceSpace = TargetSpace>
 	inline si::Angle
 	rotation_angle (RotationMatrix<TargetSpace, SourceSpace> const& m)
 	{
@@ -262,7 +282,7 @@ template<class TargetSpace = void, class SourceSpace = TargetSpace>
 	}
 
 
-template<class Space>
+template<math::CoordinateSystem Space>
 	inline si::Angle
 	angle_between (SpaceVector<auto, Space> const& a,
 				   SpaceVector<auto, Space> const& b)
@@ -271,7 +291,7 @@ template<class Space>
 	}
 
 
-template<class Space>
+template<math::CoordinateSystem Space>
 	inline auto
 	cos_angle_between (SpaceVector<auto, Space> const& a,
 					   SpaceVector<auto, Space> const& b)
@@ -286,7 +306,7 @@ template<class Space>
  * expressed in radians.
  * FIXME has numerical instabilities at small rotations
  */
-template<class TargetSpace = void, class SourceSpace = TargetSpace>
+template<math::CoordinateSystem TargetSpace = void, math::CoordinateSystem SourceSpace = TargetSpace>
 	[[nodiscard]]
 	constexpr RotationMatrix<TargetSpace, SourceSpace>
 	to_rotation_matrix (SpaceVector<si::Angle, TargetSpace> const& rotation_vector)
@@ -301,7 +321,7 @@ template<class TargetSpace = void, class SourceSpace = TargetSpace>
 /**
  * Return rotation vector from rotation matrix.
  */
-template<class TargetSpace = void, class SourceSpace = TargetSpace>
+template<math::CoordinateSystem TargetSpace = void, math::CoordinateSystem SourceSpace = TargetSpace>
 	[[nodiscard]]
 	constexpr SpaceVector<si::Angle, TargetSpace>
 	to_rotation_vector (RotationMatrix<TargetSpace, SourceSpace> const& matrix)

@@ -18,6 +18,7 @@
 #include <xefis/config/all.h>
 
 // Neutrino:
+#include <neutrino/math/concepts.h>
 #include <neutrino/math/math.h>
 
 // Standard:
@@ -25,16 +26,6 @@
 
 
 namespace xf {
-
-// Earth-centered Earth-fixed frame of reference:
-struct ECEFSpace;
-
-// Local-tangent-plane frame of reference:
-struct NEDSpace;
-
-// Simulated body frame of reference (X points to the front, Y to the right, Z down the body):
-struct AirframeSpace;
-
 
 template<class Triangle>
 	concept TriangleConcept = requires (Triangle const& t) {
@@ -45,16 +36,16 @@ template<class Triangle>
 	};
 
 
-template<class Scalar = double, class Space = void>
+template<class Scalar = double, math::CoordinateSystem Space = void>
 	using PlaneVector = math::Vector<Scalar, 2, Space, void>;
 
-template<class Scalar = double, class Space = void>
+template<class Scalar = double, math::CoordinateSystem Space = void>
 	using SpaceVector = math::Vector<Scalar, 3, Space, void>;
 
-template<class Scalar = double, class TargetSpace = void, class SourceSpace = TargetSpace>
+template<class Scalar = double, math::CoordinateSystem TargetSpace = void, math::CoordinateSystem SourceSpace = TargetSpace>
 	using PlaneMatrix = math::Matrix<Scalar, 2, 2, TargetSpace, SourceSpace>;
 
-template<class Scalar = double, class TargetSpace = void, class SourceSpace = TargetSpace>
+template<class Scalar = double, math::CoordinateSystem TargetSpace = void, math::CoordinateSystem SourceSpace = TargetSpace>
 	using SpaceMatrix = math::Matrix<Scalar, 3, 3, TargetSpace, SourceSpace>;
 
 /*
@@ -63,38 +54,38 @@ template<class Scalar = double, class TargetSpace = void, class SourceSpace = Ta
 
 // Essentially same as RotationMatrix but use RotationMatrix for intended rotations,
 // and AffineTransform for everything.
-template<class TargetSpace = void, class SourceSpace = TargetSpace>
+template<math::CoordinateSystem TargetSpace = void, math::CoordinateSystem SourceSpace = TargetSpace>
 	using AffineTransform = SpaceMatrix<double, TargetSpace, SourceSpace>;
 
-template<class Scalar, std::size_t N, class Space = void>
+template<class Scalar, std::size_t N, math::CoordinateSystem Space = void>
 	using Triangle = std::array<math::Vector<Scalar, N, Space>, 3>;
 
-template<class Scalar, class Space = void>
+template<class Scalar, math::CoordinateSystem Space = void>
 	using PlaneTriangle = Triangle<Scalar, 2, Space>;
 
-template<class Scalar, class Space = void>
+template<class Scalar, math::CoordinateSystem Space = void>
 	using SpaceTriangle = Triangle<Scalar, 3, Space>;
 
-template<class TargetSpace = void, class SourceSpace = TargetSpace>
+template<math::CoordinateSystem TargetSpace = void, math::CoordinateSystem SourceSpace = TargetSpace>
 	using RotationMatrix = SpaceMatrix<double, TargetSpace, SourceSpace>;
 
-template<class TargetSpace = void, class SourceSpace = TargetSpace>
+template<math::CoordinateSystem TargetSpace = void, math::CoordinateSystem SourceSpace = TargetSpace>
 	using RotationQuaternion = math::Quaternion<double, TargetSpace, SourceSpace>;
 
-template<class TargetSpace = void, class SourceSpace = TargetSpace>
+template<math::CoordinateSystem TargetSpace = void, math::CoordinateSystem SourceSpace = TargetSpace>
 	RotationMatrix<TargetSpace, SourceSpace> const kNoRotation = math::unit;
 
 /*
  * Physical stuff
  */
 
-template<class Space = void>
+template<math::CoordinateSystem Space = void>
 	using SpaceLength = SpaceVector<si::Length, Space>;
 
-template<class Space = void>
+template<math::CoordinateSystem Space = void>
 	using SpaceForce = SpaceVector<si::Force, Space>;
 
-template<class Space = void>
+template<math::CoordinateSystem Space = void>
 	using SpaceTorque = SpaceVector<si::Torque, Space>;
 
 } // namespace xf
