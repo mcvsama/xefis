@@ -141,12 +141,7 @@ RigidBodyPainter::apply_camera_rotations()
 	}
 
 	if (_followed_body && _following_orientation)
-	{
-		auto const body_rotation_matrix = _followed_body->placement().base_to_body_rotation();
-		auto const axis = rotation_axis (body_rotation_matrix);
-		auto const angle = rotation_angle_about_matrix_axis (body_rotation_matrix, axis);
-		_gl.rotate (angle, axis[0], axis[1], axis[2]);
-	}
+		_gl.rotate (RotationQuaternion<rigid_body::BodyCOM, rigid_body::WorldSpace> (_followed_body->placement().base_to_body_rotation()));
 }
 
 

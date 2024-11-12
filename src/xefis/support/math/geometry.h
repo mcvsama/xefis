@@ -155,6 +155,18 @@ template<math::Scalar S, math::CoordinateSystem Space>
 	}
 
 
+// TODO to quaternion_operations.h
+template<math::Scalar S, math::CoordinateSystem TargetSpace, math::CoordinateSystem SourceSpace>
+	[[nodiscard]]
+	constexpr math::Quaternion<S, TargetSpace, SourceSpace>
+	normalized (math::Quaternion<S, TargetSpace, SourceSpace> const& quaternion)
+	{
+		// TODO also create abs (quaternion)
+		return S (1) * quaternion / quaternion.norm();
+	}
+
+
+// TODO to matrix_operations.h as Vector<S, N, ...>
 template<math::Scalar S, math::CoordinateSystem Space>
 	[[nodiscard]]
 	constexpr SpaceVector<S, Space>
@@ -222,6 +234,7 @@ template<math::Scalar S, math::CoordinateSystem Space>
 /**
  * Create orthonormal basis matrix from given vector Z.
  * Two orthonormal vectors to Z will be chosen randomly.
+ * TODO Use Quaternions
  */
 template<math::Scalar S, math::CoordinateSystem TargetSpace, math::CoordinateSystem SourceSpace = TargetSpace>
 	[[nodiscard]]

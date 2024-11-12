@@ -198,9 +198,9 @@ template<class pBaseSpace = void, class pSpace = pBaseSpace>
 				{ return reinterpret_cast<Placement<NewBaseSpace, NewSpace> const&> (*this); }
 
 	  private:
-		SpaceVector<si::Length, BaseSpace>		_position				{ math::zero };
-		RotationQuaternion<Space, BaseSpace>	_base_to_body_rotation	{ math::identity };
-		RotationQuaternion<BaseSpace, Space>	_body_to_base_rotation	{ math::identity };
+		SpaceVector<si::Length, BaseSpace>	_position				{ math::zero };
+		RotationToBodyQ						_base_to_body_rotation	{ math::identity };
+		RotationToBaseQ						_body_to_base_rotation	{ math::identity };
 	};
 
 
@@ -227,8 +227,8 @@ template<class B, class F>
 	inline void
 	Placement<B, F>::set_base_to_body_rotation (RotationToBody const& rotation)
 	{
-		_base_to_body_rotation = rotation;
-		_body_to_base_rotation = ~rotation;
+		_base_to_body_rotation = RotationToBodyQ (rotation); // TODO Get rid of RotationTo****Q
+		_body_to_base_rotation = RotationToBaseQ (~rotation);
 	}
 
 
@@ -236,8 +236,8 @@ template<class B, class F>
 	inline void
 	Placement<B, F>::set_body_to_base_rotation (RotationToBase const& rotation)
 	{
-		_body_to_base_rotation = rotation;
-		_base_to_body_rotation = ~rotation;
+		_body_to_base_rotation = RotationToBaseQ (rotation); // TODO Get rid of RotationTo****Q
+		_base_to_body_rotation = RotationToBodyQ (~rotation);
 	}
 
 

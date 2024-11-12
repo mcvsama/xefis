@@ -16,6 +16,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/support/math/geometry.h>
 #include <xefis/support/simulation/rigid_body/shape.h>
 #include <xefis/support/simulation/rigid_body/shape_material.h>
 #include <xefis/support/simulation/rigid_body/shape_vertex.h>
@@ -123,10 +124,22 @@ class GLSpace
 	set_hfov_perspective (QSize, si::Angle hfov, float near_plane, float far_plane);
 
 	/**
+	 * Rotate current OpenGL matrix by given rotation quaternion.
+	 */
+	static void
+	rotate (RotationQuaternion<auto, auto> const&);
+
+	/**
 	 * Rotate current OpenGL matrix by given rotation matrix.
 	 */
 	static void
 	rotate (RotationMatrix<auto, auto> const&);
+
+	/**
+	 * Rotate current OpenGL matrix by given angle about given vector.
+	 */
+	static void
+	rotate (si::Angle const angle, SpaceVector<double, auto> const& axis);
 
 	/**
 	 * Rotate current OpenGL matrix by given angle about given vector.
@@ -289,6 +302,13 @@ GLSpace::to_opengl (QColor const& color)
 
 
 inline void
+GLSpace::rotate (RotationQuaternion<auto, auto> const& q)
+{
+	rotate (rotation_angle (q), rotation_axis (q));
+}
+
+
+inline void
 GLSpace::rotate (RotationMatrix<auto, auto> const& r)
 {
 	std::array<double, 16> const array {
@@ -299,6 +319,13 @@ GLSpace::rotate (RotationMatrix<auto, auto> const& r)
 	};
 
 	glMultMatrixd (array.data());
+}
+
+
+inline void
+GLSpace::rotate (si::Angle const angle, SpaceVector<double, auto> const& axis)
+{
+	rotate (angle, axis.x(), axis.y(), axis.z());
 }
 
 
