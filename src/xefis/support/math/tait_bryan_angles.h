@@ -30,14 +30,14 @@ namespace xf {
 // Using Airplane-coordinates.
 struct TaitBryanAnglesParams
 {
-	si::Angle	pitch;	// About X (forward)
 	si::Angle	roll;	// About Y (right wing)
+	si::Angle	pitch;	// About X (forward)
 	si::Angle	yaw;	// About Z (down)
 };
 
 
 /**
- * Pitch, roll, yaw angles from the NED frame.
+ * Roll, pitch, yaw angles from the NED frame.
  */
 struct TaitBryanAngles: public SpaceVector<si::Angle>
 {
@@ -46,7 +46,7 @@ struct TaitBryanAngles: public SpaceVector<si::Angle>
 
 	// Ctor
 	TaitBryanAngles (TaitBryanAnglesParams const& params):
-		SpaceVector<si::Angle> (params.pitch, params.roll, params.yaw)
+		SpaceVector<si::Angle> (params.roll, params.pitch, params.yaw)
 	{ }
 
 	// Ctor
@@ -57,14 +57,14 @@ struct TaitBryanAngles: public SpaceVector<si::Angle>
 
 	[[nodiscard]]
 	constexpr auto
-	pitch() const noexcept
+	roll() const noexcept
 	{
 		return (*this)[0];
 	}
 
 	[[nodiscard]]
 	constexpr auto
-	roll() const noexcept
+	pitch() const noexcept
 	{
 		return (*this)[1];
 	}
