@@ -46,14 +46,14 @@ Wing::update_external_forces (Atmosphere const* atmosphere)
 {
 	if (atmosphere)
 	{
-		// Rotations:
-		auto const world_to_ecef = RotationMatrix<ECEFSpace, rigid_body::WorldSpace> (math::unit);
-		auto const ecef_to_world = RotationMatrix<rigid_body::WorldSpace, ECEFSpace> (math::unit);
-		auto const body_to_airfoil_spline = RotationMatrix<AirfoilSplineSpace, rigid_body::BodyCOM> (math::unit);
-		auto const airfoil_spline_to_body = RotationMatrix<rigid_body::BodyCOM, AirfoilSplineSpace> (math::unit);
-		auto const world_to_body = placement().base_to_body_rotation();
+		// Rotations: TODO Perhaps don't do these calculations if it's just multiplying by 1?
+		auto const world_to_ecef = RotationQuaternion<ECEFSpace, rigid_body::WorldSpace> (math::identity);
+		auto const ecef_to_world = RotationQuaternion<rigid_body::WorldSpace, ECEFSpace> (math::identity);
+		auto const body_to_airfoil_spline = RotationQuaternion<AirfoilSplineSpace, rigid_body::BodyCOM> (math::identity);
+		auto const airfoil_spline_to_body = RotationQuaternion<rigid_body::BodyCOM, AirfoilSplineSpace> (math::identity);
+		auto const world_to_body = placement().base_to_body_rotation_q();
 		// ECEF → WorldSpace → BodyCOM → AirfoilSplineSpace:
-		RotationMatrix<AirfoilSplineSpace, ECEFSpace> ecef_to_spline_transform = body_to_airfoil_spline * world_to_body * ecef_to_world;
+		RotationQuaternion<AirfoilSplineSpace, ECEFSpace> ecef_to_spline_transform = body_to_airfoil_spline * world_to_body * ecef_to_world;
 
 		auto const body_position_in_ecef = world_to_ecef * placement().position();
 		auto const body_velocity_in_ecef = world_to_ecef * velocity_moments<rigid_body::WorldSpace>().velocity();

@@ -157,7 +157,7 @@ class Airfoil
 
 template<class TargetSpace, class SourceSpace>
 	AirfoilAerodynamicForces<TargetSpace>
-	operator* (RotationMatrix<TargetSpace, SourceSpace> const& rotation, AirfoilAerodynamicForces<SourceSpace> const& source)
+	operator* (RotationQuaternion<TargetSpace, SourceSpace> const& rotation, AirfoilAerodynamicForces<SourceSpace> const& source)
 	{
 		AirfoilAerodynamicForces<TargetSpace> result;
 		result.lift = rotation * source.lift;

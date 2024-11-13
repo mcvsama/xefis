@@ -45,7 +45,7 @@ template<class Space>
 
 template<class TargetSpace, class SourceSpace>
 	constexpr Air<TargetSpace>
-	operator* (RotationMatrix<TargetSpace, SourceSpace> const& rotation, Air<SourceSpace> const& air)
+	operator* (RotationQuaternion<TargetSpace, SourceSpace> const& rotation, Air<SourceSpace> const& air)
 	{
 		return {
 			.density = air.density,
