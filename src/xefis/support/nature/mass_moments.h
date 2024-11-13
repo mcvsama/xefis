@@ -174,10 +174,12 @@ template<class TargetSpace, class SourceSpace>
 	operator* (RotationQuaternion<TargetSpace, SourceSpace> const& rotation,
 			   MassMoments<SourceSpace> const& mass_moments)
 	{
+		auto const rotation_matrix = RotationMatrix<TargetSpace, SourceSpace> (rotation);
+
 		return {
 			mass_moments.mass(),
 			rotation * mass_moments.center_of_mass_position(),
-			rotation * mass_moments.inertia_tensor() * ~rotation,
+			rotation_matrix * mass_moments.inertia_tensor() * ~rotation_matrix,
 		};
 	}
 

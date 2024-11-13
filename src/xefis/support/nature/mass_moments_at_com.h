@@ -120,9 +120,11 @@ template<class TargetSpace, class SourceSpace>
 	operator* (RotationMatrix<TargetSpace, SourceSpace> const& rotation,
 			   MassMomentsAtCOM<SourceSpace> const& mass_moments)
 	{
+		auto const rotation_matrix = RotationMatrix<TargetSpace, SourceSpace> (rotation);
+
 		return {
 			mass_moments.mass(),
-			rotation * mass_moments.inertia_tensor() * ~rotation,
+			rotation_matrix * mass_moments.inertia_tensor() * ~rotation_matrix,
 		};
 	}
 

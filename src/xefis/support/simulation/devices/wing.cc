@@ -96,8 +96,8 @@ Wing::update_external_forces (Atmosphere const* atmosphere)
 MassMoments<rigid_body::BodyCOM>
 Wing::calculate_body_com_mass_moments (Airfoil const& airfoil, si::Density const material_density)
 {
-	// Well, let AirfoilSplineSpace and BodyCOM be actually the same, so an unit matrix:
-	auto const rotation = RotationMatrix<rigid_body::BodyCOM, AirfoilSplineSpace> (math::unit);
+	// Well, let AirfoilSplineSpace and BodyCOM be actually the same, so an identity rotation:
+	auto const rotation = RotationQuaternion<rigid_body::BodyCOM, AirfoilSplineSpace> (math::identity);
 	return rotation * calculate_mass_moments<AirfoilSplineSpace> (airfoil, material_density);
 }
 
