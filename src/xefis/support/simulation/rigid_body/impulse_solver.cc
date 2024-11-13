@@ -308,7 +308,7 @@ ImpulseSolver::update_placements (si::Time dt)
 		auto const vm = body->velocity_moments<WorldSpace>();
 		auto const ds = vm.velocity() * dt;
 		auto const dr_vec = vm.angular_velocity() * dt;
-		auto const dr = to_rotation_matrix (dr_vec);
+		auto const dr = to_rotation_quaternion (dr_vec);
 
 		placement.translate_frame (ds);
 		placement.rotate_body_frame (dr);
