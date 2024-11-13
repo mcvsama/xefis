@@ -82,10 +82,18 @@ struct TaitBryanAngles: public SpaceVector<si::Angle>
 inline TaitBryanAngles
 tait_bryan_angles (RotationMatrix<ECEFSpace, AirframeSpace> const& body_coordinates, si::LonLat const& position)
 {
-	auto const diff = euler_angle_difference (RotationMatrix<> { ecef_to_ned_rotation (position).array() },
-											  RotationMatrix<> { body_coordinates.array() });
+	auto const diff = euler_angle_difference (math::reframe<void, void> (RotationMatrix<NEDSpace, ECEFSpace> { ecef_to_ned_rotation (position) }),
+											  math::reframe<void, void> (RotationMatrix<ECEFSpace, AirframeSpace> { body_coordinates }));
 
 	return TaitBryanAngles (diff);
+}
+
+
+[[nodiscard]]
+inline TaitBryanAngles
+tait_bryan_angles (RotationQuaternion<ECEFSpace, AirframeSpace> const& body_rotation, si::LonLat const& position)
+{
+	return tait_bryan_angles (RotationMatrix<ECEFSpace, AirframeSpace> (body_rotation), position);
 }
 
 
@@ -99,9 +107,17 @@ tait_bryan_angles (RotationMatrix<ECEFSpace, AirframeSpace> const& body_coordina
 
 [[nodiscard]]
 inline TaitBryanAngles
-tait_bryan_angles (Placement<ECEFSpace, AirframeSpace> const& pr)
+tait_bryan_angles (RotationQuaternion<ECEFSpace, AirframeSpace> const& body_rotation, SpaceVector<si::Length, ECEFSpace> const& position)
 {
-	return tait_bryan_angles (pr.body_coordinates(), polar (pr.position()));
+	return tait_bryan_angles (body_rotation, polar (position));
+}
+
+
+[[nodiscard]]
+inline TaitBryanAngles
+tait_bryan_angles (Placement<ECEFSpace, AirframeSpace> const& placement)
+{
+	return tait_bryan_angles (placement.body_to_base_rotation(), polar (placement.position()));
 }
 
 } // namespace xf

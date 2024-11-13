@@ -24,7 +24,7 @@
 
 namespace xf {
 
-RotationMatrix<NEDSpace, ECEFSpace>
+RotationQuaternion<NEDSpace, ECEFSpace>
 ecef_to_ned_rotation (si::LonLat const& position)
 {
 	SpaceVector<double, NEDSpace> const n0 = north_vector (EquatorPrimeMeridian);
@@ -33,19 +33,19 @@ ecef_to_ned_rotation (si::LonLat const& position)
 	SpaceVector<double, NEDSpace> const n1 = rotation_about (e1, -position.lat()) * n0;
 	SpaceVector<double, NEDSpace> const d1 = cross_product (n1, e1);
 
-	return { n1, e1, d1 };
+	return RotationMatrix<NEDSpace, ECEFSpace> { n1, e1, d1 };
 }
 
 
-RotationMatrix<ECEFSpace, AirframeSpace>
+RotationQuaternion<ECEFSpace, AirframeSpace>
 airframe_to_ecef_rotation (TaitBryanAngles const& angles, si::LonLat const& position)
 {
-	RotationMatrix<NEDSpace, ECEFSpace> const ned0 = ecef_to_ned_rotation (position);
-	RotationMatrix<NEDSpace, ECEFSpace> const ned1 = rotation_about<NEDSpace> (down_vector (ned0), angles.yaw()) * ned0;
-	RotationMatrix<NEDSpace, ECEFSpace> const ned2 = rotation_about<NEDSpace> (east_vector (ned1), angles.pitch()) * ned1;
-	RotationMatrix<NEDSpace, ECEFSpace> const ned3 = rotation_about<NEDSpace> (north_vector (ned2), angles.roll()) * ned2;
+	RotationQuaternion<NEDSpace, ECEFSpace> const ned0 = ecef_to_ned_rotation (position);
+	RotationQuaternion<NEDSpace, ECEFSpace> const ned1 = quaternion_rotation_about<NEDSpace> (down_vector (ned0), angles.yaw()) * ned0;
+	RotationQuaternion<NEDSpace, ECEFSpace> const ned2 = quaternion_rotation_about<NEDSpace> (east_vector (ned1), angles.pitch()) * ned1;
+	RotationQuaternion<NEDSpace, ECEFSpace> const ned3 = quaternion_rotation_about<NEDSpace> (north_vector (ned2), angles.roll()) * ned2;
 
-	return RotationMatrix<ECEFSpace, NEDSpace> { math::unit } * ned3 * RotationMatrix<ECEFSpace, AirframeSpace> { math::unit };
+	return RotationQuaternion<ECEFSpace, NEDSpace> { math::unit } * ned3 * RotationQuaternion<ECEFSpace, AirframeSpace> { math::unit };
 }
 
 } // namespace xf
