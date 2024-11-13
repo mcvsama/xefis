@@ -84,7 +84,6 @@ tait_bryan_angles (RotationMatrix<ECEFSpace, AirframeSpace> const& body_coordina
 {
 	auto const diff = euler_angle_difference (math::reframe<void, void> (RotationMatrix<NEDSpace, ECEFSpace> { ecef_to_ned_rotation (position) }),
 											  math::reframe<void, void> (RotationMatrix<ECEFSpace, AirframeSpace> { body_coordinates }));
-
 	return TaitBryanAngles (diff);
 }
 
@@ -93,7 +92,18 @@ tait_bryan_angles (RotationMatrix<ECEFSpace, AirframeSpace> const& body_coordina
 inline TaitBryanAngles
 tait_bryan_angles (RotationQuaternion<ECEFSpace, AirframeSpace> const& body_rotation, si::LonLat const& position)
 {
-	return tait_bryan_angles (RotationMatrix<ECEFSpace, AirframeSpace> (body_rotation), position);
+	auto const q_relative = ecef_to_ned_rotation (position) * body_rotation;
+	auto const w = q_relative.w();
+	auto const x = q_relative.x();
+	auto const y = q_relative.y();
+	auto const z = q_relative.z();
+	auto const yy = square (y);
+
+	return TaitBryanAngles ({
+		.roll = 1_rad * std::atan2 (2.0 * (w * x + y * z), 1.0 - 2.0 * (x * x + yy)),
+		.pitch = 1_rad * std::asin (2.0 * (w * y - z * x)),
+		.yaw = 1_rad * std::atan2 (2.0 * (w * z + x * y), 1.0 - 2.0 * (yy + z * z)),
+	});
 }
 
 
