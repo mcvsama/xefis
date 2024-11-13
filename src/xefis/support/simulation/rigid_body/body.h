@@ -278,25 +278,25 @@ class Body: public Noncopyable
 	 * Rotate the body about it's center of mass by provided rotation matrix.
 	 */
 	void
-	rotate_about_center_of_mass (RotationMatrix<WorldSpace> const&);
+	rotate_about_center_of_mass (RotationQuaternion<WorldSpace> const&);
 
 	/**
 	 * Rotate the body about world space origin by provided rotation matrix.
 	 */
 	void
-	rotate_about_world_origin (RotationMatrix<WorldSpace> const&);
+	rotate_about_world_origin (RotationQuaternion<WorldSpace> const&);
 
 	/**
 	 * Rotate the body about the body origin.
 	 */
 	void
-	rotate_about_body_origin (RotationMatrix<WorldSpace> const&);
+	rotate_about_body_origin (RotationQuaternion<WorldSpace> const&);
 
 	/**
 	 * Rotate the body about given point.
 	 */
 	void
-	rotate_about (SpaceLength<WorldSpace> const& about_point, RotationMatrix<WorldSpace> const& rotation)
+	rotate_about (SpaceLength<WorldSpace> const& about_point, RotationQuaternion<WorldSpace> const& rotation)
 		{ _placement.rotate_base_frame_about (about_point, rotation); }
 
 	/**

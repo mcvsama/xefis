@@ -56,7 +56,7 @@ Body::set_mass_moments (MassMoments<BodyCOM> const& mass_moments)
 
 
 void
-Body::rotate_about_center_of_mass (RotationMatrix<WorldSpace> const& rotation)
+Body::rotate_about_center_of_mass (RotationQuaternion<WorldSpace> const& rotation)
 {
 	_placement.rotate_body_frame (rotation);
 	_velocity_moments = rotation * _velocity_moments;
@@ -67,7 +67,7 @@ Body::rotate_about_center_of_mass (RotationMatrix<WorldSpace> const& rotation)
 
 
 void
-Body::rotate_about_world_origin (RotationMatrix<WorldSpace> const& rotation)
+Body::rotate_about_world_origin (RotationQuaternion<WorldSpace> const& rotation)
 {
 	_placement.rotate_base_frame (rotation);
 	_velocity_moments = rotation * _velocity_moments;
@@ -78,7 +78,7 @@ Body::rotate_about_world_origin (RotationMatrix<WorldSpace> const& rotation)
 
 
 void
-Body::rotate_about_body_origin (RotationMatrix<WorldSpace> const& rotation)
+Body::rotate_about_body_origin (RotationQuaternion<WorldSpace> const& rotation)
 {
 	SpaceLength<WorldSpace> const about_point = _placement.bound_transform_to_base (_origin_placement.position());
 
