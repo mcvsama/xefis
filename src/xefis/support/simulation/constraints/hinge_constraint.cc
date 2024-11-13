@@ -77,8 +77,8 @@ HingeConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, 
 	LocationConstraint<5> location_constraint_value;
 	location_constraint_value.put (c.u, 0, 0);
 	auto const a1xa2 = cross_product (c.a1, c.a2);
-	location_constraint_value[0, 3] = (~c.t1 * a1xa2).scalar();
-	location_constraint_value[0, 4] = (~c.t2 * a1xa2).scalar();
+	location_constraint_value[0, 3] = dot_product (c.t1, a1xa2);
+	location_constraint_value[0, 4] = dot_product (c.t2, a1xa2);
 
 	auto const J = calculate_jacobian (vm_1, ext_forces_1, Jv1, Jw1,
 									   vm_2, ext_forces_2, Jv2, Jw2,
