@@ -1,6 +1,6 @@
 /* vim:ts=4
  *
- * Copyleft 2019  Michał Gawron
+ * Copyleft 2024  Michał Gawron
  * Marduk Unix Labs, http://mulabs.org/
  *
  * This program is free software: you can redistribute it and/or modify
@@ -47,26 +47,8 @@ class FixedOrientationHelper
 							   Placement<WorldSpace, BodyCOM> const& location_2) const;
 
   private:
-	RotationMatrix<BodyCOM, BodyCOM> _initial_relative_rotation;
+	RotationQuaternion<BodyCOM, BodyCOM>	_initial_relative_rotation;
 };
-
-
-inline
-FixedOrientationHelper::FixedOrientationHelper (Placement<WorldSpace, BodyCOM> const& location_1,
-												Placement<WorldSpace, BodyCOM> const& location_2):
-	_initial_relative_rotation (relative_rotation (location_1, location_2))
-{ }
-
-
-inline SpaceLength<WorldSpace>
-FixedOrientationHelper::rotation_constraint_value (Placement<WorldSpace, BodyCOM> const& location_1,
-												   Placement<WorldSpace, BodyCOM> const& location_2) const
-{
-	RotationMatrix<BodyCOM, BodyCOM> const current_relative_rotation = relative_rotation (location_1, location_2);
-	RotationMatrix<BodyCOM, BodyCOM> const body_error = ~_initial_relative_rotation * current_relative_rotation;
-	SpaceVector<si::Angle, WorldSpace> const world_error = location_2.body_to_base_rotation() * to_rotation_vector (body_error);
-	return world_error * 1_m / 1_rad;
-}
 
 } // namespace xf::rigid_body
 

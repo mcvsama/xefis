@@ -311,6 +311,7 @@ MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/qt/ownership_br
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/simulation/components/capacitor.h
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/simulation/components/resistor.h
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/simulation/components/voltage_source.h
+MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/simulation/constraints/helpers/fixed_orientation_helper.cc
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/simulation/constraints/helpers/fixed_orientation_helper.h
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/simulation/constraints/angular_limits_constraint.cc
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/simulation/constraints/angular_limits_constraint.h
