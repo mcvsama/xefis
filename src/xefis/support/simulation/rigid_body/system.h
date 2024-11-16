@@ -187,10 +187,10 @@ class System: private Noncopyable
 	rotational_kinetic_energy() const;
 
 	/**
-	 * Rotate whole system about space origin by provided rotation matrix.
+	 * Rotate whole system about space origin by provided rotation quaternion.
 	 */
 	void
-	rotate_about_world_origin (RotationMatrix<WorldSpace> const&);
+	rotate_about_world_origin (RotationQuaternion<WorldSpace> const&);
 
 	/**
 	 * Translate whole system by given vector.

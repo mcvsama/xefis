@@ -94,7 +94,7 @@ class Shape
 	 * Rotate the shape about space origin by provided rotation matrix.
 	 */
 	void
-	rotate (RotationMatrix<BodyOrigin> const&);
+	rotate (RotationQuaternion<BodyOrigin> const&);
 
 	/**
 	 * Translate the shape by given vector.

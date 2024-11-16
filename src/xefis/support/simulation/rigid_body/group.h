@@ -75,13 +75,13 @@ class Group
 	 * Rotate the body about world space origin by provided rotation matrix.
 	 */
 	void
-	rotate_about_world_origin (RotationMatrix<WorldSpace> const&);
+	rotate_about_world_origin (RotationQuaternion<WorldSpace> const&);
 
 	/**
 	 * Rotate the body about given point.
 	 */
 	void
-	rotate_about (SpaceLength<WorldSpace> const& about_point, RotationMatrix<WorldSpace> const&);
+	rotate_about (SpaceLength<WorldSpace> const& about_point, RotationQuaternion<WorldSpace> const&);
 
 	/**
 	 * Translate the body by given vector.

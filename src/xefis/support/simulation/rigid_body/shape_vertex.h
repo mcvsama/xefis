@@ -113,7 +113,7 @@ class ShapeVertex
 	 * Rotate the vertex about space origin by provided rotation matrix.
 	 */
 	void
-	rotate (RotationMatrix<BodyOrigin> const&);
+	rotate (RotationQuaternion<BodyOrigin> const&);
 
 	/**
 	 * Translate the vertex by given vector.

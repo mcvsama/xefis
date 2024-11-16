@@ -34,37 +34,37 @@ namespace xf {
 
 template<math::CoordinateSystem TargetSpace = void, math::CoordinateSystem SourceSpace = TargetSpace>
 	[[nodiscard]]
-	constexpr RotationMatrix<TargetSpace, SourceSpace>
+	constexpr RotationQuaternion<TargetSpace, SourceSpace>
 	rotation_about (SpaceVector<double, TargetSpace> const& axis, si::Angle const angle)
 	{
-		return RotationMatrix (quaternion_rotation_about (axis, angle));
+		return quaternion_rotation_about (axis, angle);
 	}
 
 
 template<math::CoordinateSystem TargetSpace = void, math::CoordinateSystem SourceSpace = TargetSpace>
 	[[nodiscard]]
-	constexpr RotationMatrix<TargetSpace, SourceSpace>
+	constexpr RotationQuaternion<TargetSpace, SourceSpace>
 	x_rotation (si::Angle const angle)
 	{
-		return x_rotation_matrix<TargetSpace, SourceSpace> (angle);
+		return x_rotation_quaternion<TargetSpace, SourceSpace> (angle);
 	}
 
 
 template<math::CoordinateSystem TargetSpace = void, math::CoordinateSystem SourceSpace = TargetSpace>
 	[[nodiscard]]
-	constexpr RotationMatrix<TargetSpace, SourceSpace>
+	constexpr RotationQuaternion<TargetSpace, SourceSpace>
 	y_rotation (si::Angle const angle)
 	{
-		return y_rotation_matrix<TargetSpace, SourceSpace> (angle);
+		return y_rotation_quaternion<TargetSpace, SourceSpace> (angle);
 	}
 
 
 template<math::CoordinateSystem TargetSpace = void, math::CoordinateSystem SourceSpace = TargetSpace>
 	[[nodiscard]]
-	constexpr RotationMatrix<TargetSpace, SourceSpace>
+	constexpr RotationQuaternion<TargetSpace, SourceSpace>
 	z_rotation (si::Angle const angle)
 	{
-		return z_rotation_matrix<TargetSpace, SourceSpace> (angle);
+		return z_rotation_quaternion<TargetSpace, SourceSpace> (angle);
 	}
 
 

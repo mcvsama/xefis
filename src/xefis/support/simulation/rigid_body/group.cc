@@ -24,7 +24,7 @@
 namespace xf::rigid_body {
 
 void
-Group::rotate_about_world_origin (RotationMatrix<WorldSpace> const& rotation)
+Group::rotate_about_world_origin (RotationQuaternion<WorldSpace> const& rotation)
 {
 	for (auto& body: _bodies)
 		body->rotate_about_world_origin (rotation);
@@ -32,7 +32,7 @@ Group::rotate_about_world_origin (RotationMatrix<WorldSpace> const& rotation)
 
 
 void
-Group::rotate_about (SpaceLength<WorldSpace> const& about_point, RotationMatrix<WorldSpace> const& rotation)
+Group::rotate_about (SpaceLength<WorldSpace> const& about_point, RotationQuaternion<WorldSpace> const& rotation)
 {
 	for (auto& body: _bodies)
 		body->rotate_about (about_point, rotation);

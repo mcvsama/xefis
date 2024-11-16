@@ -34,7 +34,7 @@ ShapeVertex::transform (AffineTransform<BodyOrigin> const& transformation)
 
 
 void
-ShapeVertex::rotate (RotationMatrix<BodyOrigin> const& rotation)
+ShapeVertex::rotate (RotationQuaternion<BodyOrigin> const& rotation)
 {
 	_position = rotation * _position;
 

@@ -52,7 +52,7 @@ System::rotational_kinetic_energy() const
 
 
 void
-System::rotate_about_world_origin (RotationMatrix<WorldSpace> const& rotation)
+System::rotate_about_world_origin (RotationQuaternion<WorldSpace> const& rotation)
 {
 	for (auto& body: _bodies)
 		body->rotate_about_world_origin (rotation);

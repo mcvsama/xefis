@@ -33,7 +33,7 @@ Shape::transform (AffineTransform<BodyOrigin> const& transform)
 
 
 void
-Shape::rotate (RotationMatrix<BodyOrigin> const& rotation)
+Shape::rotate (RotationQuaternion<BodyOrigin> const& rotation)
 {
 	for_all_vertices ([&] (ShapeVertex& vertex) {
 		vertex.rotate (rotation);
