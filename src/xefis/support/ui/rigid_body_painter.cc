@@ -16,7 +16,6 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/support/math/euler_angles.h>
 #include <xefis/support/nature/constants.h>
 #include <xefis/support/simulation/constraints/fixed_constraint.h>
 #include <xefis/support/simulation/constraints/hinge_constraint.h>

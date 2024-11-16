@@ -12,7 +12,6 @@
  */
 
 // Xefis:
-#include <xefis/support/math/euler_angles.h>
 #include <xefis/support/math/tait_bryan_angles.h>
 #include <xefis/support/math/transforms.h>
 #include <xefis/support/nature/constants.h>
