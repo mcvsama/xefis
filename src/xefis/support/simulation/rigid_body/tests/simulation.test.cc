@@ -43,7 +43,10 @@ std::unique_ptr<rigid_body::Body>
 make_iss()
 {
 	xf::SpaceLength<xf::ECEFSpace> const iss_ecef_position = xf::cartesian (xf::LonLatRadius (0_deg, 0_deg, kISSHeight));
-	xf::RotationMatrix<rigid_body::WorldSpace> const iss_ecef_rotation = math::reframe<rigid_body::WorldSpace, rigid_body::WorldSpace> (xf::airframe_to_ecef_rotation (xf::TaitBryanAngles { 0_deg, 0_deg, 0_deg }, iss_ecef_position));
+	xf::RotationQuaternion<rigid_body::WorldSpace> const iss_ecef_rotation =
+		math::reframe<rigid_body::WorldSpace, rigid_body::WorldSpace> (
+			xf::airframe_to_ecef_rotation (xf::TaitBryanAngles { 0_deg, 0_deg, 0_deg }, iss_ecef_position)
+		);
 	xf::SpaceVector<si::Velocity, rigid_body::WorldSpace> const iss_velocity { 0_mps, 0_mps, 27'600_kph };
 	xf::SpaceVector<si::AngularVelocity, rigid_body::WorldSpace> const iss_angular_velocity (math::zero);
 	xf::MassMoments<rigid_body::BodyCOM> const iss_mass_moments (419'725_kg, math::zero, math::unit);
