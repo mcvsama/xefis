@@ -16,7 +16,6 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/support/math/euler_angles.h>
 #include <xefis/support/math/rotations.h>
 #include <xefis/support/simulation/rigid_body/system.h>
 #include <xefis/support/ui/gl_space.h>
@@ -311,7 +310,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	si::PixelDensity					_pixel_density;
 	// Camera position is relative to the followed body:
 	SpaceLength<rigid_body::WorldSpace>	_camera_position;
-	EulerAngles							_camera_angles;
+	SpaceVector<si::Angle>				_camera_angles;
 	LonLatRadius						_position_on_earth			{ 0_deg, 0_deg, 0_m };
 	GLSpace								_gl;
 	rigid_body::Body const*				_followed_body				{ nullptr };
@@ -329,15 +328,6 @@ class RigidBodyPainter: protected QOpenGLFunctions
 										_body_rendering_config;
 	std::minstd_rand0					_air_particles_prng;
 };
-
-
-inline void
-RigidBodyPainter::set_camera_angles (si::Angle const x, si::Angle const y, si::Angle const z)
-{
-	_camera_angles[0] = x; // Pitch
-	_camera_angles[1] = y; // Yaw
-	_camera_angles[2] = z; // Roll
-}
 
 } // namespace xf
 

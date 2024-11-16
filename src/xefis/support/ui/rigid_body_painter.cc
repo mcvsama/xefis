@@ -51,6 +51,15 @@ RigidBodyPainter::RigidBodyPainter (si::PixelDensity const pixel_density):
 
 
 void
+RigidBodyPainter::set_camera_angles (si::Angle const x, si::Angle const y, si::Angle const z)
+{
+	_camera_angles[0] = x; // Pitch
+	_camera_angles[1] = y; // Yaw
+	_camera_angles[2] = z; // Roll
+}
+
+
+void
 RigidBodyPainter::paint (rigid_body::System const& system, QOpenGLPaintDevice& canvas)
 {
 	initializeOpenGLFunctions();
