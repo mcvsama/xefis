@@ -134,6 +134,17 @@ template<class TargetSpace = void, class SourceSpace = TargetSpace>
 	}
 
 
+template<class TargetSpace = void, class SourceSpace = TargetSpace>
+	inline Wrench<TargetSpace>
+	operator* (RotationQuaternion<TargetSpace, SourceSpace> const& rotation, Wrench<SourceSpace> const& wrench)
+	{
+		return {
+			rotation * static_cast<ForceMoments<SourceSpace>> (wrench),
+			rotation * wrench.position(),
+		};
+	}
+
+
 /**
  * Calculate equivalent force and torque about the origin (not necessarily a center of mass).
  *
