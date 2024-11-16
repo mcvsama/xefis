@@ -26,6 +26,7 @@
 // Standard:
 #include <cstddef>
 #include <cmath>
+#include <numbers>
 
 
 namespace xf {
@@ -87,25 +88,52 @@ template<math::CoordinateSystem TargetSpace = void, math::CoordinateSystem Sourc
 
 
 /**
- * Determine the rotation axis form the rotation quaternion.
+ * Determine the rotation angle about the rotation axis of the quaternion.
+ * The resulting angle is always positive.
  */
 template<math::CoordinateSystem TargetSpace = void, math::CoordinateSystem SourceSpace = TargetSpace>
-	[[nodiscard]]
-	inline SpaceVector<double, TargetSpace>
-	rotation_axis (RotationQuaternion<TargetSpace, SourceSpace> const& rotation)
+	inline si::Angle
+	angle (RotationQuaternion<TargetSpace, SourceSpace> const& rotation)
 	{
-		return normalized (rotation.imag());
+		auto a = 2_rad * acos (std::clamp (rotation.w(), -1.0, +1.0));
+
+		// Angle should always be positive, but in some cases axis will be inverse:
+		if (rotation.w() < 0)
+			a = 2.0_rad * std::numbers::pi - a;
+
+		return a;
 	}
 
 
 /**
- * Determine the rotation angle about the rotation axis of the quaternion.
+ * Determine the rotation axis form the rotation quaternion.
+ * Result is not normalized.
  */
 template<math::CoordinateSystem TargetSpace = void, math::CoordinateSystem SourceSpace = TargetSpace>
-	inline si::Angle
-	rotation_angle (RotationQuaternion<TargetSpace, SourceSpace> const& rotation)
+	[[nodiscard]]
+	inline SpaceVector<double, TargetSpace>
+	unnormalized_axis (RotationQuaternion<TargetSpace, SourceSpace> const& rotation)
 	{
-		return 2_rad * acos (std::clamp (rotation.w(), -1.0, +1.0));
+		auto axis = rotation.imag();
+
+		if (axis[0] == 0.0 && axis[1] == 0.0 && axis[2] == 0.0)
+			axis = { 1.0, 0.0, 0.0 };
+
+		// Since angle() is always positive, we need to invert axis for cases -π…2π:
+		return 1.0 * sgn (rotation.w()) * axis;
+	}
+
+
+/**
+ * Determine the rotation axis form the rotation quaternion.
+ * Result is normalized.
+ */
+template<math::CoordinateSystem TargetSpace = void, math::CoordinateSystem SourceSpace = TargetSpace>
+	[[nodiscard]]
+	inline SpaceVector<double, TargetSpace>
+	normalized_axis (RotationQuaternion<TargetSpace, SourceSpace> const& rotation)
+	{
+		return normalized (unnormalized_axis (rotation));
 	}
 
 
@@ -117,7 +145,7 @@ template<math::CoordinateSystem TargetSpace = void, math::CoordinateSystem Sourc
 	constexpr SpaceVector<si::Angle, TargetSpace>
 	to_rotation_vector (RotationQuaternion<TargetSpace, SourceSpace> const& quaternion)
 	{
-		return rotation_angle (quaternion) * rotation_axis (quaternion);
+		return angle (quaternion) * normalized_axis (quaternion);
 	}
 
 
@@ -136,9 +164,19 @@ template<math::CoordinateSystem TargetSpace = void, math::CoordinateSystem Sourc
 		auto const axis = normalized (rotation_vector).transformed ([](si::Angle const value) { return value.in<si::Radian>(); });
 
 		if (angle != 0_rad)
-			return { cos (0.5 * angle), axis * sin (half_angle) };
+			return { cos (half_angle), sin (half_angle) * axis };
 		else
 			return { 1.0, 0.0, 0.0, 0.0 };
+	}
+
+
+template<class Target, class Source>
+	[[nodiscard]]
+	inline auto
+	relative_rotation (RotationQuaternion<Target, Source> const& from, RotationQuaternion<Target, Source> const& to)
+	{
+		// Divide the "from" rotation quaternion by the "to" rotation quaternion (mutiply by inversion):
+		return from * ~to;
 	}
 
 } // namespace xf

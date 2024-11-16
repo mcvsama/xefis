@@ -304,7 +304,7 @@ GLSpace::to_opengl (QColor const& color)
 inline void
 GLSpace::rotate (RotationQuaternion<auto, auto> const& q)
 {
-	rotate (rotation_angle (q), rotation_axis (q));
+	rotate (angle (q), normalized_axis (q));
 }
 
 

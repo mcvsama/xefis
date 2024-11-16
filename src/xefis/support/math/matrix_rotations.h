@@ -137,12 +137,13 @@ template<math::CoordinateSystem TargetSpace = void, math::CoordinateSystem Sourc
 
 /**
  * Determine the non-normalized rotation axis from the matrix.
- * Has problems with 0° (nans) and 180° (also nans)
+ * Result is not normalized.
+ * Has problems near 0° (nans) and 180° (also nans).
  */
 template<math::CoordinateSystem TargetSpace = void, math::CoordinateSystem SourceSpace = TargetSpace>
 	[[nodiscard]]
 	inline SpaceVector<double, TargetSpace>
-	rotation_axis (RotationMatrix<TargetSpace, SourceSpace> const& rotation)
+	unnormalized_axis (RotationMatrix<TargetSpace, SourceSpace> const& rotation)
 	{
 		SpaceVector<double, TargetSpace> result {
 			rotation[1, 2] - rotation[2, 1],
@@ -159,11 +160,25 @@ template<math::CoordinateSystem TargetSpace = void, math::CoordinateSystem Sourc
 
 
 /**
+ * Determine the non-normalized rotation axis from the matrix.
+ * Result is normalized.
+ * Has problems near 0° (nans) and 180° (also nans).
+ */
+template<math::CoordinateSystem TargetSpace = void, math::CoordinateSystem SourceSpace = TargetSpace>
+	[[nodiscard]]
+	inline SpaceVector<double, TargetSpace>
+	normalized_axis (RotationMatrix<TargetSpace, SourceSpace> const& rotation)
+	{
+		return normalized (unnormalized_axis (rotation));
+	}
+
+
+/**
  * Determine the rotation angle about any axis from the matrix.
  */
 template<math::CoordinateSystem TargetSpace = void, math::CoordinateSystem SourceSpace = TargetSpace>
 	inline si::Angle
-	rotation_angle_about_matrix_axis (RotationMatrix<TargetSpace, SourceSpace> const& rotation, SpaceVector<double, TargetSpace> normalized_axis)
+	angle_about_matrix_axis (RotationMatrix<TargetSpace, SourceSpace> const& rotation, SpaceVector<double, TargetSpace> normalized_axis)
 	{
 		SpaceVector<double> const x = math::reframe<void, void> (normalized (find_any_perpendicular (normalized_axis)));
 		SpaceVector<double> const y = math::reframe<void, void> (rotation) * x;
@@ -180,10 +195,9 @@ template<math::CoordinateSystem TargetSpace = void, math::CoordinateSystem Sourc
  */
 template<math::CoordinateSystem TargetSpace = void, math::CoordinateSystem SourceSpace = TargetSpace>
 	inline si::Angle
-	rotation_angle (RotationMatrix<TargetSpace, SourceSpace> const& rotation)
+	angle (RotationMatrix<TargetSpace, SourceSpace> const& rotation)
 	{
-		auto const axis = normalized (rotation_axis (rotation));
-		return rotation_angle_about_matrix_axis (rotation, axis);
+		return angle_about_matrix_axis (rotation, normalized_axis (rotation));
 	}
 
 
@@ -195,8 +209,8 @@ template<math::CoordinateSystem TargetSpace = void, math::CoordinateSystem Sourc
 	constexpr SpaceVector<si::Angle, TargetSpace>
 	to_rotation_vector (RotationMatrix<TargetSpace, SourceSpace> const& matrix)
 	{
-		auto const axis = normalized (rotation_axis (matrix));
-		return rotation_angle_about_matrix_axis (matrix, axis) * axis;
+		auto const axis = normalized_axis (matrix);
+		return angle_about_matrix_axis (matrix, axis) * axis;
 	}
 
 
@@ -215,6 +229,16 @@ template<math::CoordinateSystem TargetSpace = void, math::CoordinateSystem Sourc
 			return matrix_rotation_about (vector_normalized (rotation_vector) / 1_rad, abs (rotation_vector));
 		else
 			return math::unit;
+	}
+
+
+template<class Target, class Source>
+	[[nodiscard]]
+	inline auto
+	relative_rotation (RotationMatrix<Target, Source> const& from, RotationMatrix<Target, Source> const& to)
+	{
+		// Divide the "from" rotation matrix by the "to" rotation matrix (mutiply by inversion):
+		return from * ~to;
 	}
 
 } // namespace xf

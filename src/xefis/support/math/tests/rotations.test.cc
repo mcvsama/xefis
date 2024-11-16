@@ -13,8 +13,11 @@
 
 // Xefis:
 #include <xefis/support/math/geometry.h>
-#include <xefis/support/math/rotations.h>
+#include <xefis/support/math/placement.h>
+#include <xefis/support/math/matrix_rotations.h>
 #include <xefis/support/math/quaternion_rotations.h>
+#include <xefis/support/math/rotations.h>
+#include <xefis/support/simulation/rigid_body/concepts.h>
 
 // Neutrino:
 #include <neutrino/test/auto_test.h>
@@ -30,6 +33,27 @@ namespace xf::test {
 namespace {
 
 using namespace neutrino::si;
+
+
+template<math::CoordinateSystem TS, math::CoordinateSystem SS>
+	auto
+	random_quaternion_rotation()
+	{
+		using std::numbers::pi;
+
+		auto const angle = neutrino::renormalize (rand(), Range<double> (0, RAND_MAX), Range<si::Angle> (-2_rad * pi, +2_rad * pi));
+		auto const axis = normalized (SpaceVector<double, TS> { 1.0 * rand(), 1.0 * rand(), 1.0 * rand() });
+
+		return quaternion_rotation_about<TS, SS> (axis, angle);
+	};
+
+
+template<math::Scalar S, math::CoordinateSystem Space = void>
+	auto
+	random_vector()
+	{
+		return SpaceVector<S, Space> { S (rand()), S (rand()), S (rand()) };
+	}
 
 
 AutoTest t1 ("Math: rotations with Quaternion", []{
@@ -50,18 +74,31 @@ AutoTest t1 ("Math: rotations with Quaternion", []{
 	test_asserts::verify_equal_with_epsilon ("z → x",
 											 y_rotation_quaternion (+90_deg) * vz, vx, 1e-9_m);
 	test_asserts::verify_equal_with_epsilon ("Z angle == 90_deg",
-											 rotation_angle (z_rotation_quaternion (+90_deg)), 90_deg, 1e-9_deg);
+											 angle (z_rotation_quaternion (+90_deg)), 90_deg, 1e-9_deg);
 	test_asserts::verify_equal_with_epsilon ("Z axis == Z",
-											 rotation_axis (z_rotation_quaternion (+90_deg)), vz / 1_m, 1e-9);
+											 normalized_axis (z_rotation_quaternion (+90_deg)), vz / 1_m, 1e-9);
 	test_asserts::verify_equal_with_epsilon ("rotation_vector (90_deg rotation) is π/2",
 											 to_rotation_vector (z_rotation_quaternion (+90_deg)),
 											 SpaceVector<si::Angle> { 0_rad, 0_rad, 0.5_rad * pi },
 											 1e-9_rad);
-	// TODO 270°
 });
 
 
-AutoTest t2 ("Math: rotations with Matrix", []{
+AutoTest t2 ("Math: rotations with Quaternion (angle range π…2π)", []{
+	using std::numbers::pi;
+
+	for (auto const a: { -0.9_rad * pi, +0.9_rad * pi })
+	{
+		auto const x = normalized (SpaceVector { 1.0 * rand(), 1.0 * rand(), 1.0 * rand() });
+		auto const q = quaternion_rotation_about (x, a);
+
+		test_asserts::verify_equal_with_epsilon (std::format ("{} quaternion returns correct angle and always positive", a),
+												 angle (q), abs (a), 1e-9_rad);
+	}
+});
+
+
+AutoTest t3 ("Math: rotations with Matrix", []{
 	using std::numbers::pi;
 
 	test_asserts::verify_equal_with_epsilon ("rotation_vector (90_deg rotation) is π/2",
@@ -72,46 +109,112 @@ AutoTest t2 ("Math: rotations with Matrix", []{
 });
 
 
-AutoTest t3 ("Math: rotations: Matrix-Quaternion conversions", []{
-	// TODO
-});
-
-
 AutoTest t4 ("Math: random rotations fuzz", []{
 	using std::numbers::pi;
 
 	for (int i = 0; i < 1000; ++i)
 	{
-		auto const vec = normalized (SpaceLength { 1_m * rand(), 1_m * rand(), 1_m * rand() });
-		auto const angle = neutrino::renormalize (rand(), Range<double> (0, RAND_MAX), Range<si::Angle> (-2_rad * pi, +2_rad * pi));
-		auto const axis = normalized (SpaceVector { 1.0 * rand(), 1.0 * rand(), 1.0 * rand() });
-		auto const rotation = quaternion_rotation_about (axis, angle);
-		auto const rotation_m = RotationMatrix (rotation);
-		auto const rotation_vector = to_rotation_vector (rotation);
-		auto const rotation_vector_m = to_rotation_vector (rotation_m);
+		auto const vec = random_vector<double>();
+		auto const a = neutrino::renormalize (rand(), Range<double> (0, RAND_MAX), Range<si::Angle> (-1_rad * pi, +1_rad * pi));
+		auto const x = normalized (SpaceVector { 1.0 * rand(), 1.0 * rand(), 1.0 * rand() });
+		auto const q_rotation = quaternion_rotation_about (x, a);
+		auto const m_rotation = matrix_rotation_about (x, a);
+		auto const q_rotation_vector = to_rotation_vector (q_rotation);
+		auto const m_rotation_vector = to_rotation_vector (m_rotation);
+		// Since length of some random vectors can be very high, the required epsilon must be adjusted:
+		auto const epsilon = abs (vec) * 1e-14;
 
-		test_asserts::verify_equal_with_epsilon ("~rotation * (rotation * vec) == vec",
-												 ~rotation * (rotation * vec), vec, 1e-9_m);
-		test_asserts::verify_equal_with_epsilon ("inv (rotation) * (rotation * vec) == vec",
-												 math::inv (rotation) * (rotation * vec), vec, 1e-9_m);
-		test_asserts::verify_equal_with_epsilon ("-rotation rotates the same as +rotation",
-												 -rotation * vec, +rotation * vec, 1e-9_m);
-		test_asserts::verify_equal_with_epsilon ("to_rotation_quaternion (to_rotation_vector (q)) == q",
-												 to_rotation_quaternion (to_rotation_vector (rotation)), rotation, 1e-9);
-		test_asserts::verify_equal_with_epsilon ("to_rotation_vector (Quaterion) == to_rotation_vector (Matrix)",
-												 rotation_vector, rotation_vector_m, 1e-9_rad);
+		test_asserts::verify_equal_with_epsilon ("~q_rotation * (q_rotation * vec) == vec",
+												 ~q_rotation * (q_rotation * vec), vec, epsilon);
+		test_asserts::verify_equal_with_epsilon ("inv (q_rotation) * (q_rotation * vec) == vec",
+												 math::inv (q_rotation) * (q_rotation * vec), vec, epsilon);
+		test_asserts::verify_equal_with_epsilon ("-q_rotation rotates the same as +q_rotation",
+												 -q_rotation * vec, +q_rotation * vec, epsilon);
 
-		if (test_asserts::equal_with_epsilon (rotation_axis (rotation), axis, 1e-9))
+		// Make sure either Qa = Qb or Qa == -Qb, since they're equivalent:
+		if (!test_asserts::equal_with_epsilon (to_rotation_quaternion (to_rotation_vector (q_rotation)), q_rotation, epsilon))
 		{
-			test_asserts::verify_equal_with_epsilon ("rotation_angle() is correct",
-													 rotation_angle (rotation), angle, 1e-9_rad);
+			test_asserts::verify_equal_with_epsilon ("to_rotation_quaternion (to_rotation_vector (q)) == q",
+													 to_rotation_quaternion (to_rotation_vector (q_rotation)), -q_rotation, epsilon);
+		}
+
+		test_asserts::verify_equal_with_epsilon ("to_rotation_vector (Quaterion) == to_rotation_vector (Matrix)",
+												 q_rotation_vector, m_rotation_vector, si::Angle (epsilon));
+
+		// The axis must be the same or negated, but if it's negated then the angle must be (2 * pi - angle):
+		if (test_asserts::equal_with_epsilon (normalized_axis (q_rotation), x, epsilon))
+		{
+			test_asserts::verify_equal_with_epsilon ("normalized_axis() is correct",
+													 normalized_axis (q_rotation), x, epsilon);
+			test_asserts::verify_equal_with_epsilon ("angle() is correct",
+													 angle (q_rotation), a, si::Angle (epsilon));
 		}
 		else
 		{
-			test_asserts::verify_equal_with_epsilon ("rotation_axis() is correct",
-													 rotation_axis (rotation), -axis, 1e-9);
-			test_asserts::verify_equal_with_epsilon ("rotation_angle() is correct",
-													 rotation_angle (rotation), -angle, 1e-9_rad);
+			test_asserts::verify_equal_with_epsilon ("normalized_axis() is correct (negated quaternion)",
+													 normalized_axis (q_rotation), -x, epsilon);
+
+			// angle() always returns positive values, so be prepared for it:
+			if (a > 0_rad)
+			{
+				test_asserts::verify_equal_with_epsilon ("angle() is correct (negated quaternion, positive original angle)",
+														 angle (q_rotation), 2_rad * pi - a, si::Angle (epsilon));
+			}
+			else
+			{
+				test_asserts::verify_equal_with_epsilon ("angle() is correct (negated quaternion, negative original angle)",
+														 angle (q_rotation), -a, si::Angle (epsilon));
+			}
+		}
+	}
+});
+
+
+AutoTest t5 ("Math: fixed orientation helper rotations", []{
+	using xf::rigid_body::BodyCOM;
+	using xf::rigid_body::WorldSpace;
+
+	for (int i = 0; i < 100; ++i)
+	{
+		auto const position = SpaceLength<WorldSpace> { 1_m, 1_m, 1_m };
+		auto const placement_1 = Placement<WorldSpace, BodyCOM> (position, x_rotation_matrix<BodyCOM, WorldSpace> (0_deg));
+		auto placement_2 = Placement<WorldSpace, BodyCOM> (position, x_rotation_matrix<BodyCOM, WorldSpace> (90_deg));
+
+		auto const q_initial_relative_rotation = RotationQuaternion (relative_rotation (placement_1, placement_2));
+		auto const m_initial_relative_rotation = RotationMatrix<BodyCOM, BodyCOM> (q_initial_relative_rotation);
+
+		for (int j = 0; j < 100; ++j)
+		{
+			placement_2.rotate_body_frame (random_quaternion_rotation<WorldSpace, WorldSpace>());
+
+			RotationMatrix<BodyCOM, BodyCOM> const m_current_relative_rotation = relative_rotation (placement_1, placement_2);
+			auto const m_angle = angle (m_current_relative_rotation);
+			auto const m_axis = normalized_axis (m_current_relative_rotation);
+
+			RotationQuaternion<BodyCOM, BodyCOM> const q_current_relative_rotation = relative_rotation (placement_1, placement_2);
+			auto const q_angle = angle (q_current_relative_rotation);
+			auto const q_axis = normalized_axis (q_current_relative_rotation);
+
+			test_asserts::verify_equal_with_epsilon ("Matrix vs Quaternion: rotation angles are the same",
+													 m_angle, q_angle, 1e-9_rad);
+			test_asserts::verify_equal_with_epsilon ("Matrix vs Quaternion: rotation axes are the same",
+													 m_axis, q_axis, 1e-9);
+
+			for (auto k = 0; k < 10; ++k)
+			{
+				auto vec = normalized (random_vector<si::Length, BodyCOM>());
+				test_asserts::verify_equal_with_epsilon ("Matrix vs Quaternion: current relative rotations are the same",
+														 m_current_relative_rotation * vec, q_current_relative_rotation * vec, 1e-9_m);
+			}
+
+			RotationMatrix<BodyCOM, BodyCOM> const m_body_error = ~m_initial_relative_rotation * m_current_relative_rotation;
+			RotationQuaternion<BodyCOM, BodyCOM> const q_body_error = ~q_initial_relative_rotation * q_current_relative_rotation;
+
+			SpaceVector<si::Angle, WorldSpace> const m_world_error = placement_2.body_to_base_rotation() * to_rotation_vector (m_body_error);
+			SpaceVector<si::Angle, WorldSpace> const q_world_error = placement_2.body_to_base_rotation() * to_rotation_vector (q_body_error);
+
+			test_asserts::verify_equal_with_epsilon ("Matrix relative rotations == Quaternion relative rotations",
+													 m_world_error, q_world_error, 1e-9_rad);
 		}
 	}
 });

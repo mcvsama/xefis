@@ -327,16 +327,6 @@ template<class BaseSpace>
 		return from.base_to_body_rotation() * to.body_to_base_rotation();
 	}
 
-
-template<class Target, class Source>
-	[[nodiscard]]
-	inline auto
-	relative_rotation (RotationMatrix<Target, Source> const& from, RotationMatrix<Target, Source> const& to)
-	{
-		// Divide the "from" rotation matrix by the "to" rotation matrix (mutiply by inversion):
-		return from * ~to;
-	}
-
 } // namespace xf
 
 #endif
