@@ -62,7 +62,7 @@ ImpulseSolver::evolve (si::Time const dt)
 	update_acceleration_moments();
 	update_velocity_moments (dt);
 	update_placements (dt);
-	orthonormalize_rotation_matrices();
+	normalize_rotations();
 
 	for (auto& body: _system.bodies())
 		body->evolve (dt);
@@ -319,14 +319,14 @@ ImpulseSolver::update_placements (si::Time dt)
 
 
 void
-ImpulseSolver::orthonormalize_rotation_matrices()
+ImpulseSolver::normalize_rotations()
 {
 	// Once in a while orthonormalize rotation matrices in bodies:
 	if (!_system.bodies().empty())
 	{
 		auto& body = _system.bodies()[_processed_frames % _system.bodies().size()];
 		auto pl = body->placement();
-		pl.set_body_to_base_rotation (vector_normalized (orthogonalized (pl.body_to_base_rotation())));
+		pl.set_body_to_base_rotation (normalized (pl.body_to_base_rotation()));
 		body->set_placement (pl);
 	}
 }

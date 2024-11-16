@@ -134,7 +134,7 @@ class ImpulseSolver: private Noncopyable
 	update_placements (si::Time dt);
 
 	void
-	orthonormalize_rotation_matrices();
+	normalize_rotations();
 
 	template<class Space>
 		void
