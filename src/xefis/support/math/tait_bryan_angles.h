@@ -78,7 +78,7 @@ struct TaitBryanAngles: public SpaceVector<si::Angle>
 };
 
 
-[[nodiscard]]
+[[nodiscard, deprecated]]
 inline TaitBryanAngles
 tait_bryan_angles (RotationMatrix<ECEFSpace, AirframeSpace> const& body_coordinates, si::LonLat const& position)
 {

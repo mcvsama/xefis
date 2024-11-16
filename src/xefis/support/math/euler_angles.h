@@ -52,7 +52,7 @@ struct EulerAngles: public SpaceVector<si::Angle>
 
 
 template<math::CoordinateSystem SourceSpace1, math::CoordinateSystem SourceSpace2>
-	[[nodiscard]]
+	[[nodiscard, deprecated]]
 	inline EulerAngles
 	euler_angles (RotationMatrix<SourceSpace1, SourceSpace2> const& matrix)
 	{
@@ -72,11 +72,11 @@ template<math::CoordinateSystem SourceSpace1, math::CoordinateSystem SourceSpace
 		auto const [qw, qx, qy, qz] = quaternion.components();
 
 		// <https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Quaternion_to_Euler_angles_(in_3-2-1_sequence)_conversion>
-		auto const phi = 1_rad * atan2 (2 * (qw * qx + qy * qz), 1 - 2 * (square (qx) + square (qy)));
-		auto const theta = 1_rad * (-0.5 * pi + 2 * (atan2 (sqrt (1 + 2 * (qw * qy - qx * qz)), sqrt (1 - 2 * (qw * qy - qx * qz)))));
-		auto const psi = 1_rad * atan2 (2 * (qw * qz + qx * qy), 1 - 2 * (square (qy) + square (qz)));
+		auto const roll = 1_rad * (-0.5 * pi + 2 * (atan2 (sqrt (1 + 2 * (qw * qy - qx * qz)), sqrt (1 - 2 * (qw * qy - qx * qz)))));
+		auto const pitch = 1_rad * atan2 (2 * (qw * qx + qy * qz), 1 - 2 * (square (qx) + square (qy)));
+		auto const heading = 1_rad * atan2 (2 * (qw * qz + qx * qy), 1 - 2 * (square (qy) + square (qz)));
 
-		return { theta, phi, psi };
+		return { roll, pitch, heading };
 	}
 
 
@@ -96,10 +96,10 @@ template<math::CoordinateSystem TargetSpace1, math::CoordinateSystem TargetSpace
 
 /**
  * Return a set of Euler angles as difference in rotation between two bases.
- * Order of vector columns in resulting matrix: pitch, roll, yaw.
+ * Order of vector columns in resulting matrix: roll, pitch, yaw.
  */
 template<math::CoordinateSystem TargetSpace1, math::CoordinateSystem TargetSpace2, math::CoordinateSystem SourceSpace1, math::CoordinateSystem SourceSpace2>
-	[[nodiscard]]
+	[[nodiscard, deprecated]]
 	inline EulerAngles
 	euler_angle_difference (RotationMatrix<TargetSpace1, SourceSpace1> const& base_a, RotationMatrix<TargetSpace2, SourceSpace2> const& base_b)
 	{
@@ -112,16 +112,13 @@ template<math::CoordinateSystem TargetSpace1, math::CoordinateSystem TargetSpace
 		auto const x3 = base_b.column (0); // Heading
 		auto const y3 = base_b.column (1); // Pitch
 
-		// Heading:
-		auto const psi = 1_rad * atan2 (dot_product (x3, y0), dot_product (x3, x0));
-		// Pitch:
-		auto const theta = 1_rad * atan2 (dot_product (-x3, z0), sqrt (square (dot_product (x3, x0)) + square (dot_product (x3, y0))));
-		// Roll:
-		auto const y2 = rotation_about (z0, psi) * y0;
-		auto const z2 = rotation_about (y2, theta) * z0;
-		auto const phi = 1_rad * atan2 (dot_product (y3, z2), dot_product (y3, y2));
+		auto const heading = 1_rad * atan2 (dot_product (x3, y0), dot_product (x3, x0));
+		auto const roll = 1_rad * atan2 (dot_product (-x3, z0), sqrt (square (dot_product (x3, x0)) + square (dot_product (x3, y0))));
+		auto const y2 = rotation_about (z0, heading) * y0;
+		auto const z2 = rotation_about (y2, roll) * z0;
+		auto const pitch = 1_rad * atan2 (dot_product (y3, z2), dot_product (y3, y2));
 
-		return { theta, phi, psi };
+		return { roll, pitch, heading };
 	}
 
 } // namespace xf
