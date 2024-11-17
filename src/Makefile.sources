@@ -278,7 +278,6 @@ MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/instrument/text
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/instrument/text_painter.h
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/math/concepts.h
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/math/coordinate_systems.h
-MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/math/euler_angles.h
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/math/geometry.h
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/math/lonlat_radius.h
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/math/matrix_rotations.h
