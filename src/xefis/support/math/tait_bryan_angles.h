@@ -29,8 +29,8 @@ namespace xf {
 // Using Airplane-coordinates.
 struct TaitBryanAnglesParams
 {
-	si::Angle	roll;	// About Y (right wing)
-	si::Angle	pitch;	// About X (forward)
+	si::Angle	roll;	// About X in aircraft coordinates (forward)
+	si::Angle	pitch;	// About Y in aircraft coordinates (right wing)
 	si::Angle	yaw;	// About Z (down)
 };
 
