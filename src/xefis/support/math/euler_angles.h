@@ -38,11 +38,11 @@ struct EulerAngles: public SpaceVector<si::Angle>
 	{ }
 
 	constexpr auto
-	alpha() const noexcept
+	gamma() const noexcept
 		{ return (*this)[0]; }
 
 	constexpr auto
-	gamma() const noexcept
+	alpha() const noexcept
 		{ return (*this)[1]; }
 
 	constexpr auto
@@ -73,7 +73,7 @@ template<math::CoordinateSystem SourceSpace1, math::CoordinateSystem SourceSpace
 
 /**
  * Return a set of Euler angles as difference in rotation between two bases.
- * Order of vector columns in resulting matrix: pitch, roll, yaw.
+ * Order of vector columns in resulting matrix: roll, pitch, yaw.
  */
 template<math::CoordinateSystem TargetSpace1, math::CoordinateSystem TargetSpace2, math::CoordinateSystem SourceSpace1, math::CoordinateSystem SourceSpace2>
 	[[nodiscard]]
