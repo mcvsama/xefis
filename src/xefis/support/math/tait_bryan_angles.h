@@ -16,7 +16,6 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/support/math/euler_angles.h>
 #include <xefis/support/math/geometry.h>
 #include <xefis/support/math/placement.h>
 #include <xefis/support/math/transforms.h>
