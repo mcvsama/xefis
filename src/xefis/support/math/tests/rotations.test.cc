@@ -98,18 +98,83 @@ AutoTest t2 ("Math: rotations with Quaternion (angle range π…2π)", []{
 });
 
 
-AutoTest t3 ("Math: rotations with Matrix", []{
+AutoTest t3 ("Math: composing quaternion rotations", []{
+	for (int i = 0; i < 1000; ++i)
+	{
+		auto const vec = random_vector();
+		auto const q1 = random_quaternion_rotation();
+		auto const q2 = random_quaternion_rotation();
+		auto const q3 = random_quaternion_rotation();
+		auto const epsilon = abs (vec) * 1e-14;
+
+		test_asserts::verify_equal_with_epsilon ("(q1 * q2) * vec == q1 * (q2 * vec)",
+												 (q1 * q2) * vec,
+												 q1 * (q2 * vec),
+												 epsilon);
+		test_asserts::verify_equal_with_epsilon ("(q1 * ~q2) * vec == q1 * (~q2 * vec)",
+												 (q1 * ~q2) * vec,
+												 q1 * (~q2 * vec),
+												 epsilon);
+		test_asserts::verify_equal_with_epsilon ("((q1 * q2) * q3) * vec == (q1 * (q2 * q3)) * vec",
+												 ((q1 * q2) * q3) * vec,
+												 (q1 * (q2 * q3)) * vec,
+												 epsilon);
+		test_asserts::verify_equal_with_epsilon ("to_rotation_vector ((q1 * q2) * q3) == to_rotation_vector (q1 * (q2 * q3))",
+												 to_rotation_vector ((q1 * q2) * q3),
+												 to_rotation_vector (q1 * (q2 * q3)),
+												 1_rad * epsilon);
+	}
+});
+
+
+AutoTest t4 ("Math: Quaternion-Matrix compatibility", []{
 	using std::numbers::pi;
 
 	test_asserts::verify_equal_with_epsilon ("rotation_vector (90_deg rotation) is π/2",
 											 to_rotation_vector (z_rotation_matrix (+90_deg)),
 											 SpaceVector<si::Angle> { 0_rad, 0_rad, 0.5_rad * pi },
 											 1e-9_rad);
-	// TODO 270°
+
+	for (int i = 0; i < 1000; ++i)
+	{
+		auto const vec = random_vector();
+		auto const q1 = random_quaternion_rotation();
+		auto const q2 = random_quaternion_rotation();
+		auto const q3 = random_quaternion_rotation();
+		auto const m1 = RotationMatrix (q1);
+		auto const m2 = RotationMatrix (q2);
+		auto const m3 = RotationMatrix (q3);
+		auto const epsilon = abs (vec) * 1e-14;
+
+		test_asserts::verify_equal_with_epsilon ("(1)",
+												 (q1 * m2) * vec,
+												 q1 * (m2 * vec),
+												 epsilon);
+		test_asserts::verify_equal_with_epsilon ("(2)",
+												 (q1 * q2) * vec,
+												 m1 * (q2 * vec),
+												 epsilon);
+		test_asserts::verify_equal_with_epsilon ("(3)",
+												 ((q1 * q2) * q3) * vec,
+												 m1 * ((q2 * q3) * vec),
+												 epsilon);
+		test_asserts::verify_equal_with_epsilon ("(4)",
+												 ((q1 * q2) * q3) * vec,
+												 (m1 * (m2 * m3)) * vec,
+												 epsilon);
+		test_asserts::verify_equal_with_epsilon ("(5)",
+												 to_rotation_vector ((q1 * q2) * m3),
+												 to_rotation_vector (q1 * (q2 * m3)),
+												 1_rad * epsilon);
+		test_asserts::verify_equal_with_epsilon ("(6)",
+												 to_rotation_vector ((q1 * q2) * q3),
+												 to_rotation_vector (m1 * (m2 * m3)),
+												 1_rad * epsilon);
+	}
 });
 
 
-AutoTest t4 ("Math: random rotations fuzz", []{
+AutoTest t5 ("Math: random rotations fuzz", []{
 	using std::numbers::pi;
 
 	for (int i = 0; i < 1000; ++i)
@@ -170,7 +235,7 @@ AutoTest t4 ("Math: random rotations fuzz", []{
 });
 
 
-AutoTest t5 ("Math: fixed orientation helper rotations", []{
+AutoTest t6 ("Math: fixed orientation helper rotations", []{
 	using xf::rigid_body::BodyCOM;
 	using xf::rigid_body::WorldSpace;
 
