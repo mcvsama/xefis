@@ -31,8 +31,24 @@ class TaitBryanAngles;
 
 
 [[nodiscard]]
-RotationQuaternion<ECEFSpace, AirframeSpace>
-airframe_to_ecef_rotation (TaitBryanAngles const& angles, si::LonLat const& position);
+RotationMatrix<ECEFSpace, AirframeSpace>
+airframe_to_ecef_rotation_matrix (TaitBryanAngles const& angles, si::LonLat const& position);
+
+
+[[nodiscard]]
+inline RotationQuaternion<ECEFSpace, AirframeSpace>
+airframe_to_ecef_rotation (TaitBryanAngles const& angles, si::LonLat const& position)
+{
+	return RotationQuaternion (airframe_to_ecef_rotation_matrix (angles, position));
+}
+
+
+[[nodiscard]]
+inline RotationMatrix<ECEFSpace, AirframeSpace>
+airframe_to_ecef_rotation_matrix (TaitBryanAngles const& angles, SpaceVector<si::Length, ECEFSpace> const& position)
+{
+	return airframe_to_ecef_rotation_matrix (angles, polar (position));
+}
 
 
 [[nodiscard]]
@@ -44,8 +60,24 @@ airframe_to_ecef_rotation (TaitBryanAngles const& angles, SpaceVector<si::Length
 
 
 [[nodiscard]]
-RotationQuaternion<NEDSpace, ECEFSpace>
-ecef_to_ned_rotation (si::LonLat const& position);
+RotationMatrix<NEDSpace, ECEFSpace>
+ecef_to_ned_rotation_matrix (si::LonLat const& position);
+
+
+[[nodiscard]]
+inline RotationQuaternion<NEDSpace, ECEFSpace>
+ecef_to_ned_rotation (si::LonLat const& position)
+{
+	return RotationQuaternion (ecef_to_ned_rotation_matrix (position));
+}
+
+
+[[nodiscard]]
+inline RotationMatrix<NEDSpace, ECEFSpace>
+ecef_to_ned_rotation_matrix (SpaceVector<si::Length, ECEFSpace> const& position)
+{
+	return ecef_to_ned_rotation_matrix (polar (position));
+}
 
 
 [[nodiscard]]
@@ -53,6 +85,14 @@ inline RotationQuaternion<NEDSpace, ECEFSpace>
 ecef_to_ned_rotation (SpaceVector<si::Length, ECEFSpace> const& position)
 {
 	return ecef_to_ned_rotation (polar (position));
+}
+
+
+[[nodiscard]]
+inline RotationMatrix<NEDSpace, AirframeSpace>
+airframe_to_ned_rotation_matrix (Placement<ECEFSpace, AirframeSpace> const& pr)
+{
+	return ecef_to_ned_rotation_matrix (pr.position()) * RotationMatrix (pr.body_to_base_rotation());
 }
 
 

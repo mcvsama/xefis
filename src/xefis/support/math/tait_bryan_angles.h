@@ -100,7 +100,7 @@ tait_bryan_angles (RotationQuaternion<ECEFSpace, AirframeSpace> const& body_rota
 inline TaitBryanAngles
 tait_bryan_angles (RotationMatrix<ECEFSpace, AirframeSpace> const& body_coordinates, SpaceVector<si::Length, ECEFSpace> const& position)
 {
-	return tait_bryan_angles (body_coordinates, polar (position));
+	return tait_bryan_angles (RotationQuaternion (body_coordinates), polar (position));
 }
 
 

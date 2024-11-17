@@ -24,8 +24,20 @@
 
 namespace xf {
 
-RotationQuaternion<NEDSpace, ECEFSpace>
-ecef_to_ned_rotation (si::LonLat const& position)
+RotationMatrix <ECEFSpace, AirframeSpace>
+airframe_to_ecef_rotation_matrix (TaitBryanAngles const& angles, si::LonLat const& position)
+{
+	RotationMatrix<NEDSpace, ECEFSpace> const ned0 = ecef_to_ned_rotation_matrix (position);
+	RotationMatrix<NEDSpace, ECEFSpace> const ned1 = matrix_rotation_about (down_vector (ned0), angles.yaw()) * ned0;
+	RotationMatrix<NEDSpace, ECEFSpace> const ned2 = matrix_rotation_about (east_vector (ned1), angles.pitch()) * ned1;
+	RotationMatrix<NEDSpace, ECEFSpace> const ned3 = matrix_rotation_about (north_vector (ned2), angles.roll()) * ned2;
+
+	return math::reframe<ECEFSpace, AirframeSpace> (ned3);
+}
+
+
+RotationMatrix<NEDSpace, ECEFSpace>
+ecef_to_ned_rotation_matrix (si::LonLat const& position)
 {
 	SpaceVector<double, NEDSpace> const n0 = north_vector (EquatorPrimeMeridian);
 	SpaceVector<double, NEDSpace> const e0 = east_vector (EquatorPrimeMeridian);
@@ -33,19 +45,7 @@ ecef_to_ned_rotation (si::LonLat const& position)
 	SpaceVector<double, NEDSpace> const n1 = rotation_about (e1, -position.lat()) * n0;
 	SpaceVector<double, NEDSpace> const d1 = cross_product (n1, e1);
 
-	return RotationMatrix<NEDSpace, ECEFSpace> { n1, e1, d1 };
-}
-
-
-RotationQuaternion<ECEFSpace, AirframeSpace>
-airframe_to_ecef_rotation (TaitBryanAngles const& angles, si::LonLat const& position)
-{
-	RotationQuaternion<NEDSpace, ECEFSpace> const ned0 = ecef_to_ned_rotation (position);
-	RotationQuaternion<NEDSpace, ECEFSpace> const ned1 = quaternion_rotation_about<NEDSpace> (down_vector (ned0), angles.yaw()) * ned0;
-	RotationQuaternion<NEDSpace, ECEFSpace> const ned2 = quaternion_rotation_about<NEDSpace> (east_vector (ned1), angles.pitch()) * ned1;
-	RotationQuaternion<NEDSpace, ECEFSpace> const ned3 = quaternion_rotation_about<NEDSpace> (north_vector (ned2), angles.roll()) * ned2;
-
-	return RotationQuaternion<ECEFSpace, NEDSpace> (math::identity) * ned3 * RotationQuaternion<ECEFSpace, AirframeSpace> (math::identity);
+	return { n1, e1, d1 };
 }
 
 } // namespace xf

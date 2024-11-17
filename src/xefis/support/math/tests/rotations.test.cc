@@ -177,8 +177,8 @@ AutoTest t5 ("Math: fixed orientation helper rotations", []{
 	for (int i = 0; i < 100; ++i)
 	{
 		auto const position = SpaceLength<WorldSpace> { 1_m, 1_m, 1_m };
-		auto const placement_1 = Placement<WorldSpace, BodyCOM> (position, x_rotation_matrix<BodyCOM, WorldSpace> (0_deg));
-		auto placement_2 = Placement<WorldSpace, BodyCOM> (position, x_rotation_matrix<BodyCOM, WorldSpace> (90_deg));
+		auto const placement_1 = Placement<WorldSpace, BodyCOM> (position, x_rotation<BodyCOM, WorldSpace> (0_deg));
+		auto placement_2 = Placement<WorldSpace, BodyCOM> (position, x_rotation<BodyCOM, WorldSpace> (90_deg));
 
 		auto const q_initial_relative_rotation = relative_rotation (placement_1, placement_2);
 		auto const m_initial_relative_rotation = RotationMatrix<BodyCOM, BodyCOM> (q_initial_relative_rotation);
@@ -187,7 +187,7 @@ AutoTest t5 ("Math: fixed orientation helper rotations", []{
 		{
 			placement_2.rotate_body_frame (random_quaternion_rotation<WorldSpace, WorldSpace>());
 
-			RotationMatrix<BodyCOM, BodyCOM> const m_current_relative_rotation = relative_rotation (placement_1, placement_2);
+			RotationMatrix<BodyCOM, BodyCOM> const m_current_relative_rotation = RotationMatrix (relative_rotation (placement_1, placement_2));
 			auto const m_angle = angle (m_current_relative_rotation);
 			auto const m_axis = normalized_axis (m_current_relative_rotation);
 
