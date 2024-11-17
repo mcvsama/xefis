@@ -35,7 +35,7 @@ namespace {
 using namespace neutrino::si;
 
 
-template<math::CoordinateSystem TS, math::CoordinateSystem SS>
+template<math::CoordinateSystem TS = void, math::CoordinateSystem SS = void>
 	auto
 	random_quaternion_rotation()
 	{
@@ -48,7 +48,7 @@ template<math::CoordinateSystem TS, math::CoordinateSystem SS>
 	};
 
 
-template<math::Scalar S, math::CoordinateSystem Space = void>
+template<math::Scalar S = double, math::CoordinateSystem Space = void>
 	auto
 	random_vector()
 	{
@@ -114,7 +114,7 @@ AutoTest t4 ("Math: random rotations fuzz", []{
 
 	for (int i = 0; i < 1000; ++i)
 	{
-		auto const vec = random_vector<double>();
+		auto const vec = random_vector();
 		auto const a = neutrino::renormalize (rand(), Range<double> (0, RAND_MAX), Range<si::Angle> (-1_rad * pi, +1_rad * pi));
 		auto const x = normalized (SpaceVector { 1.0 * rand(), 1.0 * rand(), 1.0 * rand() });
 		auto const q_rotation = quaternion_rotation_about (x, a);
