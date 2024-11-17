@@ -45,7 +45,7 @@ airframe_to_ecef_rotation (TaitBryanAngles const& angles, si::LonLat const& posi
 	RotationQuaternion<NEDSpace, ECEFSpace> const ned2 = quaternion_rotation_about<NEDSpace> (east_vector (ned1), angles.pitch()) * ned1;
 	RotationQuaternion<NEDSpace, ECEFSpace> const ned3 = quaternion_rotation_about<NEDSpace> (north_vector (ned2), angles.roll()) * ned2;
 
-	return RotationQuaternion<ECEFSpace, NEDSpace> { math::unit } * ned3 * RotationQuaternion<ECEFSpace, AirframeSpace> { math::unit };
+	return RotationQuaternion<ECEFSpace, NEDSpace> (math::identity) * ned3 * RotationQuaternion<ECEFSpace, AirframeSpace> (math::identity);
 }
 
 } // namespace xf
