@@ -78,16 +78,6 @@ struct TaitBryanAngles: public SpaceVector<si::Angle>
 };
 
 
-[[nodiscard, deprecated]]
-inline TaitBryanAngles
-tait_bryan_angles (RotationMatrix<ECEFSpace, AirframeSpace> const& body_coordinates, si::LonLat const& position)
-{
-	auto const diff = euler_angle_difference (math::reframe<void, void> (RotationMatrix<NEDSpace, ECEFSpace> { ecef_to_ned_rotation (position) }),
-											  math::reframe<void, void> (RotationMatrix<ECEFSpace, AirframeSpace> { body_coordinates }));
-	return TaitBryanAngles (diff);
-}
-
-
 [[nodiscard]]
 inline TaitBryanAngles
 tait_bryan_angles (RotationQuaternion<ECEFSpace, AirframeSpace> const& body_rotation, si::LonLat const& position)

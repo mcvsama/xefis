@@ -52,15 +52,6 @@ struct EulerAngles: public SpaceVector<si::Angle>
 
 
 template<math::CoordinateSystem SourceSpace1, math::CoordinateSystem SourceSpace2>
-	[[nodiscard, deprecated]]
-	inline EulerAngles
-	euler_angles (RotationMatrix<SourceSpace1, SourceSpace2> const& matrix)
-	{
-		return euler_angle_difference (RotationMatrix<SourceSpace1, SourceSpace2> (math::identity), matrix);
-	}
-
-
-template<math::CoordinateSystem SourceSpace1, math::CoordinateSystem SourceSpace2>
 	[[nodiscard]]
 	inline EulerAngles
 	euler_angles (RotationQuaternion<SourceSpace1, SourceSpace2> const& quaternion)
@@ -91,34 +82,6 @@ template<math::CoordinateSystem TargetSpace1, math::CoordinateSystem TargetSpace
 							RotationQuaternion<TargetSpace2, SourceSpace2> const& base_b)
 	{
 		return euler_angles (base_b / base_a);
-	}
-
-
-/**
- * Return a set of Euler angles as difference in rotation between two bases.
- * Order of vector columns in resulting matrix: roll, pitch, yaw.
- */
-template<math::CoordinateSystem TargetSpace1, math::CoordinateSystem TargetSpace2, math::CoordinateSystem SourceSpace1, math::CoordinateSystem SourceSpace2>
-	[[nodiscard, deprecated]]
-	inline EulerAngles
-	euler_angle_difference (RotationMatrix<TargetSpace1, SourceSpace1> const& base_a, RotationMatrix<TargetSpace2, SourceSpace2> const& base_b)
-	{
-		using std::atan2;
-		using std::sqrt;
-
-		auto const x0 = base_a.column (0); // Heading
-		auto const y0 = base_a.column (1); // Pitch
-		auto const z0 = base_a.column (2); // Roll
-		auto const x3 = base_b.column (0); // Heading
-		auto const y3 = base_b.column (1); // Pitch
-
-		auto const heading = 1_rad * atan2 (dot_product (x3, y0), dot_product (x3, x0));
-		auto const roll = 1_rad * atan2 (dot_product (-x3, z0), sqrt (square (dot_product (x3, x0)) + square (dot_product (x3, y0))));
-		auto const y2 = rotation_about (z0, heading) * y0;
-		auto const z2 = rotation_about (y2, roll) * z0;
-		auto const pitch = 1_rad * atan2 (dot_product (y3, z2), dot_product (y3, y2));
-
-		return { roll, pitch, heading };
 	}
 
 } // namespace xf
