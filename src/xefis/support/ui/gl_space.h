@@ -327,9 +327,9 @@ GLSpace::rotate (RotationMatrix<auto, auto> const& r)
 
 
 inline void
-GLSpace::rotate (si::Angle const angle, SpaceVector<double, auto> const& axis)
+GLSpace::rotate (si::Angle const angle, SpaceVector<double, auto> const& normalized_axis)
 {
-	rotate (angle, axis.x(), axis.y(), axis.z());
+	rotate (angle, normalized_axis.x(), normalized_axis.y(), normalized_axis.z());
 }
 
 
