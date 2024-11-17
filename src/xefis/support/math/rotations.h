@@ -68,6 +68,9 @@ template<math::CoordinateSystem TargetSpace = void, math::CoordinateSystem Sourc
 	}
 
 
+template<math::CoordinateSystem TargetSpace = void, math::CoordinateSystem SourceSpace = TargetSpace>
+	static auto const kNoRotation		= RotationQuaternion<TargetSpace, SourceSpace> (math::identity);
+
 template<math::CoordinateSystem TargetSpace, math::CoordinateSystem SourceSpace>
 	static auto const kXRotationPlus45	= x_rotation<TargetSpace, SourceSpace> (45_deg);
 

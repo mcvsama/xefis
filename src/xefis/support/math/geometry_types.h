@@ -63,9 +63,6 @@ template<math::CoordinateSystem TargetSpace = void, math::CoordinateSystem Sourc
 template<math::CoordinateSystem TargetSpace = void, math::CoordinateSystem SourceSpace = TargetSpace>
 	using RotationQuaternion = math::Quaternion<double, TargetSpace, SourceSpace>;
 
-template<math::CoordinateSystem TargetSpace = void, math::CoordinateSystem SourceSpace = TargetSpace>
-	RotationMatrix<TargetSpace, SourceSpace> const kNoRotation = math::unit;
-
 /*
  * Physical stuff
  */
