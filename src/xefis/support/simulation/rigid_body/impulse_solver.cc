@@ -35,10 +35,12 @@ ImpulseSolver::ImpulseSolver (System& system, uint32_t const max_iterations):
 
 
 void
-ImpulseSolver::set_required_precision (std::optional<si::Force> const force, std::optional<si::Torque> const torque)
+ImpulseSolver::set_required_precision (si::Force const force, si::Torque const torque)
 {
-	_required_force_precision = force;
-	_required_torque_precision = torque;
+	_required_force_torque_precision = ForceTorque {
+		.force = force,
+		.torque = torque,
+	};
 }
 
 
@@ -163,7 +165,7 @@ ImpulseSolver::update_constraint_forces (si::Time const dt)
 
 	for (iteration = 0; iteration < _max_iterations && !precise_enough; ++iteration)
 	{
-		precise_enough = true;
+		precise_enough = _required_force_torque_precision.has_value();
 
 		// Reset constraint forces:
 		for (auto& body: _system.bodies())
@@ -188,26 +190,22 @@ ImpulseSolver::update_constraint_forces (si::Time const dt)
 																				  fc2.velocity_moments, total_ext_forces_2,
 																				  dt);
 
-                    if (auto prev = constraint->previous_calculation_force_moments())
-                    {
-						if (_required_force_precision)
+					if (_required_force_torque_precision)
+					{
+						if (auto prev = constraint->previous_calculation_force_moments())
 						{
 							auto const dF = abs (constraint_forces[0].force() - prev->force());
-
-							if (dF > *_required_force_precision)
-								precise_enough = false;
-						}
-
-						if (_required_torque_precision)
-						{
 							auto const dT = abs (constraint_forces[0].torque() - prev->torque());
 
-							if (dT > *_required_torque_precision)
+							if (dF > _required_force_torque_precision->force)
+								precise_enough = false;
+
+							if (dT > _required_force_torque_precision->torque)
 								precise_enough = false;
 						}
-                    }
-                    else
-                        precise_enough = false;
+						else
+							precise_enough = false;
+					}
 
                     constraint->previous_calculation_force_moments() = constraint_forces[0];
 

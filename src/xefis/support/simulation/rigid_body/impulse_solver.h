@@ -70,6 +70,12 @@ class ImpulseSolver: private Noncopyable
 {
 	static constexpr size_t kDefaultMaxIterations { 1000 };
 
+	struct ForceTorque
+	{
+		si::Force	force;
+		si::Torque	torque;
+	};
+
   public:
 	/**
 	 */
@@ -93,8 +99,8 @@ class ImpulseSolver: private Noncopyable
 	/**
 	 * Set required precision for calculated force moments of constraints.
 	 */
-	 void
-	 set_required_precision (std::optional<si::Force>, std::optional<si::Torque>);
+	void
+	set_required_precision (si::Force, si::Torque);
 
 	/**
 	 * Evolve the system physically by given Δt.
@@ -149,8 +155,7 @@ class ImpulseSolver: private Noncopyable
 	std::optional<Limits>		_limits;
 	size_t						_max_iterations		{ kDefaultMaxIterations };
 	uint64_t					_processed_frames	{ 0 };
-	std::optional<si::Force>	_required_force_precision;
-	std::optional<si::Torque>	_required_torque_precision;
+	std::optional<ForceTorque>	_required_force_torque_precision;
 };
 
 
