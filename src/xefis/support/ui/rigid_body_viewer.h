@@ -166,7 +166,7 @@ class RigidBodyViewer: public GLAnimationWidget
 		{ return _position; }
 
 	/**
-	 * Return current camera rotation about the X axis.
+	 * Return current camera rotation about the X axis in screen coordinates.
 	 */
 	[[nodiscard]]
 	si::Angle
@@ -174,7 +174,7 @@ class RigidBodyViewer: public GLAnimationWidget
 		{ return _x_angle; }
 
 	/**
-	 * Return current camera rotation about the Y axis.
+	 * Return current camera rotation about the Y axis in screen coordinates.
 	 */
 	[[nodiscard]]
 	si::Angle
