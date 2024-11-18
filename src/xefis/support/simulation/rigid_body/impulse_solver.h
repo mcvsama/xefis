@@ -133,6 +133,13 @@ class ImpulseSolver: private Noncopyable
 	EvolutionDetails
 	update_constraint_forces (si::Time dt);
 
+	/**
+	 * Return true if this constraint is solved withing required precision.
+	 */
+	[[nodiscard]]
+	bool
+	update_single_constraint_forces (Constraint*, si::Time dt);
+
 	static AccelerationMoments<WorldSpace>
 	acceleration_moments (Body const&, ForceMoments<WorldSpace> const&);
 
