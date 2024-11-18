@@ -356,7 +356,7 @@ make_airfoil_shape (AirfoilShapeParameters const& params)
 		SpaceVector<double, BodyOrigin> const k_towards_next = SpaceVector<double, BodyOrigin> (next_point[0], next_point[1], 0) - SpaceVector<double, BodyOrigin> (point[0], point[1], 0);
 		SpaceVector<double, BodyOrigin> const normal_with_prev (cross_product (z_versor, k_towards_prev));
 		SpaceVector<double, BodyOrigin> const normal_with_next (cross_product (k_towards_next, z_versor));
-		SpaceVector<double, BodyOrigin> const normal = normalized (normal_with_prev + normal_with_next);
+		SpaceVector<double, BodyOrigin> const normal = (normal_with_prev + normal_with_next).normalized();
 
 		strip.emplace_back (p1, normal, params.material);
 		strip.emplace_back (p2, normal, params.material);

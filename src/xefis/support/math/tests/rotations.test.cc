@@ -42,7 +42,7 @@ template<math::CoordinateSystem TS = void, math::CoordinateSystem SS = void>
 		using std::numbers::pi;
 
 		auto const angle = neutrino::renormalize (rand(), Range<double> (0, RAND_MAX), Range<si::Angle> (-2_rad * pi, +2_rad * pi));
-		auto const axis = normalized (SpaceVector<double, TS> { 1.0 * rand(), 1.0 * rand(), 1.0 * rand() });
+		auto const axis = SpaceVector<double, TS> { 1.0 * rand(), 1.0 * rand(), 1.0 * rand() }.normalized();
 
 		return quaternion_rotation_about<TS, SS> (axis, angle);
 	};
@@ -89,7 +89,7 @@ AutoTest t2 ("Math: rotations with Quaternion (angle range π…2π)", []{
 
 	for (auto const a: { -0.9_rad * pi, +0.9_rad * pi })
 	{
-		auto const x = normalized (SpaceVector { 1.0 * rand(), 1.0 * rand(), 1.0 * rand() });
+		auto const x = SpaceVector { 1.0 * rand(), 1.0 * rand(), 1.0 * rand() }.normalized();
 		auto const q = quaternion_rotation_about (x, a);
 
 		test_asserts::verify_equal_with_epsilon (std::format ("{} quaternion returns correct angle and always positive", a),
@@ -181,7 +181,7 @@ AutoTest t5 ("Math: random rotations fuzz", []{
 	{
 		auto const vec = random_vector();
 		auto const a = neutrino::renormalize (rand(), Range<double> (0, RAND_MAX), Range<si::Angle> (-1_rad * pi, +1_rad * pi));
-		auto const x = normalized (SpaceVector { 1.0 * rand(), 1.0 * rand(), 1.0 * rand() });
+		auto const x = SpaceVector { 1.0 * rand(), 1.0 * rand(), 1.0 * rand() }.normalized();
 		auto const q_rotation = quaternion_rotation_about (x, a);
 		auto const m_rotation = matrix_rotation_about (x, a);
 		auto const q_rotation_vector = to_rotation_vector (q_rotation);
@@ -267,7 +267,7 @@ AutoTest t6 ("Math: fixed orientation helper rotations", []{
 
 			for (auto k = 0; k < 10; ++k)
 			{
-				auto vec = normalized (random_vector<si::Length, BodyCOM>());
+				auto vec = random_vector<si::Length, BodyCOM>().normalized();
 				test_asserts::verify_equal_with_epsilon ("Matrix vs Quaternion: current relative rotations are the same",
 														 m_current_relative_rotation * vec, q_current_relative_rotation * vec, 1e-9_m);
 			}

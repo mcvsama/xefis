@@ -126,7 +126,7 @@ ImpulseSolver::update_gravitational_forces (Body& b1, Body& b2)
 		r_unsafe_abs < minimum_distance
 			? r_unsafe_abs < zero_distance
 				? SpaceLength<WorldSpace> { minimum_distance, 0_m, 0_m }
-				: normalized (r_unsafe) * minimum_distance / 1_m
+				: r_unsafe.normalized() * minimum_distance / 1_m
 			: r_unsafe;
 	auto const r_abs = abs (r);
 	auto const gravitational_force = kGravitationalConstant * m1 * m2 * r / (r_abs * r_abs * r_abs);
@@ -326,7 +326,7 @@ ImpulseSolver::normalize_rotations()
 	{
 		auto& body = _system.bodies()[_processed_frames % _system.bodies().size()];
 		auto pl = body->placement();
-		pl.set_body_to_base_rotation (normalized (pl.body_to_base_rotation()));
+		pl.set_body_to_base_rotation (pl.body_to_base_rotation().normalized());
 		body->set_placement (pl);
 	}
 }

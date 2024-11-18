@@ -31,12 +31,6 @@
 namespace xf {
 
 // Forward:
-template<math::Scalar S, math::CoordinateSystem Space>
-	[[nodiscard]]
-	constexpr SpaceVector<S, Space>
-	normalized (SpaceVector<S, Space> const& vector);
-
-// Forward:
 template<math::Scalar S, std::size_t C, std::size_t R, math::CoordinateSystem TargetSpace, math::CoordinateSystem SourceSpace>
 	[[nodiscard]]
 	constexpr math::Matrix<S, C, R, TargetSpace, SourceSpace>
@@ -169,7 +163,7 @@ template<math::CoordinateSystem TargetSpace = void, math::CoordinateSystem Sourc
 	inline SpaceVector<double, TargetSpace>
 	normalized_axis (RotationMatrix<TargetSpace, SourceSpace> const& rotation)
 	{
-		return normalized (unnormalized_axis (rotation));
+		return unnormalized_axis (rotation).normalized();
 	}
 
 
@@ -180,7 +174,7 @@ template<math::CoordinateSystem TargetSpace = void, math::CoordinateSystem Sourc
 	inline si::Angle
 	angle_about_matrix_axis (RotationMatrix<TargetSpace, SourceSpace> const& rotation, SpaceVector<double, TargetSpace> normalized_axis)
 	{
-		SpaceVector<double> const x = math::reframe<void, void> (normalized (find_any_perpendicular (normalized_axis)));
+		SpaceVector<double> const x = math::reframe<void, void> (find_any_perpendicular (normalized_axis).normalized());
 		SpaceVector<double> const y = math::reframe<void, void> (rotation) * x;
 
 		auto const sin_theta = abs (cross_product (x, y));

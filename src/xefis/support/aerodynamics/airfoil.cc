@@ -92,8 +92,8 @@ Airfoil::planar_aerodynamic_forces (Air<AirfoilSplineSpace> const& relative_air)
 
 		SpaceVector<si::Length, AirfoilSplineSpace> const	cp_position			{ _airfoil_characteristics.center_of_pressure_position (*re, wrap_angle_for_field (aoa.alpha)) * _chord_length, 0_m, 0_m };
 		// If air.velocity is 0, normalized will be nan³, but we're guarded by the if above.
-		SpaceVector<double, AirfoilSplineSpace> const		drag_direction		= normalized (relative_air.velocity) / 1_mps;
-		SpaceVector<double, AirfoilSplineSpace> const		lift_direction		= normalized (cross_product (SpaceVector<double, AirfoilSplineSpace> { 0.0, 0.0, +1.0 }, relative_air.velocity)) / 1_mps;
+		SpaceVector<double, AirfoilSplineSpace> const		drag_direction		= relative_air.velocity.normalized() / 1_mps;
+		SpaceVector<double, AirfoilSplineSpace> const		lift_direction		= cross_product (SpaceVector<double, AirfoilSplineSpace> { 0.0, 0.0, +1.0 }, relative_air.velocity).normalized() / 1_mps;
 		SpaceVector<si::Torque, AirfoilSplineSpace> const	pitching_moment_vec	{ 0_Nm, 0_Nm, torque };
 
 		// TODO drag should be 3D, that is also in Z direction

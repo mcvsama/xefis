@@ -31,13 +31,6 @@
 
 namespace xf {
 
-// Forward:
-template<math::Scalar S, math::CoordinateSystem Space>
-	[[nodiscard]]
-	constexpr SpaceVector<S, Space>
-	normalized (SpaceVector<S, Space> const& vector);
-
-
 /**
  * Return rotation quaternion about the given axis vector for given angle.
  */
@@ -133,7 +126,7 @@ template<math::CoordinateSystem TargetSpace = void, math::CoordinateSystem Sourc
 	inline SpaceVector<double, TargetSpace>
 	normalized_axis (RotationQuaternion<TargetSpace, SourceSpace> const& rotation)
 	{
-		return normalized (unnormalized_axis (rotation));
+		return unnormalized_axis (rotation).normalized();
 	}
 
 
@@ -161,7 +154,7 @@ template<math::CoordinateSystem TargetSpace = void, math::CoordinateSystem Sourc
 	{
 		auto const angle = abs (rotation_vector);
 		auto const half_angle = 0.5 * angle;
-		auto const axis = normalized (rotation_vector).transformed ([](si::Angle const value) { return value.in<si::Radian>(); });
+		auto const axis = rotation_vector.normalized().transformed ([](si::Angle const value) { return value.in<si::Radian>(); });
 
 		if (angle != 0_rad)
 			return { cos (half_angle), sin (half_angle) * axis };

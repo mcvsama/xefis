@@ -44,8 +44,8 @@ HingePrecalculation::HingePrecalculation (SpaceLength<BodyCOM> const& anchor_poi
 	_anchor_2 = pl_2.bound_transform_to_body (pl_1.bound_transform_to_base (anchor_point_1));
 	_hinge_1 = anchor_point_2 - anchor_point_1;
 	_hinge_2 = pl_2.unbound_transform_to_body (pl_1.unbound_transform_to_base (_hinge_1));
-	_normalized_hinge_1 = normalized (_hinge_1);
-	_normalized_hinge_2 = normalized (_hinge_2);
+	_normalized_hinge_1 = _hinge_1.normalized();
+	_normalized_hinge_2 = _hinge_2.normalized();
 }
 
 
@@ -62,8 +62,8 @@ HingePrecalculation::HingePrecalculation (Body& body_1,
 	_anchor_2 = anchor_point_1;
 	_hinge_1 = anchor_point_2 - anchor_point_1;
 	_hinge_2 = pl_2.unbound_transform_to_body (pl_1.unbound_transform_to_base (_hinge_1));
-	_normalized_hinge_1 = normalized (_hinge_1);
-	_normalized_hinge_2 = normalized (_hinge_2);
+	_normalized_hinge_1 = _hinge_1.normalized();
+	_normalized_hinge_2 = _hinge_2.normalized();
 }
 
 
@@ -81,8 +81,8 @@ HingePrecalculation::HingePrecalculation (Body& body_1,
 	_anchor_2 = pl_2.bound_transform_to_body (anchor_point_2);
 	_hinge_1 = pl_1.unbound_transform_to_body (hinge);
 	_hinge_2 = pl_2.unbound_transform_to_body (hinge);
-	_normalized_hinge_1 = normalized (_hinge_1);
-	_normalized_hinge_2 = normalized (_hinge_2);
+	_normalized_hinge_1 = _hinge_1.normalized();
+	_normalized_hinge_2 = _hinge_2.normalized();
 }
 
 
@@ -98,8 +98,8 @@ HingePrecalculation::calculate (HingePrecalculationData& data)
 	auto const u = x2 + r2 - x1 - r1;
 	auto const a1 = pl_1.unbound_transform_to_base (body_1_normalized_hinge()) / abs (body_1_normalized_hinge());
 	auto const a2 = pl_2.unbound_transform_to_base (body_2_normalized_hinge()) / abs (body_2_normalized_hinge());
-	auto const t1 = normalized (cross_product (a1, find_non_colinear (a1) * 1_m));
-	auto const t2 = normalized (cross_product (a1, t1));
+	auto const t1 = cross_product (a1, find_non_colinear (a1) * 1_m).normalized();
+	auto const t2 = cross_product (a1, t1).normalized();
 	auto const rotation_error = _fixed_orientation.rotation_constraint_value (pl_1, pl_2);
 	auto const angle = projection_onto_normalized (rotation_error, a1);
 

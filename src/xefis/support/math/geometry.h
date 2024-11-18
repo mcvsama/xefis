@@ -155,27 +155,6 @@ template<math::Scalar S, math::CoordinateSystem Space>
 	}
 
 
-// TODO to quaternion_operations.h
-template<math::Scalar S, math::CoordinateSystem TargetSpace, math::CoordinateSystem SourceSpace>
-	[[nodiscard]]
-	constexpr math::Quaternion<S, TargetSpace, SourceSpace>
-	normalized (math::Quaternion<S, TargetSpace, SourceSpace> const& quaternion)
-	{
-		// TODO also create abs (quaternion)
-		return S (1) * quaternion / quaternion.norm();
-	}
-
-
-// TODO to matrix_operations.h as Vector<S, N, ...>
-template<math::Scalar S, math::CoordinateSystem Space>
-	[[nodiscard]]
-	constexpr SpaceVector<S, Space>
-	normalized (SpaceVector<S, Space> const& vector)
-	{
-		return S (1) * vector / abs (vector);
-	}
-
-
 /**
  * Project vector "vector" onto "onto" vector.
  */
@@ -184,7 +163,7 @@ template<math::Scalar S1, math::Scalar S2, math::CoordinateSystem Space>
 	constexpr auto
 	projection (SpaceVector<S1, Space> const& vector, SpaceVector<S2, Space> const& onto)
 	{
-		return dot_product (vector, normalized (onto)) * onto;
+		return dot_product (vector, onto.normalized()) * onto;
 	}
 
 
@@ -208,8 +187,7 @@ template<math::Scalar S, math::CoordinateSystem Space>
 	constexpr SpaceVector<S, Space>
 	find_non_colinear (SpaceVector<S, Space> input)
 	{
-		input = normalized (input);
-
+		input.normalize();
 		auto output = kXRotationPlus90<Space, Space> * input;
 
 		if (abs (cross_product (input, output)) > 0)
@@ -241,8 +219,8 @@ template<math::Scalar S, math::CoordinateSystem TargetSpace, math::CoordinateSys
 	constexpr RotationMatrix<TargetSpace, SourceSpace>
 	make_basis_from_z (SpaceVector<S, TargetSpace> const& z)
 	{
-		auto const x = normalized (find_any_perpendicular (z));
-		auto const y = normalized (cross_product (z, x));
+		auto const x = find_any_perpendicular (z).normalized();
+		auto const y = cross_product (z, x).normalized();
 
 		return RotationMatrix<TargetSpace, SourceSpace> {
 			x[0], y[0], z[0],
@@ -261,8 +239,7 @@ template<math::Scalar S, math::CoordinateSystem Space>
 							 SpaceVector<S, Space> const& b,
 							 SpaceVector<S, Space> const& c)
 	{
-		auto const scalar_1 = decltype (a[0]) { 1 };
-		return normalized (cross_product (b - a, c - a) / scalar_1 / scalar_1);
+		return ((1 / (S (1) * S (1))) * cross_product (b - a, c - a)).normalized();
 	}
 
 
