@@ -212,7 +212,6 @@ template<math::Scalar S, math::CoordinateSystem Space>
 /**
  * Create orthonormal basis matrix from given vector Z.
  * Two orthonormal vectors to Z will be chosen randomly.
- * TODO Use Quaternions
  */
 template<math::Scalar S, math::CoordinateSystem TargetSpace, math::CoordinateSystem SourceSpace = TargetSpace>
 	[[nodiscard]]
