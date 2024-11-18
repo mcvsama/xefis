@@ -146,6 +146,7 @@ class ImpulseSolver: private Noncopyable
 	void
 	update_acceleration_moments();
 
+	[[nodiscard]]
 	static VelocityMoments<WorldSpace>
 	calculate_velocity_moments (Body const&, AccelerationMoments<WorldSpace> const&, si::Time dt);
 
