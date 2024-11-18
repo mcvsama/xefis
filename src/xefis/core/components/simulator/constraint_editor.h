@@ -17,6 +17,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/simulation/rigid_body/constraint.h>
+#include <xefis/support/ui/observation_widget.h>
 
 // Qt:
 #include <QCheckBox>
@@ -56,6 +57,8 @@ class ConstraintEditor: public QWidget
 
   private:
 	rigid_body::Constraint*		_edited_constraint { nullptr };
+	std::unique_ptr<ObservationWidget>
+								_edited_constraint_widget;
 	QLabel*						_constraint_label;
 };
 
