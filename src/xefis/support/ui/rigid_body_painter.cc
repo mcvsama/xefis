@@ -148,7 +148,7 @@ RigidBodyPainter::apply_camera_rotations()
 	}
 
 	if (_followed_body && _following_orientation)
-		_gl.rotate (_followed_body->placement().base_to_body_rotation());
+		_gl.rotate (_followed_body->placement().body_to_base_rotation());
 }
 
 
