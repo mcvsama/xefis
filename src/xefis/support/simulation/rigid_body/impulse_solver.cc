@@ -244,6 +244,7 @@ ImpulseSolver::update_constraint_forces (si::Time const dt)
 	// Tell each constraint that we finally calculated its forces:
 	for (auto& constraint: _system.constraints())
 	{
+		// TODO What, these are summed-up constraint_force_moments, not individual ones, should be individual though:
 		constraint->calculated_constraint_forces ({ constraint->body_1().frame_cache().constraint_force_moments,
 													constraint->body_2().frame_cache().constraint_force_moments }, dt);
 	}
