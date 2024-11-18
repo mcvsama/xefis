@@ -103,6 +103,15 @@ class ImpulseSolver: private Noncopyable
 	set_required_precision (si::Force, si::Torque);
 
 	/**
+	 * With warm starting the constraint forces are reused for the next simulation frame
+	 * as a starting points. It speeds up convergence.
+	 * Enabled by default.
+	 */
+	void
+	set_warm_starting (bool enabled)
+		{ _warm_starting = enabled; }
+
+	/**
 	 * Evolve the system physically by given Δt.
 	 */
 	EvolutionDetails
@@ -156,6 +165,7 @@ class ImpulseSolver: private Noncopyable
 	size_t						_max_iterations		{ kDefaultMaxIterations };
 	uint64_t					_processed_frames	{ 0 };
 	std::optional<ForceTorque>	_required_force_torque_precision;
+	bool						_warm_starting		{ true };
 };
 
 

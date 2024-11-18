@@ -160,8 +160,9 @@ ImpulseSolver::update_constraint_forces (si::Time const dt)
 	bool precise_enough = false;
 	size_t iteration = 0;
 
-    for (auto const& constraint: _system.constraints())
-        constraint->previous_calculation_force_moments().reset();
+	if (!_warm_starting)
+		for (auto const& constraint: _system.constraints())
+			constraint->previous_calculation_force_moments().reset();
 
 	for (iteration = 0; iteration < _max_iterations && !precise_enough; ++iteration)
 	{
