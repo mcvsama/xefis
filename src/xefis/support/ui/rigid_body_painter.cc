@@ -231,6 +231,9 @@ RigidBodyPainter::paint_planet()
 	auto const low_ground_fog_color = low_fog_color;
 	auto const ground_fog_density = renormalize (normalized_altitude, Range { 0.0f, 1.0f }, Range { 0.001f, 0.0015f });
 
+	// Offset by planet position in the simulation:
+	_gl.translate (_planet_body->placement().position());
+
 	// Draw stuff like we were located at Lon/Lat 0°/0° looking towards south pole.
 	// In other words match ECEF coordinates with standard OpenGL screen coordinates.
 
