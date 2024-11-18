@@ -249,18 +249,6 @@ template<class Space>
 
 template<class TargetSpace, class SourceSpace>
 	constexpr ForceMoments<TargetSpace>
-	operator* (RotationMatrix<TargetSpace, SourceSpace> const& transformation,
-			   ForceMoments<SourceSpace> const& force_torque)
-	{
-		return {
-			transformation * force_torque.force(),
-			transformation * force_torque.torque(),
-		};
-	}
-
-
-template<class TargetSpace, class SourceSpace>
-	constexpr ForceMoments<TargetSpace>
 	operator* (RotationQuaternion<TargetSpace, SourceSpace> const& rotation,
 			   ForceMoments<SourceSpace> const& force_moments)
 	{

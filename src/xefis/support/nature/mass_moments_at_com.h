@@ -117,27 +117,18 @@ template<class pSpace = void>
 
 template<class TargetSpace, class SourceSpace>
 	inline MassMomentsAtCOM<TargetSpace>
-	operator* (RotationMatrix<TargetSpace, SourceSpace> const& rotation,
-			   MassMomentsAtCOM<SourceSpace> const& mass_moments)
-	{
-		auto const rotation_matrix = RotationMatrix<TargetSpace, SourceSpace> (rotation);
-
-		return {
-			mass_moments.mass(),
-			rotation_matrix * mass_moments.inertia_tensor() * ~rotation_matrix,
-		};
-	}
-
-
-template<class TargetSpace, class SourceSpace>
-	inline MassMomentsAtCOM<TargetSpace>
 	operator* (RotationQuaternion<TargetSpace, SourceSpace> const& rotation,
 			   MassMomentsAtCOM<SourceSpace> const& mass_moments)
 	{
 		// Rotating a tensor with a quaterion:
 		// either rotate each vector component of a tensor with the quaterion
 		// separately or create a rotation matrix R and use formula: R * Tensor * ~R.
-		return RotationMatrix (rotation) * mass_moments;
+		auto const rotation_matrix = RotationMatrix<TargetSpace, SourceSpace> (rotation);
+
+		return {
+			mass_moments.mass(),
+			rotation_matrix * mass_moments.inertia_tensor() * ~rotation_matrix,
+		};
 	}
 
 

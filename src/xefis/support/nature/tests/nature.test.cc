@@ -30,7 +30,7 @@ namespace {
 
 AutoTest t1 ("Nature: MassMoments calculations", []{
 	{
-		auto identity = SpaceMatrix<double> (math::identity);
+		auto identity = RotationQuaternion (math::identity);
 		SpaceMatrix<si::MomentOfInertia> const moi2 {
 			2_kgm2, 0_kgm2, 0_kgm2,
 			0_kgm2, 2_kgm2, 0_kgm2,

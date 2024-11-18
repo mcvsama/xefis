@@ -125,17 +125,6 @@ template<class Space>
 
 template<class TargetSpace = void, class SourceSpace = TargetSpace>
 	inline Wrench<TargetSpace>
-	operator* (RotationMatrix<TargetSpace, SourceSpace> const& rotation, Wrench<SourceSpace> const& wrench)
-	{
-		return {
-			rotation * static_cast<ForceMoments<SourceSpace>> (wrench),
-			rotation * wrench.position(),
-		};
-	}
-
-
-template<class TargetSpace = void, class SourceSpace = TargetSpace>
-	inline Wrench<TargetSpace>
 	operator* (RotationQuaternion<TargetSpace, SourceSpace> const& rotation, Wrench<SourceSpace> const& wrench)
 	{
 		return {

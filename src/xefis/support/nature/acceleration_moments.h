@@ -145,18 +145,6 @@ template<class Space>
 
 template<class TargetSpace, class SourceSpace>
 	constexpr AccelerationMoments<TargetSpace>
-	operator* (RotationMatrix<TargetSpace, SourceSpace> const& rotation,
-			   AccelerationMoments<SourceSpace> const& acceleration_moments)
-	{
-		return {
-			rotation * acceleration_moments.acceleration(),
-			rotation * acceleration_moments.angular_acceleration(),
-		};
-	}
-
-
-template<class TargetSpace, class SourceSpace>
-	constexpr AccelerationMoments<TargetSpace>
 	operator* (RotationQuaternion<TargetSpace, SourceSpace> const& rotation,
 			   AccelerationMoments<SourceSpace> const& acceleration_moments)
 	{
