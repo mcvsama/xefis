@@ -1,0 +1,7 @@
+MACHINE_sim_1_COMMON_FILES += ../common/airfoils/control_surface_airfoil.h
+MACHINE_sim_1_COMMON_FILES += ../common/link/air_to_ground.h
+MACHINE_sim_1_COMMON_FILES += ../common/link/crypto.h
+MACHINE_sim_1_COMMON_FILES += ../common/link/ground_to_air.h
+MACHINE_sim_1_COMMON_FILES += ../common/common.h
+MACHINE_sim_1_COMMON_FILES += ../common/enums.h
+

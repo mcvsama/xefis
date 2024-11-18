@@ -1,2 +1,4 @@
 XEFIS_MACHINES += test_instruments
+XEFIS_MACHINES += sim-1/aircraft
+XEFIS_MACHINES += sim-1/ground_station/control_machine
 

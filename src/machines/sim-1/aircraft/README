@@ -1,0 +1,3 @@
+Main logic for the aircraft control and additionally a simulation of the
+aircraft running on a separate thread.
+
