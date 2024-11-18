@@ -145,7 +145,7 @@ SimulatorWidget::make_simulation_controls()
 	_simulation_performance_label->setSizePolicy (QSizePolicy::Fixed, QSizePolicy::Fixed);
 	update_simulation_performance_label();
 
-	auto* basis_colors_label = new QLabel ("<b><span style='color: red'>X</span> <span style='color: green'>Y</span> <span style='color: blue'>Z</span></b>", this);
+	auto* basis_colors_label = new QLabel ("<b><span style='color: red'>X (Null Island)</span> <span style='color: green'>Y</span> <span style='color: blue'>Z (North Pole)</span></b>", this);
 
 	auto* layout = new QHBoxLayout (sim_controls);
 	layout->setMargin (0);
