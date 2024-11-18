@@ -43,8 +43,11 @@ template<math::CoordinateSystem TS = void, math::CoordinateSystem SS = void>
 
 		auto const angle = neutrino::renormalize (rand(), Range<double> (0, RAND_MAX), Range<si::Angle> (-2_rad * pi, +2_rad * pi));
 		auto const axis = SpaceVector<double, TS> { 1.0 * rand(), 1.0 * rand(), 1.0 * rand() }.normalized();
+		auto const q = quaternion_rotation_about<TS, SS> (axis, angle);
 
-		return quaternion_rotation_about<TS, SS> (axis, angle);
+		test_asserts::verify_equal_with_epsilon ("rotation quaternion is normalized", q.norm(), 1.0, 1e-9);
+
+		return q;
 	};
 
 
