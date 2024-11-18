@@ -309,22 +309,26 @@ ImpulseSolver::update_velocity_moments (si::Time const dt)
 }
 
 
+Placement<WorldSpace, BodyCOM>
+ImpulseSolver::calculate_placement (Body const& body, VelocityMoments<WorldSpace> const& vm, si::Time const dt)
+{
+	auto placement = body.placement();
+	auto const ds = vm.velocity() * dt;
+	auto const dr_vec = vm.angular_velocity() * dt;
+	auto const dr = to_rotation_quaternion (dr_vec);
+
+	placement.translate_frame (ds);
+	placement.rotate_body_frame (dr);
+
+	return placement;
+}
+
+
 void
 ImpulseSolver::update_placements (si::Time dt)
 {
 	for (auto& body: _system.bodies())
-	{
-		auto placement = body->placement();
-		auto const vm = body->velocity_moments<WorldSpace>();
-		auto const ds = vm.velocity() * dt;
-		auto const dr_vec = vm.angular_velocity() * dt;
-		auto const dr = to_rotation_quaternion (dr_vec);
-
-		placement.translate_frame (ds);
-		placement.rotate_body_frame (dr);
-
-		body->set_placement (placement);
-	}
+		body->set_placement (calculate_placement (*body, body->velocity_moments<WorldSpace>(), dt));
 }
 
 

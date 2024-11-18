@@ -152,6 +152,10 @@ class ImpulseSolver: private Noncopyable
 	void
 	update_velocity_moments (si::Time dt);
 
+	[[nodiscard]]
+	Placement<WorldSpace, BodyCOM>
+	calculate_placement (Body const&, VelocityMoments<WorldSpace> const&, si::Time const dt);
+
 	void
 	update_placements (si::Time dt);
 
