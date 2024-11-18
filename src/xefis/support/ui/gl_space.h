@@ -304,7 +304,11 @@ GLSpace::to_opengl (QColor const& color)
 inline void
 GLSpace::rotate (RotationQuaternion<auto, auto> const& q)
 {
-	rotate (angle (q), normalized_axis (q));
+	// People on the Internet suggest not to use glRotatef()
+	// but instead to convert the quaternion to a rotation matrix and
+	// use matrix multiplication. Since using glRotatef() indeed
+	// yields weird results, I'm fine with the matrix.
+	rotate (RotationMatrix (q));
 }
 
 
