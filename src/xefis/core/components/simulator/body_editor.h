@@ -17,7 +17,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/simulation/rigid_body/body.h>
-#include <xefis/support/ui/body_widget.h>
+#include <xefis/support/ui/observation_widget.h>
 #include <xefis/support/ui/paint_helper.h>
 
 // Qt:
@@ -65,7 +65,8 @@ class BodyEditor: public QWidget
 	QVBoxLayout					_layout				{ this };
 	RigidBodyViewer&			_rigid_body_viewer;
 	rigid_body::Body*			_edited_body		{ nullptr };
-	std::unique_ptr<BodyWidget>	_edited_body_widget;
+	std::unique_ptr<ObservationWidget>
+								_edited_body_widget;
 	QVBoxLayout					_edited_body_widget_layout;
 	QLabel*						_body_label;
 	QToolBox					_tool_box;

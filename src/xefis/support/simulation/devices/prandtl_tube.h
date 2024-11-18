@@ -18,7 +18,7 @@
 #include <xefis/config/all.h>
 #include <xefis/support/earth/air/atmosphere.h>
 #include <xefis/support/simulation/rigid_body/body.h>
-#include <xefis/support/ui/body_widget.h>
+#include <xefis/support/ui/observation_widget.h>
 
 // Standard:
 #include <cstddef>
@@ -40,7 +40,7 @@ struct PrandtlTubeParameters
  */
 class PrandtlTube:
 	public rigid_body::Body,
-	public HasBodyWidget
+	public HasObservationWidget
 {
   public:
 	/**

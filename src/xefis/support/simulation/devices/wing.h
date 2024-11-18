@@ -30,7 +30,7 @@ namespace xf::sim {
 
 class Wing:
 	public rigid_body::Body,
-	public HasBodyWidget
+	public HasObservationWidget
 {
   public:
 	// Ctor
@@ -54,9 +54,9 @@ class Wing:
 	void
 	update_external_forces (Atmosphere const*) override;
 
-	// HasBodyWidget API
+	// HasObservationWidget API
 	[[nodiscard]]
-	std::unique_ptr<BodyWidget>
+	std::unique_ptr<ObservationWidget>
 	create_body_widget()
 		{ return std::make_unique<WingWidget> (*this); }
 

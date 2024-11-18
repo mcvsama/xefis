@@ -11,12 +11,13 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__SUPPORT__UI__BODY_WIDGET_H__INCLUDED
-#define XEFIS__SUPPORT__UI__BODY_WIDGET_H__INCLUDED
+#ifndef XEFIS__SUPPORT__UI__OBSERVATION_WIDGET_H__INCLUDED
+#define XEFIS__SUPPORT__UI__OBSERVATION_WIDGET_H__INCLUDED
 
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/simulation/rigid_body/body.h>
+#include <xefis/support/simulation/rigid_body/constraint.h>
 
 // Qt:
 #include <QGridLayout>
@@ -31,7 +32,7 @@
 
 namespace xf {
 
-class BodyWidget: public QWidget
+class ObservationWidget: public QWidget
 {
   private:
 	using Getter = std::function<std::string()>;
@@ -47,17 +48,26 @@ class BodyWidget: public QWidget
   public:
 	// Ctor
 	explicit
-	BodyWidget (rigid_body::Body*);
+	ObservationWidget()
+	{ }
+
+	// Ctor
+	explicit
+	ObservationWidget (rigid_body::Body*);
+
+	// Ctor
+	explicit
+	ObservationWidget (rigid_body::Constraint*);
 
 	// Dtor
 	virtual
-	~BodyWidget() = default;
+	~ObservationWidget() = default;
 
 	/**
 	 * Update values in the widget.
 	 */
 	virtual void
-	update_body_values();
+	update_observed_values();
 
   protected:
 	/**
@@ -80,21 +90,22 @@ class BodyWidget: public QWidget
 
   private:
 	rigid_body::Body*		_body			{ nullptr };
+	rigid_body::Constraint*	_constraint		{ nullptr };
 	QGridLayout				_layout			{ this };
 	std::vector<Observable>	_observables;
 };
 
 
-class HasBodyWidget
+class HasObservationWidget
 {
   public:
 	// Dtor
 	virtual
-	~HasBodyWidget() = default;
+	~HasObservationWidget() = default;
 
 	[[nodiscard]]
-	virtual std::unique_ptr<BodyWidget>
-	create_body_widget();
+	virtual std::unique_ptr<ObservationWidget>
+	create_observation_widget();
 };
 
 } // namespace xf

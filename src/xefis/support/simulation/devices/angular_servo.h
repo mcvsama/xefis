@@ -21,7 +21,7 @@
 #include <xefis/support/simulation/devices/interfaces/angular_servo.h>
 #include <xefis/support/simulation/rigid_body/body.h>
 #include <xefis/support/simulation/rigid_body/constraint.h>
-#include <xefis/support/ui/body_widget.h>
+#include <xefis/support/ui/observation_widget.h>
 
 // Standard:
 #include <cstddef>
@@ -33,7 +33,7 @@ namespace xf::sim {
 class AngularServo:
 	public interfaces::AngularServo,
 	public rigid_body::Body,
-	public HasBodyWidget
+	public HasObservationWidget
 	// TODO and electrial device
 {
   public:

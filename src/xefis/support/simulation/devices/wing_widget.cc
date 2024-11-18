@@ -29,7 +29,7 @@
 namespace xf::sim {
 
 WingWidget::WingWidget (Wing& wing):
-	BodyWidget (&wing),
+	ObservationWidget (&wing),
 	_wing (wing)
 {
 	setup_airfoil_info_widget();
@@ -59,7 +59,7 @@ WingWidget::setup_airfoil_info_widget()
 
 
 void
-WingWidget::update_body_values()
+WingWidget::update_observed_values()
 {
 	_airfoil_spline_widget.set_airfoil (_wing.airfoil());
 
@@ -94,7 +94,7 @@ WingWidget::update_body_values()
 			*str = "–";
 	}
 
-	BodyWidget::update_body_values();
+	ObservationWidget::update_observed_values();
 }
 
 } // namespace xf::sim

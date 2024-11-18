@@ -69,9 +69,9 @@ BodyEditor::edit (rigid_body::Body* body_to_edit)
 
 	if (_edited_body)
 	{
-		if (auto* has_body_widget = dynamic_cast<HasBodyWidget*> (_edited_body))
+		if (auto* has_observation_widget = dynamic_cast<HasObservationWidget*> (_edited_body))
 		{
-			_edited_body_widget = has_body_widget->create_body_widget();
+			_edited_body_widget = has_observation_widget->create_observation_widget();
 
 			if (_edited_body_widget)
 				_edited_body_widget_layout.addWidget (_edited_body_widget.get());
@@ -88,7 +88,7 @@ BodyEditor::refresh()
 	using rigid_body::WorldSpace;
 
 	if (_edited_body_widget)
-		_edited_body_widget->update_body_values();
+		_edited_body_widget->update_observed_values();
 
 	if (_edited_body)
 	{

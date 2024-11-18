@@ -17,7 +17,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/ui/airfoil_spline_widget.h>
-#include <xefis/support/ui/body_widget.h>
+#include <xefis/support/ui/observation_widget.h>
 
 // Qt:
 #include <QLabel>
@@ -32,16 +32,16 @@ namespace xf::sim {
 
 class Wing;
 
-class WingWidget: public BodyWidget
+class WingWidget: public ObservationWidget
 {
   public:
 	// Ctor
 	explicit
 	WingWidget (Wing& wing);
 
-	// BodyWidget API
+	// ObservationWidget API
 	void
-	update_body_values() override;
+	update_observed_values() override;
 
   private:
 	void

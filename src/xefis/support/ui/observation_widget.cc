@@ -12,7 +12,7 @@
  */
 
 // Local:
-#include "body_widget.h"
+#include "observation_widget.h"
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -30,7 +30,7 @@
 
 namespace xf {
 
-BodyWidget::BodyWidget (rigid_body::Body* body):
+ObservationWidget::ObservationWidget (rigid_body::Body* body):
 	_body (body)
 {
 	if (_body)
@@ -54,8 +54,18 @@ BodyWidget::BodyWidget (rigid_body::Body* body):
 }
 
 
+ObservationWidget::ObservationWidget (rigid_body::Constraint* constraint):
+	_constraint (constraint)
+{
+	if (_constraint)
+	{
+		// TODO last calculation of constraint forces
+	}
+}
+
+
 void
-BodyWidget::update_body_values()
+ObservationWidget::update_observed_values()
 {
 	for (auto& observable: _observables)
 	{
@@ -68,7 +78,7 @@ BodyWidget::update_body_values()
 
 
 void
-BodyWidget::add_widget (QWidget& widget)
+ObservationWidget::add_widget (QWidget& widget)
 {
 	auto row = _layout.rowCount();
 	_layout.addWidget (&widget, row, 0, 1, 2);
@@ -76,7 +86,7 @@ BodyWidget::add_widget (QWidget& widget)
 
 
 QLabel&
-BodyWidget::add_observable (std::string_view const name, Getter const getter, Setter const setter)
+ObservationWidget::add_observable (std::string_view const name, Getter const getter, Setter const setter)
 {
 	auto* value_label = new QLabel ("–");
 	_observables.emplace_back (value_label, getter, setter);
@@ -89,16 +99,21 @@ BodyWidget::add_observable (std::string_view const name, Getter const getter, Se
 }
 
 QLabel&
-BodyWidget::add_observable (std::string_view const name, std::string& observed_string, Setter const setter)
+ObservationWidget::add_observable (std::string_view const name, std::string& observed_string, Setter const setter)
 {
 	return add_observable (name, [&observed_string]() { return observed_string; }, setter);
 }
 
 
-std::unique_ptr<BodyWidget>
-HasBodyWidget::create_body_widget()
+std::unique_ptr<ObservationWidget>
+HasObservationWidget::create_observation_widget()
 {
-	return std::make_unique<BodyWidget> (dynamic_cast<rigid_body::Body*> (this));
+	if (rigid_body::Body* body = dynamic_cast<rigid_body::Body*> (this))
+		return std::make_unique<ObservationWidget> (body);
+	else if (rigid_body::Constraint* constraint = dynamic_cast<rigid_body::Constraint*> (this))
+		return std::make_unique<ObservationWidget> (constraint);
+	else
+		return std::make_unique<ObservationWidget>();
 }
 
 } // namespace xf
