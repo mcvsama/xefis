@@ -123,7 +123,8 @@ template<math::CoordinateSystem Space>
 	angle_between (SpaceVector<auto, Space> const& a,
 				   SpaceVector<auto, Space> const& b)
 	{
-		return 1_rad * std::acos (dot_product (a, b) / (abs (a) * abs (b)));
+		auto const arg = dot_product (a, b) / (abs (a) * abs (b));
+		return 1_rad * std::acos (std::clamp (arg, -1.0, +1.0));
 	}
 
 
