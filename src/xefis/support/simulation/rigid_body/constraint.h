@@ -339,7 +339,7 @@ class Constraint: public ConnectedBodies
 	std::optional<si::Torque>	_breaking_torque;
 	double						_baumgarte_factor				{ kDefaultBaumgarteFactor };
 	double						_constraint_force_mixing_factor { 0.0 };
-	double						_friction_factor				{ 0.0 };
+	double						_friction_factor				{ 0.0 }; // TODO implement
 	std::optional<ForceMoments<WorldSpace>>
 								_previous_calculation_force_moments;
 };
