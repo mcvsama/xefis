@@ -53,25 +53,27 @@ class BodyFrameCache
 	SpaceMatrix<si::Mass, WorldSpace>::InverseMatrix			inv_M;
 	SpaceMatrix<si::MomentOfInertia, WorldSpace>::InverseMatrix	inv_I;
 
-	// Those are used temporarily when converging constraint_force_moments:
+	// Those are used temporarily when calculating all_constraints_force_moments:
 	ForceMoments<WorldSpace>									gravitational_force_moments;
 	ForceMoments<WorldSpace>									external_force_moments; // Excluding gravitation.
-	ForceMoments<WorldSpace>									constraint_force_moments;
 	VelocityMoments<WorldSpace>									velocity_moments;
 
 	// Needed by Body::acceleration_moments_except_gravity(): TODO maybe it can be moved to the Body?
 	AccelerationMoments<WorldSpace>								acceleration_moments_except_gravity;
 
+	// The resulting summed constraint forces to apply to the body after simulation step:
+	ForceMoments<WorldSpace>									all_constraints_force_moments;
+
   public:
 	[[nodiscard]]
 	ForceMoments<WorldSpace>
 	all_force_moments() const noexcept
-		{ return gravitational_force_moments + external_force_moments + constraint_force_moments; }
+		{ return gravitational_force_moments + external_force_moments + all_constraints_force_moments; }
 
 	[[nodiscard]]
 	ForceMoments<WorldSpace>
 	force_moments_except_gravity() const noexcept
-		{ return external_force_moments + constraint_force_moments; }
+		{ return external_force_moments + all_constraints_force_moments; }
 };
 
 

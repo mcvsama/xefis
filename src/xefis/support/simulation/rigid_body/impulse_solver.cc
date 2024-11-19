@@ -168,7 +168,7 @@ ImpulseSolver::update_constraint_forces (si::Time const dt)
 	{
 		// Reset constraint forces:
 		for (auto& body: _system.bodies())
-			body->frame_cache().constraint_force_moments = ForceMoments<WorldSpace>();
+			body->frame_cache().all_constraints_force_moments = ForceMoments<WorldSpace>();
 
 		precise_enough = true;
 
@@ -196,9 +196,9 @@ ImpulseSolver::update_constraint_forces (si::Time const dt)
 	// Tell each constraint that we finally calculated its forces:
 	for (auto& constraint: _system.constraints())
 	{
-		// TODO What, these are summed-up constraint_force_moments, not individual ones, should be individual though:
-		constraint->calculated_constraint_forces ({ constraint->body_1().frame_cache().constraint_force_moments,
-													constraint->body_2().frame_cache().constraint_force_moments }, dt);
+		// TODO What, these are summed-up all_constraints_force_moments, not individual ones, should be individual though:
+		constraint->calculated_constraint_forces ({ constraint->body_1().frame_cache().all_constraints_force_moments,
+													constraint->body_2().frame_cache().all_constraints_force_moments }, dt);
 	}
 
     return {
@@ -249,8 +249,8 @@ ImpulseSolver::update_single_constraint_forces (Constraint* constraint, si::Time
 
 			constraint->previous_calculation_force_moments() = constraint_forces[0];
 
-			fc1.constraint_force_moments += constraint_forces[0];
-			fc2.constraint_force_moments += constraint_forces[1];
+			fc1.all_constraints_force_moments += constraint_forces[0];
+			fc2.all_constraints_force_moments += constraint_forces[1];
 
 			// Recalculate accelerations: TODO do we need to store it in frame cache?
 			auto const acceleration_moments_1 = calculate_acceleration_moments (b1.placement(), b1.mass_moments(), fc1.all_force_moments());
