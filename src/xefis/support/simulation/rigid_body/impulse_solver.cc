@@ -188,8 +188,8 @@ ImpulseSolver::update_constraint_forces (si::Time const dt)
 			auto& fc1 = b1.frame_cache();
 			auto& fc2 = b2.frame_cache();
 
-			fc1.acceleration_moments_except_gravity = acceleration_moments (b1, fc1.force_moments_except_gravity());
-			fc2.acceleration_moments_except_gravity = acceleration_moments (b2, fc2.force_moments_except_gravity());
+			fc1.acceleration_moments_except_gravity = calculate_acceleration_moments (b1.placement(), b1.mass_moments(), fc1.force_moments_except_gravity());
+			fc2.acceleration_moments_except_gravity = calculate_acceleration_moments (b2.placement(), b2.mass_moments(), fc2.force_moments_except_gravity());
 		}
 	}
 
@@ -252,13 +252,13 @@ ImpulseSolver::update_single_constraint_forces (Constraint* constraint, si::Time
 			fc1.constraint_force_moments += constraint_forces[0];
 			fc2.constraint_force_moments += constraint_forces[1];
 
-			// Recalculate accelerations:
-			fc1.acceleration_moments = acceleration_moments (b1, fc1.all_force_moments());
-			fc2.acceleration_moments = acceleration_moments (b2, fc2.all_force_moments());
+			// Recalculate accelerations: TODO do we need to store it in frame cache?
+			auto const acceleration_moments_1 = calculate_acceleration_moments (b1.placement(), b1.mass_moments(), fc1.all_force_moments());
+			auto const acceleration_moments_2 = calculate_acceleration_moments (b2.placement(), b2.mass_moments(), fc2.all_force_moments());
 
-			// Recalculate velocity moments:
-			fc1.velocity_moments = calculate_velocity_moments (b1, fc1.acceleration_moments, dt);
-			fc2.velocity_moments = calculate_velocity_moments (b2, fc2.acceleration_moments, dt);
+			// Recalculate velocity moments: TODO do we need to store it in frame cache?
+			fc1.velocity_moments = calculate_velocity_moments (b1.velocity_moments<WorldSpace>(), acceleration_moments_1, dt);
+			fc2.velocity_moments = calculate_velocity_moments (b2.velocity_moments<WorldSpace>(), acceleration_moments_2, dt);
 		}
 	}
 
@@ -267,12 +267,11 @@ ImpulseSolver::update_single_constraint_forces (Constraint* constraint, si::Time
 
 
 AccelerationMoments<WorldSpace>
-ImpulseSolver::acceleration_moments (Body const& body, ForceMoments<WorldSpace> const& force_moments)
+ImpulseSolver::calculate_acceleration_moments (Placement<WorldSpace, BodyCOM> const& placement, MassMomentsAtCOM<BodyCOM> const& mm, ForceMoments<WorldSpace> const& force_moments)
 {
-	auto const fm = body.placement().unbound_transform_to_body (force_moments);
-	auto const mm = body.mass_moments();
+	auto const fm = placement.unbound_transform_to_body (force_moments);
 	auto const am = AccelerationMoments<BodyCOM> (fm.force() / mm.mass(), 1_rad * mm.inverse_inertia_tensor() * fm.torque());
-	return body.placement().unbound_transform_to_base (am);
+	return placement.unbound_transform_to_base (am);
 }
 
 
@@ -283,15 +282,14 @@ ImpulseSolver::update_acceleration_moments()
 	{
 		auto fm = body->frame_cache().all_force_moments();
 		apply_limits (fm);
-		body->set_acceleration_moments<WorldSpace> (acceleration_moments (*body, fm));
+		body->set_acceleration_moments<WorldSpace> (calculate_acceleration_moments (body->placement(), body->mass_moments(), fm));
 	}
 }
 
 
 VelocityMoments<WorldSpace>
-ImpulseSolver::calculate_velocity_moments (Body const& body, AccelerationMoments<WorldSpace> const& am, si::Time const dt)
+ImpulseSolver::calculate_velocity_moments (VelocityMoments<WorldSpace> vm, AccelerationMoments<WorldSpace> const& am, si::Time const dt)
 {
-	auto vm = body.velocity_moments<WorldSpace>();
 	vm.set_velocity (vm.velocity() + am.acceleration() * dt);
 	vm.set_angular_velocity (vm.angular_velocity() + am.angular_acceleration() * dt);
 	return vm;
@@ -303,7 +301,7 @@ ImpulseSolver::update_velocity_moments (si::Time const dt)
 {
 	for (auto& body: _system.bodies())
 	{
-		auto vm = calculate_velocity_moments (*body, body->acceleration_moments<WorldSpace>(), dt);
+		auto vm = calculate_velocity_moments (body->velocity_moments<WorldSpace>(), body->acceleration_moments<WorldSpace>(), dt);
 		apply_limits (vm);
 		body->set_velocity_moments<WorldSpace> (vm);
 	}
@@ -311,9 +309,8 @@ ImpulseSolver::update_velocity_moments (si::Time const dt)
 
 
 Placement<WorldSpace, BodyCOM>
-ImpulseSolver::calculate_placement (Body const& body, VelocityMoments<WorldSpace> const& vm, si::Time const dt)
+ImpulseSolver::calculate_placement (Placement<WorldSpace, BodyCOM> placement, VelocityMoments<WorldSpace> const& vm, si::Time const dt)
 {
-	auto placement = body.placement();
 	auto const ds = vm.velocity() * dt;
 	auto const dr_vec = vm.angular_velocity() * dt;
 	auto const dr = to_rotation_quaternion (dr_vec);
@@ -329,7 +326,7 @@ void
 ImpulseSolver::update_placements (si::Time dt)
 {
 	for (auto& body: _system.bodies())
-		body->set_placement (calculate_placement (*body, body->velocity_moments<WorldSpace>(), dt));
+		body->set_placement (calculate_placement (body->placement(), body->velocity_moments<WorldSpace>(), dt));
 }
 
 

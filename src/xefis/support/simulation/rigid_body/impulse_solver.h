@@ -140,22 +140,23 @@ class ImpulseSolver: private Noncopyable
 	bool
 	update_single_constraint_forces (Constraint*, si::Time dt);
 
+	[[nodiscard]]
 	static AccelerationMoments<WorldSpace>
-	acceleration_moments (Body const&, ForceMoments<WorldSpace> const&);
+	calculate_acceleration_moments (Placement<WorldSpace, BodyCOM> const&, MassMomentsAtCOM<BodyCOM> const&, ForceMoments<WorldSpace> const&);
 
 	void
 	update_acceleration_moments();
 
 	[[nodiscard]]
 	static VelocityMoments<WorldSpace>
-	calculate_velocity_moments (Body const&, AccelerationMoments<WorldSpace> const&, si::Time dt);
+	calculate_velocity_moments (VelocityMoments<WorldSpace>, AccelerationMoments<WorldSpace> const&, si::Time dt);
 
 	void
 	update_velocity_moments (si::Time dt);
 
 	[[nodiscard]]
-	Placement<WorldSpace, BodyCOM>
-	calculate_placement (Body const&, VelocityMoments<WorldSpace> const&, si::Time const dt);
+	static Placement<WorldSpace, BodyCOM>
+	calculate_placement (Placement<WorldSpace, BodyCOM>, VelocityMoments<WorldSpace> const&, si::Time const dt);
 
 	void
 	update_placements (si::Time dt);
