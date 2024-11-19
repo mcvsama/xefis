@@ -252,7 +252,7 @@ ImpulseSolver::update_single_constraint_forces (Constraint* constraint, si::Time
 			iter1.all_constraints_force_moments += constraint_forces[0];
 			iter2.all_constraints_force_moments += constraint_forces[1];
 
-			// Recalculate accelerations: TODO do we need to store it in frame cache?
+			// Recalculate accelerations:
 			auto const acceleration_moments_1 = calculate_acceleration_moments (b1.placement(), b1.mass_moments(), iter1.all_force_moments());
 			auto const acceleration_moments_2 = calculate_acceleration_moments (b2.placement(), b2.mass_moments(), iter2.all_force_moments());
 
