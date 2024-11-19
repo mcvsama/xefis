@@ -583,9 +583,9 @@ RigidBodyPainter::paint_forces (rigid_body::Body const& body)
 	auto constexpr force_to_length = 0.1_m / 1_N; // TODO unhardcode
 	auto constexpr torque_to_length = force_to_length / 1_m; // TODO unhardcode
 
-	auto const& cache = body.frame_cache();
-	auto const gfm = cache.gravitational_force_moments;
-	auto const efm = cache.external_force_moments;
+	auto const& iter = body.iteration();
+	auto const gfm = iter.gravitational_force_moments;
+	auto const efm = iter.external_force_moments;
 	auto const fbp = followed_body_position();
 	auto const com = body.placement().position() - fbp;
 
@@ -622,7 +622,6 @@ void
 RigidBodyPainter::paint_angular_velocity (rigid_body::Body const& body)
 {
 	auto constexpr angular_velocity_to_length = 0.1_m / 1_radps; // TODO unhardcode
-	// TODO auto const& cache = body.frame_cache();
 	auto const com = body.placement().position() - followed_body_position();
 	auto const omega = body.velocity_moments<rigid_body::WorldSpace>().angular_velocity();
 
@@ -634,7 +633,6 @@ void
 RigidBodyPainter::paint_angular_momentum (rigid_body::Body const& body)
 {
 	auto constexpr angular_momentum_to_length = 0.001_m / (1_kg * 1_m2 / 1_s) / 1_rad; // TODO unhardcode
-	//TODO auto const& cache = body.frame_cache();
 	auto const com = body.placement().position() - followed_body_position();
 	auto const I = body.mass_moments().inertia_tensor();
 	auto const L = I * body.velocity_moments<rigid_body::BodyCOM>().angular_velocity();

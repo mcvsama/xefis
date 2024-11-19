@@ -50,8 +50,8 @@ ImpulseSolver::evolve (si::Time const dt)
 	// Reset required parts of frame cache:
 	for (auto& body: _system.bodies())
 	{
-		body->frame_cache().gravitational_force_moments = {};
-		body->frame_cache().velocity_moments = body->velocity_moments<WorldSpace>();
+		body->iteration().gravitational_force_moments = {};
+		body->iteration().velocity_moments = body->velocity_moments<WorldSpace>();
 	}
 
 	for (auto& frame_precalculation: _system.frame_precalculations())
@@ -82,8 +82,8 @@ ImpulseSolver::update_mass_moments()
 	{
 		auto const mass_moments = body->mass_moments();
 
-		body->frame_cache().inv_M = (1.0 / mass_moments.mass()) * SpaceMatrix<double, WorldSpace> (math::unit);
-		body->frame_cache().inv_I = body->placement().unbound_transform_to_base (mass_moments).inverse_inertia_tensor();
+		body->iteration().inv_M = (1.0 / mass_moments.mass()) * SpaceMatrix<double, WorldSpace> (math::unit);
+		body->iteration().inv_I = body->placement().unbound_transform_to_base (mass_moments).inverse_inertia_tensor();
 	}
 }
 
@@ -133,8 +133,8 @@ ImpulseSolver::update_gravitational_forces (Body& b1, Body& b2)
 	auto const r_abs = abs (r);
 	auto const gravitational_force = kGravitationalConstant * m1 * m2 * r / (r_abs * r_abs * r_abs);
 
-	b1.frame_cache().gravitational_force_moments += ForceMoments<WorldSpace> { +gravitational_force, math::zero };
-	b2.frame_cache().gravitational_force_moments += ForceMoments<WorldSpace> { -gravitational_force, math::zero };
+	b1.iteration().gravitational_force_moments += ForceMoments<WorldSpace> { +gravitational_force, math::zero };
+	b2.iteration().gravitational_force_moments += ForceMoments<WorldSpace> { -gravitational_force, math::zero };
 }
 
 
@@ -148,7 +148,7 @@ ImpulseSolver::update_external_forces()
 
 	for (auto& body: _system.bodies())
 	{
-		body->frame_cache().external_force_moments = body->external_force_moments<WorldSpace>();
+		body->iteration().external_force_moments = body->external_force_moments<WorldSpace>();
 		body->reset_applied_impulses();
 	}
 }
@@ -168,7 +168,7 @@ ImpulseSolver::update_constraint_forces (si::Time const dt)
 	{
 		// Reset constraint forces:
 		for (auto& body: _system.bodies())
-			body->frame_cache().all_constraints_force_moments = ForceMoments<WorldSpace>();
+			body->iteration().all_constraints_force_moments = ForceMoments<WorldSpace>();
 
 		precise_enough = true;
 
@@ -185,11 +185,11 @@ ImpulseSolver::update_constraint_forces (si::Time const dt)
 			auto& b1 = constraint->body_1();
 			auto& b2 = constraint->body_2();
 
-			auto& fc1 = b1.frame_cache();
-			auto& fc2 = b2.frame_cache();
+			auto& iter1 = b1.iteration();
+			auto& iter2 = b2.iteration();
 
-			fc1.acceleration_moments_except_gravity = calculate_acceleration_moments (b1.placement(), b1.mass_moments(), fc1.force_moments_except_gravity());
-			fc2.acceleration_moments_except_gravity = calculate_acceleration_moments (b2.placement(), b2.mass_moments(), fc2.force_moments_except_gravity());
+			iter1.acceleration_moments_except_gravity = calculate_acceleration_moments (b1.placement(), b1.mass_moments(), iter1.force_moments_except_gravity());
+			iter2.acceleration_moments_except_gravity = calculate_acceleration_moments (b2.placement(), b2.mass_moments(), iter2.force_moments_except_gravity());
 		}
 	}
 
@@ -197,8 +197,8 @@ ImpulseSolver::update_constraint_forces (si::Time const dt)
 	for (auto& constraint: _system.constraints())
 	{
 		// TODO What, these are summed-up all_constraints_force_moments, not individual ones, should be individual though:
-		constraint->calculated_constraint_forces ({ constraint->body_1().frame_cache().all_constraints_force_moments,
-													constraint->body_2().frame_cache().all_constraints_force_moments }, dt);
+		constraint->calculated_constraint_forces ({ constraint->body_1().iteration().all_constraints_force_moments,
+													constraint->body_2().iteration().all_constraints_force_moments }, dt);
 	}
 
     return {
@@ -218,16 +218,16 @@ ImpulseSolver::update_single_constraint_forces (Constraint* constraint, si::Time
 		auto& b1 = constraint->body_1();
 		auto& b2 = constraint->body_2();
 
-		auto& fc1 = b1.frame_cache();
-		auto& fc2 = b2.frame_cache();
+		auto& iter1 = b1.iteration();
+		auto& iter2 = b2.iteration();
 
 		if (!b1.broken() && !b2.broken())
 		{
-			auto const total_ext_forces_1 = fc1.gravitational_force_moments + fc1.external_force_moments;
-			auto const total_ext_forces_2 = fc2.gravitational_force_moments + fc2.external_force_moments;
+			auto const total_ext_forces_1 = iter1.gravitational_force_moments + iter1.external_force_moments;
+			auto const total_ext_forces_2 = iter2.gravitational_force_moments + iter2.external_force_moments;
 
-			auto const constraint_forces = constraint->constraint_forces (fc1.velocity_moments, total_ext_forces_1,
-																		  fc2.velocity_moments, total_ext_forces_2,
+			auto const constraint_forces = constraint->constraint_forces (iter1.velocity_moments, total_ext_forces_1,
+																		  iter2.velocity_moments, total_ext_forces_2,
 																		  dt);
 
 			if (_required_force_torque_precision)
@@ -249,16 +249,16 @@ ImpulseSolver::update_single_constraint_forces (Constraint* constraint, si::Time
 
 			constraint->previous_calculation_force_moments() = constraint_forces[0];
 
-			fc1.all_constraints_force_moments += constraint_forces[0];
-			fc2.all_constraints_force_moments += constraint_forces[1];
+			iter1.all_constraints_force_moments += constraint_forces[0];
+			iter2.all_constraints_force_moments += constraint_forces[1];
 
 			// Recalculate accelerations: TODO do we need to store it in frame cache?
-			auto const acceleration_moments_1 = calculate_acceleration_moments (b1.placement(), b1.mass_moments(), fc1.all_force_moments());
-			auto const acceleration_moments_2 = calculate_acceleration_moments (b2.placement(), b2.mass_moments(), fc2.all_force_moments());
+			auto const acceleration_moments_1 = calculate_acceleration_moments (b1.placement(), b1.mass_moments(), iter1.all_force_moments());
+			auto const acceleration_moments_2 = calculate_acceleration_moments (b2.placement(), b2.mass_moments(), iter2.all_force_moments());
 
 			// Recalculate velocity moments: TODO do we need to store it in frame cache?
-			fc1.velocity_moments = calculate_velocity_moments (b1.velocity_moments<WorldSpace>(), acceleration_moments_1, dt);
-			fc2.velocity_moments = calculate_velocity_moments (b2.velocity_moments<WorldSpace>(), acceleration_moments_2, dt);
+			iter1.velocity_moments = calculate_velocity_moments (b1.velocity_moments<WorldSpace>(), acceleration_moments_1, dt);
+			iter2.velocity_moments = calculate_velocity_moments (b2.velocity_moments<WorldSpace>(), acceleration_moments_2, dt);
 		}
 	}
 
@@ -280,7 +280,7 @@ ImpulseSolver::update_acceleration_moments()
 {
 	for (auto& body: _system.bodies())
 	{
-		auto fm = body->frame_cache().all_force_moments();
+		auto fm = body->iteration().all_force_moments();
 		apply_limits (fm);
 		body->set_acceleration_moments<WorldSpace> (calculate_acceleration_moments (body->placement(), body->mass_moments(), fm));
 	}

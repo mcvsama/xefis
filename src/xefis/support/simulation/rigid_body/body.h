@@ -25,6 +25,7 @@
 #include <xefis/support/nature/mass_moments_at_com.h>
 #include <xefis/support/nature/velocity_moments.h>
 #include <xefis/support/nature/wrench.h>
+#include <xefis/support/simulation/rigid_body/body_iteration.h>
 #include <xefis/support/simulation/rigid_body/concepts.h>
 #include <xefis/support/simulation/rigid_body/shape.h>
 
@@ -43,39 +44,6 @@
 
 
 namespace xf::rigid_body {
-
-/**
- * A set of calculations related to the body done by the simulator on each frame.
- */
-class BodyFrameCache
-{
-  public:
-	SpaceMatrix<si::Mass, WorldSpace>::InverseMatrix			inv_M;
-	SpaceMatrix<si::MomentOfInertia, WorldSpace>::InverseMatrix	inv_I;
-
-	// Those are used temporarily when calculating all_constraints_force_moments:
-	ForceMoments<WorldSpace>									gravitational_force_moments;
-	ForceMoments<WorldSpace>									external_force_moments; // Excluding gravitation.
-	VelocityMoments<WorldSpace>									velocity_moments;
-
-	// Needed by Body::acceleration_moments_except_gravity(): TODO maybe it can be moved to the Body?
-	AccelerationMoments<WorldSpace>								acceleration_moments_except_gravity;
-
-	// The resulting summed constraint forces to apply to the body after simulation step:
-	ForceMoments<WorldSpace>									all_constraints_force_moments;
-
-  public:
-	[[nodiscard]]
-	ForceMoments<WorldSpace>
-	all_force_moments() const noexcept
-		{ return gravitational_force_moments + external_force_moments + all_constraints_force_moments; }
-
-	[[nodiscard]]
-	ForceMoments<WorldSpace>
-	force_moments_except_gravity() const noexcept
-		{ return external_force_moments + all_constraints_force_moments; }
-};
-
 
 /**
  * Rigid body.
@@ -342,18 +310,18 @@ class Body: public Noncopyable
 	 * To be used by the simulator.
 	 */
 	[[nodiscard]]
-	BodyFrameCache&
-	frame_cache() noexcept
-		{ return _frame_cache; }
+	BodyIteration&
+	iteration() noexcept
+		{ return _iteration; }
 
 	/**
 	 * Return frame cache of the body.
 	 * To be used by the simulator.
 	 */
 	[[nodiscard]]
-	BodyFrameCache const&
-	frame_cache() const noexcept
-		{ return _frame_cache; }
+	BodyIteration const&
+	iteration() const noexcept
+		{ return _iteration; }
 
 	/**
 	 * Return true if the body is broken and must not be used in the system
@@ -403,7 +371,7 @@ class Body: public Noncopyable
 	mutable std::optional<ForceMoments<WorldSpace>>		_world_space_applied_impulses;
 	ForceMoments<BodyCOM>								_applied_impulses;
 	// Stuff calculated when simulation is run:
-	BodyFrameCache										_frame_cache;
+	BodyIteration										_iteration;
 	// Body shape:
 	std::optional<Shape>								_shape;
 	ShapeType											_shape_type;
@@ -489,9 +457,9 @@ template<CoordinateSystemConcept Space>
 	Body::acceleration_moments_except_gravity() const
 	{
 		if constexpr (std::is_same_v<Space, WorldSpace>)
-			return frame_cache().acceleration_moments_except_gravity;
+			return iteration().acceleration_moments_except_gravity;
 		else if constexpr (std::is_same_v<Space, BodyCOM>)
-			return _placement.unbound_transform_to_body (frame_cache().acceleration_moments_except_gravity);
+			return _placement.unbound_transform_to_body (iteration().acceleration_moments_except_gravity);
 		else
 			static_assert (false, "Unsupported coordinate system");
 	}

@@ -352,6 +352,7 @@ MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/simulation/fail
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/simulation/failure/sigmoidal_temperature_failure.h
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/simulation/rigid_body/body.cc
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/simulation/rigid_body/body.h
+MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/simulation/rigid_body/body_iteration.h
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/simulation/rigid_body/connected_bodies.h
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/simulation/rigid_body/constraint.h
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/simulation/rigid_body/frame_precalculation.h

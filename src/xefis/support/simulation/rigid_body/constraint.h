@@ -416,10 +416,10 @@ template<std::size_t N>
 		auto const v2 = vm_2.velocity();
 		auto const w2 = vm_2.angular_velocity() * inv_radian;
 
-		auto const inv_M1 = body_1().frame_cache().inv_M;
-		auto const inv_I1 = body_1().frame_cache().inv_I;
-		auto const inv_M2 = body_2().frame_cache().inv_M;
-		auto const inv_I2 = body_2().frame_cache().inv_I;
+		auto const inv_M1 = body_1().iteration().inv_M;
+		auto const inv_I1 = body_1().iteration().inv_I;
+		auto const inv_M2 = body_2().iteration().inv_M;
+		auto const inv_I2 = body_2().iteration().inv_I;
 
 		// Total jacobian: J * (v + Δt * a)
 		auto const J = Jv1 * (v1 + dt * inv_M1 * (ext_forces_1.force()))
@@ -451,10 +451,10 @@ template<std::size_t N>
 							 JacobianV<N> const& Jv2,
 							 JacobianW<N> const& Jw2) const
 	{
-		auto const inv_M1 = body_1().frame_cache().inv_M;
-		auto const inv_I1 = body_1().frame_cache().inv_I;
-		auto const inv_M2 = body_2().frame_cache().inv_M;
-		auto const inv_I2 = body_2().frame_cache().inv_I;
+		auto const inv_M1 = body_1().iteration().inv_M;
+		auto const inv_I1 = body_1().iteration().inv_I;
+		auto const inv_M2 = body_2().iteration().inv_M;
+		auto const inv_I2 = body_2().iteration().inv_I;
 		auto const CFM = _constraint_force_mixing_factor * InverseConstraintMassMatrix <N> (math::unit);
 
 		// Unfolded expression: J * inv(M) * ~J.
@@ -472,8 +472,8 @@ template<std::size_t N>
 	Constraint::calculate_K (JacobianV<N> const& Jv1,
 							 JacobianV<N> const& Jv2) const
 	{
-		auto const inv_M1 = body_1().frame_cache().inv_M;
-		auto const inv_M2 = body_2().frame_cache().inv_M;
+		auto const inv_M1 = body_1().iteration().inv_M;
+		auto const inv_M2 = body_2().iteration().inv_M;
 		auto const CFM = _constraint_force_mixing_factor * InverseConstraintMassMatrix <N> (math::unit);
 
 		// Unfolded expression: J * inv(M) * ~J.
@@ -488,8 +488,8 @@ template<std::size_t N>
 	Constraint::calculate_K (JacobianW<N> const& Jw1,
 							 JacobianW<N> const& Jw2) const
 	{
-		auto const inv_I1 = body_1().frame_cache().inv_I;
-		auto const inv_I2 = body_2().frame_cache().inv_I;
+		auto const inv_I1 = body_1().iteration().inv_I;
+		auto const inv_I2 = body_2().iteration().inv_I;
 		auto const CFM = _constraint_force_mixing_factor * InverseConstraintMassMatrix <N> (math::unit);
 
 		// Unfolded expression: J * inv(M) * ~J.

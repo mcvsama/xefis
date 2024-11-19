@@ -19,6 +19,7 @@
 #include <xefis/support/math/geometry.h>
 
 // Neutrino:
+#include <neutrino/math/matrix_operations.h>
 #include <neutrino/numeric.h>
 #include <neutrino/variant.h>
 
@@ -118,8 +119,8 @@ AngularServoConstraint::update_velocity_and_torque()
 	auto const arm_velocity = w2_about_hinge - w1_about_hinge;
 	_arm_angular_velocity = dot_product (arm_velocity, hinge);
 
-	auto const t1_about_hinge = projection_onto_normalized (Constraint::body_1().frame_cache().all_constraints_force_moments.torque(), hinge);
-	auto const t2_about_hinge = projection_onto_normalized (Constraint::body_2().frame_cache().all_constraints_force_moments.torque(), hinge);
+	auto const t1_about_hinge = projection_onto_normalized (Constraint::body_1().iteration().all_constraints_force_moments.torque(), hinge);
+	auto const t2_about_hinge = projection_onto_normalized (Constraint::body_2().iteration().all_constraints_force_moments.torque(), hinge);
 	auto const arm_torque = t2_about_hinge - t1_about_hinge;
 	_arm_torque = dot_product (arm_torque, hinge);
 }
