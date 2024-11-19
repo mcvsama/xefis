@@ -177,7 +177,7 @@ ImpulseSolver::update_constraint_forces (si::Time const dt)
 				precise_enough = false;
 	}
 
-	// Update acceleration moments except gravity:
+	// Update acceleration moments except gravity (used by eg. acceleration sensors):
 	for (auto const& constraint: _system.constraints())
 	{
 		if (constraint->enabled() && !constraint->broken())
