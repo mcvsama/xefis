@@ -62,7 +62,7 @@ ImpulseSolver::evolve (si::Time const dt)
 	update_external_forces();
 	auto const details = update_constraint_forces (dt);
 	update_acceleration_moments();
-	update_velocity_moments (dt);
+	update_velocity_moments();
 	update_placements (dt);
 	normalize_rotations();
 
@@ -253,12 +253,12 @@ ImpulseSolver::update_single_constraint_forces (Constraint* constraint, si::Time
 			iter2.all_constraints_force_moments += constraint_forces[1];
 
 			// Recalculate accelerations:
-			auto const acceleration_moments_1 = calculate_acceleration_moments (b1.placement(), b1.mass_moments(), iter1.all_force_moments());
-			auto const acceleration_moments_2 = calculate_acceleration_moments (b2.placement(), b2.mass_moments(), iter2.all_force_moments());
+			iter1.acceleration_moments = calculate_acceleration_moments (b1.placement(), b1.mass_moments(), iter1.all_force_moments());
+			iter2.acceleration_moments = calculate_acceleration_moments (b2.placement(), b2.mass_moments(), iter2.all_force_moments());
 
-			// Recalculate velocity moments: TODO do we need to store it in frame cache?
-			iter1.velocity_moments = calculate_velocity_moments (b1.velocity_moments<WorldSpace>(), acceleration_moments_1, dt);
-			iter2.velocity_moments = calculate_velocity_moments (b2.velocity_moments<WorldSpace>(), acceleration_moments_2, dt);
+			// Recalculate velocity moments:
+			iter1.velocity_moments = calculate_velocity_moments (b1.velocity_moments<WorldSpace>(), iter1.acceleration_moments, dt);
+			iter2.velocity_moments = calculate_velocity_moments (b2.velocity_moments<WorldSpace>(), iter2.acceleration_moments, dt);
 		}
 	}
 
@@ -279,11 +279,7 @@ void
 ImpulseSolver::update_acceleration_moments()
 {
 	for (auto& body: _system.bodies())
-	{
-		auto fm = body->iteration().all_force_moments();
-		apply_limits (fm);
-		body->set_acceleration_moments<WorldSpace> (calculate_acceleration_moments (body->placement(), body->mass_moments(), fm));
-	}
+		body->set_acceleration_moments<WorldSpace> (body->iteration().acceleration_moments);
 }
 
 
@@ -297,11 +293,11 @@ ImpulseSolver::calculate_velocity_moments (VelocityMoments<WorldSpace> vm, Accel
 
 
 void
-ImpulseSolver::update_velocity_moments (si::Time const dt)
+ImpulseSolver::update_velocity_moments()
 {
 	for (auto& body: _system.bodies())
 	{
-		auto vm = calculate_velocity_moments (body->velocity_moments<WorldSpace>(), body->acceleration_moments<WorldSpace>(), dt);
+		auto& vm = body->iteration().velocity_moments;
 		apply_limits (vm);
 		body->set_velocity_moments<WorldSpace> (vm);
 	}

@@ -45,6 +45,7 @@ class BodyIteration
 	ForceMoments<WorldSpace>									external_force_moments; // Excluding gravitation.
 	VelocityMoments<WorldSpace>									velocity_moments;
 
+	AccelerationMoments<WorldSpace>								acceleration_moments;
 	// Needed by Body::acceleration_moments_except_gravity(): TODO maybe it can be moved to the Body?
 	AccelerationMoments<WorldSpace>								acceleration_moments_except_gravity;
 
