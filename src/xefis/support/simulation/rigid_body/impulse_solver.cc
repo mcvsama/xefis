@@ -50,8 +50,9 @@ ImpulseSolver::evolve (si::Time const dt)
 	// Reset required parts of frame cache and initialize starting points:
 	for (auto& body: _system.bodies())
 	{
-		body->iteration().gravitational_force_moments = {};
-		body->iteration().velocity_moments = body->velocity_moments<WorldSpace>();
+		auto& iter = body->iteration();
+		iter.gravitational_force_moments = {};
+		iter.velocity_moments = body->velocity_moments<WorldSpace>(); // TODO + warmer;
 	}
 
 	for (auto& frame_precalculation: _system.frame_precalculations())

@@ -91,8 +91,8 @@ HingePrecalculation::calculate (HingePrecalculationData& data)
 {
 	auto const pl_1 = body_1().placement();
 	auto const pl_2 = body_2().placement();
-	auto const x1 = body_1().placement().position();
-	auto const x2 = body_2().placement().position();
+	auto const x1 = pl_1.position();
+	auto const x2 = pl_2.position();
 	auto const r1 = pl_1.unbound_transform_to_base (body_1_anchor());
 	auto const r2 = pl_2.unbound_transform_to_base (body_2_anchor());
 	auto const u = x2 + r2 - x1 - r1;
