@@ -33,7 +33,7 @@ SliderConstraint::SliderConstraint (SliderPrecalculation& slider_precalculation)
 
 
 ConstraintForces
-SliderConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, VelocityMoments<WorldSpace> const& vm_2, si::Time dt) const
+SliderConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, VelocityMoments<WorldSpace> const& vm_2, si::Time dt)
 {
 	auto const& c = _slider_precalculation.data();
 

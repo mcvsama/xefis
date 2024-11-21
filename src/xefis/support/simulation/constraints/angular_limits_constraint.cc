@@ -39,7 +39,7 @@ AngularLimitsConstraint::AngularLimitsConstraint (HingePrecalculation& hinge_pre
 
 
 ConstraintForces
-AngularLimitsConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, VelocityMoments<WorldSpace> const& vm_2, si::Time dt) const
+AngularLimitsConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, VelocityMoments<WorldSpace> const& vm_2, si::Time dt)
 {
 	ConstraintForces fc;
 	auto const& hinge_data = _hinge_precalculation.data();

@@ -39,7 +39,7 @@ LinearLimitsConstraint::LinearLimitsConstraint (SliderPrecalculation& slider_pre
 
 
 ConstraintForces
-LinearLimitsConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, VelocityMoments<WorldSpace> const& vm_2, si::Time dt) const
+LinearLimitsConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, VelocityMoments<WorldSpace> const& vm_2, si::Time dt)
 {
 	ConstraintForces fc;
 	auto const& slider_data = _slider_precalculation.data();

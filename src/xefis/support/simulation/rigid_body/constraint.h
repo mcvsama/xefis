@@ -214,6 +214,14 @@ class Constraint: public ConnectedBodies
 		{ _friction_factor = factor; }
 
 	/**
+	 * Initialize the constraint for the next simulation step. Not iteration, just step.
+	 * Default implementation does nothing.
+	 */
+	virtual void
+	initialize_step()
+	{ }
+
+	/**
 	 * Return constraint forces to apply to the two bodies.
 	 *
 	 * Call do_constraint_forces() and check if constraint needs to be broken
@@ -221,7 +229,7 @@ class Constraint: public ConnectedBodies
 	 */
 	[[nodiscard]]
 	ConstraintForces
-	constraint_forces (VelocityMoments<WorldSpace> const& vm_1, VelocityMoments<WorldSpace> const& vm_2, si::Time dt) const;
+	constraint_forces (VelocityMoments<WorldSpace> const& vm_1, VelocityMoments<WorldSpace> const& vm_2, si::Time dt);
 
 	/**
 	 * Called when final constraint forces are obtained for current frame of simulation.
@@ -253,7 +261,7 @@ class Constraint: public ConnectedBodies
 	 */
 	[[nodiscard]]
 	virtual ConstraintForces
-	do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, VelocityMoments<WorldSpace> const& vm_2, si::Time dt) const = 0;
+	do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, VelocityMoments<WorldSpace> const& vm_2, si::Time dt) = 0;
 
 	/**
 	 * Helper function that calculates actual corrective forces for given Jacobians and location constraints.
@@ -353,7 +361,7 @@ Constraint::set_breaking_force_torque (std::optional<si::Force> const breaking_f
 
 
 inline ConstraintForces
-Constraint::constraint_forces (VelocityMoments<WorldSpace> const& vm_1, VelocityMoments<WorldSpace> const& vm_2, si::Time dt) const
+Constraint::constraint_forces (VelocityMoments<WorldSpace> const& vm_1, VelocityMoments<WorldSpace> const& vm_2, si::Time dt)
 {
 	if (_broken)
 	{

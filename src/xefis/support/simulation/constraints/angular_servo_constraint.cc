@@ -52,7 +52,7 @@ AngularServoConstraint::AngularServoConstraint (HingePrecalculation& hinge_preca
 
 
 ConstraintForces
-AngularServoConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, VelocityMoments<WorldSpace> const& vm_2, si::Time const dt) const
+AngularServoConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, VelocityMoments<WorldSpace> const& vm_2, si::Time const dt)
 {
 	return _motor_constraint.constraint_forces (vm_1, vm_2, dt);
 }

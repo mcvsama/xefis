@@ -43,7 +43,7 @@ class HingeConstraint: public Constraint
   protected:
 	// Constraint API
 	ConstraintForces
-	do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, VelocityMoments<WorldSpace> const& vm_2, si::Time dt) const override;
+	do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, VelocityMoments<WorldSpace> const& vm_2, si::Time dt) override;
 
   private:
 	HingePrecalculation& _hinge_precalculation;

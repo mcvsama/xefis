@@ -31,7 +31,7 @@ AngularMotorConstraint::AngularMotorConstraint (HingePrecalculation& hinge_preca
 
 
 ConstraintForces
-AngularMotorConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, VelocityMoments<WorldSpace> const& vm_2, si::Time dt) const
+AngularMotorConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, VelocityMoments<WorldSpace> const& vm_2, si::Time dt)
 {
 	auto const& c = _hinge_precalculation.data();
 

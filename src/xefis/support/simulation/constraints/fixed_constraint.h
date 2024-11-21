@@ -41,16 +41,16 @@ class FixedConstraint: public Constraint
   protected:
 	// Constraint API
 	ConstraintForces
-	do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, VelocityMoments<WorldSpace> const& vm_2, si::Time dt) const override;
+	do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, VelocityMoments<WorldSpace> const& vm_2, si::Time dt) override;
 
   private:
 	SpaceLength<BodyCOM>	_anchor_1;
 	SpaceLength<BodyCOM>	_anchor_2;
 	FixedOrientationHelper	_fixed_orientation;
-	JacobianV<6> mutable			_Jv1;
-	JacobianW<6> mutable			_Jw1;
-	JacobianV<6> mutable			_Jv2;
-	JacobianW<6> mutable			_Jw2;
+	JacobianV<6>			_Jv1;
+	JacobianW<6>			_Jw1;
+	JacobianV<6>			_Jv2;
+	JacobianW<6>			_Jw2;
 };
 
 } // namespace xf::rigid_body

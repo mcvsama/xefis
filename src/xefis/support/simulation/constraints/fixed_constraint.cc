@@ -79,8 +79,6 @@ FixedConstraint::FixedConstraint (Body& body_1, Body& body_2):
 }
 
 
-ConstraintForces
-FixedConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, VelocityMoments<WorldSpace> const& vm_2, si::Time dt) const
 {
 	// TODO placement and position doesn't change in each iteration, they only change in each step, so cache them per step
 	// and all variables that depend on them
@@ -98,6 +96,8 @@ FixedConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, 
 	location_constraint_value.put (x2 + r2 - x1 - r1, 0, 0);
 	location_constraint_value.put (_fixed_orientation.rotation_constraint_value (pl_1, pl_2), 0, 3);
 
+ConstraintForces
+FixedConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, VelocityMoments<WorldSpace> const& vm_2, si::Time dt)
 	auto const J = calculate_jacobian (vm_1, _Jv1, _Jw1, vm_2, _Jv2, _Jw2);
 	auto const K = calculate_K (_Jv1, _Jw1, _Jv2, _Jw2);
 	auto const lambda = calculate_lambda (location_constraint_value, J, K, dt);

@@ -33,7 +33,7 @@ HingeConstraint::HingeConstraint (HingePrecalculation& hinge_precalculation):
 
 
 ConstraintForces
-HingeConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, VelocityMoments<WorldSpace> const& vm_2, si::Time dt) const
+HingeConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, VelocityMoments<WorldSpace> const& vm_2, si::Time dt)
 {
 	auto const& c = _hinge_precalculation.data();
 
