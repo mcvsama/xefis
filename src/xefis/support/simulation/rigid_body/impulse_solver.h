@@ -130,6 +130,9 @@ class ImpulseSolver: private Noncopyable
 	void
 	update_external_forces();
 
+	void
+	calculate_constants_for_step (si::Time dt);
+
 	EvolutionDetails
 	update_constraint_forces (si::Time dt);
 

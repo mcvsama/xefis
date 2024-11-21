@@ -70,17 +70,15 @@ class LinearLimitsConstraint: public Constraint
   protected:
 	// Constraint API
 	ConstraintForces
-	do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, ForceMoments<WorldSpace> const& ext_forces_1,
-						  VelocityMoments<WorldSpace> const& vm_2, ForceMoments<WorldSpace> const& ext_forces_2,
-						  si::Time dt) const override;
+	do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, VelocityMoments<WorldSpace> const& vm_2, si::Time dt) const override;
 
   private:
 	/**
 	 * Return corrective forces for slider limits: minimum distance.
 	 */
 	std::optional<ConstraintForces>
-	min_distance_corrections (VelocityMoments<WorldSpace> const& vm_1, ForceMoments<WorldSpace> const& ext_forces_1,
-							  VelocityMoments<WorldSpace> const& vm_2, ForceMoments<WorldSpace> const& ext_forces_2,
+	min_distance_corrections (VelocityMoments<WorldSpace> const& vm_1,
+							  VelocityMoments<WorldSpace> const& vm_2,
 							  si::Time dt,
 							  SliderPrecalculationData const&) const;
 
@@ -88,8 +86,8 @@ class LinearLimitsConstraint: public Constraint
 	 * Return corrective forces for slider limits: maximum distance.
 	 */
 	std::optional<ConstraintForces>
-	max_distance_corrections (VelocityMoments<WorldSpace> const& vm_1, ForceMoments<WorldSpace> const& ext_forces_1,
-							  VelocityMoments<WorldSpace> const& vm_2, ForceMoments<WorldSpace> const& ext_forces_2,
+	max_distance_corrections (VelocityMoments<WorldSpace> const& vm_1,
+							  VelocityMoments<WorldSpace> const& vm_2,
 							  si::Time dt,
 							  SliderPrecalculationData const&) const;
 

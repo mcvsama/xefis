@@ -43,8 +43,8 @@ class AngularSpringConstraint: public Constraint
 	 */
 	using SpringTorqueFunction = std::function<si::Torque (si::Angle,
 														   SpaceVector<double, WorldSpace> const& hinge,
-														   VelocityMoments<WorldSpace> const& vm1, ForceMoments<WorldSpace> const& fm1,
-														   VelocityMoments<WorldSpace> const& vm2, ForceMoments<WorldSpace> const& fm2,
+														   VelocityMoments<WorldSpace> const& vm1,
+														   VelocityMoments<WorldSpace> const& vm2,
 														   si::Time const dt)>;
 
   public:
@@ -55,9 +55,7 @@ class AngularSpringConstraint: public Constraint
   protected:
 	// Constraint API
 	ConstraintForces
-	do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, ForceMoments<WorldSpace> const& ext_forces_1,
-						  VelocityMoments<WorldSpace> const& vm_2, ForceMoments<WorldSpace> const& ext_forces_2,
-						  si::Time dt) const override;
+	do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, VelocityMoments<WorldSpace> const& vm_2, si::Time dt) const override;
 
   private:
 	HingePrecalculation&	_hinge;
@@ -79,8 +77,8 @@ angular_spring_function (TorqueForAngle torque_for_angle)
 {
 	return [=] (si::Angle const angle,
 				[[maybe_unused]] SpaceVector<double, WorldSpace> const& hinge,
-				[[maybe_unused]] VelocityMoments<WorldSpace> const& vm1, [[maybe_unused]] ForceMoments<WorldSpace> const& fm1,
-				[[maybe_unused]] VelocityMoments<WorldSpace> const& vm2, [[maybe_unused]] ForceMoments<WorldSpace> const& fm2,
+				[[maybe_unused]] VelocityMoments<WorldSpace> const& vm1,
+				[[maybe_unused]] VelocityMoments<WorldSpace> const& vm2,
 				[[maybe_unused]] si::Time const dt)
 	{
 		return torque_for_angle * angle;

@@ -39,18 +39,16 @@ LinearLimitsConstraint::LinearLimitsConstraint (SliderPrecalculation& slider_pre
 
 
 ConstraintForces
-LinearLimitsConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, ForceMoments<WorldSpace> const& ext_forces_1,
-											  VelocityMoments<WorldSpace> const& vm_2, ForceMoments<WorldSpace> const& ext_forces_2,
-											  si::Time dt) const
+LinearLimitsConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, VelocityMoments<WorldSpace> const& vm_2, si::Time dt) const
 {
 	ConstraintForces fc;
 	auto const& slider_data = _slider_precalculation.data();
 	// TODO doesn't seem to work correctly
 
-	if (auto fc_min = min_distance_corrections (vm_1, ext_forces_1, vm_2, ext_forces_2, dt, slider_data))
+	if (auto fc_min = min_distance_corrections (vm_1, vm_2, dt, slider_data))
 		fc = fc + *fc_min;
 
-	if (auto fc_max = max_distance_corrections (vm_2, ext_forces_1, vm_2, ext_forces_2, dt, slider_data))
+	if (auto fc_max = max_distance_corrections (vm_2, vm_2, dt, slider_data))
 		fc = fc + *fc_max;
 
 	return fc;
@@ -58,8 +56,8 @@ LinearLimitsConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const&
 
 
 std::optional<ConstraintForces>
-LinearLimitsConstraint::min_distance_corrections (VelocityMoments<WorldSpace> const& vm_1, ForceMoments<WorldSpace> const& ext_forces_1,
-												  VelocityMoments<WorldSpace> const& vm_2, ForceMoments<WorldSpace> const& ext_forces_2,
+LinearLimitsConstraint::min_distance_corrections (VelocityMoments<WorldSpace> const& vm_1,
+												  VelocityMoments<WorldSpace> const& vm_2,
 												  si::Time dt,
 												  SliderPrecalculationData const& c) const
 {
@@ -77,9 +75,7 @@ LinearLimitsConstraint::min_distance_corrections (VelocityMoments<WorldSpace> co
 		Jw2.put (c.r2xa, 0, 0);
 		location_constraint_value = c.distance - *_min_distance;
 
-		auto const J = calculate_jacobian (vm_1, ext_forces_1, Jv1, Jw1,
-										   vm_2, ext_forces_2, Jv2, Jw2,
-										   dt);
+		auto const J = calculate_jacobian (vm_1, Jv1, Jw1, vm_2, Jv2, Jw2);
 		auto const K = calculate_K (Jv1, Jw1, Jv2, Jw2);
 		auto const lambda = calculate_lambda (location_constraint_value, J, K, dt);
 
@@ -91,8 +87,8 @@ LinearLimitsConstraint::min_distance_corrections (VelocityMoments<WorldSpace> co
 
 
 std::optional<ConstraintForces>
-LinearLimitsConstraint::max_distance_corrections (VelocityMoments<WorldSpace> const& vm_1, ForceMoments<WorldSpace> const& ext_forces_1,
-												  VelocityMoments<WorldSpace> const& vm_2, ForceMoments<WorldSpace> const& ext_forces_2,
+LinearLimitsConstraint::max_distance_corrections (VelocityMoments<WorldSpace> const& vm_1,
+												  VelocityMoments<WorldSpace> const& vm_2,
 												  si::Time dt,
 												  SliderPrecalculationData const& c) const
 {
@@ -110,9 +106,7 @@ LinearLimitsConstraint::max_distance_corrections (VelocityMoments<WorldSpace> co
 		Jw2.put (-c.r2xa, 0, 0);
 		location_constraint_value = *_max_distance - c.distance;
 
-		auto const J = calculate_jacobian (vm_1, ext_forces_1, Jv1, Jw1,
-										   vm_2, ext_forces_2, Jv2, Jw2,
-										   dt);
+		auto const J = calculate_jacobian (vm_1, Jv1, Jw1, vm_2, Jv2, Jw2);
 		auto const K = calculate_K (Jv1, Jw1, Jv2, Jw2);
 		auto const lambda = calculate_lambda (location_constraint_value, J, K, dt);
 

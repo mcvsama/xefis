@@ -35,33 +35,40 @@ namespace xf::rigid_body {
 class BodyIteration
 {
   public:
+	using ImpulseOverMass = decltype (si::Impulse (1) / si::Mass (1));
+	using AngularImpulseOverInertia = decltype (si::AngularImpulse (1) / si::MomentOfInertia (1));
+
+  public:
 	// Those are recalculated on each simulation step, but stay the same on all
 	// solver iterations:
 	SpaceMatrix<si::Mass, WorldSpace>::InverseMatrix			inv_M;
 	SpaceMatrix<si::MomentOfInertia, WorldSpace>::InverseMatrix	inv_I;
-
-	// Those are used temporarily when calculating all_constraints_force_moments:
 	ForceMoments<WorldSpace>									gravitational_force_moments;
-	ForceMoments<WorldSpace>									external_force_moments; // Excluding gravitation.
-	VelocityMoments<WorldSpace>									velocity_moments;
+	ForceMoments<WorldSpace>									external_force_moments_except_gravity; // Excluding gravitation.
+	ForceMoments<WorldSpace>									external_force_moments; // Gravity + external_force_moments_except_gravity
+	SpaceVector<ImpulseOverMass, WorldSpace>					external_impulses_over_mass;
+	SpaceVector<AngularImpulseOverInertia, WorldSpace>			external_angular_impulses_over_inertia_tensor;
 
+	// The resulting summed constraint forces to apply to the body after simulation step:
+	ForceMoments<WorldSpace>									all_constraints_force_moments;
 	AccelerationMoments<WorldSpace>								acceleration_moments;
 	// Needed by Body::acceleration_moments_except_gravity(): TODO maybe it can be moved to the Body?
 	AccelerationMoments<WorldSpace>								acceleration_moments_except_gravity;
 
-	// The resulting summed constraint forces to apply to the body after simulation step:
-	ForceMoments<WorldSpace>									all_constraints_force_moments;
+	// Those are used temporarily when calculating all_constraints_force_moments,
+	// at the end they contain new velocities for the body:
+	VelocityMoments<WorldSpace>									velocity_moments;
 
   public:
 	[[nodiscard]]
 	ForceMoments<WorldSpace>
 	all_force_moments() const noexcept
-		{ return gravitational_force_moments + external_force_moments + all_constraints_force_moments; }
+		{ return external_force_moments + all_constraints_force_moments; }
 
 	[[nodiscard]]
 	ForceMoments<WorldSpace>
 	force_moments_except_gravity() const noexcept
-		{ return external_force_moments + all_constraints_force_moments; }
+		{ return external_force_moments_except_gravity + all_constraints_force_moments; }
 };
 
 } // namespace xf::rigid_body

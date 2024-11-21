@@ -71,17 +71,15 @@ class AngularLimitsConstraint: public Constraint
   protected:
 	// Constraint API
 	ConstraintForces
-	do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, ForceMoments<WorldSpace> const& ext_forces_1,
-						  VelocityMoments<WorldSpace> const& vm_2, ForceMoments<WorldSpace> const& ext_forces_2,
-						  si::Time dt) const override;
+	do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, VelocityMoments<WorldSpace> const& vm_2, si::Time dt) const override;
 
   private:
 	/**
 	 * Return corrective forces for hinge limits: minimum angle.
 	 */
 	std::optional<ConstraintForces>
-	min_angle_corrections (VelocityMoments<WorldSpace> const& vm_1, ForceMoments<WorldSpace> const& ext_forces_1,
-						   VelocityMoments<WorldSpace> const& vm_2, ForceMoments<WorldSpace> const& ext_forces_2,
+	min_angle_corrections (VelocityMoments<WorldSpace> const& vm_1,
+						   VelocityMoments<WorldSpace> const& vm_2,
 						   si::Time dt,
 						   HingePrecalculationData const&) const;
 
@@ -89,8 +87,8 @@ class AngularLimitsConstraint: public Constraint
 	 * Return corrective forces for hinge limits: maximum angle.
 	 */
 	std::optional<ConstraintForces>
-	max_angle_corrections (VelocityMoments<WorldSpace> const& vm_1, ForceMoments<WorldSpace> const& ext_forces_1,
-						   VelocityMoments<WorldSpace> const& vm_2, ForceMoments<WorldSpace> const& ext_forces_2,
+	max_angle_corrections (VelocityMoments<WorldSpace> const& vm_1,
+						   VelocityMoments<WorldSpace> const& vm_2,
 						   si::Time dt,
 						   HingePrecalculationData const&) const;
 

@@ -221,9 +221,7 @@ class Constraint: public ConnectedBodies
 	 */
 	[[nodiscard]]
 	ConstraintForces
-	constraint_forces (VelocityMoments<WorldSpace> const& vm_1, ForceMoments<WorldSpace> const& ext_forces_1,
-					   VelocityMoments<WorldSpace> const& vm_2, ForceMoments<WorldSpace> const& ext_forces_2,
-					   si::Time dt) const;
+	constraint_forces (VelocityMoments<WorldSpace> const& vm_1, VelocityMoments<WorldSpace> const& vm_2, si::Time dt) const;
 
 	/**
 	 * Called when final constraint forces are obtained for current frame of simulation.
@@ -255,9 +253,7 @@ class Constraint: public ConnectedBodies
 	 */
 	[[nodiscard]]
 	virtual ConstraintForces
-	do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, ForceMoments<WorldSpace> const& ext_forces_1,
-						  VelocityMoments<WorldSpace> const& vm_2, ForceMoments<WorldSpace> const& ext_forces_2,
-						  si::Time dt) const = 0;
+	do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, VelocityMoments<WorldSpace> const& vm_2, si::Time dt) const = 0;
 
 	/**
 	 * Helper function that calculates actual corrective forces for given Jacobians and location constraints.
@@ -281,14 +277,11 @@ class Constraint: public ConnectedBodies
 		[[nodiscard]]
 		Jacobian<N>
 		calculate_jacobian (VelocityMoments<WorldSpace> const& vm_1,
-							ForceMoments<WorldSpace> const& ext_forces_1,
 							JacobianV<N> const& Jv1,
 							JacobianW<N> const& Jw1,
 							VelocityMoments<WorldSpace> const& vm_2,
-							ForceMoments<WorldSpace> const& ext_forces_2,
 							JacobianV<N> const& Jv2,
-							JacobianW<N> const& Jw2,
-							si::Time dt) const;
+							JacobianW<N> const& Jw2) const;
 
 	/**
 	 * Calculate lambda (a vector of si::Force).
@@ -360,9 +353,7 @@ Constraint::set_breaking_force_torque (std::optional<si::Force> const breaking_f
 
 
 inline ConstraintForces
-Constraint::constraint_forces (VelocityMoments<WorldSpace> const& vm_1, ForceMoments<WorldSpace> const& ext_forces_1,
-							   VelocityMoments<WorldSpace> const& vm_2, ForceMoments<WorldSpace> const& ext_forces_2,
-							   si::Time dt) const
+Constraint::constraint_forces (VelocityMoments<WorldSpace> const& vm_1, VelocityMoments<WorldSpace> const& vm_2, si::Time dt) const
 {
 	if (_broken)
 	{
@@ -372,7 +363,7 @@ Constraint::constraint_forces (VelocityMoments<WorldSpace> const& vm_1, ForceMom
 		};
 	}
 	else
-		return do_constraint_forces (vm_1, ext_forces_1, vm_2, ext_forces_2, dt);
+		return do_constraint_forces (vm_1, vm_2, dt);
 
 }
 
@@ -400,14 +391,11 @@ template<std::size_t N>
 template<std::size_t N>
 	inline Constraint::Jacobian<N>
 	Constraint::calculate_jacobian (VelocityMoments<WorldSpace> const& vm_1,
-									ForceMoments<WorldSpace> const& ext_forces_1,
 									JacobianV<N> const& Jv1,
 									JacobianW<N> const& Jw1,
 									VelocityMoments<WorldSpace> const& vm_2,
-									ForceMoments<WorldSpace> const& ext_forces_2,
 									JacobianV<N> const& Jv2,
-									JacobianW<N> const& Jw2,
-									si::Time dt) const
+									JacobianW<N> const& Jw2) const
 	{
 		constexpr auto inv_radian = decltype (1.0 / 1_rad) { 1 };
 
@@ -416,16 +404,14 @@ template<std::size_t N>
 		auto const v2 = vm_2.velocity();
 		auto const w2 = vm_2.angular_velocity() * inv_radian;
 
-		auto const inv_M1 = body_1().iteration().inv_M;
-		auto const inv_I1 = body_1().iteration().inv_I;
-		auto const inv_M2 = body_2().iteration().inv_M;
-		auto const inv_I2 = body_2().iteration().inv_I;
+		auto const& b1_iter = body_1().iteration();
+		auto const& b2_iter = body_2().iteration();
 
 		// Total jacobian: J * (v + Δt * a)
-		auto const J = Jv1 * (v1 + dt * inv_M1 * (ext_forces_1.force()))
-					 + Jw1 * (w1 + dt * inv_I1 * (ext_forces_1.torque()))
-					 + Jv2 * (v2 + dt * inv_M2 * (ext_forces_2.force()))
-					 + Jw2 * (w2 + dt * inv_I2 * (ext_forces_2.torque()));
+		auto const J = Jv1 * (v1 + b1_iter.external_impulses_over_mass)
+					 + Jw1 * (w1 + b1_iter.external_angular_impulses_over_inertia_tensor)
+					 + Jv2 * (v2 + b2_iter.external_impulses_over_mass)
+					 + Jw2 * (w2 + b2_iter.external_angular_impulses_over_inertia_tensor);
 
 		return J;
 	}

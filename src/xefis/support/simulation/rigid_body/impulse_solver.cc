@@ -47,7 +47,7 @@ ImpulseSolver::set_required_precision (si::Force const force, si::Torque const t
 EvolutionDetails
 ImpulseSolver::evolve (si::Time const dt)
 {
-	// Reset required parts of frame cache:
+	// Reset required parts of frame cache and initialize starting points:
 	for (auto& body: _system.bodies())
 	{
 		body->iteration().gravitational_force_moments = {};
@@ -148,8 +148,21 @@ ImpulseSolver::update_external_forces()
 
 	for (auto& body: _system.bodies())
 	{
-		body->iteration().external_force_moments = body->external_force_moments<WorldSpace>();
+		body->iteration().external_force_moments_except_gravity = body->external_force_moments<WorldSpace>();
 		body->reset_applied_impulses();
+	}
+}
+
+
+void
+ImpulseSolver::calculate_constants_for_step (si::Time const dt)
+{
+	for (auto& body: _system.bodies())
+	{
+		auto& iter = body->iteration();
+		iter.external_force_moments = iter.gravitational_force_moments + iter.external_force_moments_except_gravity;
+		iter.external_impulses_over_mass = dt * iter.inv_M * iter.external_force_moments.force();
+		iter.external_angular_impulses_over_inertia_tensor = dt * iter.inv_I * iter.external_force_moments.torque();
 	}
 }
 
@@ -157,6 +170,8 @@ ImpulseSolver::update_external_forces()
 EvolutionDetails
 ImpulseSolver::update_constraint_forces (si::Time const dt)
 {
+	calculate_constants_for_step (dt);
+
 	bool precise_enough = false;
 	size_t iteration = 0;
 
@@ -223,12 +238,7 @@ ImpulseSolver::update_single_constraint_forces (Constraint* constraint, si::Time
 
 		if (!b1.broken() && !b2.broken())
 		{
-			auto const total_ext_forces_1 = iter1.gravitational_force_moments + iter1.external_force_moments;
-			auto const total_ext_forces_2 = iter2.gravitational_force_moments + iter2.external_force_moments;
-
-			auto const constraint_forces = constraint->constraint_forces (iter1.velocity_moments, total_ext_forces_1,
-																		  iter2.velocity_moments, total_ext_forces_2,
-																		  dt);
+			auto const constraint_forces = constraint->constraint_forces (iter1.velocity_moments, iter2.velocity_moments, dt);
 
 			if (_required_force_torque_precision)
 			{

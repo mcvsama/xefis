@@ -36,9 +36,7 @@ FixedConstraint::FixedConstraint (Body& body_1, Body& body_2):
 
 
 ConstraintForces
-FixedConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, ForceMoments<WorldSpace> const& ext_forces_1,
-									   VelocityMoments<WorldSpace> const& vm_2, ForceMoments<WorldSpace> const& ext_forces_2,
-									   si::Time dt) const
+FixedConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, VelocityMoments<WorldSpace> const& vm_2, si::Time dt) const
 {
 	auto const pl_1 = body_1().placement();
 	auto const pl_2 = body_2().placement();
@@ -99,9 +97,7 @@ FixedConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, 
 	location_constraint_value.put (x2 + r2 - x1 - r1, 0, 0);
 	location_constraint_value.put (_fixed_orientation.rotation_constraint_value (pl_1, pl_2), 0, 3);
 
-	auto const J = calculate_jacobian (vm_1, ext_forces_1, Jv1, Jw1,
-									   vm_2, ext_forces_2, Jv2, Jw2,
-									   dt);
+	auto const J = calculate_jacobian (vm_1, Jv1, Jw1, vm_2, Jv2, Jw2);
 	auto const K = calculate_K (Jv1, Jw1, Jv2, Jw2);
 	auto const lambda = calculate_lambda (location_constraint_value, J, K, dt);
 

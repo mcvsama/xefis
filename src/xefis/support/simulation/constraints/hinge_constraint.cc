@@ -33,9 +33,7 @@ HingeConstraint::HingeConstraint (HingePrecalculation& hinge_precalculation):
 
 
 ConstraintForces
-HingeConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, ForceMoments<WorldSpace> const& ext_forces_1,
-									   VelocityMoments<WorldSpace> const& vm_2, ForceMoments<WorldSpace> const& ext_forces_2,
-									   si::Time dt) const
+HingeConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, VelocityMoments<WorldSpace> const& vm_2, si::Time dt) const
 {
 	auto const& c = _hinge_precalculation.data();
 
@@ -79,9 +77,7 @@ HingeConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, 
 	location_constraint_value[0, 3] = dot_product (c.t1, a1xa2);
 	location_constraint_value[0, 4] = dot_product (c.t2, a1xa2);
 
-	auto const J = calculate_jacobian (vm_1, ext_forces_1, Jv1, Jw1,
-									   vm_2, ext_forces_2, Jv2, Jw2,
-									   dt);
+	auto const J = calculate_jacobian (vm_1, Jv1, Jw1, vm_2, Jv2, Jw2);
 	auto const K = calculate_K (Jv1, Jw1, Jv2, Jw2);
 	auto const lambda = calculate_lambda (location_constraint_value, J, K, dt);
 

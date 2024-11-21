@@ -31,9 +31,7 @@ AngularMotorConstraint::AngularMotorConstraint (HingePrecalculation& hinge_preca
 
 
 ConstraintForces
-AngularMotorConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, ForceMoments<WorldSpace> const& ext_forces_1,
-											  VelocityMoments<WorldSpace> const& vm_2, ForceMoments<WorldSpace> const& ext_forces_2,
-											  si::Time dt) const
+AngularMotorConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, VelocityMoments<WorldSpace> const& vm_2, si::Time dt) const
 {
 	auto const& c = _hinge_precalculation.data();
 
@@ -46,9 +44,7 @@ AngularMotorConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const&
 	Jw2.put (1_m * -~c.a1, 0, 0);
 	location_constraint_value = _max_angular_velocity * 1_m / 1_rad * 1_s;
 
-	auto const J = calculate_jacobian (vm_1, ext_forces_1, Jv, Jw1,
-									   vm_2, ext_forces_2, Jv, Jw2,
-									   dt);
+	auto const J = calculate_jacobian (vm_1, Jv, Jw1, vm_2, Jv, Jw2);
 	auto const K = calculate_K (Jw1, Jw2);
 	auto lambda = calculate_lambda (location_constraint_value, J, K, dt);
 	lambda = std::clamp (lambda.scalar(), -_force, +_force); // TODO scalar?

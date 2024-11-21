@@ -154,9 +154,7 @@ class AngularServoConstraint:
   protected:
 	// Constraint API
 	ConstraintForces
-	do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, ForceMoments<WorldSpace> const& ext_forces_1,
-						  VelocityMoments<WorldSpace> const& vm_2, ForceMoments<WorldSpace> const& ext_forces_2,
-						  si::Time dt) const override;
+	do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, VelocityMoments<WorldSpace> const& vm_2, si::Time dt) const override;
 
 	// Constraint API
 	void
