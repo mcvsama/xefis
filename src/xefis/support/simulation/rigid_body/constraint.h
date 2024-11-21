@@ -74,8 +74,9 @@ class Constraint: public ConnectedBodies
 	template<std::size_t N>
 		using ConstraintMassMatrix = math::SquareMatrix<decltype (1 / 1_kg), N, WorldSpace, WorldSpace>;
 
+	// Z matrix is a result of -inv (K) * dt, where K is result of calculate_K():
 	template<std::size_t N>
-		using InverseConstraintMassMatrix = math::SquareMatrix<decltype (1 / 1_kg), N, WorldSpace, WorldSpace>;
+		using ConstraintZMatrix = math::SquareMatrix<decltype (1_kg / 1_s), N, WorldSpace, WorldSpace>;
 
   public:
 	// Ctor
@@ -218,7 +219,7 @@ class Constraint: public ConnectedBodies
 	 * Default implementation does nothing.
 	 */
 	virtual void
-	initialize_step()
+	initialize_step ([[maybe_unused]] si::Time dt)
 	{ }
 
 	/**
@@ -303,6 +304,17 @@ class Constraint: public ConnectedBodies
 						  si::Time dt) const;
 
 	/**
+	 * Calculate lambda (a vector of si::Force).
+	 */
+	template<std::size_t N>
+		[[nodiscard]]
+		Lambda<N>
+		calculate_lambda (LocationConstraint<N> const& location_constraint,
+						  Jacobian<N> const& J,
+						  ConstraintZMatrix<N> const& Z,
+						  si::Time dt) const;
+
+	/**
 	 * Calculate mass matrix K in a generic way.
 	 * It's also called the "constraint matrix".
 	 */
@@ -331,6 +343,32 @@ class Constraint: public ConnectedBodies
 		ConstraintMassMatrix<N>
 		calculate_K (JacobianW<N> const& Jw1,
 					 JacobianW<N> const& Jw2) const;
+
+	template<std::size_t N>
+		[[nodiscard]]
+		ConstraintZMatrix<N>
+		calculate_Z (JacobianV<N> const& Jv1,
+					 JacobianW<N> const& Jw1,
+					 JacobianV<N> const& Jv2,
+					 JacobianW<N> const& Jw2,
+					 si::Time const dt) const
+		{ return -1.0 / dt * inv (calculate_K (Jv1, Jw1, Jv2, Jw2)); }
+
+	template<std::size_t N>
+		[[nodiscard]]
+		ConstraintZMatrix<N>
+		calculate_Z (JacobianV<N> const& Jv1,
+					 JacobianV<N> const& Jv2,
+					 si::Time const dt) const
+		{ return -1.0 / dt * inv (calculate_K (Jv1, Jv2)); }
+
+	template<std::size_t N>
+		[[nodiscard]]
+		ConstraintZMatrix<N>
+		calculate_Z (JacobianW<N> const& Jw1,
+					 JacobianW<N> const& Jw2,
+					 si::Time const dt) const
+		{ return -1.0 / dt * inv (calculate_K (Jw1, Jw2)); }
 
   private:
 	std::string					_label;
@@ -407,19 +445,14 @@ template<std::size_t N>
 	{
 		constexpr auto inv_radian = decltype (1.0 / 1_rad) { 1 };
 
-		auto const v1 = vm_1.velocity();
-		auto const w1 = vm_1.angular_velocity() * inv_radian;
-		auto const v2 = vm_2.velocity();
-		auto const w2 = vm_2.angular_velocity() * inv_radian;
-
 		auto const& b1_iter = body_1().iteration();
 		auto const& b2_iter = body_2().iteration();
 
 		// Total jacobian: J * (v + Δt * a)
-		auto const J = Jv1 * (v1 + b1_iter.external_impulses_over_mass)
-					 + Jw1 * (w1 + b1_iter.external_angular_impulses_over_inertia_tensor)
-					 + Jv2 * (v2 + b2_iter.external_impulses_over_mass)
-					 + Jw2 * (w2 + b2_iter.external_angular_impulses_over_inertia_tensor);
+		auto const J = Jv1 * (vm_1.velocity() + b1_iter.external_impulses_over_mass)
+					 + Jw1 * (vm_1.angular_velocity() * inv_radian + b1_iter.external_angular_impulses_over_inertia_tensor)
+					 + Jv2 * (vm_2.velocity() + b2_iter.external_impulses_over_mass)
+					 + Jw2 * (vm_2.angular_velocity() * inv_radian + b2_iter.external_angular_impulses_over_inertia_tensor);
 
 		return J;
 	}
@@ -434,12 +467,25 @@ template<std::size_t N>
 	{
 		auto const inv_dt = 1 / dt;
 		auto const stabilization_bias = baumgarte_factor() * inv_dt * location_constraint;
-		return (-inv (K) * (J + stabilization_bias)) * inv_dt;
+		return -inv_dt * inv (K) * (J + stabilization_bias);
 	}
 
 
 template<std::size_t N>
-	inline math::SquareMatrix<decltype (1 / 1_kg), N, WorldSpace>
+	inline Constraint::Lambda<N>
+	Constraint::calculate_lambda (LocationConstraint<N> const& location_constraint,
+								  Jacobian<N> const& J,
+								  ConstraintZMatrix<N> const& Z,
+								  si::Time const dt) const
+	{
+		auto const inv_dt = 1 / dt;
+		auto const stabilization_bias = baumgarte_factor() * inv_dt * location_constraint;
+		return Z * (J + stabilization_bias);
+	}
+
+
+template<std::size_t N>
+	inline Constraint::ConstraintMassMatrix<N>
 	Constraint::calculate_K (JacobianV<N> const& Jv1,
 							 JacobianW<N> const& Jw1,
 							 JacobianV<N> const& Jv2,
@@ -462,7 +508,7 @@ template<std::size_t N>
 
 
 template<std::size_t N>
-	inline math::SquareMatrix<decltype (1 / 1_kg), N, WorldSpace>
+	inline Constraint::ConstraintMassMatrix<N>
 	Constraint::calculate_K (JacobianV<N> const& Jv1,
 							 JacobianV<N> const& Jv2) const
 	{
@@ -478,7 +524,7 @@ template<std::size_t N>
 
 
 template<std::size_t N>
-	inline math::SquareMatrix<decltype (1 / 1_kg), N, WorldSpace>
+	inline Constraint::ConstraintMassMatrix<N>
 	Constraint::calculate_K (JacobianW<N> const& Jw1,
 							 JacobianW<N> const& Jw2) const
 	{

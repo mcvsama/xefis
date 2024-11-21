@@ -79,28 +79,34 @@ FixedConstraint::FixedConstraint (Body& body_1, Body& body_2):
 }
 
 
+void
+FixedConstraint::initialize_step()
 {
-	// TODO placement and position doesn't change in each iteration, they only change in each step, so cache them per step
-	// and all variables that depend on them
-	auto const pl_1 = body_1().placement();
-	auto const pl_2 = body_2().placement();
-	auto const x1 = pl_1.position();
-	auto const x2 = pl_2.position();
+	auto const placement_1 = body_1().placement();
+	auto const placement_2 = body_2().placement();
 
-	auto const r1 = pl_1.unbound_transform_to_base (_anchor_1);
-	auto const r2 = pl_2.unbound_transform_to_base (_anchor_2);
+	auto const x1 = placement_1.position();
+	auto const x2 = placement_2.position();
+
+	auto const r1 = placement_1.unbound_transform_to_base (_anchor_1);
+	auto const r2 = placement_2.unbound_transform_to_base (_anchor_2);
+
 	_Jw1.put (+make_pseudotensor (r1), 0, 0); // Translation
 	_Jw2.put (-make_pseudotensor (r2), 0, 0); // Translation
 
-	LocationConstraint<6> location_constraint_value;
-	location_constraint_value.put (x2 + r2 - x1 - r1, 0, 0);
-	location_constraint_value.put (_fixed_orientation.rotation_constraint_value (pl_1, pl_2), 0, 3);
+	_location_constraint_value = LocationConstraint<6>(); // TODO maybe this reset is not needed?
+	_location_constraint_value.put (x2 + r2 - x1 - r1, 0, 0);
+	_location_constraint_value.put (_fixed_orientation.rotation_constraint_value (placement_1, placement_2), 0, 3);
+
+	_K = calculate_K (_Jv1, _Jw1, _Jv2, _Jw2);
+}
+
 
 ConstraintForces
 FixedConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, VelocityMoments<WorldSpace> const& vm_2, si::Time dt)
+{
 	auto const J = calculate_jacobian (vm_1, _Jv1, _Jw1, vm_2, _Jv2, _Jw2);
-	auto const K = calculate_K (_Jv1, _Jw1, _Jv2, _Jw2);
-	auto const lambda = calculate_lambda (location_constraint_value, J, K, dt);
+	auto const lambda = calculate_lambda (_location_constraint_value, J, _K, dt);
 
 	// TODO this internally transposes jacobians, so store here the transposed ones and reuse them
 	return calculate_constraint_forces (_Jv1, _Jw1, _Jv2, _Jw2, lambda);

@@ -38,6 +38,10 @@ class FixedConstraint: public Constraint
 	explicit
 	FixedConstraint (Body& body_1, Body& body_2);
 
+	// Constraint API
+	void
+	initialize_step() override;
+
   protected:
 	// Constraint API
 	ConstraintForces
@@ -51,6 +55,8 @@ class FixedConstraint: public Constraint
 	JacobianW<6>			_Jw1;
 	JacobianV<6>			_Jv2;
 	JacobianW<6>			_Jw2;
+	ConstraintMassMatrix<6>	_K;
+	LocationConstraint<6>	_location_constraint_value;
 };
 
 } // namespace xf::rigid_body

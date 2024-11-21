@@ -180,6 +180,9 @@ ImpulseSolver::update_constraint_forces (si::Time const dt)
 		for (auto const& constraint: _system.constraints())
 			constraint->previous_calculation_force_moments().reset();
 
+	for (auto const& constraint: _system.constraints())
+		constraint->initialize_step (dt);
+
 	for (iteration = 0; iteration < _max_iterations && !precise_enough; ++iteration)
 	{
 		// Reset constraint forces:
