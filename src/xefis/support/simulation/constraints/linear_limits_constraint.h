@@ -67,6 +67,10 @@ class LinearLimitsConstraint: public Constraint
 	void
 	set_distances (Range<si::Length>);
 
+	// Constraint API
+	void
+	initialize_step (si::Time dt) override;
+
   protected:
 	// Constraint API
 	ConstraintForces
@@ -95,6 +99,18 @@ class LinearLimitsConstraint: public Constraint
 	SliderPrecalculation&		_slider_precalculation;
 	std::optional<si::Length>	_min_distance;
 	std::optional<si::Length>	_max_distance;
+	JacobianV<1>				_min_Jv1;
+	JacobianW<1>				_min_Jw1;
+	JacobianV<1>				_min_Jv2;
+	JacobianW<1>				_min_Jw2;
+	ConstraintZMatrix<1>		_min_Z;
+	LocationConstraint<1>		_min_location_constraint_value;
+	JacobianV<1>				_max_Jv1;
+	JacobianW<1>				_max_Jw1;
+	JacobianV<1>				_max_Jv2;
+	JacobianW<1>				_max_Jw2;
+	ConstraintZMatrix<1>		_max_Z;
+	LocationConstraint<1>		_max_location_constraint_value;
 };
 
 

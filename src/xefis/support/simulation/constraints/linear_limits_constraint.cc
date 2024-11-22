@@ -38,12 +38,34 @@ LinearLimitsConstraint::LinearLimitsConstraint (SliderPrecalculation& slider_pre
 { }
 
 
+void
+LinearLimitsConstraint::initialize_step (si::Time const dt)
+{
+	auto const& slider_data = _slider_precalculation.data();
+
+	_min_Jv1.put (-~slider_data.a, 0, 0);
+	_min_Jw1.put (-slider_data.r1uxa, 0, 0);
+	_min_Jv2.put (~slider_data.a, 0, 0);
+	_min_Jw2.put (slider_data.r2xa, 0, 0);
+	_min_location_constraint_value = slider_data.distance - *_min_distance;
+	_min_Z = calculate_Z (_min_Jv1, _min_Jw1, _min_Jv2, _min_Jw2, dt);
+
+	// TODO doesn't seem to work correctly; perhaps look at symmetry of _min_Jw1 == _max_Jw2 in angular_limits
+	// TODO and try to replicate it here:
+	_max_Jv1.put (~slider_data.a, 0, 0);
+	_max_Jw1.put (slider_data.r1uxa, 0, 0);
+	_max_Jv2.put (-~slider_data.a, 0, 0);
+	_max_Jw2.put (-slider_data.r2xa, 0, 0);
+	_max_location_constraint_value = *_max_distance - slider_data.distance;
+	_max_Z = calculate_Z (_max_Jv1, _max_Jw1, _max_Jv2, _max_Jw2, dt);
+}
+
+
 ConstraintForces
 LinearLimitsConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, VelocityMoments<WorldSpace> const& vm_2, si::Time dt)
 {
 	ConstraintForces fc;
 	auto const& slider_data = _slider_precalculation.data();
-	// TODO doesn't seem to work correctly
 
 	if (auto fc_min = min_distance_corrections (vm_1, vm_2, dt, slider_data))
 		fc = fc + *fc_min;
@@ -59,27 +81,14 @@ std::optional<ConstraintForces>
 LinearLimitsConstraint::min_distance_corrections (VelocityMoments<WorldSpace> const& vm_1,
 												  VelocityMoments<WorldSpace> const& vm_2,
 												  si::Time dt,
-												  SliderPrecalculationData const& c) const
+												  SliderPrecalculationData const& slider_data) const
 {
-	if (_min_distance && c.distance < *_min_distance)
+	if (_min_distance && slider_data.distance < *_min_distance)
 	{
-		JacobianV<1> Jv1;
-		JacobianW<1> Jw1;
-		JacobianV<1> Jv2;
-		JacobianW<1> Jw2;
-		LocationConstraint<1> location_constraint_value;
+		auto const J = calculate_jacobian (vm_1, _min_Jv1, _min_Jw1, vm_2, _min_Jv2, _min_Jw2);
+		auto const lambda = calculate_lambda (_min_location_constraint_value, J, _min_Z, dt);
 
-		Jv1.put (-~c.a, 0, 0);
-		Jw1.put (-c.r1uxa, 0, 0);
-		Jv2.put (~c.a, 0, 0);
-		Jw2.put (c.r2xa, 0, 0);
-		location_constraint_value = c.distance - *_min_distance;
-
-		auto const J = calculate_jacobian (vm_1, Jv1, Jw1, vm_2, Jv2, Jw2);
-		auto const K = calculate_K (Jv1, Jw1, Jv2, Jw2);
-		auto const lambda = calculate_lambda (location_constraint_value, J, K, dt);
-
-		return calculate_constraint_forces (Jv1, Jw1, Jv2, Jw2, lambda);
+		return calculate_constraint_forces (_min_Jv1, _min_Jw1, _min_Jv2, _min_Jw2, lambda);
 	}
 	else
 		return std::nullopt;
@@ -90,27 +99,14 @@ std::optional<ConstraintForces>
 LinearLimitsConstraint::max_distance_corrections (VelocityMoments<WorldSpace> const& vm_1,
 												  VelocityMoments<WorldSpace> const& vm_2,
 												  si::Time dt,
-												  SliderPrecalculationData const& c) const
+												  SliderPrecalculationData const& slider_data) const
 {
-	if (_max_distance && c.distance > *_max_distance)
+	if (_max_distance && slider_data.distance > *_max_distance)
 	{
-		JacobianV<1> Jv1;
-		JacobianW<1> Jw1;
-		JacobianV<1> Jv2;
-		JacobianW<1> Jw2;
-		LocationConstraint<1> location_constraint_value;
+		auto const J = calculate_jacobian (vm_1, _max_Jv1, _max_Jw1, vm_2, _max_Jv2, _max_Jw2);
+		auto const lambda = calculate_lambda (_max_location_constraint_value, J, _max_Z, dt);
 
-		Jv1.put (~c.a, 0, 0);
-		Jw1.put (c.r1uxa, 0, 0);
-		Jv2.put (-~c.a, 0, 0);
-		Jw2.put (-c.r2xa, 0, 0);
-		location_constraint_value = *_max_distance - c.distance;
-
-		auto const J = calculate_jacobian (vm_1, Jv1, Jw1, vm_2, Jv2, Jw2);
-		auto const K = calculate_K (Jv1, Jw1, Jv2, Jw2);
-		auto const lambda = calculate_lambda (location_constraint_value, J, K, dt);
-
-		return calculate_constraint_forces (Jv1, Jw1, Jv2, Jw2, lambda);
+		return calculate_constraint_forces (_max_Jv1, _max_Jw1, _max_Jv2, _max_Jw2, lambda);
 	}
 	else
 		return std::nullopt;
