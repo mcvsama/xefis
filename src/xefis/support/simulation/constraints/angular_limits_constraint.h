@@ -68,6 +68,10 @@ class AngularLimitsConstraint: public Constraint
 	void
 	set_angles (Range<si::Angle>);
 
+	// Constraint API
+	void
+	initialize_step (si::Time dt) override;
+
   protected:
 	// Constraint API
 	ConstraintForces
@@ -81,7 +85,7 @@ class AngularLimitsConstraint: public Constraint
 	min_angle_corrections (VelocityMoments<WorldSpace> const& vm_1,
 						   VelocityMoments<WorldSpace> const& vm_2,
 						   si::Time dt,
-						   HingePrecalculationData const&) const;
+						   HingePrecalculationData const& hinge_data) const;
 
 	/**
 	 * Return corrective forces for hinge limits: maximum angle.
@@ -90,12 +94,20 @@ class AngularLimitsConstraint: public Constraint
 	max_angle_corrections (VelocityMoments<WorldSpace> const& vm_1,
 						   VelocityMoments<WorldSpace> const& vm_2,
 						   si::Time dt,
-						   HingePrecalculationData const&) const;
+						   HingePrecalculationData const& hinge_data) const;
 
   private:
 	HingePrecalculation&		_hinge_precalculation;
 	std::optional<si::Angle>	_min_angle;
 	std::optional<si::Angle>	_max_angle;
+	JacobianV<1>				_Jv { math::zero };
+	JacobianW<1>				_min_Jw1;
+	JacobianW<1>				_min_Jw2;
+	// Jw1 and Jw2 are the same for maximums as for minimums, but exchanged.
+	ConstraintZMatrix<1>		_min_Z;
+	LocationConstraint<1>		_min_location_constraint_value;
+	ConstraintZMatrix<1>		_max_Z;
+	LocationConstraint<1>		_max_location_constraint_value;
 };
 
 

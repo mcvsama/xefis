@@ -38,6 +38,21 @@ AngularLimitsConstraint::AngularLimitsConstraint (HingePrecalculation& hinge_pre
 { }
 
 
+void
+AngularLimitsConstraint::initialize_step (si::Time const dt)
+{
+	auto const& hinge = _hinge_precalculation.data();
+
+	_min_Jw1.put (1_m * -~hinge.a1, 0, 0);
+	_min_Jw2.put (1_m * ~hinge.a1, 0, 0);
+	// _max_* are reversed _min_*.
+	_min_Z = calculate_Z (_min_Jw1, _min_Jw2, dt);
+	_min_location_constraint_value = (hinge.angle - *_min_angle) * 1_m / 1_rad;
+	_max_Z = calculate_Z (_min_Jw2, _min_Jw1, dt);
+	_max_location_constraint_value = (*_max_angle - hinge.angle) * 1_m / 1_rad;
+}
+
+
 ConstraintForces
 AngularLimitsConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, VelocityMoments<WorldSpace> const& vm_2, si::Time dt)
 {
@@ -58,24 +73,14 @@ std::optional<ConstraintForces>
 AngularLimitsConstraint::min_angle_corrections (VelocityMoments<WorldSpace> const& vm_1,
 												VelocityMoments<WorldSpace> const& vm_2,
 												si::Time dt,
-												HingePrecalculationData const& c) const
+												HingePrecalculationData const& hinge_data) const
 {
-	if (_min_angle && c.angle < *_min_angle)
+	if (_min_angle && hinge_data.angle < *_min_angle)
 	{
-		JacobianV<1> Jv (math::zero);
-		JacobianW<1> Jw1;
-		JacobianW<1> Jw2;
-		LocationConstraint<1> location_constraint_value;
+		auto const J = calculate_jacobian (vm_1, _Jv, _min_Jw1, vm_2, _Jv, _min_Jw2);
+		auto const lambda = calculate_lambda (_min_location_constraint_value, J, _min_Z, dt);
 
-		Jw1.put (1_m * -~c.a1, 0, 0);
-		Jw2.put (1_m * ~c.a1, 0, 0);
-		location_constraint_value = (c.angle - *_min_angle) * 1_m / 1_rad;
-
-		auto const J = calculate_jacobian (vm_1, Jv, Jw1, vm_2, Jv, Jw2);
-		auto const K = calculate_K (Jw1, Jw2);
-		auto const lambda = calculate_lambda (location_constraint_value, J, K, dt);
-
-		return calculate_constraint_forces (Jv, Jw1, Jv, Jw2, lambda);
+		return calculate_constraint_forces (_Jv, _min_Jw1, _Jv, _min_Jw2, lambda);
 	}
 	else
 		return std::nullopt;
@@ -86,24 +91,14 @@ std::optional<ConstraintForces>
 AngularLimitsConstraint::max_angle_corrections (VelocityMoments<WorldSpace> const& vm_1,
 												VelocityMoments<WorldSpace> const& vm_2,
 												si::Time dt,
-												HingePrecalculationData const& c) const
+												HingePrecalculationData const& hinge_data) const
 {
-	if (_max_angle && c.angle > *_max_angle)
+	if (_max_angle && hinge_data.angle > *_max_angle)
 	{
-		JacobianV<1> Jv (math::zero);
-		JacobianW<1> Jw1;
-		JacobianW<1> Jw2;
-		LocationConstraint<1> location_constraint_value;
+		auto const J = calculate_jacobian (vm_1, _Jv, _min_Jw2, vm_2, _Jv, _min_Jw1);
+		auto const lambda = calculate_lambda (_max_location_constraint_value, J, _max_Z, dt);
 
-		Jw1.put (1_m * ~c.a1, 0, 0);
-		Jw2.put (1_m * -~c.a1, 0, 0);
-		location_constraint_value = (*_max_angle - c.angle) * 1_m / 1_rad;
-
-		auto const J = calculate_jacobian (vm_1, Jv, Jw1, vm_2, Jv, Jw2);
-		auto const K = calculate_K (Jw1, Jw2);
-		auto const lambda = calculate_lambda (location_constraint_value, J, K, dt);
-
-		return calculate_constraint_forces (Jv, Jw1, Jv, Jw2, lambda);
+		return calculate_constraint_forces (_Jv, _min_Jw2, _Jv, _min_Jw1, lambda);
 	}
 	else
 		return std::nullopt;
