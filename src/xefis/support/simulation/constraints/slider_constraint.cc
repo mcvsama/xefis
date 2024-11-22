@@ -29,15 +29,8 @@ SliderConstraint::SliderConstraint (SliderPrecalculation& slider_precalculation)
 	_slider_precalculation (slider_precalculation)
 {
 	set_label ("slider");
-}
 
-
-ConstraintForces
-SliderConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, VelocityMoments<WorldSpace> const& vm_2, si::Time dt)
-{
-	auto const& c = _slider_precalculation.data();
-
-	auto Jv1 = JacobianV<5> {
+	_Jv1 = JacobianV<5> {
 		// Translation:
 		 0.0,  0.0,  0.0,
 		 0.0,  0.0,  0.0,
@@ -46,10 +39,8 @@ SliderConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1,
 		 0.0,  0.0,  0.0,
 		 0.0,  0.0,  0.0,
 	};
-	Jv1.put (-~c.t1, 0, 0);
-	Jv1.put (-~c.t2, 0, 1);
 
-	auto Jw1 = JacobianW<5> {
+	_Jw1 = JacobianW<5> {
 		// Translation:
 		 0.0_m,  0.0_m,  0.0_m,
 		 0.0_m,  0.0_m,  0.0_m,
@@ -58,11 +49,8 @@ SliderConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1,
 		 0.0_m, -1.0_m,  0.0_m,
 		 0.0_m,  0.0_m, -1.0_m,
 	};
-	// Translation:
-	Jw1.put (-~cross_product (c.r1 + c.u, c.t1), 0, 0);
-	Jw1.put (-~cross_product (c.r1 + c.u, c.t2), 0, 1);
 
-	auto Jv2 = JacobianV<5> {
+	_Jv2 = JacobianV<5> {
 		// Translation:
 		 0.0,  0.0,  0.0,
 		 0.0,  0.0,  0.0,
@@ -71,10 +59,8 @@ SliderConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1,
 		 0.0,  0.0,  0.0,
 		 0.0,  0.0,  0.0,
 	};
-	Jv2.put (~c.t1, 0, 0);
-	Jv2.put (~c.t2, 0, 1);
 
-	auto Jw2 = JacobianW<5> {
+	_Jw2 = JacobianW<5> {
 		// Translation:
 		 0.0_m,  0.0_m,  0.0_m,
 		 0.0_m,  0.0_m,  0.0_m,
@@ -83,20 +69,41 @@ SliderConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1,
 		 0.0_m, +1.0_m,  0.0_m,
 		 0.0_m,  0.0_m, +1.0_m,
 	};
+}
+
+
+void
+SliderConstraint::initialize_step (si::Time const dt)
+{
+	auto const& slider_data = _slider_precalculation.data();
+
+	_Jv1.put (-~slider_data.t1, 0, 0);
+	_Jv1.put (-~slider_data.t2, 0, 1);
 	// Translation:
-	Jw2.put (~cross_product (c.r2, c.t1), 0, 0);
-	Jw2.put (~cross_product (c.r2, c.t2), 0, 1);
+	_Jw1.put (-~cross_product (slider_data.r1 + slider_data.u, slider_data.t1), 0, 0);
+	_Jw1.put (-~cross_product (slider_data.r1 + slider_data.u, slider_data.t2), 0, 1);
 
-	LocationConstraint<5> location_constraint_value;
-	location_constraint_value.put (~c.u * c.t1, 0, 0);
-	location_constraint_value.put (~c.u * c.t2, 0, 1);
-	location_constraint_value.put (c.rotation_error, 0, 2);
+	_Jv2.put (~slider_data.t1, 0, 0);
+	_Jv2.put (~slider_data.t2, 0, 1);
+	// Translation:
+	_Jw2.put (~cross_product (slider_data.r2, slider_data.t1), 0, 0);
+	_Jw2.put (~cross_product (slider_data.r2, slider_data.t2), 0, 1);
 
-	auto const J = calculate_jacobian (vm_1, Jv1, Jw1, vm_2, Jv2, Jw2);
-	auto const K = calculate_K (Jv1, Jw1, Jv2, Jw2);
-	auto const lambda = calculate_lambda (location_constraint_value, J, K, dt);
+	_location_constraint_value.put (~slider_data.u * slider_data.t1, 0, 0);
+	_location_constraint_value.put (~slider_data.u * slider_data.t2, 0, 1);
+	_location_constraint_value.put (slider_data.rotation_error, 0, 2);
 
-	return calculate_constraint_forces (Jv1, Jw1, Jv2, Jw2, lambda);
+	_Z = calculate_Z (_Jv1, _Jw1, _Jv2, _Jw2, dt);
+}
+
+
+ConstraintForces
+SliderConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, VelocityMoments<WorldSpace> const& vm_2, si::Time dt)
+{
+	auto const J = calculate_jacobian (vm_1, _Jv1, _Jw1, vm_2, _Jv2, _Jw2);
+	auto const lambda = calculate_lambda (_location_constraint_value, J, _Z, dt);
+
+	return calculate_constraint_forces (_Jv1, _Jw1, _Jv2, _Jw2, lambda);
 }
 
 } // namespace xf::rigid_body

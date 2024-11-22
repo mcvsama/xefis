@@ -33,13 +33,23 @@ class SliderConstraint: public Constraint
 	explicit
 	SliderConstraint (SliderPrecalculation&);
 
+	// Constraint API
+	void
+	initialize_step (si::Time dt) override;
+
   protected:
 	// Constraint API
 	ConstraintForces
 	do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, VelocityMoments<WorldSpace> const& vm_2, si::Time dt) override;
 
   private:
-	SliderPrecalculation& _slider_precalculation;
+	SliderPrecalculation&	_slider_precalculation;
+	JacobianV<5>			_Jv1;
+	JacobianW<5>			_Jw1;
+	JacobianV<5>			_Jv2;
+	JacobianW<5>			_Jw2;
+	ConstraintZMatrix<5>	_Z;
+	LocationConstraint<5>	_location_constraint_value;
 };
 
 } // namespace xf::rigid_body
