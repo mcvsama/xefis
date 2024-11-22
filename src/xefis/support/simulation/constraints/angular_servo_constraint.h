@@ -151,6 +151,10 @@ class AngularServoConstraint:
 	arm_torque() const
 		{ return _arm_torque; }
 
+	// Constraint API
+	void
+	initialize_step (si::Time dt) override;
+
   protected:
 	// Constraint API
 	ConstraintForces

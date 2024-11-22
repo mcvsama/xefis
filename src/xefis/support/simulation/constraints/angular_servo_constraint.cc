@@ -51,6 +51,13 @@ AngularServoConstraint::AngularServoConstraint (HingePrecalculation& hinge_preca
 }
 
 
+void
+AngularServoConstraint::initialize_step (si::Time const dt)
+{
+	_motor_constraint.initialize_step (dt);
+}
+
+
 ConstraintForces
 AngularServoConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, VelocityMoments<WorldSpace> const& vm_2, si::Time const dt)
 {
