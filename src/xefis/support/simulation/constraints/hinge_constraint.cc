@@ -29,15 +29,8 @@ HingeConstraint::HingeConstraint (HingePrecalculation& hinge_precalculation):
 	_hinge_precalculation (hinge_precalculation)
 {
 	set_label ("hinge");
-}
 
-
-ConstraintForces
-HingeConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, VelocityMoments<WorldSpace> const& vm_2, si::Time dt)
-{
-	auto const& c = _hinge_precalculation.data();
-
-	auto const Jv1 = JacobianV<5> {
+	_Jv1 = JacobianV<5> {
 		// Translation:
 		-1.0,  0.0,  0.0,
 		 0.0, -1.0,  0.0,
@@ -47,14 +40,7 @@ HingeConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, 
 		 0.0,  0.0,  0.0,
 	};
 
-	auto Jw1 = JacobianW<5>();
-	// Translation:
-	Jw1.put (make_pseudotensor (c.r1), 0, 0);
-	// Rotation:
-	Jw1.put (-~c.t1, 0, 3);
-	Jw1.put (-~c.t2, 0, 4);
-
-	auto const Jv2 = JacobianV<5> {
+	_Jv2 = JacobianV<5> {
 		// Translation:
 		+1.0,  0.0,  0.0,
 		 0.0, +1.0,  0.0,
@@ -63,25 +49,43 @@ HingeConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, 
 		 0.0,  0.0,  0.0,
 		 0.0,  0.0,  0.0,
 	};
+}
 
-	auto Jw2 = JacobianW<5>();
+
+void
+HingeConstraint::initialize_step (si::Time const dt)
+{
+	auto const& hinge = _hinge_precalculation.data();
+
 	// Translation:
-	Jw2.put (-make_pseudotensor (c.r2), 0, 0);
+	_Jw1.put (make_pseudotensor (hinge.r1), 0, 0);
 	// Rotation:
-	Jw2.put (~c.t1, 0, 3);
-	Jw2.put (~c.t2, 0, 4);
+	_Jw1.put (-~hinge.t1, 0, 3);
+	_Jw1.put (-~hinge.t2, 0, 4);
 
-	LocationConstraint<5> location_constraint_value;
-	location_constraint_value.put (c.u, 0, 0);
-	auto const a1xa2 = cross_product (c.a1, c.a2);
-	location_constraint_value[0, 3] = dot_product (c.t1, a1xa2);
-	location_constraint_value[0, 4] = dot_product (c.t2, a1xa2);
+	_Jw2 = JacobianW<5>();
+	// Translation:
+	_Jw2.put (-make_pseudotensor (hinge.r2), 0, 0);
+	// Rotation:
+	_Jw2.put (~hinge.t1, 0, 3);
+	_Jw2.put (~hinge.t2, 0, 4);
 
-	auto const J = calculate_jacobian (vm_1, Jv1, Jw1, vm_2, Jv2, Jw2);
-	auto const K = calculate_K (Jv1, Jw1, Jv2, Jw2);
-	auto const lambda = calculate_lambda (location_constraint_value, J, K, dt);
+	_Z = calculate_Z (_Jv1, _Jw1, _Jv2, _Jw2, dt);
 
-	return calculate_constraint_forces (Jv1, Jw1, Jv2, Jw2, lambda);
+	_location_constraint_value.put (hinge.u, 0, 0);
+	auto const a1xa2 = cross_product (hinge.a1, hinge.a2);
+	_location_constraint_value[0, 3] = dot_product (hinge.t1, a1xa2);
+	_location_constraint_value[0, 4] = dot_product (hinge.t2, a1xa2);
+}
+
+
+ConstraintForces
+HingeConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, VelocityMoments<WorldSpace> const& vm_2, si::Time dt)
+{
+	auto const J = calculate_jacobian (vm_1, _Jv1, _Jw1, vm_2, _Jv2, _Jw2);
+	auto const lambda = calculate_lambda (_location_constraint_value, J, _Z, dt);
+
+	return calculate_constraint_forces (_Jv1, _Jw1, _Jv2, _Jw2, lambda);
 }
 
 } // namespace xf::rigid_body
