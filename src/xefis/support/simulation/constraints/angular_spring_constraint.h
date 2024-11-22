@@ -42,7 +42,7 @@ class AngularSpringConstraint: public Constraint
 	 * which stabilizes the constraint.
 	 */
 	using SpringTorqueFunction = std::function<si::Torque (si::Angle,
-														   SpaceVector<double, WorldSpace> const& hinge,
+														   SpaceVector<double, WorldSpace> const& hinge_axis,
 														   VelocityMoments<WorldSpace> const& vm1,
 														   VelocityMoments<WorldSpace> const& vm2,
 														   si::Time const dt)>;
@@ -52,14 +52,19 @@ class AngularSpringConstraint: public Constraint
 	explicit
 	AngularSpringConstraint (HingePrecalculation&, SpringTorqueFunction);
 
+	// Constraint API
+	void
+	initialize_step (si::Time dt) override;
+
   protected:
 	// Constraint API
 	ConstraintForces
 	do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, VelocityMoments<WorldSpace> const& vm_2, si::Time dt) override;
 
   private:
-	HingePrecalculation&	_hinge;
-	SpringTorqueFunction	_spring_torque;
+	HingePrecalculation&			_hinge;
+	SpringTorqueFunction			_spring_torque;
+	SpaceVector<double, WorldSpace>	_hinge_axis;
 };
 
 
@@ -76,7 +81,7 @@ constexpr auto
 angular_spring_function (TorqueForAngle torque_for_angle)
 {
 	return [=] (si::Angle const angle,
-				[[maybe_unused]] SpaceVector<double, WorldSpace> const& hinge,
+				[[maybe_unused]] SpaceVector<double, WorldSpace> const& hinge_axis,
 				[[maybe_unused]] VelocityMoments<WorldSpace> const& vm1,
 				[[maybe_unused]] VelocityMoments<WorldSpace> const& vm2,
 				[[maybe_unused]] si::Time const dt)
