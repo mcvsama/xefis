@@ -40,7 +40,7 @@ class FixedConstraint: public Constraint
 
 	// Constraint API
 	void
-	initialize_step() override;
+	initialize_step (si::Time dt) override;
 
   protected:
 	// Constraint API
@@ -55,7 +55,7 @@ class FixedConstraint: public Constraint
 	JacobianW<6>			_Jw1;
 	JacobianV<6>			_Jv2;
 	JacobianW<6>			_Jw2;
-	ConstraintMassMatrix<6>	_K;
+	ConstraintZMatrix<6>	_Z;
 	LocationConstraint<6>	_location_constraint_value;
 };
 
