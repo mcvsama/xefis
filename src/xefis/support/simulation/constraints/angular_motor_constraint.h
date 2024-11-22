@@ -64,6 +64,10 @@ class AngularMotorConstraint: public Constraint
 	set_max_angular_velocity (si::AngularVelocity const w) noexcept
 		{ _max_angular_velocity = w; }
 
+	// Constraint API
+	void
+	initialize_step (si::Time dt) override;
+
   protected:
 	// Constraint API
 	ConstraintForces
@@ -72,6 +76,11 @@ class AngularMotorConstraint: public Constraint
   private:
 	HingePrecalculation&	_hinge_precalculation;
 	si::AngularVelocity		_max_angular_velocity;
+	JacobianV<1>			_Jv { math::zero };
+	JacobianW<1>			_Jw1;
+	JacobianW<1>			_Jw2;
+	ConstraintZMatrix<1>	_Z;
+	LocationConstraint<1>	_location_constraint_value;
 	// Even though it's a torque, it's more convenient to keep it as a force:
 	si::Force				_force;
 };

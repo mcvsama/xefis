@@ -30,26 +30,26 @@ AngularMotorConstraint::AngularMotorConstraint (HingePrecalculation& hinge_preca
 }
 
 
+void
+AngularMotorConstraint::initialize_step (si::Time const dt)
+{
+	auto const& hinge = _hinge_precalculation.data();
+
+	_Jw1.put (1_m * ~hinge.a1, 0, 0);
+	_Jw2.put (1_m * -~hinge.a1, 0, 0);
+	_Z = calculate_Z (_Jw1, _Jw2, dt);
+	_location_constraint_value = _max_angular_velocity * 1_m / 1_rad * 1_s;
+}
+
+
 ConstraintForces
 AngularMotorConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, VelocityMoments<WorldSpace> const& vm_2, si::Time dt)
 {
-	auto const& c = _hinge_precalculation.data();
-
-	JacobianV<1> Jv (math::zero);
-	JacobianW<1> Jw1;
-	JacobianW<1> Jw2;
-	LocationConstraint<1> location_constraint_value;
-
-	Jw1.put (1_m * ~c.a1, 0, 0);
-	Jw2.put (1_m * -~c.a1, 0, 0);
-	location_constraint_value = _max_angular_velocity * 1_m / 1_rad * 1_s;
-
-	auto const J = calculate_jacobian (vm_1, Jv, Jw1, vm_2, Jv, Jw2);
-	auto const K = calculate_K (Jw1, Jw2);
-	auto lambda = calculate_lambda (location_constraint_value, J, K, dt);
+	auto const J = calculate_jacobian (vm_1, _Jv, _Jw1, vm_2, _Jv, _Jw2);
+	auto lambda = calculate_lambda (_location_constraint_value, J, _Z, dt);
 	lambda = std::clamp (lambda.scalar(), -_force, +_force); // TODO scalar?
 
-	return calculate_constraint_forces (Jv, Jw1, Jv, Jw2, lambda);
+	return calculate_constraint_forces (_Jv, _Jw1, _Jv, _Jw2, lambda);
 }
 
 } // namespace xf::rigid_body
