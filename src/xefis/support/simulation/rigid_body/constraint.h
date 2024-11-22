@@ -491,11 +491,11 @@ template<std::size_t N>
 							 JacobianV<N> const& Jv2,
 							 JacobianW<N> const& Jw2) const
 	{
-		auto const inv_M1 = body_1().iteration().inv_M;
-		auto const inv_I1 = body_1().iteration().inv_I;
-		auto const inv_M2 = body_2().iteration().inv_M;
-		auto const inv_I2 = body_2().iteration().inv_I;
-		auto const CFM = _constraint_force_mixing_factor * InverseConstraintMassMatrix <N> (math::unit);
+		auto const& inv_M1 = body_1().iteration().inv_M;
+		auto const& inv_I1 = body_1().iteration().inv_I;
+		auto const& inv_M2 = body_2().iteration().inv_M;
+		auto const& inv_I2 = body_2().iteration().inv_I;
+		auto const CFM = _constraint_force_mixing_factor * ConstraintMassMatrix <N> (math::unit);
 
 		// Unfolded expression: J * inv(M) * ~J.
 		// This has to be unfolded because of two distinct scalar types held by Jacobians.
@@ -512,9 +512,9 @@ template<std::size_t N>
 	Constraint::calculate_K (JacobianV<N> const& Jv1,
 							 JacobianV<N> const& Jv2) const
 	{
-		auto const inv_M1 = body_1().iteration().inv_M;
-		auto const inv_M2 = body_2().iteration().inv_M;
-		auto const CFM = _constraint_force_mixing_factor * InverseConstraintMassMatrix <N> (math::unit);
+		auto const& inv_M1 = body_1().iteration().inv_M;
+		auto const& inv_M2 = body_2().iteration().inv_M;
+		auto const CFM = _constraint_force_mixing_factor * ConstraintMassMatrix <N> (math::unit);
 
 		// Unfolded expression: J * inv(M) * ~J.
 		return Jv1 * inv_M1 * ~Jv1
@@ -528,9 +528,9 @@ template<std::size_t N>
 	Constraint::calculate_K (JacobianW<N> const& Jw1,
 							 JacobianW<N> const& Jw2) const
 	{
-		auto const inv_I1 = body_1().iteration().inv_I;
-		auto const inv_I2 = body_2().iteration().inv_I;
-		auto const CFM = _constraint_force_mixing_factor * InverseConstraintMassMatrix <N> (math::unit);
+		auto const& inv_I1 = body_1().iteration().inv_I;
+		auto const& inv_I2 = body_2().iteration().inv_I;
+		auto const CFM = _constraint_force_mixing_factor * ConstraintMassMatrix <N> (math::unit); // TODO optimize if 0; maybe only add on last iteration?
 
 		// Unfolded expression: J * inv(M) * ~J.
 		return Jw1 * inv_I1 * ~Jw1
