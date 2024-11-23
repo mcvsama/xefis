@@ -152,10 +152,10 @@ template<class pObservedValue, class pAssignedValue = pObservedValue>
 
 	  private:
 		void
-		inc_source_use_count();
+		inc_source_readers_count();
 
 		void
-		dec_source_use_count();
+		dec_source_readers_count();
 
 		/**
 		 * Fetch data from given socket.
@@ -189,7 +189,7 @@ template<class OV, class AV>
 	ConnectableSocket<OV, AV>::~ConnectableSocket()
 	{
 		// Unregister ourselves from the source:
-		dec_source_use_count();
+		dec_source_readers_count();
 	}
 
 
@@ -197,7 +197,7 @@ template<class OV, class AV>
 	inline void
 	ConnectableSocket<OV, AV>::operator<< (NoDataSource const)
 	{
-		dec_source_use_count();
+		dec_source_readers_count();
 		_source = std::monostate{};
 	}
 
@@ -208,9 +208,9 @@ template<class OV, class AV>
 		inline SocketType<AV>&
 		ConnectableSocket<OV, AV>::operator<< (SocketType<AssignedValue>& source)
 		{
-			dec_source_use_count();
+			dec_source_readers_count();
 			_source = &source;
-			inc_source_use_count();
+			inc_source_readers_count();
 
 			return source;
 		}
@@ -222,9 +222,9 @@ template<class OV, class AV>
 		inline SocketType<AV>&
 		ConnectableSocket<OV, AV>::operator<< (std::unique_ptr<SocketType<AssignedValue>>&& source)
 		{
-			dec_source_use_count();
+			dec_source_readers_count();
 			_source = std::move (source);
-			inc_source_use_count();
+			inc_source_readers_count();
 
 			auto& uptr_ref = std::get<std::unique_ptr<Socket<AssignedValue>>> (_source);
 			return static_cast<SocketType<AssignedValue>&> (*uptr_ref);
@@ -237,9 +237,9 @@ template<class OV, class AV>
 		inline void
 		ConnectableSocket<OV, AV>::operator<< (ConstantSource<CompatibleValue> const& source)
 		{
-			dec_source_use_count();
+			dec_source_readers_count();
 			_source = ConstantSource<AssignedValue> { source.value };
-			inc_source_use_count();
+			inc_source_readers_count();
 		}
 
 
@@ -365,7 +365,7 @@ template<class OV, class AV>
 
 template<class OV, class AV>
 	inline void
-	ConnectableSocket<OV, AV>::inc_source_use_count()
+	ConnectableSocket<OV, AV>::inc_source_readers_count()
 	{
 		std::visit (overload {
 			[&] (std::monostate) noexcept {
@@ -375,10 +375,10 @@ template<class OV, class AV>
 				// No action
 			},
 			[&] (Socket<AssignedValue>* socket) {
-				socket->inc_use_count (this);
+				socket->inc_readers_count (this);
 			},
 			[&] (std::unique_ptr<Socket<AssignedValue>>& socket) {
-				socket->inc_use_count (this);
+				socket->inc_readers_count (this);
 			}
 		}, _source);
 	}
@@ -386,7 +386,7 @@ template<class OV, class AV>
 
 template<class OV, class AV>
 	inline void
-	ConnectableSocket<OV, AV>::dec_source_use_count()
+	ConnectableSocket<OV, AV>::dec_source_readers_count()
 	{
 		std::visit (overload {
 			[&] (std::monostate) noexcept {
@@ -396,10 +396,10 @@ template<class OV, class AV>
 				// No action
 			},
 			[&] (Socket<AssignedValue>* socket) {
-				socket->dec_use_count (this);
+				socket->dec_readers_count (this);
 			},
 			[&] (std::unique_ptr<Socket<AssignedValue>>& socket) {
-				socket->dec_use_count (this);
+				socket->dec_readers_count (this);
 			}
 		}, _source);
 	}

@@ -35,7 +35,7 @@ SocketItem::SocketItem (BasicSocket* socket, QTreeWidgetItem& parent):
 	_socket (socket)
 {
 	if (_socket)
-		setText (SocketTree::UseCountColumn, QString::number (_socket->use_count()));
+		setText (SocketTree::UseCountColumn, QString::number (_socket->readers_count()));
 }
 
 

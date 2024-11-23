@@ -173,7 +173,7 @@ PerformanceComputer::compute_glide_ratio()
 			: 0;
 		_io.glide_ratio = ratio;
 
-		if (_io.glide_ratio_string.use_count() > 0)
+		if (_io.glide_ratio_string.readers_count() > 0)
 		{
 			std::string_view arr;
 
@@ -201,7 +201,7 @@ PerformanceComputer::compute_glide_ratio()
 void
 PerformanceComputer::compute_total_energy_variometer()
 {
-	if (_io.total_energy_variometer.use_count() > 0)
+	if (_io.total_energy_variometer.readers_count() > 0)
 	{
 		si::Time update_dt = _total_energy_variometer_computer.update_dt();
 

@@ -46,7 +46,7 @@ AltAcq::process (xf::Cycle const& cycle)
 {
 	_output_computer.process (cycle.update_time());
 
-	if (_io.altitude_acquire_flag.use_count() > 0 && _io.altitude_amsl && _io.altitude_acquire_amsl)
+	if (_io.altitude_acquire_flag.readers_count() > 0 && _io.altitude_amsl && _io.altitude_acquire_amsl)
 	{
 		if (_altitude_amsl_changed.value_changed() || _altitude_acquire_amsl_changed.value_changed())
 		{

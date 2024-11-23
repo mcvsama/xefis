@@ -148,12 +148,11 @@ class BasicSocket:
 		{ return TimeHelper::now() - valid_timestamp(); }
 
 	/**
-	 * Use-count for this socket.
-	 * This is number of sockets reading value from this socket.
+	 * Number of sockets reading value from this socket.
 	 */
 	[[nodiscard]]
 	std::size_t
-	use_count() const noexcept
+	readers_count() const noexcept
 		{ return _targets.size(); }
 
 	/**
@@ -214,14 +213,14 @@ class BasicSocket:
 	 * Increase use-count of this socket (listener started listening to value of this socket).
 	 */
 	void
-	inc_use_count (BasicSocket* listener)
+	inc_readers_count (BasicSocket* listener)
 		{ _targets.push_back (listener); }
 
 	/**
 	 * Decrease use-count of this socket (listener stopped listening to value of this socket).
 	 */
 	void
-	dec_use_count (BasicSocket* listener);
+	dec_readers_count (BasicSocket* listener);
 
 	/**
 	 * Set socket to the nil value.
@@ -273,7 +272,7 @@ BasicSocket::fetch (Cycle const& cycle)
 
 
 inline void
-BasicSocket::dec_use_count (BasicSocket* listener)
+BasicSocket::dec_readers_count (BasicSocket* listener)
 {
 	auto new_end = std::remove (_targets.begin(), _targets.end(), listener);
 	_targets.resize (neutrino::to_unsigned (std::distance (_targets.begin(), new_end)));
