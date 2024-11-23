@@ -18,7 +18,6 @@
 #include <xefis/config/all.h>
 #include <xefis/support/nature/acceleration_moments.h>
 #include <xefis/support/nature/force_moments.h>
-#include <xefis/support/nature/mass_moments.h>
 #include <xefis/support/nature/velocity_moments.h>
 #include <xefis/support/simulation/rigid_body/concepts.h>
 

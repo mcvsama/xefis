@@ -62,7 +62,7 @@ class Wing:
 
   private:
 	[[nodiscard]]
-	static MassMoments<BodyCOM>
+	static MassMomentsAtArm<BodyCOM>
 	calculate_body_com_mass_moments (Airfoil const&, si::Density material_density);
 
   private:

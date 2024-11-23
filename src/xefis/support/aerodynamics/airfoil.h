@@ -21,6 +21,7 @@
 #include <xefis/support/aerodynamics/reynolds_number.h>
 #include <xefis/support/earth/air/air.h>
 #include <xefis/support/math/geometry.h>
+#include <xefis/support/nature/mass_moments_at_arm.h>
 
 // Standard:
 #include <cstddef>
@@ -172,7 +173,7 @@ template<class TargetSpace, class SourceSpace>
  * Calculate mass moments of a wing for its origin (not center of mass).
  */
 template<class Space>
-	MassMoments<Space>
+	MassMomentsAtArm<Space>
 	calculate_mass_moments (Airfoil const& airfoil, si::Density const material_density)
 	{
 		return calculate_mass_moments<Space> (airfoil.spline(), airfoil.chord_length(), airfoil.wing_length(), material_density);

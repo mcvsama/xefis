@@ -12,7 +12,7 @@
  */
 
 // Xefis:
-#include <xefis/support/nature/mass_moments.h>
+#include <xefis/support/nature/mass_moments_at_arm.h>
 #include <xefis/support/nature/velocity_moments.h>
 #include <xefis/support/nature/wrench.h>
 
@@ -28,7 +28,7 @@
 namespace xf::test {
 namespace {
 
-AutoTest t1 ("Nature: MassMoments calculations", []{
+AutoTest t1 ("Nature: MassMomentsAtArm calculations", []{
 	{
 		auto identity = RotationQuaternion (math::identity);
 		SpaceMatrix<si::MomentOfInertia> const moi2 {
@@ -36,8 +36,8 @@ AutoTest t1 ("Nature: MassMoments calculations", []{
 			0_kgm2, 2_kgm2, 0_kgm2,
 			0_kgm2, 0_kgm2, 2_kgm2,
 		};
-		MassMoments<> const m1 (1_kg, { 0_m, 0_m, 0_m }, math::identity);
-		MassMoments<> const m2 (1_kg, { 2_m, 4_m, 6_m }, math::identity);
+		MassMomentsAtArm<> const m1 (1_kg, { 0_m, 0_m, 0_m }, math::identity);
+		MassMomentsAtArm<> const m2 (1_kg, { 2_m, 4_m, 6_m }, math::identity);
 
 		auto const m3 = m1 + m2;
 
@@ -65,8 +65,8 @@ AutoTest t1 ("Nature: MassMoments calculations", []{
 	}
 
 	{
-		MassMoments<> const m1 (9_kg, { -2_m, 0_m, 0_m }, math::identity);
-		MassMoments<> const m2 (1_kg, { +7_m, 0_m, 0_m }, math::identity);
+		MassMomentsAtArm<> const m1 (9_kg, { -2_m, 0_m, 0_m }, math::identity);
+		MassMomentsAtArm<> const m2 (1_kg, { +7_m, 0_m, 0_m }, math::identity);
 
 		auto const m3 = m1 + m2;
 
@@ -77,7 +77,7 @@ AutoTest t1 ("Nature: MassMoments calculations", []{
 												 1e-9_m);
 	}
 
-	// Apply rotation to MassMoments:
+	// Apply rotation to MassMomentsAtArm:
 	{
 		// TODO
 	}

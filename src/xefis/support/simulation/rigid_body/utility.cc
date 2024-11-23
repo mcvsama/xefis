@@ -29,7 +29,7 @@ namespace xf::rigid_body {
 std::unique_ptr<Body>
 make_earth()
 {
-	return std::make_unique<Body> (MassMoments<BodyCOM> (kEarthMass, math::zero, math::reframe<BodyCOM, BodyCOM> (kEarthMomentOfInertia)));
+	return std::make_unique<Body> (MassMoments<BodyCOM> (kEarthMass, math::reframe<BodyCOM, BodyCOM> (kEarthMomentOfInertia)));
 }
 
 } // namespace xf::rigid_body

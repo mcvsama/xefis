@@ -16,7 +16,7 @@
 #include <xefis/support/math/transforms.h>
 #include <xefis/support/math/triangulation.h>
 #include <xefis/support/nature/constants.h>
-#include <xefis/support/nature/mass_moments_at_com.h>
+#include <xefis/support/nature/mass_moments.h>
 #include <xefis/support/nature/various_inertia_tensors.h>
 #include <xefis/support/simulation/constraints/angular_limits_constraint.h>
 #include <xefis/support/simulation/constraints/angular_servo_constraint.h>
@@ -67,7 +67,7 @@ auto const hinge2 = SpaceLength<BodyCOM> (0.0_m, 0.5_m, 0_m);
 auto const hinge3 = SpaceLength<BodyCOM> (0.0_m, 0.25_m, 0_m);
 
 
-MassMomentsAtCOM<BodyCOM>
+MassMoments<BodyCOM>
 make_body_mass_moments (si::Mass const mass, si::Length const edge_length)
 {
 	return {
@@ -78,7 +78,7 @@ make_body_mass_moments (si::Mass const mass, si::Length const edge_length)
 
 
 // TODO operator _L (litres)
-MassMomentsAtCOM<BodyCOM>
+MassMoments<BodyCOM>
 make_body_mass_moments (si::Mass const mass, si::Density const density = 1000_kg / 1_m3)
 {
 	auto const edge_length = 1_m * std::pow ((mass / density).value(), 1.0 / 3.0);

@@ -105,7 +105,7 @@ make_aircraft (xf::rigid_body::System& rigid_body_system, Models& models)
 	// Fuselage
 
 	auto const fuselage_mass = 2_kg;
-	auto& fuselage = aircraft_group.add<rb::Body> (xf::MassMoments<BodyCOM> (fuselage_mass, math::zero, xf::make_cuboid_inertia_tensor<BodyCOM> (fuselage_mass, { 100_cm, 100_cm, 100_cm })));
+	auto& fuselage = aircraft_group.add<rb::Body> (xf::MassMoments<BodyCOM> (fuselage_mass, xf::make_cuboid_inertia_tensor<BodyCOM> (fuselage_mass, { 100_cm, 100_cm, 100_cm })));
 	fuselage.set_label ("fuselage");
 	// Move it a bit to the front:
 	fuselage.translate ({ +1.0_m, 0_m, 0_m });

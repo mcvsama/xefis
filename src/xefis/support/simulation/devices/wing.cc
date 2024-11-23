@@ -93,7 +93,7 @@ Wing::update_external_forces (Atmosphere const* atmosphere)
 }
 
 
-MassMoments<BodyCOM>
+MassMomentsAtArm<BodyCOM>
 Wing::calculate_body_com_mass_moments (Airfoil const& airfoil, si::Density const material_density)
 {
 	// Well, let AirfoilSplineSpace and BodyCOM be actually the same, so an identity rotation:

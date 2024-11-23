@@ -78,7 +78,7 @@ make_centered_cube_shape (SpaceLength<BodyOrigin> const& dimensions, ShapeMateri
 
 
 Shape
-make_centered_cube_shape (xf::MassMomentsAtCOM<BodyCOM> const& mm, ShapeMaterial const& material)
+make_centered_cube_shape (xf::MassMoments<BodyCOM> const& mm, ShapeMaterial const& material)
 {
 	// Assuming center of mass position is 0.
 

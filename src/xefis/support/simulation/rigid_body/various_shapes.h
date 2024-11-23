@@ -18,7 +18,7 @@
 #include <xefis/config/all.h>
 #include <xefis/support/aerodynamics/airfoil_spline.h>
 #include <xefis/support/math/geometry.h>
-#include <xefis/support/nature/mass_moments_at_com.h>
+#include <xefis/support/nature/mass_moments.h>
 #include <xefis/support/simulation/rigid_body/shape.h>
 #include <xefis/support/simulation/rigid_body/shape_material.h>
 #include <xefis/support/simulation/rigid_body/various_materials.h>
@@ -156,7 +156,7 @@ make_centered_cube_shape (SpaceLength<BodyOrigin> const& dimensions, ShapeMateri
  * The cube is centered around the [0, 0, 0] point.
  */
 Shape
-make_centered_cube_shape (xf::MassMomentsAtCOM<BodyCOM> const&, ShapeMaterial const& material = {});
+make_centered_cube_shape (xf::MassMoments<BodyCOM> const&, ShapeMaterial const& material = {});
 
 /**
  * Make sphere of given radius.

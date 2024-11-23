@@ -145,7 +145,7 @@ class ImpulseSolver: private Noncopyable
 
 	[[nodiscard]]
 	static AccelerationMoments<WorldSpace>
-	calculate_acceleration_moments (Placement<WorldSpace, BodyCOM> const&, MassMomentsAtCOM<BodyCOM> const&, ForceMoments<WorldSpace> const&);
+	calculate_acceleration_moments (Placement<WorldSpace, BodyCOM> const&, MassMoments<BodyCOM> const&, ForceMoments<WorldSpace> const&);
 
 	void
 	update_acceleration_moments();

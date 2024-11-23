@@ -44,7 +44,7 @@ PrandtlTube::PrandtlTube (Atmosphere const& atmosphere, PrandtlTubeParameters co
 
 	auto const inertia_tensor_at_com = make_centered_solid_cylinder_inertia_tensor<BodyCOM> ({ .mass = params.mass, .radius = 0.5 * params.diameter, .length = params.length });
 	auto const inertia_tensor_at_origin = inertia_tensor_com_to_point (params.mass, inertia_tensor_at_com, SpaceLength<BodyCOM> { 0_m, 0_m, 0.5 * params.length });
-	set_mass_moments (MassMoments<BodyCOM> (params.mass, { 0_m, 0_m, 0.5 * params.length }, inertia_tensor_at_origin));
+	set_mass_moments (MassMomentsAtArm<BodyCOM> (params.mass, { 0_m, 0_m, 0.5 * params.length }, inertia_tensor_at_origin));
 
 	// Make X point into the wind:
 	rotate_about_body_origin (xf::y_rotation<WorldSpace> (90_deg));

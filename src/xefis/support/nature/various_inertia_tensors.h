@@ -17,7 +17,6 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/math/geometry.h>
-#include <xefis/support/nature/mass_moments.h>
 
 // Neutrino:
 #include <neutrino/numeric.h>

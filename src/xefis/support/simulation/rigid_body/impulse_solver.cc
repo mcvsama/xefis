@@ -281,7 +281,7 @@ ImpulseSolver::update_single_constraint_forces (Constraint* constraint, si::Time
 
 
 AccelerationMoments<WorldSpace>
-ImpulseSolver::calculate_acceleration_moments (Placement<WorldSpace, BodyCOM> const& placement, MassMomentsAtCOM<BodyCOM> const& mm, ForceMoments<WorldSpace> const& force_moments)
+ImpulseSolver::calculate_acceleration_moments (Placement<WorldSpace, BodyCOM> const& placement, MassMoments<BodyCOM> const& mm, ForceMoments<WorldSpace> const& force_moments)
 {
 	auto const fm = placement.unbound_transform_to_body (force_moments);
 	auto const am = AccelerationMoments<BodyCOM> (fm.force() / mm.mass(), 1_rad * mm.inverse_inertia_tensor() * fm.torque());

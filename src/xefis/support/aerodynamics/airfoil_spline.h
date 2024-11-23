@@ -18,7 +18,7 @@
 #include <xefis/config/all.h>
 #include <xefis/support/math/geometry.h>
 #include <xefis/support/math/triangulation.h>
-#include <xefis/support/nature/mass_moments.h>
+#include <xefis/support/nature/mass_moments_at_arm.h>
 
 // Neutrino:
 #include <neutrino/math/concepts.h>
@@ -96,7 +96,7 @@ class AirfoilSpline
 
 
 template<class Space>
-	MassMoments<Space>
+	MassMomentsAtArm<Space>
 	calculate_mass_moments (AirfoilSpline const& airfoil_spline, si::Length const chord_length, si::Length const wing_length, si::Density const material_density)
 	{
 		auto const triangulation = triangulate<double, Space> (begin (airfoil_spline.points()), end (airfoil_spline.points()));

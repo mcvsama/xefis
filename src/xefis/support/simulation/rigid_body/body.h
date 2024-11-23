@@ -21,8 +21,8 @@
 #include <xefis/support/math/placement.h>
 #include <xefis/support/nature/acceleration_moments.h>
 #include <xefis/support/nature/force_moments.h>
+#include <xefis/support/nature/mass_moments_at_arm.h>
 #include <xefis/support/nature/mass_moments.h>
-#include <xefis/support/nature/mass_moments_at_com.h>
 #include <xefis/support/nature/velocity_moments.h>
 #include <xefis/support/nature/wrench.h>
 #include <xefis/support/simulation/rigid_body/body_iteration.h>
@@ -59,10 +59,10 @@ class Body: public Noncopyable
 
   public:
 	// Ctor
-	Body (MassMomentsAtCOM<BodyCOM> const&, ShapeType = ShapeIsConstant);
+	Body (MassMoments<BodyCOM> const&, ShapeType = ShapeIsConstant);
 
 	// Ctor
-	Body (MassMoments<BodyCOM> const&, ShapeType = ShapeIsConstant);
+	Body (MassMomentsAtArm<BodyCOM> const&, ShapeType = ShapeIsConstant);
 
 	// Dtor
 	virtual
@@ -81,7 +81,7 @@ class Body: public Noncopyable
 	 * Return mass moments at center-of-mass.
 	 */
 	[[nodiscard]]
-	MassMomentsAtCOM<BodyCOM>
+	MassMoments<BodyCOM>
 	mass_moments() const
 		{ return _mass_moments; }
 
@@ -89,14 +89,14 @@ class Body: public Noncopyable
 	 * Set new mass moments at center-of-mass.
 	 */
 	void
-	set_mass_moments (MassMomentsAtCOM<BodyCOM> const& mass_moments)
+	set_mass_moments (MassMoments<BodyCOM> const& mass_moments)
 		{ _mass_moments = mass_moments; }
 
 	/**
 	 * Set new mass moments at center-of-mass.
 	 */
 	void
-	set_mass_moments (MassMoments<BodyCOM> const&);
+	set_mass_moments (MassMomentsAtArm<BodyCOM> const&);
 
 	/**
 	 * Return placement of center-of-mass.
@@ -356,7 +356,7 @@ class Body: public Noncopyable
 
   private:
 	std::string											_label;
-	MassMomentsAtCOM<BodyCOM>							_mass_moments;
+	MassMoments<BodyCOM>								_mass_moments;
 	// Location of center-of-mass:
 	Placement<WorldSpace, BodyCOM>						_placement;
 	// Location of origin:

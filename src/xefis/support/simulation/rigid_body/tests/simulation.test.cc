@@ -49,7 +49,7 @@ make_iss()
 		);
 	xf::SpaceVector<si::Velocity, WorldSpace> const iss_velocity { 0_mps, 0_mps, 27'600_kph };
 	xf::SpaceVector<si::AngularVelocity, WorldSpace> const iss_angular_velocity (math::zero);
-	xf::MassMoments<BodyCOM> const iss_mass_moments (419'725_kg, math::zero, math::unit);
+	xf::MassMoments<BodyCOM> const iss_mass_moments (419'725_kg, math::unit);
 
 	auto body = std::make_unique<rigid_body::Body> (iss_mass_moments);
 	auto pl = body->placement();

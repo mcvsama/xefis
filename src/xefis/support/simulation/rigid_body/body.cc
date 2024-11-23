@@ -23,13 +23,6 @@
 
 namespace xf::rigid_body {
 
-Body::Body (MassMomentsAtCOM<BodyCOM> const& mass_moments, ShapeType const shape_type):
-	_shape_type (shape_type)
-{
-	set_mass_moments (mass_moments);
-}
-
-
 Body::Body (MassMoments<BodyCOM> const& mass_moments, ShapeType const shape_type):
 	_shape_type (shape_type)
 {
@@ -37,8 +30,15 @@ Body::Body (MassMoments<BodyCOM> const& mass_moments, ShapeType const shape_type
 }
 
 
+Body::Body (MassMomentsAtArm<BodyCOM> const& mass_moments, ShapeType const shape_type):
+	_shape_type (shape_type)
+{
+	set_mass_moments (mass_moments);
+}
+
+
 void
-Body::set_mass_moments (MassMoments<BodyCOM> const& mass_moments)
+Body::set_mass_moments (MassMomentsAtArm<BodyCOM> const& mass_moments)
 {
 	auto const com_position = mass_moments.center_of_mass_position();
 
