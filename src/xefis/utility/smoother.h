@@ -28,6 +28,7 @@
 #include <cstddef>
 #include <cmath>
 #include <algorithm>
+#include <numbers>
 
 
 namespace xf {
@@ -297,7 +298,7 @@ template<class V>
 		// Note: this is without the usual 0.5 factor, so it's not normalized,
 		// but no energy correction (2.0 factor) will be needed later.
 		for (std::size_t n = 0; n < N; ++n)
-			_window[n] = 1.0 - std::cos (2.0 * M_PI * n / (N - 1));
+			_window[n] = 1.0 - std::cos (2.0 * std::numbers::pi * n / (N - 1));
 	}
 
 } // namespace xf

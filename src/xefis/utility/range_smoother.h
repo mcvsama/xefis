@@ -29,6 +29,7 @@
 #include <cstddef>
 #include <cmath>
 #include <algorithm>
+#include <numbers>
 
 
 namespace xf {
@@ -225,7 +226,7 @@ template<class V>
 	inline double
 	RangeSmoother<V>::encircle (Value s) const noexcept
 	{
-		return renormalize (s, _range, Range<double> (0.0, 2.0 * M_PI));
+		return renormalize (s, _range, Range<double> (0.0, 2.0 * std::numbers::pi));
 	}
 
 
@@ -233,7 +234,7 @@ template<class V>
 	inline typename RangeSmoother<V>::Value
 	RangeSmoother<V>::decircle (double s) const noexcept
 	{
-		return renormalize (s, Range<double> (0.0, 2.0 * M_PI), _range);
+		return renormalize (s, Range<double> (0.0, 2.0 * std::numbers::pi), _range);
 	}
 
 
@@ -243,7 +244,7 @@ template<class V>
 	{
 		std::size_t N = _window.size();
 		for (std::size_t n = 0; n < N; ++n)
-			_window[n] = 0.5 * (1.0 - std::cos (2.0 * M_PI * n / (N - 1)));
+			_window[n] = 0.5 * (1.0 - std::cos (2.0 * std::numbers::pi * n / (N - 1)));
 	}
 
 } // namespace xf

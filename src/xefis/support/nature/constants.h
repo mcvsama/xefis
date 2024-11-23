@@ -20,6 +20,7 @@
 
 // Standard:
 #include <cstddef>
+#include <numbers>
 
 
 namespace xf {
@@ -63,7 +64,7 @@ constexpr si::Density				kStdAirDensity					= 1.225_kg / 1_m3;
 constexpr si::Time					kSiderealDay					= 23_h + 56_min + 4.09_s;
 constexpr si::Length				kEarthMeanRadius				= 6367.46_km;
 constexpr si::Mass					kEarthMass						= 5.9722e24_kg;
-constexpr si::AngularVelocity		kEarthAngularVelocity			= 2_rad * M_PI / xf::kSiderealDay;
+constexpr si::AngularVelocity		kEarthAngularVelocity			= 2_rad * std::numbers::pi / xf::kSiderealDay;
 // Simplified EGM96 model:
 constexpr SpaceMatrix<si::MomentOfInertia, ECEFSpace>
 									kEarthMomentOfInertia {

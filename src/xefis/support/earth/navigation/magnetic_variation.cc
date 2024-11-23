@@ -19,6 +19,7 @@
 
 // Standard:
 #include <cstddef>
+#include <numbers>
 
 
 namespace xf {
@@ -353,7 +354,7 @@ MagneticVariationImpl::calc_magvar( double lat, double lon, double h, uint64_t d
     }
 
     /* Find geodetic field components: */
-    psi = theta - ((M_PI / 2.0) - lat);
+    psi = theta - ((std::numbers::pi / 2.0) - lat);
     sinpsi = sin(psi);
     cospsi = cos(psi);
     X = -B_theta * cospsi - B_r * sinpsi;
