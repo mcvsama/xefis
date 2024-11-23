@@ -17,7 +17,6 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/airframe/airframe.h>
-#include <xefis/support/airframe/lift.h>
 #include <xefis/support/airframe/types.h>
 #include <xefis/support/earth/air/air.h>
 #include <xefis/support/earth/navigation/wind_triangle.h>
