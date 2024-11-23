@@ -398,7 +398,7 @@ template<CoordinateSystemConcept Space>
 			return *_body_space_velocity_moments;
 		}
 		else
-			static_assert (false, "Unsupported coordinate system");
+			static_assert (false, "unsupported coordinate system");
 	}
 
 
@@ -413,7 +413,7 @@ template<CoordinateSystemConcept Space>
 		else if constexpr (std::is_same_v<Space, BodyCOM>)
 			_velocity_moments = _placement.unbound_transform_to_base (velocity_moments);
 		else
-			static_assert (false, "Unsupported coordinate system");
+			static_assert (false, "unsupported coordinate system");
 	}
 
 
@@ -433,7 +433,7 @@ template<CoordinateSystemConcept Space>
 			return *_body_space_acceleration_moments;
 		}
 		else
-			static_assert (false, "Unsupported coordinate system");
+			static_assert (false, "unsupported coordinate system");
 	}
 
 
@@ -448,7 +448,7 @@ template<CoordinateSystemConcept Space>
 		else if constexpr (std::is_same_v<Space, BodyCOM>)
 			_acceleration_moments = _placement.unbound_transform_to_base (acceleration_moments);
 		else
-			static_assert (false, "Unsupported coordinate system");
+			static_assert (false, "unsupported coordinate system");
 	}
 
 
@@ -461,7 +461,7 @@ template<CoordinateSystemConcept Space>
 		else if constexpr (std::is_same_v<Space, BodyCOM>)
 			return _placement.unbound_transform_to_body (iteration().acceleration_moments_except_gravity);
 		else
-			static_assert (false, "Unsupported coordinate system");
+			static_assert (false, "unsupported coordinate system");
 	}
 
 
@@ -481,7 +481,7 @@ template<CoordinateSystemConcept Space>
 		else if constexpr (std::is_same_v<Space, BodyCOM>)
 			return _applied_impulses;
 		else
-			static_assert (false, "Unsupported coordinate system");
+			static_assert (false, "unsupported coordinate system");
 	}
 
 
@@ -496,7 +496,7 @@ template<CoordinateSystemConcept Space>
 		else if constexpr (std::is_same_v<Space, BodyCOM>)
 			_applied_impulses += force_moments;
 		else
-			static_assert (false, "Unsupported coordinate system");
+			static_assert (false, "unsupported coordinate system");
 	}
 
 
@@ -514,14 +514,14 @@ template<CoordinateSystemConcept ForceSpace, CoordinateSystemConcept PositionSpa
 		else if constexpr (std::is_same_v<ForceSpace, BodyCOM>)
 			body_space_force_moments = force_moments;
 		else
-			static_assert (false, "Unsupported coordinate system");
+			static_assert (false, "unsupported coordinate system");
 
 		if constexpr (std::is_same_v<PositionSpace, WorldSpace>)
 			body_space_position = _placement.bound_transform_to_body (position);
 		else if constexpr (std::is_same_v<ForceSpace, BodyCOM>)
 			body_space_position = position;
 		else
-			static_assert (false, "Unsupported coordinate system");
+			static_assert (false, "unsupported coordinate system");
 
 		apply_impulse (Wrench (body_space_force_moments, body_space_position));
 	}
@@ -543,7 +543,7 @@ template<CoordinateSystemConcept Space>
 		else if constexpr (std::is_same_v<Space, BodyCOM>)
 			_applied_impulses += resultant_force (wrench);
 		else
-			static_assert (false, "Unsupported coordinate system");
+			static_assert (false, "unsupported coordinate system");
 	}
 
 
@@ -574,7 +574,7 @@ template<CoordinateSystemConcept Space>
 		else if constexpr (std::is_same_v<Space, BodyOrigin>)
 			return math::zero;
 		else
-			static_assert (false, "Unsupported coordinate system");
+			static_assert (false, "unsupported coordinate system");
 	}
 
 
@@ -587,7 +587,7 @@ template<CoordinateSystemConcept Space>
 		else if constexpr (std::is_same_v<Space, BodyCOM>)
 			_placement.translate_frame (placement().body_to_base_rotation() * translation);
 		else
-			static_assert (false, "Unsupported coordinate system");
+			static_assert (false, "unsupported coordinate system");
 	}
 
 } // namespace xf::rigid_body
