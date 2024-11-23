@@ -62,7 +62,7 @@ class Simulation: public neutrino::Noncopyable
 	xf::Logger							_logger;
 	Models&								_models;
 	xf::rigid_body::System				_rigid_body_system			{ _models.standard_atmosphere };
-	xf::rigid_body::ImpulseSolver		_rigid_body_solver			{ _rigid_body_system, 30 };
+	xf::rigid_body::ImpulseSolver		_rigid_body_solver			{ _rigid_body_system, 1 };
 	xf::electrical::Network				_electrical_network;
 	xf::electrical::NodeVoltageSolver	_electrical_network_solver	{ _electrical_network, 1e-3 };
 	SimulatedAircraft					_aircraft					{ make_aircraft (_rigid_body_system, _models) };

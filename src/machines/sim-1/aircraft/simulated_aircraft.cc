@@ -289,11 +289,11 @@ make_aircraft (xf::rigid_body::System& rigid_body_system, Models& models)
 
 	// TODO Virtual sensors mounted on rigid bodies should "fail" as in stop reporting any data if the body breaks off the main fuselage or something.
 	for (auto& constraint: constraints)
-		constraint->set_breaking_force_torque (1'000_N, 1'000_Nm);
+		constraint->set_breaking_force_torque (10'000_N, 1'000_Nm);
 
-	rigid_body_system.set_baumgarte_factor (0.5);
+	rigid_body_system.set_baumgarte_factor (0.3);
 	rigid_body_system.set_constraint_force_mixing_factor (1e-3);
-	prandtl_tube_fixed_constraint.set_baumgarte_factor (1.0);
+	prandtl_tube_fixed_constraint.set_baumgarte_factor (0.6);
 
 	return SimulatedAircraft {
 		.rigid_group		= std::move (aircraft_group),

@@ -51,6 +51,7 @@ Simulation::Simulation (Machine& machine, Models& models, neutrino::Logger const
 	auto& earth = _rigid_body_system.add_gravitating (rb::make_earth());
 	earth.set_label ("Earth");
 
+	_rigid_body_solver.set_required_precision (1_N, 0.1_Nm);
 	_rigid_body_solver.set_limits (rb::Limits {
 		.max_force				= 1e6_N,
 		.max_torque				= 1e6_Nm,
