@@ -57,13 +57,13 @@ class AirfoilSplineWidget: public CanvasWidget
 	 * Set center of pressure position.
 	 */
 	template<class Space>
-		requires (std::is_same_v<Space, rigid_body::BodyCOM> || std::is_same_v<Space, AirfoilSplineSpace>)
+		requires (std::is_same_v<Space, BodyCOM> || std::is_same_v<Space, AirfoilSplineSpace>)
 		void
 		set_center_of_pressure_position (PlaneVector<double, Space> const& position)
 		{
 			_center_of_pressure_position = { position.x(), position.y() };
 
-			if constexpr (std::is_same_v<Space, rigid_body::BodyCOM>)
+			if constexpr (std::is_same_v<Space, BodyCOM>)
 				_center_of_pressure_position_relative_to_com = true;
 			else if constexpr (std::is_same_v<Space, AirfoilSplineSpace>)
 				_center_of_pressure_position_relative_to_com = false;
@@ -77,21 +77,21 @@ class AirfoilSplineWidget: public CanvasWidget
 	 * Set lift force (relative to center of mass).
 	 */
 	void
-	set_lift_force (PlaneVector<si::Force, rigid_body::BodyCOM> const& lift_force)
+	set_lift_force (PlaneVector<si::Force, BodyCOM> const& lift_force)
 		{ _lift_force = lift_force; }
 
 	/**
 	 * Set drag force (relative to center of mass).
 	 */
 	void
-	set_drag_force (PlaneVector<si::Force, rigid_body::BodyCOM> const& drag_force)
+	set_drag_force (PlaneVector<si::Force, BodyCOM> const& drag_force)
 		{ _drag_force = drag_force; }
 
 	/**
 	 * Set pitching moment (relative to center of mass).
 	 */
 	void
-	set_pitching_moment (PlaneVector<si::Torque, rigid_body::BodyCOM> const& pitching_moment)
+	set_pitching_moment (PlaneVector<si::Torque, BodyCOM> const& pitching_moment)
 		{ _pitching_moment = pitching_moment; }
 
 	/**
@@ -99,7 +99,7 @@ class AirfoilSplineWidget: public CanvasWidget
 	 * was provided in set_airfoil_spline().
 	 */
 	template<class Space>
-		requires (std::is_same_v<Space, rigid_body::BodyCOM> || std::is_same_v<Space, AirfoilSplineSpace>)
+		requires (std::is_same_v<Space, BodyCOM> || std::is_same_v<Space, AirfoilSplineSpace>)
 		void
 		set_center_of_pressure_position (PlaneVector<si::Length, Space> const& position)
 		{
@@ -136,11 +136,11 @@ class AirfoilSplineWidget: public CanvasWidget
 	std::optional<si::Length>			_chord_length;
 	QPointF								_center_of_mass_position;
 	std::optional<QPointF>				_center_of_pressure_position;
-	std::optional<PlaneVector<si::Force, rigid_body::BodyCOM>>
+	std::optional<PlaneVector<si::Force, BodyCOM>>
 										_lift_force;
-	std::optional<PlaneVector<si::Force, rigid_body::BodyCOM>>
+	std::optional<PlaneVector<si::Force, BodyCOM>>
 										_drag_force;
-	std::optional<PlaneVector<si::Torque, rigid_body::BodyCOM>>
+	std::optional<PlaneVector<si::Torque, BodyCOM>>
 										_pitching_moment;
 	// If not relative to COM, then it's relative to space origin in AirfoilSplineSpace:
 	bool								_center_of_pressure_position_relative_to_com { false };

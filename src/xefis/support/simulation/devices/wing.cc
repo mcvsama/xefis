@@ -47,16 +47,16 @@ Wing::update_external_forces (Atmosphere const* atmosphere)
 	if (atmosphere)
 	{
 		// Rotations: TODO Perhaps don't do these calculations if it's just multiplying by 1?
-		auto const world_to_ecef = RotationQuaternion<ECEFSpace, rigid_body::WorldSpace> (math::identity);
-		auto const ecef_to_world = RotationQuaternion<rigid_body::WorldSpace, ECEFSpace> (math::identity);
-		auto const body_to_airfoil_spline = RotationQuaternion<AirfoilSplineSpace, rigid_body::BodyCOM> (math::identity);
-		auto const airfoil_spline_to_body = RotationQuaternion<rigid_body::BodyCOM, AirfoilSplineSpace> (math::identity);
+		auto const world_to_ecef = RotationQuaternion<ECEFSpace, WorldSpace> (math::identity);
+		auto const ecef_to_world = RotationQuaternion<WorldSpace, ECEFSpace> (math::identity);
+		auto const body_to_airfoil_spline = RotationQuaternion<AirfoilSplineSpace, BodyCOM> (math::identity);
+		auto const airfoil_spline_to_body = RotationQuaternion<BodyCOM, AirfoilSplineSpace> (math::identity);
 		auto const world_to_body = placement().base_to_body_rotation();
 		// ECEF → WorldSpace → BodyCOM → AirfoilSplineSpace:
 		RotationQuaternion<AirfoilSplineSpace, ECEFSpace> ecef_to_spline_transform = body_to_airfoil_spline * world_to_body * ecef_to_world;
 
 		auto const body_position_in_ecef = world_to_ecef * placement().position();
-		auto const body_velocity_in_ecef = world_to_ecef * velocity_moments<rigid_body::WorldSpace>().velocity();
+		auto const body_velocity_in_ecef = world_to_ecef * velocity_moments<WorldSpace>().velocity();
 
 		auto ecef_air = atmosphere->air_at (body_position_in_ecef);
 		ecef_air.velocity -= body_velocity_in_ecef;
@@ -71,9 +71,9 @@ Wing::update_external_forces (Atmosphere const* atmosphere)
 		auto const lift_force = body_aeroforces_at_origin.lift;
 		auto const drag_force = body_aeroforces_at_origin.drag;
 		auto const pitching_moment = body_aeroforces_at_origin.pitching_moment;
-		auto const center_of_pressure = body_aeroforces_at_origin.center_of_pressure + origin<rigid_body::BodyCOM>();
+		auto const center_of_pressure = body_aeroforces_at_origin.center_of_pressure + origin<BodyCOM>();
 
-		// New parameters converted to rigid_body::BodyCOM:
+		// New parameters converted to BodyCOM:
 		_airfoil_aerodynamic_parameters = {
 			.air = body_air,
 			.reynolds_number = spline_aeroforces_at_origin.reynolds_number,
@@ -87,17 +87,17 @@ Wing::update_external_forces (Atmosphere const* atmosphere)
 			},
 		};
 
-		apply_impulse (ForceMoments<rigid_body::BodyCOM> (lift_force, pitching_moment), center_of_pressure);
-		apply_impulse (ForceMoments<rigid_body::BodyCOM> (drag_force, math::zero), center_of_pressure);
+		apply_impulse (ForceMoments<BodyCOM> (lift_force, pitching_moment), center_of_pressure);
+		apply_impulse (ForceMoments<BodyCOM> (drag_force, math::zero), center_of_pressure);
 	}
 }
 
 
-MassMoments<rigid_body::BodyCOM>
+MassMoments<BodyCOM>
 Wing::calculate_body_com_mass_moments (Airfoil const& airfoil, si::Density const material_density)
 {
 	// Well, let AirfoilSplineSpace and BodyCOM be actually the same, so an identity rotation:
-	auto const rotation = RotationQuaternion<rigid_body::BodyCOM, AirfoilSplineSpace> (math::identity);
+	auto const rotation = RotationQuaternion<BodyCOM, AirfoilSplineSpace> (math::identity);
 	return rotation * calculate_mass_moments<AirfoilSplineSpace> (airfoil, material_density);
 }
 

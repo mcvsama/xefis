@@ -27,10 +27,6 @@
 
 namespace xf::sim {
 
-using rigid_body::BodyCOM;
-using rigid_body::WorldSpace;
-
-
 PrandtlTube::PrandtlTube (Atmosphere const& atmosphere, PrandtlTubeParameters const& params):
 	Body (MassMoments<BodyCOM>()),
 	_atmosphere (&atmosphere)

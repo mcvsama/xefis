@@ -85,8 +85,6 @@ BodyEditor::edit (rigid_body::Body* body_to_edit)
 void
 BodyEditor::refresh()
 {
-	using rigid_body::WorldSpace;
-
 	if (_edited_body_widget)
 		_edited_body_widget->update_observed_values();
 

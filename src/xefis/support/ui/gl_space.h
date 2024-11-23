@@ -101,7 +101,7 @@ class GLSpace
 	 * Add given offset to all vertex positions that are drawn.
 	 */
 	void
-	set_global_offset (SpaceLength<rigid_body::BodyOrigin> const& offset) noexcept;
+	set_global_offset (SpaceLength<BodyOrigin> const& offset) noexcept;
 
 	/**
 	 * Store current OpenGL matrix, call the lambda and restore matrix.
@@ -181,8 +181,8 @@ class GLSpace
 	/**
 	 * Return value in OpenGL coordinates.
 	 */
-	SpaceVector<double, rigid_body::BodyOrigin>
-	vector_to_opengl (SpaceLength<rigid_body::BodyOrigin> const value)
+	SpaceVector<double, BodyOrigin>
+	vector_to_opengl (SpaceLength<BodyOrigin> const value)
 		{ return value * _position_scale; }
 
 	/**
@@ -249,10 +249,10 @@ class GLSpace
 	pop_context();
 
   private:
-	SpaceLength<rigid_body::BodyOrigin>			_global_offset;
-	SpaceVector<double, rigid_body::BodyOrigin>	_global_offset_float;
-	decltype (1 / 1_m)							_position_scale { 1 };
-	std::stack<AdditionalParameters>			_additional_parameters_stack;
+	SpaceLength<BodyOrigin>				_global_offset;
+	SpaceVector<double, BodyOrigin>		_global_offset_float;
+	decltype (1 / 1_m)					_position_scale { 1 };
+	std::stack<AdditionalParameters>	_additional_parameters_stack;
 };
 
 
@@ -266,7 +266,7 @@ template<class Value>
 
 
 inline void
-GLSpace::set_global_offset (SpaceLength<rigid_body::BodyOrigin> const& offset) noexcept
+GLSpace::set_global_offset (SpaceLength<BodyOrigin> const& offset) noexcept
 {
 	_global_offset = offset;
 	_global_offset_float = offset * _position_scale;

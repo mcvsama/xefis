@@ -35,9 +35,6 @@
 
 namespace sim1::aircraft {
 
-namespace rb = xf::rigid_body;
-using namespace neutrino::debug;
-
 Simulation::Simulation (Machine& machine, Models& models, neutrino::Logger const& logger):
 	_logger (logger),
 	_models (models),
@@ -45,14 +42,14 @@ Simulation::Simulation (Machine& machine, Models& models, neutrino::Logger const
 {
 	auto const location = xf::LonLatRadius (0_deg, 45_deg, xf::kEarthMeanRadius + 0.5_km);
 	auto const tait_bryan_angles = xf::TaitBryanAngles ({ .roll = 0_deg, .pitch = -30_deg, .yaw = 0_deg });
-	_aircraft.rigid_group.rotate_about_world_origin (math::reframe<rb::WorldSpace, rb::WorldSpace> (airframe_to_ecef_rotation (tait_bryan_angles, location)));
-	_aircraft.rigid_group.translate (math::reframe<rb::WorldSpace, void> (xf::cartesian (location)));
+	_aircraft.rigid_group.rotate_about_world_origin (math::reframe<xf::WorldSpace, xf::WorldSpace> (airframe_to_ecef_rotation (tait_bryan_angles, location)));
+	_aircraft.rigid_group.translate (math::reframe<xf::WorldSpace, void> (xf::cartesian (location)));
 
-	auto& earth = _rigid_body_system.add_gravitating (rb::make_earth());
+	auto& earth = _rigid_body_system.add_gravitating (xf::rigid_body::make_earth());
 	earth.set_label ("Earth");
 
 	_rigid_body_solver.set_required_precision (1_N, 0.1_Nm);
-	_rigid_body_solver.set_limits (rb::Limits {
+	_rigid_body_solver.set_limits (xf::rigid_body::Limits {
 		.max_force				= 1e6_N,
 		.max_torque				= 1e6_Nm,
 		.max_velocity			= 1e6_mps,

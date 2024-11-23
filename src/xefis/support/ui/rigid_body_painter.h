@@ -133,7 +133,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	 * Set camera focus point.
 	 */
 	void
-	set_camera_position (SpaceLength<rigid_body::WorldSpace> const& position)
+	set_camera_position (SpaceLength<WorldSpace> const& position)
 		{ _camera_position = position; }
 
 	/**
@@ -300,33 +300,33 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	paint_angular_momentum (rigid_body::Body const&);
 
 	void
-	draw_arrow (SpaceLength<rigid_body::WorldSpace> const& origin, SpaceLength<rigid_body::WorldSpace> const& vector, rigid_body::ShapeMaterial const& material = {});
+	draw_arrow (SpaceLength<WorldSpace> const& origin, SpaceLength<WorldSpace> const& vector, rigid_body::ShapeMaterial const& material = {});
 
 	[[nodiscard]]
-	SpaceLength<rigid_body::WorldSpace>
+	SpaceLength<WorldSpace>
 	followed_body_position() const;
 
   private:
-	si::PixelDensity					_pixel_density;
+	si::PixelDensity		_pixel_density;
 	// Camera position is relative to the followed body:
-	SpaceLength<rigid_body::WorldSpace>	_camera_position;
-	SpaceVector<si::Angle>				_camera_angles;
-	LonLatRadius						_position_on_earth			{ 0_deg, 0_deg, 0_m };
-	GLSpace								_gl;
-	rigid_body::Body const*				_followed_body				{ nullptr };
-	bool								_following_orientation		{ true };
-	rigid_body::Body const*				_planet_body				{ nullptr };
-	rigid_body::Body const*				_hovered_body				{ nullptr };
-	rigid_body::Body const*				_focused_body				{ nullptr };
-	bool								_constraints_visible		{ false };
-	bool								_gravity_visible			{ false };
-	bool								_external_forces_visible	{ false };
-	bool								_aerodynamic_forces_visible	{ false };
-	bool								_angular_velocities_visible	{ false };
-	bool								_angular_momenta_visible	{ false };
+	SpaceLength<WorldSpace>	_camera_position;
+	SpaceVector<si::Angle>	_camera_angles;
+	LonLatRadius			_position_on_earth			{ 0_deg, 0_deg, 0_m };
+	GLSpace					_gl;
+	rigid_body::Body const*	_followed_body				{ nullptr };
+	bool					_following_orientation		{ true };
+	rigid_body::Body const*	_planet_body				{ nullptr };
+	rigid_body::Body const*	_hovered_body				{ nullptr };
+	rigid_body::Body const*	_focused_body				{ nullptr };
+	bool					_constraints_visible		{ false };
+	bool					_gravity_visible			{ false };
+	bool					_external_forces_visible	{ false };
+	bool					_aerodynamic_forces_visible	{ false };
+	bool					_angular_velocities_visible	{ false };
+	bool					_angular_momenta_visible	{ false };
 	std::map<rigid_body::Body const*, BodyRenderingConfig>
-										_body_rendering_config;
-	std::minstd_rand0					_air_particles_prng;
+							_body_rendering_config;
+	std::minstd_rand0		_air_particles_prng;
 };
 
 } // namespace xf

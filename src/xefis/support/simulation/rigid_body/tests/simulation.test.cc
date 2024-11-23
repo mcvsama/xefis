@@ -43,20 +43,20 @@ std::unique_ptr<rigid_body::Body>
 make_iss()
 {
 	xf::SpaceLength<xf::ECEFSpace> const iss_ecef_position = xf::cartesian (xf::LonLatRadius (0_deg, 0_deg, kISSHeight));
-	xf::RotationQuaternion<rigid_body::WorldSpace> const iss_ecef_rotation =
-		math::reframe<rigid_body::WorldSpace, rigid_body::WorldSpace> (
+	xf::RotationQuaternion<WorldSpace> const iss_ecef_rotation =
+		math::reframe<WorldSpace, WorldSpace> (
 			xf::airframe_to_ecef_rotation (xf::TaitBryanAngles { 0_deg, 0_deg, 0_deg }, iss_ecef_position)
 		);
-	xf::SpaceVector<si::Velocity, rigid_body::WorldSpace> const iss_velocity { 0_mps, 0_mps, 27'600_kph };
-	xf::SpaceVector<si::AngularVelocity, rigid_body::WorldSpace> const iss_angular_velocity (math::zero);
-	xf::MassMoments<rigid_body::BodyCOM> const iss_mass_moments (419'725_kg, math::zero, math::unit);
+	xf::SpaceVector<si::Velocity, WorldSpace> const iss_velocity { 0_mps, 0_mps, 27'600_kph };
+	xf::SpaceVector<si::AngularVelocity, WorldSpace> const iss_angular_velocity (math::zero);
+	xf::MassMoments<BodyCOM> const iss_mass_moments (419'725_kg, math::zero, math::unit);
 
 	auto body = std::make_unique<rigid_body::Body> (iss_mass_moments);
 	auto pl = body->placement();
-	pl.set_position (math::reframe<rigid_body::WorldSpace, void> (iss_ecef_position));
-	pl.set_body_to_base_rotation (math::reframe<rigid_body::WorldSpace, rigid_body::BodyCOM> (iss_ecef_rotation));
+	pl.set_position (math::reframe<WorldSpace, void> (iss_ecef_position));
+	pl.set_body_to_base_rotation (math::reframe<WorldSpace, BodyCOM> (iss_ecef_rotation));
 	body->set_placement (pl);
-	body->set_velocity_moments (VelocityMoments<rigid_body::WorldSpace> { iss_velocity, iss_angular_velocity });
+	body->set_velocity_moments (VelocityMoments<WorldSpace> { iss_velocity, iss_angular_velocity });
 
 	return body;
 }
@@ -72,11 +72,11 @@ AutoTest t_1 ("rigid_body::System: 90-minute simulation of gravitational forces"
 	auto const interim_precision = 20_km;
 	auto const final_precision = 50_m;
 
-	SpaceLength<rigid_body::WorldSpace> const earth_initial_position { 0_m, 0_m, 0_m };
-	SpaceLength<rigid_body::WorldSpace> const iss_position_1_of_4 { 0_m, 0_m, +kISSHeight };
-	SpaceLength<rigid_body::WorldSpace> const iss_position_2_of_4 { -kISSHeight, 0_m, 0_m };
-	SpaceLength<rigid_body::WorldSpace> const iss_position_3_of_4 { 0_m, 0_m, -kISSHeight };
-	SpaceLength<rigid_body::WorldSpace> const iss_position_4_of_4 { +kISSHeight, 0_m, 0_m };
+	SpaceLength<WorldSpace> const earth_initial_position { 0_m, 0_m, 0_m };
+	SpaceLength<WorldSpace> const iss_position_1_of_4 { 0_m, 0_m, +kISSHeight };
+	SpaceLength<WorldSpace> const iss_position_2_of_4 { -kISSHeight, 0_m, 0_m };
+	SpaceLength<WorldSpace> const iss_position_3_of_4 { 0_m, 0_m, -kISSHeight };
+	SpaceLength<WorldSpace> const iss_position_4_of_4 { +kISSHeight, 0_m, 0_m };
 
 	auto evolver = Evolver (1 / 50_Hz, g_null_logger, [&] (si::Time const dt) { rigid_body_solver.evolve (dt); });
 

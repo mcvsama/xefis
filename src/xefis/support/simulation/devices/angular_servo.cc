@@ -31,12 +31,12 @@
 
 namespace xf::sim {
 
-AngularServo::AngularServo (rigid_body::AngularServoConstraint& constraint, si::Angle const resolution, MassMoments<rigid_body::BodyCOM> const& mass_moments):
+AngularServo::AngularServo (rigid_body::AngularServoConstraint& constraint, si::Angle const resolution, MassMoments<BodyCOM> const& mass_moments):
 	Body (mass_moments),
 	_constraint (constraint),
 	_resolution (resolution)
 {
-	set_shape (make_centered_cube_shape (mass_moments));
+	set_shape (xf::rigid_body::make_centered_cube_shape (mass_moments));
 }
 
 
@@ -51,7 +51,7 @@ std::unique_ptr<AngularServo>
 make_standard_servo (rigid_body::AngularServoConstraint& constraint, float scale)
 {
 	auto const mass = 40_gr * scale;
-	auto const mass_moments = MassMoments<rigid_body::BodyCOM> (mass, math::zero, make_cuboid_inertia_tensor<rigid_body::BodyCOM> (mass, { 40_mm * scale, 20_mm * scale, 36_mm * scale }));
+	auto const mass_moments = MassMoments<BodyCOM> (mass, math::zero, make_cuboid_inertia_tensor<BodyCOM> (mass, { 40_mm * scale, 20_mm * scale, 36_mm * scale }));
 	return std::make_unique<AngularServo> (constraint, 0.5_deg, mass_moments);
 }
 
@@ -60,7 +60,7 @@ std::unique_ptr<AngularServo>
 make_standard_9gram_servo (rigid_body::AngularServoConstraint& constraint)
 {
 	auto const mass = 9_gr;
-	auto const mass_moments = MassMoments<rigid_body::BodyCOM> (mass, math::zero, make_cuboid_inertia_tensor<rigid_body::BodyCOM> (mass, { 24_mm, 12_mm, 28_mm }));
+	auto const mass_moments = MassMoments<BodyCOM> (mass, math::zero, make_cuboid_inertia_tensor<BodyCOM> (mass, { 24_mm, 12_mm, 28_mm }));
 	return std::make_unique<AngularServo> (constraint, 0.5_deg, mass_moments);
 }
 

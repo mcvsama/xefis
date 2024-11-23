@@ -239,9 +239,6 @@ AutoTest t5 ("Math: random rotations fuzz", []{
 
 
 AutoTest t6 ("Math: fixed orientation helper rotations", []{
-	using xf::rigid_body::BodyCOM;
-	using xf::rigid_body::WorldSpace;
-
 	for (int i = 0; i < 100; ++i)
 	{
 		auto const position = SpaceLength<WorldSpace> { 1_m, 1_m, 1_m };

@@ -66,7 +66,7 @@ class RigidBodyViewer: public GLAnimationWidget
 
 	static constexpr si::Angle	kDefaultXAngle		{ 0_deg };
 	static constexpr si::Angle	kDefaultYAngle		{ 0_deg };
-	static constexpr SpaceLength<rigid_body::WorldSpace>
+	static constexpr SpaceLength<WorldSpace>
 								kDefaultPosition	{ 0_m, 0_m, 10_m };
 
 	static constexpr auto		kRotationScale		{ 2_deg / 1_mm };
@@ -161,7 +161,7 @@ class RigidBodyViewer: public GLAnimationWidget
 	 * Return current camera position.
 	 */
 	[[nodiscard]]
-	SpaceLength<rigid_body::WorldSpace> const&
+	SpaceLength<WorldSpace> const&
 	position() const noexcept
 		{ return _position; }
 
@@ -247,22 +247,22 @@ class RigidBodyViewer: public GLAnimationWidget
 	display_menu();
 
   private:
-	Machine*							_machine						{ nullptr };
-	rigid_body::System const*			_rigid_body_system				{ nullptr };
-	RigidBodyPainter					_rigid_body_painter;
-	OnRedraw							_on_redraw;
-	QPoint								_last_pos;
-	bool								_changing_rotation: 1			{ false };
-	bool								_changing_translation: 1		{ false };
+	Machine*					_machine						{ nullptr };
+	rigid_body::System const*	_rigid_body_system				{ nullptr };
+	RigidBodyPainter			_rigid_body_painter;
+	OnRedraw					_on_redraw;
+	QPoint						_last_pos;
+	bool						_changing_rotation: 1			{ false };
+	bool						_changing_translation: 1		{ false };
 	// Right-click and move causes rotation of the view, right-click without moving opens a popup menu:
-	bool								_mouse_moved_since_press: 1		{ true };
+	bool						_mouse_moved_since_press: 1		{ true };
 	// Prevents menu reappearing immediately when trying to close it with a right click:
-	bool								_prevent_menu_reappear: 1		{ false };
-	Playback							_playback						{ Playback::Paused };
-	std::size_t							_steps_to_do					{ 0 };
-	SpaceLength<rigid_body::WorldSpace>	_position						{ kDefaultPosition };
-	si::Angle							_x_angle						{ kDefaultXAngle };
-	si::Angle							_y_angle						{ kDefaultYAngle };
+	bool						_prevent_menu_reappear: 1		{ false };
+	Playback					_playback						{ Playback::Paused };
+	std::size_t					_steps_to_do					{ 0 };
+	SpaceLength<WorldSpace>		_position						{ kDefaultPosition };
+	si::Angle					_x_angle						{ kDefaultXAngle };
+	si::Angle					_y_angle						{ kDefaultYAngle };
 };
 
 } // namespace xf

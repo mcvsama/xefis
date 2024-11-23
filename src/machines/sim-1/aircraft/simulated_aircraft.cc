@@ -47,12 +47,12 @@
 
 namespace sim1::aircraft {
 
-namespace rb = xf::rigid_body;
-
 SimulatedAircraft
 make_aircraft (xf::rigid_body::System& rigid_body_system, Models& models)
 {
 	namespace rb = xf::rigid_body;
+	using xf::BodyCOM;
+	using xf::WorldSpace;
 
 	// Aircraft coordinate system:
 	//   X - front
@@ -91,21 +91,21 @@ make_aircraft (xf::rigid_body::System& rigid_body_system, Models& models)
 	auto const tail_v_airfoil = xf::Airfoil (main_wing_airfoil_characteristics, kTailVerticalStabilizerChord, kTailVerticalStabilizerLength);
 	auto const rudder_airfoil = xf::Airfoil (main_wing_airfoil_characteristics, kRudderChord, kRudderLength);
 
-	auto const x_versor = xf::SpaceVector<double, rb::BodyCOM> (1, 0, 0);
-	auto const z_versor = xf::SpaceVector<double, rb::BodyCOM> (0, 0, 1);
+	auto const x_versor = xf::SpaceVector<double, BodyCOM> (1, 0, 0);
+	auto const z_versor = xf::SpaceVector<double, BodyCOM> (0, 0, 1);
 	auto const z_wing_length = z_versor * main_wing_airfoil.wing_length();
 	auto const x_wing_chord = x_versor * main_wing_airfoil.chord_length();
 	auto const z_aileron_length = z_versor * aileron_airfoil.wing_length();
 	auto const z_elevator_length = z_versor * elevator_airfoil.wing_length();
 	auto const z_rudder_length = z_versor * rudder_airfoil.wing_length();
-	auto const wing_to_normal_rotation = xf::x_rotation<rb::WorldSpace> (+90_deg) * xf::z_rotation<rb::WorldSpace> (+180_deg);
+	auto const wing_to_normal_rotation = xf::x_rotation<WorldSpace> (+90_deg) * xf::z_rotation<WorldSpace> (+180_deg);
 
 	auto aircraft_group = rigid_body_system.make_group();
 
 	// Fuselage
 
 	auto const fuselage_mass = 2_kg;
-	auto& fuselage = aircraft_group.add<rb::Body> (xf::MassMoments<rb::BodyCOM> (fuselage_mass, math::zero, xf::make_cuboid_inertia_tensor<rb::BodyCOM> (fuselage_mass, { 100_cm, 100_cm, 100_cm })));
+	auto& fuselage = aircraft_group.add<rb::Body> (xf::MassMoments<BodyCOM> (fuselage_mass, math::zero, xf::make_cuboid_inertia_tensor<BodyCOM> (fuselage_mass, { 100_cm, 100_cm, 100_cm })));
 	fuselage.set_label ("fuselage");
 	// Move it a bit to the front:
 	fuselage.translate ({ +1.0_m, 0_m, 0_m });
@@ -117,7 +117,7 @@ make_aircraft (xf::rigid_body::System& rigid_body_system, Models& models)
 	wing_l.rotate_about_body_origin (wing_to_normal_rotation);
 	// Move to the left:
 	wing_l.translate ({ 0_m, -0.5 * kFuselageWidth, 0_m });
-	wing_l.rotate_about_body_origin (xf::x_rotation<rb::WorldSpace> (+kDihedral)); // TODO make possible to rotate about world origin by giving rotation in BodyOrigin space
+	wing_l.rotate_about_body_origin (xf::x_rotation<WorldSpace> (+kDihedral)); // TODO make possible to rotate about world origin by giving rotation in BodyOrigin space
 
 	// Wing R
 
@@ -126,51 +126,51 @@ make_aircraft (xf::rigid_body::System& rigid_body_system, Models& models)
 	wing_r.rotate_about_body_origin (wing_to_normal_rotation);
 	// Move to the right:
 	wing_r.translate ({ 0_m, +0.5 * kFuselageWidth + kWingLength, 0_m });
-	wing_r.rotate_about_body_origin (xf::x_rotation<rb::WorldSpace> (-kDihedral));
+	wing_r.rotate_about_body_origin (xf::x_rotation<WorldSpace> (-kDihedral));
 
 	// Winglet L
 
 	auto& winglet_l = aircraft_group.add<xf::sim::Wing> (winglet_airfoil, kFoamDensity);
 	winglet_l.set_label ("wing L/winglet L");
 	winglet_l.rotate_about_body_origin (wing_to_normal_rotation);
-	winglet_l.move_origin_to (wing_l.origin<rb::WorldSpace>());
+	winglet_l.move_origin_to (wing_l.origin<WorldSpace>());
 	winglet_l.translate ({ 0_m, -kWingLength, 0_m });
-	winglet_l.rotate_about (xf::SpaceLength<rb::WorldSpace> { 0_m, -0.5 * kFuselageWidth - main_wing_airfoil.wing_length(), 0_m }, xf::x_rotation<rb::WorldSpace> (+kWingletAngle));
-	winglet_l.rotate_about_world_origin (xf::x_rotation<rb::WorldSpace> (+kDihedral));
+	winglet_l.rotate_about (xf::SpaceLength<WorldSpace> { 0_m, -0.5 * kFuselageWidth - main_wing_airfoil.wing_length(), 0_m }, xf::x_rotation<WorldSpace> (+kWingletAngle));
+	winglet_l.rotate_about_world_origin (xf::x_rotation<WorldSpace> (+kDihedral));
 
 	// Winglet R
 
 	auto& winglet_r = aircraft_group.add<xf::sim::Wing> (winglet_airfoil, kFoamDensity);
 	winglet_r.set_label ("wing R/winglet R");
 	winglet_r.rotate_about_body_origin (wing_to_normal_rotation);
-	winglet_r.move_origin_to (wing_r.origin<rb::WorldSpace>());
+	winglet_r.move_origin_to (wing_r.origin<WorldSpace>());
 	winglet_r.translate ({ 0_m, +kWingletLength, 0_m });
-	winglet_r.rotate_about (xf::SpaceLength<rb::WorldSpace> { 0_m, +0.5 * kFuselageWidth + main_wing_airfoil.wing_length(), 0_m }, xf::x_rotation<rb::WorldSpace> (-kWingletAngle));
-	winglet_r.rotate_about_world_origin (xf::x_rotation<rb::WorldSpace> (-kDihedral));
+	winglet_r.rotate_about (xf::SpaceLength<WorldSpace> { 0_m, +0.5 * kFuselageWidth + main_wing_airfoil.wing_length(), 0_m }, xf::x_rotation<WorldSpace> (-kWingletAngle));
+	winglet_r.rotate_about_world_origin (xf::x_rotation<WorldSpace> (-kDihedral));
 
 	// Aileron L
 
 	auto& aileron_l = aircraft_group.add<xf::sim::Wing> (aileron_airfoil, kFoamDensity);
 	aileron_l.set_label ("wing L/aileron L");
 	aileron_l.rotate_about_body_origin (wing_to_normal_rotation);
-	aileron_l.move_origin_to (wing_l.origin<rb::WorldSpace>() + xf::SpaceLength<rb::WorldSpace> {
+	aileron_l.move_origin_to (wing_l.origin<WorldSpace>() + xf::SpaceLength<WorldSpace> {
 		-main_wing_airfoil.chord_length(),
 		-main_wing_airfoil.wing_length() + aileron_airfoil.wing_length(),
 		0_m,
 	});
-	aileron_l.rotate_about_world_origin (xf::x_rotation<rb::WorldSpace> (+kDihedral));
+	aileron_l.rotate_about_world_origin (xf::x_rotation<WorldSpace> (+kDihedral));
 
 	// Aileron R
 
 	auto& aileron_r = aircraft_group.add<xf::sim::Wing> (aileron_airfoil, kFoamDensity);
 	aileron_r.set_label ("wing R/aileron R");
 	aileron_r.rotate_about_body_origin (wing_to_normal_rotation);
-	aileron_r.move_origin_to (wing_r.origin<rb::WorldSpace>() + xf::SpaceLength<rb::WorldSpace> {
+	aileron_r.move_origin_to (wing_r.origin<WorldSpace>() + xf::SpaceLength<WorldSpace> {
 		-main_wing_airfoil.chord_length(),
 		0_m,
 		0_m,
 	});
-	aileron_r.rotate_about_world_origin (xf::x_rotation<rb::WorldSpace> (-kDihedral));
+	aileron_r.rotate_about_world_origin (xf::x_rotation<WorldSpace> (-kDihedral));
 
 	// Tail horizontal
 
@@ -182,51 +182,51 @@ make_aircraft (xf::rigid_body::System& rigid_body_system, Models& models)
 	// Move to the tail:
 	tail_h.translate ({ -1.5_m, 0_m, 0_m });
 	// A bit of negative lift on the tail for longitudal stability:
-	tail_h.rotate_about_body_origin (xf::y_rotation<rb::WorldSpace> (-5_deg));
+	tail_h.rotate_about_body_origin (xf::y_rotation<WorldSpace> (-5_deg));
 
 	// Elevator
 
 	auto& elevator = aircraft_group.add<xf::sim::Wing> (elevator_airfoil, kFoamDensity);
 	elevator.set_label ("tail/elevator");
 	elevator.rotate_about_body_origin (wing_to_normal_rotation);
-	elevator.move_origin_to (tail_h.origin<rb::WorldSpace>());
+	elevator.move_origin_to (tail_h.origin<WorldSpace>());
 	elevator.translate ({ -tail_h_airfoil.chord_length(), 0_m, 0_m });
 
 	// Tail vertical
 
 	auto& tail_v = aircraft_group.add<xf::sim::Wing> (tail_v_airfoil, kFoamDensity);
 	tail_v.set_label ("tail/stabilizer/vertical");
-	tail_v.rotate_about_body_origin (xf::y_rotation<rb::WorldSpace> (-180_deg));
-	tail_v.move_origin_to (tail_h.origin<rb::WorldSpace>());
+	tail_v.rotate_about_body_origin (xf::y_rotation<WorldSpace> (-180_deg));
+	tail_v.move_origin_to (tail_h.origin<WorldSpace>());
 	tail_v.translate ({ 0_m, -0.5 * tail_h_airfoil.wing_length(), 0_m });
 
 	// Rudder
 
 	auto& rudder = aircraft_group.add<xf::sim::Wing> (rudder_airfoil, kFoamDensity);
 	rudder.set_label ("tail/rudder");
-	rudder.rotate_about_body_origin (xf::y_rotation<rb::WorldSpace> (-180_deg));
-	rudder.move_origin_to (tail_v.origin<rb::WorldSpace>());
+	rudder.rotate_about_body_origin (xf::y_rotation<WorldSpace> (-180_deg));
+	rudder.move_origin_to (tail_v.origin<WorldSpace>());
 	rudder.translate ({ -tail_v_airfoil.chord_length(), 0_m, 0_m });
 
 	// Prandtl tube
 
 	auto& prandtl_tube = aircraft_group.add<xf::sim::PrandtlTube> (models.standard_atmosphere, xf::sim::PrandtlTubeParameters { .mass = 0.1_kg, .length = 20_cm, .diameter = 1_cm }); // TODO mass = 25 g
 	prandtl_tube.set_label ("Prandtl tube");
-	prandtl_tube.move_origin_to (wing_l.origin<rb::WorldSpace>() + xf::SpaceLength<rb::WorldSpace> (0_m, -0.75 * main_wing_airfoil.wing_length(), 0_m));
+	prandtl_tube.move_origin_to (wing_l.origin<WorldSpace>() + xf::SpaceLength<WorldSpace> (0_m, -0.75 * main_wing_airfoil.wing_length(), 0_m));
 
 	// Constraints
 
-	auto& wing_l_hinge = rigid_body_system.add<rb::HingePrecalculation> (fuselage, wing_l, wing_l.origin<rb::BodyCOM>(), wing_l.origin<rb::BodyCOM>() - x_wing_chord);
-	auto& wing_r_hinge = rigid_body_system.add<rb::HingePrecalculation> (fuselage, wing_r, wing_r.origin<rb::BodyCOM>() + z_wing_length, wing_r.origin<rb::BodyCOM>() + z_wing_length - x_wing_chord);
+	auto& wing_l_hinge = rigid_body_system.add<rb::HingePrecalculation> (fuselage, wing_l, wing_l.origin<BodyCOM>(), wing_l.origin<BodyCOM>() - x_wing_chord);
+	auto& wing_r_hinge = rigid_body_system.add<rb::HingePrecalculation> (fuselage, wing_r, wing_r.origin<BodyCOM>() + z_wing_length, wing_r.origin<BodyCOM>() + z_wing_length - x_wing_chord);
 
-	auto& winglet_l_hinge = rigid_body_system.add<rb::HingePrecalculation> (wing_l, winglet_l, winglet_l.origin<rb::BodyCOM>(), winglet_l.origin<rb::BodyCOM>() + x_wing_chord);
-	auto& winglet_r_hinge = rigid_body_system.add<rb::HingePrecalculation> (wing_r.origin<rb::BodyCOM>(), wing_r.origin<rb::BodyCOM>() + x_wing_chord, wing_r, winglet_r);
+	auto& winglet_l_hinge = rigid_body_system.add<rb::HingePrecalculation> (wing_l, winglet_l, winglet_l.origin<BodyCOM>(), winglet_l.origin<BodyCOM>() + x_wing_chord);
+	auto& winglet_r_hinge = rigid_body_system.add<rb::HingePrecalculation> (wing_r.origin<BodyCOM>(), wing_r.origin<BodyCOM>() + x_wing_chord, wing_r, winglet_r);
 
-	auto& aileron_l_hinge = rigid_body_system.add<rb::HingePrecalculation> (wing_l, aileron_l, aileron_l.origin<rb::BodyCOM>(), aileron_l.origin<rb::BodyCOM>() + z_aileron_length);
-	auto& aileron_r_hinge = rigid_body_system.add<rb::HingePrecalculation> (wing_r, aileron_r, aileron_r.origin<rb::BodyCOM>(), aileron_r.origin<rb::BodyCOM>() + z_aileron_length);
+	auto& aileron_l_hinge = rigid_body_system.add<rb::HingePrecalculation> (wing_l, aileron_l, aileron_l.origin<BodyCOM>(), aileron_l.origin<BodyCOM>() + z_aileron_length);
+	auto& aileron_r_hinge = rigid_body_system.add<rb::HingePrecalculation> (wing_r, aileron_r, aileron_r.origin<BodyCOM>(), aileron_r.origin<BodyCOM>() + z_aileron_length);
 
-	auto& elevator_hinge = rigid_body_system.add<rb::HingePrecalculation> (tail_h, elevator, elevator.origin<rb::BodyCOM>(), elevator.origin<rb::BodyCOM>() + z_elevator_length);
-	auto& rudder_hinge = rigid_body_system.add<rb::HingePrecalculation> (tail_v, rudder, rudder.origin<rb::BodyCOM>(), rudder.origin<rb::BodyCOM>() + z_rudder_length);
+	auto& elevator_hinge = rigid_body_system.add<rb::HingePrecalculation> (tail_h, elevator, elevator.origin<BodyCOM>(), elevator.origin<BodyCOM>() + z_elevator_length);
+	auto& rudder_hinge = rigid_body_system.add<rb::HingePrecalculation> (tail_v, rudder, rudder.origin<BodyCOM>(), rudder.origin<BodyCOM>() + z_rudder_length);
 
 	// Servo limits:
 	rigid_body_system.add<rb::AngularLimitsConstraint> (aileron_l_hinge, xf::Range { -60_deg, +60_deg });

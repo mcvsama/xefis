@@ -46,7 +46,7 @@ class Wing:
 		{ return _airfoil; }
 
 	[[nodiscard]]
-	std::optional<AirfoilAerodynamicParameters<rigid_body::BodyCOM>> const&
+	std::optional<AirfoilAerodynamicParameters<BodyCOM>> const&
 	airfoil_aerodynamic_parameters() const noexcept
 		{ return _airfoil_aerodynamic_parameters; }
 
@@ -62,12 +62,12 @@ class Wing:
 
   private:
 	[[nodiscard]]
-	static MassMoments<rigid_body::BodyCOM>
+	static MassMoments<BodyCOM>
 	calculate_body_com_mass_moments (Airfoil const&, si::Density material_density);
 
   private:
-	Airfoil																_airfoil;
-	std::optional<AirfoilAerodynamicParameters<rigid_body::BodyCOM>>	_airfoil_aerodynamic_parameters;
+	Airfoil													_airfoil;
+	std::optional<AirfoilAerodynamicParameters<BodyCOM>>	_airfoil_aerodynamic_parameters;
 };
 
 } // namespace xf::sim

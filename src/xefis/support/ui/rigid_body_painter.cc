@@ -467,7 +467,7 @@ RigidBodyPainter::paint_body (rigid_body::Body const& body, bool body_visible, b
 				if (auto const& shape = body.shape())
 					_gl.draw (*shape);
 				else
-					_gl.draw (make_centered_cube_shape (body.mass_moments()));
+					_gl.draw (rigid_body::make_centered_cube_shape (body.mass_moments()));
 			});
 		}
 
@@ -623,7 +623,7 @@ RigidBodyPainter::paint_angular_velocity (rigid_body::Body const& body)
 {
 	auto constexpr angular_velocity_to_length = 0.1_m / 1_radps; // TODO unhardcode
 	auto const com = body.placement().position() - followed_body_position();
-	auto const omega = body.velocity_moments<rigid_body::WorldSpace>().angular_velocity();
+	auto const omega = body.velocity_moments<WorldSpace>().angular_velocity();
 
 	draw_arrow (com, omega * angular_velocity_to_length, rigid_body::make_material (Qt::darkMagenta));
 }
@@ -635,7 +635,7 @@ RigidBodyPainter::paint_angular_momentum (rigid_body::Body const& body)
 	auto constexpr angular_momentum_to_length = 0.001_m / (1_kg * 1_m2 / 1_s) / 1_rad; // TODO unhardcode
 	auto const com = body.placement().position() - followed_body_position();
 	auto const I = body.mass_moments().inertia_tensor();
-	auto const L = I * body.velocity_moments<rigid_body::BodyCOM>().angular_velocity();
+	auto const L = I * body.velocity_moments<BodyCOM>().angular_velocity();
 	auto const L_world = body.placement().unbound_transform_to_base (L);
 
 	draw_arrow (com, L_world * angular_momentum_to_length, rigid_body::make_material (Qt::darkBlue));
@@ -643,7 +643,7 @@ RigidBodyPainter::paint_angular_momentum (rigid_body::Body const& body)
 
 
 void
-RigidBodyPainter::draw_arrow (SpaceLength<rigid_body::WorldSpace> const& origin, SpaceLength<rigid_body::WorldSpace> const& vector, rigid_body::ShapeMaterial const& material)
+RigidBodyPainter::draw_arrow (SpaceLength<WorldSpace> const& origin, SpaceLength<WorldSpace> const& vector, rigid_body::ShapeMaterial const& material)
 {
 	_gl.save_context ([&] {
 		auto const length = abs (vector);
@@ -747,7 +747,7 @@ RigidBodyPainter::paint_ecef_basis (QOpenGLPaintDevice& canvas)
 }
 
 
-SpaceLength<rigid_body::WorldSpace>
+SpaceLength<WorldSpace>
 RigidBodyPainter::followed_body_position() const
 {
 	if (_followed_body)

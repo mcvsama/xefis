@@ -47,7 +47,7 @@ class AngularServo:
 	 *			Servo mass moments.
 	 */
 	explicit
-	AngularServo (rigid_body::AngularServoConstraint&, si::Angle resolution, MassMoments<rigid_body::BodyCOM> const&);
+	AngularServo (rigid_body::AngularServoConstraint&, si::Angle resolution, MassMoments<BodyCOM> const&);
 
 	[[nodiscard]]
 	si::Angle

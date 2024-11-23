@@ -38,6 +38,18 @@ class NEDSpace: public neutrino::math::CoordinateSystemBase
 class AirframeSpace: public neutrino::math::CoordinateSystemBase
 { };
 
+// Body space coordinate system, origin at body's center of mass:
+struct BodyCOM: public math::CoordinateSystemBase
+{ };
+
+// Body space coordinate system, origin at body-origin:
+struct BodyOrigin: public math::CoordinateSystemBase
+{ };
+
+// World (aka global aka absolute) space coordinate system:
+struct WorldSpace: public math::CoordinateSystemBase
+{ };
+
 } // namespace xf
 
 #endif
