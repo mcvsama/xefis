@@ -187,7 +187,7 @@ class Constraint: public ConnectedBodies
 	[[nodiscard]]
 	double
 	constraint_force_mixing_factor() const noexcept
-		{ return _constraint_force_mixing_factor; }
+		{ return _constraint_force_mixing_factor.value(); }
 
 	/**
 	 * Set Constraint Force Mixing factor.
@@ -195,7 +195,7 @@ class Constraint: public ConnectedBodies
 	 */
 	void
 	set_constraint_force_mixing_factor (double factor) noexcept
-		{ _constraint_force_mixing_factor = factor; }
+		{ _constraint_force_mixing_factor = ConstraintMassMatrix<0>::Scalar (factor); }
 
 	/**
 	 * Return the friction factor.
@@ -370,17 +370,24 @@ class Constraint: public ConnectedBodies
 					 si::Time const dt) const
 		{ return -1.0 / dt * inv (calculate_K (Jw1, Jw2)); }
 
+	/**
+	 * Adds Constraint Mixing Factor (CFM) to the given K matrix.
+	 */
+	template<std::size_t N>
+		ConstraintMassMatrix<N>&
+		apply_constraint_mixing_factor (ConstraintMassMatrix<N>&) const;
+
   private:
-	std::string					_label;
-	bool						_enabled						{ true };
-	bool						_broken							{ false };
-	std::optional<si::Force>	_breaking_force;
-	std::optional<si::Torque>	_breaking_torque;
-	double						_baumgarte_factor				{ kDefaultBaumgarteFactor };
-	double						_constraint_force_mixing_factor { 0.0 };
-	double						_friction_factor				{ 0.0 }; // TODO implement
+	std::string						_label;
+	bool							_enabled						{ true };
+	bool							_broken							{ false };
+	std::optional<si::Force>		_breaking_force;
+	std::optional<si::Torque>		_breaking_torque;
+	double							_baumgarte_factor				{ kDefaultBaumgarteFactor };
+	ConstraintMassMatrix<0>::Scalar	_constraint_force_mixing_factor { 0.0 };
+	double							_friction_factor				{ 0.0 }; // TODO implement
 	std::optional<ForceMoments<WorldSpace>>
-								_previous_calculation_force_moments;
+									_previous_calculation_force_moments;
 };
 
 
@@ -495,15 +502,15 @@ template<std::size_t N>
 		auto const& inv_I1 = body_1().iteration().inv_I;
 		auto const& inv_M2 = body_2().iteration().inv_M;
 		auto const& inv_I2 = body_2().iteration().inv_I;
-		auto const CFM = _constraint_force_mixing_factor * ConstraintMassMatrix <N> (math::unit);
 
 		// Unfolded expression: J * inv(M) * ~J.
 		// This has to be unfolded because of two distinct scalar types held by Jacobians.
-		return Jv1 * inv_M1 * ~Jv1
-			 + Jw1 * inv_I1 * ~Jw1
-			 + Jv2 * inv_M2 * ~Jv2
-			 + Jw2 * inv_I2 * ~Jw2
-			 + CFM;
+		auto K = Jv1 * inv_M1 * ~Jv1
+			   + Jw1 * inv_I1 * ~Jw1
+			   + Jv2 * inv_M2 * ~Jv2
+			   + Jw2 * inv_I2 * ~Jw2;
+
+		return apply_constraint_mixing_factor (K);
 	}
 
 
@@ -514,12 +521,12 @@ template<std::size_t N>
 	{
 		auto const& inv_M1 = body_1().iteration().inv_M;
 		auto const& inv_M2 = body_2().iteration().inv_M;
-		auto const CFM = _constraint_force_mixing_factor * ConstraintMassMatrix <N> (math::unit);
 
 		// Unfolded expression: J * inv(M) * ~J.
-		return Jv1 * inv_M1 * ~Jv1
-			 + Jv2 * inv_M2 * ~Jv2
-			 + CFM;
+		auto K = Jv1 * inv_M1 * ~Jv1
+			   + Jv2 * inv_M2 * ~Jv2;
+
+		return apply_constraint_mixing_factor (K);
 	}
 
 
@@ -530,12 +537,24 @@ template<std::size_t N>
 	{
 		auto const& inv_I1 = body_1().iteration().inv_I;
 		auto const& inv_I2 = body_2().iteration().inv_I;
-		auto const CFM = _constraint_force_mixing_factor * ConstraintMassMatrix <N> (math::unit); // TODO optimize if 0; maybe only add on last iteration?
 
 		// Unfolded expression: J * inv(M) * ~J.
-		return Jw1 * inv_I1 * ~Jw1
-			 + Jw2 * inv_I2 * ~Jw2
-			 + CFM;
+		auto K = Jw1 * inv_I1 * ~Jw1
+			   + Jw2 * inv_I2 * ~Jw2;
+
+		return apply_constraint_mixing_factor (K);
+	}
+
+
+template<std::size_t N>
+	inline Constraint::ConstraintMassMatrix<N>&
+	Constraint::apply_constraint_mixing_factor (ConstraintMassMatrix<N>& K) const
+	{
+		if (_constraint_force_mixing_factor.value() != 0.0)
+			for (std::size_t i = 0; i < N; ++i)
+				K[i, i] += _constraint_force_mixing_factor;
+
+		return K;
 	}
 
 
