@@ -17,8 +17,8 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/math/geometry.h>
-#include <xefis/support/geometry/triangle.h>
-#include <xefis/support/geometry/triangulation.h>
+#include <xefis/support/math/triangle.h>
+#include <xefis/support/math/triangulation.h>
 #include <xefis/support/simulation/rigid_body/various_shapes.h>
 
 // Standard:

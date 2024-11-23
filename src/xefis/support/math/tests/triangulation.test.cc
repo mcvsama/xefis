@@ -14,8 +14,8 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/aerodynamics/airfoil_spline.h>
-#include <xefis/support/geometry/triangulation.h>
-#include <xefis/support/geometry/triangle.h>
+#include <xefis/support/math/triangle.h>
+#include <xefis/support/math/triangulation.h>
 
 // Neutrino:
 #include <neutrino/qt/qutils.h>

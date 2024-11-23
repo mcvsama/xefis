@@ -18,7 +18,7 @@
 #include <xefis/config/all.h>
 #include <xefis/support/math/geometry.h>
 #include <xefis/support/math/placement.h>
-#include <xefis/support/geometry/triangle.h>
+#include <xefis/support/math/triangle.h>
 
 // Neutrino:
 #include <neutrino/math/math.h>

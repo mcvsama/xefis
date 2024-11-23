@@ -13,8 +13,8 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/support/geometry/triangulation.h>
 #include <xefis/support/math/transforms.h>
+#include <xefis/support/math/triangulation.h>
 #include <xefis/support/nature/constants.h>
 #include <xefis/support/nature/mass_moments_at_com.h>
 #include <xefis/support/nature/various_inertia_tensors.h>

@@ -16,8 +16,8 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/support/geometry/triangulation.h>
 #include <xefis/support/math/geometry.h>
+#include <xefis/support/math/triangulation.h>
 #include <xefis/support/nature/mass_moments.h>
 
 // Neutrino:
