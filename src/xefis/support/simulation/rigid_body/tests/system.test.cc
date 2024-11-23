@@ -77,7 +77,6 @@ make_body_mass_moments (si::Mass const mass, si::Length const edge_length)
 }
 
 
-// TODO operator _L (litres)
 MassMoments<BodyCOM>
 make_body_mass_moments (si::Mass const mass, si::Density const density = 1000_kg / 1_m3)
 {
