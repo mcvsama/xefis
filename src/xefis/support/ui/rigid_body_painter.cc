@@ -585,7 +585,7 @@ RigidBodyPainter::paint_forces (rigid_body::Body const& body)
 	auto constexpr external_force_color = Qt::darkYellow;
 	auto constexpr external_torque_color = Qt::cyan;
 
-	auto constexpr force_to_length = 0.1_m / 1_N; // TODO unhardcode
+	auto constexpr force_to_length = 0.1_m / 1_N; // TODO unhardcode; make autoscaling depending on aircraft total mass
 	auto constexpr torque_to_length = force_to_length / 1_m; // TODO unhardcode
 
 	auto const& iter = body.iteration();
