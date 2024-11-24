@@ -481,6 +481,7 @@ RigidBodyPainter::paint_body (rigid_body::Body const& body, BodyRenderingConfig 
 		if (rendering.origin_visible || focused)
 		{
 			paint_origin();
+			paint_basis (30_cm);
 		}
 	});
 }
