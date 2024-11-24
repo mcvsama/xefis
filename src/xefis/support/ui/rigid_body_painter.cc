@@ -44,6 +44,9 @@
 
 namespace xf {
 
+constexpr auto kBasisLight	= GL_LIGHT1;
+
+
 RigidBodyPainter::RigidBodyPainter (si::PixelDensity const pixel_density):
 	_pixel_density (pixel_density),
 	_gl (pixel_density * kDefaultPositionScale)
@@ -684,66 +687,73 @@ RigidBodyPainter::paint_ecef_basis (QOpenGLPaintDevice& canvas)
 	glMatrixMode (GL_MODELVIEW);
 	glDisable (GL_FOG);
 
-	float const scale = 0.4;
-	si::Length const radius = 4_mm * scale;
-	si::Length const length = 20_cm * scale;
-	si::Length const cone_radius = 15_mm * scale;
-	si::Length const cone_length = 40_mm * scale;
+	_gl.save_context ([&] {
+		_gl.translate (0_m, 0_m, -1_m);
+		apply_camera_rotations();
+		paint_basis (8_cm);
+	});
+}
+
+
+void
+RigidBodyPainter::paint_basis (si::Length const length)
+{
+	si::Length const radius = length / 50;
+	si::Length const cone_radius = length / 13;
+	si::Length const cone_length = length / 5;
 
 	auto const blue = rigid_body::make_material (QColor (0x11, 0x11, 0xff));
 	auto const red = rigid_body::make_material (Qt::red);
 	auto const green = rigid_body::make_material (Qt::green);
 
-	auto const draw_basis = [&] {
+	auto const paint = [&] {
+		glEnable (kBasisLight);
+		glLightfv (kBasisLight, GL_POSITION, GLArray { 0.0f, 0.0f, 0.0f, 0.5f });
+		glLightfv (kBasisLight, GL_AMBIENT, GLArray { 0.25f, 0.25f, 0.25f, 1.0f });
+		glLightfv (kBasisLight, GL_DIFFUSE, GLArray { 0.5f, 0.5f, 0.5f, 1.0f });
+		glLightfv (kBasisLight, GL_SPECULAR, GLArray { 0.9f, 0.9f, 0.9f, 1.0f });
+
+		auto const kNumFaces = 12;
+
+		// Root ball:
+		_gl.draw (rigid_body::make_centered_sphere_shape ({ .radius = 2 * radius, .slices = 8, .stacks = 8 }));
+		// X axis:
 		_gl.save_context ([&] {
-			glEnable (GL_LIGHT1);
-			glLightfv (GL_LIGHT1, GL_POSITION, GLArray { 0.0f, 0.0f, 0.0f, 0.5f });
-			glLightfv (GL_LIGHT1, GL_AMBIENT, GLArray { 0.25f, 0.25f, 0.25f, 1.0f });
-			glLightfv (GL_LIGHT1, GL_DIFFUSE, GLArray { 0.5f, 0.5f, 0.5f, 1.0f });
-			glLightfv (GL_LIGHT1, GL_SPECULAR, GLArray { 0.9f, 0.9f, 0.9f, 1.0f });
-
-			_gl.translate (0_m, 0_m, -1_m);
-			apply_camera_rotations();
-
-			auto const kNumFaces = 12;
-
-			// Root ball:
-			_gl.draw (rigid_body::make_centered_sphere_shape ({ .radius = 2 * radius, .slices = 8, .stacks = 8 }));
-			// X axis:
-			_gl.save_context ([&] {
-				_gl.rotate (+90_deg, 0.0, 1.0, 0.0);
-				_gl.draw (rigid_body::make_cylinder_shape ({ .length = length, .radius = radius, .num_faces = kNumFaces, .material = red }));
-				_gl.translate (0_m, 0_m, length);
-				_gl.draw (rigid_body::make_cone_shape ({ .length = cone_length, .radius = cone_radius, .num_faces = kNumFaces, .with_bottom = true, .material = red }));
-			});
-			// Y axis:
-			_gl.save_context ([&] {
-				_gl.rotate (-90_deg, 1.0, 0.0, 0.0);
-				_gl.draw (rigid_body::make_cylinder_shape ({ .length = length, .radius = radius, .num_faces = kNumFaces, .material = green }));
-				_gl.translate (0_m, 0_m, length);
-				_gl.draw (rigid_body::make_cone_shape ({ .length = cone_length, .radius = cone_radius, .num_faces = kNumFaces, .with_bottom = true, .material = green }));
-			});
-			// Z axis:
-			_gl.save_context ([&] {
-				_gl.draw (rigid_body::make_cylinder_shape ({ .length = length, .radius = radius, .num_faces = kNumFaces, .material = blue }));
-				_gl.translate (0_m, 0_m, length);
-				_gl.draw (rigid_body::make_cone_shape ({ .length = cone_length, .radius = cone_radius, .num_faces = kNumFaces, .with_bottom = true, .material = blue }));
-			});
-
-			glDisable (GL_LIGHT1);
+			_gl.rotate (+90_deg, 0.0, 1.0, 0.0);
+			_gl.draw (rigid_body::make_cylinder_shape ({ .length = length, .radius = radius, .num_faces = kNumFaces, .material = red }));
+			_gl.translate (0_m, 0_m, length);
+			_gl.draw (rigid_body::make_cone_shape ({ .length = cone_length, .radius = cone_radius, .num_faces = kNumFaces, .with_bottom = true, .material = red }));
 		});
+		// Y axis:
+		_gl.save_context ([&] {
+			_gl.rotate (-90_deg, 1.0, 0.0, 0.0);
+			_gl.draw (rigid_body::make_cylinder_shape ({ .length = length, .radius = radius, .num_faces = kNumFaces, .material = green }));
+			_gl.translate (0_m, 0_m, length);
+			_gl.draw (rigid_body::make_cone_shape ({ .length = cone_length, .radius = cone_radius, .num_faces = kNumFaces, .with_bottom = true, .material = green }));
+		});
+		// Z axis:
+		_gl.save_context ([&] {
+			_gl.draw (rigid_body::make_cylinder_shape ({ .length = length, .radius = radius, .num_faces = kNumFaces, .material = blue }));
+			_gl.translate (0_m, 0_m, length);
+			_gl.draw (rigid_body::make_cone_shape ({ .length = cone_length, .radius = cone_radius, .num_faces = kNumFaces, .with_bottom = true, .material = blue }));
+		});
+
+		glDisable (kBasisLight);
 	};
 
+	// It's not enough to just disable depth testing, because the basis is also a 3D object.
+	// We only want it to be drawn on top of the scene, but the arrows themselves should
+	// obscure others when needed.
 	// Draw once to set z-buffer to farthest value:
 	glDepthRange (1.0, 1.0);
 	glDepthFunc (GL_ALWAYS);
 	glDisable (GL_LIGHTING);
-	draw_basis();
+	paint();
 	// Draw again, normally. This ensures that basis is always drawn regardless of any other object positions.
 	glDepthRangef (0.0, 1.0);
 	glDepthFunc (GL_LEQUAL);
 	glEnable (GL_LIGHTING);
-	draw_basis();
+	paint();
 }
 
 

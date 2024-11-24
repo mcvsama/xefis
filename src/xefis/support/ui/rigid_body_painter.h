@@ -270,6 +270,9 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	paint_ecef_basis (QOpenGLPaintDevice&);
 
 	void
+	paint_basis (si::Length arrow_length);
+
+	void
 	paint_planet();
 
 	void
