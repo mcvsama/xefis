@@ -279,13 +279,16 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	paint_system (rigid_body::System const&);
 
 	void
-	paint_body (rigid_body::Body const&, bool body_visible, bool origin_visible);
+	paint_body (rigid_body::Body const&, BodyRenderingConfig const&);
 
 	void
-	paint_center_of_mass (rigid_body::Body const&);
+	paint_center_of_mass();
 
 	void
-	paint_moments_of_inertia_cuboid (rigid_body::Body const&);
+	paint_origin();
+
+	void
+	paint_moments_of_inertia_cuboid (MassMoments<BodyCOM> const&);
 
 	void
 	paint_constraint (rigid_body::Constraint const&);

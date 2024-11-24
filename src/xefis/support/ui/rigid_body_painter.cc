@@ -409,7 +409,6 @@ RigidBodyPainter::paint_system (rigid_body::System const& system)
 	_gl.save_context ([&] {
 		for (auto const& body: system.bodies())
 		{
-			auto const focused = _focused_body == body.get();
 			BodyRenderingConfig const* rendering = &default_body_rendering;
 
 			if (auto const rendering_it = _body_rendering_config.find (body.get());
@@ -418,13 +417,7 @@ RigidBodyPainter::paint_system (rigid_body::System const& system)
 				rendering = &rendering_it->second;
 			}
 
-			paint_body (*body, rendering->body_visible, rendering->origin_visible);
-
-			if (focused || rendering->center_of_mass_visible)
-				paint_center_of_mass (*body);
-
-			if (rendering->moments_of_inertia_visible)
-				paint_moments_of_inertia_cuboid (*body);
+			paint_body (*body, *rendering);
 		}
 
 		if (constraints_visible())
@@ -447,19 +440,29 @@ RigidBodyPainter::paint_system (rigid_body::System const& system)
 
 
 void
-RigidBodyPainter::paint_body (rigid_body::Body const& body, bool body_visible, bool origin_visible)
+RigidBodyPainter::paint_body (rigid_body::Body const& body, BodyRenderingConfig const& rendering)
 {
+	auto const focused = _focused_body == &body;
+
 	_gl.save_context ([&] {
+		// Transform so that center-of-mass is at the OpenGL space origin:
 		_gl.translate (body.placement().position() - followed_body_position());
 		_gl.rotate (body.placement().base_to_body_rotation());
+
+		if (focused || rendering.center_of_mass_visible)
+			paint_center_of_mass();
+
+		if (rendering.moments_of_inertia_visible)
+			paint_moments_of_inertia_cuboid (body.mass_moments());
+
 		// Body shapes are defined relative to BodyOrigin coordinates, so transform again:
 		_gl.translate (body.origin_placement().position());
 		_gl.rotate (body.origin_placement().base_to_body_rotation());
 
-		if (body_visible)
+		if (rendering.body_visible)
 		{
 			_gl.save_context ([&] {
-				if (_focused_body == &body)
+				if (focused)
 					_gl.additional_parameters().color_override = QColor::fromRgb (0x00, 0xaa, 0x7f);
 				else if (_hovered_body == &body)
 					_gl.additional_parameters().color_override = QColor::fromRgb (0x00, 0xaa, 0x7f).lighter (150);
@@ -471,42 +474,39 @@ RigidBodyPainter::paint_body (rigid_body::Body const& body, bool body_visible, b
 			});
 		}
 
-		if (origin_visible || _focused_body == &body)
+		if (rendering.origin_visible || focused)
 		{
-			auto const origin_material = rigid_body::make_material ({ 0xff, 0xff, 0x00 });
-			// TODO make the sphere zoom-independent (distance from the camera-independent):
-			auto const origin_shape = rigid_body::make_centered_sphere_shape ({ .radius = 5_cm, .slices = 8, .stacks = 8, .material = origin_material });
-			_gl.draw (origin_shape);
+			paint_origin();
 		}
 	});
 }
 
 
 void
-RigidBodyPainter::paint_center_of_mass (rigid_body::Body const& body)
+RigidBodyPainter::paint_center_of_mass()
 {
 	// TODO make the sphere zoom-independent (distance from the camera-independent):
 	auto const com_shape = rigid_body::make_center_of_mass_symbol_shape (5_cm);
-
-	_gl.save_context ([&] {
-		_gl.translate (body.placement().position() - followed_body_position());
-		_gl.rotate (body.placement().base_to_body_rotation());
-		_gl.draw (com_shape);
-	});
+	_gl.draw (com_shape);
 }
 
 
 void
-RigidBodyPainter::paint_moments_of_inertia_cuboid (rigid_body::Body const& body)
+RigidBodyPainter::paint_origin()
+{
+	auto const origin_material = rigid_body::make_material ({ 0xff, 0xff, 0x00 });
+	// TODO make the sphere zoom-independent (distance from the camera-independent):
+	auto const origin_shape = rigid_body::make_centered_sphere_shape ({ .radius = 5_cm, .slices = 8, .stacks = 8, .material = origin_material });
+	_gl.draw (origin_shape);
+}
+
+
+void
+RigidBodyPainter::paint_moments_of_inertia_cuboid (MassMoments<BodyCOM> const& mass_moments)
 {
 	auto const com_material = rigid_body::make_material ({ 0x00, 0x44, 0x99 });
-	auto const com_shape = make_centered_cube_shape (body.mass_moments(), com_material);
-
-	_gl.save_context ([&] {
-		_gl.translate (body.placement().position() - followed_body_position());
-		_gl.rotate (body.placement().base_to_body_rotation());
-		_gl.draw (com_shape);
-	});
+	auto const com_shape = make_centered_cube_shape (mass_moments, com_material);
+	_gl.draw (com_shape);
 }
 
 
