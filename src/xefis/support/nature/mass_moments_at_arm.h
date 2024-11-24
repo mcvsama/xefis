@@ -136,8 +136,7 @@ template<class pSpace = void>
 		 */
 		[[nodiscard]]
 		MassMoments<Space>
-		centered_at_center_of_mass() const
-			{ return MassMoments<Space> (*this); }
+		centered_at_center_of_mass() const;
 
 	  private:
 		si::Mass									_mass						{ 0_kg };
@@ -329,6 +328,17 @@ template<class S>
 		_inverse_inertia_tensor = inv (_inertia_tensor);
 
 		return *this;
+	}
+
+
+template<class S>
+	inline MassMoments<S>
+	MassMomentsAtArm<S>::centered_at_center_of_mass() const
+	{
+		return {
+			_mass,
+			inertia_tensor_point_to_com (_mass, _inertia_tensor, -_center_of_mass_position),
+		};
 	}
 
 } // namespace xf

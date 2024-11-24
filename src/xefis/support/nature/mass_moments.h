@@ -52,14 +52,6 @@ template<class pSpace = void>
 		// Ctor
 		MassMoments (si::Mass, InertiaTensor<Space> const& inertia_tensor_at_com);
 
-		/**
-		 * Convert from MassMomentsAtArm by centering center of mass at space origin.
-		 * Since converting from MassMomentsAtArm to MassMoments loses information about
-		 * the arm (first moment of mass), this constructor is explicit.
-		 */
-		explicit
-		MassMoments (MassMomentsAtArm<Space> const&);
-
 		// Ctor method
 		static MassMomentsAtArm<Space>
 		zero()
@@ -147,16 +139,6 @@ template<class S>
 		_inertia_tensor (inertia_tensor_at_com),
 		_inverse_inertia_tensor (inv (inertia_tensor_at_com))
 	{ }
-
-
-template<class S>
-	inline
-	MassMoments<S>::MassMoments (MassMomentsAtArm<Space> const& mass_moments)
-	{
-		_mass = mass_moments.mass();
-		_inertia_tensor = inertia_tensor_point_to_com (_mass, mass_moments.inertia_tensor(), -mass_moments.center_of_mass_position());
-		_inverse_inertia_tensor = inv (_inertia_tensor);
-	}
 
 } // namespace xf
 
