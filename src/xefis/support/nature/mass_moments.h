@@ -54,7 +54,10 @@ template<class pSpace = void>
 
 		/**
 		 * Convert from MassMomentsAtArm by centering center of mass at space origin.
+		 * Since converting from MassMomentsAtArm to MassMoments loses information about
+		 * the arm (first moment of mass), this constructor is explicit.
 		 */
+		explicit
 		MassMoments (MassMomentsAtArm<Space> const&);
 
 		// Ctor method

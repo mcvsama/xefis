@@ -137,7 +137,7 @@ template<class pSpace = void>
 		[[nodiscard]]
 		MassMoments<Space>
 		centered_at_center_of_mass() const
-			{ return { *this }; }
+			{ return MassMoments<Space> (*this); }
 
 	  private:
 		si::Mass									_mass						{ 0_kg };
