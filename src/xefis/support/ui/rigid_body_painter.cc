@@ -44,6 +44,7 @@
 
 namespace xf {
 
+constexpr auto kSunLight	= GL_LIGHT0;
 constexpr auto kBasisLight	= GL_LIGHT1;
 
 
@@ -112,7 +113,7 @@ RigidBodyPainter::setup (QOpenGLPaintDevice& canvas)
 	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glEnable (GL_LIGHTING);
-	glEnable (GL_LIGHT0);
+	glEnable (kSunLight);
 
 	glLoadIdentity();
 }
@@ -158,9 +159,9 @@ RigidBodyPainter::apply_camera_rotations()
 void
 RigidBodyPainter::setup_light()
 {
-	glLightfv (GL_LIGHT0, GL_AMBIENT, GLArray { 0.25f, 0.25f, 0.25f, 1.0f });
-	glLightfv (GL_LIGHT0, GL_DIFFUSE, GLArray { 0.5f, 0.5f, 0.5f, 1.0f });
-	glLightfv (GL_LIGHT0, GL_SPECULAR, GLArray { 0.75f, 0.75f, 0.75f, 1.0f });
+	glLightfv (kSunLight, GL_AMBIENT, GLArray { 0.25f, 0.25f, 0.25f, 1.0f });
+	glLightfv (kSunLight, GL_DIFFUSE, GLArray { 0.5f, 0.5f, 0.5f, 1.0f });
+	glLightfv (kSunLight, GL_SPECULAR, GLArray { 0.75f, 0.75f, 0.75f, 1.0f });
 
 	_gl.save_context ([&] {
 		if (_planet_body)
@@ -170,7 +171,7 @@ RigidBodyPainter::setup_light()
 			// Otherwise let the observer cast the light:
 			_gl.translate (0_m, 0_m, 1_km);
 
-		glLightfv (GL_LIGHT0, GL_POSITION, GLArray { 0.0f, 0.0f, 0.0f, 0.5f });
+		glLightfv (kSunLight, GL_POSITION, GLArray { 0.0f, 0.0f, 0.0f, 0.5f });
 		// TODO GL_SPOT_DIRECTION
 		// TODO GL_SPOT_EXPONENT
 		// TODO GL_SPOT_CUTOFF
