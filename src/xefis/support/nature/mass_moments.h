@@ -53,9 +53,9 @@ template<class pSpace = void>
 		MassMoments (si::Mass, InertiaTensor<Space> const& inertia_tensor_at_com);
 
 		// Ctor method
-		static MassMomentsAtArm<Space>
+		static MassMoments<Space>
 		zero()
-			{ return {};}
+			{ return {}; }
 
 		/**
 		 * Convert to standard MassMomentsAtArm.
