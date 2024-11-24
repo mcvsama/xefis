@@ -241,14 +241,17 @@ make_aircraft (xf::rigid_body::System& rigid_body_system, Models& models)
 
 	auto& aileron_l_servo = aircraft_group.add (xf::sim::make_standard_servo (aileron_l_servo_constraint, 3));
 	aileron_l_servo.set_label ("wing L/aileron L/servo");
+	aileron_l_servo.rotate_about_body_origin (xf::x_rotation<WorldSpace> (90_deg));
 	aileron_l_servo.move_to (wing_l.placement().position());
 
 	auto& aileron_r_servo = aircraft_group.add (xf::sim::make_standard_servo (aileron_r_servo_constraint, 3));
 	aileron_r_servo.set_label ("wing R/aileron R/servo");
+	aileron_r_servo.rotate_about_body_origin (xf::x_rotation<WorldSpace> (90_deg));
 	aileron_r_servo.move_to (wing_r.placement().position());
 
 	auto& elevator_servo = aircraft_group.add (xf::sim::make_standard_servo (elevator_servo_constraint, 3));
 	elevator_servo.set_label ("tail/elevator/servo");
+	elevator_servo.rotate_about_body_origin (xf::x_rotation<WorldSpace> (90_deg));
 	elevator_servo.move_to (tail_h.placement().position());
 
 	auto& rudder_servo = aircraft_group.add (xf::sim::make_standard_servo (rudder_servo_constraint, 3));
