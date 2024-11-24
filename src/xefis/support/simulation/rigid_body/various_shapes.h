@@ -159,6 +159,12 @@ Shape
 make_centered_cube_shape (xf::MassMoments<BodyCOM> const&, ShapeMaterial const& material = {});
 
 /**
+ * Make cube that represents given moments of inertia.
+ */
+Shape
+make_cube_shape (xf::MassMomentsAtArm<BodyCOM> const&, ShapeMaterial const& material = {});
+
+/**
  * Make sphere of given radius.
  */
 Shape

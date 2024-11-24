@@ -36,7 +36,7 @@ AngularServo::AngularServo (rigid_body::AngularServoConstraint& constraint, si::
 	_constraint (constraint),
 	_resolution (resolution)
 {
-	set_shape (xf::rigid_body::make_centered_cube_shape (mass_moments));
+	set_shape (xf::rigid_body::make_cube_shape (mass_moments));
 }
 
 

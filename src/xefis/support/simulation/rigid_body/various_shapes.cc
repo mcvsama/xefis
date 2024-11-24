@@ -81,7 +81,6 @@ Shape
 make_centered_cube_shape (xf::MassMoments<BodyCOM> const& mm, ShapeMaterial const& material)
 {
 	// Assuming center of mass position is 0.
-
 	auto const k = mm.mass() / 12;
 	auto const inv_double_k = 1 / (2 * k);
 	auto const I = mm.inertia_tensor(); // Assuming it's ortogonalized
@@ -94,6 +93,15 @@ make_centered_cube_shape (xf::MassMoments<BodyCOM> const& mm, ShapeMaterial cons
 	si::Length const z = sqrt ((+d0 +d1 -d2) * inv_double_k);
 
 	return make_centered_cube_shape (SpaceLength<BodyOrigin> { x, y, z }, material);
+}
+
+
+Shape
+make_cube_shape (xf::MassMomentsAtArm<BodyCOM> const& mm, ShapeMaterial const& material)
+{
+	auto shape = make_centered_cube_shape (mm.centered_at_center_of_mass(), material);
+	shape.translate (math::reframe<BodyOrigin, void> (mm.center_of_mass_position())); // FIXME maybe -?
+	return shape;
 }
 
 
