@@ -36,7 +36,7 @@ ObservationWidget::ObservationWidget (rigid_body::Body* body):
 	if (_body)
 	{
 		add_observable ("Mass", [this]() {
-			return neutrino::format_unit (_body->mass_moments().mass().in<si::Kilogram>() * 1000.0, 6, "g");
+			return neutrino::format_unit (_body->mass_moments<BodyCOM>().mass().in<si::Kilogram>() * 1000.0, 6, "g");
 		});
 		add_observable ("Translational kinetic energy", [this]() {
 			return neutrino::format_unit (_body->translational_kinetic_energy().in<si::Joule>(), 6, "J");

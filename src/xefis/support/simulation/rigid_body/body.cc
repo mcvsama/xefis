@@ -104,7 +104,7 @@ Body::move_origin_to (SpaceLength<WorldSpace> const& new_origin_position)
 si::Energy
 Body::translational_kinetic_energy() const
 {
-	auto const mm = mass_moments();
+	auto const mm = mass_moments<BodyCOM>();
 	auto const vm = velocity_moments<WorldSpace>();
 	return 0.5 * mm.mass() * square (abs (vm.velocity()));
 }
@@ -113,7 +113,7 @@ Body::translational_kinetic_energy() const
 si::Energy
 Body::rotational_kinetic_energy() const
 {
-	auto const mm = mass_moments();
+	auto const mm = mass_moments<BodyCOM>();
 	auto const vm = velocity_moments<BodyCOM>();
 	return 0.5 * (~vm.angular_velocity() * mm.inertia_tensor() * vm.angular_velocity() / 1_rad / 1_rad).scalar();
 }

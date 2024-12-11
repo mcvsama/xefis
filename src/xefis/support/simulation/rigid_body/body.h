@@ -80,10 +80,10 @@ class Body: public Noncopyable
 	/**
 	 * Return mass moments at center-of-mass.
 	 */
-	[[nodiscard]]
-	MassMoments<BodyCOM>
-	mass_moments() const
-		{ return _mass_moments; }
+	template<CoordinateSystemConcept Space>
+		[[nodiscard]]
+		MassMoments<Space>
+		mass_moments() const;
 
 	/**
 	 * Set new mass moments at center-of-mass.
@@ -357,6 +357,7 @@ class Body: public Noncopyable
   private:
 	std::string											_label;
 	MassMoments<BodyCOM>								_mass_moments;
+	mutable std::optional<MassMoments<WorldSpace>>		_world_space_mass_moments;
 	// Location of center-of-mass:
 	Placement<WorldSpace, BodyCOM>						_placement;
 	// Location of origin:
@@ -380,6 +381,26 @@ class Body: public Noncopyable
 	// The body is not valid for computation anymore (eg. has NaNs in physical quantities):
 	bool												_broken { false };
 };
+
+
+template<CoordinateSystemConcept Space>
+	inline MassMoments<Space>
+	Body::mass_moments() const
+	{
+		if constexpr (std::is_same_v<Space, BodyCOM>)
+			return _mass_moments;
+		else if constexpr (std::is_same_v<Space, WorldSpace>)
+		{
+			std::lock_guard lock (_optionals_mutex);
+
+			if (!_world_space_mass_moments)
+				_world_space_mass_moments = _placement.unbound_transform_to_base (_mass_moments);
+
+			return *_world_space_mass_moments;
+		}
+		else
+			static_assert (false, "unsupported coordinate system");
+	}
 
 
 template<CoordinateSystemConcept Space>

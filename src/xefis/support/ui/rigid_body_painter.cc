@@ -457,7 +457,7 @@ RigidBodyPainter::paint_body (rigid_body::Body const& body, BodyRenderingConfig 
 			paint_center_of_mass();
 
 		if (rendering.moments_of_inertia_visible)
-			paint_moments_of_inertia_cuboid (body.mass_moments());
+			paint_moments_of_inertia_cuboid (body.mass_moments<BodyCOM>());
 
 		// Body shapes are defined relative to BodyOrigin coordinates, so transform again:
 		_gl.translate (body.origin_placement().position());
@@ -474,7 +474,7 @@ RigidBodyPainter::paint_body (rigid_body::Body const& body, BodyRenderingConfig 
 				if (auto const& shape = body.shape())
 					_gl.draw (*shape);
 				else
-					_gl.draw (rigid_body::make_centered_cube_shape (body.mass_moments()));
+					_gl.draw (rigid_body::make_centered_cube_shape (body.mass_moments<BodyCOM>()));
 			});
 		}
 
@@ -639,7 +639,7 @@ RigidBodyPainter::paint_angular_momentum (rigid_body::Body const& body)
 {
 	auto constexpr angular_momentum_to_length = 0.001_m / (1_kg * 1_m2 / 1_s) / 1_rad; // TODO unhardcode
 	auto const com = body.placement().position() - followed_body_position();
-	auto const I = body.mass_moments().inertia_tensor();
+	auto const I = body.mass_moments<BodyCOM>().inertia_tensor();
 	auto const L = I * body.velocity_moments<BodyCOM>().angular_velocity();
 	auto const L_world = body.placement().unbound_transform_to_base (L);
 
