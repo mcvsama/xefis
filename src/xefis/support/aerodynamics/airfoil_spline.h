@@ -97,10 +97,10 @@ class AirfoilSpline
 
 template<class Space>
 	MassMomentsAtArm<Space>
-	calculate_mass_moments (AirfoilSpline const& airfoil_spline, si::Length const chord_length, si::Length const wing_length, si::Density const material_density)
+	calculate_mass_moments_at_arm (AirfoilSpline const& airfoil_spline, si::Length const chord_length, si::Length const wing_length, si::Density const material_density)
 	{
 		auto const triangulation = triangulate<double, Space> (begin (airfoil_spline.points()), end (airfoil_spline.points()));
-		return calculate_mass_moments (triangulation, chord_length, wing_length, material_density);
+		return calculate_mass_moments_at_arm (triangulation, chord_length, wing_length, material_density);
 	}
 
 } // namespace xf

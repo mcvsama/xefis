@@ -98,7 +98,7 @@ Wing::calculate_body_com_mass_moments (Airfoil const& airfoil, si::Density const
 {
 	// Well, let AirfoilSplineSpace and BodyCOM be actually the same, so an identity rotation:
 	auto const rotation = RotationQuaternion<BodyCOM, AirfoilSplineSpace> (math::identity);
-	return rotation * calculate_mass_moments<AirfoilSplineSpace> (airfoil, material_density);
+	return rotation * calculate_mass_moments_at_arm<AirfoilSplineSpace> (airfoil, material_density);
 }
 
 } // namespace xf::sim

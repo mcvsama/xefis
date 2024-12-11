@@ -61,8 +61,8 @@ AirfoilSplineWidget::set_airfoil_spline (AirfoilSpline const& airfoil_spline, st
 		auto const assumed_chord_length = _chord_length.value_or (1_m);
 		auto const assumed_wing_length = 1_m;
 		auto const assumed_material_density = 1_kg / 1_m3;
-		auto const mass_moments = calculate_mass_moments<AirfoilSplineSpace> (_airfoil_spline, assumed_chord_length, assumed_wing_length, assumed_material_density);
-		auto const center_of_mass_3d = mass_moments.center_of_mass_position();;
+		auto const mass_moments = calculate_mass_moments_at_arm<AirfoilSplineSpace> (_airfoil_spline, assumed_chord_length, assumed_wing_length, assumed_material_density);
+		auto const center_of_mass_3d = mass_moments.center_of_mass_position();
 		_center_of_mass_position = { center_of_mass_3d.x() / assumed_chord_length, center_of_mass_3d.y() / assumed_chord_length };
 	}
 

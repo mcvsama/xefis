@@ -30,6 +30,7 @@
 #include <cstddef>
 #include <initializer_list>
 #include <iterator>
+#include <ranges>
 
 
 namespace xf {
@@ -79,15 +80,6 @@ template<class pSpace = void>
 		static MassMomentsAtArm<Space>
 		zero()
 			{ return {}; }
-
-		// Ctor method
-		static MassMomentsAtArm
-		from_point_masses (std::forward_iterator auto begin, std::forward_iterator auto end);
-
-		// Ctor method
-		static MassMomentsAtArm
-		from_point_masses (std::initializer_list<MassMomentsAtArm<Space>> point_masses)
-			{ return from_point_masses (point_masses.begin(), point_masses.end()); }
 
 		/**
 		 * Add another mass moments and thus create mass moments for the system of the two bodies
@@ -233,13 +225,52 @@ template<class Space>
 	}
 
 
+template<class Space, std::forward_iterator MassMomentsIterator>
+	inline MassMomentsAtArm<Space>
+	calculate_mass_moments_at_arm (MassMomentsIterator const begin, MassMomentsIterator const end)
+		requires std::is_same_v<std::remove_cvref_t<decltype (*std::declval<MassMomentsIterator>())>, MassMomentsAtArm<Space>>
+	{
+		MassMomentsAtArm<Space> result;
+
+		for (auto const& element: boost::make_iterator_range (begin, end))
+			result += element;
+
+		return result;
+	}
+
+
+template<class Space>
+	inline MassMomentsAtArm<Space>
+	calculate_mass_moments_at_arm (std::initializer_list<MassMomentsAtArm<Space>> const elements)
+	{
+		return calculate_mass_moments_at_arm<Space> (elements.begin(), elements.end());
+	}
+
+
+template<class Space>
+	inline MassMomentsAtArm<Space>
+	calculate_mass_moments_at_arm (std::span<MassMomentsAtArm<Space>> const elements)
+	{
+		return calculate_mass_moments_at_arm<Space> (elements.begin(), elements.end());
+	}
+
+
+template<class Space>
+	inline MassMomentsAtArm<Space>
+	calculate_mass_moments_at_arm (std::ranges::view auto const& elements)
+		requires std::same_as<std::ranges::range_value_t<decltype (elements)>, MassMomentsAtArm<Space>>
+	{
+		return calculate_mass_moments_at_arm<Space> (elements.begin(), elements.end());
+	}
+
+
 /**
  * Calculate mass moments of a wing viewed from origin.
  * Assuming the wing is extruded along +Z axis and chord length scales X and Y axes.
  */
 template<class Scalar, class Space>
 	inline MassMomentsAtArm<Space>
-	calculate_mass_moments (std::vector<PlaneTriangle<Scalar, Space>> const& polygon_triangulation, si::Length const chord_length, si::Length const wing_length, si::Density const material_density)
+	calculate_mass_moments_at_arm (std::vector<PlaneTriangle<Scalar, Space>> const& polygon_triangulation, si::Length const chord_length, si::Length const wing_length, si::Density const material_density)
 	{
 		// Have 2D triangulation points, make two sets of them, split the virtual wing into two identical-length parts,
 		// make the points at the center of each wing part. This way we'll get correct MOI for all 3D axes.
@@ -263,7 +294,7 @@ template<class Scalar, class Space>
 			point_masses.push_back (MassMomentsAtArm<Space> { point_mass, position_2, inertia_tensor_2 });
 		}
 
-		return MassMomentsAtArm<Space>::from_point_masses (begin (point_masses), end (point_masses));
+		return calculate_mass_moments_at_arm<Space> (begin (point_masses), end (point_masses));
 	}
 
 
@@ -296,19 +327,6 @@ template<class S>
 		_inertia_tensor (mass_moments.inertia_tensor()),
 		_inverse_inertia_tensor (mass_moments.inverse_inertia_tensor())
 	{ }
-
-
-template<class S>
-	inline MassMomentsAtArm<S>
-	MassMomentsAtArm<S>::from_point_masses (std::forward_iterator auto begin, std::forward_iterator auto end)
-	{
-		MassMomentsAtArm<S> result;
-
-		for (auto const& point_mass: boost::make_iterator_range (begin, end))
-			result += point_mass;
-
-		return result;
-	}
 
 
 template<class S>

@@ -174,9 +174,9 @@ template<class TargetSpace, class SourceSpace>
  */
 template<class Space>
 	MassMomentsAtArm<Space>
-	calculate_mass_moments (Airfoil const& airfoil, si::Density const material_density)
+	calculate_mass_moments_at_arm (Airfoil const& airfoil, si::Density const material_density)
 	{
-		return calculate_mass_moments<Space> (airfoil.spline(), airfoil.chord_length(), airfoil.wing_length(), material_density);
+		return calculate_mass_moments_at_arm<Space> (airfoil.spline(), airfoil.chord_length(), airfoil.wing_length(), material_density);
 	}
 
 } // namespace xf
