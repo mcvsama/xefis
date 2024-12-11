@@ -83,7 +83,7 @@ ImpulseSolver::update_mass_moments()
 	{
 		auto const mass_moments = body->mass_moments<WorldSpace>();
 
-		body->iteration().inv_M = (1.0 / mass_moments.mass()) * SpaceMatrix<double, WorldSpace> (math::unit);
+		body->iteration().inv_M = SpaceMatrix<decltype (1.0 / 1_kg), WorldSpace>::equal_diagonal (1.0 / mass_moments.mass());
 		body->iteration().inv_I = mass_moments.inverse_inertia_tensor();
 	}
 }
