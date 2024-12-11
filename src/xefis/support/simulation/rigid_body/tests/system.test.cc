@@ -186,7 +186,7 @@ ManualTest t_2 ("rigid_body::System: fixed constraints", []{
 		body->rotate_about_world_origin (y_rotation<WorldSpace> (+90_deg));
 
 	run (system, &body1, [&] (si::Time const) {
-		body1.apply_impulse (ForceMoments<WorldSpace> ({ 0_N, +gravity_acceleration * (10_kg + 1_kg), 0_N }, kNoTorque));
+		body1.apply_impulse (ForceMoments<WorldSpace> ({ 0_N, +gravity_acceleration * 10_kg, 0_N }, kNoTorque));
 		body2.apply_impulse (ForceMoments<WorldSpace> ({ 0_N, -gravity_acceleration * 10_kg, 0_N }, kNoTorque));
 	});
 });
