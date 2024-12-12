@@ -86,8 +86,11 @@ ScreenWidget::refresh()
 				}
 			};
 
-			update_histogram (metrics->start_latencies, *widgets.start_latency_histogram, *widgets.start_latency_stats);
-			update_histogram (metrics->total_latencies, *widgets.total_latency_histogram, *widgets.total_latency_stats);
+			if (widgets.start_latency_histogram && widgets.start_latency_stats)
+				update_histogram (metrics->start_latencies, *widgets.start_latency_histogram, *widgets.start_latency_stats);
+
+			if (widgets.total_latency_histogram && widgets.total_latency_stats)
+				update_histogram (metrics->total_latencies, *widgets.total_latency_histogram, *widgets.total_latency_stats);
 		}
 	}
 }
