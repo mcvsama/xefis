@@ -192,20 +192,8 @@ ImpulseSolver::update_constraint_forces (si::Time const dt)
 	}
 
 	// Update acceleration moments except gravity (used by eg. acceleration sensors):
-	for (auto const& constraint: _system.constraints())
-	{
-		if (constraint->enabled() && !constraint->broken())
-		{
-			auto& b1 = constraint->body_1();
-			auto& b2 = constraint->body_2();
-
-			auto& iter1 = b1.iteration();
-			auto& iter2 = b2.iteration();
-
-			iter1.acceleration_moments_except_gravity = calculate_acceleration_moments (b1.mass_moments<WorldSpace>(), iter1.force_moments_except_gravity());
-			iter2.acceleration_moments_except_gravity = calculate_acceleration_moments (b2.mass_moments<WorldSpace>(), iter2.force_moments_except_gravity());
-		}
-	}
+	for (auto& body: _system.bodies())
+		body->iteration().acceleration_moments_except_gravity = calculate_acceleration_moments (body->mass_moments<WorldSpace>(), body->iteration().force_moments_except_gravity());
 
 	// Tell each constraint that we finally calculated its forces:
 	for (auto& constraint: _system.constraints())
