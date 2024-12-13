@@ -48,17 +48,23 @@ class BodyIteration
 	SpaceVector<ImpulseOverMass, WorldSpace>					external_impulses_over_mass;
 	SpaceVector<AngularImpulseOverInertia, WorldSpace>			external_angular_impulses_over_inertia_tensor;
 
-	// The resulting summed constraint forces to apply to the body after simulation step:
-	ForceMoments<WorldSpace>									all_constraints_force_moments;
-	AccelerationMoments<WorldSpace>								acceleration_moments;
+	// Those are used temporarily when calculating all_constraints_force_moments:
+	VelocityMoments<WorldSpace>									velocity_moments;
+	bool														velocity_moments_updated { false };
+	std::optional<AccelerationMoments<WorldSpace>>				acceleration_moments;
 	// Needed by Body::acceleration_moments_except_gravity(): TODO maybe it can be moved to the Body?
 	AccelerationMoments<WorldSpace>								acceleration_moments_except_gravity;
 
-	// Those are used temporarily when calculating all_constraints_force_moments,
-	// at the end they contain new velocities for the body:
-	VelocityMoments<WorldSpace>									velocity_moments;
+	// The resulting summed constraint forces to apply to the body after simulation step:
+	ForceMoments<WorldSpace>									all_constraints_force_moments;
 
   public:
+	/**
+	 * Reset values for new iteration. Only resets stuff that needs reset.
+	 */
+	void
+	reset (VelocityMoments<WorldSpace> const& vm);
+
 	[[nodiscard]]
 	ForceMoments<WorldSpace>
 	all_force_moments() const noexcept
@@ -69,6 +75,15 @@ class BodyIteration
 	force_moments_except_gravity() const noexcept
 		{ return external_force_moments_except_gravity + all_constraints_force_moments; }
 };
+
+
+inline void
+BodyIteration::reset (VelocityMoments<WorldSpace> const& vm)
+{
+	this->velocity_moments = vm; // TODO + warmer;
+	this->velocity_moments_updated = false;
+	this->acceleration_moments.reset();
+}
 
 } // namespace xf::rigid_body
 

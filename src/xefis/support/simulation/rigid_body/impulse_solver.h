@@ -121,14 +121,17 @@ class ImpulseSolver: private Noncopyable
 	void
 	update_mass_moments();
 
-	void
-	update_gravitational_forces();
-
 	static void
 	update_gravitational_forces (Body&, Body&);
 
 	void
-	update_external_forces();
+	update_gravitational_forces();
+
+	void
+	update_external_forces (si::Time dt);
+
+	void
+	update_forces (si::Time dt);
 
 	void
 	calculate_constants_for_step (si::Time dt);
@@ -155,7 +158,7 @@ class ImpulseSolver: private Noncopyable
 	calculate_velocity_moments (VelocityMoments<WorldSpace>, AccelerationMoments<WorldSpace> const&, si::Time dt);
 
 	void
-	update_velocity_moments();
+	update_velocity_moments (si::Time dt);
 
 	[[nodiscard]]
 	static Placement<WorldSpace, BodyCOM>

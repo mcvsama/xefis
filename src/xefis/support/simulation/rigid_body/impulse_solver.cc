@@ -49,21 +49,16 @@ ImpulseSolver::evolve (si::Time const dt)
 {
 	// Reset required parts of frame cache and initialize starting points:
 	for (auto& body: _system.bodies())
-	{
-		auto& iter = body->iteration();
-		iter.gravitational_force_moments = {};
-		iter.velocity_moments = body->velocity_moments<WorldSpace>(); // TODO + warmer;
-	}
+		body->iteration().reset (body->velocity_moments<WorldSpace>());
 
 	for (auto& frame_precalculation: _system.frame_precalculations())
 		frame_precalculation->reset();
 
 	update_mass_moments();
-	update_gravitational_forces();
-	update_external_forces();
+	update_forces (dt);
 	auto const details = update_constraint_forces (dt);
 	update_acceleration_moments();
-	update_velocity_moments();
+	update_velocity_moments (dt);
 	update_placements (dt);
 	normalize_rotations();
 
@@ -81,30 +76,11 @@ ImpulseSolver::update_mass_moments()
 {
 	for (auto& body: _system.bodies())
 	{
+		auto& iter = body->iteration();
 		auto const mass_moments = body->mass_moments<WorldSpace>();
-
-		body->iteration().inv_M = SpaceMatrix<decltype (1.0 / 1_kg), WorldSpace>::equal_diagonal (1.0 / mass_moments.mass());
-		body->iteration().inv_I = mass_moments.inverse_inertia_tensor();
+		iter.inv_M = SpaceMatrix<decltype (1.0 / 1_kg), WorldSpace>::equal_diagonal (1.0 / mass_moments.mass());
+		iter.inv_I = mass_moments.inverse_inertia_tensor();
 	}
-}
-
-
-void
-ImpulseSolver::update_gravitational_forces()
-{
-	auto const& gravitating_bodies = _system.gravitating_bodies();
-	auto const& non_gravitating_bodies = _system.non_gravitating_bodies();
-
-	// Gravity interactions between gravitating bodies:
-	if (gravitating_bodies.size() > 1)
-		for (auto i1: gravitating_bodies | boost::adaptors::indexed())
-			for (auto i2: gravitating_bodies | boost::adaptors::sliced (neutrino::to_unsigned (i1.index()) + 1u, _system.bodies().size()))
-				update_gravitational_forces (*i1.value(), *i2);
-
-	// Gravity interactions between gravitating bodies and the rest:
-	for (auto& b1: gravitating_bodies)
-		for (auto& b2: non_gravitating_bodies)
-			update_gravitational_forces (*b1, *b2);
 }
 
 
@@ -140,7 +116,29 @@ ImpulseSolver::update_gravitational_forces (Body& b1, Body& b2)
 
 
 void
-ImpulseSolver::update_external_forces()
+ImpulseSolver::update_gravitational_forces()
+{
+	for (auto& body: _system.bodies())
+		body->iteration().gravitational_force_moments = {};
+
+	auto const& gravitating_bodies = _system.gravitating_bodies();
+	auto const& non_gravitating_bodies = _system.non_gravitating_bodies();
+
+	// Gravity interactions between gravitating bodies:
+	if (gravitating_bodies.size() > 1)
+		for (auto i1: gravitating_bodies | boost::adaptors::indexed())
+			for (auto i2: gravitating_bodies | boost::adaptors::sliced (neutrino::to_unsigned (i1.index()) + 1u, _system.bodies().size()))
+				update_gravitational_forces (*i1.value(), *i2);
+
+	// Gravity interactions between gravitating bodies and the rest:
+	for (auto& b1: gravitating_bodies)
+		for (auto& b2: non_gravitating_bodies)
+			update_gravitational_forces (*b1, *b2);
+}
+
+
+void
+ImpulseSolver::update_external_forces (si::Time const dt)
 {
 	auto const& atmosphere = _system.atmosphere();
 
@@ -149,30 +147,27 @@ ImpulseSolver::update_external_forces()
 
 	for (auto& body: _system.bodies())
 	{
-		body->iteration().external_force_moments_except_gravity = body->external_force_moments<WorldSpace>();
+		auto& iter = body->iteration();
+		iter.external_force_moments_except_gravity = body->external_force_moments<WorldSpace>();
+		iter.external_force_moments = iter.gravitational_force_moments + iter.external_force_moments_except_gravity;
+		iter.external_impulses_over_mass = dt * iter.inv_M * iter.external_force_moments.force();
+		iter.external_angular_impulses_over_inertia_tensor = dt * iter.inv_I * iter.external_force_moments.torque();
 		body->reset_applied_impulses();
 	}
 }
 
 
 void
-ImpulseSolver::calculate_constants_for_step (si::Time const dt)
+ImpulseSolver::update_forces (si::Time const dt)
 {
-	for (auto& body: _system.bodies())
-	{
-		auto& iter = body->iteration();
-		iter.external_force_moments = iter.gravitational_force_moments + iter.external_force_moments_except_gravity;
-		iter.external_impulses_over_mass = dt * iter.inv_M * iter.external_force_moments.force();
-		iter.external_angular_impulses_over_inertia_tensor = dt * iter.inv_I * iter.external_force_moments.torque();
-	}
+	update_gravitational_forces();
+	update_external_forces (dt);
 }
 
 
 EvolutionDetails
 ImpulseSolver::update_constraint_forces (si::Time const dt)
 {
-	calculate_constants_for_step (dt);
-
 	bool precise_enough = false;
 	size_t iteration = 0;
 
@@ -271,8 +266,8 @@ ImpulseSolver::update_single_constraint_forces (Constraint* constraint, si::Time
 			iter2.acceleration_moments = calculate_acceleration_moments (b2.mass_moments<WorldSpace>(), iter2.all_force_moments());
 
 			// Recalculate velocity moments:
-			iter1.velocity_moments = calculate_velocity_moments (b1.velocity_moments<WorldSpace>(), iter1.acceleration_moments, dt);
-			iter2.velocity_moments = calculate_velocity_moments (b2.velocity_moments<WorldSpace>(), iter2.acceleration_moments, dt);
+			iter1.velocity_moments = calculate_velocity_moments (b1.velocity_moments<WorldSpace>(), *iter1.acceleration_moments, dt);
+			iter2.velocity_moments = calculate_velocity_moments (b2.velocity_moments<WorldSpace>(), *iter2.acceleration_moments, dt);
 		}
 	}
 
@@ -292,7 +287,21 @@ void
 ImpulseSolver::update_acceleration_moments()
 {
 	for (auto& body: _system.bodies())
-		body->set_acceleration_moments<WorldSpace> (body->iteration().acceleration_moments);
+	{
+		auto const& iter = body->iteration();
+		auto am = AccelerationMoments<WorldSpace>();
+
+		if (iter.acceleration_moments)
+			am = *iter.acceleration_moments;
+		else
+		{
+			auto fm = iter.all_force_moments();
+			apply_limits (fm); // TODO should also be applied during iterations
+			am = calculate_acceleration_moments (body->mass_moments<WorldSpace>(), fm);
+		}
+
+		body->set_acceleration_moments<WorldSpace> (am);
+	}
 }
 
 
@@ -306,11 +315,13 @@ ImpulseSolver::calculate_velocity_moments (VelocityMoments<WorldSpace> vm, Accel
 
 
 void
-ImpulseSolver::update_velocity_moments()
+ImpulseSolver::update_velocity_moments (si::Time const dt)
 {
 	for (auto& body: _system.bodies())
 	{
-		auto& vm = body->iteration().velocity_moments;
+		auto vm = body->iteration().velocity_moments_updated
+			? body->iteration().velocity_moments
+			: calculate_velocity_moments (body->velocity_moments<WorldSpace>(), body->acceleration_moments<WorldSpace>(), dt);
 		apply_limits (vm);
 		body->set_velocity_moments<WorldSpace> (vm);
 	}
