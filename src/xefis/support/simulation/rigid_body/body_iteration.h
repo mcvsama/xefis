@@ -52,8 +52,6 @@ class BodyIteration
 	VelocityMoments<WorldSpace>									velocity_moments;
 	bool														velocity_moments_updated { false };
 	std::optional<AccelerationMoments<WorldSpace>>				acceleration_moments;
-	// Needed by Body::acceleration_moments_except_gravity(): TODO maybe it can be moved to the Body?
-	AccelerationMoments<WorldSpace>								acceleration_moments_except_gravity;
 
 	// The resulting summed constraint forces to apply to the body after simulation step:
 	ForceMoments<WorldSpace>									all_constraints_force_moments;
