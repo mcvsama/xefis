@@ -89,7 +89,7 @@ RigidBodyPainter::setup (QOpenGLPaintDevice& canvas)
 {
 	auto const size = canvas.size();
 
-	_position_on_earth = xf::polar (math::reframe<ECEFSpace, void> (followed_body_position()));
+	_position_on_earth = xf::polar (math::coordinate_system_cast<ECEFSpace, void> (followed_body_position()));
 
 	glMatrixMode (GL_PROJECTION);
 	glLoadIdentity();

@@ -56,18 +56,20 @@ PrandtlTube::static_pressure() const
 {
 	// TODO calculate relative wind from atmosphere and own velocities
 	// TODO variations of pressure coming from the relative wind
-	return _atmosphere->air_at (placement().reframe<ECEFSpace, void>().position()).pressure;
+	return _atmosphere->air_at (placement().coordinate_system_cast<ECEFSpace, void>().position()).pressure;
 }
 
 
 si::Pressure
 PrandtlTube::total_pressure() const
 {
+	using math::coordinate_system_cast;
+
 	// TODO calculate relative wind from atmosphere and own velocities
 	// TODO variations of pressure coming from the relative wind
 	return xf::total_pressure (*_atmosphere,
-							   placement().reframe<ECEFSpace, ECEFSpace>(),
-							   math::reframe<ECEFSpace, void> (velocity_moments<WorldSpace>().velocity()));
+							   coordinate_system_cast<ECEFSpace, ECEFSpace> (placement()),
+							   coordinate_system_cast<ECEFSpace, void> (velocity_moments<WorldSpace>().velocity()));
 }
 
 } // namespace xf::sim

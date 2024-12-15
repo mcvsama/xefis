@@ -32,7 +32,7 @@ airframe_to_ecef_rotation_matrix (TaitBryanAngles const& angles, si::LonLat cons
 	RotationMatrix<NEDSpace, ECEFSpace> const ned2 = matrix_rotation_about (east_vector (ned1), angles.pitch()) * ned1;
 	RotationMatrix<NEDSpace, ECEFSpace> const ned3 = matrix_rotation_about (north_vector (ned2), angles.roll()) * ned2;
 
-	return math::reframe<ECEFSpace, AirframeSpace> (ned3);
+	return math::coordinate_system_cast<ECEFSpace, AirframeSpace> (ned3);
 }
 
 

@@ -187,20 +187,45 @@ template<class pBaseSpace = void, class pSpace = pBaseSpace>
 			unbound_transform_to_base (InputObject const& input) const
 				{ return _body_to_base_rotation * input; }
 
-		/**
-		 * Reframe current placement into different spaces.
-		 */
-		template<class NewBaseSpace, class NewSpace>
-			[[nodiscard]]
-			constexpr Placement<NewBaseSpace, NewSpace>
-			reframe() const
-				{ return reinterpret_cast<Placement<NewBaseSpace, NewSpace> const&> (*this); }
-
 	  private:
 		SpaceVector<si::Length, BaseSpace>	_position				{ math::zero };
 		RotationToBody						_base_to_body_rotation	{ math::identity };
 		RotationToBase						_body_to_base_rotation	{ math::identity };
 	};
+
+
+/*
+ * Global functions
+ */
+
+
+/**
+ * Reframe a placement into different spaces.
+ */
+template<class NewBaseSpace, class NewSpace, class OldBaseSpace, class OldSpace>
+	[[nodiscard]]
+	constexpr Placement<NewBaseSpace, NewSpace>&
+	coordinate_system_cast (Placement<OldBaseSpace, OldSpace>& old)
+	{
+		return reinterpret_cast<Placement<NewBaseSpace, NewSpace>&> (old);
+	}
+
+
+/**
+ * Reframe a placement into different spaces.
+ */
+template<class NewBaseSpace, class NewSpace, class OldBaseSpace, class OldSpace>
+	[[nodiscard]]
+	constexpr Placement<NewBaseSpace, NewSpace> const&
+	coordinate_system_cast (Placement<OldBaseSpace, OldSpace> const& old)
+	{
+		return reinterpret_cast<Placement<NewBaseSpace, NewSpace> const&> (old);
+	}
+
+
+/*
+ * Placement
+ */
 
 
 template<class B, class F>

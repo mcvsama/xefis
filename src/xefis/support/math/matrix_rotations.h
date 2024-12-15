@@ -174,8 +174,8 @@ template<math::CoordinateSystem TargetSpace = void, math::CoordinateSystem Sourc
 	inline si::Angle
 	angle_about_matrix_axis (RotationMatrix<TargetSpace, SourceSpace> const& rotation, SpaceVector<double, TargetSpace> normalized_axis)
 	{
-		SpaceVector<double> const x = math::reframe<void, void> (find_any_perpendicular (normalized_axis).normalized());
-		SpaceVector<double> const y = math::reframe<void, void> (rotation) * x;
+		SpaceVector<double> const x = math::coordinate_system_cast<void, void> (find_any_perpendicular (normalized_axis).normalized());
+		SpaceVector<double> const y = math::coordinate_system_cast<void, void> (rotation) * x;
 
 		auto const sin_theta = abs (cross_product (x, y));
 		auto const cos_theta = dot_product (x, y);

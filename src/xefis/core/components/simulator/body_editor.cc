@@ -97,7 +97,7 @@ BodyEditor::refresh()
 		{
 			auto const position_on_planet = _edited_body->placement().position() - planet_body->placement().position();
 			// Assuming the planet is in ECEF orientation.
-			auto const polar_location = xf::polar (math::reframe<ECEFSpace, void> (position_on_planet));
+			auto const polar_location = xf::polar (math::coordinate_system_cast<ECEFSpace, void> (position_on_planet));
 			auto const velocity_moments = _edited_body->velocity_moments<WorldSpace>() - planet_body->velocity_moments<WorldSpace>();
 
 			_longitude.setText (QString::fromStdString (std::format ("{:.6f}", polar_location.lon().to<si::Degree>())));

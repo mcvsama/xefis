@@ -42,8 +42,8 @@ Simulation::Simulation (Machine& machine, Models& models, neutrino::Logger const
 {
 	auto const location = xf::LonLatRadius (0_deg, 45_deg, xf::kEarthMeanRadius + 0.5_km);
 	auto const tait_bryan_angles = xf::TaitBryanAngles ({ .roll = 0_deg, .pitch = -30_deg, .yaw = 0_deg });
-	_aircraft.rigid_group.rotate_about_world_origin (math::reframe<xf::WorldSpace, xf::WorldSpace> (airframe_to_ecef_rotation (tait_bryan_angles, location)));
-	_aircraft.rigid_group.translate (math::reframe<xf::WorldSpace, void> (xf::cartesian (location)));
+	_aircraft.rigid_group.rotate_about_world_origin (math::coordinate_system_cast<xf::WorldSpace, xf::WorldSpace> (airframe_to_ecef_rotation (tait_bryan_angles, location)));
+	_aircraft.rigid_group.translate (math::coordinate_system_cast<xf::WorldSpace, void> (xf::cartesian (location)));
 
 	auto& earth = _rigid_body_system.add_gravitating (xf::rigid_body::make_earth());
 	earth.set_label ("Earth");

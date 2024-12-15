@@ -100,7 +100,7 @@ Shape
 make_cube_shape (xf::MassMomentsAtArm<BodyCOM> const& mm, ShapeMaterial const& material)
 {
 	auto shape = make_centered_cube_shape (mm.centered_at_center_of_mass(), material);
-	shape.translate (math::reframe<BodyOrigin, void> (mm.center_of_mass_position())); // FIXME maybe -?
+	shape.translate (math::coordinate_system_cast<BodyOrigin, void> (mm.center_of_mass_position())); // FIXME maybe -?
 	return shape;
 }
 
