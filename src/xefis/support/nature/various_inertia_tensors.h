@@ -43,7 +43,7 @@ struct MassRadiusLength {
 /**
  * Center-of-mass is at the center of the cuboid.
  */
-template<class Space = void>
+template<math::CoordinateSystem Space = void>
 	inline InertiaTensor<Space>
 	make_cuboid_inertia_tensor (si::Mass const& mass, SpaceLength<> const& dimensions)
 	{
@@ -61,7 +61,7 @@ template<class Space = void>
 	}
 
 
-template<class Space = void>
+template<math::CoordinateSystem Space = void>
 	inline InertiaTensor<Space>
 	make_cuboid_inertia_tensor (si::Mass const& mass, si::Length const edge_length)
 	{
@@ -69,7 +69,7 @@ template<class Space = void>
 	}
 
 
-template<class Space = void>
+template<math::CoordinateSystem Space = void>
 	inline InertiaTensor<Space>
 	make_hollow_sphere_inertia_tensor (MassRadius const& params)
 	{
@@ -84,7 +84,7 @@ template<class Space = void>
 	}
 
 
-template<class Space = void>
+template<math::CoordinateSystem Space = void>
 	inline InertiaTensor<Space>
 	make_solid_sphere_inertia_tensor (MassRadius const& params)
 	{
@@ -103,7 +103,7 @@ template<class Space = void>
  * The cylinder is considered to have length in the Z direction.
  * The center of mass is at [0, 0, 0] position.
  */
-template<class Space = void>
+template<math::CoordinateSystem Space = void>
 	inline InertiaTensor<Space>
 	make_centered_solid_cylinder_inertia_tensor (MassRadiusLength const& params)
 	{

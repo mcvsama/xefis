@@ -95,7 +95,7 @@ class AirfoilSpline
  */
 
 
-template<class Space>
+template<math::CoordinateSystem Space>
 	MassMomentsAtArm<Space>
 	calculate_mass_moments_at_arm (AirfoilSpline const& airfoil_spline, si::Length const chord_length, si::Length const wing_length, si::Density const material_density)
 	{

@@ -32,7 +32,7 @@ namespace xf {
  *   • 0th moment = force
  *   • 1st moment = torque (except for moments that don't change angular momentum).
  */
-template<class Space = void>
+template<math::CoordinateSystem Space = void>
 	class ForceMoments
 	{
 	  public:
@@ -98,7 +98,7 @@ template<class Space = void>
 	};
 
 
-template<class Space>
+template<math::CoordinateSystem Space>
 	constexpr
 	ForceMoments<Space>::ForceMoments (SpaceVector<si::Force, Space> const& force, SpaceVector<si::Torque, Space> const& torque):
 		_force (force),
@@ -106,7 +106,7 @@ template<class Space>
 	{ }
 
 
-template<class Space>
+template<math::CoordinateSystem Space>
 	constexpr ForceMoments<Space>&
 	ForceMoments<Space>::operator+= (ForceMoments const& other)
 	{
@@ -116,7 +116,7 @@ template<class Space>
 	}
 
 
-template<class Space>
+template<math::CoordinateSystem Space>
 	constexpr ForceMoments<Space>&
 	ForceMoments<Space>::operator-= (ForceMoments const& other)
 	{
@@ -126,7 +126,7 @@ template<class Space>
 	}
 
 
-template<class Space>
+template<math::CoordinateSystem Space>
 	constexpr ForceMoments<Space>&
 	ForceMoments<Space>::operator+= (SpaceVector<si::Force, Space> const& other)
 	{
@@ -135,7 +135,7 @@ template<class Space>
 	}
 
 
-template<class Space>
+template<math::CoordinateSystem Space>
 	constexpr ForceMoments<Space>&
 	ForceMoments<Space>::operator-= (SpaceVector<si::Force, Space> const& other)
 	{
@@ -144,7 +144,7 @@ template<class Space>
 	}
 
 
-template<class Space>
+template<math::CoordinateSystem Space>
 	constexpr ForceMoments<Space>&
 	ForceMoments<Space>::operator+= (SpaceVector<si::Torque, Space> const& other)
 	{
@@ -153,7 +153,7 @@ template<class Space>
 	}
 
 
-template<class Space>
+template<math::CoordinateSystem Space>
 	constexpr ForceMoments<Space>&
 	ForceMoments<Space>::operator-= (SpaceVector<si::Torque, Space> const& other)
 	{
@@ -162,7 +162,7 @@ template<class Space>
 	}
 
 
-template<class Space>
+template<math::CoordinateSystem Space>
 	constexpr ForceMoments<Space>
 	ForceMoments<Space>::at (SpaceVector<si::Length, Space> const& point) const
 	{
@@ -180,7 +180,7 @@ template<class Space>
  */
 
 
-template<class Space>
+template<math::CoordinateSystem Space>
 	constexpr ForceMoments<Space>
 	operator+ (ForceMoments<Space> a)
 	{
@@ -188,7 +188,7 @@ template<class Space>
 	}
 
 
-template<class Space>
+template<math::CoordinateSystem Space>
 	constexpr ForceMoments<Space>
 	operator+ (ForceMoments<Space> a, ForceMoments<Space> const& b)
 	{
@@ -196,7 +196,7 @@ template<class Space>
 	}
 
 
-template<class Space>
+template<math::CoordinateSystem Space>
 	constexpr ForceMoments<Space>
 	operator+ (ForceMoments<Space> a, SpaceVector<si::Force, Space> const& b)
 	{
@@ -204,7 +204,7 @@ template<class Space>
 	}
 
 
-template<class Space>
+template<math::CoordinateSystem Space>
 	constexpr ForceMoments<Space>
 	operator+ (ForceMoments<Space> a, SpaceVector<si::Torque, Space> const& b)
 	{
@@ -212,7 +212,7 @@ template<class Space>
 	}
 
 
-template<class Space>
+template<math::CoordinateSystem Space>
 	constexpr ForceMoments<Space>
 	operator- (ForceMoments<Space> a)
 	{
@@ -223,7 +223,7 @@ template<class Space>
 	}
 
 
-template<class Space>
+template<math::CoordinateSystem Space>
 	constexpr ForceMoments<Space>
 	operator- (ForceMoments<Space> a, ForceMoments<Space> const& b)
 	{
@@ -231,7 +231,7 @@ template<class Space>
 	}
 
 
-template<class Space>
+template<math::CoordinateSystem Space>
 	constexpr ForceMoments<Space>
 	operator- (ForceMoments<Space> a, SpaceVector<si::Force, Space> const& b)
 	{
@@ -239,7 +239,7 @@ template<class Space>
 	}
 
 
-template<class Space>
+template<math::CoordinateSystem Space>
 	constexpr ForceMoments<Space>
 	operator- (ForceMoments<Space> a, SpaceVector<si::Torque, Space> const& b)
 	{
@@ -247,7 +247,7 @@ template<class Space>
 	}
 
 
-template<class TargetSpace, class SourceSpace>
+template<math::CoordinateSystem TargetSpace, math::CoordinateSystem SourceSpace>
 	constexpr ForceMoments<TargetSpace>
 	operator* (RotationQuaternion<TargetSpace, SourceSpace> const& rotation,
 			   ForceMoments<SourceSpace> const& force_moments)

@@ -156,7 +156,7 @@ class Airfoil
  */
 
 
-template<class TargetSpace, class SourceSpace>
+template<math::CoordinateSystem TargetSpace, math::CoordinateSystem SourceSpace>
 	AirfoilAerodynamicForces<TargetSpace>
 	operator* (RotationQuaternion<TargetSpace, SourceSpace> const& rotation, AirfoilAerodynamicForces<SourceSpace> const& source)
 	{
@@ -172,7 +172,7 @@ template<class TargetSpace, class SourceSpace>
 /**
  * Calculate mass moments of a wing for its origin (not center of mass).
  */
-template<class Space>
+template<math::CoordinateSystem Space>
 	MassMomentsAtArm<Space>
 	calculate_mass_moments_at_arm (Airfoil const& airfoil, si::Density const material_density)
 	{

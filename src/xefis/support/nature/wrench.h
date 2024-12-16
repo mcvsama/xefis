@@ -31,7 +31,7 @@
 
 namespace xf {
 
-template<class Space = void>
+template<math::CoordinateSystem Space = void>
 	class Wrench: public ForceMoments<Space>
 	{
 	  public:
@@ -71,14 +71,14 @@ template<class Space = void>
 	};
 
 
-template<class Space>
+template<math::CoordinateSystem Space>
 	constexpr
 	Wrench<Space>::Wrench (ForceMoments<Space> const& force_torque):
 		ForceMoments<Space> (force_torque)
 	{ }
 
 
-template<class Space>
+template<math::CoordinateSystem Space>
 	constexpr
 	Wrench<Space>::Wrench (ForceMoments<Space> const& force_torque, SpaceVector<si::Length, Space> const& position):
 		ForceMoments<Space> (force_torque),
@@ -86,7 +86,7 @@ template<class Space>
 	{ }
 
 
-template<class Space>
+template<math::CoordinateSystem Space>
 	constexpr
 	Wrench<Space>::Wrench (SpaceVector<si::Force, Space> const& force, SpaceVector<si::Torque, Space> const& torque, SpaceVector<si::Length, Space> const& position):
 		ForceMoments<Space> (force, torque),
@@ -102,7 +102,7 @@ template<class Space>
 /**
  * This changes the application position of the force/torque. Doesn't recalculate anything.
  */
-template<class Space>
+template<math::CoordinateSystem Space>
 	inline Wrench<Space>
 	operator+ (Wrench<Space> wrench, SpaceLength<Space> const& offset)
 	{
@@ -114,7 +114,7 @@ template<class Space>
 /**
  * This changes the application position of the force/torque. Doesn't recalculate anything.
  */
-template<class Space>
+template<math::CoordinateSystem Space>
 	inline Wrench<Space>
 	operator- (Wrench<Space> wrench, SpaceLength<Space> const& offset)
 	{
@@ -123,7 +123,7 @@ template<class Space>
 	}
 
 
-template<class TargetSpace = void, class SourceSpace = TargetSpace>
+template<math::CoordinateSystem TargetSpace = void, math::CoordinateSystem SourceSpace = TargetSpace>
 	inline Wrench<TargetSpace>
 	operator* (RotationQuaternion<TargetSpace, SourceSpace> const& rotation, Wrench<SourceSpace> const& wrench)
 	{
@@ -140,7 +140,7 @@ template<class TargetSpace = void, class SourceSpace = TargetSpace>
  * Warning: if you have non-BodySpace Wrench, transform it first to BodySpace
  * before using resultant_force(), because space origin is assumed to be center-of-mass.
  */
-template<class Space>
+template<math::CoordinateSystem Space>
 	inline ForceMoments<Space>
 	resultant_force (Wrench<Space> const& wrench)
 	{
@@ -154,7 +154,7 @@ template<class Space>
  * Calculate total equivalent force and torque about the origin
  * from a set of forces and torques at various points in space.
  */
-template<class Space, class WrenchIterator>
+template<math::CoordinateSystem Space, class WrenchIterator>
 	inline ForceMoments<Space>
 	resultant_force (WrenchIterator begin, WrenchIterator end)
 	{

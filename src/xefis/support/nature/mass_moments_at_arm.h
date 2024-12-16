@@ -35,11 +35,11 @@
 
 namespace xf {
 
-template<class Space>
+template<math::CoordinateSystem Space>
 	using InertiaTensor = SpaceMatrix<si::MomentOfInertia, Space>;
 
 
-template<class Space>
+template<math::CoordinateSystem Space>
 	class MassMoments;
 
 
@@ -49,7 +49,7 @@ template<class Space>
  *  • 1st = center of mass (dipole)
  *  • 2nd = moments of inertia tensor at the center of mass (quadrupole)
  */
-template<class pSpace = void>
+template<math::CoordinateSystem pSpace = void>
 	class MassMomentsAtArm
 	{
 	  public:
@@ -144,7 +144,7 @@ template<class pSpace = void>
  */
 
 
-template<class Space>
+template<math::CoordinateSystem Space>
 	inline MassMomentsAtArm<Space>
 	operator+ (MassMomentsAtArm<Space> a, MassMomentsAtArm<Space> const& b)
 	{
@@ -152,7 +152,7 @@ template<class Space>
 	}
 
 
-template<class TargetSpace, class SourceSpace>
+template<math::CoordinateSystem TargetSpace, math::CoordinateSystem SourceSpace>
 	inline MassMomentsAtArm<TargetSpace>
 	operator* (RotationQuaternion<TargetSpace, SourceSpace> const& rotation,
 			   MassMomentsAtArm<SourceSpace> const& mass_moments)
@@ -172,7 +172,7 @@ template<class TargetSpace, class SourceSpace>
  * Doesn't include the own (center of mass) inertia tensor part.
  * The displacement vector R can be negated without changing the result.
  */
-template<class Space>
+template<math::CoordinateSystem Space>
 	InertiaTensor<Space>
 	displacement_inertia_tensor (si::Mass const mass, SpaceLength<Space> const& R)
 	{
@@ -186,7 +186,7 @@ template<class Space>
  * Converts inertia tensor as seen from the center of mass to seen from given point.
  * The displacement is relative to center of mass position.
  */
-template<class Space>
+template<math::CoordinateSystem Space>
 	InertiaTensor<Space>
 	inertia_tensor_com_to_point (si::Mass const mass,
 								 InertiaTensor<Space> const& inertia_tensor_at_center_of_mass,
@@ -200,7 +200,7 @@ template<class Space>
  * Converts inertia tensor as seen from any point to seen from center of mass.
  * The displacement is relative to center of mass position.
  */
-template<class Space>
+template<math::CoordinateSystem Space>
 	InertiaTensor<Space>
 	inertia_tensor_point_to_com (si::Mass const mass,
 								 InertiaTensor<Space> const& inertia_tensor_at_point,
@@ -214,7 +214,7 @@ template<class Space>
  * Converts inertia tensor as seen from one point to seen from another point.
  * The displacements are relative to center of mass position.
  */
-template<class Space>
+template<math::CoordinateSystem Space>
 	InertiaTensor<Space>
 	inertia_tensor_point_to_point (si::Mass const mass,
 								   InertiaTensor<Space> const& old_inertia_tensor_at_point,
@@ -225,7 +225,7 @@ template<class Space>
 	}
 
 
-template<class Space, std::forward_iterator MassMomentsIterator>
+template<math::CoordinateSystem Space, std::forward_iterator MassMomentsIterator>
 	inline MassMomentsAtArm<Space>
 	calculate_mass_moments_at_arm (MassMomentsIterator const begin, MassMomentsIterator const end)
 		requires std::is_same_v<std::remove_cvref_t<decltype (*std::declval<MassMomentsIterator>())>, MassMomentsAtArm<Space>>
@@ -239,7 +239,7 @@ template<class Space, std::forward_iterator MassMomentsIterator>
 	}
 
 
-template<class Space>
+template<math::CoordinateSystem Space>
 	inline MassMomentsAtArm<Space>
 	calculate_mass_moments_at_arm (std::initializer_list<MassMomentsAtArm<Space>> const elements)
 	{
@@ -247,7 +247,7 @@ template<class Space>
 	}
 
 
-template<class Space>
+template<math::CoordinateSystem Space>
 	inline MassMomentsAtArm<Space>
 	calculate_mass_moments_at_arm (std::span<MassMomentsAtArm<Space>> const elements)
 	{
@@ -255,7 +255,7 @@ template<class Space>
 	}
 
 
-template<class Space>
+template<math::CoordinateSystem Space>
 	inline MassMomentsAtArm<Space>
 	calculate_mass_moments_at_arm (std::ranges::view auto const& elements)
 		requires std::same_as<std::ranges::range_value_t<decltype (elements)>, MassMomentsAtArm<Space>>
@@ -268,9 +268,9 @@ template<class Space>
  * Calculate mass moments of a wing viewed from origin.
  * Assuming the wing is extruded along +Z axis and chord length scales X and Y axes.
  */
-template<class Scalar, class Space>
+template<math::Scalar S, math::CoordinateSystem Space>
 	inline MassMomentsAtArm<Space>
-	calculate_mass_moments_at_arm (std::vector<PlaneTriangle<Scalar, Space>> const& polygon_triangulation, si::Length const chord_length, si::Length const wing_length, si::Density const material_density)
+	calculate_mass_moments_at_arm (std::vector<PlaneTriangle<S, Space>> const& polygon_triangulation, si::Length const chord_length, si::Length const wing_length, si::Density const material_density)
 	{
 		// Have 2D triangulation points, make two sets of them, split the virtual wing into two identical-length parts,
 		// make the points at the center of each wing part. This way we'll get correct MOI for all 3D axes.
@@ -303,14 +303,14 @@ template<class Scalar, class Space>
  */
 
 
-template<class S>
+template<math::CoordinateSystem S>
 	inline
 	MassMomentsAtArm<S>::MassMomentsAtArm (si::Mass mass, InertiaTensor<Space> const& inertia_tensor_at_com):
 		MassMomentsAtArm (mass, math::zero, inertia_tensor_at_com) // Origin is the same as center-of-mass here.
 	{ }
 
 
-template<class S>
+template<math::CoordinateSystem S>
 	inline
 	MassMomentsAtArm<S>::MassMomentsAtArm (si::Mass mass, SpaceLength<Space> const& center_of_mass_position, InertiaTensor<Space> const& inertia_tensor_at_origin):
 		_mass (mass),
@@ -320,7 +320,7 @@ template<class S>
 	{ }
 
 
-template<class S>
+template<math::CoordinateSystem S>
 	inline
 	MassMomentsAtArm<S>::MassMomentsAtArm (MassMoments<Space> const& mass_moments):
 		_mass (mass_moments.mass()),
@@ -329,7 +329,7 @@ template<class S>
 	{ }
 
 
-template<class S>
+template<math::CoordinateSystem S>
 	inline MassMomentsAtArm<S>&
 	MassMomentsAtArm<S>::operator+= (MassMomentsAtArm const& other)
 	{
@@ -349,7 +349,7 @@ template<class S>
 	}
 
 
-template<class S>
+template<math::CoordinateSystem S>
 	inline MassMoments<S>
 	MassMomentsAtArm<S>::centered_at_center_of_mass() const
 	{

@@ -39,7 +39,7 @@ namespace xf {
  * Like MassMomentsAtArm, but assumes that the inertia tensor is viewed from center of mass.
  * And the center of mass always returns a zero vector.
  */
-template<class pSpace = void>
+template<math::CoordinateSystem pSpace = void>
 	class MassMoments
 	{
 	  public:
@@ -110,7 +110,7 @@ template<class pSpace = void>
  */
 
 
-template<class TargetSpace, class SourceSpace>
+template<math::CoordinateSystem TargetSpace, math::CoordinateSystem SourceSpace>
 	inline MassMoments<TargetSpace>
 	operator* (RotationQuaternion<TargetSpace, SourceSpace> const& rotation,
 			   MassMoments<SourceSpace> const& mass_moments)
@@ -132,9 +132,9 @@ template<class TargetSpace, class SourceSpace>
  */
 
 
-template<class S>
+template<math::CoordinateSystem Space>
 	inline
-	MassMoments<S>::MassMoments (si::Mass mass, InertiaTensor<Space> const& inertia_tensor_at_com):
+	MassMoments<Space>::MassMoments (si::Mass mass, InertiaTensor<Space> const& inertia_tensor_at_com):
 		_mass (mass),
 		_inertia_tensor (inertia_tensor_at_com),
 		_inverse_inertia_tensor (inv (inertia_tensor_at_com))

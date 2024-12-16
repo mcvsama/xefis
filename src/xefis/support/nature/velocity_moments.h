@@ -31,7 +31,7 @@ namespace xf {
  * VelocityMoments represents linear and angular velocity.
  * Angular velocity isn't normally called a moment, but it sounds consistent with Force- or Mass-moments.
  */
-template<class Space = void>
+template<math::CoordinateSystem Space = void>
 	class VelocityMoments
 	{
 	  public:
@@ -79,7 +79,7 @@ template<class Space = void>
 	};
 
 
-template<class Space>
+template<math::CoordinateSystem Space>
 	constexpr
 	VelocityMoments<Space>::VelocityMoments (SpaceVector<si::Velocity, Space> const& velocity,
 											 SpaceVector<si::AngularVelocity, Space> const& angular_velocity):
@@ -88,7 +88,7 @@ template<class Space>
 	{ }
 
 
-template<class Space>
+template<math::CoordinateSystem Space>
 	constexpr VelocityMoments<Space>&
 	VelocityMoments<Space>::inplace_add (VelocityMoments const& other, SpaceLength<Space> const& arm)
 	{
@@ -98,7 +98,7 @@ template<class Space>
 	}
 
 
-template<class Space>
+template<math::CoordinateSystem Space>
 	constexpr VelocityMoments<Space>&
 	VelocityMoments<Space>::inplace_subtract (VelocityMoments const& other, SpaceLength<Space> const& arm)
 	{
@@ -113,7 +113,7 @@ template<class Space>
  */
 
 
-template<class Space>
+template<math::CoordinateSystem Space>
 	constexpr VelocityMoments<Space>
 	operator+ (VelocityMoments<Space> a)
 	{
@@ -121,7 +121,7 @@ template<class Space>
 	}
 
 
-template<class Space>
+template<math::CoordinateSystem Space>
 	constexpr VelocityMoments<Space>
 	operator+ (VelocityMoments<Space> a, VelocityMoments<Space> b)
 	{
@@ -132,7 +132,7 @@ template<class Space>
 	}
 
 
-template<class Space>
+template<math::CoordinateSystem Space>
 	constexpr VelocityMoments<Space>
 	add (VelocityMoments<Space> a, VelocityMoments<Space> const& b, SpaceLength<Space> const& arm)
 	{
@@ -140,7 +140,7 @@ template<class Space>
 	}
 
 
-template<class Space>
+template<math::CoordinateSystem Space>
 	constexpr VelocityMoments<Space>
 	operator- (VelocityMoments<Space> a)
 	{
@@ -151,7 +151,7 @@ template<class Space>
 	}
 
 
-template<class Space>
+template<math::CoordinateSystem Space>
 	constexpr VelocityMoments<Space>
 	operator- (VelocityMoments<Space> a, VelocityMoments<Space> b)
 	{
@@ -162,7 +162,7 @@ template<class Space>
 	}
 
 
-template<class Space>
+template<math::CoordinateSystem Space>
 	constexpr VelocityMoments<Space>
 	subtract (VelocityMoments<Space> a, VelocityMoments<Space> const& b, SpaceLength<Space> const& arm)
 	{
@@ -170,7 +170,7 @@ template<class Space>
 	}
 
 
-template<class TargetSpace, class SourceSpace>
+template<math::CoordinateSystem TargetSpace, math::CoordinateSystem SourceSpace>
 	constexpr VelocityMoments<TargetSpace>
 	operator* (RotationQuaternion<TargetSpace, SourceSpace> const& rotation,
 			   VelocityMoments<SourceSpace> const& velocity_moments)
