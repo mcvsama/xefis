@@ -118,20 +118,20 @@ template<math::Scalar S, math::CoordinateSystem Space>
 	}
 
 
-template<math::CoordinateSystem Space>
+template<math::Scalar S, math::CoordinateSystem Space>
 	inline si::Angle
-	angle_between (SpaceVector<auto, Space> const& a,
-				   SpaceVector<auto, Space> const& b)
+	angle_between (SpaceVector<S, Space> const& a,
+				   SpaceVector<S, Space> const& b)
 	{
 		auto const arg = dot_product (a, b) / (abs (a) * abs (b));
 		return 1_rad * std::acos (std::clamp (arg, -1.0, +1.0));
 	}
 
 
-template<math::CoordinateSystem Space>
+template<math::Scalar S, math::CoordinateSystem Space>
 	inline auto
-	cos_angle_between (SpaceVector<auto, Space> const& a,
-					   SpaceVector<auto, Space> const& b)
+	cos_angle_between (SpaceVector<S, Space> const& a,
+					   SpaceVector<S, Space> const& b)
 	{
 		return dot_product (a, b) / (abs (a) * abs (b));
 	}

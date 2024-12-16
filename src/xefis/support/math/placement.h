@@ -293,10 +293,10 @@ template<class B, class F>
 	}
 
 
-template<class BaseSpace>
+template<class BaseSpace, class Space1, class Space2>
 	[[nodiscard]]
 	inline auto
-	relative_rotation (Placement<BaseSpace, auto> const& from, Placement<BaseSpace, auto> const& to)
+	relative_rotation (Placement<BaseSpace, Space1> const& from, Placement<BaseSpace, Space2> const& to)
 	{
 		// Divide the "from" rotation matrix by the "to" rotation matrix (mutiply by inversion):
 		return from.base_to_body_rotation() * to.body_to_base_rotation();

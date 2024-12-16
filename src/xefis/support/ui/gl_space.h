@@ -126,20 +126,23 @@ class GLSpace
 	/**
 	 * Rotate current OpenGL matrix by given rotation quaternion.
 	 */
-	static void
-	rotate (RotationQuaternion<auto, auto> const&);
+	template<math::CoordinateSystem TargetSpace, math::CoordinateSystem SourceSpace>
+		static void
+		rotate (RotationQuaternion<TargetSpace, SourceSpace> const&);
 
 	/**
 	 * Rotate current OpenGL matrix by given rotation matrix.
 	 */
-	static void
-	rotate (RotationMatrix<auto, auto> const&);
+	template<math::CoordinateSystem TargetSpace, math::CoordinateSystem SourceSpace>
+		static void
+		rotate (RotationMatrix<TargetSpace, SourceSpace> const&);
 
 	/**
 	 * Rotate current OpenGL matrix by given angle about given vector.
 	 */
-	static void
-	rotate (si::Angle const angle, SpaceVector<double, auto> const& axis);
+	template<math::CoordinateSystem Space>
+		static void
+		rotate (si::Angle const angle, SpaceVector<double, Space> const& axis);
 
 	/**
 	 * Rotate current OpenGL matrix by given angle about given vector.
@@ -162,14 +165,16 @@ class GLSpace
 	/**
 	 * Translate current OpenGL matrix by given vector.
 	 */
-	static void
-	translate (SpaceVector<double, auto>);
+	template<math::CoordinateSystem Space>
+		static void
+		translate (SpaceVector<double, Space>);
 
 	/**
 	 * Translate current OpenGL matrix by given vector.
 	 */
-	void
-	translate (SpaceVector<si::Length, auto>);
+	template<math::CoordinateSystem Space>
+		void
+		translate (SpaceVector<si::Length, Space>);
 
 	/**
 	 * Return value in OpenGL coordinates.
@@ -219,14 +224,16 @@ class GLSpace
 	/**
 	 * Add OpenGL vertex at given position.
 	 */
-	void
-	add_vertex (SpaceVector<double, auto> position);
+	template<math::CoordinateSystem Space>
+		void
+		add_vertex (SpaceVector<double, Space> position);
 
 	/**
 	 * Add OpenGL vertex at given position.
 	 */
-	void
-	add_vertex (SpaceVector<si::Length, auto> position);
+	template<math::CoordinateSystem Space>
+		void
+		add_vertex (SpaceVector<si::Length, Space> position);
 
 	/**
 	 * Return reference to current additional parameters struct.
@@ -301,36 +308,39 @@ GLSpace::to_opengl (QColor const& color)
 }
 
 
-inline void
-GLSpace::rotate (RotationQuaternion<auto, auto> const& q)
-{
-	// People on the Internet suggest not to use glRotatef()
-	// but instead to convert the quaternion to a rotation matrix and
-	// use matrix multiplication. Since using glRotatef() indeed
-	// yields weird results, I'm fine with the matrix.
-	rotate (RotationMatrix (q));
-}
+template<math::CoordinateSystem TargetSpace, math::CoordinateSystem SourceSpace>
+	inline void
+	GLSpace::rotate (RotationQuaternion<TargetSpace, SourceSpace> const& q)
+	{
+		// People on the Internet suggest not to use glRotatef()
+		// but instead to convert the quaternion to a rotation matrix and
+		// use matrix multiplication. Since using glRotatef() indeed
+		// yields weird results, I'm fine with the matrix.
+		rotate (RotationMatrix (q));
+	}
 
 
-inline void
-GLSpace::rotate (RotationMatrix<auto, auto> const& r)
-{
-	std::array<double, 16> const array {
-		r[0, 0], r[1, 0], r[2, 0], 0.0,
-		r[0, 1], r[1, 1], r[2, 1], 0.0,
-		r[0, 2], r[1, 2], r[2, 2], 0.0,
-		0.0,     0.0,     0.0,     1.0,
-	};
+template<math::CoordinateSystem TargetSpace, math::CoordinateSystem SourceSpace>
+	inline void
+	GLSpace::rotate (RotationMatrix<TargetSpace, SourceSpace> const& r)
+	{
+		std::array<double, 16> const array {
+			r[0, 0], r[1, 0], r[2, 0], 0.0,
+			r[0, 1], r[1, 1], r[2, 1], 0.0,
+			r[0, 2], r[1, 2], r[2, 2], 0.0,
+			0.0,     0.0,     0.0,     1.0,
+		};
 
-	glMultMatrixd (array.data());
-}
+		glMultMatrixd (array.data());
+	}
 
 
-inline void
-GLSpace::rotate (si::Angle const angle, SpaceVector<double, auto> const& normalized_axis)
-{
-	rotate (angle, normalized_axis.x(), normalized_axis.y(), normalized_axis.z());
-}
+template<math::CoordinateSystem Space>
+	inline void
+	GLSpace::rotate (si::Angle const angle, SpaceVector<double, Space> const& normalized_axis)
+	{
+		rotate (angle, normalized_axis.x(), normalized_axis.y(), normalized_axis.z());
+	}
 
 
 inline void
@@ -354,18 +364,20 @@ GLSpace::translate (si::Length x, si::Length y, si::Length z)
 }
 
 
-inline void
-GLSpace::translate (SpaceVector<double, auto> offset)
-{
-	glTranslatef (offset[0], offset[1], offset[2]);
-}
+template<math::CoordinateSystem Space>
+	inline void
+	GLSpace::translate (SpaceVector<double, Space> offset)
+	{
+		glTranslatef (offset[0], offset[1], offset[2]);
+	}
 
 
-inline void
-GLSpace::translate (SpaceVector<si::Length, auto> offset)
-{
-	translate (offset * _position_scale);
-}
+template<math::CoordinateSystem Space>
+	inline void
+	GLSpace::translate (SpaceVector<si::Length, Space> offset)
+	{
+		translate (offset * _position_scale);
+	}
 
 
 inline void
@@ -411,20 +423,22 @@ GLSpace::add_vertex (rigid_body::ShapeVertex const& vertex)
 }
 
 
-inline void
-GLSpace::add_vertex (SpaceVector<double, auto> position)
-{
-	position += _global_offset_float;
-	glVertex3f (position[0], position[1], position[2]);
-}
+template<math::CoordinateSystem Space>
+	inline void
+	GLSpace::add_vertex (SpaceVector<double, Space> position)
+	{
+		position += _global_offset_float;
+		glVertex3f (position[0], position[1], position[2]);
+	}
 
 
-inline void
-GLSpace::add_vertex (SpaceVector<si::Length, auto> position)
-{
-	position += _global_offset;
-	add_vertex (position * _position_scale);
-}
+template<math::CoordinateSystem Space>
+	inline void
+	GLSpace::add_vertex (SpaceVector<si::Length, Space> position)
+	{
+		position += _global_offset;
+		add_vertex (position * _position_scale);
+	}
 
 } // namespace xf
 

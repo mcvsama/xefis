@@ -56,7 +56,7 @@ PrandtlTube::static_pressure() const
 {
 	// TODO calculate relative wind from atmosphere and own velocities
 	// TODO variations of pressure coming from the relative wind
-	return _atmosphere->air_at (placement().coordinate_system_cast<ECEFSpace, void>().position()).pressure;
+	return _atmosphere->air_at (coordinate_system_cast<ECEFSpace, void> (placement().position())).pressure;
 }
 
 
