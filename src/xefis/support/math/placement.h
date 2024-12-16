@@ -31,7 +31,7 @@ namespace xf {
  */
 
 // TODO Perhaps rename *_to_base() to *_to_world(), and maybe *_to_body() to *_to_local()?
-template<class pBaseSpace = void, class pSpace = pBaseSpace>
+template<math::CoordinateSystem pBaseSpace = void, math::CoordinateSystem pSpace = pBaseSpace>
 	class Placement
 	{
 	  public:
@@ -202,7 +202,7 @@ template<class pBaseSpace = void, class pSpace = pBaseSpace>
 /**
  * Reframe a placement into different spaces.
  */
-template<class NewBaseSpace, class NewSpace, class OldBaseSpace, class OldSpace>
+template<math::CoordinateSystem NewBaseSpace, math::CoordinateSystem NewSpace, math::CoordinateSystem OldBaseSpace, math::CoordinateSystem OldSpace>
 	[[nodiscard]]
 	constexpr Placement<NewBaseSpace, NewSpace>&
 	coordinate_system_cast (Placement<OldBaseSpace, OldSpace>& old)
@@ -214,7 +214,7 @@ template<class NewBaseSpace, class NewSpace, class OldBaseSpace, class OldSpace>
 /**
  * Reframe a placement into different spaces.
  */
-template<class NewBaseSpace, class NewSpace, class OldBaseSpace, class OldSpace>
+template<math::CoordinateSystem NewBaseSpace, math::CoordinateSystem NewSpace, math::CoordinateSystem OldBaseSpace, math::CoordinateSystem OldSpace>
 	[[nodiscard]]
 	constexpr Placement<NewBaseSpace, NewSpace> const&
 	coordinate_system_cast (Placement<OldBaseSpace, OldSpace> const& old)
@@ -228,64 +228,64 @@ template<class NewBaseSpace, class NewSpace, class OldBaseSpace, class OldSpace>
  */
 
 
-template<class B, class F>
+template<math::CoordinateSystem BaseSpace, math::CoordinateSystem Space>
 	inline
-	Placement<B, F>::Placement (Position const& position, RotationToBody const& rotation)
-		requires (!std::is_same<B, F>()):
+	Placement<BaseSpace, Space>::Placement (Position const& position, RotationToBody const& rotation)
+		requires (!std::is_same<BaseSpace, Space>()):
 		_position (position),
 		_base_to_body_rotation (rotation),
 		_body_to_base_rotation (~rotation)
 	{ }
 
 
-template<class B, class F>
+template<math::CoordinateSystem BaseSpace, math::CoordinateSystem Space>
 	inline
-	Placement<B, F>::Placement (Position const& position, RotationToBase const& rotation):
+	Placement<BaseSpace, Space>::Placement (Position const& position, RotationToBase const& rotation):
 		_position (position),
 		_base_to_body_rotation (~rotation),
 		_body_to_base_rotation (rotation)
 	{ }
 
 
-template<class B, class F>
+template<math::CoordinateSystem BaseSpace, math::CoordinateSystem Space>
 	inline void
-	Placement<B, F>::set_base_to_body_rotation (RotationToBody const& rotation)
+	Placement<BaseSpace, Space>::set_base_to_body_rotation (RotationToBody const& rotation)
 	{
 		_base_to_body_rotation = rotation;
 		_body_to_base_rotation = ~rotation;
 	}
 
 
-template<class B, class F>
+template<math::CoordinateSystem BaseSpace, math::CoordinateSystem Space>
 	inline void
-	Placement<B, F>::set_body_to_base_rotation (RotationToBase const& rotation)
+	Placement<BaseSpace, Space>::set_body_to_base_rotation (RotationToBase const& rotation)
 	{
 		_body_to_base_rotation = rotation;
 		_base_to_body_rotation = ~rotation;
 	}
 
 
-template<class B, class F>
+template<math::CoordinateSystem BaseSpace, math::CoordinateSystem Space>
 	inline void
-	Placement<B, F>::rotate_body_frame (RotationQuaternion<BaseSpace> const& rotation)
+	Placement<BaseSpace, Space>::rotate_body_frame (RotationQuaternion<BaseSpace> const& rotation)
 	{
 		_body_to_base_rotation = rotation * _body_to_base_rotation;
 		_base_to_body_rotation = ~_body_to_base_rotation;
 	}
 
 
-template<class B, class F>
+template<math::CoordinateSystem BaseSpace, math::CoordinateSystem Space>
 	inline void
-	Placement<B, F>::rotate_base_frame (RotationQuaternion<BaseSpace> const& rotation)
+	Placement<BaseSpace, Space>::rotate_base_frame (RotationQuaternion<BaseSpace> const& rotation)
 	{
 		_position = rotation * _position;
 		rotate_body_frame (rotation);
 	}
 
 
-template<class B, class F>
+template<math::CoordinateSystem BaseSpace, math::CoordinateSystem Space>
 	inline void
-	Placement<B, F>::rotate_base_frame_about (Position const& about_point, RotationQuaternion<BaseSpace> const& rotation)
+	Placement<BaseSpace, Space>::rotate_base_frame_about (Position const& about_point, RotationQuaternion<BaseSpace> const& rotation)
 	{
 		_position -= about_point;
 		rotate_base_frame (rotation);
@@ -293,7 +293,7 @@ template<class B, class F>
 	}
 
 
-template<class BaseSpace, class Space1, class Space2>
+template<math::CoordinateSystem BaseSpace, math::CoordinateSystem Space1, math::CoordinateSystem Space2>
 	[[nodiscard]]
 	inline auto
 	relative_rotation (Placement<BaseSpace, Space1> const& from, Placement<BaseSpace, Space2> const& to)
