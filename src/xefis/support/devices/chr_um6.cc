@@ -115,8 +115,7 @@ CHRUM6::set_logger (Logger const& logger)
 CHRUM6::Read
 CHRUM6::read (ConfigurationAddress address, ReadCallback callback)
 {
-	_requests.push (std::make_unique<Read> (address, callback));
-	Read ret = *dynamic_cast<Read*> (_requests.back().get());
+	auto ret = make_request<Read> (address, callback);
 	process_queue();
 	return ret;
 }
@@ -125,8 +124,7 @@ CHRUM6::read (ConfigurationAddress address, ReadCallback callback)
 CHRUM6::Read
 CHRUM6::read (DataAddress address, ReadCallback callback)
 {
-	_requests.push (std::make_unique<Read> (address, callback));
-	Read ret = *dynamic_cast<Read*> (_requests.back().get());
+	auto ret = make_request<Read> (address, callback);
 	process_queue();
 	return ret;
 }
@@ -135,8 +133,7 @@ CHRUM6::read (DataAddress address, ReadCallback callback)
 CHRUM6::Write
 CHRUM6::write (ConfigurationAddress address, uint32_t value, WriteCallback callback)
 {
-	_requests.push (std::make_unique<Write> (address, value, callback));
-	Write ret = *dynamic_cast<Write*> (_requests.back().get());
+	auto ret = make_request<Write> (address, value, callback);
 	process_queue();
 	return ret;
 }
@@ -155,8 +152,7 @@ CHRUM6::write (ConfigurationAddress address, float const value, WriteCallback ca
 CHRUM6::Command
 CHRUM6::command (CommandAddress address, CommandCallback callback)
 {
-	_requests.push (std::make_unique<Command> (address, callback));
-	Command ret = *dynamic_cast<Command*> (_requests.back().get());
+	auto ret = make_request<Command> (address, callback);
 	process_queue();
 	return ret;
 }

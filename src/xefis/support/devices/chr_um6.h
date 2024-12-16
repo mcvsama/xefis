@@ -630,6 +630,17 @@ class CHRUM6
 	static const char*
 	packet_name (uint32_t address) noexcept;
 
+	/**
+	 * Push request to the queue and return it.
+	 */
+	template<std::derived_from<Request> RequestType, class ...Args>
+		RequestType&
+		make_request (Args&& ...args)
+		{
+			auto& request_ptr = _requests.emplace (std::make_unique<RequestType> (std::forward<Args> (args)...));
+			return *static_cast<RequestType*> (request_ptr.get());
+		}
+
   private:
 	SerialPort*								_serial_port	{ nullptr };
 	std::unique_ptr<PacketReader>			_packet_reader;
@@ -801,7 +812,7 @@ CHRUM6::Read::make_callback()
 
 inline
 CHRUM6::Write::Write (ConfigurationAddress address, uint32_t value, WriteCallback callback):
-	std::shared_ptr<WriteData> (new WriteData())
+	std::shared_ptr<WriteData> (std::make_shared<WriteData>())
 {
 	setup (static_cast<uint32_t> (address), true, value);
 	get()->value = value;
