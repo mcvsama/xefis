@@ -58,6 +58,28 @@ Xefis::Xefis (int& argc, char** argv):
 	// Also encode std::strings and const chars* in UTF-8:
 	QTextCodec::setCodecForLocale (QTextCodec::codecForName ("UTF-8"));
 
+	// Print warnings about broken rendering when using QT_SCALE_FACTOR:
+	if (const char* QT_SCALE_FACTOR = std::getenv ("QT_SCALE_FACTOR"))
+	{
+		auto const factor = neutrino::parse<double> (QT_SCALE_FACTOR);
+
+		if (std::abs (factor - 1.0) > 1e-4)
+		{
+			_logger << "Warning: QT_SCALE_FACTOR different than 1 detected.\n"
+				<< "Expect stuff to be rendered incorrectly (cropped, wrongly rescaled, etc).\n"
+				<< "To have everything working as expected, make sure that the DPI reported by your system\n"
+				<< "matches actual DPI of the screen and the QT_SCALE_FACTOR is 1 or unset completely.\n";
+		}
+	}
+
+	// Print warnings about broken rendering when using QT_FONT_DPI:
+	if (std::getenv ("QT_FONT_DPI") != nullptr)
+	{
+		_logger << "Warning: QT_FONT_DPI detected.\n"
+			<< "Xefis works properly if QT_FONT_DPI matches actual physical DPI of the screen.\n"
+			<< "Otherwise expect fonts to be too large or too small.\n";
+	}
+
 	Exception::log (_logger, [&] {
 		_system = std::make_unique<System> (_logger);
 		_graphics = std::make_unique<Graphics> (_logger);
