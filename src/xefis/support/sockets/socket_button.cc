@@ -36,11 +36,11 @@ SocketButton::process()
 
 	std::visit (overload {
 		[&] (PressCallback const& press_callback) {
-			if (current_state && !_last_state)
+			if (press_callback && current_state && !_last_state)
 				press_callback();
 		},
 		[&] (ChangeCallback const& change_callback) {
-			if (current_state != _last_state)
+			if (change_callback && current_state != _last_state)
 				change_callback (current_state);
 		},
 	}, _callback);
