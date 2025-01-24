@@ -19,6 +19,7 @@
 
 // Standard:
 #include <cstddef>
+#include <ranges>
 
 
 namespace xf::rigid_body {
@@ -68,6 +69,17 @@ Group::rotational_kinetic_energy() const
 		e += body->rotational_kinetic_energy();
 
 	return e;
+}
+
+
+MassMomentsAtArm<WorldSpace>
+Group::mass_moments() const
+{
+	auto const get_mass_moments_from_body = [](auto& body_ptr) -> MassMomentsAtArm<WorldSpace> {
+		return body_ptr->template mass_moments<WorldSpace>();
+	};
+
+	return calculate_mass_moments_at_arm<WorldSpace> (_bodies | std::views::transform (get_mass_moments_from_body));
 }
 
 } // namespace xf::rigid_body

@@ -17,6 +17,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/math/geometry.h>
+#include <xefis/support/nature/mass_moments_at_arm.h>
 #include <xefis/support/simulation/rigid_body/concepts.h>
 
 // Neutrino:
@@ -100,6 +101,13 @@ class Group
 	 */
 	si::Energy
 	rotational_kinetic_energy() const;
+
+	/**
+	 * Calculate total mass moments of the group.
+	 */
+	[[nodiscard]]
+	MassMomentsAtArm<WorldSpace>
+	mass_moments() const;
 
   private:
 	System*				_system;
