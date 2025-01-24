@@ -100,7 +100,7 @@ make_aircraft (xf::rigid_body::System& rigid_body_system, Models& models)
 	auto const z_rudder_length = z_versor * rudder_airfoil.wing_length();
 	auto const wing_to_normal_rotation = xf::x_rotation<WorldSpace> (+90_deg) * xf::z_rotation<WorldSpace> (+180_deg);
 
-	auto aircraft_group = rigid_body_system.make_group();
+	auto& aircraft_group = rigid_body_system.make_group ("Aircraft");
 
 	// Fuselage
 
@@ -299,7 +299,7 @@ make_aircraft (xf::rigid_body::System& rigid_body_system, Models& models)
 	prandtl_tube_fixed_constraint.set_baumgarte_factor (0.6);
 
 	return SimulatedAircraft {
-		.rigid_group		= std::move (aircraft_group),
+		.rigid_group		= aircraft_group,
 		.primary_body		= fuselage,
 		.aileron_l_servo	= aileron_l_servo,
 		.aileron_r_servo	= aileron_r_servo,

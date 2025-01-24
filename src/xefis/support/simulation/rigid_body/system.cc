@@ -27,6 +27,15 @@
 
 namespace xf::rigid_body {
 
+Group&
+System::make_group (std::string_view const label)
+{
+	auto& group = *_groups.insert (std::make_unique<Group> (*this)).first->get();
+	group.set_label (std::string (label));
+	return group;
+}
+
+
 si::Energy
 System::translational_kinetic_energy() const
 {

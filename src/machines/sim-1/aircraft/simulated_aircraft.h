@@ -31,7 +31,7 @@ class Models;
 class SimulatedAircraft
 {
   public:
-	xf::rigid_body::Group		rigid_group;
+	xf::rigid_body::Group&		rigid_group;
 	xf::rigid_body::Body&		primary_body;
 
 //	xf::rigid_body::Body&		left_engine;

@@ -28,6 +28,8 @@
 // Standard:
 #include <cstddef>
 #include <memory>
+#include <set>
+#include <string_view>
 #include <type_traits>
 #include <vector>
 
@@ -43,6 +45,7 @@ class System: private Noncopyable
 {
   public:
 	using FramePrecalculations	= std::vector<std::unique_ptr<BasicFramePrecalculation>>;
+	using Groups				= std::set<std::unique_ptr<Group>>;
 	using Bodies				= std::vector<std::unique_ptr<Body>>;
 	using Constraints			= std::vector<std::unique_ptr<Constraint>>;
 	using BodyPointers			= std::vector<Body*>;
@@ -129,8 +132,16 @@ class System: private Noncopyable
 	 * Make a group belonging to this system.
 	 */
 	[[nodiscard]]
-	Group
-	make_group() noexcept;
+	Group&
+	make_group (std::string_view label = {});
+
+	/**
+	 * Return sequence of body groups.
+	 */
+	[[nodiscard]]
+	Groups const&
+	groups() const
+		{ return _groups; }
 
 	/**
 	 * Return sequence of simulated bodies.
@@ -218,6 +229,7 @@ class System: private Noncopyable
 
   private:
 	FramePrecalculations	_frame_precalculations;
+	Groups					_groups;
 	Bodies					_bodies;
 	Constraints				_constraints;
 	// Bodies acting on all bodies gravitationally (contains pointers to elements in _bodies):
@@ -308,13 +320,6 @@ template<BasicFramePrecalculationConcept SpecificFramePrecalculation>
 		_frame_precalculations.push_back (std::move (frame_cache));
 		return static_cast<SpecificFramePrecalculation&> (*_frame_precalculations.back());
 	}
-
-
-inline Group
-System::make_group() noexcept
-{
-	return Group (*this);
-}
 
 } // namespace xf::rigid_body
 

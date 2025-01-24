@@ -37,12 +37,21 @@ class System;
  * A set of bodies that can be translated/rotated as a whole.
  * Group does not own bodies, rigid body System does.
  */
-class Group
+class Group: private Noncopyable
 {
   public:
 	// Ctor
 	explicit
 	Group (System& system);
+
+	[[nodiscard]]
+	std::string const&
+	label() const noexcept
+		{ return _label; }
+
+	void
+	set_label (std::string const& label)
+		{ _label = label; }
 
 	/**
 	 * Add new body to the group and the system.
@@ -71,6 +80,14 @@ class Group
 	template<BodyConcept SpecificBody>
 		SpecificBody&
 		add_gravitating (std::unique_ptr<SpecificBody>&&);
+
+	/**
+	 * Return sequence of grouped bodies.
+	 */
+	[[nodiscard]]
+	std::vector<Body*> const&
+	bodies() const noexcept
+		{ return _bodies; }
 
 	/**
 	 * Rotate the body about world space origin by provided rotation matrix.
@@ -112,6 +129,7 @@ class Group
 	mass_moments() const;
 
   private:
+	std::string			_label;
 	System*				_system;
 	std::vector<Body*>	_bodies;
 };
