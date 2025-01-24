@@ -19,6 +19,9 @@
 // Xefis:
 #include <xefis/config/all.h>
 
+// Neutrino:
+#include <neutrino/qt/qsignals_blocker.h>
+
 // Qt:
 #include <QCursor>
 #include <QMenu>
@@ -52,7 +55,7 @@ void
 BodiesTree::refresh()
 {
 	// Prevent sending itemChanged() signals when creating new items:
-	bool was_blocked = blockSignals (true);
+	auto const signals_blocker = QSignalsBlocker (this);
 
 	auto bodies = std::set<rigid_body::Body*>();
 
@@ -72,8 +75,6 @@ BodiesTree::refresh()
 	recalculate_gravitating_bodies();
 	insert_new (bodies, constraints, body_to_item);
 	update_existing (body_items_to_update, constraint_items_to_update);
-
-	blockSignals (was_blocked);
 
 	// Select first element by default:
 	if (selectedItems().empty() && topLevelItemCount() > 0)
