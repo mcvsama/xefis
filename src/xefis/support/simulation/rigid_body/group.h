@@ -93,12 +93,14 @@ class Group
 	/**
 	 * Calculate translational kinetic energy of the group in WorldSpace frame of reference.
 	 */
+	[[nodiscard]]
 	si::Energy
 	translational_kinetic_energy() const;
 
 	/**
 	 * Calculate rotational kinetic energy of the group in WorldSpace frame of reference.
 	 */
+	[[nodiscard]]
 	si::Energy
 	rotational_kinetic_energy() const;
 
