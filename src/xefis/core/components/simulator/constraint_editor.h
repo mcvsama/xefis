@@ -43,7 +43,7 @@ class ConstraintEditor: public QWidget
 	 * Sets constraint to edit. Pass nullptr to disable.
 	 */
 	void
-	edit (rigid_body::Constraint* constraint_to_edit);
+	edit (rigid_body::Constraint*);
 
 	/**
 	 * Update data about currently edited constraint.

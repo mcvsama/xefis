@@ -48,7 +48,7 @@ class BodyEditor: public QWidget
 	 * Sets body to edit. Pass nullptr to disable.
 	 */
 	void
-	edit (rigid_body::Body* body_to_edit);
+	edit (rigid_body::Body*);
 
 	/**
 	 * Update data about currently edited body.
