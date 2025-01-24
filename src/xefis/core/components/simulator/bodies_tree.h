@@ -17,6 +17,7 @@
 // Local:
 #include "body_item.h"
 #include "constraint_item.h"
+#include "group_item.h"
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -56,9 +57,11 @@ class BodiesTree: public QTreeWidget
 	 * new items in the tree.
 	 */
 	void
-	remove_deleted (std::set<rigid_body::Body*>& existing_bodies,
-					std::set<rigid_body::Constraint*>& existing_constraints,
+	remove_deleted (std::set<rigid_body::Group*>& existing_groups,
+					std::set<GroupItem*>& group_items_to_update,
+					std::set<rigid_body::Body*>& existing_bodies,
 					std::set<BodyItem*>& body_items_to_update,
+					std::set<rigid_body::Constraint*>& existing_constraints,
 					std::set<ConstraintItem*>& constraint_items_to_update,
 					std::map<rigid_body::Body*, BodyItem*>& body_to_item);
 
@@ -66,22 +69,27 @@ class BodiesTree: public QTreeWidget
 	recalculate_gravitating_bodies();
 
 	void
-	insert_new (std::set<rigid_body::Body*> const& new_bodies,
+	insert_new (std::set<rigid_body::Group*> const& new_groups,
+				std::set<rigid_body::Body*> new_bodies,
 				std::set<rigid_body::Constraint*> const& new_constraints,
 				std::map<rigid_body::Body*, BodyItem*> const& body_to_item);
 
 	void
-	update_existing (std::set<BodyItem*> const& body_items,
+	update_existing (std::set<GroupItem*> const& group_items,
+					 std::set<BodyItem*> const& body_items,
 					 std::set<ConstraintItem*> const& constraint_items);
 
 	void
-	set_icon (rigid_body::Body const&, QTreeWidgetItem&);
+	set_icon (GroupItem&);
+
+	void
+	set_icon (BodyItem&, rigid_body::Body const&);
 
 	void
 	set_icon (ConstraintItem&);
 
 	void
-	add_constraint_item_to (BodyItem&, rigid_body::Constraint&);
+	add_constraint_item_to (rigid_body::Constraint&, BodyItem&);
 
 	// QWidget API
 	void
@@ -97,6 +105,7 @@ class BodiesTree: public QTreeWidget
 	rigid_body::Body const*	_followed_body					{ nullptr };
 	std::set<rigid_body::Body const*> // TODO flat_set when compiler supports it
 							_gravitating_bodies;
+	QIcon					_group_icon						{ icons::group() };
 	QIcon					_body_icon						{ icons::body() };
 	QIcon					_gravitating_body_icon			{ icons::gravitating_body() };
 	QIcon					_followed_body_icon				{ icons::followed_body() };

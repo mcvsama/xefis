@@ -15,6 +15,7 @@
 #include "bodies_tree.h"
 #include "body_item.h"
 #include "constraint_item.h"
+#include "group_item.h"
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -57,6 +58,11 @@ BodiesTree::refresh()
 	// Prevent sending itemChanged() signals when creating new items:
 	auto const signals_blocker = QSignalsBlocker (this);
 
+	auto groups = std::set<rigid_body::Group*>();
+
+	for (auto const& group: _rigid_body_system.groups())
+		groups.insert (group.get());
+
 	auto bodies = std::set<rigid_body::Body*>();
 
 	for (auto const& body: _rigid_body_system.bodies())
@@ -67,14 +73,18 @@ BodiesTree::refresh()
 	for (auto const& constraint: _rigid_body_system.constraints())
 		constraints.insert (constraint.get());
 
+	auto group_items_to_update = std::set<GroupItem*>();
 	auto body_items_to_update = std::set<BodyItem*>();
 	auto constraint_items_to_update = std::set<ConstraintItem*>();
 	auto body_to_item = std::map<rigid_body::Body*, BodyItem*>();
 
-	remove_deleted (bodies, constraints, body_items_to_update, constraint_items_to_update, body_to_item);
+	remove_deleted (groups, group_items_to_update,
+					bodies, body_items_to_update,
+					constraints, constraint_items_to_update,
+					body_to_item);
 	recalculate_gravitating_bodies();
-	insert_new (bodies, constraints, body_to_item);
-	update_existing (body_items_to_update, constraint_items_to_update);
+	insert_new (groups, bodies, constraints, body_to_item);
+	update_existing (group_items_to_update, body_items_to_update, constraint_items_to_update);
 
 	// Select first element by default:
 	if (selectedItems().empty() && topLevelItemCount() > 0)
@@ -83,19 +93,34 @@ BodiesTree::refresh()
 
 
 void
-BodiesTree::remove_deleted (std::set<rigid_body::Body*>& existing_bodies,
-							std::set<rigid_body::Constraint*>& existing_constraints,
+BodiesTree::remove_deleted (std::set<rigid_body::Group*>& existing_groups,
+							std::set<GroupItem*>& group_items_to_update,
+							std::set<rigid_body::Body*>& existing_bodies,
 							std::set<BodyItem*>& body_items_to_update,
+							std::set<rigid_body::Constraint*>& existing_constraints,
 							std::set<ConstraintItem*>& constraint_items_to_update,
 							std::map<rigid_body::Body*, BodyItem*>& body_to_item)
 {
+	auto groups_to_erase = std::set<rigid_body::Group*>();
 	auto bodies_to_erase = std::set<rigid_body::Body*>();
 	auto constraints_to_erase = std::set<rigid_body::Constraint*>();
 	auto items_to_delete = std::vector<QTreeWidgetItem*>();
 
 	for (QTreeWidgetItemIterator iter (this); *iter; ++iter)
 	{
-		if (BodyItem* body_item = dynamic_cast<BodyItem*> (*iter))
+		if (GroupItem* group_item = dynamic_cast<GroupItem*> (*iter))
+		{
+			auto* group = &group_item->group();
+
+			if (existing_groups.contains (group))
+			{
+				groups_to_erase.insert (group);
+				group_items_to_update.insert (group_item);
+			}
+			else
+				items_to_delete.push_back (group_item);
+		}
+		else if (BodyItem* body_item = dynamic_cast<BodyItem*> (*iter))
 		{
 			auto* body = &body_item->body();
 
@@ -127,14 +152,17 @@ BodiesTree::remove_deleted (std::set<rigid_body::Body*>& existing_bodies,
 		}
 	}
 
+	for (auto* group: groups_to_erase)
+		existing_groups.erase (group);
+
 	for (auto* body: bodies_to_erase)
 		existing_bodies.erase (body);
 
 	for (auto* constraint: constraints_to_erase)
 		existing_constraints.erase (constraint);
 
-	// Deleting parent deletes also children, so split removing children
-	// from parenst from deleting operation to avoid use-after-free:
+	// Deleting parent deletes also children, so first remove children
+	// from parents, then do the deleting operation to avoid use-after-free:
 	for (auto* item: items_to_delete)
 		if (item->parent())
 			item->parent()->removeChild (item);
@@ -155,55 +183,75 @@ BodiesTree::recalculate_gravitating_bodies()
 
 
 void
-BodiesTree::insert_new (std::set<rigid_body::Body*> const& new_bodies,
+BodiesTree::insert_new (std::set<rigid_body::Group*> const& new_groups,
+						std::set<rigid_body::Body*> new_bodies,
 						std::set<rigid_body::Constraint*> const& new_constraints,
 						std::map<rigid_body::Body*, BodyItem*> const& body_to_item)
 {
-	// Update body items:
+	// Collect body constraints info:
+	auto body_constraints = std::map<rigid_body::Body*, std::set<rigid_body::Constraint*>>();
+
+	for (auto const& constraint: _rigid_body_system.constraints())
 	{
-		auto body_constraints = std::map<rigid_body::Body*, std::set<rigid_body::Constraint*>>();
+		body_constraints[&constraint->body_1()].insert (constraint.get());
+		body_constraints[&constraint->body_2()].insert (constraint.get());
+	}
 
-		for (auto const& constraint: _rigid_body_system.constraints())
+	auto const add_body_item_to = [&] (rigid_body::Body& body, auto& parent) {
+		BodyItem* new_body_item = new BodyItem (parent, body);
+		set_icon (*new_body_item, body);
+
+		for (auto* constraint: body_constraints[&body])
+			add_constraint_item_to (*constraint, *new_body_item);
+	};
+
+	// GroupItem items:
+	for (auto* group: new_groups)
+	{
+		GroupItem* new_group_item = new GroupItem (*this, *group);
+		set_icon (*new_group_item);
+
+		for (auto* body: group->bodies())
 		{
-			body_constraints[&constraint->body_1()].insert (constraint.get());
-			body_constraints[&constraint->body_2()].insert (constraint.get());
-		}
-
-		for (auto* body: new_bodies)
-		{
-			BodyItem* new_body_item = new BodyItem (*this, *body);
-			set_icon (*body, *new_body_item);
-
-			for (auto* constraint: body_constraints[body])
-				add_constraint_item_to (*new_body_item, *constraint);
+			if (new_bodies.contains (body))
+			{
+				new_bodies.erase (body);
+				add_body_item_to (*body, *new_group_item);
+			}
 		}
 	}
 
-	// Update body children (constraints):
+	// Ungrouped (remaining) body items:
+	for (auto* body: new_bodies)
+		add_body_item_to (*body, *this);
+
+	// Body children (constraints):
+	for (auto* constraint: new_constraints)
 	{
-		for (auto* constraint: new_constraints)
+		auto body_1_iter = body_to_item.find (&constraint->body_1());
+		auto body_2_iter = body_to_item.find (&constraint->body_2());
+
+		if (body_1_iter != body_to_item.end() &&
+			body_2_iter != body_to_item.end())
 		{
-			auto body_1_iter = body_to_item.find (&constraint->body_1());
-			auto body_2_iter = body_to_item.find (&constraint->body_2());
+			auto* body_1_item = body_1_iter->second;
+			auto* body_2_item = body_1_iter->second;
 
-			if (body_1_iter != body_to_item.end() &&
-				body_2_iter != body_to_item.end())
-			{
-				auto* body_1_item = body_1_iter->second;
-				auto* body_2_item = body_1_iter->second;
-
-				add_constraint_item_to (*body_1_item, *constraint);
-				add_constraint_item_to (*body_2_item, *constraint);
-			}
+			add_constraint_item_to (*constraint, *body_1_item);
+			add_constraint_item_to (*constraint, *body_2_item);
 		}
 	}
 }
 
 
 void
-BodiesTree::update_existing (std::set<BodyItem*> const& body_items,
+BodiesTree::update_existing (std::set<GroupItem*> const& group_items,
+							 std::set<BodyItem*> const& body_items,
 							 std::set<ConstraintItem*> const& constraint_items)
 {
+	for (auto* group_item: group_items)
+		group_item->refresh();
+
 	for (auto* body_item: body_items)
 		body_item->refresh();
 
@@ -222,7 +270,7 @@ BodiesTree::update_existing (std::set<BodyItem*> const& body_items,
 				auto& body = body_item->body();
 
 				if (&body == old_followed_body || &body == new_followed_body)
-					set_icon (body, *body_item);
+					set_icon (*body_item, body);
 			}
 
 			_followed_body = _rigid_body_viewer.followed_body();
@@ -232,7 +280,14 @@ BodiesTree::update_existing (std::set<BodyItem*> const& body_items,
 
 
 void
-BodiesTree::set_icon (rigid_body::Body const& body, QTreeWidgetItem& item)
+BodiesTree::set_icon (GroupItem& item)
+{
+	item.setIcon (0, _group_icon);
+}
+
+
+void
+BodiesTree::set_icon (BodyItem& item, rigid_body::Body const& body)
 {
 	auto const gravitating = _gravitating_bodies.contains (&body);
 	auto const followed = _rigid_body_viewer.followed_body() == &body;
@@ -255,7 +310,7 @@ BodiesTree::set_icon (ConstraintItem& item)
 
 
 void
-BodiesTree::add_constraint_item_to (BodyItem& body_item, rigid_body::Constraint& constraint)
+BodiesTree::add_constraint_item_to (rigid_body::Constraint& constraint, BodyItem& body_item)
 {
 	auto* constraint_item = new ConstraintItem (body_item, constraint);
 	set_icon (*constraint_item);
@@ -265,7 +320,7 @@ BodiesTree::add_constraint_item_to (BodyItem& body_item, rigid_body::Constraint&
 		: constraint.body_1();
 
 	auto* connected_body_item = new BodyItem (*constraint_item, connected_body);
-	set_icon (connected_body, *connected_body_item);
+	set_icon (*connected_body_item, connected_body);
 }
 
 
