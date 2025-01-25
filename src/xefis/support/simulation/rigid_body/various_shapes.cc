@@ -115,11 +115,13 @@ make_centered_sphere_shape (SphereShapeParameters const& params)
 	si::Angle const dv = params.v_range.extent() / stacks;
 
 	Shape shape;
+	shape.triangle_strips().reserve (stacks);
 	si::Angle angle_v = params.v_range.min();
 
 	for (size_t iv = 0; iv < stacks; ++iv, angle_v += dv)
 	{
 		Shape::TriangleStrip& strip = shape.triangle_strips().emplace_back();
+		strip.reserve (2 * (slices + 1));
 		si::Angle angle_h = params.h_range.max();
 
 		for (size_t ih = 0; ih < slices + 1; ++ih, angle_h += dh)
@@ -172,18 +174,21 @@ make_cylinder_shape (CylinderShapeParameters const& params)
 	auto const num_faces = params.num_faces < 3u ? 3u : params.num_faces;
 	Shape shape;
 	Shape::TriangleStrip& strip = shape.triangle_strips().emplace_back();
+	strip.reserve (2 * (num_faces + 1));
 	std::optional<Shape::TriangleFan> bottom;
 	std::optional<Shape::TriangleFan> top;
 
 	if (params.with_bottom)
 	{
 		bottom.emplace();
+		bottom->reserve (2 + num_faces);
 		bottom->emplace_back (SpaceLength<BodyOrigin> (0_m, 0_m, 0_m), SpaceVector<double, BodyOrigin> (0.0, 0.0, -1.0), params.material);
 	}
 
 	if (params.with_top)
 	{
 		top.emplace();
+		top->reserve (2 + num_faces);
 		top->emplace_back (SpaceLength<BodyOrigin> (0_m, 0_m, params.length), SpaceVector<double, BodyOrigin> (0.0, 0.0, +1.0), params.material);
 	}
 
@@ -245,6 +250,7 @@ make_truncated_cone_shape (TruncatedConeShapeParameters const& params)
 	auto const num_faces = params.num_faces < 3u ? 3u : params.num_faces;
 	Shape shape;
 	Shape::TriangleStrip& cone_strip = shape.triangle_strips().emplace_back();
+	cone_strip.reserve (2 * (num_faces + 1));
 	std::optional<Shape::TriangleFan> top_fan;
 	std::optional<Shape::TriangleFan> bottom_fan;
 
@@ -254,12 +260,14 @@ make_truncated_cone_shape (TruncatedConeShapeParameters const& params)
 	if (params.with_bottom)
 	{
 		bottom_fan.emplace();
+		bottom_fan->reserve (2 + num_faces);
 		bottom_fan->emplace_back (SpaceLength<BodyOrigin> (0_m, 0_m, 0_m), SpaceVector<double, BodyOrigin> (0.0, 0.0, -1.0), params.material);
 	}
 
 	if (params.with_top)
 	{
 		top_fan.emplace();
+		top_fan->reserve (2 + num_faces);
 		top_fan->emplace_back (SpaceLength<BodyOrigin> (0_m, 0_m, params.length), SpaceVector<double, BodyOrigin> (0.0, 0.0, +1.0), params.material);
 	}
 
@@ -309,6 +317,7 @@ make_solid_circle (si::Length const radius, Range<si::Angle> const range, size_t
 
 	Shape shape;
 	Shape::TriangleFan& fan = shape.triangle_fans().emplace_back();
+	fan.reserve (2 + num_slices);
 	fan.emplace_back (SpaceLength<BodyOrigin> (0_m, 0_m, 0_m), SpaceVector<double, BodyOrigin> (0.0, 0.0, 1.0), material);
 
 	si::Angle const delta = range.extent() / num_slices;
@@ -329,24 +338,26 @@ make_solid_circle (si::Length const radius, Range<si::Angle> const range, size_t
 Shape
 make_airfoil_shape (AirfoilShapeParameters const& params)
 {
+	auto const n_points = params.spline.points().size();
 	Shape shape;
 	Shape::TriangleStrip& strip = shape.triangle_strips().emplace_back();
+	strip.reserve (2 * (n_points + 1));
 	std::optional<Shape::TriangleFan> bottom;
 	std::optional<Shape::TriangleFan> top;
 
 	if (params.with_bottom)
 	{
 		bottom.emplace();
+		bottom->reserve (2 + n_points);
 		bottom->emplace_back (SpaceLength<BodyOrigin> (0_m, 0_m, 0_m), SpaceVector<double, BodyOrigin> (0.0, 0.0, -1.0), params.material);
 	}
 
 	if (params.with_top)
 	{
 		top.emplace();
+		top->reserve (2 + n_points);
 		top->emplace_back (SpaceLength<BodyOrigin> (0_m, 0_m, params.wing_length), SpaceVector<double, BodyOrigin> (0.0, 0.0, +1.0), params.material);
 	}
-
-	auto const n_points = params.spline.points().size();
 
 	for (ptrdiff_t i = neutrino::to_signed (n_points) + 1; i > 0; --i)
 	{
@@ -414,6 +425,10 @@ make_propeller_shape (PropellerShapeParameters const& params)
 			shape.rotate (xf::z_rotation<BodyOrigin> (angle_between_blades));
 
 		auto strip = Shape::TriangleStrip();
+		auto const total_strip_size = 1 // (center of the blade)
+									+ 2 * params.points_per_blade
+									+ 2; // Tip of the blade;
+		strip.reserve (total_strip_size);
 		// Center of the blade:
 		strip.emplace_back (SpaceLength<BodyOrigin> { 0_m, 0_m, 0_m }, params.material);
 
