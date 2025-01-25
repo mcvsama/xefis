@@ -42,43 +42,34 @@ namespace xf {
  * Unique pointer that's also implicitly convertible to an array.
  * Useful for OpenGL functions that take arrays.
  */
-template<class Value>
-	class GLArray
+template<class Value, std::size_t Size>
+	class GLArray: public std::array<Value, Size>
 	{
 	  public:
-		// Ctor
-		GLArray (std::initializer_list<Value>);
-
-		/**
-		 * Access given element.
-		 */
-		Value&
-		operator[] (std::size_t index) noexcept
-			{ return data()[index]; }
-
-		/**
-		 * Access given element.
-		 */
-		Value const&
-		operator[] (std::size_t index) const noexcept
-			{ return data()[index]; }
+		template<std::same_as<Value> ...Args>
+			requires (sizeof...(Args) == Size)
+			GLArray (Args&& ...args):
+				std::array<Value, Size> { std::forward<Args> (args)... }
+			{ }
 
 		/**
 		 * Access the array.
 		 */
-		Value*
-		data() const noexcept
-			{ return _ptr.get(); }
+		operator Value*()
+			{ return this->data(); }
 
 		/**
 		 * Access the array.
 		 */
-		operator Value*() const
-			{ return _ptr.get(); }
-
-	  private:
-		std::unique_ptr<Value[]> _ptr;
+		operator Value const*() const
+			{ return this->data(); }
 	};
+
+
+// Deduction guide to allow writing GLArray { 1, 2, 3 } without explicitly
+// stating the Value and Size parameters.
+template<class... Args>
+	GLArray (Args&&...) -> GLArray<std::common_type_t<Args...>, sizeof...(Args)>;
 
 
 /**
@@ -114,7 +105,7 @@ class GLSpace
 	 * Convert QColor to array of floats for OpenGL functions.
 	 */
 	[[nodiscard]]
-	static GLArray<float>
+	static GLArray<float, 4>
 	to_opengl (QColor const&);
 
 	/**
@@ -263,15 +254,6 @@ class GLSpace
 };
 
 
-template<class Value>
-	inline
-	GLArray<Value>::GLArray (std::initializer_list<Value> list)
-	{
-		_ptr = std::make_unique<Value[]> (list.size());
-		std::copy (list.begin(), list.end(), _ptr.get());
-	}
-
-
 inline void
 GLSpace::set_global_offset (SpaceLength<BodyOrigin> const& offset) noexcept
 {
@@ -296,14 +278,16 @@ GLSpace::save_context (auto&& lambda)
 }
 
 
-inline GLArray<float>
+inline GLArray<float, 4>
 GLSpace::to_opengl (QColor const& color)
 {
+	constexpr float inv_255 = 1.0f / 255.0f;
+
 	return {
-		color.red() / 255.0f,
-		color.green() / 255.0f,
-		color.blue() / 255.0f,
-		color.alpha() / 255.0f,
+		inv_255 * color.red(),
+		inv_255 * color.green(),
+		inv_255 * color.blue(),
+		inv_255 * color.alpha(),
 	};
 }
 
