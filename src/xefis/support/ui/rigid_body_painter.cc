@@ -168,19 +168,16 @@ RigidBodyPainter::setup_light()
 	glLightfv (kSunLight, GL_DIFFUSE, GLArray { 0.5f, 0.5f, 0.5f, 1.0f });
 	glLightfv (kSunLight, GL_SPECULAR, GLArray { 0.75f, 0.75f, 0.75f, 1.0f });
 
-	_gl.save_context ([&] {
-		if (_planet_body)
-			// For planetary system, try to be sun:
-			_gl.translate (kSunDistance, 0_m, 0_m);
-		else
-			// Otherwise let the observer cast the light:
-			_gl.translate (0_m, 0_m, 1_km);
+	if (_planet_body)
+		// For planetary system, try to be sun:
+		glLightfv (kSunLight, GL_POSITION, GLArray { _gl.to_opengl (kSunDistance), 0.0f, 0.0f, 0.0f });
+	else
+		// Otherwise let the observer cast the light:
+		glLightfv (kSunLight, GL_POSITION, GLArray { 0.0f, 0.0f, 1.0f, 0.0f });
 
-		glLightfv (kSunLight, GL_POSITION, GLArray { 0.0f, 0.0f, 0.0f, 0.5f });
-		// TODO GL_SPOT_DIRECTION
-		// TODO GL_SPOT_EXPONENT
-		// TODO GL_SPOT_CUTOFF
-	});
+	// TODO GL_SPOT_DIRECTION
+	// TODO GL_SPOT_EXPONENT
+	// TODO GL_SPOT_CUTOFF
 }
 
 
