@@ -93,7 +93,7 @@ run (rigid_body::System& system, rigid_body::Body* followed_body, std::function<
 
 	neutrino::DummyQApplication app;
 
-	Evolver evolver (1_ms, g_null_logger, [&] (si::Time const dt) {
+	Evolver evolver (0_s, 1_ms, g_null_logger, [&] (si::Time const dt) {
 		if (apply_forces)
 			apply_forces (dt);
 
@@ -105,9 +105,9 @@ run (rigid_body::System& system, rigid_body::Body* followed_body, std::function<
 
 	RigidBodyViewer viewer (nullptr, 60_Hz);
 	viewer.set_rigid_body_system (&system);
-	viewer.set_redraw_callback ([&evolver] (std::optional<si::Time> const simulation_time) {
-		if (simulation_time)
-			evolver.evolve (*simulation_time);
+	viewer.set_redraw_callback ([&evolver] (std::optional<si::Time> const frame_duration) {
+		if (frame_duration)
+			evolver.evolve (*frame_duration);
 		else
 			evolver.evolve (1);
 	});

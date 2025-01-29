@@ -33,6 +33,7 @@
 
 // Standard:
 #include <cstddef>
+#include <chrono>
 
 
 namespace xf {
@@ -66,9 +67,9 @@ SimulatorWidget::make_viewer_widget()
 	_rigid_body_viewer.emplace (this, RigidBodyViewer::AutoFPS);
 	_rigid_body_viewer->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Expanding);
 	_rigid_body_viewer->set_rigid_body_system (&_simulator.rigid_body_system());
-	_rigid_body_viewer->set_redraw_callback ([this] (std::optional<si::Time> const simulation_time) {
-		if (simulation_time)
-			_simulator.evolve (*simulation_time);
+	_rigid_body_viewer->set_redraw_callback ([this] (std::optional<si::Time> const frame_duration) {
+		if (frame_duration)
+			_simulator.evolve (*frame_duration);
 		else
 			_simulator.evolve (1);
 
@@ -238,7 +239,9 @@ SimulatorWidget::make_body_controls()
 void
 SimulatorWidget::update_simulation_time_label()
 {
-	auto const text = std::format ("Simulation time: {:.6f} s", _simulator.simulation_time().in<si::Second>());
+	auto const simulation_time = std::chrono::system_clock::from_time_t (_simulator.simulation_time().in<si::Second>());
+	auto const elapsed_time = _simulator.elapsed_time().in<si::Second>();
+	auto const text = std::format ("Simulation time: {:%Y-%m-%d %H:%M:%S} UTC ({:.6f} s)", simulation_time, elapsed_time);
 	_simulation_time_label->setText (QString::fromStdString (text));
 }
 

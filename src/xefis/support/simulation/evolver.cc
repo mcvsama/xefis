@@ -23,8 +23,9 @@
 
 namespace xf {
 
-Evolver::Evolver (si::Time const frame_duration, Logger const& logger, Evolve const evolve):
+Evolver::Evolver (si::Time const initial_simulation_time, si::Time const frame_duration, Logger const& logger, Evolve const evolve):
 	_logger (logger),
+	_initial_simulation_time (initial_simulation_time),
 	_frame_duration (frame_duration),
 	_evolve (evolve)
 {
@@ -38,17 +39,17 @@ Evolver::evolve (si::Time const duration)
 {
 	_target_time += duration;
 	auto frames = 0u;
-	auto const prev_simulation_time = _simulation_time;
+	auto const prev_elapsed_time = _elapsed_time;
 	auto const real_time_taken = TimeHelper::measure ([&] {
-		while (_simulation_time < _target_time)
+		while (_elapsed_time < _target_time)
 		{
 			_evolve (_frame_duration);
-			_simulation_time += _frame_duration;
+			_elapsed_time += _frame_duration;
 			++frames;
 		}
 	});
 
-	_performance = (_simulation_time - prev_simulation_time) / real_time_taken;
+	_performance = (_elapsed_time - prev_elapsed_time) / real_time_taken;
 
 	return {
 		.real_time_taken = real_time_taken,
@@ -60,17 +61,17 @@ Evolver::evolve (si::Time const duration)
 Evolver::EvolutionResult
 Evolver::evolve (std::size_t const frames)
 {
-	auto const prev_simulation_time = _simulation_time;
+	auto const prev_elapsed_time = _elapsed_time;
 	auto const real_time_taken = TimeHelper::measure ([&] {
 		for (std::size_t i = 0; i < frames; ++i)
 		{
 			_evolve (_frame_duration);
 			_target_time += _frame_duration;
-			_simulation_time += _frame_duration;
+			_elapsed_time += _frame_duration;
 		}
 	});
 
-	_performance = (_simulation_time - prev_simulation_time) / real_time_taken;
+	_performance = (_elapsed_time - prev_elapsed_time) / real_time_taken;
 
 	return {
 		.real_time_taken = real_time_taken,

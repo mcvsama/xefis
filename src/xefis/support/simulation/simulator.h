@@ -39,7 +39,7 @@ class Simulator: public Noncopyable
   public:
 	// Ctor
 	explicit
-	Simulator (rigid_body::System&, rigid_body::ImpulseSolver&, si::Time frame_duration, Logger const&);
+	Simulator (rigid_body::System&, rigid_body::ImpulseSolver&, si::Time initial_simulation_time, si::Time frame_duration, Logger const&);
 
 	/**
 	 * Return current simulation frame Δt.
@@ -50,14 +50,22 @@ class Simulator: public Noncopyable
 		{ return _evolver->frame_duration(); }
 
 	/**
-	 * Return integrated simulation time.
-	 * This is the time how far the simulation has actually advanced and because Δt is not infinitely small, the result
-	 * might be larger than real_time(), but not by more than frame Δt.
+	 * Return virtual simulation time.
 	 */
 	[[nodiscard]]
 	si::Time
 	simulation_time() const noexcept
 		{ return _evolver->simulation_time(); }
+
+	/**
+	 * Return integrated virtual elapsed time, that is simulated time elapsed since the start of the simulation.
+	 * This is the time how far the simulation has actually advanced and because Δt is not infinitely small, the result might be larger than real_time(), but
+	 * not by more than frame Δt.
+	 */
+	[[nodiscard]]
+	si::Time
+	elapsed_time() const noexcept
+		{ return _evolver->elapsed_time(); }
 
 	/**
 	 * Return rigid body system that's being simulated.
@@ -76,11 +84,11 @@ class Simulator: public Noncopyable
 		{ return _rigid_body_system; }
 
 	/**
-	 * Evolve the rigid body system by given dt. Multiple evolve() calls will be made on the System.
+	 * Evolve the rigid body system by given Δt. Multiple evolve() calls will be made on the System.
 	 */
 	void
-	evolve (si::Time const simulation_time)
-		{ _evolver->evolve (simulation_time); }
+	evolve (si::Time const duration)
+		{ _evolver->evolve (duration); }
 
 	/**
 	 * Evolve the rigid body system given number of steps (frames).

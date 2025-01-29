@@ -53,7 +53,7 @@ class Evolver
 	 *			Must not be nullptr.
 	 */
 	explicit
-	Evolver (si::Time frame_duration, Logger const&, Evolve);
+	Evolver (si::Time initial_simulation_time, si::Time frame_duration, Logger const&, Evolve);
 
 	/**
 	 * Return current simulation frame Δt.
@@ -71,14 +71,22 @@ class Evolver
 		{ _frame_duration = dt; }
 
 	/**
-	 * Return integrated simulation time.
+	 * Return virtual simulation time.
+	 */
+	[[nodiscard]]
+	si::Time
+	simulation_time() const noexcept
+		{ return _initial_simulation_time + _elapsed_time; }
+
+	/**
+	 * Return integrated virtual elapsed time.
 	 * This is the time how far the simulation has actually advanced and because Δt is not infinitely small, the result
 	 * might be larger than real_time(), but not by more than frame Δt.
 	 */
 	[[nodiscard]]
 	si::Time
-	simulation_time() const noexcept
-		{ return _simulation_time; }
+	elapsed_time() const noexcept
+		{ return _elapsed_time; }
 
 	/**
 	 * Evolve the rigid body system by given simulation time. Multiple evolve() calls will be made on the System.
@@ -103,11 +111,12 @@ class Evolver
 
   private:
 	xf::Logger	_logger;
+	si::Time	_initial_simulation_time;
 	si::Time	_frame_duration;
 	Evolve		_evolve;
-	si::Time	_target_time		{ 0_s };
-	si::Time	_simulation_time	{ 0_s };
-	float		_performance		{ 1.0 };
+	si::Time	_target_time				{ 0_s };
+	si::Time	_elapsed_time				{ 0_s };
+	float		_performance				{ 1.0 };
 };
 
 } // namespace xf

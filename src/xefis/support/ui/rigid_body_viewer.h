@@ -47,7 +47,7 @@ class RigidBodyViewer: public GLAnimationWidget
 {
   public:
 	// Evolution function called before each display frame:
-	using OnRedraw = std::function<void (std::optional<si::Time> simulation_time)>;
+	using OnRedraw = std::function<void (std::optional<si::Time> frame_duration)>;
 	using FPSMode = GLAnimationWidget::FPSMode;
 	using BodyRenderingConfig = RigidBodyPainter::BodyRenderingConfig;
 
