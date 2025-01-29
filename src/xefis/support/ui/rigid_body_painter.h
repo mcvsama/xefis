@@ -281,8 +281,20 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	void
 	paint_system (rigid_body::System const&);
 
+	/**
+	 * Translate and rotate OpenGL matrix to the center of mass of the body.
+	 */
+	void
+	transform_gl_to_body_center_of_mass (rigid_body::Body const&);
+
 	void
 	paint_body (rigid_body::Body const&, BodyRenderingConfig const&);
+
+	/**
+	 * Paint additional features like XYZ basis, center of mass and origin.
+	 */
+	void
+	paint_body_helpers (rigid_body::Body const&, BodyRenderingConfig const&, bool focused);
 
 	void
 	paint_center_of_mass();
@@ -311,6 +323,10 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	[[nodiscard]]
 	SpaceLength<WorldSpace>
 	followed_body_position() const;
+
+	[[nodiscard]]
+	BodyRenderingConfig const&
+	rendering_config_for (rigid_body::Body const&);
 
   private:
 	si::PixelDensity		_pixel_density;
