@@ -398,6 +398,7 @@ MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/ui/canvas_widge
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/ui/canvas_widget.h
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/ui/gl_animation_widget.cc
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/ui/gl_animation_widget.h
+MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/ui/gl_color.h
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/ui/gl_space.cc
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/ui/gl_space.h
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/ui/histogram_stats_widget.cc

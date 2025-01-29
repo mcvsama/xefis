@@ -80,8 +80,7 @@ class GLSpace
   public:
 	struct AdditionalParameters
 	{
-		float					light_scale { 1.0f };
-		std::optional<QColor>	color_override;
+		std::optional<GLColor>	color_override;
 	};
 
   public:
@@ -100,13 +99,6 @@ class GLSpace
 	 */
 	void
 	save_context (auto&& lambda);
-
-	/**
-	 * Convert QColor to array of floats for OpenGL functions.
-	 */
-	[[nodiscard]]
-	static GLArray<float, 4>
-	to_opengl (QColor const&);
 
 	/**
 	 * Set perspective parameters.
@@ -275,20 +267,6 @@ GLSpace::save_context (auto&& lambda)
 		pop_context();
 		throw;
 	}
-}
-
-
-inline GLArray<float, 4>
-GLSpace::to_opengl (QColor const& color)
-{
-	constexpr float inv_255 = 1.0f / 255.0f;
-
-	return {
-		inv_255 * color.red(),
-		inv_255 * color.green(),
-		inv_255 * color.blue(),
-		inv_255 * color.alpha(),
-	};
 }
 
 

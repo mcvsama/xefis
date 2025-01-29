@@ -48,15 +48,24 @@ void
 GLSpace::set_material (rigid_body::ShapeMaterial const& material)
 {
 	auto const& params = additional_parameters();
-	auto const darker_factor = 100 / params.light_scale;
 
-	glFogCoordf (material.fog_distance);
-	glColor4fv (to_opengl (material.emission_color.darker (darker_factor)));
-	glMaterialfv (GL_FRONT, GL_EMISSION, to_opengl (material.emission_color.darker (darker_factor)));
-	glMaterialfv (GL_FRONT, GL_AMBIENT, to_opengl (params.color_override.value_or (material.ambient_color.darker (darker_factor))));
-	glMaterialfv (GL_FRONT, GL_DIFFUSE, to_opengl (params.color_override.value_or (material.diffuse_color.darker (darker_factor))));
-	glMaterialfv (GL_FRONT, GL_SPECULAR, to_opengl (params.color_override.value_or (material.specular_color.darker (darker_factor))));
-	glMaterialf (GL_FRONT, GL_SHININESS, material.shininess * 127);
+	glFogCoordf (material.gl_fog_distance);
+	glColor4fv (material.gl_emission_color);
+	glMaterialf (GL_FRONT, GL_SHININESS, material.gl_shininess);
+	glMaterialfv (GL_FRONT, GL_EMISSION, material.gl_emission_color);
+
+	if (params.color_override)
+	{
+		glMaterialfv (GL_FRONT, GL_AMBIENT, *params.color_override);
+		glMaterialfv (GL_FRONT, GL_DIFFUSE, *params.color_override);
+		glMaterialfv (GL_FRONT, GL_SPECULAR, *params.color_override);
+	}
+	else
+	{
+		glMaterialfv (GL_FRONT, GL_AMBIENT, material.gl_ambient_color);
+		glMaterialfv (GL_FRONT, GL_DIFFUSE, material.gl_diffuse_color);
+		glMaterialfv (GL_FRONT, GL_SPECULAR, material.gl_specular_color);
+	}
 }
 
 

@@ -25,37 +25,38 @@
 namespace xf::rigid_body {
 
 auto constexpr kBlackMatte = ShapeMaterial {
-	.emission_color	= QColor { 0, 0, 0, 0 },
-	.ambient_color	= QColor { 0, 0, 0, 0 },
-	.diffuse_color	= QColor { 0, 0, 0, 0 },
-	.specular_color	= QColor { 0, 0, 0, 0 },
-	.shininess		= 0.0,
+	.gl_emission_color	= GLColor { 0.0f, 0.0f, 0.0f, 1.0f },
+	.gl_ambient_color	= GLColor { 0.0f, 0.0f, 0.0f, 1.0f },
+	.gl_diffuse_color	= GLColor { 0.0f, 0.0f, 0.0f, 1.0f },
+	.gl_specular_color	= GLColor { 0.0f, 0.0f, 0.0f, 1.0f },
+	.gl_shininess		= 0.0f,
 };
 
 auto constexpr kWhiteMatte = ShapeMaterial {
-	.emission_color	= QColor { 0xff, 0xff, 0xff, 0xff },
-	.ambient_color	= QColor { 0xff, 0xff, 0xff, 0xff },
-	.diffuse_color	= QColor { 0xff, 0xff, 0xff, 0xff },
-	.specular_color	= QColor { 0xff, 0xff, 0xff, 0xff },
-	.shininess		= 0.0,
+	.gl_emission_color	= GLColor { 0xff, 0xff, 0xff, 0xff },
+	.gl_ambient_color	= GLColor { 0xff, 0xff, 0xff, 0xff },
+	.gl_diffuse_color	= GLColor { 0xff, 0xff, 0xff, 0xff },
+	.gl_specular_color	= GLColor { 0xff, 0xff, 0xff, 0xff },
+	.gl_shininess		= 0.0,
 };
 
 auto constexpr kGreyMatte = ShapeMaterial {
-	.emission_color	= QColor { 180, 180, 180, 0xff },
-	.ambient_color	= QColor { 180, 180, 180, 0xff },
-	.diffuse_color	= QColor { 180, 180, 180, 0xff },
-	.specular_color	= QColor { 180, 180, 180, 0xff },
-	.shininess		= 0.0,
+	.gl_emission_color	= GLColor { 180, 180, 180, 0xff },
+	.gl_ambient_color	= GLColor { 180, 180, 180, 0xff },
+	.gl_diffuse_color	= GLColor { 180, 180, 180, 0xff },
+	.gl_specular_color	= GLColor { 180, 180, 180, 0xff },
+	.gl_shininess		= 0.0,
 };
 
 
 inline ShapeMaterial
 make_material (QColor const& color)
 {
+	auto const gl_color = to_gl_color (color);
 	return rigid_body::ShapeMaterial {
-		.ambient_color	= color,
-		.diffuse_color	= color,
-		.specular_color	= color,
+		.gl_ambient_color	= gl_color,
+		.gl_diffuse_color	= gl_color,
+		.gl_specular_color	= gl_color,
 	};
 }
 

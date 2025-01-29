@@ -252,7 +252,7 @@ RigidBodyPainter::paint_planet()
 		{
 			// Set dome color (fog simulation) depending on latitude:
 			float const norm = std::clamp<float> (renormalize<si::Angle> (latitude, Range { 67.5_deg, 90_deg }, Range { 1.0f, 0.0f }), 0.0f, 1.0f);
-			material.emission_color = get_intermediate_color (std::pow (norm, 1.0 + 2 * normalized_altitude), sky_color, sky_fog_color);
+			material.set_emission_color (get_intermediate_color (std::pow (norm, 1.0 + 2 * normalized_altitude), sky_color, sky_fog_color));
 		};
 
 		auto sky = rigid_body::make_centered_sphere_shape ({
@@ -287,7 +287,7 @@ RigidBodyPainter::paint_planet()
 			float const actual_radius = 0.025;
 			float const norm = renormalize<si::Angle> (latitude, Range { 0_deg, 90_deg }, Range { 0.0f, 1.0f });
 			float const alpha = std::clamp<float> (std::pow (norm + actual_radius, 6.0f), 0.0f, 1.0f);
-			material.emission_color = QColor (0xff, 0xff, 0xff, 0xff * alpha);
+			material.gl_emission_color = { 1.0f, 1.0f, 1.0f, alpha };
 		};
 
 		// Assume it's noon at Lon/Lat 0°/0° right now.
@@ -326,18 +326,18 @@ RigidBodyPainter::paint_planet()
 		auto const ground_fog_color = get_intermediate_color (normalized_altitude, low_ground_fog_color, high_ground_fog_color);
 
 		rigid_body::ShapeMaterial ground_material;
-		ground_material.emission_color = ground_color;
-		ground_material.ambient_color = Qt::black;
-		ground_material.diffuse_color = Qt::black;
-		ground_material.specular_color = Qt::black;
-		ground_material.shininess = 0.0;
+		ground_material.set_emission_color (ground_color);
+		ground_material.set_ambient_color (Qt::black);
+		ground_material.set_diffuse_color (Qt::black);
+		ground_material.set_specular_color (Qt::black);
+		ground_material.set_shininess (0.0f);
 
 		glFogi (GL_FOG_MODE, GL_EXP);
 		glFogi (GL_FOG_COORD_SRC, GL_FRAGMENT_DEPTH);
 		glFogf (GL_FOG_DENSITY, ground_fog_density);
 		glFogf (GL_FOG_START, _gl.to_opengl (0_m));
 		glFogf (GL_FOG_END, _gl.to_opengl (kHorizonRadius));
-		glFogfv (GL_FOG_COLOR, _gl.to_opengl (ground_fog_color));
+		glFogfv (GL_FOG_COLOR, to_gl_color (ground_fog_color));
 
 		_gl.rotate (+_position_on_earth.lon(), 0, 0, 1);
 		_gl.rotate (-_position_on_earth.lat(), 0, 1, 0);
@@ -364,7 +364,7 @@ RigidBodyPainter::paint_air_particles()
 		auto const ball_size = 2_cm;
 		auto const grid_size = 5_m;
 		auto ball_material = rigid_body::kWhiteMatte;
-		ball_material.emission_color = Qt::white;
+		ball_material.set_emission_color (Qt::white);
 		auto const ball = rigid_body::make_centered_sphere_shape ({ .radius = ball_size, .slices = 3, .stacks = 3, .material = ball_material });
 		auto const range = 3 * grid_size;
 
@@ -467,9 +467,9 @@ RigidBodyPainter::paint_body (rigid_body::Body const& body, BodyRenderingConfig 
 		{
 			_gl.save_context ([&] {
 				if (focused)
-					_gl.additional_parameters().color_override = QColor::fromRgb (0x00, 0xaa, 0x7f);
+					_gl.additional_parameters().color_override = GLColor::from_rgb (0x00, 0xaa, 0x7f);
 				else if (_hovered_body == &body)
-					_gl.additional_parameters().color_override = QColor::fromRgb (0x00, 0xaa, 0x7f).lighter (150);
+					_gl.additional_parameters().color_override = GLColor::from_rgb (0x00, 0xaa, 0x7f).lighter (0.5);
 
 				if (auto const& shape = body.shape())
 					_gl.draw (*shape);

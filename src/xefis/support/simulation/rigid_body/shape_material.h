@@ -17,6 +17,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/math/geometry.h>
+#include <xefis/support/ui/gl_color.h>
 
 // Qt:
 #include <QColor>
@@ -32,12 +33,35 @@ namespace xf::rigid_body {
  */
 struct ShapeMaterial
 {
-	QColor	emission_color	{ 0x00, 0x00, 0x00, 0xff };
-	QColor	ambient_color	{ 0xff, 0xff, 0xff, 0xff };
-	QColor	diffuse_color	{ 0xff, 0xff, 0xff, 0xff };
-	QColor	specular_color	{ 0xff, 0xff, 0xff, 0xff };
-	float	shininess		{ 0.1f };
-	float	fog_distance	{ 0.0f };
+	GLColor	gl_emission_color	{ 0.0f, 0.0f, 0.0f, 1.0f };
+	GLColor	gl_ambient_color	{ 1.0f, 1.0f, 1.0f, 1.0f };
+	GLColor	gl_diffuse_color	{ 1.0f, 1.0f, 1.0f, 1.0f };
+	GLColor	gl_specular_color	{ 1.0f, 1.0f, 1.0f, 1.0f };
+	float	gl_shininess		{ 0xff * 0.1f };
+	float	gl_fog_distance		{ 0.0f };
+
+	void
+	set_emission_color (QColor const color)
+		{ gl_emission_color = to_gl_color (color); }
+
+	void
+	set_ambient_color (QColor const color)
+		{ gl_ambient_color = to_gl_color (color); }
+
+	void
+	set_diffuse_color (QColor const color)
+		{ gl_diffuse_color = to_gl_color (color); }
+
+	void
+	set_specular_color (QColor const color)
+		{ gl_specular_color = to_gl_color (color); }
+
+	/**
+	 * Set shininess in range [0..1].
+	 */
+	void
+	set_shininess (float shininess)
+		{ gl_shininess = 0xff * shininess; }
 };
 
 } // namespace xf::rigid_body
