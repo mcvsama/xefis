@@ -44,8 +44,8 @@
 
 namespace xf {
 
-constexpr auto kSunLight	= GL_LIGHT0;
-constexpr auto kBasisLight	= GL_LIGHT1;
+constexpr auto kSunLight		= GL_LIGHT0;
+constexpr auto kFeatureLight	= GL_LIGHT1;
 
 
 RigidBodyPainter::RigidBodyPainter (si::PixelDensity const pixel_density):
@@ -121,6 +121,32 @@ RigidBodyPainter::setup (QOpenGLPaintDevice& canvas)
 	glEnable (kSunLight);
 
 	glLoadIdentity();
+}
+
+
+void
+RigidBodyPainter::setup_feature_light()
+{
+	glDisable (kSunLight);
+	glEnable (kFeatureLight);
+	glLightfv (kFeatureLight, GL_AMBIENT, GLArray { 0.25f, 0.25f, 0.25f, 1.0f });
+	glLightfv (kFeatureLight, GL_DIFFUSE, GLArray { 0.5f, 0.5f, 0.5f, 1.0f });
+	glLightfv (kFeatureLight, GL_SPECULAR, GLArray { 0.9f, 0.9f, 0.9f, 1.0f });
+
+	_gl.save_context ([&] {
+		// Reset rotations and translations:
+		glLoadIdentity();
+		// Cast light from observer's position (Z = 1):
+		glLightfv (kFeatureLight, GL_POSITION, GLArray { 0.0f, 0.0f, 1.0f, 0.0f });
+	});
+}
+
+
+void
+RigidBodyPainter::setup_natural_light()
+{
+	glDisable (kFeatureLight);
+	glEnable (kSunLight);
 }
 
 
@@ -452,6 +478,14 @@ RigidBodyPainter::transform_gl_to_body_center_of_mass (rigid_body::Body const& b
 
 
 void
+RigidBodyPainter::transform_gl_from_body_center_of_mass_to_origin (rigid_body::Body const& body)
+{
+	_gl.translate (body.origin_placement().position());
+	_gl.rotate (body.origin_placement().base_to_body_rotation());
+}
+
+
+void
 RigidBodyPainter::paint_body (rigid_body::Body const& body, BodyRenderingConfig const& rendering)
 {
 	_gl.save_context ([&] {
@@ -461,8 +495,7 @@ RigidBodyPainter::paint_body (rigid_body::Body const& body, BodyRenderingConfig 
 			paint_moments_of_inertia_cuboid (body.mass_moments<BodyCOM>());
 
 		// Body shapes are defined relative to BodyOrigin coordinates, so transform again:
-		_gl.translate (body.origin_placement().position());
-		_gl.rotate (body.origin_placement().base_to_body_rotation());
+		transform_gl_from_body_center_of_mass_to_origin (body);
 
 		if (rendering.body_visible)
 		{
@@ -493,8 +526,14 @@ RigidBodyPainter::paint_body_helpers (rigid_body::Body const& body, BodyRenderin
 
 		if (focused || rendering.origin_visible)
 		{
-			paint_origin();
-			paint_basis (30_cm); // TODO make it zoom-independent
+			transform_gl_from_body_center_of_mass_to_origin (body);
+
+			// Paint the yellow origin ball only if explicitly requested,
+			// otherwise the user will know that the origin is where the basis is:
+			if (rendering.origin_visible)
+				paint_origin();
+
+			paint_basis (_camera_position.z() / 15);
 		}
 	});
 }
@@ -503,8 +542,7 @@ RigidBodyPainter::paint_body_helpers (rigid_body::Body const& body, BodyRenderin
 void
 RigidBodyPainter::paint_center_of_mass()
 {
-	// TODO make the sphere zoom-independent (distance from the camera-independent):
-	auto const com_shape = rigid_body::make_center_of_mass_symbol_shape (5_cm);
+	auto const com_shape = rigid_body::make_center_of_mass_symbol_shape (_camera_position.z() / 150);
 
 	_gl.save_context ([&] {
 		glDisable (GL_LIGHTING);
@@ -518,13 +556,12 @@ void
 RigidBodyPainter::paint_origin()
 {
 	auto const origin_material = rigid_body::make_material ({ 0xff, 0xff, 0x00 });
-	// TODO make the sphere zoom-independent (distance from the camera-independent):
-	auto const origin_shape = rigid_body::make_centered_sphere_shape ({ .radius = 5_cm, .slices = 8, .stacks = 8, .material = origin_material });
+	auto const origin_shape = rigid_body::make_centered_sphere_shape ({ .radius = _camera_position.z() / 150, .slices = 8, .stacks = 8, .material = origin_material });
 
 	_gl.save_context ([&] {
-		glDisable (GL_LIGHTING);
+		setup_feature_light();
 		_gl.draw (origin_shape);
-		glEnable (GL_LIGHTING);
+		setup_natural_light();
 	});
 }
 
@@ -730,21 +767,9 @@ RigidBodyPainter::paint_basis (si::Length const length)
 	auto const blue = rigid_body::make_material (QColor (0x11, 0x11, 0xff));
 	auto const red = rigid_body::make_material (Qt::red);
 	auto const green = rigid_body::make_material (Qt::green);
-
-	glDisable (kSunLight);
-	glEnable (kBasisLight);
-	glLightfv (kBasisLight, GL_AMBIENT, GLArray { 0.25f, 0.25f, 0.25f, 1.0f });
-	glLightfv (kBasisLight, GL_DIFFUSE, GLArray { 0.5f, 0.5f, 0.5f, 1.0f });
-	glLightfv (kBasisLight, GL_SPECULAR, GLArray { 0.9f, 0.9f, 0.9f, 1.0f });
-
-	_gl.save_context ([&] {
-		// Reset rotations and translations:
-		glLoadIdentity();
-		// Cast light from observer's position (Z = 1):
-		glLightfv (kBasisLight, GL_POSITION, GLArray { 0.0f, 0.0f, 1.0f, 0.0f });
-	});
-
 	auto const kNumFaces = 12;
+
+	setup_feature_light();
 
 	// Root ball:
 	_gl.draw (rigid_body::make_centered_sphere_shape ({ .radius = 2 * radius, .slices = 8, .stacks = 8 }));
@@ -769,8 +794,7 @@ RigidBodyPainter::paint_basis (si::Length const length)
 		_gl.draw (rigid_body::make_cone_shape ({ .length = cone_length, .radius = cone_radius, .num_faces = kNumFaces, .with_bottom = true, .material = blue }));
 	});
 
-	glDisable (kBasisLight);
-	glEnable (kSunLight);
+	setup_natural_light();
 }
 
 

@@ -60,18 +60,18 @@ class RigidBodyViewer: public GLAnimationWidget
 	};
 
   public:
-	static constexpr auto		kRotationButton		{ Qt::RightButton };
-	static constexpr auto		kTranslationButton	{ Qt::LeftButton };
-	static constexpr auto		kResetViewButton	{ Qt::BackButton };
+	static constexpr auto		kRotationButton			{ Qt::RightButton };
+	static constexpr auto		kTranslationButton		{ Qt::LeftButton };
+	static constexpr auto		kResetViewButton		{ Qt::BackButton };
 
-	static constexpr si::Angle	kDefaultXAngle		{ 0_deg };
-	static constexpr si::Angle	kDefaultYAngle		{ 0_deg };
+	static constexpr si::Angle	kDefaultXAngle			{ 0_deg };
+	static constexpr si::Angle	kDefaultYAngle			{ 0_deg };
 	static constexpr SpaceLength<WorldSpace>
-								kDefaultPosition	{ 0_m, 0_m, 10_m };
+								kDefaultCameraPosition	{ 0_m, 0_m, 10_m };
 
-	static constexpr auto		kRotationScale		{ 2_deg / 1_mm };
-	static constexpr auto		kTranslationScale	{ 2.5_cm / 1_mm };
-	static constexpr float		kHighPrecision		{ 0.05f };
+	static constexpr auto		kRotationScale			{ 2_deg / 1_mm };
+	static constexpr auto		kTranslationScale		{ 2.5_cm / 1_mm };
+	static constexpr float		kHighPrecision			{ 0.05f };
 
   public:
 	// Ctor
@@ -162,8 +162,8 @@ class RigidBodyViewer: public GLAnimationWidget
 	 */
 	[[nodiscard]]
 	SpaceLength<WorldSpace> const&
-	position() const noexcept
-		{ return _position; }
+	camera_position() const noexcept
+		{ return _camera_position; }
 
 	/**
 	 * Return current camera rotation about the X axis in screen coordinates.
@@ -260,7 +260,7 @@ class RigidBodyViewer: public GLAnimationWidget
 	bool						_prevent_menu_reappear: 1		{ false };
 	Playback					_playback						{ Playback::Paused };
 	std::size_t					_steps_to_do					{ 0 };
-	SpaceLength<WorldSpace>		_position						{ kDefaultPosition };
+	SpaceLength<WorldSpace>		_camera_position				{ kDefaultCameraPosition };
 	si::Angle					_x_angle						{ kDefaultXAngle };
 	si::Angle					_y_angle						{ kDefaultYAngle };
 };

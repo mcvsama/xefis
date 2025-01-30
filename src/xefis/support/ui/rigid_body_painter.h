@@ -251,6 +251,12 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	setup (QOpenGLPaintDevice&);
 
 	void
+	setup_feature_light();
+
+	void
+	setup_natural_light();
+
+	void
 	setup_camera();
 
 	void
@@ -282,10 +288,17 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	paint_system (rigid_body::System const&);
 
 	/**
-	 * Translate and rotate OpenGL matrix to the center of mass of the body.
+	 * Translate and rotate OpenGL space to the center of mass of the body.
 	 */
 	void
 	transform_gl_to_body_center_of_mass (rigid_body::Body const&);
+
+	/**
+	 * Transform OpenGL space to the body origin, assuming that the space
+	 * is already transformed to body's center of mass.
+	 */
+	void
+	transform_gl_from_body_center_of_mass_to_origin (rigid_body::Body const&);
 
 	void
 	paint_body (rigid_body::Body const&, BodyRenderingConfig const&);
