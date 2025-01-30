@@ -37,7 +37,7 @@ auto constexpr kWhiteMatte = ShapeMaterial {
 	.gl_ambient_color	= GLColor { 0xff, 0xff, 0xff, 0xff },
 	.gl_diffuse_color	= GLColor { 0xff, 0xff, 0xff, 0xff },
 	.gl_specular_color	= GLColor { 0xff, 0xff, 0xff, 0xff },
-	.gl_shininess		= 0.0,
+	.gl_shininess		= 0.0f,
 };
 
 auto constexpr kGreyMatte = ShapeMaterial {
@@ -45,15 +45,16 @@ auto constexpr kGreyMatte = ShapeMaterial {
 	.gl_ambient_color	= GLColor { 180, 180, 180, 0xff },
 	.gl_diffuse_color	= GLColor { 180, 180, 180, 0xff },
 	.gl_specular_color	= GLColor { 180, 180, 180, 0xff },
-	.gl_shininess		= 0.0,
+	.gl_shininess		= 0.0f,
 };
 
 
 inline ShapeMaterial
-make_material (QColor const& color)
+make_material (QColor const& material_color, QColor const& emission_color = Qt::black)
 {
-	auto const gl_color = to_gl_color (color);
+	auto const gl_color = to_gl_color (material_color);
 	return rigid_body::ShapeMaterial {
+		.gl_emission_color	= to_gl_color (emission_color),
 		.gl_ambient_color	= gl_color,
 		.gl_diffuse_color	= gl_color,
 		.gl_specular_color	= gl_color,
