@@ -62,8 +62,8 @@ PanelButton::PanelButton (QWidget* parent, Panel* panel, LEDColor color, Socket<
 
 	_button = new QPushButton (this);
 	_button->setFixedSize (40, 25);
-	QObject::connect (_button, SIGNAL (pressed()), this, SLOT (write()));
-	QObject::connect (_button, SIGNAL (released()), this, SLOT (write()));
+	QObject::connect (_button, &QPushButton::pressed, this, &PanelButton::write);
+	QObject::connect (_button, &QPushButton::released, this, &PanelButton::write);
 
 	QVBoxLayout* layout = new QVBoxLayout (this);
 	layout->setMargin (0);

@@ -521,7 +521,7 @@ GPS::GPS (xf::ProcessingLoop& loop, xf::System* system, xf::SerialPort::Configur
 	_power_cycle_timer = std::make_unique<QTimer> (this);
 	_power_cycle_timer->setInterval (kPowerRestartDelay.in<si::Millisecond>());
 	_power_cycle_timer->setSingleShot (true);
-	QObject::connect (_power_cycle_timer.get(), SIGNAL (timeout()), this, SLOT (power_on()));
+	QObject::connect (_power_cycle_timer.get(), &QTimer::timeout, this, &GPS::power_on);
 
 	_io.read_errors = 0;
 	_io.serviceable = false;

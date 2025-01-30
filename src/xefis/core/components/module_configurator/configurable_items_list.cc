@@ -51,7 +51,7 @@ ConfigurableItemsList::ConfigurableItemsList (Machine& machine, QWidget* parent)
 	_list->setVerticalScrollMode (QAbstractItemView::ScrollPerPixel);
 	_list->setContextMenuPolicy (Qt::CustomContextMenu);
 	_list->setHeaderLabels ({ "Module" });
-	QObject::connect (_list, SIGNAL (currentItemChanged (QTreeWidgetItem*, QTreeWidgetItem*)), this, SLOT (item_selected (QTreeWidgetItem*, QTreeWidgetItem*)));
+	QObject::connect (_list, &QTreeWidget::currentItemChanged, this, &ConfigurableItemsList::item_selected);
 
 	QHBoxLayout* layout = new QHBoxLayout (this);
 	layout->setMargin (0);
@@ -63,7 +63,7 @@ ConfigurableItemsList::ConfigurableItemsList (Machine& machine, QWidget* parent)
 	_refresh_timer = new QTimer (this);
 	_refresh_timer->setInterval (100);
 	_refresh_timer->setSingleShot (false);
-	QObject::connect (_refresh_timer, SIGNAL (timeout()), this, SLOT (read()));
+	QObject::connect (_refresh_timer, &QTimer::timeout, this, &ConfigurableItemsList::read);
 	_refresh_timer->start();
 
 	read();

@@ -250,7 +250,7 @@ JoystickInput::JoystickInput (xf::ProcessingLoop& loop, QDomElement const& confi
 	_reopen_timer = std::make_unique<QTimer> (this);
 	_reopen_timer->setInterval (500);
 	_reopen_timer->setSingleShot (true);
-	QObject::connect (_reopen_timer.get(), SIGNAL (timeout()), this, SLOT (open_device()));
+	QObject::connect (_reopen_timer.get(), &QTimer::timeout, this, &JoystickInput::open_device);
 }
 
 
@@ -279,7 +279,7 @@ JoystickInput::open_device()
 			_failure_count = 0;
 			_notifier = std::make_unique<QSocketNotifier> (_device, QSocketNotifier::Read, this);
 			_notifier->setEnabled (true);
-			QObject::connect (_notifier.get(), SIGNAL (activated (int)), this, SLOT (read()));
+			QObject::connect (_notifier.get(), &QSocketNotifier::activated, this, &JoystickInput::read);
 		}
 	}
 	catch (...)

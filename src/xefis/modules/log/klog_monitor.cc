@@ -35,7 +35,7 @@ KLogMonitor::KLogMonitor (xf::ProcessingLoop& loop, std::string_view const& inst
 	_timer = new QTimer (this);
 	_timer->setInterval (100);
 	_timer->setSingleShot (false);
-	QObject::connect (_timer, SIGNAL (timeout()), this, SLOT (check_klog()));
+	QObject::connect (_timer, &QTimer::timeout, this, &KLogMonitor::check_klog);
 	_timer->start();
 
 	_io.flag_oom = true;

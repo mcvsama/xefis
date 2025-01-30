@@ -50,12 +50,12 @@ CHRUM6::CHRUM6 (xf::ProcessingLoop& loop, xf::SerialPort&& serial_port, xf::Logg
 	_restart_timer = std::make_unique<QTimer> (this);
 	_restart_timer->setInterval (kRestartDelay.in<si::Millisecond>());
 	_restart_timer->setSingleShot (true);
-	QObject::connect (_restart_timer.get(), SIGNAL (timeout()), this, SLOT (open_device()));
+	QObject::connect (_restart_timer.get(), &QTimer::timeout, this, &CHRUM6::open_device);
 
 	_alive_check_timer = std::make_unique<QTimer> (this);
 	_alive_check_timer->setInterval (kAliveCheckInterval.in<si::Millisecond>());
 	_alive_check_timer->setSingleShot (false);
-	QObject::connect (_alive_check_timer.get(), SIGNAL (timeout()), this, SLOT (alive_check_failed()));
+	QObject::connect (_alive_check_timer.get(), &QTimer::timeout, this, &CHRUM6::alive_check_failed);
 
 	_status_check_timer = std::make_unique<QTimer> (this);
 	_status_check_timer->setInterval (kStatusCheckInterval.in<si::Millisecond>());
@@ -65,7 +65,7 @@ CHRUM6::CHRUM6 (xf::ProcessingLoop& loop, xf::SerialPort&& serial_port, xf::Logg
 	_initialization_timer = std::make_unique<QTimer> (this);
 	_initialization_timer->setInterval (kInitializationDelay.in<si::Millisecond>());
 	_initialization_timer->setSingleShot (true);
-	QObject::connect (_initialization_timer.get(), SIGNAL (timeout()), this, SLOT (initialization_timeout()));
+	QObject::connect (_initialization_timer.get(), &QTimer::timeout, this, &CHRUM6::initialization_timeout);
 
 	_sensor = std::make_unique<xf::CHRUM6> (&_serial_port, _logger.with_context ("serial port"));
 	_sensor->set_logger (_logger);

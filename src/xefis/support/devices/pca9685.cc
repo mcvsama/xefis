@@ -48,7 +48,7 @@ PCA9685::PCA9685 (i2c::Device&& device, si::Time output_period, Logger const& lo
 	_initialization_timer = new QTimer (this);
 	_initialization_timer->setInterval (kInitializationDelay.in<si::Millisecond>());
 	_initialization_timer->setSingleShot (true);
-	QObject::connect (_initialization_timer, SIGNAL (timeout()), this, SLOT (initialize()));
+	QObject::connect (_initialization_timer, &QTimer::timeout, this, &PCA9685::initialize);
 	_initialization_timer->start();
 }
 

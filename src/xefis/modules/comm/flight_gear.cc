@@ -205,7 +205,7 @@ FlightGear::FlightGear (xf::ProcessingLoop& loop, std::string_view const& instan
 	_timeout_timer = std::make_unique<QTimer>();
 	_timeout_timer->setSingleShot (true);
 	_timeout_timer->setInterval (200);
-	QObject::connect (_timeout_timer.get(), SIGNAL (timeout()), this, SLOT (invalidate_all()));
+	QObject::connect (_timeout_timer.get(), &QTimer::timeout, this, &FlightGear::invalidate_all);
 
 	invalidate_all();
 }
@@ -219,7 +219,7 @@ FlightGear::initialize()
 
 	_input = std::make_unique<QUdpSocket>();
 	_input->bind (_input_address, *_io.input_port, QUdpSocket::ShareAddress);
-	QObject::connect (_input.get(), SIGNAL (readyRead()), this, SLOT (got_packet()));
+	QObject::connect (_input.get(), &QUdpSocket::readyRead, this, &FlightGear::got_packet);
 
 	_output = std::make_unique<QUdpSocket>();
 }
