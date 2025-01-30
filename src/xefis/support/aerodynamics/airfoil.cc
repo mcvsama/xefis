@@ -24,12 +24,10 @@
 
 namespace xf {
 
-Airfoil::Airfoil (AirfoilCharacteristics const& airfoil_characteristics,
-				  si::Length const chord_length,
-				  si::Length const wing_length):
-	_airfoil_characteristics (airfoil_characteristics),
-	_chord_length (chord_length),
-	_wing_length (wing_length)
+Airfoil::Airfoil (AirfoilParameters const& params):
+	_airfoil_characteristics (params.airfoil_characteristics),
+	_chord_length (params.chord_length),
+	_wing_length (params.wing_length)
 { }
 
 

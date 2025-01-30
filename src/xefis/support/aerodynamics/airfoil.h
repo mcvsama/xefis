@@ -30,6 +30,14 @@
 
 namespace xf {
 
+struct AirfoilParameters
+{
+	AirfoilCharacteristics const&	airfoil_characteristics;
+	si::Length						chord_length;
+	si::Length						wing_length;
+};
+
+
 /**
  * Airfoil represents an airfoil, which is an airfoil characteristics combined with chord length and wing length.
  * This class actually allows querying for various forces generated on the wing by the moving air.
@@ -42,7 +50,7 @@ class Airfoil
   public:
 	// Ctor
 	explicit
-	Airfoil (AirfoilCharacteristics const& airfoil_characteristics, si::Length chord_length, si::Length wing_length);
+	Airfoil (AirfoilParameters const&);
 
 	/**
 	 * Return AirfoilCharacteristics object reference.

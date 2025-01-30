@@ -83,13 +83,13 @@ make_aircraft (xf::rigid_body::System& rigid_body_system, Models& models)
 									sim1::control_surface_airfoil::kPitchingMomentField,
 									sim1::control_surface_airfoil::kCenterOfPressureOffsetField);
 
-	auto const main_wing_airfoil = xf::Airfoil (main_wing_airfoil_characteristics, 50_cm, kWingLength);
-	auto const winglet_airfoil = xf::Airfoil (main_wing_airfoil_characteristics, 50_cm, kWingletLength);
-	auto const aileron_airfoil = xf::Airfoil (main_wing_airfoil_characteristics, 20_cm, kAileronLength);
-	auto const tail_h_airfoil = xf::Airfoil (main_wing_airfoil_characteristics, kTailHorizontalStabilizerChord, kTailHorizontalStabilizerLength);
-	auto const elevator_airfoil = xf::Airfoil (main_wing_airfoil_characteristics, kElevatorChord, kElevatorLength);
-	auto const tail_v_airfoil = xf::Airfoil (main_wing_airfoil_characteristics, kTailVerticalStabilizerChord, kTailVerticalStabilizerLength);
-	auto const rudder_airfoil = xf::Airfoil (main_wing_airfoil_characteristics, kRudderChord, kRudderLength);
+	auto const main_wing_airfoil = xf::Airfoil ({ .airfoil_characteristics = main_wing_airfoil_characteristics, .chord_length = 50_cm, .wing_length = kWingLength });
+	auto const winglet_airfoil = xf::Airfoil ({ .airfoil_characteristics = main_wing_airfoil_characteristics, .chord_length = 50_cm, .wing_length = kWingletLength });
+	auto const aileron_airfoil = xf::Airfoil ({ .airfoil_characteristics = main_wing_airfoil_characteristics, .chord_length = 20_cm, .wing_length = kAileronLength });
+	auto const tail_h_airfoil = xf::Airfoil ({ .airfoil_characteristics = main_wing_airfoil_characteristics, .chord_length = kTailHorizontalStabilizerChord, .wing_length = kTailHorizontalStabilizerLength });
+	auto const elevator_airfoil = xf::Airfoil ({ .airfoil_characteristics = main_wing_airfoil_characteristics, .chord_length = kElevatorChord, .wing_length = kElevatorLength });
+	auto const tail_v_airfoil = xf::Airfoil ({ .airfoil_characteristics = main_wing_airfoil_characteristics, .chord_length = kTailVerticalStabilizerChord, .wing_length = kTailVerticalStabilizerLength });
+	auto const rudder_airfoil = xf::Airfoil ({ .airfoil_characteristics = main_wing_airfoil_characteristics, .chord_length = kRudderChord, .wing_length = kRudderLength });
 
 	auto const x_versor = xf::SpaceVector<double, BodyCOM> (1, 0, 0);
 	auto const z_versor = xf::SpaceVector<double, BodyCOM> (0, 0, 1);
