@@ -156,5 +156,57 @@ template<math::CoordinateSystem TargetSpace, math::CoordinateSystem SourceSpace>
 
 } // namespace xf
 
+
+#include <xefis/support/nature/force_moments.h>
+#include <xefis/support/nature/mass_moments.h>
+#include <xefis/support/nature/velocity_moments.h>
+
+
+namespace xf {
+
+template<math::CoordinateSystem Space = void>
+	[[nodiscard]]
+	constexpr AccelerationMoments<Space>
+	calculate_acceleration_moments (ForceMoments<Space> const& fm, MassMoments<Space> const& mm)
+	{
+		return {
+			fm.force() / mm.mass(),
+			// TODO why 1_rad is needed here?
+			1_rad * mm.inverse_inertia_tensor() * fm.torque(),
+		};
+	}
+
+
+template<math::CoordinateSystem Space = void>
+	[[nodiscard]]
+	constexpr AccelerationMoments<Space>
+	operator/ (ForceMoments<Space> const& fm, MassMoments<Space> const& mm)
+	{
+		return calculate_acceleration_moments (fm, mm);
+	}
+
+
+template<math::CoordinateSystem Space = void>
+	[[nodiscard]]
+	constexpr AccelerationMoments<Space>
+	calculate_acceleration_moments (VelocityMoments<Space> const& vm, si::Time const time)
+	{
+		return {
+			vm.velocity() / time,
+			vm.angular_velocity() / time,
+		};
+	}
+
+
+template<math::CoordinateSystem Space = void>
+	[[nodiscard]]
+	constexpr AccelerationMoments<Space>
+	operator/ (VelocityMoments<Space> const& vm, si::Time const time)
+	{
+		return calculate_acceleration_moments (vm, time);
+	}
+
+} // namespace xf
+
 #endif
 

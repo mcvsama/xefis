@@ -183,5 +183,42 @@ template<math::CoordinateSystem TargetSpace, math::CoordinateSystem SourceSpace>
 
 } // namespace xf
 
+
+#include <xefis/support/nature/acceleration_moments.h>
+
+
+namespace xf {
+
+template<math::CoordinateSystem Space = void>
+	[[nodiscard]]
+	constexpr VelocityMoments<Space>
+	calculate_velocity_moments (AccelerationMoments<Space> const& am, si::Time const time)
+	{
+		return {
+			am.acceleration() * time,
+			am.angular_acceleration() * time,
+		};
+	}
+
+
+template<math::CoordinateSystem Space = void>
+	[[nodiscard]]
+	constexpr VelocityMoments<Space>
+	operator* (AccelerationMoments<Space> const& am, si::Time const time)
+	{
+		return calculate_velocity_moments (am, time);
+	}
+
+
+template<math::CoordinateSystem Space = void>
+	[[nodiscard]]
+	constexpr VelocityMoments<Space>
+	operator* (si::Time const time, AccelerationMoments<Space> const& am)
+	{
+		return calculate_velocity_moments (am, time);
+	}
+
+} // namespace xf
+
 #endif
 

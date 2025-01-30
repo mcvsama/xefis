@@ -146,16 +146,8 @@ class ImpulseSolver: private Noncopyable
 	bool
 	update_single_constraint_forces (Constraint*, si::Time dt);
 
-	[[nodiscard]]
-	static AccelerationMoments<WorldSpace>
-	calculate_acceleration_moments (MassMoments<WorldSpace> const&, ForceMoments<WorldSpace> const&);
-
 	void
 	update_acceleration_moments();
-
-	[[nodiscard]]
-	static VelocityMoments<WorldSpace>
-	calculate_velocity_moments (VelocityMoments<WorldSpace>, AccelerationMoments<WorldSpace> const&, si::Time dt);
 
 	void
 	update_velocity_moments (si::Time dt);
