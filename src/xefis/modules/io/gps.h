@@ -99,8 +99,6 @@ class GPS:
 	public QObject,
 	public GPS_IO
 {
-	Q_OBJECT
-
   private:
 	static constexpr char			kLoggerScope[]						= "mod::GPS";
 	static constexpr unsigned int	kConnectionAttemptsPerPowerCycle	= 4;

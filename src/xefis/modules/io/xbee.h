@@ -86,8 +86,6 @@ class XBee:
 	public QObject,
 	public XBeeIO
 {
-	Q_OBJECT
-
 	static constexpr char		kLoggerScope[]				= "mod::XBee";
 
 	static constexpr int		kMaxReadFailureCount		= 10;

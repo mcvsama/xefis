@@ -41,8 +41,6 @@ namespace xf {
  */
 class HT16K33: public QObject
 {
-	Q_OBJECT
-
 	// I²C communication constants:
 	static constexpr uint8_t kSetupRegister			= 0x20;
 	static constexpr uint8_t kSetupOff				= 0x00;

@@ -41,8 +41,6 @@ class Machine;
 
 class Xefis: public QApplication
 {
-	Q_OBJECT
-
   public:
 	/**
 	 * Thrown when user gives value to a command line option that doesn't take values.

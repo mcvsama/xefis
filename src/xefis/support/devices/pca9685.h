@@ -41,8 +41,6 @@ namespace xf {
  */
 class PCA9685: public QObject
 {
-	Q_OBJECT
-
   private:
 	static constexpr si::Time		kInitializationDelay	= 0.1_s;
 	static constexpr unsigned int	kChannels				= 16;

@@ -83,8 +83,6 @@ class CHRUM6:
 	public QObject,
 	public CHRUM6_IO
 {
-	Q_OBJECT
-
   private:
 	static constexpr char kLoggerScope[] = "mod::CHRUM6";
 

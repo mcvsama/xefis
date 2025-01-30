@@ -48,8 +48,6 @@ class KLogMonitor:
 	public QObject,
 	public KLogMonitorIO
 {
-	Q_OBJECT
-
   private:
 	static constexpr std::size_t	kBufferSize = 1024 * 1024;
 

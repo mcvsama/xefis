@@ -73,8 +73,6 @@ class ETSAirspeed:
 	public QObject,
 	public ETSAirspeedIO
 {
-	Q_OBJECT
-
   private:
 	static constexpr char			kLoggerScope[]				= "mod::ETSAirspeed";
 	static constexpr uint8_t		kValueRegister				= 0xea;

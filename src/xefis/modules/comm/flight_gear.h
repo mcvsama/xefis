@@ -148,8 +148,6 @@ class FlightGear:
 	public QObject,
 	public FlightGearIO
 {
-	Q_OBJECT
-
   public:
 	// Ctor
 	explicit

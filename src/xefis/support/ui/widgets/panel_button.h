@@ -30,8 +30,6 @@ namespace xf {
 
 class PanelButton: public PanelWidget
 {
-	Q_OBJECT
-
   public:
 	/**
 	 * Color of the LED.

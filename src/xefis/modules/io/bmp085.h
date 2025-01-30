@@ -69,8 +69,6 @@ class BMP085:
 	public QObject,
 	public BMP085_IO
 {
-	Q_OBJECT
-
   private:
 	static constexpr char kLoggerScope[] = "mod::BMP085";
 

@@ -116,8 +116,6 @@ class Screen:
 	public NamedInstance,
 	private Noncopyable
 {
-	Q_OBJECT
-
   private:
 	using InstrumentsSet = std::set<Instrument*>;
 	using InstrumentDetailsMap = std::unordered_map<Instrument*, InstrumentDetails>; // TODO std::flat_map

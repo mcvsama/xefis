@@ -61,8 +61,6 @@ class JoystickInput:
 	public QObject,
 	public JoystickInputIO
 {
-	Q_OBJECT
-
   private:
 	static constexpr char	kLoggerScope[]	= "mod::Joystick";
 

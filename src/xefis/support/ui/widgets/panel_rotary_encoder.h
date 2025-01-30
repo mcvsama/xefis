@@ -35,8 +35,6 @@ class PanelRotaryEncoder: public PanelWidget
 	static constexpr QSize	KnobSize	= { 40, 40 };
 	static constexpr int	Notches		= 12;
 
-	Q_OBJECT
-
   public:
 	/**
 	 * Create simple rotary encoder.
