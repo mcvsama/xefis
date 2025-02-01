@@ -49,6 +49,7 @@ class RigidBodyViewer: public GLAnimationWidget
 	// Evolution function called before each display frame:
 	using OnRedraw = std::function<void (std::optional<si::Time> frame_duration)>;
 	using FPSMode = GLAnimationWidget::FPSMode;
+	using GroupRenderingConfig = RigidBodyPainter::GroupRenderingConfig;
 	using BodyRenderingConfig = RigidBodyPainter::BodyRenderingConfig;
 
 	enum class Playback
@@ -114,11 +115,33 @@ class RigidBodyViewer: public GLAnimationWidget
 		{ _machine = machine; }
 
 	/**
-	 * Calls set_followed_body() on internal RigidBodyPainter.
+	 * Calls set_followed() on internal RigidBodyPainter.
 	 */
 	void
-	set_followed_body (rigid_body::Body const* followed_body) noexcept
-		{ _rigid_body_painter.set_followed_body (followed_body); }
+	set_followed (rigid_body::Group const& followed_group) noexcept
+		{ _rigid_body_painter.set_followed (followed_group); }
+
+	/**
+	 * Calls set_followed() on internal RigidBodyPainter.
+	 */
+	void
+	set_followed (rigid_body::Body const& followed_body) noexcept
+		{ _rigid_body_painter.set_followed (followed_body); }
+
+	/**
+	 * Calls set_followed_to_none() on internal RigidBodyPainter.
+	 */
+	void
+	set_followed_to_none() noexcept
+		{ _rigid_body_painter.set_followed_to_none(); }
+
+	/**
+	 * Return followed_group() from internal RigidBodyPainter.
+	 */
+	[[nodiscard]]
+	rigid_body::Group const*
+	followed_group() const noexcept
+		{ return _rigid_body_painter.followed_group(); }
 
 	/**
 	 * Return followed_body() from internal RigidBodyPainter.
@@ -127,6 +150,27 @@ class RigidBodyViewer: public GLAnimationWidget
 	rigid_body::Body const*
 	followed_body() const noexcept
 		{ return _rigid_body_painter.followed_body(); }
+
+	/**
+	 * Calls set_focused() on internal RigidBodyPainter.
+	 */
+	void
+	set_focused (rigid_body::Group const& focused_group) noexcept
+		{ _rigid_body_painter.set_focused (focused_group); }
+
+	/**
+	 * Calls set_focused() on internal RigidBodyPainter.
+	 */
+	void
+	set_focused (rigid_body::Body const& focused_body) noexcept
+		{ _rigid_body_painter.set_focused (focused_body); }
+
+	/**
+	 * Calls set_focused_to_none() on internal RigidBodyPainter.
+	 */
+	void
+	set_focused_to_none() noexcept
+		{ _rigid_body_painter.set_focused_to_none(); }
 
 	/**
 	 * Return the planet body.
@@ -149,13 +193,6 @@ class RigidBodyViewer: public GLAnimationWidget
 	void
 	set_hovered (rigid_body::Body const* hovered_body) noexcept
 		{ _rigid_body_painter.set_hovered (hovered_body); }
-
-	/**
-	 * Calls set_focused() on internal RigidBodyPainter.
-	 */
-	void
-	set_focused (rigid_body::Body const* focused_body) noexcept
-		{ _rigid_body_painter.set_focused (focused_body); }
 
 	/**
 	 * Return current camera position.
@@ -203,9 +240,14 @@ class RigidBodyViewer: public GLAnimationWidget
 	step();
 
 	[[nodiscard]]
+	GroupRenderingConfig&
+	get_rendering_config (rigid_body::Group const& group)
+		{ return _rigid_body_painter.get_rendering_config (group); }
+
+	[[nodiscard]]
 	BodyRenderingConfig&
-	get_body_rendering_config (rigid_body::Body const& body)
-		{ return _rigid_body_painter.get_body_rendering_config (body); }
+	get_rendering_config (rigid_body::Body const& body)
+		{ return _rigid_body_painter.get_rendering_config (body); }
 
   protected:
 	// QWidget API

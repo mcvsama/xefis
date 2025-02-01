@@ -167,7 +167,9 @@ RigidBodyPainter::apply_camera_rotations()
 	_gl.rotate (_camera_angles[1], 0, 1, 0); // Yaw
 	_gl.rotate (_camera_angles[2], 0, 0, 1); // Roll
 
-	if (_followed_body && _following_orientation)
+	auto const* followed_body = this->followed_body();
+
+	if (followed_body && _following_orientation)
 	{
 		// The body is assumed to be in aircraft coordinates (X = front, Y = right, Z = down).
 		// The screen is in standard math/screen coordinates (X = right, Y = top, Z = towards the viewer).
@@ -182,8 +184,8 @@ RigidBodyPainter::apply_camera_rotations()
 		_gl.rotate (+_position_on_earth.lat(), 0, 1, 0); // About Y
 	}
 
-	if (_followed_body && _following_orientation)
-		_gl.rotate (_followed_body->placement().body_to_base_rotation());
+	if (followed_body && _following_orientation)
+		_gl.rotate (followed_body->placement().body_to_base_rotation());
 }
 
 
@@ -438,7 +440,7 @@ RigidBodyPainter::paint_system (rigid_body::System const& system)
 
 	_gl.save_context ([&] {
 		for (auto const& body: system.bodies())
-			paint_body (*body, rendering_config_for (*body));
+			paint_body (*body, get_rendering_config (*body));
 
 		if (constraints_visible())
 			for (auto const& constraint: system.constraints())
@@ -456,13 +458,15 @@ RigidBodyPainter::paint_system (rigid_body::System const& system)
 			for (auto const& body: system.bodies())
 				paint_angular_momentum (*body);
 
+		auto const* focused_body = this->focused_body();
+
 		for (auto const& body: system.bodies())
 		{
 			// We'll now paint features that are always visible, so clear the Z buffer
 			// in OpenGL and do the painting:
 			glClearDepth (1.0f);
 			glClear (GL_DEPTH_BUFFER_BIT);
-			paint_body_helpers (*body, rendering_config_for (*body), body.get() == _focused_body);
+			paint_body_helpers (*body, get_rendering_config (*body), body.get() == focused_body);
 		}
 	});
 }
@@ -500,7 +504,7 @@ RigidBodyPainter::paint_body (rigid_body::Body const& body, BodyRenderingConfig 
 		if (rendering.body_visible)
 		{
 			_gl.save_context ([&] {
-				if (&body == _focused_body)
+				if (&body == focused_body())
 					_gl.additional_parameters().color_override = GLColor::from_rgb (0x00, 0xaa, 0x7f);
 				else if (_hovered_body == &body)
 					_gl.additional_parameters().color_override = GLColor::from_rgb (0x00, 0xaa, 0x7f).lighter (0.5);
@@ -801,27 +805,10 @@ RigidBodyPainter::paint_basis (si::Length const length)
 SpaceLength<WorldSpace>
 RigidBodyPainter::followed_body_position() const
 {
-	if (_followed_body)
-		return _followed_body->placement().position();
+	if (auto const* followed_body = this->followed_body())
+		return followed_body->placement().position();
 	else
 		return { 0_m, 0_m, 0_m };
-}
-
-
-RigidBodyPainter::BodyRenderingConfig const&
-RigidBodyPainter::rendering_config_for (rigid_body::Body const& body)
-{
-	static auto const default_body_rendering = BodyRenderingConfig();
-
-	BodyRenderingConfig const* rendering = &default_body_rendering;
-
-	if (auto const rendering_it = _body_rendering_config.find (&body);
-		rendering_it != _body_rendering_config.end())
-	{
-		rendering = &rendering_it->second;
-	}
-
-	return *rendering;
 }
 
 } // namespace xf

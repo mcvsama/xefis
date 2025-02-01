@@ -118,7 +118,12 @@ BodiesTree::remove_deleted (std::set<rigid_body::Group*>& existing_groups,
 				group_items_to_update.insert (group_item);
 			}
 			else
+			{
 				items_to_delete.push_back (group_item);
+
+				if (_followed_group == group)
+					_followed_group = nullptr;
+			}
 		}
 		else if (BodyItem* body_item = dynamic_cast<BodyItem*> (*iter))
 		{
@@ -199,7 +204,7 @@ BodiesTree::insert_new (std::set<rigid_body::Group*> const& new_groups,
 
 	auto const add_body_item_to = [&] (rigid_body::Body& body, auto& parent) {
 		BodyItem* new_body_item = new BodyItem (parent, body);
-		set_icon (*new_body_item, body);
+		set_icon (*new_body_item);
 
 		for (auto* constraint: body_constraints[&body])
 			add_constraint_item_to (*constraint, *new_body_item);
@@ -258,6 +263,25 @@ BodiesTree::update_existing (std::set<GroupItem*> const& group_items,
 	for (auto* constraint_item: constraint_items)
 		constraint_item->refresh();
 
+	// Update followed-group icons:
+	{
+		auto const* old_followed_group = _followed_group;
+		auto const* new_followed_group = _rigid_body_viewer.followed_group();
+
+		if (old_followed_group != new_followed_group)
+		{
+			for (auto* group_item: group_items)
+			{
+				auto& group = group_item->group();
+
+				if (&group == old_followed_group || &group == new_followed_group)
+					set_icon (*group_item);
+			}
+
+			_followed_group = _rigid_body_viewer.followed_group();
+		}
+	}
+
 	// Update followed-body icons:
 	{
 		auto const* old_followed_body = _followed_body;
@@ -270,7 +294,7 @@ BodiesTree::update_existing (std::set<GroupItem*> const& group_items,
 				auto& body = body_item->body();
 
 				if (&body == old_followed_body || &body == new_followed_body)
-					set_icon (*body_item, body);
+					set_icon (*body_item);
 			}
 
 			_followed_body = _rigid_body_viewer.followed_body();
@@ -282,13 +306,15 @@ BodiesTree::update_existing (std::set<GroupItem*> const& group_items,
 void
 BodiesTree::set_icon (GroupItem& item)
 {
-	item.setIcon (0, _group_icon);
+	auto const followed = _rigid_body_viewer.followed_group() == &item.group();
+	item.setIcon (0, followed ? _followed_group_icon : _group_icon);
 }
 
 
 void
-BodiesTree::set_icon (BodyItem& item, rigid_body::Body const& body)
+BodiesTree::set_icon (BodyItem& item)
 {
+	auto const& body = item.body();
 	auto const gravitating = _gravitating_bodies.contains (&body);
 	auto const followed = _rigid_body_viewer.followed_body() == &body;
 	auto const icon = gravitating
@@ -320,7 +346,7 @@ BodiesTree::add_constraint_item_to (rigid_body::Constraint& constraint, BodyItem
 		: constraint.body_1();
 
 	auto* connected_body_item = new BodyItem (*constraint_item, connected_body);
-	set_icon (*connected_body_item, connected_body);
+	set_icon (*connected_body_item);
 }
 
 
@@ -328,83 +354,108 @@ void
 BodiesTree::contextMenuEvent (QContextMenuEvent* event)
 {
 	QMenu menu;
+	QTreeWidgetItem* item = itemAt (event->pos());
 
+	if (auto* group_item = dynamic_cast<GroupItem*> (item))
 	{
-		QTreeWidgetItem* item = itemAt (event->pos());
+		auto& rendering = _rigid_body_viewer.get_rendering_config (group_item->group());
 
-		if (auto* body_item = dynamic_cast<BodyItem*> (item))
 		{
-			auto& rendering = _rigid_body_viewer.get_body_rendering_config (body_item->body());
-
-			{
-				auto* action = menu.addAction ("&Follow this body", [this, body_item] {
-					_rigid_body_viewer.set_followed_body (&body_item->body());
-					refresh();
-				});
-				action->setIcon (_followed_body_icon);
-			}
-
-			menu.addAction ("&Edit name", [this, body_item] {
-				editItem (body_item, 0);
-			});
-
-			{
-				auto* action = menu.addAction ("Break this body", [this, body_item] {
-					body_item->body().set_broken();
-					refresh();
-				});
-
-				if (body_item->body().broken())
-					action->setEnabled (false);
-			}
-
-			menu.addSeparator();
-
-			{
-				auto* action = menu.addAction ("Body visible", [this, body_item, &rendering] {
-					rendering.body_visible = !rendering.body_visible;
-				});
-				action->setCheckable (true);
-				action->setChecked (rendering.body_visible);
-			}
-
-			{
-				auto* action = menu.addAction ("Origin always visible", [this, body_item, &rendering] {
-					rendering.origin_visible = !rendering.origin_visible;
-				});
-				action->setCheckable (true);
-				action->setChecked (rendering.origin_visible);
-			}
-
-			{
-				auto* action = menu.addAction ("Center of mass always visible", [this, body_item, &rendering] {
-					rendering.center_of_mass_visible = !rendering.center_of_mass_visible;
-				});
-				action->setCheckable (true);
-				action->setChecked (rendering.center_of_mass_visible);
-			}
-
-			{
-				auto* action = menu.addAction ("Moments of inertia cuboid visible", [this, body_item, &rendering] {
-					rendering.moments_of_inertia_visible = !rendering.moments_of_inertia_visible;
-				});
-				action->setCheckable (true);
-				action->setChecked (rendering.moments_of_inertia_visible);
-			}
-
-			// TODO For airfoils - "Center of pressure visible" (green or light blue?)
-		}
-		else if (auto* constraint_item = dynamic_cast<ConstraintItem*> (item))
-		{
-			menu.addAction ("&Edit name", [this, constraint_item] {
-				editItem (constraint_item, 0);
-			});
-
-			menu.addAction ("Break this constraint", [this, constraint_item] {
-				constraint_item->constraint().set_broken();
+			auto* action = menu.addAction ("&Follow this group", [this, group_item] {
+				_rigid_body_viewer.set_followed (group_item->group());
 				refresh();
 			});
+			action->setIcon (_followed_group_icon);
 		}
+
+		{
+			auto* action = menu.addAction ("Origin always visible", [this, group_item, &rendering] {
+				rendering.origin_visible = !rendering.origin_visible;
+			});
+			action->setCheckable (true);
+			action->setChecked (rendering.origin_visible);
+		}
+
+		{
+			auto* action = menu.addAction ("Center of mass always visible", [this, group_item, &rendering] {
+				rendering.center_of_mass_visible = !rendering.center_of_mass_visible;
+			});
+			action->setCheckable (true);
+			action->setChecked (rendering.center_of_mass_visible);
+		}
+	}
+	else if (auto* body_item = dynamic_cast<BodyItem*> (item))
+	{
+		auto& rendering = _rigid_body_viewer.get_rendering_config (body_item->body());
+
+		{
+			auto* action = menu.addAction ("&Follow this body", [this, body_item] {
+				_rigid_body_viewer.set_followed (body_item->body());
+				refresh();
+			});
+			action->setIcon (_followed_body_icon);
+		}
+
+		menu.addAction ("&Edit name", [this, body_item] {
+			editItem (body_item, 0);
+		});
+
+		{
+			auto* action = menu.addAction ("Break this body", [this, body_item] {
+				body_item->body().set_broken();
+				refresh();
+			});
+
+			if (body_item->body().broken())
+				action->setEnabled (false);
+		}
+
+		menu.addSeparator();
+
+		{
+			auto* action = menu.addAction ("Body visible", [this, body_item, &rendering] {
+				rendering.body_visible = !rendering.body_visible;
+			});
+			action->setCheckable (true);
+			action->setChecked (rendering.body_visible);
+		}
+
+		{
+			auto* action = menu.addAction ("Origin always visible", [this, body_item, &rendering] {
+				rendering.origin_visible = !rendering.origin_visible;
+			});
+			action->setCheckable (true);
+			action->setChecked (rendering.origin_visible);
+		}
+
+		{
+			auto* action = menu.addAction ("Center of mass always visible", [this, body_item, &rendering] {
+				rendering.center_of_mass_visible = !rendering.center_of_mass_visible;
+			});
+			action->setCheckable (true);
+			action->setChecked (rendering.center_of_mass_visible);
+		}
+
+		{
+			auto* action = menu.addAction ("Moments of inertia cuboid visible", [this, body_item, &rendering] {
+				rendering.moments_of_inertia_visible = !rendering.moments_of_inertia_visible;
+			});
+			action->setCheckable (true);
+			action->setChecked (rendering.moments_of_inertia_visible);
+		}
+
+		// TODO For airfoils - "Center of pressure visible" (green or light blue?)
+	}
+	else if (auto* constraint_item = dynamic_cast<ConstraintItem*> (item))
+	{
+		menu.addAction ("&Edit name", [this, constraint_item] {
+			editItem (constraint_item, 0);
+		});
+
+		menu.addAction ("Break this constraint", [this, constraint_item] {
+			constraint_item->constraint().set_broken();
+			refresh();
+		});
 	}
 
 	menu.exec (event->globalPos());

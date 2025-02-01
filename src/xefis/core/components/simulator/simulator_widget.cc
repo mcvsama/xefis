@@ -179,12 +179,17 @@ SimulatorWidget::make_body_controls()
 	_editors_stack->addWidget (&*_constraint_editor);
 
 	QObject::connect (&*_bodies_tree, &QTreeWidget::currentItemChanged, [this] (QTreeWidgetItem* current, [[maybe_unused]] QTreeWidgetItem* previous) {
-		if (auto* body_item = dynamic_cast<BodyItem*> (current))
+		if (auto* group_item = dynamic_cast<GroupItem*> (current))
+		{
+			auto& group = group_item->group();
+			_rigid_body_viewer->set_focused (group);
+		}
+		else if (auto* body_item = dynamic_cast<BodyItem*> (current))
 		{
 			auto& body = body_item->body();
 			_body_editor->edit (&body);
 			_editors_stack->setCurrentWidget (&*_body_editor);
-			_rigid_body_viewer->set_focused (&body);
+			_rigid_body_viewer->set_focused (body);
 		}
 		else if (auto* constraint_item = dynamic_cast<ConstraintItem*> (current))
 		{

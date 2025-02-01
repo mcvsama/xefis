@@ -30,6 +30,8 @@
 #include <cstddef>
 #include <map>
 #include <random>
+#include <utility>
+#include <variant>
 
 
 namespace xf {
@@ -49,6 +51,13 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	static constexpr auto		kSunRadius					= 200_km;
 
   public:
+	struct GroupRenderingConfig
+	{
+		bool	origin_visible { false };
+		bool	center_of_mass_visible { false };
+		// TODO moments_of_inertia_visible
+	};
+
 	struct BodyRenderingConfig
 	{
 		bool	body_visible { true };
@@ -64,20 +73,41 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	RigidBodyPainter (si::PixelDensity);
 
 	/**
+	 * Follow the selected group to keep it centered on the screen.
+	 * Pass nullptr to disable follow.
+	 */
+	void
+	set_followed (rigid_body::Group const& followed_group) noexcept
+		{ _followed = &followed_group; }
+
+	/**
 	 * Follow the selected body to keep it centered on the screen.
 	 * Pass nullptr to disable follow.
 	 */
 	void
-	set_followed_body (rigid_body::Body const* followed_body) noexcept
-		{ _followed_body = followed_body; }
+	set_followed (rigid_body::Body const& followed_body) noexcept
+		{ _followed = &followed_body; }
+
+	/**
+	 * Disable body/group following.
+	 */
+	void
+	set_followed_to_none() noexcept
+		{ _followed = std::monostate(); }
+
+	/**
+	 * Return a followed group, if set, or nullptr.
+	 */
+	[[nodiscard]]
+	rigid_body::Group const*
+	followed_group() const noexcept;
 
 	/**
 	 * Return a followed body, if set, or nullptr.
 	 */
 	[[nodiscard]]
 	rigid_body::Body const*
-	followed_body() const noexcept
-		{ return _followed_body; }
+	followed_body() const noexcept;
 
 	/**
 	 * Enable camera orientation following the main body.
@@ -91,6 +121,43 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	bool
 	following_body_orientation() const noexcept
 		{ return _following_orientation; }
+
+	/**
+	 * Set the focused group.
+	 * Pass nullptr to set none as focused.
+	 */
+	void
+	set_focused (rigid_body::Group const& focused_group) noexcept
+		{ _focused = &focused_group; }
+
+	/**
+	 * Set the focused body. It's painted with different color.
+	 * Pass nullptr to set none as focused.
+	 */
+	void
+	set_focused (rigid_body::Body const& focused_body) noexcept
+		{ _focused = &focused_body; }
+
+	/**
+	 * Unfocus any group/body.
+	 */
+	void
+	set_focused_to_none() noexcept
+		{ _focused = std::monostate(); }
+
+	/**
+	 * Return a focused group, if set, or nullptr.
+	 */
+	[[nodiscard]]
+	rigid_body::Group const*
+	focused_group() const noexcept;
+
+	/**
+	 * Return a focused body, if set, or nullptr.
+	 */
+	[[nodiscard]]
+	rigid_body::Body const*
+	focused_body() const noexcept;
 
 	/**
 	 * Return the planet body or nullptr.
@@ -120,14 +187,6 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	void
 	set_hovered (rigid_body::Body const* hovered_body) noexcept
 		{ _hovered_body = hovered_body; }
-
-	/**
-	 * Set the focused body. It's painted with different color.
-	 * Pass nullptr to set none as focused.
-	 */
-	void
-	set_focused (rigid_body::Body const* focused_body) noexcept
-		{ _focused_body = focused_body; }
 
 	/**
 	 * Set camera focus point.
@@ -233,11 +292,19 @@ class RigidBodyPainter: protected QOpenGLFunctions
 		{ _angular_momenta_visible = visible; }
 
 	/**
+	 * Return config object for given group.
+	 */
+	[[nodiscard]]
+	GroupRenderingConfig&
+	get_rendering_config (rigid_body::Group const& group)
+		{ return _group_rendering_config[&group]; }
+
+	/**
 	 * Return config object for given body.
 	 */
 	[[nodiscard]]
 	BodyRenderingConfig&
-	get_body_rendering_config (rigid_body::Body const& body)
+	get_rendering_config (rigid_body::Body const& body)
 		{ return _body_rendering_config[&body]; }
 
 	/**
@@ -337,10 +404,6 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	SpaceLength<WorldSpace>
 	followed_body_position() const;
 
-	[[nodiscard]]
-	BodyRenderingConfig const&
-	rendering_config_for (rigid_body::Body const&);
-
   private:
 	si::PixelDensity		_pixel_density;
 	// Camera position is relative to the followed body:
@@ -348,21 +411,65 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	SpaceVector<si::Angle>	_camera_angles;
 	LonLatRadius			_position_on_earth			{ 0_deg, 0_deg, 0_m };
 	GLSpace					_gl;
-	rigid_body::Body const*	_followed_body				{ nullptr };
+	std::variant<std::monostate, rigid_body::Group const*, rigid_body::Body const*>
+							_followed;
 	bool					_following_orientation		{ true };
+	std::variant<std::monostate, rigid_body::Group const*, rigid_body::Body const*>
+							_focused;
 	rigid_body::Body const*	_planet_body				{ nullptr };
 	rigid_body::Body const*	_hovered_body				{ nullptr };
-	rigid_body::Body const*	_focused_body				{ nullptr };
 	bool					_constraints_visible		{ false };
 	bool					_gravity_visible			{ false };
 	bool					_external_forces_visible	{ false };
 	bool					_aerodynamic_forces_visible	{ false };
 	bool					_angular_velocities_visible	{ false };
 	bool					_angular_momenta_visible	{ false };
+	std::map<rigid_body::Group const*, GroupRenderingConfig>
+							_group_rendering_config;
 	std::map<rigid_body::Body const*, BodyRenderingConfig>
 							_body_rendering_config;
 	std::minstd_rand0		_air_particles_prng;
 };
+
+
+inline rigid_body::Group const*
+RigidBodyPainter::followed_group() const noexcept
+{
+	if (auto* group = std::get_if<rigid_body::Group const*> (&_followed))
+		return *group;
+	else
+		return nullptr;
+}
+
+
+inline rigid_body::Body const*
+RigidBodyPainter::followed_body() const noexcept
+{
+	if (auto* body = std::get_if<rigid_body::Body const*> (&_followed))
+		return *body;
+	else
+		return nullptr;
+}
+
+
+inline rigid_body::Group const*
+RigidBodyPainter::focused_group() const noexcept
+{
+	if (auto* group = std::get_if<rigid_body::Group const*> (&_focused))
+		return *group;
+	else
+		return nullptr;
+}
+
+
+inline rigid_body::Body const*
+RigidBodyPainter::focused_body() const noexcept
+{
+	if (auto* body = std::get_if<rigid_body::Body const*> (&_focused))
+		return *body;
+	else
+		return nullptr;
+}
 
 } // namespace xf
 

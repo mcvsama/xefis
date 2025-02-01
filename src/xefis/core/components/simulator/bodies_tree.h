@@ -83,7 +83,7 @@ class BodiesTree: public QTreeWidget
 	set_icon (GroupItem&);
 
 	void
-	set_icon (BodyItem&, rigid_body::Body const&);
+	set_icon (BodyItem&);
 
 	void
 	set_icon (ConstraintItem&);
@@ -100,17 +100,19 @@ class BodiesTree: public QTreeWidget
 	leaveEvent (QEvent*);
 
   private:
-	rigid_body::System&		_rigid_body_system;
-	RigidBodyViewer&		_rigid_body_viewer;
-	rigid_body::Body const*	_followed_body					{ nullptr };
+	rigid_body::System&			_rigid_body_system;
+	RigidBodyViewer&			_rigid_body_viewer;
+	rigid_body::Group const*	_followed_group					{ nullptr };
+	rigid_body::Body const*		_followed_body					{ nullptr };
 	std::set<rigid_body::Body const*> // TODO flat_set when compiler supports it
-							_gravitating_bodies;
-	QIcon					_group_icon						{ icons::group() };
-	QIcon					_body_icon						{ icons::body() };
-	QIcon					_gravitating_body_icon			{ icons::gravitating_body() };
-	QIcon					_followed_body_icon				{ icons::followed_body() };
-	QIcon					_followed_gravitating_body_icon	{ icons::followed_gravitating_body() };
-	QIcon					_constraint_icon				{ icons::constraint() };
+								_gravitating_bodies;
+	QIcon						_group_icon						{ icons::group() };
+	QIcon						_body_icon						{ icons::body() };
+	QIcon						_gravitating_body_icon			{ icons::gravitating_body() };
+	QIcon						_followed_group_icon			{ icons::followed_group() };
+	QIcon						_followed_body_icon				{ icons::followed_body() };
+	QIcon						_followed_gravitating_body_icon	{ icons::followed_gravitating_body() };
+	QIcon						_constraint_icon				{ icons::constraint() };
 };
 
 } // namespace xf

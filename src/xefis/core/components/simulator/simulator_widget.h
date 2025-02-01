@@ -61,10 +61,16 @@ class SimulatorWidget: public QWidget
 	set_machine (Machine* machine);
 
 	/**
+	 * Sets the followed group in the internal RigidBodyViewer.
+	 */
+	void
+	set_followed (rigid_body::Group const&) noexcept;
+
+	/**
 	 * Sets the followed body in the internal RigidBodyViewer.
 	 */
 	void
-	set_followed_body (rigid_body::Body const* followed_body) noexcept;
+	set_followed (rigid_body::Body const&) noexcept;
 
 	/**
 	 * Sets the planet body in the internal RigidBodyViewer.
@@ -117,9 +123,17 @@ SimulatorWidget::set_machine (Machine* const machine)
 
 
 inline void
-SimulatorWidget::set_followed_body (rigid_body::Body const* followed_body) noexcept
+SimulatorWidget::set_followed (rigid_body::Group const& followed_group) noexcept
 {
-	_rigid_body_viewer->set_followed_body (followed_body);
+	_rigid_body_viewer->set_followed (followed_group);
+	_bodies_tree->refresh();
+}
+
+
+inline void
+SimulatorWidget::set_followed (rigid_body::Body const& followed_body) noexcept
+{
+	_rigid_body_viewer->set_followed (followed_body);
 	_bodies_tree->refresh();
 }
 
