@@ -246,7 +246,7 @@ SimulatorWidget::update_simulation_time_label()
 {
 	auto const simulation_time = std::chrono::system_clock::from_time_t (_simulator.simulation_time().in<si::Second>());
 	auto const elapsed_time = _simulator.elapsed_time().in<si::Second>();
-	auto const text = std::format ("Simulation time: {:%Y-%m-%d %H:%M:%S} UTC ({:.6f} s)", simulation_time, elapsed_time);
+	auto const text = std::format ("{:%Y-%m-%d %H:%M:%S} UTC ({:.6f} s)", simulation_time, elapsed_time);
 	_simulation_time_label->setText (QString::fromStdString (text));
 }
 
