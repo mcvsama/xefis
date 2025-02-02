@@ -110,6 +110,14 @@ GLSpace::draw (rigid_body::Shape const& shape)
 
 
 void
+GLSpace::clear_z_buffer (float const value)
+{
+	glClearDepth (value);
+	glClear (GL_DEPTH_BUFFER_BIT);
+}
+
+
+void
 GLSpace::push_context()
 {
 	if (_additional_parameters_stack.empty())

@@ -231,6 +231,9 @@ class GLSpace
 	void
 	draw (rigid_body::Shape const& shape);
 
+	void
+	clear_z_buffer (float value = 1.0f);
+
   private:
 	void
 	push_context();
