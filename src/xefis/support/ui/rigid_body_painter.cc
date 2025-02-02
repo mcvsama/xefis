@@ -16,6 +16,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/support/math/rotations.h>
 #include <xefis/support/nature/constants.h>
 #include <xefis/support/simulation/constraints/fixed_constraint.h>
 #include <xefis/support/simulation/constraints/hinge_constraint.h>
@@ -458,15 +459,23 @@ RigidBodyPainter::paint (rigid_body::System const& system)
 			for (auto const& body: system.bodies())
 				paint_angular_momentum (*body);
 
+		auto const* focused_group = this->focused_group();
 		auto const* focused_body = this->focused_body();
 
-		for (auto const& body: system.bodies())
-			paint_helpers (*body, get_rendering_config (*body), body.get() == focused_body);
 		{
 			// We'll now paint features that are always visible, so clear the Z buffer
-			// in OpenGL and do the painting:
-			glClearDepth (1.0f);
-			glClear (GL_DEPTH_BUFFER_BIT);
+			// in OpenGL and do the painting with blending enabled.
+
+			glEnable (GL_BLEND);
+			_gl.clear_z_buffer();
+
+			for (auto const& group: system.groups())
+				paint_helpers (*group, get_rendering_config (*group), group.get() == focused_group);
+
+			for (auto const& body: system.bodies())
+				paint_helpers (*body, get_rendering_config (*body), body.get() == focused_body);
+
+			glDisable (GL_BLEND);
 		}
 	});
 }
@@ -479,6 +488,19 @@ template<math::CoordinateSystem BaseSpace, math::CoordinateSystem Space>
 		_gl.translate (placement.position());
 		_gl.rotate (placement.base_to_body_rotation());
 	}
+
+
+void
+RigidBodyPainter::transform_gl_to_center_of_mass (rigid_body::Group const& group)
+{
+	// Transform so that center-of-mass is at the OpenGL space origin:
+	auto const center_of_mass = group.mass_moments().center_of_mass_position();
+	auto const* rotation_reference_body = group.rotation_reference_body();
+	auto const rotation = rotation_reference_body
+		? rotation_reference_body->placement().body_to_base_rotation()
+		: kNoRotation<WorldSpace, BodyCOM>;
+	transform_gl_to (Placement<WorldSpace, BodyCOM> (center_of_mass, rotation) - followed_position());
+}
 
 
 void
@@ -523,6 +545,22 @@ RigidBodyPainter::paint (rigid_body::Body const& body, BodyRenderingConfig const
 			});
 		}
 	});
+}
+
+
+void
+RigidBodyPainter::paint_helpers (rigid_body::Group const& group, GroupRenderingConfig const& rendering, bool focused)
+{
+	if (focused || rendering.center_of_mass_visible)
+	{
+		_gl.save_context ([&] {
+			transform_gl_to_center_of_mass (group);
+			paint_center_of_mass();
+
+			if (group.rotation_reference_body())
+				paint_basis (_camera_position.z() / 15); // Rotation was taken into account in transform_gl_to_center_of_mass (Group).
+		});
+	}
 }
 
 

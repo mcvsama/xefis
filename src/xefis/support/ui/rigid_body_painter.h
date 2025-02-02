@@ -383,6 +383,12 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	 * Paint additional features like XYZ basis, center of mass and origin.
 	 */
 	void
+	paint_helpers (rigid_body::Group const&, GroupRenderingConfig const&, bool focused);
+
+	/**
+	 * Paint additional features like XYZ basis, center of mass and origin.
+	 */
+	void
 	paint_helpers (rigid_body::Body const&, BodyRenderingConfig const&, bool focused);
 
 	void
