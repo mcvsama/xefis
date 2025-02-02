@@ -20,6 +20,7 @@
 #include <xefis/support/nature/constants.h>
 #include <xefis/support/simulation/devices/wing.h>
 #include <xefis/support/simulation/rigid_body/concepts.h>
+#include <xefis/support/ui/keys_values_widget.h>
 #include <xefis/support/ui/paint_helper.h>
 #include <xefis/support/ui/rigid_body_viewer.h>
 #include <xefis/support/ui/widget.h>
@@ -45,15 +46,13 @@ BodyEditor::BodyEditor (QWidget* parent, RigidBodyViewer& viewer):
 	top_strip->setMinimumWidth (ph.em_pixels_int (25));
 	_body_label = top_label;
 
-	_tool_box.addItem (create_position_widget(), icons::body(), "Position");
-	_tool_box.addItem (new QLabel ("TODO", this), icons::body(), "Velocity moments");
-	_tool_box.addItem (new QLabel ("TODO", this), icons::body(), "External force moments");
-	_tool_box.addItem (new QLabel ("TODO", this), icons::body(), "Custom impulses");
-	_tool_box.addItem (new QLabel ("Acceleration, kinetic energy, broken?", this), icons::body(), "Computed");
-
 	_layout.addWidget (top_strip);
 	_layout.addLayout (&_edited_body_widget_layout);
-	_layout.addWidget (&_tool_box);
+	_layout.addWidget (create_position_widget());
+	_layout.addWidget (create_velocities_widget());
+	// _tool_box.addItem (new QLabel ("TODO", this), icons::body(), "External force moments");
+	// _tool_box.addItem (new QLabel ("TODO", this), icons::body(), "Custom impulses");
+	// _tool_box.addItem (new QLabel ("Acceleration, kinetic energy, broken?", this), icons::body(), "Computed");
 	_layout.addItem (new QSpacerItem (0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
 	setEnabled (false);
@@ -123,22 +122,20 @@ BodyEditor::refresh()
 QWidget*
 BodyEditor::create_position_widget()
 {
-	auto* widget = new QWidget (this);
-	widget->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Fixed);
+	auto* widget = new KeysValuesWidget (u8"Position");
+	widget->add (u8"Latitude:", _latitude);
+	widget->add (u8"Longitude:", _longitude);
+	widget->add (u8"AMSL height:", _altitude_amsl);
+	return widget;
+}
 
-	auto row = 0;
-	auto* layout = new QGridLayout (widget);
-	layout->addWidget (new QLabel ("Latitude:"), row, 0);
-	layout->addWidget (&_latitude, row++, 1);
-	layout->addWidget (new QLabel ("Longitude:" ), row, 0);
-	layout->addWidget (&_longitude, row++, 1);
-	layout->addWidget (new QLabel ("AMSL height:"), row, 0);
-	layout->addWidget (&_altitude_amsl, row++, 1);
-	layout->addWidget (new QLabel ("Velocity:"), row, 0);
-	layout->addWidget (&_velocity, row++, 1);
-	layout->addWidget (new QLabel ("Angular velocity:"), row, 0);
-	layout->addWidget (&_angular_velocity, row++, 1);
 
+QWidget*
+BodyEditor::create_velocities_widget()
+{
+	auto* widget = new KeysValuesWidget (u8"Velocities");
+	widget->add (u8"Velocity:", _velocity);
+	widget->add (u8"Angular velocity:", _angular_velocity);
 	return widget;
 }
 

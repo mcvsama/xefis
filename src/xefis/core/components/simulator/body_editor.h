@@ -61,6 +61,10 @@ class BodyEditor: public QWidget
 	QWidget*
 	create_position_widget();
 
+	[[nodiscard]]
+	QWidget*
+	create_velocities_widget();
+
   private:
 	QVBoxLayout					_layout				{ this };
 	RigidBodyViewer&			_rigid_body_viewer;
