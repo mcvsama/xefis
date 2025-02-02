@@ -352,13 +352,23 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	paint_air_particles();
 
 	void
-	paint_system (rigid_body::System const&);
+	paint (rigid_body::System const&);
+
+	template<math::CoordinateSystem BaseSpace, math::CoordinateSystem Space>
+		void
+		transform_gl_to (Placement<BaseSpace, Space> const&);
+
+	/**
+	 * Translate and rotate OpenGL space to the center of mass of the group.
+	 */
+	void
+	transform_gl_to_center_of_mass (rigid_body::Group const&);
 
 	/**
 	 * Translate and rotate OpenGL space to the center of mass of the body.
 	 */
 	void
-	transform_gl_to_body_center_of_mass (rigid_body::Body const&);
+	transform_gl_to_center_of_mass (rigid_body::Body const&);
 
 	/**
 	 * Transform OpenGL space to the body origin, assuming that the space
@@ -368,13 +378,13 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	transform_gl_from_body_center_of_mass_to_origin (rigid_body::Body const&);
 
 	void
-	paint_body (rigid_body::Body const&, BodyRenderingConfig const&);
+	paint (rigid_body::Body const&, BodyRenderingConfig const&);
 
 	/**
 	 * Paint additional features like XYZ basis, center of mass and origin.
 	 */
 	void
-	paint_body_helpers (rigid_body::Body const&, BodyRenderingConfig const&, bool focused);
+	paint_helpers (rigid_body::Body const&, BodyRenderingConfig const&, bool focused);
 
 	void
 	paint_center_of_mass();

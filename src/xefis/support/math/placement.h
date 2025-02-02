@@ -302,6 +302,24 @@ template<math::CoordinateSystem BaseSpace, math::CoordinateSystem Space1, math::
 		return from.base_to_body_rotation() * to.body_to_base_rotation();
 	}
 
+
+template<math::CoordinateSystem BaseSpace, math::CoordinateSystem Space>
+	inline Placement<BaseSpace, Space>
+	operator+ (Placement<BaseSpace, Space> placement, typename Placement<BaseSpace, Space>::Position const& vector)
+	{
+		placement.translate_frame (vector);
+		return placement;
+	}
+
+
+template<math::CoordinateSystem BaseSpace, math::CoordinateSystem Space>
+	inline Placement<BaseSpace, Space>
+	operator- (Placement<BaseSpace, Space> placement, typename Placement<BaseSpace, Space>::Position const& vector)
+	{
+		placement.translate_frame (-vector);
+		return placement;
+	}
+
 } // namespace xf
 
 #endif

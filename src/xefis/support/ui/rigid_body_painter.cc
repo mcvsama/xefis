@@ -218,7 +218,7 @@ RigidBodyPainter::paint_world (rigid_body::System const& system)
 
 		paint_planet();
 		paint_air_particles();
-		paint_system (system);
+		paint (system);
 	});
 }
 
@@ -434,13 +434,13 @@ RigidBodyPainter::paint_air_particles()
 
 
 void
-RigidBodyPainter::paint_system (rigid_body::System const& system)
+RigidBodyPainter::paint (rigid_body::System const& system)
 {
 	glDisable (GL_FOG);
 
 	_gl.save_context ([&] {
 		for (auto const& body: system.bodies())
-			paint_body (*body, get_rendering_config (*body));
+			paint (*body, get_rendering_config (*body));
 
 		if (constraints_visible())
 			for (auto const& constraint: system.constraints())
@@ -461,39 +461,46 @@ RigidBodyPainter::paint_system (rigid_body::System const& system)
 		auto const* focused_body = this->focused_body();
 
 		for (auto const& body: system.bodies())
+			paint_helpers (*body, get_rendering_config (*body), body.get() == focused_body);
 		{
 			// We'll now paint features that are always visible, so clear the Z buffer
 			// in OpenGL and do the painting:
 			glClearDepth (1.0f);
 			glClear (GL_DEPTH_BUFFER_BIT);
-			paint_body_helpers (*body, get_rendering_config (*body), body.get() == focused_body);
 		}
 	});
 }
 
 
+template<math::CoordinateSystem BaseSpace, math::CoordinateSystem Space>
+	void
+	RigidBodyPainter::transform_gl_to (Placement<BaseSpace, Space> const& placement)
+	{
+		_gl.translate (placement.position());
+		_gl.rotate (placement.base_to_body_rotation());
+	}
+
+
 void
-RigidBodyPainter::transform_gl_to_body_center_of_mass (rigid_body::Body const& body)
+RigidBodyPainter::transform_gl_to_center_of_mass (rigid_body::Body const& body)
 {
 	// Transform so that center-of-mass is at the OpenGL space origin:
-	_gl.translate (body.placement().position() - followed_body_position());
-	_gl.rotate (body.placement().base_to_body_rotation());
+	transform_gl_to (body.placement() - followed_body_position());
 }
 
 
 void
 RigidBodyPainter::transform_gl_from_body_center_of_mass_to_origin (rigid_body::Body const& body)
 {
-	_gl.translate (body.origin_placement().position());
-	_gl.rotate (body.origin_placement().base_to_body_rotation());
+	transform_gl_to (body.origin_placement());
 }
 
 
 void
-RigidBodyPainter::paint_body (rigid_body::Body const& body, BodyRenderingConfig const& rendering)
+RigidBodyPainter::paint (rigid_body::Body const& body, BodyRenderingConfig const& rendering)
 {
 	_gl.save_context ([&] {
-		transform_gl_to_body_center_of_mass (body);
+		transform_gl_to_center_of_mass (body);
 
 		if (rendering.moments_of_inertia_visible)
 			paint_moments_of_inertia_cuboid (body.mass_moments<BodyCOM>());
@@ -520,12 +527,12 @@ RigidBodyPainter::paint_body (rigid_body::Body const& body, BodyRenderingConfig 
 
 
 void
-RigidBodyPainter::paint_body_helpers (rigid_body::Body const& body, BodyRenderingConfig const& rendering, bool focused)
+RigidBodyPainter::paint_helpers (rigid_body::Body const& body, BodyRenderingConfig const& rendering, bool focused)
 {
 	if (focused || rendering.center_of_mass_visible || rendering.origin_visible)
 	{
 		_gl.save_context ([&] {
-			transform_gl_to_body_center_of_mass (body);
+			transform_gl_to_center_of_mass (body);
 
 			if (focused || rendering.center_of_mass_visible)
 				paint_center_of_mass();
