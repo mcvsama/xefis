@@ -256,8 +256,8 @@ SimulatorWidget::update_simulation_performance_label()
 {
 	auto const perf = _simulator.performance();
 	auto const text = std::format ("Performance: {:.0f}%", 100.0f * perf);
-	auto const prefix = perf < 1.0 ? "<span style='color: red'>" : "";
-	auto const suffix = perf < 1.0 ? "</span>" : "";
+	auto const prefix = perf < 1.0 ? "<span style='color: red'>" : "<span>";
+	auto const suffix = "</span>";
 	_simulation_performance_label->setText (prefix + QString::fromStdString (text) + suffix);
 }
 
