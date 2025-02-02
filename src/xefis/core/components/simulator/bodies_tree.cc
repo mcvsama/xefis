@@ -369,14 +369,6 @@ BodiesTree::contextMenuEvent (QContextMenuEvent* event)
 		}
 
 		{
-			auto* action = menu.addAction ("Origin always visible", [this, group_item, &rendering] {
-				rendering.origin_visible = !rendering.origin_visible;
-			});
-			action->setCheckable (true);
-			action->setChecked (rendering.origin_visible);
-		}
-
-		{
 			auto* action = menu.addAction ("Center of mass always visible", [this, group_item, &rendering] {
 				rendering.center_of_mass_visible = !rendering.center_of_mass_visible;
 			});

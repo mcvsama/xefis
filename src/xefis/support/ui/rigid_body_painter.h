@@ -53,7 +53,6 @@ class RigidBodyPainter: protected QOpenGLFunctions
   public:
 	struct GroupRenderingConfig
 	{
-		bool	origin_visible { false };
 		bool	center_of_mass_visible { false };
 		// TODO moments_of_inertia_visible
 	};
