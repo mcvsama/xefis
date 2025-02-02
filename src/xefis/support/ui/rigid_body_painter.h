@@ -411,7 +411,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 
 	[[nodiscard]]
 	SpaceLength<WorldSpace>
-	followed_body_position() const;
+	followed_position() const;
 
   private:
 	si::PixelDensity		_pixel_density;

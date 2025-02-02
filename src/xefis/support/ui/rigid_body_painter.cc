@@ -94,7 +94,7 @@ RigidBodyPainter::setup (QOpenGLPaintDevice& canvas)
 {
 	auto const size = canvas.size();
 
-	_position_on_earth = xf::polar (math::coordinate_system_cast<ECEFSpace, void> (followed_body_position()));
+	_position_on_earth = xf::polar (math::coordinate_system_cast<ECEFSpace, void> (followed_position()));
 
 	glMatrixMode (GL_PROJECTION);
 	glLoadIdentity();
@@ -248,7 +248,7 @@ RigidBodyPainter::paint_planet()
 		return QColor::fromHslF (h3, s3, l3).convertTo (QColor::Rgb);
 	};
 
-	auto const altitude_amsl = abs (followed_body_position() + _camera_position) - kEarthMeanRadius;
+	auto const altitude_amsl = abs (followed_position() + _camera_position) - kEarthMeanRadius;
 	float normalized_altitude = renormalize (altitude_amsl, Range { 0_km, 15_km }, Range { 0.0f, 1.0f });
 	normalized_altitude = std::clamp (normalized_altitude, 0.0f, 1.0f);
 
@@ -400,7 +400,7 @@ RigidBodyPainter::paint_air_particles()
 
 		// Figure out nearest 3D grid points.
 		// Then wiggle each one pseudo-randomly.
-		auto const body_pos = followed_body_position();
+		auto const body_pos = followed_position();
 		auto const inv_grid_size = 1 / grid_size;
 		auto const rounded_to_grid = body_pos.transformed ([inv_grid_size, grid_size] (auto const value) {
 			return std::round (value * inv_grid_size) * grid_size;
@@ -485,7 +485,7 @@ void
 RigidBodyPainter::transform_gl_to_center_of_mass (rigid_body::Body const& body)
 {
 	// Transform so that center-of-mass is at the OpenGL space origin:
-	transform_gl_to (body.placement() - followed_body_position());
+	transform_gl_to (body.placement() - followed_position());
 }
 
 
@@ -595,7 +595,7 @@ RigidBodyPainter::paint_constraint (rigid_body::Constraint const& constraint)
 	if (constraint.enabled() && !constraint.broken())
 	{
 		_gl.save_context ([&] {
-			auto fcorr = followed_body_position();
+			auto fcorr = followed_position();
 			auto const& b1 = constraint.body_1();
 			auto const& b2 = constraint.body_2();
 			auto com1 = b1.placement().position() - fcorr;
@@ -665,7 +665,7 @@ RigidBodyPainter::paint_forces (rigid_body::Body const& body)
 	auto const& iter = body.iteration();
 	auto const gfm = iter.gravitational_force_moments;
 	auto const efm = iter.external_force_moments;
-	auto const fbp = followed_body_position();
+	auto const fbp = followed_position();
 	auto const com = body.placement().position() - fbp;
 
 	if (_gravity_visible)
@@ -701,7 +701,7 @@ void
 RigidBodyPainter::paint_angular_velocity (rigid_body::Body const& body)
 {
 	auto constexpr angular_velocity_to_length = 0.1_m / 1_radps; // TODO unhardcode
-	auto const com = body.placement().position() - followed_body_position();
+	auto const com = body.placement().position() - followed_position();
 	auto const omega = body.velocity_moments<WorldSpace>().angular_velocity();
 
 	draw_arrow (com, omega * angular_velocity_to_length, rigid_body::make_material (Qt::darkMagenta));
@@ -712,7 +712,7 @@ void
 RigidBodyPainter::paint_angular_momentum (rigid_body::Body const& body)
 {
 	auto constexpr angular_momentum_to_length = 0.001_m / (1_kg * 1_m2 / 1_s) / 1_rad; // TODO unhardcode
-	auto const com = body.placement().position() - followed_body_position();
+	auto const com = body.placement().position() - followed_position();
 	auto const I = body.mass_moments<BodyCOM>().inertia_tensor();
 	auto const L = I * body.velocity_moments<BodyCOM>().angular_velocity();
 	auto const L_world = body.placement().unbound_transform_to_base (L);
@@ -813,10 +813,14 @@ RigidBodyPainter::paint_basis (si::Length const length)
 
 
 SpaceLength<WorldSpace>
-RigidBodyPainter::followed_body_position() const
+RigidBodyPainter::followed_position() const
 {
 	if (auto const* followed_body = this->followed_body())
 		return followed_body->placement().position();
+	else if (auto const* followed_group = this->followed_group())
+	{
+		return followed_group->mass_moments().center_of_mass_position();
+	}
 	else
 		return { 0_m, 0_m, 0_m };
 }
