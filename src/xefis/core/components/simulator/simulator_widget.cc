@@ -117,7 +117,7 @@ SimulatorWidget::make_simulation_controls()
 	});
 	update_start_stop_icon();
 
-	auto* step_sim_button = new QPushButton ("Single step", this);
+	auto* step_sim_button = new QPushButton (QString::fromStdString (std::format ("Single step: Δt = {} s", _simulator.frame_duration().in<si::Second>())), this);
 	QObject::connect (step_sim_button, &QPushButton::pressed, [this, update_start_stop_icon] {
 		if (_rigid_body_viewer)
 			_rigid_body_viewer->step();
@@ -132,11 +132,7 @@ SimulatorWidget::make_simulation_controls()
 	});
 
 	auto* sim_controls = new QWidget (this);
-	sim_controls->setSizePolicy (QSizePolicy::Fixed, QSizePolicy::Fixed);
-
-	auto time_step_text = std::format ("Δt = {} s", _simulator.frame_duration().in<si::Second>());
-	auto* time_step_label = new QLabel (QString::fromStdString (time_step_text), this);
-	time_step_label->setSizePolicy (QSizePolicy::Fixed, QSizePolicy::Fixed);
+	sim_controls->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Fixed);
 
 	_simulation_time_label.emplace ("", this);
 	_simulation_time_label->setSizePolicy (QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -148,20 +144,26 @@ SimulatorWidget::make_simulation_controls()
 
 	auto* basis_colors_label = new QLabel ("<b><span style='color: red'>X (Null Island)</span> <span style='color: green'>Y</span> <span style='color: blue'>Z (North Pole)</span></b>", this);
 
-	auto* layout = new QHBoxLayout (sim_controls);
-	layout->setMargin (0);
-	layout->addWidget (start_stop_sim_button);
-	layout->addWidget (step_sim_button);
-	layout->addWidget (show_configurator_button);
-	layout->addItem (new QSpacerItem (ph.em_pixels_int (1.0), 0, QSizePolicy::Fixed, QSizePolicy::Fixed));
-	layout->addWidget (basis_colors_label);
-	layout->addItem (new QSpacerItem (ph.em_pixels_int (1.0), 0, QSizePolicy::Fixed, QSizePolicy::Fixed));
-	layout->addWidget (time_step_label);
-	layout->addItem (new QSpacerItem (ph.em_pixels_int (1.0), 0, QSizePolicy::Fixed, QSizePolicy::Fixed));
-	layout->addWidget (&*_simulation_time_label);
-	layout->addItem (new QSpacerItem (ph.em_pixels_int (1.0), 0, QSizePolicy::Fixed, QSizePolicy::Fixed));
-	layout->addWidget (&*_simulation_performance_label);
-	layout->addItem (new QSpacerItem (0, 0, QSizePolicy::Expanding, QSizePolicy::Fixed));
+	auto* row1_layout = new QHBoxLayout();
+	row1_layout->setMargin (0);
+	row1_layout->addWidget (start_stop_sim_button);
+	row1_layout->addWidget (step_sim_button);
+	row1_layout->addItem (new QSpacerItem (ph.em_pixels_int (1.0), 0, QSizePolicy::Fixed, QSizePolicy::Fixed));
+	row1_layout->addWidget (basis_colors_label);
+	row1_layout->addItem (new QSpacerItem (0, 0, QSizePolicy::Expanding, QSizePolicy::Fixed));
+	row1_layout->addWidget (show_configurator_button);
+
+	auto* row2_layout = new QHBoxLayout();
+	row2_layout->setMargin (0);
+	row2_layout->addWidget (&*_simulation_time_label);
+	row2_layout->addItem (new QSpacerItem (ph.em_pixels_int (1.0), 0, QSizePolicy::Fixed, QSizePolicy::Fixed));
+	row2_layout->addWidget (&*_simulation_performance_label);
+	row2_layout->addItem (new QSpacerItem (0, 0, QSizePolicy::Expanding, QSizePolicy::Fixed));
+
+	auto* sim_controls_layout = new QVBoxLayout (sim_controls);
+	sim_controls_layout->setMargin (0);
+	sim_controls_layout->addLayout (row1_layout);
+	sim_controls_layout->addLayout (row2_layout);
 
 	return sim_controls;
 }
