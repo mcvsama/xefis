@@ -93,6 +93,9 @@ class SimulatorWidget: public QWidget
 	make_body_controls();
 
 	void
+	update_editor_for (QTreeWidgetItem*);
+
+	void
 	update_simulation_time_label();
 
 	void
