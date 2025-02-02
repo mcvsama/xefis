@@ -273,9 +273,9 @@ RigidBodyViewer::display_menu()
 		action->setChecked (_rigid_body_painter.angular_momenta_visible());
 	}
 
-	// "Camera follows the main body"
+	// "Camera follows the group/body"
 	{
-		auto* action = menu.addAction ("Camera orientation follows the &main body", [&] {
+		auto* action = menu.addAction ("Camera orientation &follows the group or body", [&] {
 			_rigid_body_painter.set_following_body_orientation (!_rigid_body_painter.following_body_orientation());
 		});
 		action->setCheckable (true);

@@ -168,11 +168,13 @@ RigidBodyPainter::apply_camera_rotations()
 	_gl.rotate (_camera_angles[1], 0, 1, 0); // Yaw
 	_gl.rotate (_camera_angles[2], 0, 0, 1); // Roll
 
+	auto const* followed_group = this->followed_group();
 	auto const* followed_body = this->followed_body();
 
-	if (followed_body && _following_orientation)
+	// Match the screen coordinates with the group/body/planet coordinates:
+	if ((followed_group || followed_body) && _following_orientation)
 	{
-		// The body is assumed to be in aircraft coordinates (X = front, Y = right, Z = down).
+		// The body/group is assumed to be in aircraft coordinates (X = front, Y = right, Z = down).
 		// The screen is in standard math/screen coordinates (X = right, Y = top, Z = towards the viewer).
 		// We have to rotate about axes defined by the screen to get to see the aircraft from behind.
 		_gl.rotate (-90_deg, 0, 0, 1); // About Z
@@ -185,8 +187,15 @@ RigidBodyPainter::apply_camera_rotations()
 		_gl.rotate (+_position_on_earth.lat(), 0, 1, 0); // About Y
 	}
 
-	if (followed_body && _following_orientation)
-		_gl.rotate (followed_body->placement().body_to_base_rotation());
+	if (_following_orientation)
+	{
+		if (followed_group)
+			if (auto const* rotation_reference_body = followed_group->rotation_reference_body())
+				followed_body = rotation_reference_body;
+
+		if (followed_body)
+			_gl.rotate (followed_body->placement().body_to_base_rotation());
+	}
 }
 
 
