@@ -90,6 +90,23 @@ class Group: private Noncopyable
 		{ return _bodies; }
 
 	/**
+	 * Set given body as rotation-reference body. Its rotation will be used as a reference for the whole group.
+	 * It doesn't have to belong to this group.
+	 * Pass nullptr to disable.
+	 */
+	void
+	set_rotation_reference_body (Body const* body)
+		{ _rotation_reference_body = body; }
+
+	/**
+	 * Return rotation-reference body if it exist.
+	 */
+	[[nodiscard]]
+	Body const*
+	rotation_reference_body() const noexcept
+		{ return _rotation_reference_body; }
+
+	/**
 	 * Rotate the body about world space origin by provided rotation matrix.
 	 */
 	void
@@ -132,6 +149,7 @@ class Group: private Noncopyable
 	std::string			_label;
 	System*				_system;
 	std::vector<Body*>	_bodies;
+	Body const*			_rotation_reference_body { nullptr };
 };
 
 } // namespace xf::rigid_body

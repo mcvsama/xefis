@@ -298,6 +298,8 @@ make_aircraft (xf::rigid_body::System& rigid_body_system, Models& models)
 	rigid_body_system.set_constraint_force_mixing_factor (1e-3);
 	prandtl_tube_fixed_constraint.set_baumgarte_factor (0.6);
 
+	aircraft_group.set_rotation_reference_body (&fuselage);
+
 	return SimulatedAircraft {
 		.rigid_group		= aircraft_group,
 		.primary_body		= fuselage,
