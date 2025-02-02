@@ -417,7 +417,11 @@ class RigidBodyPainter: protected QOpenGLFunctions
 
 	[[nodiscard]]
 	SpaceLength<WorldSpace>
-	followed_position() const;
+	followed_position();
+
+	[[nodiscard]]
+	SpaceLength<WorldSpace>
+	get_center_of_mass (rigid_body::Group const&);
 
   private:
 	si::PixelDensity		_pixel_density;
@@ -444,6 +448,8 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	std::map<rigid_body::Body const*, BodyRenderingConfig>
 							_body_rendering_config;
 	std::minstd_rand0		_air_particles_prng;
+	std::map<rigid_body::Group const*, SpaceLength<WorldSpace>>
+							_group_centers_of_mass_cache;
 };
 
 

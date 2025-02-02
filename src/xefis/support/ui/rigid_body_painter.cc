@@ -67,6 +67,8 @@ RigidBodyPainter::set_camera_angles (si::Angle const x, si::Angle const y, si::A
 void
 RigidBodyPainter::paint (rigid_body::System const& system, QOpenGLPaintDevice& canvas)
 {
+	_group_centers_of_mass_cache.clear();
+
 	initializeOpenGLFunctions();
 	auto const ph = PaintHelper (canvas);
 
@@ -503,12 +505,11 @@ void
 RigidBodyPainter::transform_gl_to_center_of_mass (rigid_body::Group const& group)
 {
 	// Transform so that center-of-mass is at the OpenGL space origin:
-	auto const center_of_mass = group.mass_moments().center_of_mass_position();
 	auto const* rotation_reference_body = group.rotation_reference_body();
 	auto const rotation = rotation_reference_body
 		? rotation_reference_body->placement().body_to_base_rotation()
 		: kNoRotation<WorldSpace, BodyCOM>;
-	transform_gl_to (Placement<WorldSpace, BodyCOM> (center_of_mass, rotation) - followed_position());
+	transform_gl_to (Placement<WorldSpace, BodyCOM> (get_center_of_mass (group), rotation) - followed_position());
 }
 
 
@@ -860,16 +861,27 @@ RigidBodyPainter::paint_basis (si::Length const length)
 
 
 SpaceLength<WorldSpace>
-RigidBodyPainter::followed_position() const
+RigidBodyPainter::followed_position()
 {
 	if (auto const* followed_body = this->followed_body())
 		return followed_body->placement().position();
 	else if (auto const* followed_group = this->followed_group())
-	{
-		return followed_group->mass_moments().center_of_mass_position();
-	}
+		return get_center_of_mass (*followed_group);
 	else
 		return { 0_m, 0_m, 0_m };
+}
+
+
+SpaceLength<WorldSpace>
+RigidBodyPainter::get_center_of_mass (rigid_body::Group const& group)
+{
+	if (auto const it = _group_centers_of_mass_cache.find (&group);
+		it != _group_centers_of_mass_cache.end())
+	{
+		return it->second;
+	}
+	else
+		return _group_centers_of_mass_cache[&group] = group.mass_moments().center_of_mass_position();
 }
 
 } // namespace xf
