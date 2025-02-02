@@ -522,24 +522,27 @@ RigidBodyPainter::paint_body (rigid_body::Body const& body, BodyRenderingConfig 
 void
 RigidBodyPainter::paint_body_helpers (rigid_body::Body const& body, BodyRenderingConfig const& rendering, bool focused)
 {
-	_gl.save_context ([&] {
-		transform_gl_to_body_center_of_mass (body);
+	if (focused || rendering.center_of_mass_visible || rendering.origin_visible)
+	{
+		_gl.save_context ([&] {
+			transform_gl_to_body_center_of_mass (body);
 
-		if (focused || rendering.center_of_mass_visible)
-			paint_center_of_mass();
+			if (focused || rendering.center_of_mass_visible)
+				paint_center_of_mass();
 
-		if (focused || rendering.origin_visible)
-		{
-			transform_gl_from_body_center_of_mass_to_origin (body);
+			if (focused || rendering.origin_visible)
+			{
+				transform_gl_from_body_center_of_mass_to_origin (body);
 
-			// Paint the yellow origin ball only if explicitly requested,
-			// otherwise the user will know that the origin is where the basis is:
-			if (rendering.origin_visible)
-				paint_origin();
+				// Paint the yellow origin ball only if explicitly requested,
+				// otherwise the user will know that the origin is where the basis is:
+				if (rendering.origin_visible)
+					paint_origin();
 
-			paint_basis (_camera_position.z() / 15);
-		}
-	});
+				paint_basis (_camera_position.z() / 15);
+			}
+		});
+	}
 }
 
 
