@@ -30,9 +30,9 @@ PrandtlTubeWidget::PrandtlTubeWidget (PrandtlTube& prandtl_tube):
 	_prandtl_tube (prandtl_tube)
 {
 	auto group = ObservationWidget::add_group (u8"Readings");
-	group.add_observable ("Static pressure", _static_pressure);
-	group.add_observable ("+ Dynamic pressure", _dynamic_pressure);
-	group.add_observable ("= Total pressure", _total_pressure);
+	group.add_observable ("Total pressure", _total_pressure);
+	group.add_observable ("− Static pressure", _static_pressure);
+	group.add_observable ("= Dynamic pressure", _dynamic_pressure);
 }
 
 
