@@ -17,6 +17,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/earth/air/atmosphere.h>
+#include <xefis/support/simulation/devices/prandtl_tube_widget.h>
 #include <xefis/support/simulation/rigid_body/body.h>
 #include <xefis/support/ui/observation_widget.h>
 
@@ -57,6 +58,12 @@ class PrandtlTube:
 	[[nodiscard]]
 	si::Pressure
 	total_pressure() const;
+
+	// HasObservationWidget API
+	[[nodiscard]]
+	std::unique_ptr<ObservationWidget>
+	create_observation_widget() override
+		{ return std::make_unique<PrandtlTubeWidget> (*this); }
 
   private:
 	Atmosphere const* _atmosphere;
