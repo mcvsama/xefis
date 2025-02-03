@@ -37,7 +37,7 @@ class WingWidget: public ObservationWidget
   public:
 	// Ctor
 	explicit
-	WingWidget (Wing& wing);
+	WingWidget (Wing&);
 
 	// ObservationWidget API
 	void

@@ -134,13 +134,13 @@ class ObservationWidget: public QWidget
 
   private:
 	// TODO rigid_body::Group*			_group			{ nullptr };
-	rigid_body::Body*					_body			{ nullptr };
-	rigid_body::Constraint*				_constraint		{ nullptr };
-	QGridLayout							_layout			{ this };
-	rigid_body::Body const*				_planet_body	{ nullptr };
-	LonLatRadius						_polar_location	{ 0_deg, 0_deg, 0_m };
-	VelocityMoments<WorldSpace>			_velocity_moments;
-	std::vector<Observable>				_observables;
+	rigid_body::Body*			_body			{ nullptr };
+	rigid_body::Constraint*		_constraint		{ nullptr };
+	QGridLayout					_layout			{ this };
+	rigid_body::Body const*		_planet_body	{ nullptr };
+	LonLatRadius				_polar_location	{ 0_deg, 0_deg, 0_m };
+	VelocityMoments<WorldSpace>	_velocity_moments;
+	std::vector<Observable>		_observables;
 };
 
 
