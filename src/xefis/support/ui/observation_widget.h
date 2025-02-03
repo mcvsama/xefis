@@ -32,9 +32,40 @@
 
 namespace xf {
 
+class ObservationWidget;
+
+
+class ObservationWidgetGroup
+{
+  public:
+	using Getter = std::function<std::string()>;
+	using Setter = std::function<void (std::string_view)>;
+
+  public:
+	// Ctor
+	explicit
+	ObservationWidgetGroup (ObservationWidget& widget, QGridLayout& layout);
+
+	void
+	add_widget (QWidget&);
+
+	QLabel&
+	add_observable (std::string_view name, Getter, Setter = nullptr);
+
+	QLabel&
+	add_observable (std::string_view name, std::string& observed_string, Setter = nullptr);
+
+  private:
+	ObservationWidget*	_widget;
+	QGridLayout*		_layout;
+};
+
+
 class ObservationWidget: public QWidget
 {
-  private:
+	friend class ObservationWidgetGroup;
+
+  public:
 	using Getter = std::function<std::string()>;
 	using Setter = std::function<void (std::string_view)>;
 
@@ -67,9 +98,15 @@ class ObservationWidget: public QWidget
 	 * Update values in the widget.
 	 */
 	virtual void
-	update_observed_values();
+	update_observed_values (rigid_body::Body const* planet_body);
 
   protected:
+	/**
+	 * Add and return new group of observables.
+	 */
+	ObservationWidgetGroup
+	add_group (std::u8string_view title = u8"");
+
 	/**
 	 * Add widget to the layout.
 	 */
@@ -89,10 +126,21 @@ class ObservationWidget: public QWidget
 	add_observable (std::string_view name, std::string& observed_string, Setter = nullptr);
 
   private:
-	rigid_body::Body*		_body			{ nullptr };
-	rigid_body::Constraint*	_constraint		{ nullptr };
-	QGridLayout				_layout			{ this };
-	std::vector<Observable>	_observables;
+	void
+	add_widget (QWidget&, QGridLayout&);
+
+	QLabel&
+	add_observable (std::string_view name, Getter, Setter, QGridLayout&);
+
+  private:
+	// TODO rigid_body::Group*			_group			{ nullptr };
+	rigid_body::Body*					_body			{ nullptr };
+	rigid_body::Constraint*				_constraint		{ nullptr };
+	QGridLayout							_layout			{ this };
+	rigid_body::Body const*				_planet_body	{ nullptr };
+	LonLatRadius						_polar_location	{ 0_deg, 0_deg, 0_m };
+	VelocityMoments<WorldSpace>			_velocity_moments;
+	std::vector<Observable>				_observables;
 };
 
 

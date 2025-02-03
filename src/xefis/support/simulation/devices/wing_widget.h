@@ -41,7 +41,7 @@ class WingWidget: public ObservationWidget
 
 	// ObservationWidget API
 	void
-	update_observed_values() override;
+	update_observed_values (rigid_body::Body const* planet_body) override;
 
   private:
 	void

@@ -34,11 +34,12 @@ WingWidget::WingWidget (Wing& wing):
 {
 	setup_airfoil_info_widget();
 	add_widget (_airfoil_frame);
-	add_observable ("True air speed", _true_air_speed);
-	add_observable ("Static air temperature", _static_air_temperature);
-	add_observable ("Air density", _air_density);
-	add_observable ("Dynamic viscosity:", _dynamic_viscosity);
-	add_observable ("Reynolds number:", _reynolds_number);
+	auto group = ObservationWidget::add_group();
+	group.add_observable ("True air speed", _true_air_speed);
+	group.add_observable ("Static air temperature", _static_air_temperature);
+	group.add_observable ("Air density", _air_density);
+	group.add_observable ("Dynamic viscosity:", _dynamic_viscosity);
+	group.add_observable ("Reynolds number:", _reynolds_number);
 }
 
 
@@ -59,7 +60,7 @@ WingWidget::setup_airfoil_info_widget()
 
 
 void
-WingWidget::update_observed_values()
+WingWidget::update_observed_values (rigid_body::Body const* planet_body)
 {
 	_airfoil_spline_widget.set_airfoil (_wing.airfoil());
 
@@ -94,7 +95,7 @@ WingWidget::update_observed_values()
 			*str = "–";
 	}
 
-	ObservationWidget::update_observed_values();
+	ObservationWidget::update_observed_values (planet_body);
 }
 
 } // namespace xf::sim

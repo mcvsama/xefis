@@ -19,14 +19,10 @@
 #include <xefis/support/simulation/rigid_body/body.h>
 #include <xefis/support/ui/observation_widget.h>
 #include <xefis/support/ui/paint_helper.h>
+#include <xefis/support/ui/rigid_body_viewer.h>
 
 // Qt:
-#include <QCheckBox>
 #include <QLabel>
-#include <QLineEdit>
-#include <QPushButton>
-#include <QToolBox>
-#include <QWidget>
 
 // Standard:
 #include <cstddef>
@@ -57,30 +53,12 @@ class BodyEditor: public QWidget
 	refresh();
 
   private:
-	[[nodiscard]]
-	QWidget*
-	create_position_widget();
-
-	[[nodiscard]]
-	QWidget*
-	create_velocities_widget();
-
-  private:
-	QVBoxLayout					_layout				{ this };
-	RigidBodyViewer&			_rigid_body_viewer;
-	rigid_body::Body*			_edited_body		{ nullptr };
+	RigidBodyViewer&	_rigid_body_viewer;
+	rigid_body::Body*	_edited_body		{ nullptr };
 	std::unique_ptr<ObservationWidget>
-								_edited_body_widget;
-	QVBoxLayout					_edited_body_widget_layout;
-	QLabel*						_body_label;
-	QToolBox					_tool_box;
-	// Position on the planet:
-	QLabel						_latitude;
-	QLabel						_longitude;
-	QLabel						_altitude_amsl;
-	// Velocities relative to the planet:
-	QLabel						_velocity;
-	QLabel						_angular_velocity;
+						_edited_body_widget;
+	QVBoxLayout			_edited_body_widget_layout;
+	QLabel*				_body_label;
 };
 
 } // namespace xf
