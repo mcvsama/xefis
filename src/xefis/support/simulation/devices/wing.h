@@ -57,7 +57,7 @@ class Wing:
 	// HasObservationWidget API
 	[[nodiscard]]
 	std::unique_ptr<ObservationWidget>
-	create_body_widget()
+	create_observation_widget() override
 		{ return std::make_unique<WingWidget> (*this); }
 
   private:
