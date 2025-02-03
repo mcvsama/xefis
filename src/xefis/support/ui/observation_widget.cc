@@ -59,10 +59,34 @@ ObservationWidgetGroup::add_observable (std::string_view const name, std::string
 }
 
 
-ObservationWidget::ObservationWidget (rigid_body::Body* body):
-	_body (body)
+ObservationWidget::ObservationWidget()
 {
 	_layout.setMargin (0);
+}
+
+
+ObservationWidget::ObservationWidget (rigid_body::Group* group):
+	ObservationWidget()
+{
+	_group = group;
+
+	if (_group)
+	{
+		// Basic information:
+		{
+			auto group = add_group();
+			group.add_observable ("Mass", [this]() {
+				return neutrino::format_unit (_group->mass_moments().mass().in<si::Kilogram>() * 1000.0, 6, "g");
+			});
+		}
+	}
+}
+
+
+ObservationWidget::ObservationWidget (rigid_body::Body* body):
+	ObservationWidget()
+{
+	_body = body;
 
 	if (_body)
 	{
@@ -120,8 +144,10 @@ ObservationWidget::ObservationWidget (rigid_body::Body* body):
 
 
 ObservationWidget::ObservationWidget (rigid_body::Constraint* constraint):
-	_constraint (constraint)
+	ObservationWidget()
 {
+	_constraint = constraint;
+
 	if (_constraint)
 	{
 		// TODO last calculation of constraint forces
@@ -209,7 +235,9 @@ ObservationWidget::add_observable (std::string_view const name, Getter const get
 std::unique_ptr<ObservationWidget>
 HasObservationWidget::create_observation_widget()
 {
-	if (rigid_body::Body* body = dynamic_cast<rigid_body::Body*> (this))
+	if (rigid_body::Group* group = dynamic_cast<rigid_body::Group*> (this))
+		return std::make_unique<ObservationWidget> (group);
+	else if (rigid_body::Body* body = dynamic_cast<rigid_body::Body*> (this))
 		return std::make_unique<ObservationWidget> (body);
 	else if (rigid_body::Constraint* constraint = dynamic_cast<rigid_body::Constraint*> (this))
 		return std::make_unique<ObservationWidget> (constraint);

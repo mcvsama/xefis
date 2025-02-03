@@ -80,6 +80,7 @@ SimulatorWidget::make_viewer_widget()
 
 		update_simulation_time_label();
 		update_simulation_performance_label();
+		_group_editor->refresh();
 		_body_editor->refresh();
 		_constraint_editor->refresh();
 	});
@@ -177,11 +178,13 @@ SimulatorWidget::make_simulation_controls()
 QWidget*
 SimulatorWidget::make_body_controls()
 {
+	_group_editor.emplace (this, *_rigid_body_viewer);
 	_body_editor.emplace (this, *_rigid_body_viewer);
 	_constraint_editor.emplace (this);
 	_bodies_tree.emplace (this, _simulator.rigid_body_system(), *_rigid_body_viewer);
 
 	_editors_stack.emplace (this);
+	_editors_stack->addWidget (&*_group_editor);
 	_editors_stack->addWidget (&*_body_editor);
 	_editors_stack->addWidget (&*_constraint_editor);
 
@@ -203,7 +206,15 @@ SimulatorWidget::make_body_controls()
 	QObject::connect (&*_bodies_tree, &QTreeWidget::itemChanged, [this] (QTreeWidgetItem* item, int column) {
 		if (column == 0)
 		{
-			if (auto* body_item = dynamic_cast<BodyItem*> (item))
+			if (auto* group_item = dynamic_cast<GroupItem*> (item))
+			{
+				group_item->backpropagate();
+				_bodies_tree->refresh();
+
+				if (_group_editor)
+					_group_editor->refresh();
+			}
+			else if (auto* body_item = dynamic_cast<BodyItem*> (item))
 			{
 				body_item->backpropagate();
 				_bodies_tree->refresh();
@@ -212,7 +223,13 @@ SimulatorWidget::make_body_controls()
 					_body_editor->refresh();
 			}
 			else if (auto* constraint_item = dynamic_cast<ConstraintItem*> (item))
+			{
 				constraint_item->backpropagate();
+				_bodies_tree->refresh();
+
+				if (_constraint_editor)
+					_constraint_editor->refresh();
+			}
 		}
 	});
 
@@ -234,8 +251,8 @@ SimulatorWidget::update_editor_for (QTreeWidgetItem* item)
 	if (auto* group_item = dynamic_cast<GroupItem*> (item))
 	{
 		auto& group = group_item->group();
-		// TODO _group_editor->edit (&group);
-		//_editors_stack->setCurrentWidget (&*_group_editor);
+		_group_editor->edit (&group);
+		_editors_stack->setCurrentWidget (&*_group_editor);
 		_rigid_body_viewer->set_focused (group);
 	}
 	else if (auto* body_item = dynamic_cast<BodyItem*> (item))
@@ -252,6 +269,7 @@ SimulatorWidget::update_editor_for (QTreeWidgetItem* item)
 	}
 	else
 	{
+		_group_editor->edit (nullptr);
 		_body_editor->edit (nullptr);
 		_constraint_editor->edit (nullptr);
 	}

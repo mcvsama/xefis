@@ -16,6 +16,7 @@
 
 // Local:
 #include "bodies_tree.h"
+#include "group_editor.h"
 #include "body_editor.h"
 #include "constraint_editor.h"
 
@@ -107,6 +108,7 @@ class SimulatorWidget: public QWidget
 	std::optional<RigidBodyViewer>	_rigid_body_viewer;
 	// Warning: QStackedWidget deletes widgets added to it in its destructor:
 	std::optional<QStackedWidget>	_editors_stack;
+	std::optional<GroupEditor>		_group_editor;
 	std::optional<BodyEditor>		_body_editor;
 	std::optional<ConstraintEditor>	_constraint_editor;
 	std::optional<BodiesTree>		_bodies_tree;

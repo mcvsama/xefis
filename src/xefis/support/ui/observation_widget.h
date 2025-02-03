@@ -16,6 +16,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/support/simulation/rigid_body/group.h>
 #include <xefis/support/simulation/rigid_body/body.h>
 #include <xefis/support/simulation/rigid_body/constraint.h>
 
@@ -79,8 +80,11 @@ class ObservationWidget: public QWidget
   public:
 	// Ctor
 	explicit
-	ObservationWidget()
-	{ }
+	ObservationWidget();
+
+	// Ctor
+	explicit
+	ObservationWidget (rigid_body::Group*);
 
 	// Ctor
 	explicit
@@ -133,7 +137,7 @@ class ObservationWidget: public QWidget
 	add_observable (std::string_view name, Getter, Setter, QGridLayout&);
 
   private:
-	// TODO rigid_body::Group*			_group			{ nullptr };
+	rigid_body::Group*			_group			{ nullptr };
 	rigid_body::Body*			_body			{ nullptr };
 	rigid_body::Constraint*		_constraint		{ nullptr };
 	QGridLayout					_layout			{ this };
