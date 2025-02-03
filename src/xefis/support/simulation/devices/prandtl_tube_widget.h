@@ -39,10 +39,10 @@ class PrandtlTubeWidget: public ObservationWidget
 	update_observed_values (rigid_body::Body const* planet_body) override;
 
   private:
-	PrandtlTube&		_prandtl_tube;
-	std::string			_static_pressure;
-	std::string			_dynamic_pressure;
-	std::string			_total_pressure;
+	PrandtlTube&	_prandtl_tube;
+	std::string		_static_pressure;
+	std::string		_dynamic_pressure;
+	std::string		_total_pressure;
 };
 
 } // namespace xf::sim
