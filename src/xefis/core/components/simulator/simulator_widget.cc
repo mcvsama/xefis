@@ -206,6 +206,7 @@ SimulatorWidget::make_body_controls()
 	_body_editor.emplace (this, *_rigid_body_viewer);
 	_constraint_editor.emplace (this);
 	_bodies_tree.emplace (this, _simulator.rigid_body_system(), *_rigid_body_viewer);
+	_bodies_tree->setMouseTracking (true);
 
 	_editors_stack.emplace (this);
 	_editors_stack->addWidget (&*_group_editor);
@@ -224,8 +225,6 @@ SimulatorWidget::make_body_controls()
 		else
 			_rigid_body_viewer->set_hovered (nullptr);
 	});
-
-	_bodies_tree->setMouseTracking (true);
 
 	QObject::connect (&*_bodies_tree, &QTreeWidget::itemChanged, [this] (QTreeWidgetItem* item, int column) {
 		if (column == 0)
