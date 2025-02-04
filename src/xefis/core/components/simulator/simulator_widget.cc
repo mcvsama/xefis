@@ -144,8 +144,9 @@ SimulatorWidget::make_simulation_controls()
 	_simulation_time_label->setSizePolicy (QSizePolicy::Fixed, QSizePolicy::Fixed);
 	update_simulation_time_label();
 
-	_simulation_performance_label.emplace ("", this);
-	_simulation_performance_label->setSizePolicy (QSizePolicy::Fixed, QSizePolicy::Fixed);
+	_simulation_performance_value_label.emplace ("", this);
+	_simulation_performance_value_label->setFixedWidth (ph.em_pixels_int (4));
+
 	update_simulation_performance_label();
 
 	auto* basis_colors_label = new QLabel ("<b><span style='color: red'>X (Null Island)</span> <span style='color: green'>Y</span> <span style='color: blue'>Z (North Pole)</span></b>", this);
@@ -163,7 +164,8 @@ SimulatorWidget::make_simulation_controls()
 	row2_layout->setMargin (0);
 	row2_layout->addWidget (&*_simulation_time_label);
 	row2_layout->addItem (new QSpacerItem (ph.em_pixels_int (1.0), 0, QSizePolicy::Fixed, QSizePolicy::Fixed));
-	row2_layout->addWidget (&*_simulation_performance_label);
+	row2_layout->addWidget (new QLabel ("Performance: "));
+	row2_layout->addWidget (&*_simulation_performance_value_label);
 	row2_layout->addItem (new QSpacerItem (0, 0, QSizePolicy::Expanding, QSizePolicy::Fixed));
 
 	auto* sim_controls_layout = new QVBoxLayout (sim_controls);
@@ -289,11 +291,17 @@ SimulatorWidget::update_simulation_time_label()
 void
 SimulatorWidget::update_simulation_performance_label()
 {
-	auto const perf = _simulator.performance();
-	auto const text = std::format ("Performance: {:.0f}%", 100.0f * perf);
+	auto perf = _simulator.performance();
+
+	if (std::isfinite (perf))
+		_last_finite_performance = perf;
+	else
+		perf = _last_finite_performance;
+
+	auto const text = std::format ("{:.0f}%", 100.0f * perf);
 	auto const prefix = perf < 1.0 ? "<span style='color: red'>" : "<span>";
 	auto const suffix = "</span>";
-	_simulation_performance_label->setText (prefix + QString::fromStdString (text) + suffix);
+	_simulation_performance_value_label->setText (prefix + QString::fromStdString (text) + suffix);
 }
 
 } // namespace xf
