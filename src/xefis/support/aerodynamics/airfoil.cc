@@ -68,7 +68,7 @@ AirfoilAerodynamicParameters<AirfoilSplineSpace>
 Airfoil::planar_aerodynamic_forces (Air<AirfoilSplineSpace> const& relative_air) const
 {
 	// Wind vector will be normalized, so make sure it's not near 0:
-	if (abs (relative_air.velocity) > 1e-6_mps)
+	if (abs (relative_air.velocity) > 1e-9_mps)
 	{
 		auto const aoa = AngleOfAttack {
 			.alpha	= 1_rad * atan2 (relative_air.velocity[1], relative_air.velocity[0]),
