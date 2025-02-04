@@ -103,7 +103,7 @@ class SimulatorWidget: public QWidget
 	update_simulation_performance_label();
 
   private:
-	Machine*						_machine				{ nullptr };
+	Machine*						_machine					{ nullptr };
 	Simulator&						_simulator;
 	std::optional<RigidBodyViewer>	_rigid_body_viewer;
 	// Warning: QStackedWidget deletes widgets added to it in its destructor:
@@ -114,8 +114,9 @@ class SimulatorWidget: public QWidget
 	std::optional<BodiesTree>		_bodies_tree;
 	std::optional<QLabel>			_simulation_time_label;
 	std::optional<QLabel>			_simulation_performance_value_label;
-	QIcon							_start_icon				{ icons::start() };
-	QIcon							_pause_icon				{ icons::pause() };
+	QIcon							_start_icon					{ icons::start() };
+	QIcon							_pause_icon					{ icons::pause() };
+	float							_simulation_speed			{ 1.0f };
 	float							_last_finite_performance	{ 1.0f };
 };
 

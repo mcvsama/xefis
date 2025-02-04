@@ -23,11 +23,15 @@
 #include <xefis/support/simulation/simulator.h>
 #include <xefis/support/ui/paint_helper.h>
 
+// Neutrino:
+#include <neutrino/qt/qstring.h>
+
 // Qt:
 #include <QLabel>
 #include <QLayout>
 #include <QPushButton>
 #include <QSizePolicy>
+#include <QSlider>
 #include <QShortcut>
 #include <QSplitter>
 
@@ -74,7 +78,7 @@ SimulatorWidget::make_viewer_widget()
 	_rigid_body_viewer->set_rigid_body_system (&_simulator.rigid_body_system());
 	_rigid_body_viewer->set_redraw_callback ([this] (std::optional<si::Time> const frame_duration) {
 		if (frame_duration)
-			_simulator.evolve (*frame_duration);
+			_simulator.evolve (*frame_duration * _simulation_speed);
 		else
 			_simulator.evolve (1);
 
@@ -131,6 +135,21 @@ SimulatorWidget::make_simulation_controls()
 		update_start_stop_icon();
 	});
 
+	auto* speed_label = new QLabel ("-");
+	speed_label->setFixedWidth (ph.em_pixels_int (4));
+
+	auto* speed_slider = new QSlider (Qt::Horizontal);
+	speed_slider->setTickPosition (QSlider::TicksAbove);
+	speed_slider->setTracking (true);
+	speed_slider->setTickInterval (10);
+	speed_slider->setPageStep (10);
+	speed_slider->setRange (1, 200);
+	QObject::connect (speed_slider, &QSlider::valueChanged, [this, speed_label] (int value) {
+		_simulation_speed = value / 100.0f;
+		speed_label->setText (to_qstring (std::format (" {:d}%", value)));
+	});
+	speed_slider->setValue (100);
+
 	auto* show_configurator_button = new QPushButton ("Show machine config", this);
 	QObject::connect (show_configurator_button, &QPushButton::clicked, [this] {
 		if (_machine)
@@ -162,11 +181,14 @@ SimulatorWidget::make_simulation_controls()
 
 	auto* row2_layout = new QHBoxLayout();
 	row2_layout->setMargin (0);
-	row2_layout->addWidget (&*_simulation_time_label);
+	row2_layout->addWidget (new QLabel ("Speed: "));
+	row2_layout->addWidget (speed_slider);
+	row2_layout->addWidget (speed_label);
 	row2_layout->addItem (new QSpacerItem (ph.em_pixels_int (1.0), 0, QSizePolicy::Fixed, QSizePolicy::Fixed));
 	row2_layout->addWidget (new QLabel ("Performance: "));
 	row2_layout->addWidget (&*_simulation_performance_value_label);
 	row2_layout->addItem (new QSpacerItem (0, 0, QSizePolicy::Expanding, QSizePolicy::Fixed));
+	row2_layout->addWidget (&*_simulation_time_label);
 
 	auto* sim_controls_layout = new QVBoxLayout (sim_controls);
 	sim_controls_layout->setMargin (0);
