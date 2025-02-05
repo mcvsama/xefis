@@ -168,7 +168,7 @@ ObservationWidget::add_basic_observables()
 	auto group = add_group();
 
 	group.add_observable ("Mass", [this]() {
-		return neutrino::format_unit (_mass_moments.mass().in<si::Kilogram>() * 1000.0, 6, "g");
+		return neutrino::format_unit (_mass_moments.mass().in<si::Gram>(), 6, "g");
 	});
 	group.add_observable ("Translational kinetic energy", [this]() {
 		return neutrino::format_unit (_translational_kinetic_energy.in<si::Joule>(), 6, "J");
