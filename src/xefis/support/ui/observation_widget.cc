@@ -72,13 +72,8 @@ ObservationWidget::ObservationWidget (rigid_body::Group* group):
 
 	if (_group)
 	{
-		// Basic information:
-		{
-			auto group = add_group();
-			group.add_observable ("Mass", [this]() {
-				return neutrino::format_unit (_group->mass_moments().mass().in<si::Kilogram>() * 1000.0, 6, "g");
-			});
-		}
+		add_basic_observables();
+		add_position_observables();
 	}
 }
 
@@ -90,55 +85,17 @@ ObservationWidget::ObservationWidget (rigid_body::Body* body):
 
 	if (_body)
 	{
-		// Basic information:
-		{
-			auto group = add_group();
-			group.add_observable ("Mass", [this]() {
-				return neutrino::format_unit (_body->mass_moments<BodyCOM>().mass().in<si::Kilogram>() * 1000.0, 6, "g");
-			});
-			group.add_observable ("Translational kinetic energy", [this]() {
-				return neutrino::format_unit (_body->translational_kinetic_energy().in<si::Joule>(), 6, "J");
-			});
-			group.add_observable ("Rotational kinetic energy", [this]() {
-				return neutrino::format_unit (_body->rotational_kinetic_energy().in<si::Joule>(), 6, "J");
-			});
-			group.add_observable ("Load factor", [this]() {
-				// TODO low pass filter on load factor:
-				auto const acceleration = _body->acceleration_moments_except_gravity<BodyCOM>().acceleration();
-				// Wing's down in BodyCOM (airfoil coordinates) is negative Y, so use .y():
-				return std::format ("{:.2f}", acceleration.y() / xf::kStdGravitationalAcceleration);
-			});
-		}
+		auto basic_info_group = add_basic_observables();
+		basic_info_group.add_observable ("Load factor", [this]() {
+			// TODO low pass filter on load factor:
+			auto const acceleration = _body->acceleration_moments_except_gravity<BodyCOM>().acceleration();
+			// Wing's down in BodyCOM (airfoil coordinates) is negative Y, so use .y():
+			auto const load_factor = acceleration.y() / xf::kStdGravitationalAcceleration;
+			return std::format ("{:.2f}", load_factor);
+		});
 
-		// Position:
-		{
-			auto group = add_group (u8"Position");
-			group.add_observable ("Latitude", [this]() {
-				return _planet_body ? std::format ("{:.6f}", _polar_location.lat().to<si::Degree>()) : "";
-			});
-			group.add_observable ("Longitude:", [this]() {
-				return _planet_body ? std::format ("{:.6f}", _polar_location.lon().to<si::Degree>()) : "";
-			});
-			group.add_observable ("AMSL height:", [this]() {
-				return _planet_body ? std::format ("{:.3f}", _polar_location.radius() - xf::kEarthMeanRadius) : "";
-			});
-		}
-
-		// Velocities:
-		{
-			auto group = add_group (u8"Velocities");
-			group.add_observable ("Velocity", [this]() {
-				return std::format ("{:.3f}", abs (_velocity_moments.velocity()));
-			});
-			group.add_observable ("Angular velocity", [this]() {
-				return std::format ("{:.3f}", abs (_velocity_moments.angular_velocity()));
-			});
-		}
-
-		// TODO
-		// (new QLabel ("TODO", this), icons::body(), "External force moments");
-		// (new QLabel ("TODO", this), icons::body(), "Custom impulses");
-		// (new QLabel ("Acceleration, kinetic energy, broken?", this), icons::body(), "Computed");
+		add_position_observables();
+		add_velocity_observables();
 	}
 }
 
@@ -160,12 +117,28 @@ ObservationWidget::update_observed_values (rigid_body::Body const* planet_body)
 {
 	_planet_body = planet_body;
 
-	if (_planet_body && _body)
+	if (_body)
 	{
-		auto const position_on_planet = _body->placement().position() - planet_body->placement().position();
+		_mass_moments = _body->mass_moments<WorldSpace>();
+		_translational_kinetic_energy = _body->translational_kinetic_energy();
+		_rotational_kinetic_energy = _body->rotational_kinetic_energy();
+	}
+	else if (_group)
+	{
+		_mass_moments = _group->mass_moments();
+		_translational_kinetic_energy = _group->translational_kinetic_energy();
+		_rotational_kinetic_energy = _group->rotational_kinetic_energy();
+	}
+
+	if (_planet_body && (_body || _group))
+	{
+		auto const position = _body ? _body->placement().position() : _mass_moments.center_of_mass_position();
+		auto const position_on_planet = position - planet_body->placement().position();
 		// Assuming the planet is in ECEF orientation.
 		_polar_location = xf::polar (math::coordinate_system_cast<ECEFSpace, void> (position_on_planet));
-		_velocity_moments = _body->velocity_moments<WorldSpace>() - planet_body->velocity_moments<WorldSpace>();
+
+		if (_body)
+			_velocity_moments = _body->velocity_moments<WorldSpace>() - planet_body->velocity_moments<WorldSpace>();
 	}
 
 	for (auto& observable: _observables)
@@ -186,6 +159,54 @@ ObservationWidget::add_group (std::u8string_view const title)
 	auto const row = _layout.rowCount();
 	_layout.addWidget (group_box, row, 0, 1, 2);
 	return ObservationWidgetGroup (*this, *group_box_layout);
+}
+
+
+ObservationWidgetGroup
+ObservationWidget::add_basic_observables()
+{
+	auto group = add_group();
+
+	group.add_observable ("Mass", [this]() {
+		return neutrino::format_unit (_mass_moments.mass().in<si::Kilogram>() * 1000.0, 6, "g");
+	});
+	group.add_observable ("Translational kinetic energy", [this]() {
+		return neutrino::format_unit (_translational_kinetic_energy.in<si::Joule>(), 6, "J");
+	});
+	group.add_observable ("Rotational kinetic energy", [this]() {
+		return neutrino::format_unit (_rotational_kinetic_energy.in<si::Joule>(), 6, "J");
+	});
+
+	return group;
+}
+
+
+void
+ObservationWidget::add_position_observables()
+{
+	auto group = add_group (u8"Position");
+	group.add_observable ("Latitude", [this]() {
+		return _planet_body ? std::format ("{:.6f}", _polar_location.lat().to<si::Degree>()) : "";
+	});
+	group.add_observable ("Longitude:", [this]() {
+		return _planet_body ? std::format ("{:.6f}", _polar_location.lon().to<si::Degree>()) : "";
+	});
+	group.add_observable ("AMSL height:", [this]() {
+		return _planet_body ? std::format ("{:.3f}", _polar_location.radius() - xf::kEarthMeanRadius) : "";
+	});
+}
+
+
+void
+ObservationWidget::add_velocity_observables()
+{
+	auto group = add_group (u8"Velocities");
+	group.add_observable ("Velocity", [this]() {
+		return std::format ("{:.3f}", abs (_velocity_moments.velocity()));
+	});
+	group.add_observable ("Angular velocity", [this]() {
+		return std::format ("{:.3f}", abs (_velocity_moments.angular_velocity()));
+	});
 }
 
 

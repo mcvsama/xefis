@@ -130,6 +130,15 @@ class ObservationWidget: public QWidget
 	add_observable (std::string_view name, std::string& observed_string, Setter = nullptr);
 
   private:
+	ObservationWidgetGroup
+	add_basic_observables();
+
+	void
+	add_position_observables();
+
+	void
+	add_velocity_observables();
+
 	void
 	add_widget (QWidget&, QGridLayout&);
 
@@ -137,14 +146,18 @@ class ObservationWidget: public QWidget
 	add_observable (std::string_view name, Getter, Setter, QGridLayout&);
 
   private:
-	rigid_body::Group*			_group			{ nullptr };
-	rigid_body::Body*			_body			{ nullptr };
-	rigid_body::Constraint*		_constraint		{ nullptr };
-	QGridLayout					_layout			{ this };
-	rigid_body::Body const*		_planet_body	{ nullptr };
-	LonLatRadius				_polar_location	{ 0_deg, 0_deg, 0_m };
-	VelocityMoments<WorldSpace>	_velocity_moments;
-	std::vector<Observable>		_observables;
+	rigid_body::Group*				_group					{ nullptr };
+	rigid_body::Body*				_body					{ nullptr };
+	rigid_body::Constraint*			_constraint				{ nullptr };
+	QGridLayout						_layout					{ this };
+	rigid_body::Body const*			_planet_body			{ nullptr };
+	std::vector<Observable>			_observables;
+	// Typical observables:
+	si::Energy						_translational_kinetic_energy;
+	si::Energy						_rotational_kinetic_energy;
+	LonLatRadius					_polar_location			{ 0_deg, 0_deg, 0_m };
+	VelocityMoments<WorldSpace>		_velocity_moments;
+	MassMomentsAtArm<WorldSpace>	_mass_moments;
 };
 
 
