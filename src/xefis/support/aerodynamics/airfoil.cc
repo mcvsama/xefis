@@ -143,7 +143,9 @@ Airfoil::lift_drag_areas (si::Angle alpha, si::Angle beta) const
 constexpr si::Angle
 Airfoil::wrap_angle_for_field (si::Angle angle)
 {
-	return floored_mod (angle, Range<si::Angle> (-180_deg, +180_deg));
+	// Not expecting that fields define values for ranges outside -90…+90°,
+	// so just do a mirror extension:
+	return floored_mod (angle, Range<si::Angle> (-90_deg, +90_deg));
 }
 
 } // namespace xf
