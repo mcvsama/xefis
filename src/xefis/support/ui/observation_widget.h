@@ -19,6 +19,7 @@
 #include <xefis/support/simulation/rigid_body/group.h>
 #include <xefis/support/simulation/rigid_body/body.h>
 #include <xefis/support/simulation/rigid_body/constraint.h>
+#include <xefis/utility/smoother.h>
 
 // Qt:
 #include <QGridLayout>
@@ -158,6 +159,7 @@ class ObservationWidget: public QWidget
 	LonLatRadius					_polar_location			{ 0_deg, 0_deg, 0_m };
 	VelocityMoments<WorldSpace>		_velocity_moments;
 	MassMomentsAtArm<WorldSpace>	_mass_moments;
+	Smoother<float>					_load_factor_smoother	{ 100_ms, 10_ms };
 };
 
 

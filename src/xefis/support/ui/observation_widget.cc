@@ -86,12 +86,15 @@ ObservationWidget::ObservationWidget (rigid_body::Body* body):
 	if (_body)
 	{
 		auto basic_info_group = add_basic_observables();
-		basic_info_group.add_observable ("Load factor", [this]() {
-			// TODO low pass filter on load factor:
+		basic_info_group.add_observable ("Load factor", [this, prev_time = TimeHelper::now()]() mutable {
+			auto const now = TimeHelper::now();
+			auto const dt = now - prev_time;
+			prev_time = now;
+
 			auto const acceleration = _body->acceleration_moments_except_gravity<BodyCOM>().acceleration();
 			// Wing's down in BodyCOM (airfoil coordinates) is negative Y, so use .y():
 			auto const load_factor = acceleration.y() / xf::kStdGravitationalAcceleration;
-			return std::format ("{:.2f}", load_factor);
+			return std::format ("{:.2f}", _load_factor_smoother (load_factor, dt));
 		});
 
 		add_position_observables();
