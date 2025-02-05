@@ -82,7 +82,7 @@ SimulatorWidget::make_viewer_widget()
 			_simulator.evolve (1);
 
 		update_simulation_time_label();
-		update_simulation_performance_label();
+		update_simulation_performance_label (frame_duration.value_or (0_ms));
 		_group_editor->refresh();
 		_body_editor->refresh();
 		_constraint_editor->refresh();
@@ -165,7 +165,7 @@ SimulatorWidget::make_simulation_controls()
 	_simulation_performance_value_label.emplace ("", this);
 	_simulation_performance_value_label->setFixedWidth (ph.em_pixels_int (4));
 
-	update_simulation_performance_label();
+	update_simulation_performance_label (0_ms);
 
 	auto* basis_colors_label = new QLabel ("<b><span style='color: red'>X (Null Island)</span> <span style='color: green'>Y</span> <span style='color: blue'>Z (North Pole)</span></b>", this);
 
@@ -309,7 +309,7 @@ SimulatorWidget::update_simulation_time_label()
 
 
 void
-SimulatorWidget::update_simulation_performance_label()
+SimulatorWidget::update_simulation_performance_label (si::Time const dt)
 {
 	auto perf = _simulator.performance();
 
@@ -318,6 +318,7 @@ SimulatorWidget::update_simulation_performance_label()
 	else
 		perf = _last_finite_performance;
 
+	perf = _performance_smoother (perf, dt);
 	auto const text = std::format ("{:.0f}%", 100.0f * perf);
 	auto const prefix = perf < 1.0 ? "<span style='color: red'>" : "<span>";
 	auto const suffix = "</span>";

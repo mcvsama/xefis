@@ -24,6 +24,7 @@
 #include <xefis/support/simulation/rigid_body/system.h>
 #include <xefis/support/simulation/simulator.h>
 #include <xefis/support/ui/rigid_body_viewer.h>
+#include <xefis/utility/smoother.h>
 
 // Qt:
 #include <QIcon>
@@ -98,7 +99,7 @@ class SimulatorWidget: public QWidget
 	update_simulation_time_label();
 
 	void
-	update_simulation_performance_label();
+	update_simulation_performance_label (si::Time dt);
 
   private:
 	Machine*						_machine					{ nullptr };
@@ -119,6 +120,7 @@ class SimulatorWidget: public QWidget
 	QIcon							_pause_icon					{ icons::pause() };
 	float							_simulation_speed			{ 1.0f };
 	float							_last_finite_performance	{ 1.0f };
+	Smoother<float>					_performance_smoother		{ 100_ms, 10_ms };
 };
 
 
