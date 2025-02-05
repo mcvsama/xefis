@@ -16,9 +16,7 @@
 
 // Local:
 #include "bodies_tree.h"
-#include "group_editor.h"
-#include "body_editor.h"
-#include "constraint_editor.h"
+#include "standard_editor.h"
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -108,9 +106,12 @@ class SimulatorWidget: public QWidget
 	std::optional<RigidBodyViewer>	_rigid_body_viewer;
 	// Warning: QStackedWidget deletes widgets added to it in its destructor:
 	std::optional<QStackedWidget>	_editors_stack;
-	std::optional<GroupEditor>		_group_editor;
-	std::optional<BodyEditor>		_body_editor;
-	std::optional<ConstraintEditor>	_constraint_editor;
+	std::optional<StandardEditor<rigid_body::Group>>
+									_group_editor;
+	std::optional<StandardEditor<rigid_body::Body>>
+									_body_editor;
+	std::optional<StandardEditor<rigid_body::Constraint>>
+									_constraint_editor;
 	std::optional<BodiesTree>		_bodies_tree;
 	std::optional<QLabel>			_simulation_time_label;
 	std::optional<QLabel>			_simulation_performance_value_label;

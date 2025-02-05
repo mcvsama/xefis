@@ -13,7 +13,6 @@
 
 // Local:
 #include "bodies_tree.h"
-#include "body_editor.h"
 #include "body_item.h"
 #include "simulator_widget.h"
 
@@ -202,9 +201,9 @@ SimulatorWidget::make_simulation_controls()
 QWidget*
 SimulatorWidget::make_body_controls()
 {
-	_group_editor.emplace (this, *_rigid_body_viewer);
-	_body_editor.emplace (this, *_rigid_body_viewer);
-	_constraint_editor.emplace (this);
+	_group_editor.emplace (this, *_rigid_body_viewer, Qt::blue);
+	_body_editor.emplace (this, *_rigid_body_viewer, Qt::darkGreen);
+	_constraint_editor.emplace (this, *_rigid_body_viewer, QColor (0xff, 0x8c, 0));
 	_bodies_tree.emplace (this, _simulator.rigid_body_system(), *_rigid_body_viewer);
 	_bodies_tree->setMouseTracking (true);
 
