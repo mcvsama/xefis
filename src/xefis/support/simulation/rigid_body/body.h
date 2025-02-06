@@ -358,7 +358,7 @@ class Body: public Noncopyable
 	 * Ask body to update external force moments by calling apply_impulse() methods.
 	 */
 	virtual void
-	update_external_forces (Atmosphere const*)
+	update_external_forces (Atmosphere const*, [[maybe_unused]] si::Time frame_duration)
 	{ }
 
   private:

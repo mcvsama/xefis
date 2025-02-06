@@ -42,7 +42,7 @@ Wing::Wing (Airfoil const& airfoil, si::Density const material_density):
 
 
 void
-Wing::update_external_forces (Atmosphere const* atmosphere)
+Wing::update_external_forces (Atmosphere const* atmosphere, si::Time const dt)
 {
 	if (atmosphere)
 	{
@@ -68,10 +68,17 @@ Wing::update_external_forces (Atmosphere const* atmosphere)
 		auto const body_aeroforces_at_origin = airfoil_spline_to_body * spline_aeroforces_at_origin.forces;
 
 		// Compute 'at COM' values:
-		auto const lift_force = body_aeroforces_at_origin.lift;
-		auto const drag_force = body_aeroforces_at_origin.drag;
-		auto const pitching_moment = body_aeroforces_at_origin.pitching_moment;
+		auto lift_force = body_aeroforces_at_origin.lift;
+		auto drag_force = body_aeroforces_at_origin.drag;
+		auto pitching_moment = body_aeroforces_at_origin.pitching_moment;
 		auto const center_of_pressure = body_aeroforces_at_origin.center_of_pressure + origin<BodyCOM>();
+
+		if (_smoothing_enabled)
+		{
+			lift_force = _lift_smoother (lift_force, dt);
+			drag_force = _drag_smoother (drag_force, dt);
+			pitching_moment = _pitching_moment_smoother (pitching_moment, dt);
+		}
 
 		// New parameters converted to BodyCOM:
 		_airfoil_aerodynamic_parameters = {
@@ -90,6 +97,27 @@ Wing::update_external_forces (Atmosphere const* atmosphere)
 		apply_impulse (ForceMoments<BodyCOM> (lift_force, pitching_moment), center_of_pressure);
 		apply_impulse (ForceMoments<BodyCOM> (drag_force, math::zero), center_of_pressure);
 	}
+}
+
+
+void
+Wing::set_smoothing_parameters (si::Time const smoothing_time, si::Time const precision)
+{
+	_lift_smoother.set_smoothing_time (smoothing_time);
+	_drag_smoother.set_smoothing_time (smoothing_time);
+	_pitching_moment_smoother.set_smoothing_time (smoothing_time);
+
+	_lift_smoother.set_precision (precision);
+	_drag_smoother.set_precision (precision);
+	_pitching_moment_smoother.set_precision (precision);
+}
+
+
+void
+Wing::enable_smoothing (si::Time const smoothing_time, si::Time const precision)
+{
+	set_smoothing_enabled (true);
+	set_smoothing_parameters (smoothing_time, precision);
 }
 
 

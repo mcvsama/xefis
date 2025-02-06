@@ -74,6 +74,8 @@ make_aircraft (xf::rigid_body::System& rigid_body_system, Models& models)
 	auto const kElevatorLength = 1_m;
 	auto const kRudderChord = 20_cm;
 	auto const kRudderLength = 50_cm;
+	auto const kWingAeroforcesSmoothing = 4_ms;
+	auto const kWingAeroforcesSmoothingPrecision = 0.5_ms;
 
 	auto const main_wing_airfoil_spline = xf::AirfoilSpline (sim1::control_surface_airfoil::kSpline);
 	auto const main_wing_airfoil_characteristics =
@@ -118,6 +120,7 @@ make_aircraft (xf::rigid_body::System& rigid_body_system, Models& models)
 	// Move to the left:
 	wing_l.translate ({ 0_m, -0.5 * kFuselageWidth, 0_m });
 	wing_l.rotate_about_body_origin (xf::x_rotation<WorldSpace> (+kDihedral)); // TODO make possible to rotate about world origin by giving rotation in BodyOrigin space
+	wing_l.enable_smoothing (kWingAeroforcesSmoothing, kWingAeroforcesSmoothingPrecision);
 
 	// Wing R
 
@@ -127,6 +130,7 @@ make_aircraft (xf::rigid_body::System& rigid_body_system, Models& models)
 	// Move to the right:
 	wing_r.translate ({ 0_m, +0.5 * kFuselageWidth + kWingLength, 0_m });
 	wing_r.rotate_about_body_origin (xf::x_rotation<WorldSpace> (-kDihedral));
+	wing_r.enable_smoothing (kWingAeroforcesSmoothing, kWingAeroforcesSmoothingPrecision);
 
 	// Winglet L
 
@@ -137,6 +141,7 @@ make_aircraft (xf::rigid_body::System& rigid_body_system, Models& models)
 	winglet_l.translate ({ 0_m, -kWingLength, 0_m });
 	winglet_l.rotate_about (xf::SpaceLength<WorldSpace> { 0_m, -0.5 * kFuselageWidth - main_wing_airfoil.wing_length(), 0_m }, xf::x_rotation<WorldSpace> (+kWingletAngle));
 	winglet_l.rotate_about_world_origin (xf::x_rotation<WorldSpace> (+kDihedral));
+	winglet_l.enable_smoothing (kWingAeroforcesSmoothing, kWingAeroforcesSmoothingPrecision);
 
 	// Winglet R
 
@@ -147,6 +152,7 @@ make_aircraft (xf::rigid_body::System& rigid_body_system, Models& models)
 	winglet_r.translate ({ 0_m, +kWingletLength, 0_m });
 	winglet_r.rotate_about (xf::SpaceLength<WorldSpace> { 0_m, +0.5 * kFuselageWidth + main_wing_airfoil.wing_length(), 0_m }, xf::x_rotation<WorldSpace> (-kWingletAngle));
 	winglet_r.rotate_about_world_origin (xf::x_rotation<WorldSpace> (-kDihedral));
+	winglet_l.enable_smoothing (kWingAeroforcesSmoothing, kWingAeroforcesSmoothingPrecision);
 
 	// Aileron L
 
@@ -159,6 +165,7 @@ make_aircraft (xf::rigid_body::System& rigid_body_system, Models& models)
 		0_m,
 	});
 	aileron_l.rotate_about_world_origin (xf::x_rotation<WorldSpace> (+kDihedral));
+	aileron_l.enable_smoothing (kWingAeroforcesSmoothing, kWingAeroforcesSmoothingPrecision);
 
 	// Aileron R
 
@@ -171,6 +178,7 @@ make_aircraft (xf::rigid_body::System& rigid_body_system, Models& models)
 		0_m,
 	});
 	aileron_r.rotate_about_world_origin (xf::x_rotation<WorldSpace> (-kDihedral));
+	aileron_r.enable_smoothing (kWingAeroforcesSmoothing, kWingAeroforcesSmoothingPrecision);
 
 	// Tail horizontal
 
@@ -183,6 +191,7 @@ make_aircraft (xf::rigid_body::System& rigid_body_system, Models& models)
 	tail_h.translate ({ -1.5_m, 0_m, 0_m });
 	// A bit of negative lift on the tail for longitudal stability:
 	tail_h.rotate_about_body_origin (xf::y_rotation<WorldSpace> (-5_deg));
+	tail_h.enable_smoothing (kWingAeroforcesSmoothing, kWingAeroforcesSmoothingPrecision);
 
 	// Elevator
 
@@ -191,6 +200,7 @@ make_aircraft (xf::rigid_body::System& rigid_body_system, Models& models)
 	elevator.rotate_about_body_origin (wing_to_normal_rotation);
 	elevator.move_origin_to (tail_h.origin<WorldSpace>());
 	elevator.translate ({ -tail_h_airfoil.chord_length(), 0_m, 0_m });
+	elevator.enable_smoothing (kWingAeroforcesSmoothing, kWingAeroforcesSmoothingPrecision);
 
 	// Tail vertical
 
@@ -199,6 +209,7 @@ make_aircraft (xf::rigid_body::System& rigid_body_system, Models& models)
 	tail_v.rotate_about_body_origin (xf::y_rotation<WorldSpace> (-180_deg));
 	tail_v.move_origin_to (tail_h.origin<WorldSpace>());
 	tail_v.translate ({ 0_m, -0.5 * tail_h_airfoil.wing_length(), 0_m });
+	tail_v.enable_smoothing (kWingAeroforcesSmoothing, kWingAeroforcesSmoothingPrecision);
 
 	// Rudder
 
@@ -207,6 +218,7 @@ make_aircraft (xf::rigid_body::System& rigid_body_system, Models& models)
 	rudder.rotate_about_body_origin (xf::y_rotation<WorldSpace> (-180_deg));
 	rudder.move_origin_to (tail_v.origin<WorldSpace>());
 	rudder.translate ({ -tail_v_airfoil.chord_length(), 0_m, 0_m });
+	rudder.enable_smoothing (kWingAeroforcesSmoothing, kWingAeroforcesSmoothingPrecision);
 
 	// Prandtl tube
 

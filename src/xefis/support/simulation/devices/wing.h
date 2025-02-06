@@ -21,6 +21,7 @@
 #include <xefis/support/simulation/devices/wing_widget.h>
 #include <xefis/support/simulation/rigid_body/body.h>
 #include <xefis/support/simulation/rigid_body/concepts.h>
+#include <xefis/utility/smoother.h>
 
 // Standard:
 #include <cstddef>
@@ -52,13 +53,34 @@ class Wing:
 
 	// Body API
 	void
-	update_external_forces (Atmosphere const*) override;
+	update_external_forces (Atmosphere const*, si::Time frame_duration) override;
 
 	// HasObservationWidget API
 	[[nodiscard]]
 	std::unique_ptr<ObservationWidget>
 	create_observation_widget() override
 		{ return std::make_unique<WingWidget> (*this); }
+
+	/**
+	 * Enable/disable smoothing of calculated aerodynamic forces.
+	 * This helps with damping oscillations that may arise in some circumstances.
+	 */
+	void
+	set_smoothing_enabled (bool enabled)
+		{ _smoothing_enabled = enabled; }
+
+	/**
+	 * Set smoothing parameters.
+	 * Precision is usually the simulation step time.
+	 */
+	void
+	set_smoothing_parameters (si::Time smoothing_time, si::Time precision);
+
+	/**
+	 * Enable smoothing and set smoothing parameters at the same time.
+	 */
+	void
+	enable_smoothing (si::Time smoothing_time, si::Time precision);
 
   private:
 	[[nodiscard]]
@@ -68,6 +90,10 @@ class Wing:
   private:
 	Airfoil													_airfoil;
 	std::optional<AirfoilAerodynamicParameters<BodyCOM>>	_airfoil_aerodynamic_parameters;
+	bool													_smoothing_enabled { false };
+	Smoother<SpaceForce<BodyCOM>>							_lift_smoother;
+	Smoother<SpaceForce<BodyCOM>>							_drag_smoother;
+	Smoother<SpaceTorque<BodyCOM>>							_pitching_moment_smoother;
 };
 
 } // namespace xf::sim

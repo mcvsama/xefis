@@ -143,7 +143,7 @@ ImpulseSolver::update_external_forces (si::Time const dt)
 	auto const& atmosphere = _system.atmosphere();
 
 	for (auto& body: _system.bodies())
-		body->update_external_forces (atmosphere);
+		body->update_external_forces (atmosphere, dt);
 
 	for (auto& body: _system.bodies())
 	{
