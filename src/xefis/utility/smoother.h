@@ -96,7 +96,7 @@ template<class pValue>
 	class Smoother: public SmootherBase
 	{
 	  public:
-		typedef pValue Value;
+		using Value = pValue;
 
 	  public:
 		// Ctor
@@ -233,8 +233,19 @@ template<class V>
 
 		_accumulated_dt += dt;
 
-		if (!isfinite (s))
-			return _z;
+		if constexpr (std::is_arithmetic_v<Value>)
+		{
+			if (!isfinite (s))
+				return _z;
+		}
+		else
+		{
+			using si::abs;
+			using std::abs;
+
+			if (!isfinite (abs (s)))
+				return _z;
+		}
 
 		if (_invalidate)
 		{
@@ -245,7 +256,7 @@ template<class V>
 		if (_accumulated_dt > 10 * _smoothing_time)
 			_accumulated_dt = 10 * _smoothing_time;
 
-		int iterations = _accumulated_dt / _precision;
+		int const iterations = _accumulated_dt / _precision;
 
 		if (iterations > 1)
 		{
@@ -254,10 +265,10 @@ template<class V>
 			for (int i = 0; i < iterations; ++i)
 				_history.push_back (p + (static_cast<double> (i + 1) / iterations) * (s - p));
 
-			_z = Value (0.0);
+			_z = Value{};
 			for (std::size_t i = 0; i < _history.size(); ++i)
 				_z += _history[i] * _window[i];
-			_z /= _history.size() - 1; // Some coeffs are 0 in the window.
+			_z *= 1.0 / (_history.size() - 1); // Some coeffs are 0 in the window.
 
 			_accumulated_dt = 0_s;
 		}
