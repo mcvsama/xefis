@@ -64,7 +64,8 @@ ModuleWidget::ModuleWidget (Module& module, QWidget* parent):
 	if (auto module_with_config_widget = dynamic_cast<Module::HasConfiguratorWidget*> (&_module))
 	{
 		auto module_config_widget = module_with_config_widget->configurator_widget();
-		tabs->addTab (new OwnershipBreaker (module_config_widget, this), "Module config");
+		tabs->addTab (module_config_widget, "Module config");
+		neutrino::break_ownership (*tabs, *module_config_widget);
 	}
 
 	auto* layout = new QVBoxLayout (this);
