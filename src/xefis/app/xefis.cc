@@ -85,16 +85,16 @@ Xefis::Xefis (int& argc, char** argv):
 	Exception::log (_logger, [&] {
 		_system = std::make_unique<System> (_logger);
 		_graphics = std::make_unique<Graphics> (_logger);
-		_machine_manager = xefis_machine_manager (*this);
+		_machine_manager = make_xefis_machine_manager (*this);
 
 		if (_machine_manager)
 			_machine = _machine_manager->make_machine();
 
 		if (!_machine)
-			_machine = xefis_machine (*this);
+			_machine = make_xefis_machine (*this);
 
 		if (!_machine)
-			_logger << "Neither machine manager (xefis_machine_manager()) nor machine (xefis_machine()) was compiled-in." << std::endl;
+			_logger << "Neither machine manager (make_xefis_machine_manager()) nor machine (make_xefis_machine()) was compiled-in." << std::endl;
 		else
 		{
 			_configurator_widget = std::make_unique<ConfiguratorWidget> (*_machine, nullptr);
@@ -244,22 +244,22 @@ Xefis::print_copyrights (std::ostream& out)
 
 
 /**
- * Default xefis_machine() function, used when there's no other provided.
+ * Default make_xefis_machine() function, used when there's no other provided.
  */
 [[gnu::weak]]
 std::unique_ptr<xf::Machine>
-xefis_machine (xf::Xefis&)
+make_xefis_machine (xf::Xefis&)
 {
 	return nullptr;
 }
 
 
 /**
- * Default xefis_machine_manager() function, used when there's no other provided.
+ * Default make_xefis_machine_manager() function, used when there's no other provided.
  */
 [[gnu::weak]]
 std::unique_ptr<xf::MachineManager>
-xefis_machine_manager (xf::Xefis&)
+make_xefis_machine_manager (xf::Xefis&)
 {
 	return nullptr;
 }

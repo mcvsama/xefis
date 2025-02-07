@@ -87,7 +87,7 @@ Machine::connect_modules()
 
 
 std::unique_ptr<xf::Machine>
-xefis_machine (xf::Xefis& xefis)
+make_xefis_machine (xf::Xefis& xefis)
 {
 	return std::make_unique<sim1::aircraft::Machine> (xefis);
 }

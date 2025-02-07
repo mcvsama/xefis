@@ -25,10 +25,10 @@
 
 
 extern std::unique_ptr<xf::Machine>
-xefis_machine (xf::Xefis&);
+make_xefis_machine (xf::Xefis&);
 
 extern std::unique_ptr<xf::MachineManager>
-xefis_machine_manager (xf::Xefis&);
+make_xefis_machine_manager (xf::Xefis&);
 
 #endif
 
