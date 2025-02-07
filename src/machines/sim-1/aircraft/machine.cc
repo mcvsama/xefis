@@ -24,9 +24,6 @@
 
 namespace sim1::aircraft {
 
-namespace rb = xf::rigid_body;
-
-
 Machine::Machine (xf::Xefis& xefis):
 	xf::SingleLoopMachine (xefis, xefis.logger(), 120_Hz)
 {
