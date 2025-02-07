@@ -12,7 +12,7 @@
  */
 
 // Local:
-#include "bodies_tree.h"
+#include "items_tree.h"
 #include "body_item.h"
 #include "constraint_item.h"
 #include "group_item.h"
@@ -34,7 +34,7 @@
 
 namespace xf {
 
-BodiesTree::BodiesTree (QWidget* parent, rigid_body::System& system, RigidBodyViewer& viewer):
+ItemsTree::ItemsTree (QWidget* parent, rigid_body::System& system, RigidBodyViewer& viewer):
 	QTreeWidget (parent),
 	_rigid_body_system (system),
 	_rigid_body_viewer (viewer)
@@ -53,7 +53,7 @@ BodiesTree::BodiesTree (QWidget* parent, rigid_body::System& system, RigidBodyVi
 
 
 void
-BodiesTree::refresh()
+ItemsTree::refresh()
 {
 	// Prevent sending itemChanged() signals when creating new items:
 	auto const signals_blocker = QSignalsBlocker (this);
@@ -93,13 +93,13 @@ BodiesTree::refresh()
 
 
 void
-BodiesTree::remove_deleted (std::set<rigid_body::Group*>& existing_groups,
-							std::set<GroupItem*>& group_items_to_update,
-							std::set<rigid_body::Body*>& existing_bodies,
-							std::set<BodyItem*>& body_items_to_update,
-							std::set<rigid_body::Constraint*>& existing_constraints,
-							std::set<ConstraintItem*>& constraint_items_to_update,
-							std::map<rigid_body::Body*, BodyItem*>& body_to_item)
+ItemsTree::remove_deleted (std::set<rigid_body::Group*>& existing_groups,
+						   std::set<GroupItem*>& group_items_to_update,
+						   std::set<rigid_body::Body*>& existing_bodies,
+						   std::set<BodyItem*>& body_items_to_update,
+						   std::set<rigid_body::Constraint*>& existing_constraints,
+						   std::set<ConstraintItem*>& constraint_items_to_update,
+						   std::map<rigid_body::Body*, BodyItem*>& body_to_item)
 {
 	auto groups_to_erase = std::set<rigid_body::Group*>();
 	auto bodies_to_erase = std::set<rigid_body::Body*>();
@@ -178,7 +178,7 @@ BodiesTree::remove_deleted (std::set<rigid_body::Group*>& existing_groups,
 
 
 void
-BodiesTree::recalculate_gravitating_bodies()
+ItemsTree::recalculate_gravitating_bodies()
 {
 	_gravitating_bodies.clear();
 
@@ -188,10 +188,10 @@ BodiesTree::recalculate_gravitating_bodies()
 
 
 void
-BodiesTree::insert_new (std::set<rigid_body::Group*> const& new_groups,
-						std::set<rigid_body::Body*> new_bodies,
-						std::set<rigid_body::Constraint*> const& new_constraints,
-						std::map<rigid_body::Body*, BodyItem*> const& body_to_item)
+ItemsTree::insert_new (std::set<rigid_body::Group*> const& new_groups,
+					   std::set<rigid_body::Body*> new_bodies,
+					   std::set<rigid_body::Constraint*> const& new_constraints,
+					   std::map<rigid_body::Body*, BodyItem*> const& body_to_item)
 {
 	// Collect body constraints info:
 	auto body_constraints = std::map<rigid_body::Body*, std::set<rigid_body::Constraint*>>();
@@ -250,9 +250,9 @@ BodiesTree::insert_new (std::set<rigid_body::Group*> const& new_groups,
 
 
 void
-BodiesTree::update_existing (std::set<GroupItem*> const& group_items,
-							 std::set<BodyItem*> const& body_items,
-							 std::set<ConstraintItem*> const& constraint_items)
+ItemsTree::update_existing (std::set<GroupItem*> const& group_items,
+							std::set<BodyItem*> const& body_items,
+							std::set<ConstraintItem*> const& constraint_items)
 {
 	for (auto* group_item: group_items)
 		group_item->refresh();
@@ -304,7 +304,7 @@ BodiesTree::update_existing (std::set<GroupItem*> const& group_items,
 
 
 void
-BodiesTree::set_icon (GroupItem& item)
+ItemsTree::set_icon (GroupItem& item)
 {
 	auto const followed = _rigid_body_viewer.followed_group() == &item.group();
 	item.setIcon (0, followed ? _followed_group_icon : _group_icon);
@@ -312,7 +312,7 @@ BodiesTree::set_icon (GroupItem& item)
 
 
 void
-BodiesTree::set_icon (BodyItem& item)
+ItemsTree::set_icon (BodyItem& item)
 {
 	auto const& body = item.body();
 	auto const gravitating = _gravitating_bodies.contains (&body);
@@ -329,14 +329,14 @@ BodiesTree::set_icon (BodyItem& item)
 
 
 void
-BodiesTree::set_icon (ConstraintItem& item)
+ItemsTree::set_icon (ConstraintItem& item)
 {
 	item.setIcon (0, _constraint_icon);
 }
 
 
 void
-BodiesTree::add_constraint_item_to (rigid_body::Constraint& constraint, BodyItem& body_item)
+ItemsTree::add_constraint_item_to (rigid_body::Constraint& constraint, BodyItem& body_item)
 {
 	auto* constraint_item = new ConstraintItem (body_item, constraint);
 	set_icon (*constraint_item);
@@ -351,7 +351,7 @@ BodiesTree::add_constraint_item_to (rigid_body::Constraint& constraint, BodyItem
 
 
 void
-BodiesTree::contextMenuEvent (QContextMenuEvent* event)
+ItemsTree::contextMenuEvent (QContextMenuEvent* event)
 {
 	QMenu menu;
 	QTreeWidgetItem* item = itemAt (event->pos());
@@ -455,7 +455,7 @@ BodiesTree::contextMenuEvent (QContextMenuEvent* event)
 
 
 void
-BodiesTree::leaveEvent (QEvent*)
+ItemsTree::leaveEvent (QEvent*)
 {
 	itemEntered (nullptr, 0);
 }

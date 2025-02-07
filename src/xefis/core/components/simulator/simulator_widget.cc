@@ -12,7 +12,7 @@
  */
 
 // Local:
-#include "bodies_tree.h"
+#include "items_tree.h"
 #include "body_item.h"
 #include "simulator_widget.h"
 
@@ -60,9 +60,9 @@ SimulatorWidget::SimulatorWidget (Simulator& simulator, QWidget* parent):
 	layout->addWidget (make_simulation_controls());
 	layout->addWidget (splitter);
 
-	_bodies_tree->refresh();
+	_items_tree->refresh();
 
-	if (auto* item = _bodies_tree->topLevelItem (0))
+	if (auto* item = _items_tree->topLevelItem (0))
 		update_editor_for (item);
 
 	resize (QSize (ph.em_pixels (80.0), ph.em_pixels (40.0)));
@@ -204,19 +204,19 @@ SimulatorWidget::make_body_controls()
 	_group_editor.emplace (this, *_rigid_body_viewer, Qt::blue);
 	_body_editor.emplace (this, *_rigid_body_viewer, Qt::darkGreen);
 	_constraint_editor.emplace (this, *_rigid_body_viewer, QColor (0xff, 0x8c, 0));
-	_bodies_tree.emplace (this, _simulator.rigid_body_system(), *_rigid_body_viewer);
-	_bodies_tree->setMouseTracking (true);
+	_items_tree.emplace (this, _simulator.rigid_body_system(), *_rigid_body_viewer);
+	_items_tree->setMouseTracking (true);
 
 	_editors_stack.emplace (this);
 	_editors_stack->addWidget (&*_group_editor);
 	_editors_stack->addWidget (&*_body_editor);
 	_editors_stack->addWidget (&*_constraint_editor);
 
-	QObject::connect (&*_bodies_tree, &QTreeWidget::currentItemChanged, [this] (QTreeWidgetItem* current, [[maybe_unused]] QTreeWidgetItem* previous) {
+	QObject::connect (&*_items_tree, &QTreeWidget::currentItemChanged, [this] (QTreeWidgetItem* current, [[maybe_unused]] QTreeWidgetItem* previous) {
 		update_editor_for (current);
 	});
 
-	QObject::connect (&*_bodies_tree, &QTreeWidget::itemEntered, [this] (QTreeWidgetItem* current, [[maybe_unused]] int column) {
+	QObject::connect (&*_items_tree, &QTreeWidget::itemEntered, [this] (QTreeWidgetItem* current, [[maybe_unused]] int column) {
 		if (!current)
 			_rigid_body_viewer->set_hovered (nullptr);
 		else if (auto* body_item = dynamic_cast<BodyItem*> (current))
@@ -225,13 +225,13 @@ SimulatorWidget::make_body_controls()
 			_rigid_body_viewer->set_hovered (nullptr);
 	});
 
-	QObject::connect (&*_bodies_tree, &QTreeWidget::itemChanged, [this] (QTreeWidgetItem* item, int column) {
+	QObject::connect (&*_items_tree, &QTreeWidget::itemChanged, [this] (QTreeWidgetItem* item, int column) {
 		if (column == 0)
 		{
 			if (auto* group_item = dynamic_cast<GroupItem*> (item))
 			{
 				group_item->backpropagate();
-				_bodies_tree->refresh();
+				_items_tree->refresh();
 
 				if (_group_editor)
 					_group_editor->refresh();
@@ -239,7 +239,7 @@ SimulatorWidget::make_body_controls()
 			else if (auto* body_item = dynamic_cast<BodyItem*> (item))
 			{
 				body_item->backpropagate();
-				_bodies_tree->refresh();
+				_items_tree->refresh();
 
 				if (_body_editor)
 					_body_editor->refresh();
@@ -247,7 +247,7 @@ SimulatorWidget::make_body_controls()
 			else if (auto* constraint_item = dynamic_cast<ConstraintItem*> (item))
 			{
 				constraint_item->backpropagate();
-				_bodies_tree->refresh();
+				_items_tree->refresh();
 
 				if (_constraint_editor)
 					_constraint_editor->refresh();
@@ -260,7 +260,7 @@ SimulatorWidget::make_body_controls()
 
 	auto* layout = new QHBoxLayout (body_controls);
 	layout->setMargin (0);
-	layout->addWidget (&*_bodies_tree);
+	layout->addWidget (&*_items_tree);
 	layout->addWidget (&*_editors_stack);
 
 	return body_controls;

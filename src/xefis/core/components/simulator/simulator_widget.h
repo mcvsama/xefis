@@ -15,7 +15,7 @@
 #define XEFIS__CORE__COMPONENTS__SIMULATOR__SIMULATOR_WIDGET_H__INCLUDED
 
 // Local:
-#include "bodies_tree.h"
+#include "items_tree.h"
 #include "standard_editor.h"
 
 // Xefis:
@@ -113,7 +113,7 @@ class SimulatorWidget: public QWidget
 									_body_editor;
 	std::optional<StandardEditor<rigid_body::Constraint>>
 									_constraint_editor;
-	std::optional<BodiesTree>		_bodies_tree;
+	std::optional<ItemsTree>		_items_tree;
 	std::optional<QLabel>			_simulation_time_label;
 	std::optional<QLabel>			_simulation_performance_value_label;
 	QIcon							_start_icon					{ icons::start() };
@@ -136,7 +136,7 @@ inline void
 SimulatorWidget::set_followed (rigid_body::Group const& followed_group) noexcept
 {
 	_rigid_body_viewer->set_followed (followed_group);
-	_bodies_tree->refresh();
+	_items_tree->refresh();
 }
 
 
@@ -144,7 +144,7 @@ inline void
 SimulatorWidget::set_followed (rigid_body::Body const& followed_body) noexcept
 {
 	_rigid_body_viewer->set_followed (followed_body);
-	_bodies_tree->refresh();
+	_items_tree->refresh();
 }
 
 } // namespace xf

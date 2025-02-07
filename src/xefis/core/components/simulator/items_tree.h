@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__CORE__COMPONENTS__SIMULATOR__BODIES_TREE_H__INCLUDED
-#define XEFIS__CORE__COMPONENTS__SIMULATOR__BODIES_TREE_H__INCLUDED
+#ifndef XEFIS__CORE__COMPONENTS__SIMULATOR__ITEMS_TREE_H__INCLUDED
+#define XEFIS__CORE__COMPONENTS__SIMULATOR__ITEMS_TREE_H__INCLUDED
 
 // Local:
 #include "body_item.h"
@@ -37,12 +37,12 @@
 
 namespace xf {
 
-class BodiesTree: public QTreeWidget
+class ItemsTree: public QTreeWidget
 {
   public:
 	// Ctor
 	explicit
-	BodiesTree (QWidget* parent, rigid_body::System&, RigidBodyViewer&);
+	ItemsTree (QWidget* parent, rigid_body::System&, RigidBodyViewer&);
 
 	/**
 	 * Refreshes the list of bodies from the system.
