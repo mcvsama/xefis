@@ -99,6 +99,7 @@ MIHAU.modules[xefis].products[xefis].sources				+= xefis/core/licenses.cc
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/core/licenses.h
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/core/machine.cc
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/core/machine.h
+MIHAU.modules[xefis].products[xefis].sources				+= xefis/core/machine_manager.h
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/core/module.cc
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/core/module.h
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/core/paint_request.h
