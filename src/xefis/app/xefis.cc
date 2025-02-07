@@ -18,6 +18,8 @@
 #include <xefis/config/all.h>
 #include <xefis/core/components/configurator/configurator_widget.h>
 #include <xefis/core/executable.h>
+#include <xefis/core/machine.h>
+#include <xefis/core/machine_manager.h>
 #include <xefis/core/system.h>
 #include <xefis/core/licenses.h>
 #include <xefis/support/airframe/airframe.h>
@@ -83,9 +85,17 @@ Xefis::Xefis (int& argc, char** argv):
 	Exception::log (_logger, [&] {
 		_system = std::make_unique<System> (_logger);
 		_graphics = std::make_unique<Graphics> (_logger);
-		_machine = ::xefis_machine (*this);
+		_machine_manager = xefis_machine_manager (*this);
 
-		if (_machine)
+		if (_machine_manager)
+			_machine = _machine_manager->make_machine();
+
+		if (!_machine)
+			_machine = xefis_machine (*this);
+
+		if (!_machine)
+			_logger << "Neither machine manager (xefis_machine_manager()) nor machine (xefis_machine()) was compiled-in." << std::endl;
+		else
 		{
 			_configurator_widget = std::make_unique<ConfiguratorWidget> (*_machine, nullptr);
 
@@ -101,8 +111,6 @@ Xefis::Xefis (int& argc, char** argv):
 			});
 			_posix_signals_check_timer->start();
 		}
-		else
-			_logger << "No machine was compiled-in." << std::endl;
 	});
 }
 
@@ -241,6 +249,17 @@ Xefis::print_copyrights (std::ostream& out)
 [[gnu::weak]]
 std::unique_ptr<xf::Machine>
 xefis_machine (xf::Xefis&)
+{
+	return nullptr;
+}
+
+
+/**
+ * Default xefis_machine_manager() function, used when there's no other provided.
+ */
+[[gnu::weak]]
+std::unique_ptr<xf::MachineManager>
+xefis_machine_manager (xf::Xefis&)
 {
 	return nullptr;
 }

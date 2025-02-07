@@ -18,6 +18,7 @@
 #include <xefis/config/all.h>
 #include <xefis/core/components/configurator/configurator_widget.h>
 #include <xefis/core/graphics.h>
+#include <xefis/core/machine_manager.h>
 #include <xefis/core/system.h>
 
 // Neutrino:
@@ -168,6 +169,7 @@ class Xefis: public QApplication
 	std::unique_ptr<System>				_system;
 	std::unique_ptr<ConfiguratorWidget>	_configurator_widget;
 	std::unique_ptr<Graphics>			_graphics;
+	std::unique_ptr<MachineManager>		_machine_manager;
 	std::unique_ptr<Machine>			_machine;
 };
 
