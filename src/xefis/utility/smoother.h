@@ -25,10 +25,11 @@
 #include <boost/circular_buffer.hpp>
 
 // Standard:
+#include <algorithm>
 #include <cstddef>
 #include <cmath>
-#include <algorithm>
 #include <numbers>
+#include <stdexcept>
 
 
 namespace xf {
@@ -99,7 +100,17 @@ template<class pValue>
 		using Value = pValue;
 
 	  public:
-		// Ctor
+		/**
+		 * \param	smoothing_time
+		 *			Duration of the smoothing window. It's time after which the output value reaches the input value.
+		 *			This Smoother uses Hann window, it means that at least 3 samples are needed for the Smoother
+		 *			to work properly.
+		 * \param	precision
+		 *			Internal precision of calculations. If the dt provided in process() varies from call to call,
+		 *			the Smoother internally uses more steps to get more correct output. The duration of each internal steps is
+		 *			controlled by this [precision] parameter.
+		 *			Must be > 0_ms and finite.
+		 */
 		explicit
 		Smoother (si::Time smoothing_time = 1_ms, si::Time precision = 1_ms) noexcept;
 
