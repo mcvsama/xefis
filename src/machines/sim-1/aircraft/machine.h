@@ -61,11 +61,11 @@ class Machine: public xf::SingleLoopMachine
 	connect_modules() override;
 
   private:
-	DataCenter			_data_center	{ loop() };
-	Models				_models;
-	Hardware			_hardware		{ loop(), logger() };
-	Computers			_computers;
-	Simulation			_simulation		{ *this, _models, logger().with_context ("simulation") };
+	DataCenter	_data_center	{ loop() };
+	Models		_models;
+	Hardware	_hardware		{ loop(), logger() };
+	Computers	_computers;
+	Simulation	_simulation		{ *this, _models, logger().with_context ("simulation") };
 };
 
 } // namespace sim1::aircraft
