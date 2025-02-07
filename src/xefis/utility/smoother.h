@@ -55,7 +55,7 @@ class SmootherBase
 	 * It's the size of the smoothing window. After that time, output value will reach target value.
 	 */
 	void
-	set_smoothing_time (si::Time smoothing_time) noexcept;
+	set_smoothing_time (si::Time smoothing_time);
 
 	/**
 	 * Return sampling precision.
@@ -67,7 +67,7 @@ class SmootherBase
 	 * Set sampling precision.
 	 */
 	void
-	set_precision (si::Time precision) noexcept;
+	set_precision (si::Time precision);
 
 	/**
 	 * Resets the smoother when the next process() is called,
@@ -169,8 +169,14 @@ SmootherBase::smoothing_time() const noexcept
 
 
 inline void
-SmootherBase::set_smoothing_time (si::Time smoothing_time) noexcept
+SmootherBase::set_smoothing_time (si::Time smoothing_time)
 {
+	using std::isfinite;
+	using si::isfinite;
+
+	if (smoothing_time <= 0_ms || !isfinite (smoothing_time))
+		throw std::logic_error ("SmootherBase::set_smoothing_time(): smoothing_time must be > 0_ms and finite");
+
 	_smoothing_time = smoothing_time;
 	int millis = _smoothing_time.in<si::Millisecond>();
 
@@ -191,8 +197,14 @@ SmootherBase::precision() const noexcept
 
 
 inline void
-SmootherBase::set_precision (si::Time precision) noexcept
+SmootherBase::set_precision (si::Time precision)
 {
+	using std::isfinite;
+	using si::isfinite;
+
+	if (precision <= 0_ms || !isfinite (precision))
+		throw std::logic_error ("SmootherBase::set_precision(): precision must be > 0_ms and finite");
+
 	_precision = precision;
 	invalidate();
 }
