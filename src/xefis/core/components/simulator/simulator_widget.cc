@@ -228,30 +228,27 @@ SimulatorWidget::make_body_controls()
 	QObject::connect (&*_items_tree, &QTreeWidget::itemChanged, [this] (QTreeWidgetItem* item, int column) {
 		if (column == 0)
 		{
-			if (auto* group_item = dynamic_cast<GroupItem*> (item))
-			{
-				group_item->backpropagate();
-				_items_tree->refresh();
+			auto backpropagate = [this, &item]<class SpecificItem, class Editor> (Editor& editor) -> bool {
+				if (auto* specific_item = dynamic_cast<SpecificItem*> (item))
+				{
+					specific_item->backpropagate();
+					_items_tree->refresh();
 
-				if (_group_editor)
-					_group_editor->refresh();
-			}
-			else if (auto* body_item = dynamic_cast<BodyItem*> (item))
-			{
-				body_item->backpropagate();
-				_items_tree->refresh();
+					if (editor)
+						editor->refresh();
 
-				if (_body_editor)
-					_body_editor->refresh();
-			}
-			else if (auto* constraint_item = dynamic_cast<ConstraintItem*> (item))
-			{
-				constraint_item->backpropagate();
-				_items_tree->refresh();
+					return true;
+				}
+				else
+					return false;
+			};
 
-				if (_constraint_editor)
-					_constraint_editor->refresh();
-			}
+			if (backpropagate.operator()<GroupItem> (_group_editor))
+			{ }
+			else if (backpropagate.operator()<BodyItem> (_body_editor))
+			{ }
+			else if (backpropagate.operator()<ConstraintItem> (_constraint_editor))
+			{ }
 		}
 	});
 
