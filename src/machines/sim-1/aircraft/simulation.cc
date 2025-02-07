@@ -63,7 +63,6 @@ Simulation::Simulation (Machine& machine, Models& models, neutrino::Logger const
 	_simulator_widget->set_machine (&machine);
 	_simulator_widget->set_followed (_aircraft.rigid_group);
 	_simulator_widget->set_planet (&earth);
-	_simulator_widget->show();
 }
 
 } // namespace sim1::aircraft

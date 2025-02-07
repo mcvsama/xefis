@@ -58,6 +58,14 @@ class Simulation: public neutrino::Noncopyable
 	aircraft() const noexcept
 		{ return _aircraft; }
 
+	xf::SimulatorWidget&
+	simulator_widget() noexcept
+		{ return *_simulator_widget; }
+
+	void
+	show()
+		{ _simulator_widget->show(); }
+
   private:
 	xf::Logger							_logger;
 	Models&								_models;

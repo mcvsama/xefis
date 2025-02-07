@@ -82,11 +82,3 @@ Machine::connect_modules()
 
 } // namespace sim1::aircraft
 
-
-std::unique_ptr<xf::Machine>
-make_xefis_machine (xf::Xefis& xefis)
-{
-	return std::make_unique<sim1::aircraft::Machine> (xefis);
-}
-
-

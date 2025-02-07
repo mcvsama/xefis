@@ -52,6 +52,10 @@ class Machine: public xf::SingleLoopMachine
 	data_center() const noexcept
 		{ return _data_center; }
 
+	QWidget&
+	simulator_widget()
+		{ return _simulation.simulator_widget(); }
+
   private:
 	void
 	connect_modules() override;
