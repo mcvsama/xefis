@@ -106,7 +106,7 @@ parse_color (QString color)
 			vals = parse_hex_string (color);
 			return QColor (vals[0], vals[1], vals[2]);
 		}
-		if (color.size() == 4)
+		else if (color.size() == 4)
 		{
 			color = color.mid (0, 1) + color.mid (0, 1) + ":" +
 					color.mid (1, 1) + color.mid (1, 1) + ":" +
