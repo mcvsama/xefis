@@ -88,7 +88,7 @@ AirfoilSplineWidget::prepare_for_painting()
 	auto const [min_x, max_x] = std::minmax_element (points.begin(), points.end(), [](auto a, auto b) { return a.x() < b.x(); });
 	auto const [min_y, max_y] = std::minmax_element (points.begin(), points.end(), [](auto a, auto b) { return a.y() < b.y(); });
 	_range[0] = Range (min_x->x(), max_x->x());
-	_range[1] = Range (min_y->y(), max_y->y()); // TODO make Range support structured bindings
+	_range[1] = Range (min_y->y(), max_y->y());
 
 	_airfoil_polygon.clear();
 
