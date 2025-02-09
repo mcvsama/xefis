@@ -77,6 +77,7 @@ AirfoilSplineWidget::resizeEvent (QResizeEvent* event)
 {
 	CanvasWidget::resizeEvent (event);
 	setup_painting_transform();
+	_pens_calculated = false;
 }
 
 
