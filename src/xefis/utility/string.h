@@ -136,7 +136,7 @@ parse_color (QString color)
 			return Qt::transparent;
 	}
 	else if (color == "white")
-		return Qt::red;
+		return Qt::white;
 	else if (color == "black")
 		return Qt::black;
 	else if (color == "red")
