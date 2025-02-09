@@ -112,42 +112,46 @@ parse_color (QString color)
 		Blob vals;
 		color = color.mid (1);
 
-		if (color.size() == 3)
-		{
-			color = color.mid (0, 1) + color.mid (0, 1) + ":" +
-					color.mid (1, 1) + color.mid (1, 1) + ":" +
-					color.mid (2, 1) + color.mid (2, 1);
-			vals = parse_hex_string (color);
-			return QColor (vals[0], vals[1], vals[2]);
-		}
-		else if (color.size() == 4)
-		{
-			color = color.mid (0, 1) + color.mid (0, 1) + ":" +
-					color.mid (1, 1) + color.mid (1, 1) + ":" +
-					color.mid (2, 1) + color.mid (2, 1) + ":" +
-					color.mid (3, 1) + color.mid (3, 1);
-			vals = parse_hex_string (color);
-			return QColor (vals[0], vals[1], vals[2], vals[3]);
-		}
-		else if (color.size() == 6)
-		{
-			color = color.mid (0, 1) + color.mid (1, 1) + ":" +
-					color.mid (2, 1) + color.mid (3, 1) + ":" +
-					color.mid (4, 1) + color.mid (5, 1);
-			vals = parse_hex_string (color);
-			return QColor (vals[0], vals[1], vals[2]);
-		}
-		else if (color.size() == 8)
-		{
-			color = color.mid (0, 1) + color.mid (1, 1) + ":" +
-					color.mid (2, 1) + color.mid (3, 1) + ":" +
-					color.mid (4, 1) + color.mid (5, 1) + ":" +
-					color.mid (6, 1) + color.mid (7, 1);
-			vals = parse_hex_string (color);
-			return QColor (vals[0], vals[1], vals[2], vals[3]);
-		}
-		else
+		try {
+			if (color.size() == 3)
+			{
+				color = color.mid (0, 1) + color.mid (0, 1) + ":" +
+						color.mid (1, 1) + color.mid (1, 1) + ":" +
+						color.mid (2, 1) + color.mid (2, 1);
+				vals = parse_hex_string (color);
+				return QColor (vals[0], vals[1], vals[2]);
+			}
+			else if (color.size() == 4)
+			{
+				color = color.mid (0, 1) + color.mid (0, 1) + ":" +
+						color.mid (1, 1) + color.mid (1, 1) + ":" +
+						color.mid (2, 1) + color.mid (2, 1) + ":" +
+						color.mid (3, 1) + color.mid (3, 1);
+				vals = parse_hex_string (color);
+				return QColor (vals[0], vals[1], vals[2], vals[3]);
+			}
+			else if (color.size() == 6)
+			{
+				color = color.mid (0, 1) + color.mid (1, 1) + ":" +
+						color.mid (2, 1) + color.mid (3, 1) + ":" +
+						color.mid (4, 1) + color.mid (5, 1);
+				vals = parse_hex_string (color);
+				return QColor (vals[0], vals[1], vals[2]);
+			}
+			else if (color.size() == 8)
+			{
+				color = color.mid (0, 1) + color.mid (1, 1) + ":" +
+						color.mid (2, 1) + color.mid (3, 1) + ":" +
+						color.mid (4, 1) + color.mid (5, 1) + ":" +
+						color.mid (6, 1) + color.mid (7, 1);
+				vals = parse_hex_string (color);
+				return QColor (vals[0], vals[1], vals[2], vals[3]);
+			}
+			else
+				return Qt::transparent;
+		} catch (InvalidBinaryString&) {
 			return Qt::transparent;
+		}
 	}
 	else if (color == "white")
 		return Qt::white;
