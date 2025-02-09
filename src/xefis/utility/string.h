@@ -174,30 +174,6 @@ parse_color (QString color)
 		return Qt::transparent;
 }
 
-
-inline Qt::Alignment
-parse_alignment (QString string)
-{
-	Qt::Alignment alignment;
-	QStringList list = string.split (" ");
-
-	if (list.contains ("top"))
-		alignment |= Qt::AlignTop;
-	else if (list.contains ("vcenter"))
-		alignment |= Qt::AlignVCenter;
-	else if (list.contains ("bottom"))
-		alignment |= Qt::AlignBottom;
-
-	if (list.contains ("left"))
-		alignment |= Qt::AlignLeft;
-	else if (list.contains ("hcenter"))
-		alignment |= Qt::AlignHCenter;
-	else if (list.contains ("right"))
-		alignment |= Qt::AlignRight;
-
-	return alignment;
-}
-
 } // namespace xf
 
 #endif
