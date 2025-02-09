@@ -46,13 +46,15 @@ parse_hex_string (QString const& string)
 
 	enum State { MSB, LSB, Colon };
 
-	auto from_xdigit = [&string](QChar& c) -> uint8_t
+	auto from_xdigit = [&string](QChar const& c) -> uint8_t
 	{
-		static xf::HexTable hextable;
+		static xf::HexTable const hextable;
 
 		char a = c.toLatin1();
+
 		if (!std::isxdigit (a))
 			throw xf::Exception ("invalid binary string: " + string.toStdString());
+
 		return hextable[a];
 	};
 
@@ -78,6 +80,7 @@ parse_hex_string (QString const& string)
 				// Skip it:
 				if (c != ':')
 					throw xf::Exception ("invalid binary string: " + string.toStdString());
+
 				state = MSB;
 				break;
 		}
@@ -85,6 +88,7 @@ parse_hex_string (QString const& string)
 	// Must end with state Colon:
 	if (state != Colon)
 		throw xf::Exception ("invalid binary string: " + string.toStdString());
+
 	return blob;
 }
 
