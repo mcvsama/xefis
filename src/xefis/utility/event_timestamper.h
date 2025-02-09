@@ -25,11 +25,22 @@
 
 namespace xf {
 
+/**
+ * This EventTimestamper class is a utility for tracking the duration since an event last occurred, where an event is defined by a boolean condition provided
+ * via a function.
+ *
+ * This class is useful in scenarios where you want to track when a condition last became true and check if a certain amount of time has passed since then.
+ * Examples:
+ *  • Detecting button presses and measuring how long since the last press.
+ *  • Tracking events in a real-time system (e.g., sensor triggers, state transitions).
+ *  • Implementing debouncing logic.
+ */
 class EventTimestamper
 {
   public:
 	/**
 	 * Update to current timestamp and test the condition.
+	 * It stores the timestamp when value returned by [condition] changes from false to true.
 	 */
 	void
 	update (si::Time now, std::function<bool()> condition);
