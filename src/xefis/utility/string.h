@@ -98,6 +98,7 @@ parse_color (QString color)
 	{
 		Blob vals;
 		color = color.mid (1);
+
 		if (color.size() == 3)
 		{
 			color = color.mid (0, 1) + color.mid (0, 1) + ":" +
