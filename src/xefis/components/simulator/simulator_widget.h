@@ -26,6 +26,9 @@
 #include <xefis/support/ui/rigid_body_viewer.h>
 #include <xefis/utility/smoother.h>
 
+// Neutrino:
+#include <neutrino/responsibility.h>
+
 // Qt:
 #include <QIcon>
 #include <QStackedWidget>
@@ -121,6 +124,8 @@ class SimulatorWidget: public QWidget
 	float							_simulation_speed			{ 1.0f };
 	float							_last_finite_performance	{ 1.0f };
 	Smoother<float>					_performance_smoother		{ 100_ms, 10_ms };
+	std::optional<neutrino::Responsibility>
+									_disconnect_item_changed_signal;
 };
 
 

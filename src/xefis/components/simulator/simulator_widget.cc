@@ -212,8 +212,12 @@ SimulatorWidget::make_body_controls()
 	_editors_stack->addWidget (&*_body_editor);
 	_editors_stack->addWidget (&*_constraint_editor);
 
-	QObject::connect (&*_items_tree, &QTreeWidget::currentItemChanged, [this] (QTreeWidgetItem* current, [[maybe_unused]] QTreeWidgetItem* previous) {
+	auto item_changed_connection = QObject::connect (&*_items_tree, &QTreeWidget::currentItemChanged, [this] (QTreeWidgetItem* current, [[maybe_unused]] QTreeWidgetItem* previous) {
 		update_editor_for (current);
+	});
+
+	_disconnect_item_changed_signal.emplace ([item_changed_connection] {
+		QObject::disconnect (item_changed_connection);
 	});
 
 	QObject::connect (&*_items_tree, &QTreeWidget::itemEntered, [this] (QTreeWidgetItem* current, [[maybe_unused]] int column) {
