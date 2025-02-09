@@ -474,6 +474,7 @@ MIHAU.modules[xefis].products[autotest].sources				+= xefis/support/simulation/r
 MIHAU.modules[xefis].products[autotest].sources				+= xefis/support/sockets/tests/socket_observer.test.cc
 MIHAU.modules[xefis].products[autotest].sources				+= xefis/support/sockets/tests/socket_delta_decoder.test.cc
 MIHAU.modules[xefis].products[autotest].sources				+= xefis/support/sockets/tests/socket_quadrature_decoder.test.cc
+MIHAU.modules[xefis].products[autotest].sources				+= xefis/utility/tests/string.test.cc
 
 MIHAU.modules[xefis].products								+= manualtest
 MIHAU.modules[xefis].products[manualtest].linker_flags		+= $(MIHAU.modules[neutrino].products[manualtest].linker_flags)
