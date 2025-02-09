@@ -16,7 +16,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/components/module_configurator/config_widget.h>
+#include <xefis/components/module_configurator/config_widget.h>
 #include <xefis/support/ui/paint_helper.h>
 
 // Neutrino:

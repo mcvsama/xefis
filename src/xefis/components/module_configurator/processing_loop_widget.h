@@ -16,8 +16,8 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/components/module_configurator/config_widget.h>
 #include <xefis/core/processing_loop.h>
-#include <xefis/core/components/module_configurator/config_widget.h>
 #include <xefis/support/ui/histogram_widget.h>
 #include <xefis/support/ui/histogram_stats_widget.h>
 #include <xefis/support/ui/widget.h>

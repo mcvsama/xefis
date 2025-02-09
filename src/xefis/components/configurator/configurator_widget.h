@@ -16,8 +16,8 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/components/data_recorder/data_recorder.h>
-#include <xefis/core/components/module_configurator/module_configurator.h>
+#include <xefis/components/data_recorder/data_recorder.h>
+#include <xefis/components/module_configurator/module_configurator.h>
 #include <xefis/core/module.h>
 #include <xefis/support/ui/widget.h>
 

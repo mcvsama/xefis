@@ -19,10 +19,10 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/components/module_configurator/config_widget.h>
+#include <xefis/components/socket_tree/socket_tree.h>
 #include <xefis/core/instrument.h>
 #include <xefis/core/machine.h>
-#include <xefis/core/components/module_configurator/config_widget.h>
-#include <xefis/core/components/socket_tree/socket_tree.h>
 #include <xefis/support/ui/histogram_widget.h>
 #include <xefis/support/ui/histogram_stats_widget.h>
 #include <xefis/support/ui/widget.h>

@@ -19,7 +19,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/components/simulator/simulator_widget.h>
+#include <xefis/components/simulator/simulator_widget.h>
 #include <xefis/support/simulation/constraints/angular_servo_constraint.h>
 #include <xefis/support/simulation/electrical/network.h>
 #include <xefis/support/simulation/electrical/node_voltage_solver.h>

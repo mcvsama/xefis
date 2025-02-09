@@ -16,7 +16,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/components/configurator/configurator_widget.h>
+#include <xefis/components/configurator/configurator_widget.h>
 #include <xefis/core/graphics.h>
 #include <xefis/core/machine_manager.h>
 #include <xefis/core/system.h>
