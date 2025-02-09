@@ -34,9 +34,18 @@
 
 namespace xf {
 
+class InvalidBinaryString: public Exception
+{
+  public:
+	using Exception::Exception;
+};
+
+
 /**
  * Parse binary string of the form: 00:11:22:aa:ff to a vector
  * of bytes (Blob).
+ *
+ * \throws InvalidBinaryString when string can't be parsed.
  */
 inline Blob
 parse_hex_string (QString const& string)
@@ -53,7 +62,7 @@ parse_hex_string (QString const& string)
 		char a = c.toLatin1();
 
 		if (!std::isxdigit (a))
-			throw xf::Exception ("invalid binary string: " + string.toStdString());
+			throw InvalidBinaryString ("invalid binary string: " + string.toStdString());
 
 		return hextable[a];
 	};
@@ -79,7 +88,7 @@ parse_hex_string (QString const& string)
 			case Colon:
 				// Skip it:
 				if (c != ':')
-					throw xf::Exception ("invalid binary string: " + string.toStdString());
+					throw InvalidBinaryString ("invalid binary string: " + string.toStdString());
 
 				state = MSB;
 				break;
@@ -87,7 +96,7 @@ parse_hex_string (QString const& string)
 	}
 	// Must end with state Colon:
 	if (state != Colon)
-		throw xf::Exception ("invalid binary string: " + string.toStdString());
+		throw InvalidBinaryString ("invalid binary string: " + string.toStdString());
 
 	return blob;
 }
