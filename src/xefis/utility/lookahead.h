@@ -23,6 +23,10 @@
 
 namespace xf {
 
+/**
+ * The Lookahead class is a predictive filter that estimates a future value of a given input signal based on a specified lookahead time. It processes input
+ * samples over time and smooths transitions while providing a forecasted output.
+ */
 template<class pValue>
 	class Lookahead
 	{
@@ -35,27 +39,26 @@ template<class pValue>
 		Lookahead (si::Time lookahead_time) noexcept;
 
 		/**
-		 * Set lookahead time.
+		 * Updates the lookahead time and invalidates the current state to force recalculation on the next input.
 		 */
 		void
 		set_lookahead_time (si::Time) noexcept;
 
 		/**
-		 * Don't compute new result until given time
-		 * has passed.
+		 * Prevents the computation of a new output until at least the specified time has elapsed since the last update.
 		 */
 		void
 		set_minimum_integration_time (si::Time) noexcept;
 
 		/**
-		 * Mark value as invalid and reset computations
-		 * until next process() call.
+		 * Mark value as invalid and reset computations until next process() call.
 		 */
 		void
 		invalidate() noexcept;
 
 		/**
 		 * Process new input sample, taken after dt time.
+		 * Specifically if enough time has passed (_minimum_integration_time), it applies a lookahead prediction formula.
 		 */
 		Value
 		process (Value input, si::Time dt) noexcept;
