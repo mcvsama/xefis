@@ -131,6 +131,9 @@ class AirfoilSplineWidget: public CanvasWidget
 	void
 	update_canvas() override;
 
+	void
+	update_pens();
+
   private:
 	AirfoilSpline						_airfoil_spline {};
 	std::optional<si::Length>			_chord_length;

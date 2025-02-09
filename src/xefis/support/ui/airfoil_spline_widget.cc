@@ -160,18 +160,8 @@ AirfoilSplineWidget::update_canvas()
 	ph.setup_painter (painter);
 	painter.setTransform (_painting_transform);
 
-	if (isVisible() && !_pens_calculated)
-	{
-		_coordinate_lines_pen = QPen (Qt::gray, ph.em_pixels (0.05f) / _scale, Qt::SolidLine, Qt::RoundCap);
-		auto const airfoil_color = QColor (0x55, 0x22, 0x00, 0x44);
-		_airfoil_pen = QPen (airfoil_color.darker (150), ph.em_pixels (0.05f) / _scale, Qt::SolidLine, Qt::RoundCap);
-		_airfoil_brush = QBrush (airfoil_color);
-		_center_of_mass_black_pen = QPen (Qt::black, ph.em_pixels (0.1f) / _scale, Qt::SolidLine, Qt::FlatCap);
-		_lift_force_pen = QPen (Qt::green, ph.em_pixels (0.1f) / _scale, Qt::SolidLine, Qt::RoundCap);
-		_drag_force_pen = QPen (Qt::red, ph.em_pixels (0.1f) / _scale, Qt::SolidLine, Qt::RoundCap);
-		_center_of_pressure_pen = QPen (Qt::blue, ph.em_pixels (0.1f) / _scale, Qt::SolidLine, Qt::FlatCap);
-		_pens_calculated = true;
-	}
+	if (isVisible())
+		update_pens();
 
 	// Coordinate lines:
 	{
@@ -259,6 +249,24 @@ AirfoilSplineWidget::update_canvas()
 
 	// TODO visualize pitching moment
 	// TODO visualize angle of attack: beta?
+}
+
+
+void
+AirfoilSplineWidget::update_pens()
+{
+	if (!_pens_calculated)
+	{
+		_coordinate_lines_pen = QPen (Qt::gray, ph.em_pixels (0.05f) / _scale, Qt::SolidLine, Qt::RoundCap);
+		auto const airfoil_color = QColor (0x55, 0x22, 0x00, 0x44);
+		_airfoil_pen = QPen (airfoil_color.darker (150), ph.em_pixels (0.05f) / _scale, Qt::SolidLine, Qt::RoundCap);
+		_airfoil_brush = QBrush (airfoil_color);
+		_center_of_mass_black_pen = QPen (Qt::black, ph.em_pixels (0.1f) / _scale, Qt::SolidLine, Qt::FlatCap);
+		_lift_force_pen = QPen (Qt::green, ph.em_pixels (0.1f) / _scale, Qt::SolidLine, Qt::RoundCap);
+		_drag_force_pen = QPen (Qt::red, ph.em_pixels (0.1f) / _scale, Qt::SolidLine, Qt::RoundCap);
+		_center_of_pressure_pen = QPen (Qt::blue, ph.em_pixels (0.1f) / _scale, Qt::SolidLine, Qt::FlatCap);
+		_pens_calculated = true;
+	}
 }
 
 } // namespace xf
