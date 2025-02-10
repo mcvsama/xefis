@@ -375,7 +375,7 @@ ArtificialHorizon::paint (AdiPaintRequest& pr) const
 		paint_pitch_scale (pr);
 		paint_heading (pr);
 		paint_tcas_ra (pr);
-		paint_roll_scale (pr);
+		paint_bank_angle_indicator (pr);
 		paint_pitch_disagree (pr);
 		paint_roll_disagree (pr);
 	}
@@ -616,7 +616,7 @@ ArtificialHorizon::paint_pitch_scale (AdiPaintRequest& pr) const
 
 
 void
-ArtificialHorizon::paint_roll_scale (AdiPaintRequest& pr) const
+ArtificialHorizon::paint_bank_angle_indicator (AdiPaintRequest& pr) const
 {
 	float const w = pr.aids.lesser_dimension() * 3.f / 9.f;
 

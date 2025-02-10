@@ -374,7 +374,7 @@ class ArtificialHorizon
 	paint_tcas_ra (AdiPaintRequest&) const;
 
 	void
-	paint_roll_scale (AdiPaintRequest&) const;
+	paint_bank_angle_indicator (AdiPaintRequest&) const;
 
 	void
 	paint_pitch_disagree (AdiPaintRequest&) const;
