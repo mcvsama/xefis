@@ -456,7 +456,7 @@ RigidBodyPainter::paint (rigid_body::System const& system)
 
 		if (constraints_visible())
 			for (auto const& constraint: system.constraints())
-				paint_constraint (*constraint);
+				paint (*constraint);
 
 		if (gravity_visible() || aerodynamic_forces_visible() || external_forces_visible())
 			for (auto const& body: system.bodies())
@@ -638,7 +638,7 @@ RigidBodyPainter::paint_moments_of_inertia_cuboid (MassMoments<BodyCOM> const& m
 
 
 void
-RigidBodyPainter::paint_constraint (rigid_body::Constraint const& constraint)
+RigidBodyPainter::paint (rigid_body::Constraint const& constraint)
 {
 	if (constraint.enabled() && !constraint.broken())
 	{

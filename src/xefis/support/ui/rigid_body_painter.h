@@ -401,7 +401,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	paint_moments_of_inertia_cuboid (MassMoments<BodyCOM> const&);
 
 	void
-	paint_constraint (rigid_body::Constraint const&);
+	paint (rigid_body::Constraint const&);
 
 	void
 	paint_forces (rigid_body::Body const&);
