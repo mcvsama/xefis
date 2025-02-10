@@ -163,13 +163,6 @@ AirfoilSplineWidget::update_canvas()
 	if (isVisible())
 		update_pens();
 
-	// Coordinate lines:
-	{
-		painter.setPen (_coordinate_lines_pen);
-		painter.drawLine (QPoint (-2, 0), QPoint (+2, 0));
-		painter.drawLine (QPoint (0, -2), QPoint (0, +2));
-	}
-
 	// Draw relative wind direction lines:
 	if (_drag_force && _center_of_pressure_position)
 	{
@@ -213,6 +206,13 @@ AirfoilSplineWidget::update_canvas()
 		painter.setPen (_airfoil_pen);
 		painter.setBrush (_airfoil_brush);
 		painter.drawPolygon (_airfoil_polygon);
+	}
+
+	// Coordinate lines:
+	{
+		painter.setPen (_coordinate_lines_pen);
+		painter.drawLine (QPoint (-2, 0), QPoint (+2, 0));
+		painter.drawLine (QPoint (0, -2), QPoint (0, +2));
 	}
 
 	// Center of mass:
@@ -291,7 +291,7 @@ AirfoilSplineWidget::update_pens()
 	if (!_pens_calculated)
 	{
 		auto const ph = PaintHelper (this->canvas(), palette(), font());
-		auto const airfoil_color = QColor (0x55, 0x22, 0x00, 0x44);
+		auto const airfoil_color = QColor (0xd2, 0xc3, 0xb1, 0xff);
 
 		_coordinate_lines_pen = QPen (Qt::black, ph.em_pixels (0.05f) / _scale, Qt::SolidLine, Qt::RoundCap);
 		_airfoil_pen = QPen (airfoil_color.darker (150), ph.em_pixels (0.05f) / _scale, Qt::SolidLine, Qt::RoundCap);
