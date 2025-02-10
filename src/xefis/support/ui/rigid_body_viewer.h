@@ -118,15 +118,8 @@ class RigidBodyViewer: public GLAnimationWidget
 	 * Calls set_followed() on internal RigidBodyPainter.
 	 */
 	void
-	set_followed (rigid_body::Group const& followed_group) noexcept
-		{ _rigid_body_painter.set_followed (followed_group); }
-
-	/**
-	 * Calls set_followed() on internal RigidBodyPainter.
-	 */
-	void
-	set_followed (rigid_body::Body const& followed_body) noexcept
-		{ _rigid_body_painter.set_followed (followed_body); }
+	set_followed (auto const& object) noexcept
+		{ _rigid_body_painter.set_followed (object); }
 
 	/**
 	 * Calls set_followed_to_none() on internal RigidBodyPainter.

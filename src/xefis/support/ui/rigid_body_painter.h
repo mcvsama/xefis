@@ -75,20 +75,14 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	RigidBodyPainter (si::PixelDensity);
 
 	/**
-	 * Follow the selected group to keep it centered on the screen.
-	 * Pass nullptr to disable follow.
+	 * Follow the selected object to keep it centered on the screen.
+	 * Call set_followed_to_none() to disable camera following.
 	 */
-	void
-	set_followed (rigid_body::Group const& followed_group) noexcept
-		{ _followed = &followed_group; }
-
-	/**
-	 * Follow the selected body to keep it centered on the screen.
-	 * Pass nullptr to disable follow.
-	 */
-	void
-	set_followed (rigid_body::Body const& followed_body) noexcept
-		{ _followed = &followed_body; }
+	template<class Object>
+		requires neutrino::SameAsAnyOf<Object, rigid_body::Group, rigid_body::Body>
+		void
+		set_followed (Object const& object) noexcept
+			{ _followed = &object; }
 
 	/**
 	 * Disable body/group following.
