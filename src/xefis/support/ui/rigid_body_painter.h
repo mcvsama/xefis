@@ -20,6 +20,9 @@
 #include <xefis/support/simulation/rigid_body/system.h>
 #include <xefis/support/ui/gl_space.h>
 
+// Neutrino:
+#include <neutrino/concepts.h>
+
 // Qt:
 #include <QOpenGLFunctions>
 #include <QOpenGLPaintDevice>
@@ -122,23 +125,16 @@ class RigidBodyPainter: protected QOpenGLFunctions
 		{ return _camera_follows_orientation; }
 
 	/**
-	 * Set the focused group.
-	 * Pass nullptr to set none as focused.
+	 * Draw given object as focused (painted differently).
 	 */
-	void
-	set_focused (rigid_body::Group const& focused_group) noexcept
-		{ _focused = &focused_group; }
+	template<class Object>
+		requires neutrino::SameAsAnyOf<Object, rigid_body::Group, rigid_body::Body, rigid_body::Constraint>
+		void
+		set_focused (Object const& object) noexcept
+			{ _focused = &object; }
 
 	/**
-	 * Set the focused body. It's painted with different color.
-	 * Pass nullptr to set none as focused.
-	 */
-	void
-	set_focused (rigid_body::Body const& focused_body) noexcept
-		{ _focused = &focused_body; }
-
-	/**
-	 * Unfocus any group/body.
+	 * Unfocus any focused object.
 	 */
 	void
 	set_focused_to_none() noexcept
@@ -149,14 +145,39 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	 */
 	[[nodiscard]]
 	rigid_body::Group const*
-	focused_group() const noexcept;
+	focused_group() const noexcept
+		{ return focused<rigid_body::Group>(); }
 
 	/**
 	 * Return a focused body, if set, or nullptr.
 	 */
 	[[nodiscard]]
 	rigid_body::Body const*
-	focused_body() const noexcept;
+	focused_body() const noexcept
+		{ return focused<rigid_body::Body>(); }
+
+	/**
+	 * Return a focused constraint, if set, or nullptr.
+	 */
+	[[nodiscard]]
+	rigid_body::Constraint const*
+	focused_constraint() const noexcept
+		{ return focused<rigid_body::Constraint>(); }
+
+	/**
+	 * Return a focused group, body or constraint, if set, or nullptr.
+	 */
+	template<class Object>
+		requires neutrino::SameAsAnyOf<Object, rigid_body::Group, rigid_body::Body, rigid_body::Constraint>
+		[[nodiscard]]
+		Object const*
+		focused() const noexcept
+		{
+			if (auto* object = std::get_if<Object const*> (&_focused))
+				return *object;
+			else
+				return nullptr;
+		}
 
 	/**
 	 * Return the planet body or nullptr.
@@ -433,7 +454,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	std::variant<std::monostate, rigid_body::Group const*, rigid_body::Body const*>
 							_followed;
 	bool					_camera_follows_orientation	{ true };
-	std::variant<std::monostate, rigid_body::Group const*, rigid_body::Body const*>
+	std::variant<std::monostate, rigid_body::Group const*, rigid_body::Body const*, rigid_body::Constraint const*>
 							_focused;
 	rigid_body::Body const*	_planet_body				{ nullptr };
 	rigid_body::Body const*	_hovered_body				{ nullptr };
@@ -467,26 +488,6 @@ inline rigid_body::Body const*
 RigidBodyPainter::followed_body() const noexcept
 {
 	if (auto* body = std::get_if<rigid_body::Body const*> (&_followed))
-		return *body;
-	else
-		return nullptr;
-}
-
-
-inline rigid_body::Group const*
-RigidBodyPainter::focused_group() const noexcept
-{
-	if (auto* group = std::get_if<rigid_body::Group const*> (&_focused))
-		return *group;
-	else
-		return nullptr;
-}
-
-
-inline rigid_body::Body const*
-RigidBodyPainter::focused_body() const noexcept
-{
-	if (auto* body = std::get_if<rigid_body::Body const*> (&_focused))
 		return *body;
 	else
 		return nullptr;

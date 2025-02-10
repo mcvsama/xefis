@@ -679,7 +679,10 @@ RigidBodyPainter::paint (rigid_body::Constraint const& constraint)
 				auto const hinge_start_1 = com1 + a1;
 				auto const hinge_end_1 = hinge_start_1 + hinge_1;
 				auto const hinge_center = hinge_start_1 + 0.5 * hinge_1;
-				auto const material = rigid_body::make_material (QColor (0xff, 0x99, 0x00));
+				auto const color = &constraint == focused_constraint()
+					? QColor (0x00, 0xaa, 0x7f)
+					: QColor (0xff, 0x99, 0x00);
+				auto const material = rigid_body::make_material (color);
 
 				// Lines from COM to hinge center:
 				rod_from_to (kDefaultConstraintDiameter, com1, hinge_center, false, material);
@@ -689,7 +692,10 @@ RigidBodyPainter::paint (rigid_body::Constraint const& constraint)
 			}
 			else if (dynamic_cast<rigid_body::FixedConstraint const*> (&constraint))
 			{
-				auto const material = rigid_body::make_material (QColor (0xff, 0x00, 0x99));
+				auto const color = &constraint == focused_constraint()
+					? QColor (0x00, 0xaa, 0x7f)
+					: QColor (0xff, 0x00, 0x99);
+				auto const material = rigid_body::make_material (color);
 				rod_from_to (kDefaultConstraintDiameter, com1, com2, false, material);
 			}
 		});

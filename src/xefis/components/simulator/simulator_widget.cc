@@ -287,8 +287,10 @@ SimulatorWidget::update_editor_for (QTreeWidgetItem* item)
 	}
 	else if (auto* constraint_item = dynamic_cast<ConstraintItem*> (item))
 	{
-		_constraint_editor->edit (&constraint_item->constraint());
+		auto& constraint = constraint_item->constraint();
+		_constraint_editor->edit (&constraint);
 		_editors_stack->setCurrentWidget (&*_constraint_editor);
+		_rigid_body_viewer->set_focused (constraint);
 	}
 	else
 	{

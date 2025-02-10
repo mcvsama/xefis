@@ -155,15 +155,15 @@ class RigidBodyViewer: public GLAnimationWidget
 	 * Calls set_focused() on internal RigidBodyPainter.
 	 */
 	void
-	set_focused (rigid_body::Group const& focused_group) noexcept
-		{ _rigid_body_painter.set_focused (focused_group); }
+	set_focused (auto const& object) noexcept
+		{ _rigid_body_painter.set_focused (object); }
 
 	/**
-	 * Calls set_focused() on internal RigidBodyPainter.
+	 * Calls set_focused_to_none() on internal RigidBodyPainter.
 	 */
 	void
-	set_focused (rigid_body::Body const& focused_body) noexcept
-		{ _rigid_body_painter.set_focused (focused_body); }
+	set_focused_to_none() noexcept
+		{ _rigid_body_painter.set_focused_to_none(); }
 
 	/**
 	 * Calls set_focused_to_none() on internal RigidBodyPainter.
