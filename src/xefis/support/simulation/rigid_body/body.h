@@ -315,6 +315,8 @@ class Body: public Noncopyable
 	/**
 	 * Return frame cache of the body.
 	 * To be used by the simulator.
+	 * If we had more than one solver, we'd probably use std::any instead of BodyIteration, but we don't
+	 * so dependency on the solver doesn't matter now.
 	 */
 	[[nodiscard]]
 	BodyIteration&

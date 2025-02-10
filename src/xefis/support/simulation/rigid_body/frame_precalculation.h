@@ -27,7 +27,7 @@ namespace xf::rigid_body {
 /**
  * A struct of data calculated on each simulation frame for certain types of constraints.
  * Instead of having each constraint recalculate commonly required values, calculate them
- * on demand here and let constaints use them.
+ * on demand here and let constraints use them.
  *
  * The solver is supposed to reset the data of all registered FramePrecalculations just before
  * calculating constraint forces in each frame.

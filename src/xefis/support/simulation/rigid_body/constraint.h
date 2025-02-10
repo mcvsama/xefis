@@ -215,7 +215,8 @@ class Constraint: public ConnectedBodies
 		{ _friction_factor = factor; }
 
 	/**
-	 * Initialize the constraint for the next simulation step. Not iteration, just step.
+	 * Initialize the constraint for the next simulation step (frame).
+	 * It's not called between solver iterations, only at each new step.
 	 * Default implementation does nothing.
 	 */
 	virtual void
@@ -225,7 +226,7 @@ class Constraint: public ConnectedBodies
 	/**
 	 * Return constraint forces to apply to the two bodies.
 	 *
-	 * Call do_constraint_forces() and check if constraint needs to be broken
+	 * Calls do_constraint_forces() and check if constraint needs to be broken
 	 * based on set breaking force/torque.
 	 */
 	[[nodiscard]]

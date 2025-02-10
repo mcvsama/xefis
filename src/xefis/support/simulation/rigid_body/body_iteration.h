@@ -39,7 +39,7 @@ class BodyIteration
 
   public:
 	// Those are recalculated on each simulation step, but stay the same on all
-	// solver iterations:
+	// impulse solver iterations:
 	SpaceMatrix<si::Mass, WorldSpace>::InverseMatrix			inv_M;
 	SpaceMatrix<si::MomentOfInertia, WorldSpace>::InverseMatrix	inv_I;
 	ForceMoments<WorldSpace>									gravitational_force_moments;
