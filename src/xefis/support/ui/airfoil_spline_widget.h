@@ -156,6 +156,7 @@ class AirfoilSplineWidget: public CanvasWidget
 	QPen						_lift_force_pen;
 	QPen						_drag_force_pen;
 	QPen						_center_of_pressure_pen;
+	QPen						_wind_line_pen;
 	// Values computed by prepare_for_painting():
 	QPolygonF					_airfoil_polygon;
 	// Range of airfoil spline points in AirfoilSplineSpace:
