@@ -180,6 +180,35 @@ class RigidBodyPainter: protected QOpenGLFunctions
 		}
 
 	/**
+	 * Set the hovered body. It's painted with different color.
+	 * Call set_hovered_to_none() set none as hovered.
+	 */
+	template<class Object>
+		requires neutrino::SameAsAnyOf<Object, rigid_body::Body, rigid_body::Constraint>
+		void
+		set_hovered (Object const& object) noexcept
+			{ _hovered = &object; }
+
+	void
+	set_hovered_to_none() noexcept
+		{ _hovered = std::monostate(); }
+
+	/**
+	 * Return a hovered group, body or constraint, if set, or nullptr.
+	 */
+	template<class Object>
+		requires neutrino::SameAsAnyOf<Object, rigid_body::Body, rigid_body::Constraint>
+		[[nodiscard]]
+		Object const*
+		hovered() const noexcept
+		{
+			if (auto* object = std::get_if<Object const*> (&_hovered))
+				return *object;
+			else
+				return nullptr;
+		}
+
+	/**
 	 * Return the planet body or nullptr.
 	 */
 	[[nodiscard]]
@@ -199,14 +228,6 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	void
 	set_planet (rigid_body::Body const* planet_body) noexcept
 		{ _planet_body = planet_body; }
-
-	/**
-	 * Set the hovered body. It's painted with different color.
-	 * Pass nullptr to set none as focused.
-	 */
-	void
-	set_hovered (rigid_body::Body const* hovered_body) noexcept
-		{ _hovered_body = hovered_body; }
 
 	/**
 	 * Set camera focus point.
@@ -456,8 +477,9 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	bool					_camera_follows_orientation	{ true };
 	std::variant<std::monostate, rigid_body::Group const*, rigid_body::Body const*, rigid_body::Constraint const*>
 							_focused;
+	std::variant<std::monostate, rigid_body::Body const*, rigid_body::Constraint const*>
+							_hovered;
 	rigid_body::Body const*	_planet_body				{ nullptr };
-	rigid_body::Body const*	_hovered_body				{ nullptr };
 	bool					_constraints_visible		{ false };
 	bool					_gravity_visible			{ false };
 	bool					_external_forces_visible	{ false };

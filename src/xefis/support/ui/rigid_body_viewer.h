@@ -166,11 +166,18 @@ class RigidBodyViewer: public GLAnimationWidget
 		{ _rigid_body_painter.set_focused_to_none(); }
 
 	/**
-	 * Calls set_focused_to_none() on internal RigidBodyPainter.
+	 * Calls set_hovered() on internal RigidBodyPainter.
 	 */
 	void
-	set_focused_to_none() noexcept
-		{ _rigid_body_painter.set_focused_to_none(); }
+	set_hovered (auto const& object) noexcept
+		{ _rigid_body_painter.set_hovered (object); }
+
+	/**
+	 * Calls set_hovered_to_none() on internal RigidBodyPainter.
+	 */
+	void
+	set_hovered_to_none() noexcept
+		{ _rigid_body_painter.set_hovered_to_none(); }
 
 	/**
 	 * Return the planet body.
@@ -186,13 +193,6 @@ class RigidBodyViewer: public GLAnimationWidget
 	void
 	set_planet (rigid_body::Body const* planet_body) noexcept
 		{ _rigid_body_painter.set_planet (planet_body); }
-
-	/**
-	 * Calls set_hovered() on internal RigidBodyPainter.
-	 */
-	void
-	set_hovered (rigid_body::Body const* hovered_body) noexcept
-		{ _rigid_body_painter.set_hovered (hovered_body); }
 
 	/**
 	 * Return current camera position.

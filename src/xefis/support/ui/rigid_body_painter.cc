@@ -545,7 +545,7 @@ RigidBodyPainter::paint (rigid_body::Body const& body, BodyRenderingConfig const
 			_gl.save_context ([&] {
 				if (&body == focused_body())
 					_gl.additional_parameters().color_override = GLColor::from_rgb (0x00, 0xaa, 0x7f);
-				else if (_hovered_body == &body)
+				else if (hovered<rigid_body::Body>() == &body)
 					_gl.additional_parameters().color_override = GLColor::from_rgb (0x00, 0xaa, 0x7f).lighter (0.5);
 
 				if (auto const& shape = body.shape())
