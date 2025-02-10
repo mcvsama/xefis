@@ -29,22 +29,27 @@ namespace xf {
 void
 draw_arrow (QPainter& painter, QPointF const& from, QPointF const& to, double arrowhead_size)
 {
-	auto const abs = [](QPointF const& point) {
-		return sqrt (square (point.x()) + square (point.y()));
-	};
-
-	auto const w = painter.pen().widthF();
-	auto const abs_from = QPointF (abs (from), 0.0f);
-	auto const abs_to = QPointF (abs (to), 0.0f);
+	QLineF const line (from, to);
+	auto const line_length = line.length();
+	auto const pen_width = painter.pen().widthF();
+	auto const tip = QPointF (line_length, 0);
 
 	painter.save();
-	auto const angle = 1_rad * std::atan2 (to.y() - from.y(), to.x() - from.x());
-	painter.rotate (angle / 1_deg);
-	painter.drawLine (abs_from, abs_to);
 
-	auto const b = abs_to + QPointF (-2.5 * arrowhead_size * w, -arrowhead_size * w);
-	auto const c = b + QPointF (0.0f, +2 * arrowhead_size * w);
-	QPointF const points[] = { abs_to, b, c, abs_to };
+	// Translate so that 'from' is at the origin:
+	painter.translate (from);
+	// Compute the angle (in radians) and rotate the painter.
+	auto const angle = 1_rad * std::atan2 (to.y() - from.y(), to.x() - from.x());
+	painter.rotate (angle.in<si::Degree>());
+	// Draw the main line of the arrow:
+	painter.drawLine (QPointF (0.0f, 0.0f), tip);
+
+	// Compute the arrowhead points:
+	auto const top = QPointF (line_length - 2.5 * arrowhead_size * pen_width, -arrowhead_size * pen_width);
+	auto const bottom = QPointF (line_length - 2.5 * arrowhead_size * pen_width, +arrowhead_size * pen_width);
+
+	// Draw arrowhead as a filled polygon:
+	QPointF const points[] = { tip, top, bottom, tip };
 	painter.drawPolygon (points, std::size (points));
 
 	painter.restore();
