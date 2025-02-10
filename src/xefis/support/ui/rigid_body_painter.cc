@@ -559,6 +559,72 @@ RigidBodyPainter::paint (rigid_body::Body const& body, BodyRenderingConfig const
 
 
 void
+RigidBodyPainter::paint (rigid_body::Constraint const& constraint)
+{
+	if (constraint.enabled() && !constraint.broken())
+	{
+		_gl.save_context ([&] {
+			auto fcorr = followed_position();
+			auto const& b1 = constraint.body_1();
+			auto const& b2 = constraint.body_2();
+			auto com1 = b1.placement().position() - fcorr;
+			auto com2 = b2.placement().position() - fcorr;
+
+			auto const rod_from_to = [this] (si::Length const radius, auto const& from, auto const& to, bool front_back_faces, rigid_body::ShapeMaterial const& material)
+			{
+				_gl.save_context ([&] {
+					auto const diff = to - from;
+					_gl.translate (from);
+
+					auto const alpha_beta = alpha_beta_from_x_to (diff);
+					_gl.rotate (alpha_beta[0], 0, 0, 1);
+					_gl.rotate (alpha_beta[1], 0, 1, 0);
+					_gl.rotate (90_deg, 0, 1, 0);
+
+					auto const shape = rigid_body::make_cylinder_shape ({
+						.length = 1_m * abs (diff / 1_m),
+						.radius = radius,
+						.num_faces = 16,
+						.with_bottom = front_back_faces,
+						.with_top = front_back_faces,
+						.material = material,
+					});
+					_gl.draw (shape);
+				});
+			};
+
+			if (auto const* hinge = dynamic_cast<rigid_body::HingeConstraint const*> (&constraint))
+			{
+				auto const a1 = b1.placement().unbound_transform_to_base (hinge->hinge_precalculation().body_1_anchor());
+				auto const hinge_1 = b1.placement().unbound_transform_to_base (hinge->hinge_precalculation().body_1_hinge());
+				auto const hinge_start_1 = com1 + a1;
+				auto const hinge_end_1 = hinge_start_1 + hinge_1;
+				auto const hinge_center = hinge_start_1 + 0.5 * hinge_1;
+				auto const color = &constraint == focused_constraint()
+					? QColor (0x00, 0xaa, 0x7f)
+					: QColor (0xff, 0x99, 0x00);
+				auto const material = rigid_body::make_material (color);
+
+				// Lines from COM to hinge center:
+				rod_from_to (kDefaultConstraintDiameter, com1, hinge_center, false, material);
+				rod_from_to (kDefaultConstraintDiameter, com2, hinge_center, false, material);
+				// Hinge:
+				rod_from_to (kDefaultHingeDiameter, hinge_start_1, hinge_end_1, true, material);
+			}
+			else if (dynamic_cast<rigid_body::FixedConstraint const*> (&constraint))
+			{
+				auto const color = &constraint == focused_constraint()
+					? QColor (0x00, 0xaa, 0x7f)
+					: QColor (0xff, 0x00, 0x99);
+				auto const material = rigid_body::make_material (color);
+				rod_from_to (kDefaultConstraintDiameter, com1, com2, false, material);
+			}
+		});
+	}
+}
+
+
+void
 RigidBodyPainter::paint_helpers (rigid_body::Group const& group, GroupRenderingConfig const& rendering, bool focused)
 {
 	if (focused || rendering.center_of_mass_visible)
@@ -634,72 +700,6 @@ RigidBodyPainter::paint_moments_of_inertia_cuboid (MassMoments<BodyCOM> const& m
 	auto const com_material = rigid_body::make_material ({ 0x00, 0x44, 0x99 });
 	auto const com_shape = make_centered_cube_shape (mass_moments, com_material);
 	_gl.draw (com_shape);
-}
-
-
-void
-RigidBodyPainter::paint (rigid_body::Constraint const& constraint)
-{
-	if (constraint.enabled() && !constraint.broken())
-	{
-		_gl.save_context ([&] {
-			auto fcorr = followed_position();
-			auto const& b1 = constraint.body_1();
-			auto const& b2 = constraint.body_2();
-			auto com1 = b1.placement().position() - fcorr;
-			auto com2 = b2.placement().position() - fcorr;
-
-			auto const rod_from_to = [this] (si::Length const radius, auto const& from, auto const& to, bool front_back_faces, rigid_body::ShapeMaterial const& material)
-			{
-				_gl.save_context ([&] {
-					auto const diff = to - from;
-					_gl.translate (from);
-
-					auto const alpha_beta = alpha_beta_from_x_to (diff);
-					_gl.rotate (alpha_beta[0], 0, 0, 1);
-					_gl.rotate (alpha_beta[1], 0, 1, 0);
-					_gl.rotate (90_deg, 0, 1, 0);
-
-					auto const shape = rigid_body::make_cylinder_shape ({
-						.length = 1_m * abs (diff / 1_m),
-						.radius = radius,
-						.num_faces = 16,
-						.with_bottom = front_back_faces,
-						.with_top = front_back_faces,
-						.material = material,
-					});
-					_gl.draw (shape);
-				});
-			};
-
-			if (auto const* hinge = dynamic_cast<rigid_body::HingeConstraint const*> (&constraint))
-			{
-				auto const a1 = b1.placement().unbound_transform_to_base (hinge->hinge_precalculation().body_1_anchor());
-				auto const hinge_1 = b1.placement().unbound_transform_to_base (hinge->hinge_precalculation().body_1_hinge());
-				auto const hinge_start_1 = com1 + a1;
-				auto const hinge_end_1 = hinge_start_1 + hinge_1;
-				auto const hinge_center = hinge_start_1 + 0.5 * hinge_1;
-				auto const color = &constraint == focused_constraint()
-					? QColor (0x00, 0xaa, 0x7f)
-					: QColor (0xff, 0x99, 0x00);
-				auto const material = rigid_body::make_material (color);
-
-				// Lines from COM to hinge center:
-				rod_from_to (kDefaultConstraintDiameter, com1, hinge_center, false, material);
-				rod_from_to (kDefaultConstraintDiameter, com2, hinge_center, false, material);
-				// Hinge:
-				rod_from_to (kDefaultHingeDiameter, hinge_start_1, hinge_end_1, true, material);
-			}
-			else if (dynamic_cast<rigid_body::FixedConstraint const*> (&constraint))
-			{
-				auto const color = &constraint == focused_constraint()
-					? QColor (0x00, 0xaa, 0x7f)
-					: QColor (0xff, 0x00, 0x99);
-				auto const material = rigid_body::make_material (color);
-				rod_from_to (kDefaultConstraintDiameter, com1, com2, false, material);
-			}
-		});
-	}
 }
 
 

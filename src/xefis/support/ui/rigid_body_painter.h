@@ -415,6 +415,9 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	void
 	paint (rigid_body::Body const&, BodyRenderingConfig const&);
 
+	void
+	paint (rigid_body::Constraint const&);
+
 	/**
 	 * Paint additional features like XYZ basis, center of mass and origin.
 	 */
@@ -435,9 +438,6 @@ class RigidBodyPainter: protected QOpenGLFunctions
 
 	void
 	paint_moments_of_inertia_cuboid (MassMoments<BodyCOM> const&);
-
-	void
-	paint (rigid_body::Constraint const&);
 
 	void
 	paint_forces (rigid_body::Body const&);
