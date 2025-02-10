@@ -174,7 +174,7 @@ RigidBodyPainter::apply_camera_rotations()
 	auto const* followed_body = this->followed_body();
 
 	// Match the screen coordinates with the group/body/planet coordinates:
-	if ((followed_group || followed_body) && _following_orientation)
+	if ((followed_group || followed_body) && _camera_follows_orientation)
 	{
 		// The body/group is assumed to be in aircraft coordinates (X = front, Y = right, Z = down).
 		// The screen is in standard math/screen coordinates (X = right, Y = top, Z = towards the viewer).
@@ -189,7 +189,7 @@ RigidBodyPainter::apply_camera_rotations()
 		_gl.rotate (+_position_on_earth.lat(), 0, 1, 0); // About Y
 	}
 
-	if (_following_orientation)
+	if (_camera_follows_orientation)
 	{
 		if (followed_group)
 			if (auto const* rotation_reference_body = followed_group->rotation_reference_body())

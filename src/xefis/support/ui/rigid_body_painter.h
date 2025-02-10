@@ -113,13 +113,13 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	 * Enabled by default.
 	 */
 	void
-	set_following_body_orientation (bool enabled) noexcept
-		{ _following_orientation = enabled; }
+	set_camera_follows_body_orientation (bool enabled) noexcept
+		{ _camera_follows_orientation = enabled; }
 
 	[[nodiscard]]
 	bool
-	following_body_orientation() const noexcept
-		{ return _following_orientation; }
+	camera_follows_body_orientation() const noexcept
+		{ return _camera_follows_orientation; }
 
 	/**
 	 * Set the focused group.
@@ -432,7 +432,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	GLSpace					_gl;
 	std::variant<std::monostate, rigid_body::Group const*, rigid_body::Body const*>
 							_followed;
-	bool					_following_orientation		{ true };
+	bool					_camera_follows_orientation	{ true };
 	std::variant<std::monostate, rigid_body::Group const*, rigid_body::Body const*>
 							_focused;
 	rigid_body::Body const*	_planet_body				{ nullptr };
