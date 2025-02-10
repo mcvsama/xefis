@@ -135,34 +135,34 @@ class AirfoilSplineWidget: public CanvasWidget
 	update_pens();
 
   private:
-	AirfoilSpline						_airfoil_spline {};
-	std::optional<si::Length>			_chord_length;
-	QPointF								_center_of_mass_position;
-	std::optional<QPointF>				_center_of_pressure_position;
+	AirfoilSpline				_airfoil_spline {};
+	std::optional<si::Length>	_chord_length;
+	QPointF						_center_of_mass_position;
+	std::optional<QPointF>		_center_of_pressure_position;
 	std::optional<PlaneVector<si::Force, BodyCOM>>
-										_lift_force;
+								_lift_force;
 	std::optional<PlaneVector<si::Force, BodyCOM>>
-										_drag_force;
+								_drag_force;
 	std::optional<PlaneVector<si::Torque, BodyCOM>>
-										_pitching_moment;
+								_pitching_moment;
 	// If not relative to COM, then it's relative to space origin in AirfoilSplineSpace:
-	bool								_center_of_pressure_position_relative_to_com { false };
-	si::Force							_force_per_spline_space_unit { 500_N };
-	bool								_pens_calculated { false };
-	QPen								_coordinate_lines_pen;
-	QPen								_airfoil_pen;
-	QBrush								_airfoil_brush;
-	QPen								_center_of_mass_black_pen;
-	QPen								_lift_force_pen;
-	QPen								_drag_force_pen;
-	QPen								_center_of_pressure_pen;
+	bool						_center_of_pressure_position_relative_to_com { false };
+	si::Force					_force_per_spline_space_unit { 500_N };
+	bool						_pens_calculated { false };
+	QPen						_coordinate_lines_pen;
+	QPen						_airfoil_pen;
+	QBrush						_airfoil_brush;
+	QPen						_center_of_mass_black_pen;
+	QPen						_lift_force_pen;
+	QPen						_drag_force_pen;
+	QPen						_center_of_pressure_pen;
 	// Values computed by prepare_for_painting():
-	QPolygonF							_airfoil_polygon;
+	QPolygonF					_airfoil_polygon;
 	// Range of airfoil spline points in AirfoilSplineSpace:
-	Range<double>						_range[2]; // X and Y respectively
+	Range<double>				_range[2]; // X and Y respectively
 	// Computed by setup_painting_transform():
-	double								_scale { 1.0 };
-	QTransform							_painting_transform;
+	double						_scale { 1.0 };
+	QTransform					_painting_transform;
 };
 
 } // namespace xf
