@@ -18,6 +18,7 @@
 #include <xefis/config/all.h>
 #include <xefis/support/nature/constants.h>
 #include <xefis/support/nature/mass_moments.h>
+#include <xefis/support/simulation/rigid_body/various_shapes.h>
 
 // Standard:
 #include <cstddef>
@@ -29,7 +30,13 @@ namespace xf::rigid_body {
 std::unique_ptr<Body>
 make_earth()
 {
-	return std::make_unique<Body> (MassMoments<BodyCOM> (kEarthMass, math::coordinate_system_cast<BodyCOM, BodyCOM> (kEarthMomentOfInertia)));
+	auto earth = std::make_unique<Body> (MassMoments<BodyCOM> (kEarthMass, math::coordinate_system_cast<BodyCOM, BodyCOM> (kEarthMomentOfInertia)));
+	earth->set_shape (rigid_body::make_centered_sphere_shape ({
+		.radius = kEarthMeanRadius,
+		.slices = 10,
+		.stacks = 10,
+	}));
+	return earth;
 }
 
 } // namespace xf::rigid_body
