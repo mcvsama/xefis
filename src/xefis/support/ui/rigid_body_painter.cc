@@ -150,6 +150,29 @@ RigidBodyPainter::setup_natural_light()
 {
 	glDisable (kFeatureLight);
 	glEnable (kSunLight);
+
+	glLightfv (kSunLight, GL_AMBIENT, GLArray { 0.25f, 0.25f, 0.25f, 1.0f });
+	glLightfv (kSunLight, GL_DIFFUSE, GLArray { 0.5f, 0.5f, 0.5f, 1.0f });
+	glLightfv (kSunLight, GL_SPECULAR, GLArray { 0.75f, 0.75f, 0.75f, 1.0f });
+
+	if (_planet_body)
+	{
+		_gl.save_context ([&] {
+			// For planetary system, try to be sun:
+			glLoadIdentity();
+			setup_camera();
+			apply_sun_rotations();
+			glLightfv (kSunLight, GL_POSITION, GLArray { 0.0f, 0.0f, _gl.to_opengl (kSunDistance), 0.0f });
+			// TODO disable (attenuate) light when sun sets
+		});
+	}
+	else
+		// Otherwise let the observer cast the light:
+		glLightfv (kSunLight, GL_POSITION, GLArray { 0.0f, 0.0f, 1.0f, 0.0f });
+
+	// TODO GL_SPOT_DIRECTION
+	// TODO GL_SPOT_EXPONENT
+	// TODO GL_SPOT_CUTOFF
 }
 
 
@@ -201,24 +224,6 @@ RigidBodyPainter::apply_camera_rotations()
 }
 
 
-void
-RigidBodyPainter::setup_light()
-{
-	glLightfv (kSunLight, GL_AMBIENT, GLArray { 0.25f, 0.25f, 0.25f, 1.0f });
-	glLightfv (kSunLight, GL_DIFFUSE, GLArray { 0.5f, 0.5f, 0.5f, 1.0f });
-	glLightfv (kSunLight, GL_SPECULAR, GLArray { 0.75f, 0.75f, 0.75f, 1.0f });
-
-	if (_planet_body)
-		// For planetary system, try to be sun:
-		glLightfv (kSunLight, GL_POSITION, GLArray { _gl.to_opengl (kSunDistance), 0.0f, 0.0f, 0.0f });
-	else
-		// Otherwise let the observer cast the light:
-		glLightfv (kSunLight, GL_POSITION, GLArray { 0.0f, 0.0f, 1.0f, 0.0f });
-
-	// TODO GL_SPOT_DIRECTION
-	// TODO GL_SPOT_EXPONENT
-	// TODO GL_SPOT_CUTOFF
-}
 
 
 void
@@ -226,7 +231,7 @@ RigidBodyPainter::paint_world (rigid_body::System const& system)
 {
 	_gl.save_context ([&] {
 		setup_camera();
-		setup_light();
+		setup_natural_light();
 
 		paint_planet();
 		paint_air_particles();

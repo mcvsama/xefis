@@ -364,8 +364,6 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	void
 	apply_camera_rotations();
 
-	void
-	setup_light();
 
 	void
 	paint_world (rigid_body::System const&);
