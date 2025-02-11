@@ -475,10 +475,11 @@ RigidBodyPainter::paint (rigid_body::System const& system)
 			for (auto const& body: system.bodies())
 				paint_angular_momentum (*body);
 
-		auto const* focused_group = this->focused_group();
-		auto const* focused_body = this->focused_body();
 
 		{
+			auto const* focused_group = this->focused_group();
+			auto const* focused_body = this->focused_body();
+
 			// We'll now paint features that are always visible, so clear the Z buffer
 			// in OpenGL and do the painting with blending enabled.
 
