@@ -32,7 +32,7 @@ make_earth()
 {
 	auto earth = std::make_unique<Body> (MassMoments<BodyCOM> (kEarthMass, math::coordinate_system_cast<BodyCOM, BodyCOM> (kEarthMomentOfInertia)));
 	earth->set_shape (rigid_body::make_centered_sphere_shape ({
-		.radius = kEarthMeanRadius,
+		.radius = 0.9 * kEarthMeanRadius,
 		.slices = 10,
 		.stacks = 10,
 	}));
