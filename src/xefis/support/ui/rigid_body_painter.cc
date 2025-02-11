@@ -26,6 +26,7 @@
 #include <xefis/support/simulation/rigid_body/various_shapes.h>
 #include <xefis/support/ui/gl_space.h>
 #include <xefis/support/ui/paint_helper.h>
+#include <xefis/support/universe/sun_position.h>
 
 // Neutrino:
 #include <neutrino/stdexcept.h>
@@ -93,11 +94,28 @@ RigidBodyPainter::paint (rigid_body::System const& system, QOpenGLPaintDevice& c
 
 
 void
+RigidBodyPainter::calculate_sun_position()
+{
+	// Reposition Sun according to current time:
+	auto const time = TimeHelper::now();
+	auto const days_since_J2000 = unix_time_to_days_since_J2000 (time);
+	auto const sun_ecliptic_position = xf::calculate_sun_position (days_since_J2000);
+	auto const sun_equatorial_position = to_equatorial_position (sun_ecliptic_position.longitude, days_since_J2000);
+	// Since equatorial coordinate system doesn't rotate with Earth, we need to take
+	// that rotation into account manually (calculate hour-angle and rotate the sun again):
+	auto const local_sidereal_time = unix_time_to_local_sidereal_time (time, _position_on_earth.lon());
+	_local_hour_angle = calculate_hour_angle (local_sidereal_time, sun_equatorial_position.right_ascension);
+	_sun_declination = sun_equatorial_position.declination;
+}
+
+
+void
 RigidBodyPainter::setup (QOpenGLPaintDevice& canvas)
 {
 	auto const size = canvas.size();
 
 	_position_on_earth = xf::polar (math::coordinate_system_cast<ECEFSpace, void> (followed_position()));
+	calculate_sun_position();
 
 	glMatrixMode (GL_PROJECTION);
 	glLoadIdentity();
@@ -224,6 +242,22 @@ RigidBodyPainter::apply_camera_rotations()
 }
 
 
+void
+RigidBodyPainter::apply_sun_rotations()
+{
+	// We have now identity rotations + camera rotations applied.
+	// Remember in OpenGL rotations are applied in reverse order.
+
+	// Rotate sun depending on local time (longitude variation):
+	_gl.rotate (_local_hour_angle, 0, 0, -1);
+
+	// Rotate sun depending on time of the year (latitude variation):
+	_gl.rotate (_sun_declination, 0, -1, 0);
+
+	// Our sun is located over the North Pole (+Z in ECEF). Rotate it to be straight over Null Island
+	// that is lon/lat 0°/0° (+X in ECEF):
+	_gl.rotate (90_deg, 0, 1, 0);
+}
 
 
 void
@@ -243,9 +277,6 @@ RigidBodyPainter::paint_world (rigid_body::System const& system)
 void
 RigidBodyPainter::paint_planet()
 {
-	// TODO Earth's angle 27° depending on time of year
-	// TODO Sun's position depending on time of day
-
 	if (!_planet_body)
 		return;
 
@@ -289,6 +320,7 @@ RigidBodyPainter::paint_planet()
 	// In other words match ECEF coordinates with standard OpenGL screen coordinates.
 
 	// Sky:
+	// TODO Vary sky color depending on Sun's position
 	_gl.save_context ([&] {
 		auto const sky_color = get_intermediate_color (normalized_altitude, sky_low_color, sky_high_color);
 		auto const sky_fog_color = get_intermediate_color (normalized_altitude, low_sky_fog_color, high_sky_fog_color);
@@ -327,22 +359,23 @@ RigidBodyPainter::paint_planet()
 
 	// Sun:
 	_gl.save_context ([&] {
+		apply_sun_rotations();
+		// Rotate sun shines when camera angle changes (about +Z):
+		_gl.rotate (_camera_angles[0] - 2 * _camera_angles[1], 0, 0, 1);
+
 		auto sun_material = rigid_body::kBlackMatte;
 
 		auto const configure_material = [&] (rigid_body::ShapeMaterial& material, si::Angle const latitude)
 		{
+			// TODO make the Sun color (temperature) vary depending on time of day.
 			float const actual_radius = 0.025;
 			float const norm = renormalize<si::Angle> (latitude, Range { 0_deg, 90_deg }, Range { 0.0f, 1.0f });
 			float const alpha = std::clamp<float> (std::pow (norm + actual_radius, 6.0f), 0.0f, 1.0f);
 			material.gl_emission_color = { 1.0f, 1.0f, 1.0f, alpha };
 		};
 
-		// Assume it's noon at Lon/Lat 0°/0° right now.
-		_gl.translate (kSunDistance, 0_m, 0_km);
-		_gl.rotate (+90_deg, 0, 1, 0);
-		// Rotate sun shines when camera angle changes:
-		_gl.rotate (_camera_angles[0] - 2 * _camera_angles[1], 0, 0, 1);
-
+		// We're looking at the dome from inside and some of the elements
+		// of the dome are colored in a way that looks like Sun.
 		auto sun = rigid_body::make_centered_sphere_shape ({
 			.radius = kSunRadius,
 			.slices = 9,

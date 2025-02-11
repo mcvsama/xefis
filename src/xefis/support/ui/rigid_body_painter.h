@@ -349,6 +349,12 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	paint (rigid_body::System const& system, QOpenGLPaintDevice& canvas);
 
   private:
+	/**
+	 * Calculate _local_hour_angle and _sun_declination.
+	 */
+	void
+	calculate_sun_position();
+
 	void
 	setup (QOpenGLPaintDevice&);
 
@@ -364,6 +370,11 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	void
 	apply_camera_rotations();
 
+	/**
+	 * Requires that _local_hour_angle and _sun_declination are calculated first.
+	 */
+	void
+	apply_sun_rotations();
 
 	void
 	paint_world (rigid_body::System const&);
@@ -485,6 +496,9 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	std::minstd_rand0		_air_particles_prng;
 	std::map<rigid_body::Group const*, SpaceLength<WorldSpace>>
 							_group_centers_of_mass_cache;
+	// Sun position:
+	si::Angle				_local_hour_angle;
+	si::Angle				_sun_declination;
 };
 
 
