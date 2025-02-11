@@ -29,7 +29,7 @@
 
 namespace xf::rigid_body {
 
-// Called by make_sphere to get material for vertices.
+// Called by make_centered_sphere_shape() to get material for vertices.
 using MakeSphereMaterialCallback = std::function<void (ShapeMaterial&, si::Angle latitude)>;
 
 
