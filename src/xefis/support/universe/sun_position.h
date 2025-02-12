@@ -55,7 +55,7 @@ struct EquatorialCoordinates
  */
 [[nodiscard]]
 EclipticCoordinates
-calculate_sun_position (double days_since_J2000);
+calculate_sun_ecliptic_position (double days_since_J2000);
 
 
 /**
@@ -63,7 +63,7 @@ calculate_sun_position (double days_since_J2000);
  */
 [[nodiscard]]
 EquatorialCoordinates
-to_equatorial_position (si::Angle const& ecliptic_longitude, double days_since_J2000);
+calculate_sun_equatorial_position (si::Angle const& ecliptic_longitude, double days_since_J2000);
 
 
 /**

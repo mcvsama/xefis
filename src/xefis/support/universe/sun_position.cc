@@ -27,7 +27,7 @@
 namespace xf {
 
 EclipticCoordinates
-calculate_sun_position (double const days_since_J2000)
+calculate_sun_ecliptic_position (double const days_since_J2000)
 {
 	// These calculations are based on <https://en.wikipedia.org/wiki/Position_of_the_Sun#Approximate_position>.
 
@@ -50,7 +50,7 @@ calculate_sun_position (double const days_since_J2000)
 
 
 EquatorialCoordinates
-to_equatorial_position (si::Angle const& ecliptic_longitude, double const days_since_J2000)
+calculate_sun_equatorial_position (si::Angle const& ecliptic_longitude, double const days_since_J2000)
 {
 	// These calculations are based on <https://en.wikipedia.org/wiki/Position_of_the_Sun#Approximate_position>.
 
