@@ -57,6 +57,17 @@ struct EquatorialCoordinates
 };
 
 
+struct HorizontalCoordinates
+{
+	// The angle between the object (e.g., the Sun) and the observer's local horizon.
+	// Positive values indicate the object is above the horizon.
+	si::Angle	altitude;
+
+	// The direction of the object along the horizon, typically measured clockwise from true north:
+	si::Angle	azimuth;
+};
+
+
 [[nodiscard]]
 EclipticCoordinates
 calculate_sun_ecliptic_position (double days_since_J2000);
@@ -65,6 +76,21 @@ calculate_sun_ecliptic_position (double days_since_J2000);
 [[nodiscard]]
 EquatorialCoordinates
 calculate_sun_equatorial_position (si::Angle const& ecliptic_longitude, double days_since_J2000);
+
+
+[[nodiscard]]
+HorizontalCoordinates
+calculate_sun_horizontal_position (si::Angle sun_declination, si::Angle observer_latitude, si::Angle hour_angle);
+
+
+[[nodiscard]]
+si::Angle
+calculate_sun_altitude (si::Angle sun_declination, si::Angle observer_latitude, si::Angle hour_angle);
+
+
+[[nodiscard]]
+si::Angle
+calculate_sun_azimuth (si::Angle sun_declination, si::Angle observer_latitude, si::Angle hour_angle, si::Angle sun_altitude);
 
 
 /**

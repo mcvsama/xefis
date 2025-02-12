@@ -65,5 +65,38 @@ calculate_sun_equatorial_position (si::Angle const& ecliptic_longitude, double c
 	};
 }
 
+
+HorizontalCoordinates
+calculate_sun_horizontal_position (si::Angle const sun_declination, si::Angle const observer_latitude, si::Angle const hour_angle)
+{
+	auto const sun_altitude = calculate_sun_altitude (sun_declination, observer_latitude, hour_angle);
+	return {
+		.altitude = sun_altitude,
+		.azimuth = calculate_sun_azimuth (sun_declination, observer_latitude, hour_angle, sun_altitude),
+	};
+}
+
+
+si::Angle
+calculate_sun_altitude (si::Angle const sun_declination, si::Angle const observer_latitude, si::Angle const hour_angle)
+{
+	return 1_rad * asin (sin (observer_latitude) * sin (sun_declination) + cos (observer_latitude) * cos (sun_declination) * cos (hour_angle));
+}
+
+
+si::Angle
+calculate_sun_azimuth (si::Angle const sun_declination, si::Angle const observer_latitude, si::Angle const hour_angle, si::Angle const sun_altitude)
+{
+	// Formulas returned by ChatGPT:
+
+	auto const azimuth = 1_rad * acos ((sin (sun_declination) - sin (sun_altitude) * sin (observer_latitude)) / (cos (sun_altitude) * cos (observer_latitude)));
+
+	// The inverse cosine function only returns values in the range 0∘0∘ to 180∘180∘, so use the following rule to determine the correct quadrant:
+	if (sin (hour_angle) >= 0)
+		return 360_deg - azimuth;
+	else
+		return azimuth;
+}
+
 } // namespace xf
 
