@@ -26,7 +26,10 @@
 
 namespace xf {
 
+// This is the standard Julian Date for the Unix epoch (1970-01-01 00:00:00 UTC):
 constexpr auto kJulianDateForUnixEpoch = 2440587.5;
+
+// This is the standard Julian Date for the J2000.0 epoch:
 constexpr auto kJ2000Epoch = 2451545.0;
 
 
@@ -45,22 +48,20 @@ struct EclipticCoordinates
 
 struct EquatorialCoordinates
 {
+	// The angular distance measured eastward along the celestial equator from the vernal equinox:
 	si::Angle	right_ascension;
+
+	// The angular distance north (positive) or south (negative) of the celestial equator
+	// (represents the Sun's position relative to Earth's equator):
 	si::Angle	declination;
 };
 
 
-/**
- * Calculate position of the Sun.
- */
 [[nodiscard]]
 EclipticCoordinates
 calculate_sun_ecliptic_position (double days_since_J2000);
 
 
-/**
- * Convert EclipticCoordinates to EquatorialCoordinates.
- */
 [[nodiscard]]
 EquatorialCoordinates
 calculate_sun_equatorial_position (si::Angle const& ecliptic_longitude, double days_since_J2000);
