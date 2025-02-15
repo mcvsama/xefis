@@ -419,8 +419,8 @@ RigidBodyPainter::paint_planet()
 		glFogf (GL_FOG_END, _gl.to_opengl (kHorizonRadius));
 		glFogfv (GL_FOG_COLOR, to_gl_color (ground_fog_color));
 
-		_gl.rotate (-_position_on_earth.lat(), 0, 1, 0);
 		_gl.rotate (+_position_on_earth.lon(), 0, 0, 1);
+		_gl.rotate (-_position_on_earth.lat(), 0, 1, 0);
 		_gl.translate (-altitude_amsl, 0_m, 0_m);
 		_gl.rotate (+90_deg, 0, 1, 0);
 
