@@ -75,6 +75,13 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	RigidBodyPainter (si::PixelDensity);
 
 	/**
+	 * Set simulation time. It makes Sun rendered in different positions.
+	 */
+	void
+	set_time (si::Time const time)
+		{ _time = time; }
+
+	/**
 	 * Follow the selected object to keep it centered on the screen.
 	 * Call set_followed_to_none() to disable camera following.
 	 */
@@ -470,6 +477,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 
   private:
 	si::PixelDensity		_pixel_density;
+	si::Time				_time;
 	// Camera position is relative to the followed body:
 	SpaceLength<WorldSpace>	_camera_position;
 	SpaceVector<si::Angle>	_camera_angles;

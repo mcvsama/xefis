@@ -80,6 +80,13 @@ class RigidBodyViewer: public GLAnimationWidget
 	RigidBodyViewer (QWidget* parent, RefreshRate);
 
 	/**
+	 * Set time for RigidBodyPainter.
+	 */
+	void
+	set_time (si::Time const time)
+		{ _rigid_body_painter.set_time (time); }
+
+	/**
 	 * Return used rigid body system. Might be nullptr.
 	 */
 	rigid_body::System const*

@@ -149,6 +149,32 @@ SimulatorWidget::make_simulation_controls()
 	});
 	speed_slider->setValue (100);
 
+	auto* day_of_year_slider = new QSlider (Qt::Horizontal);
+	day_of_year_slider->setTickPosition (QSlider::TicksAbove);
+	day_of_year_slider->setTracking (true);
+	day_of_year_slider->setTickInterval (30);
+	day_of_year_slider->setPageStep (30);
+	day_of_year_slider->setRange (0, 364);
+	day_of_year_slider->setMinimumWidth (ph.em_pixels_int (8.0));
+	QObject::connect (day_of_year_slider, &QSlider::valueChanged, [this] (int value) {
+		_day_of_year = value;
+		update_rigid_body_viewer_time();
+	});
+	day_of_year_slider->setValue (0);
+
+	auto* time_of_day_slider = new QSlider (Qt::Horizontal);
+	time_of_day_slider->setTickPosition (QSlider::TicksAbove);
+	time_of_day_slider->setTracking (true);
+	time_of_day_slider->setTickInterval (24);
+	time_of_day_slider->setPageStep (60);
+	time_of_day_slider->setRange (0, 60 * 24);
+	time_of_day_slider->setMinimumWidth (ph.em_pixels_int (8.0));
+	QObject::connect (time_of_day_slider, &QSlider::valueChanged, [this] (int value) {
+		_time_of_day = value * 60_s;
+		update_rigid_body_viewer_time();
+	});
+	day_of_year_slider->setValue (0);
+
 	auto* show_configurator_button = new QPushButton ("Show machine config", this);
 	QObject::connect (show_configurator_button, &QPushButton::clicked, [this] {
 		if (_machine)
@@ -183,6 +209,8 @@ SimulatorWidget::make_simulation_controls()
 	row2_layout->addWidget (new QLabel ("Speed: "));
 	row2_layout->addWidget (speed_slider);
 	row2_layout->addWidget (speed_label);
+	row2_layout->addWidget (day_of_year_slider);
+	row2_layout->addWidget (time_of_day_slider);
 	row2_layout->addItem (new QSpacerItem (ph.em_pixels_int (1.0), 0, QSizePolicy::Fixed, QSizePolicy::Fixed));
 	row2_layout->addWidget (new QLabel ("Performance: "));
 	row2_layout->addWidget (&*_simulation_performance_value_label);
@@ -328,6 +356,13 @@ SimulatorWidget::update_simulation_performance_label (si::Time const dt)
 	auto const prefix = perf < 1.0 ? "<span style='color: red'>" : "<span>";
 	auto const suffix = "</span>";
 	_simulation_performance_value_label->setText (prefix + QString::fromStdString (text) + suffix);
+}
+
+
+void
+SimulatorWidget::update_rigid_body_viewer_time()
+{
+	_rigid_body_viewer->set_time (_day_of_year * 24 * 3600_s + _time_of_day);
 }
 
 } // namespace xf

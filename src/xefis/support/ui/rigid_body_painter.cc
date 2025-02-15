@@ -96,8 +96,8 @@ RigidBodyPainter::paint (rigid_body::System const& system, QOpenGLPaintDevice& c
 void
 RigidBodyPainter::calculate_sun_position()
 {
-	// Reposition Sun according to current time:
-	auto const time = TimeHelper::now();
+	auto const time = _time;
+	// Reposition Sun according to time:
 	auto const days_since_J2000 = unix_time_to_days_since_J2000 (time);
 	auto const sun_ecliptic_position = xf::calculate_sun_ecliptic_position (days_since_J2000);
 	auto const sun_equatorial_position = calculate_sun_equatorial_position (sun_ecliptic_position.longitude, days_since_J2000);

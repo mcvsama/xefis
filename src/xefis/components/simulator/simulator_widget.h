@@ -104,6 +104,9 @@ class SimulatorWidget: public QWidget
 	void
 	update_simulation_performance_label (si::Time dt);
 
+	void
+	update_rigid_body_viewer_time();
+
   private:
 	Machine*						_machine					{ nullptr };
 	Simulator&						_simulator;
@@ -126,6 +129,8 @@ class SimulatorWidget: public QWidget
 	Smoother<float>					_performance_smoother		{ 100_ms, 10_ms };
 	std::optional<neutrino::Responsibility>
 									_disconnect_item_changed_signal;
+	int								_day_of_year				{ 0 };
+	si::Time						_time_of_day				{ 12 * 3600_s };
 };
 
 
