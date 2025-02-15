@@ -386,7 +386,7 @@ CHRUM6::process_message (xf::CHRUM6::Read req)
 			if (req.success() && _io.serviceable.value_or (false))
 			{
 				si::Angle const factor = 0.0109863_deg;
-				_io.orientation_heading_magnetic = xf::floored_mod<si::Angle> (factor * req.value_upper16(), 0_deg, 360_deg);
+				_io.orientation_heading_magnetic = xf::wrap_within_range<si::Angle> (factor * req.value_upper16(), 0_deg, 360_deg);
 			}
 			break;
 		}

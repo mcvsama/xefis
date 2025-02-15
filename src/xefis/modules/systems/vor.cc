@@ -70,7 +70,7 @@ VOR::compute()
 		si::LonLat const aircraft_position (*_io.input_aircraft_longitude, *_io.input_aircraft_latitude);
 
 		si::Angle current_radial = normalize (xf::initial_bearing (station_position, aircraft_position));
-		si::Angle deviation = xf::floored_mod<si::Angle> (input_radial - current_radial, -180_deg, +180_deg);
+		si::Angle deviation = xf::wrap_within_range<si::Angle> (input_radial - current_radial, -180_deg, +180_deg);
 		if (abs (deviation) > 90_deg)
 			deviation = -denormalize (deviation + 180_deg);
 
@@ -92,13 +92,13 @@ VOR::compute()
 inline si::Angle
 VOR::normalize (si::Angle const a)
 {
-	return xf::floored_mod<si::Angle> (a, 0_deg, 360_deg);
+	return xf::wrap_within_range<si::Angle> (a, 0_deg, 360_deg);
 }
 
 
 inline si::Angle
 VOR::denormalize (si::Angle const a)
 {
-	return xf::floored_mod<si::Angle> (a, -180_deg, +180_deg);
+	return xf::wrap_within_range<si::Angle> (a, -180_deg, +180_deg);
 }
 

@@ -135,7 +135,7 @@ template<class V>
 		std::fill (_history.begin(), _history.end(), value);
 		std::fill (_history_cos.begin(), _history_cos.end(), std::cos (encircle (value)));
 		std::fill (_history_sin.begin(), _history_sin.end(), std::sin (encircle (value)));
-		_z = floored_mod<Value> (_z, _range);
+		_z = wrap_within_range<Value> (_z, _range);
 	}
 
 
@@ -189,7 +189,7 @@ template<class V>
 			y /= _history.size() - 1;
 			x *= 2.0;
 			y *= 2.0; // Window energy correction.
-			_z = floored_mod<Value> (decircle (std::atan2 (y, x)), _range);
+			_z = wrap_within_range<Value> (decircle (std::atan2 (y, x)), _range);
 
 			_accumulated_dt = 0_s;
 		}

@@ -74,9 +74,8 @@ template<class Scalar, class Space, class Iterator>
 			auto const v13 = std::complex (v3_sub_v1[0], v3_sub_v1[1]);
 			auto const a12 = 1_rad * std::arg (v12);
 			auto const a13 = 1_rad * std::arg (v13);
-			auto const a_range = neutrino::Range<si::Angle> (-180_deg, +180_deg);
 
-			return neutrino::floored_mod (a12 - a13, a_range);
+			return neutrino::wrap_within_range (a12 - a13, Range { -180_deg, +180_deg });
 		};
 
 		auto const is_convex = [&turn] (Vertex const& v1, Vertex const& v2, Vertex const& v3)

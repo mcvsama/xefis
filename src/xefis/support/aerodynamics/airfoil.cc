@@ -145,7 +145,7 @@ Airfoil::wrap_angle_for_field (si::Angle angle)
 {
 	// Not expecting that fields define values for ranges outside -90…+90°,
 	// so just do a mirror extension:
-	return floored_mod (angle, Range<si::Angle> (-90_deg, +90_deg));
+	return wrap_within_range (angle, Range<si::Angle> (-90_deg, +90_deg));
 }
 
 } // namespace xf
