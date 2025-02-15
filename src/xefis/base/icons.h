@@ -27,7 +27,7 @@ QPixmap
 from_png_file (QString const& png_file) noexcept;
 
 QPixmap
-fron_svg_file (QString const& svg_file) noexcept;
+from_svg_file (QString const& svg_file) noexcept;
 
 
 #define XEFIS_PNG_ICON(key, file)		\
