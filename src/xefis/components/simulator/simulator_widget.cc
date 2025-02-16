@@ -165,7 +165,7 @@ SimulatorWidget::make_simulation_controls()
 	auto* time_of_day_slider = new QSlider (Qt::Horizontal);
 	time_of_day_slider->setTickPosition (QSlider::TicksAbove);
 	time_of_day_slider->setTracking (true);
-	time_of_day_slider->setTickInterval (24);
+	time_of_day_slider->setTickInterval (60);
 	time_of_day_slider->setPageStep (60);
 	time_of_day_slider->setRange (0, 60 * 24);
 	time_of_day_slider->setMinimumWidth (ph.em_pixels_int (8.0));
@@ -173,7 +173,7 @@ SimulatorWidget::make_simulation_controls()
 		_time_of_day = value * 60_s;
 		update_rigid_body_viewer_time();
 	});
-	day_of_year_slider->setValue (0);
+	time_of_day_slider->setValue (0);
 
 	auto* show_configurator_button = new QPushButton ("Show machine config", this);
 	QObject::connect (show_configurator_button, &QPushButton::clicked, [this] {
@@ -209,7 +209,9 @@ SimulatorWidget::make_simulation_controls()
 	row2_layout->addWidget (new QLabel ("Speed: "));
 	row2_layout->addWidget (speed_slider);
 	row2_layout->addWidget (speed_label);
+	row2_layout->addWidget (new QLabel ("UTC year:"));
 	row2_layout->addWidget (day_of_year_slider);
+	row2_layout->addWidget (new QLabel ("UTC day:"));
 	row2_layout->addWidget (time_of_day_slider);
 	row2_layout->addItem (new QSpacerItem (ph.em_pixels_int (1.0), 0, QSizePolicy::Fixed, QSizePolicy::Fixed));
 	row2_layout->addWidget (new QLabel ("Performance: "));
