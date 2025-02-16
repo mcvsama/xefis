@@ -30,7 +30,7 @@
 namespace xf::rigid_body {
 
 // Called by make_centered_sphere_shape() to get material for vertices.
-using MakeSphereMaterialCallback = std::function<void (ShapeMaterial&, si::Angle latitude)>;
+using MakeSphereMaterialCallback = std::function<void (ShapeMaterial&, si::Angle longitude, si::Angle latitude)>;
 
 
 enum RotationDirection
@@ -45,7 +45,7 @@ struct SphereShapeParameters
 	si::Length					radius;
 	std::size_t					slices;
 	std::size_t					stacks;
-	Range<si::Angle>			h_range			{ 0_deg, 360_deg };
+	Range<si::Angle>			h_range			{ -180_deg, +180_deg };
 	Range<si::Angle>			v_range			{ -90_deg, +90_deg };
 	ShapeMaterial const&		material		{ };
 	MakeSphereMaterialCallback	setup_material	{ nullptr };
@@ -165,7 +165,7 @@ Shape
 make_cube_shape (xf::MassMomentsAtArm<BodyCOM> const&, ShapeMaterial const& material = {});
 
 /**
- * Make sphere of given radius.
+ * Make sphere of given radius in ECEF coordinates (equator and slices are on X-Y plane).
  */
 Shape
 make_centered_sphere_shape (SphereShapeParameters const&);

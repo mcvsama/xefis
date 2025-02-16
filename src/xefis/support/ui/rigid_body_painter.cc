@@ -327,7 +327,7 @@ RigidBodyPainter::paint_planet()
 
 		auto sky_material = rigid_body::kBlackMatte;
 
-		auto const configure_material = [&] (rigid_body::ShapeMaterial& material, si::Angle const latitude)
+		auto const configure_material = [&] (rigid_body::ShapeMaterial& material, si::Angle, si::Angle const latitude)
 		{
 			// Set dome color (fog simulation) depending on latitude:
 			float const norm = std::clamp<float> (renormalize<si::Angle> (latitude, Range { 67.5_deg, 90_deg }, Range { 1.0f, 0.0f }), 0.0f, 1.0f);
@@ -365,7 +365,7 @@ RigidBodyPainter::paint_planet()
 
 		auto sun_material = rigid_body::kBlackMatte;
 
-		auto const configure_material = [&] (rigid_body::ShapeMaterial& material, si::Angle const latitude)
+		auto const configure_material = [&] (rigid_body::ShapeMaterial& material, si::Angle, si::Angle const latitude)
 		{
 			// TODO make the Sun color (temperature) vary depending on time of day.
 			float const actual_radius = 0.025;

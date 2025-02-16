@@ -122,34 +122,22 @@ make_centered_sphere_shape (SphereShapeParameters const& params)
 	{
 		Shape::TriangleStrip& strip = shape.triangle_strips().emplace_back();
 		strip.reserve (2 * (slices + 1));
-		si::Angle angle_h = params.h_range.max();
+		si::Angle angle_h = params.h_range.min();
 
 		for (size_t ih = 0; ih < slices + 1; ++ih, angle_h += dh)
 		{
-			// Not the most effective (could reuse vertices), but who cares.
-			auto const get_vector = [](si::Angle v, si::Angle const h)
-			{
-				v -= 90_deg;
-
-				auto const w = sin (v);
-				auto const x = w * sin (h);
-				auto const y = w * cos (h);
-				auto const z = cos (v);
-
-				return SpaceVector<double, BodyOrigin> (x, y, z);
-			};
-
-			auto const p1 = get_vector (angle_v, angle_h);
-			auto const p2 = get_vector (angle_v + dv, angle_h);
+			// TODO Calls to cartesian() and setup_material() could be reused in the future for the same points of adjacent strips:
+			auto const p1 = math::coordinate_system_cast<BodyOrigin, void> (cartesian (si::LonLat { angle_h, angle_v + dv }));
+			auto const p2 = math::coordinate_system_cast<BodyOrigin, void> (cartesian (si::LonLat { angle_h, angle_v }));
 
 			if (params.setup_material)
 			{
 				auto p1_material = params.material;
-				params.setup_material (p1_material, angle_v);
+				params.setup_material (p1_material, angle_h, angle_v);
 				strip.emplace_back (p1 * params.radius, p1, p1_material);
 
 				auto p2_material = params.material;
-				params.setup_material (p2_material, angle_v + dv);
+				params.setup_material (p2_material, angle_h, angle_v + dv);
 				strip.emplace_back (p2 * params.radius, p2, p2_material);
 			}
 			else
