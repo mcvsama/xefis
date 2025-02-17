@@ -133,11 +133,11 @@ make_centered_sphere_shape (SphereShapeParameters const& params)
 			if (params.setup_material)
 			{
 				auto p1_material = params.material;
-				params.setup_material (p1_material, si::LonLat { angle_h, angle_v });
+				params.setup_material (p1_material, si::LonLat { angle_h, angle_v + dv });
 				strip.emplace_back (p1 * params.radius, p1, p1_material);
 
 				auto p2_material = params.material;
-				params.setup_material (p2_material, si::LonLat { angle_h, angle_v + dv });
+				params.setup_material (p2_material, si::LonLat { angle_h, angle_v });
 				strip.emplace_back (p2 * params.radius, p2, p2_material);
 			}
 			else
