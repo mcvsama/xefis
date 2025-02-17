@@ -67,10 +67,10 @@ make_earth (bool include_actual_sphere)
 	};
 
 	// Small 1_m orb:
-	auto shape = make_orb (1_m, 18, 36);
+	auto shape = make_orb (1_m, 18, 9);
 
 	if (include_actual_sphere)
-		shape += make_orb (kEarthMeanRadius, 180, 360);
+		shape += make_orb (kEarthMeanRadius, 360, 180);
 
 	auto earth = std::make_unique<Body> (MassMoments<BodyCOM> (kEarthMass, math::coordinate_system_cast<BodyCOM, BodyCOM> (kEarthMomentOfInertia)));
 	earth->set_shape (shape);
