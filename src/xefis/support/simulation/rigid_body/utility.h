@@ -29,7 +29,7 @@ namespace xf::rigid_body {
  */
 [[nodiscard]]
 std::unique_ptr<Body>
-make_earth();
+make_earth (bool include_actual_sphere = false);
 
 } // namespace xf::rigid_body
 
