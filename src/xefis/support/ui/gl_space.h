@@ -134,6 +134,27 @@ class GLSpace
 	rotate (si::Angle const angle, float x, float y, float z);
 
 	/**
+	 * Convenience shortcut.
+	 */
+	static void
+	rotate_x (si::Angle const angle)
+		{ rotate (angle, 1, 0, 0); }
+
+	/**
+	 * Convenience shortcut.
+	 */
+	static void
+	rotate_y (si::Angle const angle)
+		{ rotate (angle, 0, 1, 0); }
+
+	/**
+	 * Convenience shortcut.
+	 */
+	static void
+	rotate_z (si::Angle const angle)
+		{ rotate (angle, 0, 0, 1); }
+
+	/**
 	 * Translate current OpenGL matrix by given vector.
 	 */
 	static void
