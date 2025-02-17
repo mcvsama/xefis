@@ -519,6 +519,9 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	// Sun position:
 	si::Angle					_local_hour_angle;
 	si::Angle					_sun_declination;
+	si::Angle					_sun_altitude;
+	GLColor						_sun_color;
+	float						_normalized_sun_altitude;
 };
 
 

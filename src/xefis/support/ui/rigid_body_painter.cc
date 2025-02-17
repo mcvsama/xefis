@@ -106,6 +106,12 @@ RigidBodyPainter::calculate_sun_position()
 	auto const local_sidereal_time = unix_time_to_local_sidereal_time (time, _position_on_earth.lon());
 	_local_hour_angle = calculate_hour_angle (local_sidereal_time, sun_equatorial_position.right_ascension);
 	_sun_declination = sun_equatorial_position.declination;
+	auto const sun_horizontal_position = calculate_sun_horizontal_position (_sun_declination, _position_on_earth.lat(), _local_hour_angle);
+	_sun_altitude = sun_horizontal_position.altitude;
+	auto const maximum_sun_altitude = calculate_solar_noon_altitude (_sun_declination, _position_on_earth.lat());
+	_normalized_sun_altitude = _sun_altitude / maximum_sun_altitude;
+	auto const color_factor = std::clamp (finite_or (_normalized_sun_altitude, 0.0f), 0.0f, 1.0f);
+	_sun_color = to_gl_color (get_intermediate_color (std::pow (color_factor, 0.5), QColor (0xff, 0xc8, 0x89), Qt::white));
 }
 
 
@@ -351,10 +357,10 @@ RigidBodyPainter::paint_planet()
 
 		auto sky_material = rigid_body::kBlackMatte;
 
-		auto const configure_material = [&] (rigid_body::ShapeMaterial& material, si::Angle, si::Angle const latitude)
+		auto const configure_material = [&] (rigid_body::ShapeMaterial& material, si::LonLat const position)
 		{
 			// Set dome color (fog simulation) depending on latitude:
-			float const norm = std::clamp<float> (renormalize<si::Angle> (latitude, Range { 67.5_deg, 90_deg }, Range { 1.0f, 0.0f }), 0.0f, 1.0f);
+			float const norm = std::clamp<float> (renormalize<si::Angle> (position.lat(), Range { 67.5_deg, 90_deg }, Range { 1.0f, 0.0f }), 0.0f, 1.0f);
 			material.set_emission_color (get_intermediate_color (std::pow (norm, 1.0 + 2 * normalized_altitude), sky_color, sky_fog_color));
 		};
 
@@ -389,11 +395,11 @@ RigidBodyPainter::paint_planet()
 
 		auto sun_material = rigid_body::kBlackMatte;
 
-		auto const configure_material = [&] (rigid_body::ShapeMaterial& material, si::Angle, si::Angle const latitude)
+		auto const configure_material = [&] (rigid_body::ShapeMaterial& material, si::LonLat const position)
 		{
 			// TODO make the Sun color (temperature) vary depending on time of day.
 			float const actual_radius = 0.025;
-			float const norm = renormalize<si::Angle> (latitude, Range { 0_deg, 90_deg }, Range { 0.0f, 1.0f });
+			float const norm = renormalize<si::Angle> (position.lat(), Range { 0_deg, 90_deg }, Range { 0.0f, 1.0f });
 			float const alpha = std::clamp<float> (std::pow (norm + actual_radius, 6.0f), 0.0f, 1.0f);
 			material.gl_emission_color = { 1.0f, 1.0f, 1.0f, alpha };
 		};
