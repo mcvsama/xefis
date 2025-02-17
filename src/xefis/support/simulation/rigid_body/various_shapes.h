@@ -30,7 +30,7 @@
 namespace xf::rigid_body {
 
 // Called by make_centered_sphere_shape() to get material for vertices.
-using MakeSphereMaterialCallback = std::function<void (ShapeMaterial&, si::Angle longitude, si::Angle latitude)>;
+using MakeSphereMaterialCallback = std::function<void (ShapeMaterial&, si::LonLat position)>;
 
 
 enum RotationDirection
