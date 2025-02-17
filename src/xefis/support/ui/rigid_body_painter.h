@@ -487,37 +487,38 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	get_intermediate_color (float x, QColor const& color0, QColor const& color1);
 
   private:
-	si::PixelDensity		_pixel_density;
-	si::Time				_time;
+	si::PixelDensity			_pixel_density;
+	si::Time					_time;
 	// Camera position is relative to the followed body:
-	SpaceLength<WorldSpace>	_camera_position;
-	SpaceVector<si::Angle>	_camera_angles;
-	LonLatRadius			_position_on_earth			{ 0_deg, 0_deg, 0_m };
-	GLSpace					_gl;
+	SpaceLength<WorldSpace>		_camera_position;
+	// Camera rotation in screen coordinates:
+	SpaceVector<si::Angle>		_camera_angles;
+	LonLatRadius				_position_on_earth			{ 0_deg, 0_deg, 0_m };
+	GLSpace						_gl							{ 1.0 / 1_m }; // TODO experiment with 1.0 / 1_km
 	std::variant<std::monostate, rigid_body::Group const*, rigid_body::Body const*>
-							_followed;
-	bool					_camera_follows_orientation	{ true };
+								_followed;
+	bool						_camera_follows_orientation	{ true };
 	std::variant<std::monostate, rigid_body::Group const*, rigid_body::Body const*, rigid_body::Constraint const*>
-							_focused;
+								_focused;
 	std::variant<std::monostate, rigid_body::Body const*, rigid_body::Constraint const*>
-							_hovered;
-	rigid_body::Body const*	_planet_body				{ nullptr };
-	bool					_constraints_visible		{ false };
-	bool					_gravity_visible			{ false };
-	bool					_external_forces_visible	{ false };
-	bool					_aerodynamic_forces_visible	{ false };
-	bool					_angular_velocities_visible	{ false };
-	bool					_angular_momenta_visible	{ false };
+								_hovered;
+	rigid_body::Body const*		_planet_body				{ nullptr };
+	bool						_constraints_visible		{ false };
+	bool						_gravity_visible			{ false };
+	bool						_external_forces_visible	{ false };
+	bool						_aerodynamic_forces_visible	{ false };
+	bool						_angular_velocities_visible	{ false };
+	bool						_angular_momenta_visible	{ false };
 	std::map<rigid_body::Group const*, GroupRenderingConfig>
-							_group_rendering_config;
+								_group_rendering_config;
 	std::map<rigid_body::Body const*, BodyRenderingConfig>
-							_body_rendering_config;
-	std::minstd_rand0		_air_particles_prng;
+								_body_rendering_config;
+	std::minstd_rand0			_air_particles_prng;
 	std::map<rigid_body::Group const*, SpaceLength<WorldSpace>>
-							_group_centers_of_mass_cache;
+								_group_centers_of_mass_cache;
 	// Sun position:
-	si::Angle				_local_hour_angle;
-	si::Angle				_sun_declination;
+	si::Angle					_local_hour_angle;
+	si::Angle					_sun_declination;
 };
 
 
