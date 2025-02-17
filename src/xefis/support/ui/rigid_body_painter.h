@@ -482,6 +482,10 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	SpaceLength<WorldSpace>
 	get_center_of_mass (rigid_body::Group const&);
 
+	[[nodiscard]]
+	static QColor
+	get_intermediate_color (float x, QColor const& color0, QColor const& color1);
+
   private:
 	si::PixelDensity		_pixel_density;
 	si::Time				_time;
