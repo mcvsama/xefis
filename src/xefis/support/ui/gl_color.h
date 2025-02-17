@@ -84,6 +84,16 @@ class GLColor
 	operator float const*() const noexcept
 		{ return data(); }
 
+	[[nodiscard]]
+	constexpr float&
+	operator[] (std::size_t index) noexcept
+		{ return _color_array[index]; }
+
+	[[nodiscard]]
+	constexpr float
+	operator[] (std::size_t index) const noexcept
+		{ return _color_array[index]; }
+
   private:
 	std::array<float, 4> _color_array;
 };
