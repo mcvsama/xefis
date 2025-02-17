@@ -22,6 +22,7 @@
 
 // Standard:
 #include <cstddef>
+#include <tuple>
 
 
 namespace xf {
@@ -91,6 +92,33 @@ calculate_sun_altitude (si::Angle sun_declination, si::Angle observer_latitude, 
 [[nodiscard]]
 si::Angle
 calculate_sun_azimuth (si::Angle sun_declination, si::Angle observer_latitude, si::Angle hour_angle, si::Angle sun_altitude);
+
+
+/**
+ * Calculate sunrise and sunset hour-angles.
+ * If the function returns NaN, the Sun never rises (polar night) or never sets (midnight Sun).
+ *
+ * \returns	[sunrise_hour_angle, sunset_hour_angle]
+ *			sunset_hour_angle is negative, sunset_hour_angle is positive.
+ */
+[[nodiscard]]
+constexpr std::tuple<si::Angle, si::Angle>
+calculate_sunrise_and_sunset_hour_angles (si::Angle const sun_declination, si::Angle const observer_latitude)
+{
+	auto const ha = 1_rad * acos (-tan (observer_latitude) * tan (sun_declination));
+	return { -ha, +ha };
+}
+
+
+/**
+ * Calculate maximum altitude of the Sun which occurs at solar noon (when hour angle is 0°).
+ */
+[[nodiscard]]
+constexpr si::Angle
+calculate_solar_noon_altitude (si::Angle const sun_declination, si::Angle const observer_latitude)
+{
+	return 90_deg - abs (observer_latitude - sun_declination);
+}
 
 
 /**
