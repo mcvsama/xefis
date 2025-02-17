@@ -640,9 +640,8 @@ RigidBodyPainter::paint (rigid_body::Constraint const& constraint)
 					_gl.translate (from);
 
 					auto const alpha_beta = alpha_beta_from_x_to (diff);
-					_gl.rotate (alpha_beta[0], 0, 0, 1);
-					_gl.rotate (alpha_beta[1], 0, 1, 0);
-					_gl.rotate (90_deg, 0, 1, 0);
+					_gl.rotate_z (alpha_beta[0]);
+					_gl.rotate_y (alpha_beta[1] + 90_deg);
 
 					auto const shape = rigid_body::make_cylinder_shape ({
 						.length = 1_m * abs (diff / 1_m),
@@ -854,9 +853,8 @@ RigidBodyPainter::draw_arrow (SpaceLength<WorldSpace> const& origin, SpaceLength
 			auto const alpha_beta = alpha_beta_from_x_to (vector);
 
 			_gl.translate (origin);
-			_gl.rotate (alpha_beta[0], 0, 0, 1);
-			_gl.rotate (alpha_beta[1], 0, 1, 0);
-			_gl.rotate (90_deg, 0, 1, 0);
+			_gl.rotate_z (alpha_beta[0]);
+			_gl.rotate_y (alpha_beta[1] + 90_deg);
 			_gl.draw (rigid_body::make_cylinder_shape ({ .length = length, .radius = radius, .num_faces = kNumFaces, .with_bottom = true, .with_top = true, .material = material }));
 			_gl.translate (0_m, 0_m, length);
 			_gl.draw (rigid_body::make_cone_shape ({ .length = cone_length, .radius = cone_radius, .num_faces = kNumFaces, .with_bottom = true, .material = material }));
@@ -906,14 +904,14 @@ RigidBodyPainter::paint_basis (si::Length const length)
 	_gl.draw (rigid_body::make_centered_sphere_shape ({ .radius = 2 * radius, .slices = 8, .stacks = 8 }));
 	// X axis:
 	_gl.save_context ([&] {
-		_gl.rotate (+90_deg, 0.0, 1.0, 0.0);
+		_gl.rotate_y (+90_deg);
 		_gl.draw (rigid_body::make_cylinder_shape ({ .length = length, .radius = radius, .num_faces = kNumFaces, .material = red }));
 		_gl.translate (0_m, 0_m, length);
 		_gl.draw (rigid_body::make_cone_shape ({ .length = cone_length, .radius = cone_radius, .num_faces = kNumFaces, .with_bottom = true, .material = red }));
 	});
 	// Y axis:
 	_gl.save_context ([&] {
-		_gl.rotate (-90_deg, 1.0, 0.0, 0.0);
+		_gl.rotate_x (-90_deg);
 		_gl.draw (rigid_body::make_cylinder_shape ({ .length = length, .radius = radius, .num_faces = kNumFaces, .material = green }));
 		_gl.translate (0_m, 0_m, length);
 		_gl.draw (rigid_body::make_cone_shape ({ .length = cone_length, .radius = cone_radius, .num_faces = kNumFaces, .with_bottom = true, .material = green }));
