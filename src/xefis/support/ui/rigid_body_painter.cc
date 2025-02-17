@@ -195,6 +195,21 @@ RigidBodyPainter::setup_natural_light()
 
 
 void
+RigidBodyPainter::apply_screen_to_null_island_rotations()
+{
+	// Start with assumption that OpenGL coordinates are equal to ECEF coordinates:
+	// X = Null Island, Y = lon/lat 90°/0° and Z = North.
+
+	// Rotate -90° around X-axis to align the Y-axis with the equator
+	// (so that Z points towards the prime meridian instead of North):
+	_gl.rotate_x (-90_deg);
+	// Rotate -90° around Z-axis to shift the X-axis from Null Island towards
+	// the prime meridian and align Y with the correct eastward direction:
+	_gl.rotate_z (-90_deg);
+}
+
+
+void
 RigidBodyPainter::setup_camera()
 {
 	_gl.translate (-_camera_position);
@@ -205,40 +220,49 @@ RigidBodyPainter::setup_camera()
 void
 RigidBodyPainter::apply_camera_rotations()
 {
-	// Remember that in OpenGL transforms are applied in the reverse order.
-
-	_gl.rotate (_camera_angles[0], 1, 0, 0); // Pitch
-	_gl.rotate (_camera_angles[1], 0, 1, 0); // Yaw
-	_gl.rotate (_camera_angles[2], 0, 0, 1); // Roll
+	// The camera always rotates about the screen Y axis and can be moved up and down using the screen X axis.
+	_gl.rotate_x (_camera_angles[0]); // Pitch
+	_gl.rotate_y (_camera_angles[1]); // Yaw
+	_gl.rotate_z (_camera_angles[2]); // Roll
 
 	auto const* followed_group = this->followed_group();
 	auto const* followed_body = this->followed_body();
 
-	// Match the screen coordinates with the group/body/planet coordinates:
-	if ((followed_group || followed_body) && _camera_follows_orientation)
+	// Match the screen coordinates with the group/body/planet coordinates.
+	if ((followed_group || followed_body) && followed_body != _planet_body)
 	{
-		// The body/group is assumed to be in aircraft coordinates (X = front, Y = right, Z = down).
-		// The screen is in standard math/screen coordinates (X = right, Y = top, Z = towards the viewer).
-		// We have to rotate about axes defined by the screen to get to see the aircraft from behind.
-		_gl.rotate (-90_deg, 0, 0, 1); // About Z
-		_gl.rotate (+90_deg, 0, 1, 0); // About Y
+		// Make an exception if we're following the planet body: we don't want to use aircraft coordinates
+		// for the planet, because it's unnatural:
+		if (followed_body && followed_body == _planet_body)
+			apply_screen_to_null_island_rotations();
+		else if (_camera_follows_orientation)
+		{
+			// Now the body will be shown in standard screen coordinates (X = right, Y = top, Z = towards the viewer).
+			// But we assume that bodies and groups use aircraft coordinates (X = front, Y = right wing, Z = down).
+			// So rotate again to be able to see the aircraft from behind (when camera rotations are all 0°):
+			_gl.rotate_z (-90_deg);
+			_gl.rotate_y (+90_deg);
+
+			// Rotate body/group to match the screen coordinates:
+			if (followed_group)
+				if (auto const* rotation_reference_body = followed_group->rotation_reference_body())
+					followed_body = rotation_reference_body;
+
+			if (followed_body)
+				_gl.rotate (followed_body->placement().body_to_base_rotation());
+
+		}
+		else
+		{
+			// Rotate the world so that down points to the center of _planet_body:
+			_gl.rotate_x (+_position_on_earth.lat() - 90_deg);
+			_gl.rotate_y (-_position_on_earth.lon());
+			apply_screen_to_null_island_rotations();
+		}
 	}
+	// Nothing is followed, so default to planet body if it exists:
 	else if (_planet_body)
-	{
-		// Rotate so that down on the screen is towards the center of the planet.
-		_gl.rotate (-_position_on_earth.lon() + 90_deg, 0, 0, 1); // About Z
-		_gl.rotate (+_position_on_earth.lat(), 0, 1, 0); // About Y
-	}
-
-	if (_camera_follows_orientation)
-	{
-		if (followed_group)
-			if (auto const* rotation_reference_body = followed_group->rotation_reference_body())
-				followed_body = rotation_reference_body;
-
-		if (followed_body)
-			_gl.rotate (followed_body->placement().body_to_base_rotation());
-	}
+		apply_screen_to_null_island_rotations();
 }
 
 

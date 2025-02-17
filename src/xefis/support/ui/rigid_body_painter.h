@@ -371,6 +371,13 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	void
 	setup_natural_light();
 
+	/**
+	 * Rotate the world from screen coordinates (Earth visible from top of North (Z) with Null Island on the Right (X))
+	 * to Null Island being visible from above (Z) with North on top of the screen (Y) and 90°/0° on the right (X).
+	 */
+	void
+	apply_screen_to_null_island_rotations();
+
 	void
 	setup_camera();
 
