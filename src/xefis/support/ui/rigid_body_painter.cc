@@ -278,15 +278,16 @@ RigidBodyPainter::apply_sun_rotations()
 	// We have now identity rotations + camera rotations applied.
 	// Remember in OpenGL rotations are applied in reverse order.
 
-	// Rotate sun depending on local time (longitude variation):
-	_gl.rotate (_local_hour_angle, 0, 0, -1);
+	// Rotate sun depending on UTC time:
+	auto const greenwich_hour_angle = _local_hour_angle - _position_on_earth.lon();
+	_gl.rotate_z (-greenwich_hour_angle);
 
-	// Rotate sun depending on time of the year (latitude variation):
-	_gl.rotate (_sun_declination, 0, -1, 0);
+	// Rotate sun depending on time of the year:
+	_gl.rotate_y (-_sun_declination);
 
 	// Our sun is located over the North Pole (+Z in ECEF). Rotate it to be straight over Null Island
 	// that is lon/lat 0°/0° (+X in ECEF):
-	_gl.rotate (90_deg, 0, 1, 0);
+	_gl.rotate_y (90_deg);
 }
 
 
