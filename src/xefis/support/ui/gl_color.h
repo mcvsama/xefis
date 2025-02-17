@@ -145,6 +145,22 @@ to_gl_color (QColor const& color)
 	};
 }
 
+
+[[nodiscard]]
+constexpr GLColor
+to_gl_color (math::Vector<float, 3> const& rgb_color)
+{
+	return { rgb_color[0], rgb_color[1], rgb_color[2], 1.0f };
+}
+
+
+[[nodiscard]]
+constexpr GLColor
+to_gl_color (math::Vector<float, 4> const& rgb_color)
+{
+	return { rgb_color[0], rgb_color[1], rgb_color[2], rgb_color[3] };
+}
+
 } // namespace xf
 
 #endif
