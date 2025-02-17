@@ -31,6 +31,12 @@ class GLColor
   public:
 	// Ctor
 	constexpr
+	GLColor():
+		_color_array ({ 0.0f, 0.0f, 0.0f, 0.0f })
+	{ }
+
+	// Ctor
+	constexpr
 	GLColor (float r, float g, float b, float alpha = 1.0):
 		_color_array ({ r, g, b, alpha })
 	{ }
