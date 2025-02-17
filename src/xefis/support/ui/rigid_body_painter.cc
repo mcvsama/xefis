@@ -746,7 +746,7 @@ void
 RigidBodyPainter::paint_origin()
 {
 	auto const origin_material = rigid_body::make_material ({ 0xff, 0xff, 0x00 });
-	auto const origin_shape = rigid_body::make_centered_sphere_shape ({ .radius = _camera_position.z() / 150, .slices = 8, .stacks = 8, .material = origin_material });
+	auto const origin_shape = rigid_body::make_centered_sphere_shape ({ .radius = _camera_position.z() / 150, .slices = 8, .stacks = 4, .material = origin_material });
 
 	_gl.save_context ([&] {
 		setup_feature_light();
@@ -901,7 +901,7 @@ RigidBodyPainter::paint_basis (si::Length const length)
 	setup_feature_light();
 
 	// Root ball:
-	_gl.draw (rigid_body::make_centered_sphere_shape ({ .radius = 2 * radius, .slices = 8, .stacks = 8 }));
+	_gl.draw (rigid_body::make_centered_sphere_shape ({ .radius = 2 * radius, .slices = 8, .stacks = 4 }));
 	// X axis:
 	_gl.save_context ([&] {
 		_gl.rotate_y (+90_deg);
