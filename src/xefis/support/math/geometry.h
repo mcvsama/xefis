@@ -341,39 +341,42 @@ is_point_2d_inside_triangle_tester (TriangleConcept auto const& triangle)
  */
 
 
-[[nodiscard]]
-inline SpaceVector<double, ECEFSpace>
-cartesian (si::LonLat const& position)
-{
-	auto const cos_lat = cos (position.lat());
-	auto const x = cos_lat * cos (position.lon());
-	auto const y = cos_lat * sin (position.lon());
-	auto const z = sin (position.lat());
+template<math::CoordinateSystem TargetSpace = ECEFSpace>
+	[[nodiscard]]
+	constexpr SpaceVector<double, TargetSpace>
+	cartesian (si::LonLat const& position)
+	{
+		auto const cos_lat = cos (position.lat());
+		auto const x = cos_lat * cos (position.lon());
+		auto const y = cos_lat * sin (position.lon());
+		auto const z = sin (position.lat());
 
-	return { x, y, z };
-}
-
-
-[[nodiscard]]
-inline SpaceVector<si::Length, ECEFSpace>
-cartesian (LonLatRadius const& position)
-{
-	return position.radius() * cartesian (static_cast<si::LonLat const&> (position));
-}
+		return { x, y, z };
+	}
 
 
-[[nodiscard]]
-inline LonLatRadius
-polar (SpaceVector<si::Length, ECEFSpace> const& vector)
-{
-	std::complex<double> const xy (vector[0].value(), vector[1].value());
-	std::complex<double> const wz (std::abs (xy), vector[2].value());
+template<math::CoordinateSystem TargetSpace = ECEFSpace>
+	[[nodiscard]]
+	constexpr SpaceVector<si::Length, TargetSpace>
+	cartesian (LonLatRadius const& position)
+	{
+		return position.radius() * cartesian<TargetSpace> (static_cast<si::LonLat const&> (position));
+	}
 
-	return LonLatRadius {
-		si::LonLat (1_rad * std::arg (xy), 1_rad * std::arg (wz)),
-		si::Length (std::abs (wz))
-	};
-}
+
+template<math::CoordinateSystem Space>
+	[[nodiscard]]
+	constexpr LonLatRadius
+	polar (SpaceVector<si::Length, Space> const& vector)
+	{
+		std::complex<double> const xy (vector[0].value(), vector[1].value());
+		std::complex<double> const wz (std::abs (xy), vector[2].value());
+
+		return LonLatRadius {
+			si::LonLat (1_rad * std::arg (xy), 1_rad * std::arg (wz)),
+			si::Length (std::abs (wz))
+		};
+	}
 
 } // namespace xf
 
