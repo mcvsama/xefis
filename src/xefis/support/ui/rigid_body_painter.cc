@@ -16,6 +16,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/support/earth/air/sky_dome.h>
 #include <xefis/support/math/rotations.h>
 #include <xefis/support/nature/constants.h>
 #include <xefis/support/simulation/constraints/fixed_constraint.h>
@@ -32,6 +33,7 @@
 #include <neutrino/stdexcept.h>
 
 // Qt:
+#include <QImage>
 #include <QOpenGLFunctions>
 #include <QPainter>
 
@@ -48,12 +50,41 @@ namespace xf {
 
 constexpr auto kSunLight		= GL_LIGHT0;
 constexpr auto kFeatureLight	= GL_LIGHT1;
+constexpr auto kSkyLight0		= GL_LIGHT2;
+constexpr auto kSkyLight1		= GL_LIGHT3;
+constexpr auto kSkyLight2		= GL_LIGHT4;
+constexpr auto kSkyLight3		= GL_LIGHT5;
+constexpr auto kSkyLight4		= GL_LIGHT6;
+
+// Used for scaling output of SkyDome::calculate_incident_light(); chosen experimentally:
+constexpr auto kIncidentLightScale	= 100.0;
 
 
 RigidBodyPainter::RigidBodyPainter (si::PixelDensity const pixel_density):
 	_pixel_density (pixel_density),
 	_gl (pixel_density * kDefaultPositionScale)
-{ }
+{
+	_sky_lights[0] = SkyLight {
+		.gl_number	= kSkyLight0,
+		.position	= { 0_deg, 0_deg },
+	};
+	_sky_lights[1] = SkyLight {
+		.gl_number	= kSkyLight1,
+		.position	= { 90_deg, 5_deg },
+	};
+	_sky_lights[2] = SkyLight {
+		.gl_number	= kSkyLight2,
+		.position	= { 180_deg, 5_deg },
+	};
+	_sky_lights[3] = SkyLight {
+		.gl_number	= kSkyLight3,
+		.position	= { 270_deg, 5_deg },
+	};
+	_sky_lights[4] = {
+		.gl_number	= kSkyLight4,
+		.position	= { 0_deg, 90_deg },
+	};
+}
 
 
 void
@@ -99,19 +130,33 @@ RigidBodyPainter::calculate_sun_position()
 	auto const time = _time;
 	// Reposition Sun according to time:
 	auto const days_since_J2000 = unix_time_to_days_since_J2000 (time);
-	auto const sun_ecliptic_position = xf::calculate_sun_ecliptic_position (days_since_J2000);
+	auto const sun_ecliptic_position = calculate_sun_ecliptic_position (days_since_J2000);
 	auto const sun_equatorial_position = calculate_sun_equatorial_position (sun_ecliptic_position.longitude, days_since_J2000);
 	// Since equatorial coordinate system doesn't rotate with Earth, we need to take
 	// that rotation into account manually (calculate hour-angle and rotate the sun again):
 	auto const local_sidereal_time = unix_time_to_local_sidereal_time (time, _position_on_earth.lon());
-	_local_hour_angle = calculate_hour_angle (local_sidereal_time, sun_equatorial_position.right_ascension);
+	_sun_local_hour_angle = calculate_hour_angle (local_sidereal_time, sun_equatorial_position.right_ascension);
 	_sun_declination = sun_equatorial_position.declination;
-	auto const sun_horizontal_position = calculate_sun_horizontal_position (_sun_declination, _position_on_earth.lat(), _local_hour_angle);
-	_sun_altitude = sun_horizontal_position.altitude;
-	auto const maximum_sun_altitude = calculate_solar_noon_altitude (_sun_declination, _position_on_earth.lat());
-	_normalized_sun_altitude = _sun_altitude / maximum_sun_altitude;
-	auto const color_factor = std::clamp (finite_or (_normalized_sun_altitude, 0.0f), 0.0f, 1.0f);
-	_sun_color = to_gl_color (get_intermediate_color (std::pow (color_factor, 0.5), QColor (0xff, 0xc8, 0x89), Qt::white));
+	_sun_horizontal_position = calculate_sun_horizontal_position (_sun_declination, _position_on_earth.lat(), _sun_local_hour_angle);
+	// Azimuth 0° is North, Hour angle 0° is Noon, so add 180_deg. And the direction is opposite, so negate.
+	_sun_direction = cartesian<void> (si::LonLat (-_sun_horizontal_position.azimuth + 180_deg, _sun_horizontal_position.altitude));
+	_sky_dome = SkyDome ({
+		.sun_direction = _sun_direction,
+		.earth_radius = kEarthMeanRadius,
+		.atmosphere_radius = kEarthMeanRadius + 10_km,
+	});
+}
+
+
+void
+RigidBodyPainter::calculate_sun_color()
+{
+	if (_sky_dome)
+	{
+		auto const color = kIncidentLightScale * _sky_dome->calculate_incident_light ({ 0_m, 0_m, _position_on_earth.radius() }, _sun_direction);
+		auto const tonemapped_color = tonemap_sky (_sky_dome->tonemap_separately (color));
+		_sun_color = to_gl_color (tonemapped_color);
+	}
 }
 
 
@@ -122,6 +167,7 @@ RigidBodyPainter::setup (QOpenGLPaintDevice& canvas)
 
 	_position_on_earth = xf::polar (math::coordinate_system_cast<ECEFSpace, void> (followed_position()));
 	calculate_sun_position();
+	calculate_sun_color();
 
 	glMatrixMode (GL_PROJECTION);
 	glLoadIdentity();
@@ -143,9 +189,7 @@ RigidBodyPainter::setup (QOpenGLPaintDevice& canvas)
 	glDepthFunc (GL_LEQUAL);
 	glDepthMask (GL_TRUE);
 	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 	glEnable (GL_LIGHTING);
-	glEnable (kSunLight);
 
 	glLoadIdentity();
 }
@@ -154,7 +198,13 @@ RigidBodyPainter::setup (QOpenGLPaintDevice& canvas)
 void
 RigidBodyPainter::setup_feature_light()
 {
+	// Disable natural lights:
 	glDisable (kSunLight);
+
+	for (auto& sky_light: _sky_lights)
+		glDisable (sky_light.gl_number);
+
+	// Enable feature light:
 	glEnable (kFeatureLight);
 	glLightfv (kFeatureLight, GL_AMBIENT, GLArray { 0.25f, 0.25f, 0.25f, 1.0f });
 	glLightfv (kFeatureLight, GL_DIFFUSE, GLArray { 0.5f, 0.5f, 0.5f, 1.0f });
@@ -173,26 +223,56 @@ void
 RigidBodyPainter::setup_natural_light()
 {
 	glDisable (kFeatureLight);
-	glEnable (kSunLight);
 
-	glLightfv (kSunLight, GL_AMBIENT, GLArray { 0.25f, 0.25f, 0.25f, 1.0f });
-	glLightfv (kSunLight, GL_DIFFUSE, GLArray { 0.5f, 0.5f, 0.5f, 1.0f });
-	glLightfv (kSunLight, GL_SPECULAR, GLArray { 0.75f, 0.75f, 0.75f, 1.0f });
+	glEnable (kSunLight);
+	glLightfv (kSunLight, GL_AMBIENT, _sun_color.scaled (0.2f));
+	glLightfv (kSunLight, GL_DIFFUSE, _sun_color.scaled (0.4f));
+	glLightfv (kSunLight, GL_SPECULAR, _sun_color.scaled (0.1f));
 
 	if (_planet_body)
 	{
+		// Direct sunlight:
 		_gl.save_context ([&] {
-			// For planetary system, try to be sun:
 			glLoadIdentity();
 			setup_camera();
-			apply_sun_rotations();
+			make_z_towards_the_sun();
 			glLightfv (kSunLight, GL_POSITION, GLArray { 0.0f, 0.0f, _gl.to_opengl (kSunDistance), 0.0f });
-			// TODO disable (attenuate) light when sun sets
 		});
+
+		// Sky lights:
+		if (_sky_dome)
+		{
+			for (auto& sky_light: _sky_lights)
+			{
+				_gl.save_context ([&] {
+					make_z_sky_top_x_sun_azimuth();
+					_gl.rotate_z (+sky_light.position.lon());
+					_gl.rotate_y (-sky_light.position.lat());
+
+					auto const number = sky_light.gl_number;
+					auto const light_direction = cartesian<void> (sky_light.position); // Azimuth (lon()) should possible be negated, but the sky dome is symmetric, so this is okay.
+					auto const color = kIncidentLightScale * _sky_dome->calculate_incident_light ({ 0_m, 0_m, _position_on_earth.radius() }, light_direction);
+					auto const tonemapped_color = tonemap_sky (_sky_dome->tonemap_separately (color));
+					auto const gl_color = to_gl_color (tonemapped_color);
+
+					glEnable (number);
+					glLightfv (number, GL_AMBIENT, gl_color.scaled (0.0f));
+					glLightfv (number, GL_DIFFUSE, gl_color.scaled (0.2f));
+					glLightfv (number, GL_SPECULAR, gl_color.scaled (0.0f));
+					glLightfv (number, GL_POSITION, GLArray { _gl.to_opengl (kSkyHeight), 0.0f, 0.0f, 0.0f });
+				});
+			}
+		}
 	}
 	else
+	{
 		// Otherwise let the observer cast the light:
 		glLightfv (kSunLight, GL_POSITION, GLArray { 0.0f, 0.0f, 1.0f, 0.0f });
+
+		// Disable sky lights:
+		for (auto& sky_light: _sky_lights)
+			glDisable (sky_light.gl_number);
+	}
 
 	// TODO GL_SPOT_DIRECTION
 	// TODO GL_SPOT_EXPONENT
@@ -218,7 +298,9 @@ RigidBodyPainter::apply_screen_to_null_island_rotations()
 void
 RigidBodyPainter::setup_camera()
 {
+	// Center the world at the followed body:
 	_gl.translate (-_camera_position);
+	// Rotate about that body:
 	apply_camera_rotations();
 }
 
@@ -273,13 +355,12 @@ RigidBodyPainter::apply_camera_rotations()
 
 
 void
-RigidBodyPainter::apply_sun_rotations()
+RigidBodyPainter::make_z_towards_the_sun()
 {
-	// We have now identity rotations + camera rotations applied.
-	// Remember in OpenGL rotations are applied in reverse order.
+	// Assuming we have identity rotations + camera rotations applied.
 
 	// Rotate sun depending on UTC time:
-	auto const greenwich_hour_angle = _local_hour_angle - _position_on_earth.lon();
+	auto const greenwich_hour_angle = _sun_local_hour_angle - _position_on_earth.lon();
 	_gl.rotate_z (-greenwich_hour_angle);
 
 	// Rotate sun depending on time of the year:
@@ -292,12 +373,29 @@ RigidBodyPainter::apply_sun_rotations()
 
 
 void
+RigidBodyPainter::make_z_sky_top_x_south()
+{
+	_gl.rotate_z (+_position_on_earth.lon());
+	_gl.rotate_y (-_position_on_earth.lat());
+	_gl.rotate_y (+90_deg);
+	// Z is now sky top, X is towards azimuth 180° (true south).
+}
+
+
+void
+RigidBodyPainter::make_z_sky_top_x_sun_azimuth()
+{
+	make_z_sky_top_x_south();
+	_gl.rotate_z (-_sun_horizontal_position.azimuth + 180_deg);
+}
+
+
+void
 RigidBodyPainter::paint_world (rigid_body::System const& system)
 {
 	_gl.save_context ([&] {
 		setup_camera();
 		setup_natural_light();
-
 		paint_planet();
 		paint_air_particles();
 		paint (system);
@@ -311,22 +409,6 @@ RigidBodyPainter::paint_planet()
 	if (!_planet_body)
 		return;
 
-	auto const get_intermediate_color = [](float x, QColor const& c1, QColor const& c2)
-	{
-		qreal h1, s1, l1;
-		qreal h2, s2, l2;
-
-		c1.convertTo (QColor::Hsl).getHslF (&h1, &s1, &l1);
-		c2.convertTo (QColor::Hsl).getHslF (&h2, &s2, &l2);
-
-		auto const y = 1.0 - x;
-		auto const h3 = y * h1 + x * h2;
-		auto const s3 = y * s1 + x * s2;
-		auto const l3 = y * l1 + x * l2;
-
-		return QColor::fromHslF (h3, s3, l3).convertTo (QColor::Rgb);
-	};
-
 	auto const altitude_amsl = abs (followed_position() + _camera_position) - kEarthMeanRadius;
 	float normalized_altitude = renormalize (altitude_amsl, Range { 0_km, 15_km }, Range { 0.0f, 1.0f });
 	normalized_altitude = std::clamp (normalized_altitude, 0.0f, 1.0f);
@@ -334,135 +416,135 @@ RigidBodyPainter::paint_planet()
 	auto const low_fog_color = QColor (0x58, 0x72, 0x92).lighter (200);
 	auto const high_fog_color = QColor (0xa5, 0xc9, 0xd3);
 
-	auto const sky_high_color = QColor (0x00, 0x03, 0x20);
-	auto const sky_low_color = QColor (0x4d, 0x6c, 0x92);
-	auto const high_sky_fog_color = high_fog_color;
-	auto const low_sky_fog_color = low_fog_color;
-
 	auto const ground_color = QColor (0xaa, 0x55, 0x00).darker (150);
 	auto const high_ground_fog_color = high_fog_color;
 	auto const low_ground_fog_color = low_fog_color;
 	auto const ground_fog_density = renormalize (normalized_altitude, Range { 0.0f, 1.0f }, Range { 0.001f, 0.0015f });
 
-	// Offset by planet position in the simulation:
-	_gl.translate (_planet_body->placement().position());
-
-	// Draw stuff like we were located at Lon/Lat 0°/0° looking towards south pole.
-	// In other words match ECEF coordinates with standard OpenGL screen coordinates.
-
-	// Sky:
-	// TODO Vary sky color depending on Sun's position
 	_gl.save_context ([&] {
-		auto const sky_color = get_intermediate_color (normalized_altitude, sky_low_color, sky_high_color);
-		auto const sky_fog_color = get_intermediate_color (normalized_altitude, low_sky_fog_color, high_sky_fog_color);
+		// Offset by planet position in the simulation: // FIXME wrong if the center of the world is focused object?
+		_gl.translate (_planet_body->placement().position());
 
-		auto sky_material = rigid_body::kBlackMatte;
+		// Draw stuff like we were located at Lon/Lat 0°/0° looking towards south pole.
+		// In other words match ECEF coordinates with standard OpenGL screen coordinates.
 
-		auto const configure_material = [&] (rigid_body::ShapeMaterial& material, si::LonLat const position)
+		// Sky:
+		if (_sky_dome)
 		{
-			// Set dome color (fog simulation) depending on latitude:
-			float const norm = std::clamp<float> (renormalize<si::Angle> (position.lat(), Range { 67.5_deg, 90_deg }, Range { 1.0f, 0.0f }), 0.0f, 1.0f);
-			material.set_emission_color (get_intermediate_color (std::pow (norm, 1.0 + 2 * normalized_altitude), sky_color, sky_fog_color));
-		};
+			// TODO Extract to a separate function that creates the sky dome (take si::Angle hour_angle, 0° = Noon).
+			_gl.save_context ([&] {
+				auto const sky_material = rigid_body::kBlackMatte;
+				// Sphere pole is at the top of the observer. Stacks are perpendicular to observer's local horizon:
+				auto sky = rigid_body::make_centered_sphere_shape ({
+					.radius = kHorizonRadius,
+					.slices = 40,
+					.stacks = 200,
+					.v_range = { -10_deg, 90_deg },
+					.material = sky_material,
+					.setup_material = [&, this] (rigid_body::ShapeMaterial& material, si::LonLat const sphere_position) {
+						auto const color = kIncidentLightScale * _sky_dome->calculate_incident_light ({ 0_m, 0_m, _position_on_earth.radius() }, cartesian<void> (sphere_position));
+						auto const tonemapped_color = tonemap_sky (_sky_dome->tonemap_separately (color));
+						material.gl_emission_color = to_gl_color (tonemapped_color);
+						// TODO ground haze.
+					},
+				});
+				rigid_body::negate_normals (sky);
 
-		auto sky = rigid_body::make_centered_sphere_shape ({
-			.radius = kEarthMeanRadius + kSkyHeight,
-			.slices = 20,
-			.stacks = 20,
-			.v_range = { 60_deg, 90_deg },
-			.material = sky_material,
-			.setup_material = configure_material,
+				// The sky is centered at the followed body. FIXME It should be centered at the observer
+
+				_gl.rotate_z (+_position_on_earth.lon());
+				_gl.rotate_y (-_position_on_earth.lat());
+				_gl.rotate_y (90_deg);
+				// Normally the outside of the sphere shape is rendered, inside is culled.
+				// But here we're inside the sphere, so tell OpenGL that the front faces are the
+				// inside faces:
+				glFrontFace (GL_CW);
+				_gl.draw (sky);
+				glFrontFace (GL_CCW);
+			});
+		}
+
+		// Sun:
+		_gl.save_context ([&] {
+			// TODO to func: get_sun_face_shape(); recalculated occassionally
+			auto sun_face_material = rigid_body::kWhiteMatte;
+			sun_face_material.gl_emission_color = GLColor (1.0, 1.0, 1.0);
+			auto enlargement = neutrino::renormalize (_sun_horizontal_position.altitude, Range { 0_deg, 90_deg }, Range { kSunSunsetEnlargement, kSunNoonEnlargement });
+			auto sun_face = rigid_body::make_solid_circle (enlargement * kSunRadius, { 0_deg, 360_deg }, 19, sun_face_material);
+
+			// Disable Z-testing so that the sun gets rendered even if it's far behind the sky dome sphere, and enable blending, to blend with the sky:
+			glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			glDisable (GL_ALPHA_TEST);
+
+			glDisable (GL_DEPTH_TEST);
+			glEnable (GL_BLEND);
+			glDisable (GL_LIGHTING);
+			// Same remark as for sky rendering about what's considered the front face here:
+			glFrontFace (GL_CW);
+
+			_gl.save_context ([&] {
+				make_z_towards_the_sun();
+				// Z is now direction towards the Sun:
+				_gl.translate (0_m, 0_m, kSunDistance);
+				_gl.draw (sun_face);
+			});
+
+#if 0
+			// For debugging.
+			// Draw black balls at the positions of additional source of lights.
+
+			auto black_sun = rigid_body::make_centered_sphere_shape ({
+				.radius = 30_m,
+				.slices = 10,
+				.stacks = 10,
+				.material = rigid_body::kBlackMatte,
+			});
+
+			for (auto& sky_light: _sky_lights)
+			{
+				_gl.save_context ([&] {
+					make_z_sky_top_x_sun_azimuth();
+					_gl.save_context ([&] {
+						_gl.rotate_z (+sky_light.position.lon());
+						_gl.rotate_y (-sky_light.position.lat());
+						_gl.translate (1_km, 0_m, 0_m);
+						_gl.draw (black_sun);
+					});
+				});
+			}
+#endif
+
+			glFrontFace (GL_CCW);
+			glEnable (GL_DEPTH_TEST);
+			glDisable (GL_BLEND);
+			glEnable (GL_LIGHTING);
 		});
-		rigid_body::negate_normals (sky);
 
-		_gl.rotate (-_position_on_earth.lat(), 0, 1, 0);
-		_gl.rotate (+_position_on_earth.lon(), 0, 0, 1);
-		_gl.translate (-kEarthMeanRadius - altitude_amsl, 0_m, 0_m);
-		_gl.rotate (+90_deg, 0, 1, 0);
+		// Ground:
+		_gl.save_context ([&] {
+			auto const ground_fog_color = hsl_interpolation (normalized_altitude, low_ground_fog_color, high_ground_fog_color);
 
-		// Normally the outside of the sphere shape is rendered, inside is culled.
-		// But here we're inside the sphere, so tell OpenGL that the front faces are the
-		// inside faces:
-		glFrontFace (GL_CW);
-		_gl.draw (sky);
-		glFrontFace (GL_CCW);
-	});
+			rigid_body::ShapeMaterial ground_material;
+			ground_material.set_emission_color (ground_color);
+			ground_material.set_ambient_color (Qt::black);
+			ground_material.set_diffuse_color (Qt::black);
+			ground_material.set_specular_color (Qt::black);
+			ground_material.set_shininess (0.0f);
 
-	// Sun:
-	_gl.save_context ([&] {
-		apply_sun_rotations();
-		// Rotate sun shines when camera angle changes (about +Z):
-		_gl.rotate (_camera_angles[0] - 2 * _camera_angles[1], 0, 0, 1);
+			glFogi (GL_FOG_MODE, GL_EXP);
+			glFogi (GL_FOG_COORD_SRC, GL_FRAGMENT_DEPTH);
+			glFogf (GL_FOG_DENSITY, ground_fog_density);
+			glFogf (GL_FOG_START, _gl.to_opengl (0_m));
+			glFogf (GL_FOG_END, _gl.to_opengl (kHorizonRadius));
+			glFogfv (GL_FOG_COLOR, to_gl_color (ground_fog_color));
 
-		auto sun_material = rigid_body::kBlackMatte;
+			make_z_sky_top_x_south();
+			_gl.translate (0_m, 0_m, -altitude_amsl);
 
-		auto const configure_material = [&] (rigid_body::ShapeMaterial& material, si::LonLat const position)
-		{
-			// TODO make the Sun color (temperature) vary depending on time of day.
-			float const actual_radius = 0.025;
-			float const norm = renormalize<si::Angle> (position.lat(), Range { 0_deg, 90_deg }, Range { 0.0f, 1.0f });
-			float const alpha = std::clamp<float> (std::pow (norm + actual_radius, 6.0f), 0.0f, 1.0f);
-			material.gl_emission_color = { 1.0f, 1.0f, 1.0f, alpha };
-		};
-
-		// We're looking at the dome from inside and some of the elements
-		// of the dome are colored in a way that looks like Sun.
-		auto sun = rigid_body::make_centered_sphere_shape ({
-			.radius = kSunRadius,
-			.slices = 9,
-			.stacks = 36,
-			.v_range = { 0_deg, 90_deg },
-			.material = sun_material,
-			.setup_material = configure_material,
+			glEnable (GL_FOG);
+			_gl.draw (rigid_body::make_solid_circle (kHorizonRadius, { 0_deg, 360_deg }, 10, ground_material));
+			glDisable (GL_FOG);
 		});
-		rigid_body::negate_normals (sun);
-
-		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glDisable (GL_ALPHA_TEST);
-
-		glDisable (GL_DEPTH_TEST);
-		glEnable (GL_BLEND);
-		glDisable (GL_LIGHTING);
-		// Same remark as for sky rendering about what's considered the front face here:
-		glFrontFace (GL_CW);
-		_gl.draw (sun);
-		glFrontFace (GL_CCW);
-		glEnable (GL_DEPTH_TEST);
-		glDisable (GL_BLEND);
-		glEnable (GL_LIGHTING);
-	});
-
-	// Ground:
-	_gl.save_context ([&] {
-		auto const ground_fog_color = get_intermediate_color (normalized_altitude, low_ground_fog_color, high_ground_fog_color);
-
-		rigid_body::ShapeMaterial ground_material;
-		ground_material.set_emission_color (ground_color);
-		ground_material.set_ambient_color (Qt::black);
-		ground_material.set_diffuse_color (Qt::black);
-		ground_material.set_specular_color (Qt::black);
-		ground_material.set_shininess (0.0f);
-
-		glFogi (GL_FOG_MODE, GL_EXP);
-		glFogi (GL_FOG_COORD_SRC, GL_FRAGMENT_DEPTH);
-		glFogf (GL_FOG_DENSITY, ground_fog_density);
-		glFogf (GL_FOG_START, _gl.to_opengl (0_m));
-		glFogf (GL_FOG_END, _gl.to_opengl (kHorizonRadius));
-		glFogfv (GL_FOG_COLOR, to_gl_color (ground_fog_color));
-
-		_gl.rotate (+_position_on_earth.lon(), 0, 0, 1);
-		_gl.rotate (-_position_on_earth.lat(), 0, 1, 0);
-		_gl.translate (-altitude_amsl, 0_m, 0_m);
-		_gl.rotate (+90_deg, 0, 1, 0);
-
-		glEnable (GL_FOG);
-		_gl.draw (rigid_body::make_solid_circle (kHorizonRadius, { 0_deg, 360_deg }, 10, ground_material));
-		glDisable (GL_FOG);
-	});
-
-	// Ground haze that reflects sun a bit:
-	_gl.save_context ([&] {
-		// TODO semi-transparent layer between us and the ground with strong reflection of light
 	});
 }
 
@@ -852,11 +934,11 @@ RigidBodyPainter::draw_arrow (SpaceLength<WorldSpace> const& origin, SpaceLength
 
 		if (length > 0_m)
 		{
-			float const scale = 2.0;
-			auto const kNumFaces = 12;
-			auto const cone_radius = 20_mm * scale;
-			auto const cone_length = 50_mm * scale;
-			auto const radius = 5_mm * scale;
+			auto constexpr scale = 2.0f;
+			auto constexpr kNumFaces = 12;
+			auto constexpr cone_radius = 20_mm * scale;
+			auto constexpr cone_length = 50_mm * scale;
+			auto constexpr radius = 5_mm * scale;
 			auto const alpha_beta = alpha_beta_from_x_to (vector);
 
 			_gl.translate (origin);
@@ -867,6 +949,30 @@ RigidBodyPainter::draw_arrow (SpaceLength<WorldSpace> const& origin, SpaceLength
 			_gl.draw (rigid_body::make_cone_shape ({ .length = cone_length, .radius = cone_radius, .num_faces = kNumFaces, .with_bottom = true, .material = material }));
 		}
 	});
+}
+
+
+SpaceVector<double>
+RigidBodyPainter::tonemap_sky (SpaceVector<double> rgb) const
+{
+	auto constexpr altitude_threshold = 4_deg;
+	auto constexpr reduce_green_to = 0.8;
+	auto constexpr reduce_green_to_sqrt = std::sqrt (reduce_green_to);
+
+	if (_sun_local_hour_angle > 0_deg && _sun_local_hour_angle < 180_deg)
+	{
+		auto const abs_altitude = abs (_sun_horizontal_position.altitude);
+
+		if (abs_altitude < altitude_threshold)
+		{
+			auto const from = Range { altitude_threshold, 0_deg };
+			auto const to = Range { 1.0, reduce_green_to_sqrt };
+			auto const factor = neutrino::renormalize (_sun_horizontal_position.altitude, from, to);
+			rgb[1] *= square (factor);
+		}
+	}
+
+	return rgb;
 }
 
 
@@ -960,7 +1066,7 @@ RigidBodyPainter::get_center_of_mass (rigid_body::Group const& group)
 
 
 QColor
-RigidBodyPainter::get_intermediate_color (float x, QColor const& color0, QColor const& color1)
+RigidBodyPainter::hsl_interpolation (float x, QColor const& color0, QColor const& color1)
 {
 	x = std::clamp (x, 0.0f, 1.0f);
 

@@ -1,0 +1,190 @@
+/* vim:ts=4
+ *
+ * Copyleft 2025  Michał Gawron
+ * Marduk Unix Labs, http://mulabs.org/
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
+ */
+
+#ifndef XEFIS__SUPPORT__EARTH__AIR__SKY_DOME_H__INCLUDED
+#define XEFIS__SUPPORT__EARTH__AIR__SKY_DOME_H__INCLUDED
+
+// Xefis:
+#include <xefis/config/all.h>
+#include <xefis/support/math/geometry_types.h>
+#include <xefis/support/nature/constants.h>
+
+// Standard:
+#include <cstddef>
+
+
+namespace xf {
+
+/**
+ * Implementation based on code from
+ * <https://www.scratchapixel.com/lessons/procedural-generation-virtual-worlds/simulating-sky/simulating-colors-of-the-sky.html>
+ */
+class SkyDome
+{
+  public:
+	struct Parameters
+	{
+		// Normalized vector for sun direction:
+		SpaceVector<double>	sun_direction					{ 0.0, 1.0, 0.0 };
+		// Radius of the ground:
+		si::Length			earth_radius					{ kEarthMeanRadius };
+		// Radius of the top of the sky:
+		si::Length			atmosphere_radius				{ earth_radius + 60_km };
+
+		// `rayleigh_threshold` and `mie_threshold` are characteristic distances over which the density falls by a factor of e, influencing the optical depth and the resulting light
+		// attenuation in the sky dome model.
+
+		// Thickness of the atmosphere if density was uniform; used for Rayleigh scattering:
+		si::Length			rayleigh_threshold				{ 7994_m };
+		// Thickness of the atmosphere if density was uniform; used for Mie scattering:
+		si::Length			mie_threshold					{ 1200_m };
+		// Output factor for light intensity from the the Rayleigh scattering:
+		double				rayleigh_factor					{ 1.0 };
+		// Output factor for light intensity from the the Mie scattering:
+		double				mie_factor						{ 1.0 };
+		// Automatically tonemap output values:
+		bool				enable_tonemapping				{ false };
+		// Number of samples taken along the view direction (casted ray):
+		uint32_t			num_viewing_direction_samples	{ 16 };
+		// Number of samples taken to the light source:
+		uint32_t			num_light_direction_samples		{ 8 };
+	};
+
+  private:
+	// Precomputed values that correspond to the scattering coefficients of the sky at sea level, for wavelengths 680, 550 and 440 respectively:
+    static constexpr SpaceVector<double> kRayleighBeta	= { 5.8e-6f, 13.5e-6f, 33.1e-6f };
+	// Mie scattering doesn't change the color, so the coefficients are the same:
+    static constexpr SpaceVector<double> kMieBeta		= { 21e-6f, 21e-6f, 21e-6f };
+
+  public:
+	// Ctor
+	explicit
+    SkyDome (Parameters const&);
+
+	/**
+	 * Calculate the light that reaches a `observer_position` point along a ray as it travels through the atmosphere, accounting for scattering effects.
+	 * Kind of like ray-tracing of sky dome. Include both Rayleigh and Mie effects.
+	 *
+	 * \param	observer_position
+	 *			Position of the observer.
+	 * \param	ray_direction
+	 *			This is the normalized direction vector of the ray; it indicates the path along which the light is integrated.
+	 * \param	min_distance
+	 *			The minimum distance along the ray from the observer_position where the integration (and thus the scattering calculation) begins. It can be
+	 *			adjusted if the ray starts outside the atmosphere.
+	 * \param	max_distance
+	 *			The maximum distance along the ray where the calculation ends. It’s also adjusted based on where the ray exits the atmospheric sphere.
+	 */
+	[[nodiscard]]
+    SpaceVector<double>
+	calculate_incident_light (SpaceLength<> const& observer_position, SpaceVector<double> const& ray_direction, si::Length min_distance = 0_m, si::Length max_distance = std::numeric_limits<si::Length>::infinity()) const;
+
+	[[nodiscard]]
+	static constexpr double
+	reinhard_tonemap (double value);
+
+	[[nodiscard]]
+	static constexpr double
+	tonemap (double value);
+
+	[[nodiscard]]
+	static constexpr SpaceVector<double>
+	tonemap (SpaceVector<double> input);
+
+	[[nodiscard]]
+	static constexpr SpaceVector<double>
+	tonemap_separately (SpaceVector<double> input);
+
+  private:
+	/**
+	 * Determine whether a ray intersects a sphere.
+	 *
+	 * This function tests if a ray—defined by its origin and normalized direction (direction)—intersects a sphere of a given radius (centered at the
+	 * origin). If an intersection occurs, the distances along the ray to the intersection points are returned.
+	 * Otherwise empty optional is returned.
+	 *
+	 * \param	ray_origin
+	 *			The starting point of the ray (position of the observer).
+	 * \param	ray_direction
+	 *			The normalized direction vector of the ray.
+	 * \param	radius The radius of the sphere.
+	 * \param	optional<near, far>
+	 *			Distances along the ray to the first (nearest) and the second intersection point.
+	 */
+	[[nodiscard]]
+	static std::optional<std::pair<si::Length, si::Length>>
+	ray_sphere_intersections (SpaceLength<> const& ray_origin, SpaceVector<double> const& ray_direction, si::Length const sphere_radius);
+
+  private:
+    SpaceVector<double>	_sun_direction;
+	si::Length			_earth_radius;
+    si::Length			_atmosphere_radius;
+	si::Length			_rayleigh_threshold;
+	si::Length			_mie_threshold;
+	double				_rayleigh_factor;
+	double				_mie_factor;
+	uint32_t			_num_viewing_direction_samples;
+	uint32_t			_num_light_direction_samples;
+};
+
+
+constexpr double
+SkyDome::reinhard_tonemap (double value)
+{
+	// The Reinhard operator compresses high dynamic range values
+	// by mapping value to value / (1.0 + value), which approaches 1 as value increases:
+	return value / (0.5 + value);
+}
+
+
+constexpr double
+SkyDome::tonemap (double value)
+{
+	// If the channel's value is below a threshold (1.413), apply gamma correction;
+	// otherwise, use an exponential curve to compress high values:
+	//return reinhard_tonemap (value);
+	return value < 1.413f
+		? pow (value * 0.38317f, 1.0f / 2.2f)
+		: 1.0f - exp (-value);
+}
+
+
+constexpr SpaceVector<double>
+SkyDome::tonemap (SpaceVector<double> input)
+{
+	// Compute luminance using Rec.709 weights:
+	auto const luminance = 0.2126 * input[0] + 0.7152 * input[1] + 0.0722 * input[2];
+	auto const mapped_luminance = tonemap (luminance);
+
+	// Avoid division by zero:
+	if (luminance > 0.0)
+		return input * (mapped_luminance / luminance);
+	else
+		return input;
+}
+
+
+constexpr SpaceVector<double>
+SkyDome::tonemap_separately (SpaceVector<double> input)
+{
+	// Apply tone mapping function to each color channel:
+	for (auto& v: input.array())
+		v = tonemap (v);
+
+	return input;
+}
+
+} // namespace xf
+
+#endif
+

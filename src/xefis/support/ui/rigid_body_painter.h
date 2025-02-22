@@ -16,9 +16,11 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/support/earth/air/sky_dome.h>
 #include <xefis/support/math/rotations.h>
 #include <xefis/support/simulation/rigid_body/system.h>
 #include <xefis/support/ui/gl_space.h>
+#include <xefis/support/universe/sun_position.h>
 
 // Neutrino:
 #include <neutrino/concepts.h>
@@ -44,14 +46,26 @@ namespace xf {
  */
 class RigidBodyPainter: protected QOpenGLFunctions
 {
+  private:
 	static constexpr auto		kDefaultPositionScale		= 0.0025_mm / 1_m;
 	static constexpr si::Length	kDefaultConstraintDiameter	= 1.5_cm;
 	static constexpr si::Length	kDefaultHingeDiameter		= 3_cm;
 
-	static constexpr auto		kSkyHeight					= 500_km;
+	static constexpr auto		kSkyHeight					= 60_km;
 	static constexpr auto		kHorizonRadius				= 500_km;
-	static constexpr auto		kSunDistance				= 10_km;
-	static constexpr auto		kSunRadius					= 200_km;
+	static constexpr auto		kSunRadius					= 696'340_km;
+	static constexpr auto		kSunDistance				= 147'000'000_km;
+	static constexpr auto		kSunNoonEnlargement			= 1.0;
+	static constexpr auto		kSunSunsetEnlargement		= 2.0;
+
+	struct SkyLight
+	{
+		// GL_LIGHT0, GL_LIGHT1, etc:
+		GLenum				gl_number;
+		// Position of the point on the sky where color sample will be taken;
+		// longitude 0° corresponds to current azimuth of the Sun:
+		si::LonLat			position;
+	};
 
   public:
 	struct GroupRenderingConfig
@@ -357,10 +371,13 @@ class RigidBodyPainter: protected QOpenGLFunctions
 
   private:
 	/**
-	 * Calculate _local_hour_angle and _sun_declination.
+	 * Calculate _sun_local_hour_angle and _sun_declination.
 	 */
 	void
 	calculate_sun_position();
+
+	void
+	calculate_sun_color();
 
 	void
 	setup (QOpenGLPaintDevice&);
@@ -385,10 +402,26 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	apply_camera_rotations();
 
 	/**
-	 * Requires that _local_hour_angle and _sun_declination are calculated first.
+	 * Rotates OpenGL world so that Z direction is towards the Sun.
+	 * Preconditions:
+	 *  • _sun_local_hour_angle and _sun_declination are calculated first.
+	 *  • current OpenGL rotation is identity.
 	 */
 	void
-	apply_sun_rotations();
+	make_z_towards_the_sun();
+
+	/**
+	 * Rotates OpenGL world so that Z direction is towards the center of Earth and X is towards south (azimuth 180°).
+	 * Precondition: current OpenGL rotation is identity.
+	 */
+	void
+	make_z_sky_top_x_south();
+
+	/**
+	 * Like make_z_towards_the_sun(), but make the Z touch the horizon.
+	 */
+	void
+	make_z_sky_top_x_sun_azimuth();
 
 	void
 	paint_world (rigid_body::System const&);
@@ -475,6 +508,10 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	draw_arrow (SpaceLength<WorldSpace> const& origin, SpaceLength<WorldSpace> const& vector, rigid_body::ShapeMaterial const& material = {});
 
 	[[nodiscard]]
+	SpaceVector<double>
+	tonemap_sky (SpaceVector<double> rgb) const;
+
+	[[nodiscard]]
 	SpaceLength<WorldSpace>
 	followed_position();
 
@@ -484,7 +521,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 
 	[[nodiscard]]
 	static QColor
-	get_intermediate_color (float x, QColor const& color0, QColor const& color1);
+	hsl_interpolation (float x, QColor const& color0, QColor const& color1);
 
   private:
 	si::PixelDensity			_pixel_density;
@@ -517,10 +554,13 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	std::map<rigid_body::Group const*, SpaceLength<WorldSpace>>
 								_group_centers_of_mass_cache;
 	// Sun position:
-	si::Angle					_local_hour_angle;
+	si::Angle					_sun_local_hour_angle;
 	si::Angle					_sun_declination;
-	si::Angle					_sun_altitude;
+	HorizontalCoordinates		_sun_horizontal_position;
+	SpaceVector<double>			_sun_direction;
 	GLColor						_sun_color;
+	std::optional<SkyDome>		_sky_dome;
+	std::array<SkyLight, 5>		_sky_lights;
 	float						_normalized_sun_altitude;
 };
 
