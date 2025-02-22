@@ -38,7 +38,7 @@ namespace xf {
  */
 template<math::CoordinateSystem Space>
 	[[nodiscard]]
-	inline SpaceVector<si::Velocity, Space>
+	constexpr SpaceVector<si::Velocity, Space>
 	tangential_velocity (SpaceVector<si::AngularVelocity, Space> const& w, SpaceLength<Space> const& r)
 	{
 		return cross_product (w, r) / 1_rad;
@@ -233,7 +233,7 @@ template<math::Scalar S, math::CoordinateSystem TargetSpace, math::CoordinateSys
  * Return normal vector for given triangle (front face is defined by CCW vertex order).
  */
 template<math::Scalar S, math::CoordinateSystem Space>
-	inline auto
+	constexpr auto
 	triangle_surface_normal (SpaceVector<S, Space> const& a,
 							 SpaceVector<S, Space> const& b,
 							 SpaceVector<S, Space> const& c)
@@ -246,7 +246,7 @@ template<math::Scalar S, math::CoordinateSystem Space>
  * Return normal vector for given triangle (front face is defined by CCW vertex order).
  */
 template<TriangleConcept Triangle>
-	inline auto
+	constexpr auto
 	triangle_surface_normal (Triangle const& triangle)
 	{
 		if (std::size (triangle) != 3)
@@ -260,7 +260,7 @@ template<TriangleConcept Triangle>
  * Return area of the 2D triangle.
  */
 template<PointConcept Point>
-	inline auto
+	constexpr auto
 	area_2d (Point const& a, Point const& b, Point const& c)
 	{
 		using std::abs;
@@ -272,7 +272,7 @@ template<PointConcept Point>
 /**
  * Return area of the 2D triangle.
  */
-inline auto
+constexpr auto
 area_2d (TriangleConcept auto const& triangle)
 {
 	using std::abs;
@@ -288,7 +288,7 @@ area_2d (TriangleConcept auto const& triangle)
 /**
  * Return a predicate that returns true if its argument (point) is inside of the triangle.
  */
-inline auto
+constexpr auto
 is_point_2d_inside_triangle_tester (TriangleConcept auto const& triangle)
 {
 	using Point = decltype (triangle[0]);

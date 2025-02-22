@@ -105,7 +105,7 @@ template<math::CoordinateSystem TargetSpace, math::CoordinateSystem SourceSpace>
  */
 template<math::Scalar S, math::CoordinateSystem Space>
 	[[nodiscard]]
-	std::array<si::Angle, 2>
+	inline std::array<si::Angle, 2>
 	alpha_beta_from_x_to (SpaceVector<S, Space> const& vector)
 	{
 		using std::atan2;
@@ -119,7 +119,7 @@ template<math::Scalar S, math::CoordinateSystem Space>
 
 
 template<math::Scalar S, math::CoordinateSystem Space>
-	inline si::Angle
+	constexpr si::Angle
 	angle_between (SpaceVector<S, Space> const& a,
 				   SpaceVector<S, Space> const& b)
 	{
@@ -129,7 +129,7 @@ template<math::Scalar S, math::CoordinateSystem Space>
 
 
 template<math::Scalar S, math::CoordinateSystem Space>
-	inline auto
+	constexpr auto
 	cos_angle_between (SpaceVector<S, Space> const& a,
 					   SpaceVector<S, Space> const& b)
 	{
