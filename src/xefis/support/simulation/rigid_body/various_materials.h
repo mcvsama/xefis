@@ -33,18 +33,18 @@ auto constexpr kBlackMatte = ShapeMaterial {
 };
 
 auto constexpr kWhiteMatte = ShapeMaterial {
-	.gl_emission_color	= GLColor { 0xff, 0xff, 0xff, 0xff },
-	.gl_ambient_color	= GLColor { 0xff, 0xff, 0xff, 0xff },
-	.gl_diffuse_color	= GLColor { 0xff, 0xff, 0xff, 0xff },
-	.gl_specular_color	= GLColor { 0xff, 0xff, 0xff, 0xff },
+	.gl_emission_color	= GLColor { 1.0f, 1.0f, 1.0f, 1.0f },
+	.gl_ambient_color	= GLColor { 1.0f, 1.0f, 1.0f, 1.0f },
+	.gl_diffuse_color	= GLColor { 1.0f, 1.0f, 1.0f, 1.0f },
+	.gl_specular_color	= GLColor { 0.0f, 0.0f, 0.0f, 1.0f },
 	.gl_shininess		= 0.0f,
 };
 
 auto constexpr kGreyMatte = ShapeMaterial {
-	.gl_emission_color	= GLColor { 180, 180, 180, 0xff },
-	.gl_ambient_color	= GLColor { 180, 180, 180, 0xff },
-	.gl_diffuse_color	= GLColor { 180, 180, 180, 0xff },
-	.gl_specular_color	= GLColor { 180, 180, 180, 0xff },
+	.gl_emission_color	= GLColor { 0.7f, 0.7f, 0.7f, 1.0f },
+	.gl_ambient_color	= GLColor { 0.7f, 0.7f, 0.7f, 1.0f },
+	.gl_diffuse_color	= GLColor { 0.7f, 0.7f, 0.7f, 1.0f },
+	.gl_specular_color	= GLColor { 0.0f, 0.0f, 0.0f, 1.0f },
 	.gl_shininess		= 0.0f,
 };
 
