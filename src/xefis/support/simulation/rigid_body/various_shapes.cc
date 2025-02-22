@@ -148,8 +148,8 @@ make_centered_sphere_shape (SphereShapeParameters const& params)
 		}
 	}
 
-	shape.for_all_vertices ([] (ShapeVertex& v) {
-		v.set_normal (v.position() / 1_m);
+	shape.for_all_vertices ([&params] (ShapeVertex& v) {
+		v.set_normal (v.position() / params.radius);
 	});
 
 	return shape;
