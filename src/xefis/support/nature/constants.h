@@ -1,6 +1,6 @@
 /* vim:ts=4
  *
- * Copyleft 2008…2013  Michał Gawron
+ * Copyleft 2025  Michał Gawron
  * Marduk Unix Labs, http://mulabs.org/
  *
  * This program is free software: you can redistribute it and/or modify
@@ -44,6 +44,9 @@ constexpr auto						kBoltzmannConstant				= 1.380649e-23_J / 1_K;
 constexpr si::Charge				kElementaryCharge				= 1.602176634e-19_C;
 constexpr si::MolarMass				kAirMolarMass					= 0.0289644_kg / 1_mol;
 constexpr si::SpecificHeatCapacity	kDryAirSpecificConstant			= 287.058_J / 1_kg / 1_K;
+constexpr auto						kPlankConstant					= 6.62607015e-34_J * 1_s;
+constexpr auto						kSpeedOfLight					= 299792458_mps;
+constexpr auto						kSunSurfaceTemperature			= 5778_K;
 
 /*
  * Earth
