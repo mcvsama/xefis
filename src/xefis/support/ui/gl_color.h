@@ -64,21 +64,21 @@ class GLColor
 
 	[[nodiscard]]
 	constexpr GLColor
-	scaled (float light_scale);
+	scaled (float light_scale) const;
 
 	/**
 	 * Factor is in range [0, 1].
 	 */
 	[[nodiscard]]
 	constexpr GLColor
-	darker (float factor);
+	darker (float factor) const;
 
 	/**
 	 * Factor is in range [0, 1].
 	 */
 	[[nodiscard]]
 	constexpr GLColor
-	lighter (float factor);
+	lighter (float factor) const;
 
 	[[nodiscard]]
 	constexpr float const*
@@ -106,7 +106,7 @@ class GLColor
 
 
 constexpr GLColor
-GLColor::scaled (float light_scale)
+GLColor::scaled (float light_scale) const
 {
 	GLColor copy = *this;
 
@@ -118,14 +118,14 @@ GLColor::scaled (float light_scale)
 
 
 constexpr GLColor
-GLColor::darker (float darker_factor)
+GLColor::darker (float darker_factor) const
 {
 	return scaled (1.0 - darker_factor);
 }
 
 
 constexpr GLColor
-GLColor::lighter (float lighter_factor)
+GLColor::lighter (float lighter_factor) const
 {
 	return scaled (1.0 + lighter_factor);
 }
