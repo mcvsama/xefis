@@ -43,8 +43,8 @@ enum RotationDirection
 struct SphereShapeParameters
 {
 	si::Length					radius;
-	std::size_t					slices;
-	std::size_t					stacks;
+	std::size_t					slices			{ 10 };
+	std::size_t					stacks			{ 10 };
 	Range<si::Angle>			h_range			{ -180_deg, +180_deg };
 	Range<si::Angle>			v_range			{ -90_deg, +90_deg };
 	ShapeMaterial const&		material		{ };
