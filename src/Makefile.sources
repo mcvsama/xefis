@@ -400,6 +400,7 @@ MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/ui/airfoil_spli
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/ui/airfoil_spline_widget.h
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/ui/canvas_widget.cc
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/ui/canvas_widget.h
+MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/ui/color_gradient_2d.h
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/ui/gl_animation_widget.cc
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/ui/gl_animation_widget.h
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/ui/gl_color.h
