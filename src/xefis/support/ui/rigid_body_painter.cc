@@ -172,7 +172,7 @@ RigidBodyPainter::setup (QOpenGLPaintDevice& canvas)
 	glMatrixMode (GL_PROJECTION);
 	glLoadIdentity();
 	glTranslatef (0.0, 0.0, -1.0);
-	_gl.set_hfov_perspective (size, 60_deg, _gl.to_opengl (1_m), _gl.to_opengl (100_km));
+	_gl.set_hfov_perspective (size, 40_deg, _gl.to_opengl (1_m), _gl.to_opengl (100_km));
 
 	glMatrixMode (GL_MODELVIEW);
 	glFrontFace (GL_CCW);
