@@ -108,23 +108,23 @@ make_cube_shape (xf::MassMomentsAtArm<BodyCOM> const& mm, ShapeMaterial const& m
 Shape
 make_centered_sphere_shape (SphereShapeParameters const& params)
 {
-	auto const slices = std::max<size_t> (params.slices, 3);
-	auto const stacks = std::max<size_t> (params.stacks, 2);
+	auto const n_slices = std::max<size_t> (params.slices, 3);
+	auto const n_stacks = std::max<size_t> (params.stacks, 2);
 
-	si::Angle const dh = params.h_range.extent() / slices;
-	si::Angle const dv = params.v_range.extent() / stacks;
+	si::Angle const dh = params.h_range.extent() / n_slices;
+	si::Angle const dv = params.v_range.extent() / n_stacks;
 
 	Shape shape;
-	shape.triangle_strips().reserve (stacks);
+	shape.triangle_strips().reserve (n_stacks);
 	si::Angle angle_v = params.v_range.min();
 
-	for (size_t iv = 0; iv < stacks; ++iv, angle_v += dv)
+	for (size_t iv = 0; iv < n_stacks; ++iv, angle_v += dv)
 	{
 		Shape::TriangleStrip& strip = shape.triangle_strips().emplace_back();
-		strip.reserve (2 * (slices + 1));
+		strip.reserve (2 * (n_slices + 1));
 		si::Angle angle_h = params.h_range.min();
 
-		for (size_t ih = 0; ih < slices + 1; ++ih, angle_h += dh)
+		for (size_t ih = 0; ih < n_slices + 1; ++ih, angle_h += dh)
 		{
 			// TODO Calls to cartesian() and setup_material() could be reused in the future for the same points of adjacent strips:
 			auto const p1 = math::coordinate_system_cast<BodyOrigin, void> (cartesian (si::LonLat { angle_h, angle_v + dv }));
