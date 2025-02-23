@@ -168,6 +168,7 @@ RigidBodyPainter::setup (QOpenGLPaintDevice& canvas)
 	_position_on_earth = xf::polar (math::coordinate_system_cast<ECEFSpace, void> (followed_position()));
 	calculate_sun_position();
 	calculate_sun_color();
+	calculate_sky_slices_and_stacks (_sun_horizontal_position);
 
 	glMatrixMode (GL_PROJECTION);
 	glLoadIdentity();
@@ -435,11 +436,10 @@ RigidBodyPainter::paint_planet()
 			_gl.save_context ([&] {
 				auto const sky_material = rigid_body::kBlackMatte;
 				// Sphere pole is at the top of the observer. Stacks are perpendicular to observer's local horizon:
-				auto sky = rigid_body::make_centered_sphere_shape ({
+				auto sky = rigid_body::make_centered_irregular_sphere_shape ({
 					.radius = kHorizonRadius,
-					.slices = 40,
-					.stacks = 200,
-					.v_range = { -10_deg, 90_deg },
+					.slice_angles = _sky_slices,
+					.stack_angles = _sky_stacks,
 					.material = sky_material,
 					.setup_material = [&, this] (rigid_body::ShapeMaterial& material, si::LonLat const sphere_position) {
 						auto const color = kIncidentLightScale * _sky_dome->calculate_incident_light ({ 0_m, 0_m, _position_on_earth.radius() }, cartesian<void> (sphere_position));
@@ -1062,6 +1062,68 @@ RigidBodyPainter::get_center_of_mass (rigid_body::Group const& group)
 	}
 	else
 		return _group_centers_of_mass_cache[&group] = group.mass_moments().center_of_mass_position();
+}
+
+
+void
+RigidBodyPainter::calculate_sky_slices_and_stacks (HorizontalCoordinates const sun_position)
+{
+	// Latitude:
+	{
+		auto const sun_vicinity = Range { sun_position.altitude - 10_deg, sun_position.altitude + 10_deg };
+
+		// Start below the horizon:
+		_sky_stacks = { -10_deg };
+
+		for (auto latitude = 0_deg; latitude < 90_deg; )
+		{
+			_sky_stacks.push_back (latitude);
+
+			if (latitude <= 3_deg)
+				latitude += 0.25_deg;
+			else if (latitude <= 6_deg)
+				latitude += 0.5_deg;
+			else if (sun_vicinity.includes (latitude))
+				latitude += 1_deg;
+			else
+			{
+				auto const big_step = 5_deg;
+
+				if (latitude < sun_vicinity.min() && sun_vicinity.includes (latitude + big_step))
+				{
+					latitude = sun_vicinity.min() + 0.1_deg; // Prevent infinite loop.
+					_sky_stacks.push_back (latitude);
+				}
+				else
+					latitude += big_step;
+			}
+		}
+
+		// Top of the dome:
+		_sky_stacks.push_back (90_deg);
+	}
+
+	// Longitude:
+	{
+		_sky_slices.clear();
+
+		auto constexpr sun_vicinity_slices = 13;
+		auto constexpr rest_slices = 25;
+
+		auto const sun_longitude = 180_deg - sun_position.azimuth;
+		auto const sun_vicinity = Range { sun_longitude - 20_deg, sun_longitude + 20_deg };
+		auto const sun_vicinity_delta = sun_vicinity.extent() / (sun_vicinity_slices - 1);
+		auto const rest_range = 360_deg - sun_vicinity.extent();
+		auto const rest_delta = rest_range / (rest_slices - 1);
+
+		auto longitude = sun_vicinity.min();
+
+		for (auto i = 0u; i < sun_vicinity_slices; ++i, longitude += sun_vicinity_delta)
+			_sky_slices.push_back (longitude);
+
+		for (auto i = 0u; i < rest_slices; ++i, longitude += rest_delta)
+			_sky_slices.push_back (longitude);
+	}
 }
 
 

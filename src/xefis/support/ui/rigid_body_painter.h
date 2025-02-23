@@ -519,6 +519,9 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	SpaceLength<WorldSpace>
 	get_center_of_mass (rigid_body::Group const&);
 
+	void
+	calculate_sky_slices_and_stacks (HorizontalCoordinates const sun_position);
+
 	[[nodiscard]]
 	static QColor
 	hsl_interpolation (float x, QColor const& color0, QColor const& color1);
@@ -559,6 +562,8 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	HorizontalCoordinates		_sun_horizontal_position;
 	SpaceVector<double>			_sun_direction;
 	GLColor						_sun_color;
+	std::vector<si::Angle>		_sky_slices;
+	std::vector<si::Angle>		_sky_stacks;
 	std::optional<SkyDome>		_sky_dome;
 	std::array<SkyLight, 5>		_sky_lights;
 	float						_normalized_sun_altitude;
