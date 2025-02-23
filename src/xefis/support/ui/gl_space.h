@@ -255,6 +255,10 @@ class GLSpace
 	void
 	clear_z_buffer (float value = 1.0f);
 
+	void
+	set_wireframe_enabled (bool enabled)
+		{ glPolygonMode (GL_FRONT_AND_BACK, enabled ? GL_LINE : GL_FILL); }
+
   private:
 	void
 	push_context();
