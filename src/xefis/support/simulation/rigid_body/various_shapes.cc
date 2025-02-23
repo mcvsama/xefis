@@ -157,6 +157,58 @@ make_centered_sphere_shape (SphereShapeParameters const& params)
 
 
 Shape
+make_centered_irregular_sphere_shape (IrregularSphereShapeParameters const& params)
+{
+	auto const n_slices = params.slice_angles.size();
+	auto const n_stacks = params.stack_angles.size();
+
+	if (n_slices < 3)
+		throw Exception ("IrregularSphereShapeParameters: must have at least 3 slices");
+
+	if (n_stacks < 2)
+		throw Exception ("IrregularSphereShapeParameters: must have at least 2 stacks");
+
+	Shape shape;
+	shape.triangle_strips().reserve (n_stacks);
+
+	for (auto const latitudes: params.stack_angles | std::views::slide (2))
+	{
+		Shape::TriangleStrip& strip = shape.triangle_strips().emplace_back();
+		strip.reserve (2 * (n_slices + 1));
+
+		for (auto const longitude: params.slice_angles)
+		{
+			// TODO Calls to cartesian() and setup_material() could be reused in the future for the same points of adjacent strips:
+			auto const p1 = math::coordinate_system_cast<BodyOrigin, void> (cartesian (si::LonLat { longitude, latitudes[1] }));
+			auto const p2 = math::coordinate_system_cast<BodyOrigin, void> (cartesian (si::LonLat { longitude, latitudes[0] }));
+
+			if (params.setup_material)
+			{
+				auto p1_material = params.material;
+				params.setup_material (p1_material, si::LonLat { longitude, latitudes[1] });
+				strip.emplace_back (p1 * params.radius, p1, p1_material);
+
+				auto p2_material = params.material;
+				params.setup_material (p2_material, si::LonLat { longitude, latitudes[0] });
+				strip.emplace_back (p2 * params.radius, p2, p2_material);
+			}
+			else
+			{
+				strip.emplace_back (p1 * params.radius, p1, params.material);
+				strip.emplace_back (p2 * params.radius, p2, params.material);
+			}
+		}
+	}
+
+	shape.for_all_vertices ([&params] (ShapeVertex& v) {
+		v.set_normal (v.position() / params.radius);
+	});
+
+	return shape;
+}
+
+
+Shape
 make_cylinder_shape (CylinderShapeParameters const& params)
 {
 	auto const num_faces = params.num_faces < 3u ? 3u : params.num_faces;

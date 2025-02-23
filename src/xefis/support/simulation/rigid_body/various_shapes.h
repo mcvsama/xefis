@@ -25,6 +25,8 @@
 
 // Standard:
 #include <cstddef>
+#include <functional>
+#include <span>
 
 
 namespace xf::rigid_body {
@@ -47,6 +49,18 @@ struct SphereShapeParameters
 	std::size_t					stacks			{ 10 };
 	Range<si::Angle>			h_range			{ -180_deg, +180_deg };
 	Range<si::Angle>			v_range			{ -90_deg, +90_deg };
+	ShapeMaterial const&		material		{ };
+	MakeSphereMaterialCallback	setup_material	{ nullptr };
+};
+
+
+struct IrregularSphereShapeParameters
+{
+	si::Length					radius;
+	// Must be sorted:
+	std::span<si::Angle const>	slice_angles;
+	// Must be sorted:
+	std::span<si::Angle const>	stack_angles;
 	ShapeMaterial const&		material		{ };
 	MakeSphereMaterialCallback	setup_material	{ nullptr };
 };
@@ -169,6 +183,12 @@ make_cube_shape (xf::MassMomentsAtArm<BodyCOM> const&, ShapeMaterial const& mate
  */
 Shape
 make_centered_sphere_shape (SphereShapeParameters const&);
+
+/**
+ * Make sphere of given radius in ECEF coordinates (equator and slices are on X-Y plane).
+ */
+Shape
+make_centered_irregular_sphere_shape (IrregularSphereShapeParameters const&);
 
 /**
  * Make a rod shape without bottom/top faces, placed along the Z axis.
