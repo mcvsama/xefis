@@ -570,7 +570,6 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	std::vector<si::Angle>		_sky_stacks;
 	AtmosphericScattering		_atmospheric_scattering		{{ .earth_radius = kEarthMeanRadius, .atmosphere_radius = kEarthMeanRadius + 10_km }};
 	std::array<SkyLight, 5>		_sky_lights;
-	float						_normalized_sun_altitude;
 };
 
 
