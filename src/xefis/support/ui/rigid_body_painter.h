@@ -67,6 +67,14 @@ class RigidBodyPainter: protected QOpenGLFunctions
 		si::LonLat			position;
 	};
 
+	struct SunPosition
+	{
+		si::Angle				hour_angle;
+		si::Angle				declination;
+		HorizontalCoordinates	horizontal_coordinates;
+		SpaceVector<double>		cartesian_coordinates;
+	};
+
   public:
 	struct GroupRenderingConfig
 	{
@@ -370,12 +378,6 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	paint (rigid_body::System const& system, QOpenGLPaintDevice& canvas);
 
   private:
-	/**
-	 * Calculate _sun_local_hour_angle and _sun_declination.
-	 */
-	void
-	calculate_sun_position();
-
 	void
 	calculate_sun_color();
 
@@ -519,6 +521,10 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	SpaceLength<WorldSpace>
 	get_center_of_mass (rigid_body::Group const&);
 
+	[[nodiscard]]
+	static SunPosition
+	calculate_sun_position (si::Time unix_time, si::LonLat observer_position);
+
 	void
 	calculate_sky_slices_and_stacks (HorizontalCoordinates const sun_position);
 
@@ -557,10 +563,8 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	std::map<rigid_body::Group const*, SpaceLength<WorldSpace>>
 								_group_centers_of_mass_cache;
 	// Sun position:
-	si::Angle					_sun_local_hour_angle;
-	si::Angle					_sun_declination;
-	HorizontalCoordinates		_sun_horizontal_position;
-	SpaceVector<double>			_sun_direction;
+	SunPosition					_sun_position;
+
 	GLColor						_sun_color;
 	std::vector<si::Angle>		_sky_slices;
 	std::vector<si::Angle>		_sky_stacks;

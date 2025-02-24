@@ -125,35 +125,11 @@ RigidBodyPainter::paint (rigid_body::System const& system, QOpenGLPaintDevice& c
 
 
 void
-RigidBodyPainter::calculate_sun_position()
-{
-	auto const time = _time;
-	// Reposition Sun according to time:
-	auto const days_since_J2000 = unix_time_to_days_since_J2000 (time);
-	auto const sun_ecliptic_position = calculate_sun_ecliptic_position (days_since_J2000);
-	auto const sun_equatorial_position = calculate_sun_equatorial_position (sun_ecliptic_position.longitude, days_since_J2000);
-	// Since equatorial coordinate system doesn't rotate with Earth, we need to take
-	// that rotation into account manually (calculate hour-angle and rotate the sun again):
-	auto const local_sidereal_time = unix_time_to_local_sidereal_time (time, _position_on_earth.lon());
-	_sun_local_hour_angle = calculate_hour_angle (local_sidereal_time, sun_equatorial_position.right_ascension);
-	_sun_declination = sun_equatorial_position.declination;
-	_sun_horizontal_position = calculate_sun_horizontal_position (_sun_declination, _position_on_earth.lat(), _sun_local_hour_angle);
-	// Azimuth 0° is North, Hour angle 0° is Noon, so add 180_deg. And the direction is opposite, so negate.
-	_sun_direction = cartesian<void> (si::LonLat (-_sun_horizontal_position.azimuth + 180_deg, _sun_horizontal_position.altitude));
-	_sky_dome = SkyDome ({
-		.sun_direction = _sun_direction,
-		.earth_radius = kEarthMeanRadius,
-		.atmosphere_radius = kEarthMeanRadius + 10_km,
-	});
-}
-
-
-void
 RigidBodyPainter::calculate_sun_color()
 {
 	if (_sky_dome)
 	{
-		auto const color = kIncidentLightScale * _sky_dome->calculate_incident_light ({ 0_m, 0_m, _position_on_earth.radius() }, _sun_direction);
+		auto const color = kIncidentLightScale * _sky_dome->calculate_incident_light ({ 0_m, 0_m, _position_on_earth.radius() }, _sun_position.cartesian_coordinates);
 		auto const tonemapped_color = tonemap_sky (_sky_dome->tonemap_separately (color));
 		_sun_color = to_gl_color (tonemapped_color);
 	}
@@ -166,9 +142,14 @@ RigidBodyPainter::setup (QOpenGLPaintDevice& canvas)
 	auto const size = canvas.size();
 
 	_position_on_earth = xf::polar (math::coordinate_system_cast<ECEFSpace, void> (followed_position()));
-	calculate_sun_position();
+	_sun_position = calculate_sun_position (_time, _position_on_earth);
+	_sky_dome = SkyDome ({
+		.sun_direction = _sun_position.cartesian_coordinates,
+		.earth_radius = kEarthMeanRadius,
+		.atmosphere_radius = kEarthMeanRadius + 10_km,
+	});
 	calculate_sun_color();
-	calculate_sky_slices_and_stacks (_sun_horizontal_position);
+	calculate_sky_slices_and_stacks (_sun_position.horizontal_coordinates);
 
 	glMatrixMode (GL_PROJECTION);
 	glLoadIdentity();
@@ -361,11 +342,11 @@ RigidBodyPainter::make_z_towards_the_sun()
 	// Assuming we have identity rotations + camera rotations applied.
 
 	// Rotate sun depending on UTC time:
-	auto const greenwich_hour_angle = _sun_local_hour_angle - _position_on_earth.lon();
+	auto const greenwich_hour_angle = _sun_position.hour_angle - _position_on_earth.lon();
 	_gl.rotate_z (-greenwich_hour_angle);
 
 	// Rotate sun depending on time of the year:
-	_gl.rotate_y (-_sun_declination);
+	_gl.rotate_y (-_sun_position.declination);
 
 	// Our sun is located over the North Pole (+Z in ECEF). Rotate it to be straight over Null Island
 	// that is lon/lat 0°/0° (+X in ECEF):
@@ -387,7 +368,7 @@ void
 RigidBodyPainter::make_z_sky_top_x_sun_azimuth()
 {
 	make_z_sky_top_x_south();
-	_gl.rotate_z (-_sun_horizontal_position.azimuth + 180_deg);
+	_gl.rotate_z (-_sun_position.horizontal_coordinates.azimuth + 180_deg);
 }
 
 
@@ -469,7 +450,7 @@ RigidBodyPainter::paint_planet()
 			// TODO to func: get_sun_face_shape(); recalculated occassionally
 			auto sun_face_material = rigid_body::kWhiteMatte;
 			sun_face_material.gl_emission_color = GLColor (1.0, 1.0, 1.0);
-			auto enlargement = neutrino::renormalize (_sun_horizontal_position.altitude, Range { 0_deg, 90_deg }, Range { kSunSunsetEnlargement, kSunNoonEnlargement });
+			auto enlargement = neutrino::renormalize (_sun_position.horizontal_coordinates.altitude, Range { 0_deg, 90_deg }, Range { kSunSunsetEnlargement, kSunNoonEnlargement });
 			auto sun_face = rigid_body::make_solid_circle (enlargement * kSunRadius, { 0_deg, 360_deg }, 19, sun_face_material);
 
 			// Disable Z-testing so that the sun gets rendered even if it's far behind the sky dome sphere, and enable blending, to blend with the sky:
@@ -957,15 +938,15 @@ RigidBodyPainter::tonemap_sky (SpaceVector<double> rgb) const
 	auto constexpr reduce_green_to = 0.8;
 	auto constexpr reduce_green_to_sqrt = std::sqrt (reduce_green_to);
 
-	if (_sun_local_hour_angle > 0_deg && _sun_local_hour_angle < 180_deg)
+	if (_sun_position.hour_angle > 0_deg && _sun_position.hour_angle < 180_deg)
 	{
-		auto const abs_altitude = abs (_sun_horizontal_position.altitude);
+		auto const abs_altitude = abs (_sun_position.horizontal_coordinates.altitude);
 
 		if (abs_altitude < altitude_threshold)
 		{
 			auto const from = Range { altitude_threshold, 0_deg };
 			auto const to = Range { 1.0, reduce_green_to_sqrt };
-			auto const factor = neutrino::renormalize (_sun_horizontal_position.altitude, from, to);
+			auto const factor = neutrino::renormalize (_sun_position.horizontal_coordinates.altitude, from, to);
 			rgb[1] *= square (factor);
 		}
 	}
@@ -1060,6 +1041,31 @@ RigidBodyPainter::get_center_of_mass (rigid_body::Group const& group)
 	}
 	else
 		return _group_centers_of_mass_cache[&group] = group.mass_moments().center_of_mass_position();
+}
+
+
+RigidBodyPainter::SunPosition
+RigidBodyPainter::calculate_sun_position (si::Time const time, si::LonLat const observer_position)
+{
+	// Reposition Sun according to time:
+	auto const days_since_J2000 = unix_time_to_days_since_J2000 (time);
+	auto const sun_ecliptic_position = calculate_sun_ecliptic_position (days_since_J2000);
+	auto const sun_equatorial_position = calculate_sun_equatorial_position (sun_ecliptic_position.longitude, days_since_J2000);
+	// Since equatorial coordinate system doesn't rotate with Earth, we need to take
+	// that rotation into account manually (calculate hour-angle and rotate the sun again):
+	auto const local_sidereal_time = unix_time_to_local_sidereal_time (time, observer_position.lon());
+	auto const hour_angle = calculate_hour_angle (local_sidereal_time, sun_equatorial_position.right_ascension);
+	auto const declination = sun_equatorial_position.declination;
+	auto const horizontal_coordinates = calculate_sun_horizontal_position (declination, observer_position.lat(), hour_angle);
+	// Azimuth 0° is North, Hour angle 0° is Noon, so add 180_deg. And the direction is opposite, so negate.
+	auto const cartesian_coordinates = cartesian<void> (si::LonLat (-horizontal_coordinates.azimuth + 180_deg, horizontal_coordinates.altitude));
+
+	return {
+		.hour_angle = hour_angle,
+		.declination = declination,
+		.horizontal_coordinates = horizontal_coordinates,
+		.cartesian_coordinates = cartesian_coordinates,
+	};
 }
 
 
