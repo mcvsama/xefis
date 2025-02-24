@@ -388,18 +388,18 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	void
 	setup_natural_light();
 
+	void
+	setup_camera();
+
+	void
+	apply_camera_rotations();
+
 	/**
 	 * Rotate the world from screen coordinates (Earth visible from top of North (Z) with Null Island on the Right (X))
 	 * to Null Island being visible from above (Z) with North on top of the screen (Y) and 90°/0° on the right (X).
 	 */
 	void
 	apply_screen_to_null_island_rotations();
-
-	void
-	setup_camera();
-
-	void
-	apply_camera_rotations();
 
 	/**
 	 * Rotates OpenGL world so that Z direction is towards the Sun.

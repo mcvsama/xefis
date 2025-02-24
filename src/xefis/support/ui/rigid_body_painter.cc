@@ -282,21 +282,6 @@ RigidBodyPainter::setup_natural_light()
 
 
 void
-RigidBodyPainter::apply_screen_to_null_island_rotations()
-{
-	// Start with assumption that OpenGL coordinates are equal to ECEF coordinates:
-	// X = Null Island, Y = lon/lat 90°/0° and Z = North.
-
-	// Rotate -90° around X-axis to align the Y-axis with the equator
-	// (so that Z points towards the prime meridian instead of North):
-	_gl.rotate_x (-90_deg);
-	// Rotate -90° around Z-axis to shift the X-axis from Null Island towards
-	// the prime meridian and align Y with the correct eastward direction:
-	_gl.rotate_z (-90_deg);
-}
-
-
-void
 RigidBodyPainter::setup_camera()
 {
 	// Center the world at the followed body:
@@ -352,6 +337,21 @@ RigidBodyPainter::apply_camera_rotations()
 	// Nothing is followed, so default to planet body if it exists:
 	else if (_planet_body)
 		apply_screen_to_null_island_rotations();
+}
+
+
+void
+RigidBodyPainter::apply_screen_to_null_island_rotations()
+{
+	// Start with assumption that OpenGL coordinates are equal to ECEF coordinates:
+	// X = Null Island, Y = lon/lat 90°/0° and Z = North.
+
+	// Rotate -90° around X-axis to align the Y-axis with the equator
+	// (so that Z points towards the prime meridian instead of North):
+	_gl.rotate_x (-90_deg);
+	// Rotate -90° around Z-axis to shift the X-axis from Null Island towards
+	// the prime meridian and align Y with the correct eastward direction:
+	_gl.rotate_z (-90_deg);
 }
 
 
