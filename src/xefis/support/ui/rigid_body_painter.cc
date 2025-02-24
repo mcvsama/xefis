@@ -559,8 +559,8 @@ RigidBodyPainter::paint_air_particles()
 			{
 				for (auto z = rounded_to_grid.z() - range; z <= rounded_to_grid.z() + range; z += grid_size)
 				{
-					// (x + y + z) makes adjacent points to be wiggled the same amount, so multiply other axes by 2 and 3:
-					_air_particles_prng.seed ((x + 2 * y + 3 * z).in<si::Meter>());
+					// (x + y + z) makes adjacent points to be wiggled the same amount, so multiply other axes by some big numbers:
+					_air_particles_prng.seed ((x + 10 * y + 100 * z).in<si::Meter>());
 					_gl.save_context ([&] {
 						// OpenGL's center of the view [0, 0, 0] is at body_pos, hence subtracting body_pos from
 						// absolute values (in WorldOrigin space) x, y, z here:
