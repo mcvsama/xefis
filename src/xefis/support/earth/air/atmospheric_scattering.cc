@@ -41,7 +41,6 @@ template<class Value>
 
 
 AtmosphericScattering::AtmosphericScattering (Parameters const& parameters):
-	_sun_direction (parameters.sun_direction),
 	_earth_radius (parameters.earth_radius),
 	_atmosphere_radius (parameters.atmosphere_radius),
 	_rayleigh_threshold (parameters.rayleigh_threshold),
@@ -57,6 +56,7 @@ AtmosphericScattering::AtmosphericScattering (Parameters const& parameters):
 SpaceVector<double>
 AtmosphericScattering::calculate_incident_light (SpaceLength<> const& observer_position,
 												 SpaceVector<double> const& ray_direction,
+												 SpaceVector<double> const& sun_direction,
 												 si::Length min_distance,
 												 si::Length max_distance) const
 {
@@ -82,7 +82,7 @@ AtmosphericScattering::calculate_incident_light (SpaceLength<> const& observer_p
 
 		auto const g = 0.76;
 		auto const gg = neutrino::square (g);
-		auto const mu = dot_product (ray_direction, _sun_direction); // Cosine of the angle between the sun direction and the ray direction.
+		auto const mu = dot_product (ray_direction, sun_direction); // Cosine of the angle between the sun direction and the ray direction.
 		auto const phase = RayleighMie<double> {
 			.r = 3.0 / (16.0 * std::numbers::pi) * (1.0 + mu * mu),
 			.m = 3.0 / (8.0 * std::numbers::pi) * ((1.0 - gg) * (1.0 + mu * mu)) / ((2.0 + gg) * std::pow (1.0 + gg - 2.0 * g * mu, 1.5)),
@@ -94,7 +94,7 @@ AtmosphericScattering::calculate_incident_light (SpaceLength<> const& observer_p
 		for (uint32_t i = 0; i < _num_viewing_direction_samples; ++i)
 		{
 			auto const sky_sample_position = observer_position + (sky_current_distance + sky_segment_length * 0.5f) * ray_direction;
-			auto const light_intersections = ray_sphere_intersections (sky_sample_position, _sun_direction, _atmosphere_radius);
+			auto const light_intersections = ray_sphere_intersections (sky_sample_position, sun_direction, _atmosphere_radius);
 
 			if (light_intersections)
 			{
@@ -114,7 +114,7 @@ AtmosphericScattering::calculate_incident_light (SpaceLength<> const& observer_p
 				// of light source and taking multiple samples until the top of the atmosphere:
 				for (; light_samples_taken < _num_light_direction_samples; ++light_samples_taken)
 				{
-					auto const light_sample_position = sky_sample_position + (light_current_distance + light_segment_length * 0.5f) * _sun_direction;
+					auto const light_sample_position = sky_sample_position + (light_current_distance + light_segment_length * 0.5f) * sun_direction;
 					auto const light_height = light_sample_position.norm() - _earth_radius;
 
 					if (light_height < 0_m)
@@ -138,7 +138,9 @@ AtmosphericScattering::calculate_incident_light (SpaceLength<> const& observer_p
 			}
 		}
 
-		return _rayleigh_factor * hadamard_product (contribution.r, kRayleighBeta) * phase.r + _mie_factor * hadamard_product (contribution.m, kMieBeta) * phase.m;
+		auto const rayleigh_result = _rayleigh_factor * hadamard_product (contribution.r, kRayleighBeta) * phase.r;
+		auto const mie_result = _mie_factor * hadamard_product (contribution.m, kMieBeta) * phase.m;
+		return kIncidentLightScale * (rayleigh_result + mie_result);
 	}
 }
 

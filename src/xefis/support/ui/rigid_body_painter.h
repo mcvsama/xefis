@@ -568,8 +568,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	GLColor						_sun_color;
 	std::vector<si::Angle>		_sky_slices;
 	std::vector<si::Angle>		_sky_stacks;
-	std::optional<AtmosphericScattering>
-								_atmospheric_scattering;
+	AtmosphericScattering		_atmospheric_scattering		{{ .earth_radius = kEarthMeanRadius, .atmosphere_radius = kEarthMeanRadius + 10_km }};
 	std::array<SkyLight, 5>		_sky_lights;
 	float						_normalized_sun_altitude;
 };

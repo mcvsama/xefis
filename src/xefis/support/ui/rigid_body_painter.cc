@@ -56,9 +56,6 @@ constexpr auto kSkyLight2		= GL_LIGHT4;
 constexpr auto kSkyLight3		= GL_LIGHT5;
 constexpr auto kSkyLight4		= GL_LIGHT6;
 
-// Used for scaling output of AtmosphericScattering::calculate_incident_light(); chosen experimentally:
-constexpr auto kIncidentLightScale	= 100.0;
-
 
 RigidBodyPainter::RigidBodyPainter (si::PixelDensity const pixel_density):
 	_pixel_density (pixel_density),
@@ -127,12 +124,13 @@ RigidBodyPainter::paint (rigid_body::System const& system, QOpenGLPaintDevice& c
 void
 RigidBodyPainter::calculate_sun_color()
 {
-	if (_atmospheric_scattering)
-	{
-		auto const color = kIncidentLightScale * _atmospheric_scattering->calculate_incident_light ({ 0_m, 0_m, _position_on_earth.radius() }, _sun_position.cartesian_coordinates);
-		auto const tonemapped_color = tonemap_sky (_atmospheric_scattering->tonemap_separately (color));
-		_sun_color = to_gl_color (tonemapped_color);
-	}
+	auto const color = _atmospheric_scattering.calculate_incident_light (
+		{ 0_m, 0_m, _position_on_earth.radius() },
+		_sun_position.cartesian_coordinates,
+		_sun_position.cartesian_coordinates
+	);
+	auto const tonemapped_color = tonemap_sky (_atmospheric_scattering.tonemap_separately (color));
+	_sun_color = to_gl_color (tonemapped_color);
 }
 
 
@@ -143,11 +141,6 @@ RigidBodyPainter::setup (QOpenGLPaintDevice& canvas)
 
 	_position_on_earth = xf::polar (math::coordinate_system_cast<ECEFSpace, void> (followed_position()));
 	_sun_position = calculate_sun_position (_time, _position_on_earth);
-	_atmospheric_scattering = AtmosphericScattering ({
-		.sun_direction = _sun_position.cartesian_coordinates,
-		.earth_radius = kEarthMeanRadius,
-		.atmosphere_radius = kEarthMeanRadius + 10_km,
-	});
 	calculate_sun_color();
 	calculate_sky_slices_and_stacks (_sun_position.horizontal_coordinates);
 
@@ -222,28 +215,29 @@ RigidBodyPainter::setup_natural_light()
 		});
 
 		// Sky lights:
-		if (_atmospheric_scattering)
+		for (auto& sky_light: _sky_lights)
 		{
-			for (auto& sky_light: _sky_lights)
-			{
-				_gl.save_context ([&] {
-					make_z_sky_top_x_sun_azimuth();
-					_gl.rotate_z (+sky_light.position.lon());
-					_gl.rotate_y (-sky_light.position.lat());
+			_gl.save_context ([&] {
+				make_z_sky_top_x_sun_azimuth();
+				_gl.rotate_z (+sky_light.position.lon());
+				_gl.rotate_y (-sky_light.position.lat());
 
-					auto const number = sky_light.gl_number;
-					auto const light_direction = cartesian<void> (sky_light.position); // Azimuth (lon()) should possible be negated, but the sky dome is symmetric, so this is okay.
-					auto const color = kIncidentLightScale * _atmospheric_scattering->calculate_incident_light ({ 0_m, 0_m, _position_on_earth.radius() }, light_direction);
-					auto const tonemapped_color = tonemap_sky (_atmospheric_scattering->tonemap_separately (color));
-					auto const gl_color = to_gl_color (tonemapped_color);
+				auto const number = sky_light.gl_number;
+				auto const light_direction = cartesian<void> (sky_light.position); // Azimuth (lon()) should possible be negated, but the sky dome is symmetric, so this is okay.
+				auto const color = _atmospheric_scattering.calculate_incident_light (
+					{ 0_m, 0_m, _position_on_earth.radius() },
+					light_direction,
+					_sun_position.cartesian_coordinates
+				);
+				auto const tonemapped_color = tonemap_sky (_atmospheric_scattering.tonemap_separately (color));
+				auto const gl_color = to_gl_color (tonemapped_color);
 
-					glEnable (number);
-					glLightfv (number, GL_AMBIENT, gl_color.scaled (0.0f));
-					glLightfv (number, GL_DIFFUSE, gl_color.scaled (0.2f));
-					glLightfv (number, GL_SPECULAR, gl_color.scaled (0.0f));
-					glLightfv (number, GL_POSITION, GLArray { _gl.to_opengl (kSkyHeight), 0.0f, 0.0f, 0.0f });
-				});
-			}
+				glEnable (number);
+				glLightfv (number, GL_AMBIENT, gl_color.scaled (0.0f));
+				glLightfv (number, GL_DIFFUSE, gl_color.scaled (0.2f));
+				glLightfv (number, GL_SPECULAR, gl_color.scaled (0.0f));
+				glLightfv (number, GL_POSITION, GLArray { _gl.to_opengl (kSkyHeight), 0.0f, 0.0f, 0.0f });
+			});
 		}
 	}
 	else
@@ -411,39 +405,39 @@ RigidBodyPainter::paint_planet()
 		// In other words match ECEF coordinates with standard OpenGL screen coordinates.
 
 		// Sky:
-		if (_atmospheric_scattering)
-		{
-			// TODO Extract to a separate function that creates the sky dome (take si::Angle hour_angle, 0° = Noon).
-			_gl.save_context ([&] {
-				auto const sky_material = rigid_body::kBlackMatte;
-				// Sphere pole is at the top of the observer. Stacks are perpendicular to observer's local horizon:
-				auto sky = rigid_body::make_centered_irregular_sphere_shape ({
-					.radius = kHorizonRadius,
-					.slice_angles = _sky_slices,
-					.stack_angles = _sky_stacks,
-					.material = sky_material,
-					.setup_material = [&, this] (rigid_body::ShapeMaterial& material, si::LonLat const sphere_position) {
-						auto const color = kIncidentLightScale * _atmospheric_scattering->calculate_incident_light ({ 0_m, 0_m, _position_on_earth.radius() }, cartesian<void> (sphere_position));
-						auto const tonemapped_color = tonemap_sky (_atmospheric_scattering->tonemap_separately (color));
-						material.gl_emission_color = to_gl_color (tonemapped_color);
-						// TODO ground haze.
-					},
-				});
-				rigid_body::negate_normals (sky);
-
-				// The sky is centered at the followed body. FIXME It should be centered at the observer
-
-				_gl.rotate_z (+_position_on_earth.lon());
-				_gl.rotate_y (-_position_on_earth.lat());
-				_gl.rotate_y (90_deg);
-				// Normally the outside of the sphere shape is rendered, inside is culled.
-				// But here we're inside the sphere, so tell OpenGL that the front faces are the
-				// inside faces:
-				glFrontFace (GL_CW);
-				_gl.draw (sky);
-				glFrontFace (GL_CCW);
+		_gl.save_context ([&] {
+			auto const sky_material = rigid_body::kBlackMatte;
+			// Sphere pole is at the top of the observer. Stacks are perpendicular to observer's local horizon:
+			auto sky = rigid_body::make_centered_irregular_sphere_shape ({
+				.radius = kHorizonRadius,
+				.slice_angles = _sky_slices,
+				.stack_angles = _sky_stacks,
+				.material = sky_material,
+				.setup_material = [&, this] (rigid_body::ShapeMaterial& material, si::LonLat const sphere_position) {
+					auto const color = _atmospheric_scattering.calculate_incident_light (
+						{ 0_m, 0_m, _position_on_earth.radius() },
+						cartesian<void> (sphere_position),
+						_sun_position.cartesian_coordinates
+					);
+					auto const tonemapped_color = tonemap_sky (_atmospheric_scattering.tonemap_separately (color));
+					material.gl_emission_color = to_gl_color (tonemapped_color);
+					// TODO ground haze.
+				},
 			});
-		}
+			rigid_body::negate_normals (sky);
+
+			// The sky is centered at the followed body. FIXME It should be centered at the observer
+
+			_gl.rotate_z (+_position_on_earth.lon());
+			_gl.rotate_y (-_position_on_earth.lat());
+			_gl.rotate_y (90_deg);
+			// Normally the outside of the sphere shape is rendered, inside is culled.
+			// But here we're inside the sphere, so tell OpenGL that the front faces are the
+			// inside faces:
+			glFrontFace (GL_CW);
+			_gl.draw (sky);
+			glFrontFace (GL_CCW);
+		});
 
 		// Sun:
 		_gl.save_context ([&] {

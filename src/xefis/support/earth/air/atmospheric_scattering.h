@@ -34,8 +34,6 @@ class AtmosphericScattering
   public:
 	struct Parameters
 	{
-		// Normalized vector for sun direction:
-		SpaceVector<double>	sun_direction					{ 0.0, 1.0, 0.0 };
 		// Radius of the ground:
 		si::Length			earth_radius					{ kEarthMeanRadius };
 		// Radius of the top of the sky:
@@ -59,6 +57,9 @@ class AtmosphericScattering
 		// Number of samples taken to the light source:
 		uint32_t			num_light_direction_samples		{ 8 };
 	};
+
+	// Used for scaling output of AtmosphericScattering::calculate_incident_light(); chosen experimentally:
+	static constexpr auto kIncidentLightScale = 100.0;
 
   private:
 	// Precomputed values that correspond to the scattering coefficients of the sky at sea level, for wavelengths 680, 550 and 440 respectively:
@@ -90,6 +91,7 @@ class AtmosphericScattering
 	calculate_incident_light (
 		SpaceLength<> const& observer_position,
 		SpaceVector<double> const& ray_direction,
+		SpaceVector<double> const& sun_direction,
 		si::Length min_distance = 0_m,
 		si::Length max_distance = std::numeric_limits<si::Length>::infinity()
 	) const;
