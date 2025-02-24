@@ -16,7 +16,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/support/earth/air/sky_dome.h>
+#include <xefis/support/earth/air/atmospheric_scattering.h>
 #include <xefis/support/math/rotations.h>
 #include <xefis/support/simulation/rigid_body/system.h>
 #include <xefis/support/ui/gl_space.h>
@@ -568,7 +568,8 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	GLColor						_sun_color;
 	std::vector<si::Angle>		_sky_slices;
 	std::vector<si::Angle>		_sky_stacks;
-	std::optional<SkyDome>		_sky_dome;
+	std::optional<AtmosphericScattering>
+								_atmospheric_scattering;
 	std::array<SkyLight, 5>		_sky_lights;
 	float						_normalized_sun_altitude;
 };

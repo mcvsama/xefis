@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__SUPPORT__EARTH__AIR__SKY_DOME_H__INCLUDED
-#define XEFIS__SUPPORT__EARTH__AIR__SKY_DOME_H__INCLUDED
+#ifndef XEFIS__SUPPORT__EARTH__AIR__ATMOSPHERIC_SCATTERING_H__INCLUDED
+#define XEFIS__SUPPORT__EARTH__AIR__ATMOSPHERIC_SCATTERING_H__INCLUDED
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -29,7 +29,7 @@ namespace xf {
  * Implementation based on code from
  * <https://www.scratchapixel.com/lessons/procedural-generation-virtual-worlds/simulating-sky/simulating-colors-of-the-sky.html>
  */
-class SkyDome
+class AtmosphericScattering
 {
   public:
 	struct Parameters
@@ -69,7 +69,7 @@ class SkyDome
   public:
 	// Ctor
 	explicit
-    SkyDome (Parameters const&);
+    AtmosphericScattering (Parameters const&);
 
 	/**
 	 * Calculate the light that reaches a `observer_position` point along a ray as it travels through the atmosphere, accounting for scattering effects.
@@ -144,7 +144,7 @@ class SkyDome
 
 
 constexpr double
-SkyDome::reinhard_tonemap (double value)
+AtmosphericScattering::reinhard_tonemap (double value)
 {
 	// The Reinhard operator compresses high dynamic range values
 	// by mapping value to value / (1.0 + value), which approaches 1 as value increases:
@@ -153,7 +153,7 @@ SkyDome::reinhard_tonemap (double value)
 
 
 constexpr double
-SkyDome::tonemap (double value)
+AtmosphericScattering::tonemap (double value)
 {
 	// If the channel's value is below a threshold (1.413), apply gamma correction;
 	// otherwise, use an exponential curve to compress high values:
@@ -165,7 +165,7 @@ SkyDome::tonemap (double value)
 
 
 constexpr SpaceVector<double>
-SkyDome::tonemap (SpaceVector<double> input)
+AtmosphericScattering::tonemap (SpaceVector<double> input)
 {
 	// Compute luminance using Rec.709 weights:
 	auto const luminance = 0.2126 * input[0] + 0.7152 * input[1] + 0.0722 * input[2];
@@ -180,7 +180,7 @@ SkyDome::tonemap (SpaceVector<double> input)
 
 
 constexpr SpaceVector<double>
-SkyDome::tonemap_separately (SpaceVector<double> input)
+AtmosphericScattering::tonemap_separately (SpaceVector<double> input)
 {
 	// Apply tone mapping function to each color channel:
 	for (auto& v: input.array())

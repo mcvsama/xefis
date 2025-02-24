@@ -16,7 +16,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/support/earth/air/sky_dome.h>
+#include <xefis/support/earth/air/atmospheric_scattering.h>
 #include <xefis/support/math/rotations.h>
 #include <xefis/support/nature/constants.h>
 #include <xefis/support/simulation/constraints/fixed_constraint.h>
@@ -56,7 +56,7 @@ constexpr auto kSkyLight2		= GL_LIGHT4;
 constexpr auto kSkyLight3		= GL_LIGHT5;
 constexpr auto kSkyLight4		= GL_LIGHT6;
 
-// Used for scaling output of SkyDome::calculate_incident_light(); chosen experimentally:
+// Used for scaling output of AtmosphericScattering::calculate_incident_light(); chosen experimentally:
 constexpr auto kIncidentLightScale	= 100.0;
 
 
@@ -127,10 +127,10 @@ RigidBodyPainter::paint (rigid_body::System const& system, QOpenGLPaintDevice& c
 void
 RigidBodyPainter::calculate_sun_color()
 {
-	if (_sky_dome)
+	if (_atmospheric_scattering)
 	{
-		auto const color = kIncidentLightScale * _sky_dome->calculate_incident_light ({ 0_m, 0_m, _position_on_earth.radius() }, _sun_position.cartesian_coordinates);
-		auto const tonemapped_color = tonemap_sky (_sky_dome->tonemap_separately (color));
+		auto const color = kIncidentLightScale * _atmospheric_scattering->calculate_incident_light ({ 0_m, 0_m, _position_on_earth.radius() }, _sun_position.cartesian_coordinates);
+		auto const tonemapped_color = tonemap_sky (_atmospheric_scattering->tonemap_separately (color));
 		_sun_color = to_gl_color (tonemapped_color);
 	}
 }
@@ -143,7 +143,7 @@ RigidBodyPainter::setup (QOpenGLPaintDevice& canvas)
 
 	_position_on_earth = xf::polar (math::coordinate_system_cast<ECEFSpace, void> (followed_position()));
 	_sun_position = calculate_sun_position (_time, _position_on_earth);
-	_sky_dome = SkyDome ({
+	_atmospheric_scattering = AtmosphericScattering ({
 		.sun_direction = _sun_position.cartesian_coordinates,
 		.earth_radius = kEarthMeanRadius,
 		.atmosphere_radius = kEarthMeanRadius + 10_km,
@@ -222,7 +222,7 @@ RigidBodyPainter::setup_natural_light()
 		});
 
 		// Sky lights:
-		if (_sky_dome)
+		if (_atmospheric_scattering)
 		{
 			for (auto& sky_light: _sky_lights)
 			{
@@ -233,8 +233,8 @@ RigidBodyPainter::setup_natural_light()
 
 					auto const number = sky_light.gl_number;
 					auto const light_direction = cartesian<void> (sky_light.position); // Azimuth (lon()) should possible be negated, but the sky dome is symmetric, so this is okay.
-					auto const color = kIncidentLightScale * _sky_dome->calculate_incident_light ({ 0_m, 0_m, _position_on_earth.radius() }, light_direction);
-					auto const tonemapped_color = tonemap_sky (_sky_dome->tonemap_separately (color));
+					auto const color = kIncidentLightScale * _atmospheric_scattering->calculate_incident_light ({ 0_m, 0_m, _position_on_earth.radius() }, light_direction);
+					auto const tonemapped_color = tonemap_sky (_atmospheric_scattering->tonemap_separately (color));
 					auto const gl_color = to_gl_color (tonemapped_color);
 
 					glEnable (number);
@@ -411,7 +411,7 @@ RigidBodyPainter::paint_planet()
 		// In other words match ECEF coordinates with standard OpenGL screen coordinates.
 
 		// Sky:
-		if (_sky_dome)
+		if (_atmospheric_scattering)
 		{
 			// TODO Extract to a separate function that creates the sky dome (take si::Angle hour_angle, 0° = Noon).
 			_gl.save_context ([&] {
@@ -423,8 +423,8 @@ RigidBodyPainter::paint_planet()
 					.stack_angles = _sky_stacks,
 					.material = sky_material,
 					.setup_material = [&, this] (rigid_body::ShapeMaterial& material, si::LonLat const sphere_position) {
-						auto const color = kIncidentLightScale * _sky_dome->calculate_incident_light ({ 0_m, 0_m, _position_on_earth.radius() }, cartesian<void> (sphere_position));
-						auto const tonemapped_color = tonemap_sky (_sky_dome->tonemap_separately (color));
+						auto const color = kIncidentLightScale * _atmospheric_scattering->calculate_incident_light ({ 0_m, 0_m, _position_on_earth.radius() }, cartesian<void> (sphere_position));
+						auto const tonemapped_color = tonemap_sky (_atmospheric_scattering->tonemap_separately (color));
 						material.gl_emission_color = to_gl_color (tonemapped_color);
 						// TODO ground haze.
 					},

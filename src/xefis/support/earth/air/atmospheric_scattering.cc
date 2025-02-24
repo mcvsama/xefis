@@ -12,7 +12,7 @@
  */
 
 // Local:
-#include "sky_dome.h"
+#include "atmospheric_scattering.h"
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -30,7 +30,7 @@
 namespace xf {
 
 /**
- * Helper struct used in SkyDome::calculate_incident_light().
+ * Helper struct used in AtmosphericScattering::calculate_incident_light().
  */
 template<class Value>
 	struct RayleighMie
@@ -40,7 +40,7 @@ template<class Value>
 	};
 
 
-SkyDome::SkyDome (Parameters const& parameters):
+AtmosphericScattering::AtmosphericScattering (Parameters const& parameters):
 	_sun_direction (parameters.sun_direction),
 	_earth_radius (parameters.earth_radius),
 	_atmosphere_radius (parameters.atmosphere_radius),
@@ -55,10 +55,10 @@ SkyDome::SkyDome (Parameters const& parameters):
 
 [[nodiscard]]
 SpaceVector<double>
-SkyDome::calculate_incident_light (SpaceLength<> const& observer_position,
-								   SpaceVector<double> const& ray_direction,
-								   si::Length min_distance,
-								   si::Length max_distance) const
+AtmosphericScattering::calculate_incident_light (SpaceLength<> const& observer_position,
+												 SpaceVector<double> const& ray_direction,
+												 si::Length min_distance,
+												 si::Length max_distance) const
 {
 	auto intersections = ray_sphere_intersections (observer_position, ray_direction, _atmosphere_radius);
 
@@ -144,7 +144,7 @@ SkyDome::calculate_incident_light (SpaceLength<> const& observer_position,
 
 
 std::optional<std::pair<si::Length, si::Length>>
-SkyDome::ray_sphere_intersections (SpaceLength<> const& ray_origin, SpaceVector<double> const& ray_direction, si::Length const sphere_radius)
+AtmosphericScattering::ray_sphere_intersections (SpaceLength<> const& ray_origin, SpaceVector<double> const& ray_direction, si::Length const sphere_radius)
 {
 	auto const ray_origin_m = ray_origin / 1_m;
 	auto const sphere_radius_m = sphere_radius / 1_m;
