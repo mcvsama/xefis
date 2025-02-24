@@ -554,11 +554,11 @@ RigidBodyPainter::paint_air_particles()
 {
 	_gl.save_context ([&] {
 		// Air 'particles' only appear if we have a planet:
-		auto const ball_size = 2_cm;
+		auto const dust_size = 2_cm;
 		auto const grid_size = 5_m;
-		auto ball_material = rigid_body::kWhiteMatte;
-		ball_material.set_emission_color (Qt::white);
-		auto const ball = rigid_body::make_centered_sphere_shape ({ .radius = ball_size, .slices = 3, .stacks = 3, .material = ball_material });
+		auto dust_material = rigid_body::kWhiteMatte;
+		dust_material.set_emission_color (Qt::white);
+		auto const dust = rigid_body::make_centered_sphere_shape ({ .radius = dust_size, .slices = 3, .stacks = 3, .material = dust_material });
 		auto const range = 3 * grid_size;
 
 		// Figure out nearest 3D grid points.
@@ -571,7 +571,7 @@ RigidBodyPainter::paint_air_particles()
 		auto const prng_factor = grid_size / _air_particles_prng.max();
 		auto const half_grid_size = 0.5 * grid_size;
 
-		// Paint a grid of little balls around the camera position:
+		// Paint a grid of little dust particles around the camera position:
 		for (auto x = rounded_to_grid.x() - range; x <= rounded_to_grid.x() + range; x += grid_size)
 		{
 			for (auto y = rounded_to_grid.y() - range; y <= rounded_to_grid.y() + range; y += grid_size)
@@ -587,7 +587,7 @@ RigidBodyPainter::paint_air_particles()
 						auto const wiggled_y = y - body_pos.y() + prng_factor * _air_particles_prng() - half_grid_size;
 						auto const wiggled_z = z - body_pos.z() + prng_factor * _air_particles_prng() - half_grid_size;
 						_gl.translate (wiggled_x, wiggled_y, wiggled_z);
-						_gl.draw (ball);
+						_gl.draw (dust);
 					});
 				}
 			}
@@ -621,13 +621,11 @@ RigidBodyPainter::paint (rigid_body::System const& system)
 			for (auto const& body: system.bodies())
 				paint_angular_momentum (*body);
 
-
+		// We'll now paint features that are always visible, so clear the Z buffer
+		// in OpenGL and do the painting with blending enabled.
 		{
 			auto const* focused_group = this->focused_group();
 			auto const* focused_body = this->focused_body();
-
-			// We'll now paint features that are always visible, so clear the Z buffer
-			// in OpenGL and do the painting with blending enabled.
 
 			glEnable (GL_BLEND);
 			_gl.clear_z_buffer();
@@ -716,11 +714,11 @@ RigidBodyPainter::paint (rigid_body::Constraint const& constraint)
 	if (constraint.enabled() && !constraint.broken())
 	{
 		_gl.save_context ([&] {
-			auto fcorr = followed_position();
+			auto fp = followed_position();
 			auto const& b1 = constraint.body_1();
 			auto const& b2 = constraint.body_2();
-			auto com1 = b1.placement().position() - fcorr;
-			auto com2 = b2.placement().position() - fcorr;
+			auto com1 = b1.placement().position() - fp;
+			auto com2 = b2.placement().position() - fp;
 
 			auto const rod_from_to = [this] (si::Length const radius, auto const& from, auto const& to, bool front_back_faces, rigid_body::ShapeMaterial const& material)
 			{
