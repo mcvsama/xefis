@@ -76,8 +76,8 @@ ArrivalETA::compute()
 		si::LonLat aircraft (*_io.aircraft_longitude, *_io.aircraft_latitude);
 		distance = xf::haversine_earth (station, aircraft);
 
-		si::Angle station_bearing = xf::wrap_within_range<si::Angle> (xf::initial_bearing (aircraft, station), 0_deg, 360_deg);
-		si::Angle angle_diff = xf::wrap_within_range<si::Angle> (station_bearing - *_io.track_lateral_true, -180_deg, +180_deg);
+		si::Angle station_bearing = neutrino::wrap_within_range<si::Angle> (xf::initial_bearing (aircraft, station), 0_deg, 360_deg);
+		si::Angle angle_diff = neutrino::wrap_within_range<si::Angle> (station_bearing - *_io.track_lateral_true, -180_deg, +180_deg);
 
 		if (abs (angle_diff) > 30_deg)
 			throw SetNil (true);

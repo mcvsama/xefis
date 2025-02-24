@@ -3401,8 +3401,8 @@ ADI::compute_fpv()
 
 	if (_io.fpv_visible.value_or (false) && !hidden && _io.orientation_pitch && _io.orientation_roll && _io.track_vertical && heading && track_lateral)
 	{
-		si::Angle vdiff = xf::wrap_within_range (*_io.orientation_pitch - *_io.track_vertical, -180_deg, +180_deg);
-		si::Angle hdiff = xf::wrap_within_range (**heading - **track_lateral, -180_deg, +180_deg);
+		si::Angle vdiff = neutrino::wrap_within_range (*_io.orientation_pitch - *_io.track_vertical, -180_deg, +180_deg);
+		si::Angle hdiff = neutrino::wrap_within_range (**heading - **track_lateral, -180_deg, +180_deg);
 		si::Angle roll = *_io.orientation_roll;
 
 		_computed_fpv_alpha = vdiff * si::cos (roll) + hdiff * si::sin (roll);

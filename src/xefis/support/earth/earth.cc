@@ -90,7 +90,7 @@ std::string
 to_dms (si::Angle const a, bool const three_digits)
 {
 	auto const angle_degs = a.in<si::Degree>();
-	auto const degs = std::trunc (xf::wrap_within_range (angle_degs, -180.0, +180.0));
+	auto const degs = std::trunc (neutrino::wrap_within_range (angle_degs, -180.0, +180.0));
 	auto const remainder = 60.0 * std::abs (angle_degs - degs);
 	auto const mins = std::floor (remainder);
 	auto const secs = 60.0 * std::abs (remainder - mins);
