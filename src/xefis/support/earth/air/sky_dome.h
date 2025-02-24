@@ -87,7 +87,12 @@ class SkyDome
 	 */
 	[[nodiscard]]
     SpaceVector<double>
-	calculate_incident_light (SpaceLength<> const& observer_position, SpaceVector<double> const& ray_direction, si::Length min_distance = 0_m, si::Length max_distance = std::numeric_limits<si::Length>::infinity()) const;
+	calculate_incident_light (
+		SpaceLength<> const& observer_position,
+		SpaceVector<double> const& ray_direction,
+		si::Length min_distance = 0_m,
+		si::Length max_distance = std::numeric_limits<si::Length>::infinity()
+	) const;
 
 	[[nodiscard]]
 	static constexpr double

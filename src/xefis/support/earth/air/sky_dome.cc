@@ -55,7 +55,10 @@ SkyDome::SkyDome (Parameters const& parameters):
 
 [[nodiscard]]
 SpaceVector<double>
-SkyDome::calculate_incident_light (SpaceLength<> const& observer_position, SpaceVector<double> const& ray_direction, si::Length min_distance, si::Length max_distance) const
+SkyDome::calculate_incident_light (SpaceLength<> const& observer_position,
+								   SpaceVector<double> const& ray_direction,
+								   si::Length min_distance,
+								   si::Length max_distance) const
 {
 	auto intersections = ray_sphere_intersections (observer_position, ray_direction, _atmosphere_radius);
 
