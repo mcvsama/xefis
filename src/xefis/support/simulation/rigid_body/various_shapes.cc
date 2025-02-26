@@ -27,6 +27,8 @@
 #include <cstddef>
 #include <numbers>
 #include <ranges>
+#include <type_traits>
+#include <vector>
 
 
 namespace xf::rigid_body {
@@ -105,106 +107,190 @@ make_cube_shape (xf::MassMomentsAtArm<BodyCOM> const& mm, ShapeMaterial const& m
 }
 
 
+template<class SetupMaterial>
+	Shape
+	make_centered_sphere_shape (SphereShapeParameters const& params, SetupMaterial const setup_material)
+	{
+		auto const n_slices = std::max<size_t> (params.slices, 3);
+		auto const n_stacks = std::max<size_t> (params.stacks, 2);
+
+		si::Angle const dh = params.h_range.extent() / n_slices;
+		si::Angle const dv = params.v_range.extent() / n_stacks;
+
+		Shape shape;
+		shape.triangle_strips().reserve (n_stacks);
+
+		si::Angle angle_v = params.v_range.min();
+		Shape::TriangleStrip* previous_strip = nullptr;
+
+		for (size_t iv = 0; iv < n_stacks; ++iv, angle_v += dv)
+		{
+			Shape::TriangleStrip& strip = shape.triangle_strips().emplace_back();
+			strip.reserve (2 * (n_slices + 1));
+			si::Angle angle_h = params.h_range.min();
+
+			for (size_t ih = 0; ih < n_slices + 1; ++ih, angle_h += dh)
+			{
+				// TODO Optimize poles (setup_material is called multiple times for each pole)
+				auto const p1_lonlat = si::LonLat { angle_h, angle_v + dv }; // Higher latitude
+				auto const p1_cartesian = math::coordinate_system_cast<BodyOrigin, void> (cartesian (p1_lonlat));
+
+				if constexpr (std::is_same<SetupMaterial, SynchronousSetupMaterial>())
+				{
+					auto p1_material = params.material;
+					setup_material (p1_material, p1_lonlat);
+					strip.emplace_back (p1_cartesian * params.radius, p1_material);
+
+					if (previous_strip)
+					{
+						// Reuse vertex calculated for the same point from the previous stack strip:
+						strip.push_back ((*previous_strip)[2 * ih]);
+					}
+					else
+					{
+						auto const p2_lonlat = si::LonLat { angle_h, angle_v }; // Lower latitude
+						auto const p2_cartesian = math::coordinate_system_cast<BodyOrigin, void> (cartesian (p2_lonlat));
+						auto p2_material = params.material;
+						setup_material (p2_material, p2_lonlat);
+						strip.emplace_back (p2_cartesian * params.radius, p2_material);
+					}
+				}
+				else if constexpr (std::is_same<SetupMaterial, AsynchronousSetupMaterial>())
+				{
+					// TODO
+				}
+				else
+				{
+					auto const p2_lonlat = si::LonLat { angle_h, angle_v }; // Lower latitude
+					auto const p2_cartesian = math::coordinate_system_cast<BodyOrigin, void> (cartesian (p2_lonlat));
+					strip.emplace_back (p1_cartesian * params.radius, params.material);
+					strip.emplace_back (p2_cartesian * params.radius, params.material);
+				}
+			}
+
+			previous_strip = &strip;
+		}
+
+		shape.for_all_vertices ([&params] (ShapeVertex& v) {
+			v.set_normal (v.position() / params.radius);
+		});
+
+		return shape;
+	}
+
+
 Shape
 make_centered_sphere_shape (SphereShapeParameters const& params)
 {
-	auto const n_slices = std::max<size_t> (params.slices, 3);
-	auto const n_stacks = std::max<size_t> (params.stacks, 2);
-
-	si::Angle const dh = params.h_range.extent() / n_slices;
-	si::Angle const dv = params.v_range.extent() / n_stacks;
-
-	Shape shape;
-	shape.triangle_strips().reserve (n_stacks);
-	si::Angle angle_v = params.v_range.min();
-
-	for (size_t iv = 0; iv < n_stacks; ++iv, angle_v += dv)
+	if (auto const* const synchronous_setup_material = std::get_if<SynchronousSetupMaterial> (&params.setup_material))
 	{
-		Shape::TriangleStrip& strip = shape.triangle_strips().emplace_back();
-		strip.reserve (2 * (n_slices + 1));
-		si::Angle angle_h = params.h_range.min();
-
-		for (size_t ih = 0; ih < n_slices + 1; ++ih, angle_h += dh)
-		{
-			// TODO Calls to cartesian() and setup_material() could be reused in the future for the same points of adjacent strips:
-			auto const p1 = math::coordinate_system_cast<BodyOrigin, void> (cartesian (si::LonLat { angle_h, angle_v + dv }));
-			auto const p2 = math::coordinate_system_cast<BodyOrigin, void> (cartesian (si::LonLat { angle_h, angle_v }));
-
-			if (params.setup_material)
-			{
-				auto p1_material = params.material;
-				params.setup_material (p1_material, si::LonLat { angle_h, angle_v + dv });
-				strip.emplace_back (p1 * params.radius, p1, p1_material);
-
-				auto p2_material = params.material;
-				params.setup_material (p2_material, si::LonLat { angle_h, angle_v });
-				strip.emplace_back (p2 * params.radius, p2, p2_material);
-			}
-			else
-			{
-				strip.emplace_back (p1 * params.radius, p1, params.material);
-				strip.emplace_back (p2 * params.radius, p2, params.material);
-			}
-		}
+		if (*synchronous_setup_material)
+			return make_centered_sphere_shape (params, *synchronous_setup_material);
+	}
+	else if (auto const* const asynchronous_setup_material = std::get_if<AsynchronousSetupMaterial> (&params.setup_material))
+	{
+		if (*asynchronous_setup_material)
+			return make_centered_sphere_shape (params, *asynchronous_setup_material);
 	}
 
-	shape.for_all_vertices ([&params] (ShapeVertex& v) {
-		v.set_normal (v.position() / params.radius);
-	});
-
-	return shape;
+	return make_centered_sphere_shape (params, std::monostate());
 }
+
+
+template<class SetupMaterial>
+	Shape
+	make_centered_irregular_sphere_shape (IrregularSphereShapeParameters const& params, SetupMaterial const setup_material)
+	{
+		auto const n_slices = params.slice_angles.size();
+		auto const n_stacks = params.stack_angles.size();
+
+		if (n_slices < 3)
+			throw Exception ("IrregularSphereShapeParameters: must have at least 3 slices");
+
+		if (n_stacks < 2)
+			throw Exception ("IrregularSphereShapeParameters: must have at least 2 stacks");
+
+		Shape shape;
+		shape.triangle_strips().reserve (n_stacks);
+
+		auto constexpr using_asynchronous_setup_material = std::is_same<SetupMaterial, AsynchronousSetupMaterial>();
+		[[maybe_unused]] auto futures = std::conditional_t<using_asynchronous_setup_material, std::vector<std::future<void>>, std::monostate>();
+
+		if constexpr (using_asynchronous_setup_material)
+			futures.reserve (n_stacks * (2 * (n_slices + 1)));
+
+		Shape::TriangleStrip* previous_strip = nullptr;
+
+		for (auto const latitudes: params.stack_angles | std::views::slide (2))
+		{
+			Shape::TriangleStrip& strip = shape.triangle_strips().emplace_back();
+			strip.reserve (2 * (n_slices + 1));
+
+			for (auto const [i, longitude]: std::views::enumerate (params.slice_angles))
+			{
+				// TODO Optimize poles (setup_material is called multiple times for each pole)
+				auto const p1_lonlat = si::LonLat { longitude, latitudes[1] }; // Higher latitude
+				auto const p1_cartesian = math::coordinate_system_cast<BodyOrigin, void> (cartesian (p1_lonlat));
+
+				if constexpr (std::is_same<SetupMaterial, SynchronousSetupMaterial>())
+				{
+					auto p1_material = params.material;
+					setup_material (p1_material, p1_lonlat);
+					strip.emplace_back (p1_cartesian * params.radius, p1_material);
+
+					if (previous_strip)
+					{
+						// Reuse vertex calculated for the same point from the previous stack strip:
+						strip.push_back ((*previous_strip)[neutrino::to_unsigned (2 * i)]);
+					}
+					else
+					{
+						auto const p2_lonlat = si::LonLat { longitude, latitudes[0] }; // Lower latitude
+						auto const p2_cartesian = math::coordinate_system_cast<BodyOrigin, void> (cartesian (p2_lonlat));
+						auto p2_material = params.material;
+						setup_material (p2_material, p2_lonlat);
+						strip.emplace_back (p2_cartesian * params.radius, p2_material);
+					}
+				}
+				else if constexpr (std::is_same<SetupMaterial, AsynchronousSetupMaterial>())
+				{
+					// TODO
+				}
+				else
+				{
+					auto const p2_lonlat = si::LonLat { longitude, latitudes[0] }; // Lower latitude
+					auto const p2_cartesian = math::coordinate_system_cast<BodyOrigin, void> (cartesian (p2_lonlat));
+					strip.emplace_back (p1_cartesian * params.radius, params.material);
+					strip.emplace_back (p2_cartesian * params.radius, params.material);
+				}
+			}
+
+			previous_strip = &strip;
+		}
+
+		shape.for_all_vertices ([&params] (ShapeVertex& v) {
+			v.set_normal (v.position() / params.radius);
+		});
+
+		return shape;
+	}
 
 
 Shape
 make_centered_irregular_sphere_shape (IrregularSphereShapeParameters const& params)
 {
-	auto const n_slices = params.slice_angles.size();
-	auto const n_stacks = params.stack_angles.size();
-
-	if (n_slices < 3)
-		throw Exception ("IrregularSphereShapeParameters: must have at least 3 slices");
-
-	if (n_stacks < 2)
-		throw Exception ("IrregularSphereShapeParameters: must have at least 2 stacks");
-
-	Shape shape;
-	shape.triangle_strips().reserve (n_stacks);
-
-	for (auto const latitudes: params.stack_angles | std::views::slide (2))
+	if (auto const* const synchronous_setup_material = std::get_if<SynchronousSetupMaterial> (&params.setup_material))
 	{
-		Shape::TriangleStrip& strip = shape.triangle_strips().emplace_back();
-		strip.reserve (2 * (n_slices + 1));
-
-		for (auto const longitude: params.slice_angles)
-		{
-			// TODO Calls to cartesian() and setup_material() could be reused in the future for the same points of adjacent strips:
-			auto const p1 = math::coordinate_system_cast<BodyOrigin, void> (cartesian (si::LonLat { longitude, latitudes[1] }));
-			auto const p2 = math::coordinate_system_cast<BodyOrigin, void> (cartesian (si::LonLat { longitude, latitudes[0] }));
-
-			if (params.setup_material)
-			{
-				auto p1_material = params.material;
-				params.setup_material (p1_material, si::LonLat { longitude, latitudes[1] });
-				strip.emplace_back (p1 * params.radius, p1, p1_material);
-
-				auto p2_material = params.material;
-				params.setup_material (p2_material, si::LonLat { longitude, latitudes[0] });
-				strip.emplace_back (p2 * params.radius, p2, p2_material);
-			}
-			else
-			{
-				strip.emplace_back (p1 * params.radius, p1, params.material);
-				strip.emplace_back (p2 * params.radius, p2, params.material);
-			}
-		}
+		if (*synchronous_setup_material)
+			return make_centered_irregular_sphere_shape (params, *synchronous_setup_material);
+	}
+	else if (auto const* const asynchronous_setup_material = std::get_if<AsynchronousSetupMaterial> (&params.setup_material))
+	{
+		if (*asynchronous_setup_material)
+			return make_centered_irregular_sphere_shape (params, *asynchronous_setup_material);
 	}
 
-	shape.for_all_vertices ([&params] (ShapeVertex& v) {
-		v.set_normal (v.position() / params.radius);
-	});
-
-	return shape;
+	return make_centered_irregular_sphere_shape (params, std::monostate());
 }
 
 

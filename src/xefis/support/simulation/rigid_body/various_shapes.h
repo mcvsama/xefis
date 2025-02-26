@@ -26,13 +26,16 @@
 // Standard:
 #include <cstddef>
 #include <functional>
+#include <future>
 #include <span>
 
 
 namespace xf::rigid_body {
 
+using SynchronousSetupMaterial		= std::function<void (ShapeMaterial&, si::LonLat position)>;
+using AsynchronousSetupMaterial		= std::function<std::future<void> (ShapeMaterial&, si::LonLat position)>;
 // Called by make_centered_sphere_shape() to get material for vertices.
-using MakeSphereMaterialCallback = std::function<void (ShapeMaterial&, si::LonLat position)>;
+using MakeSphereMaterialCallback	= std::variant<std::monostate, SynchronousSetupMaterial, AsynchronousSetupMaterial>;
 
 
 enum RotationDirection
@@ -50,7 +53,7 @@ struct SphereShapeParameters
 	Range<si::Angle>			h_range			{ -180_deg, +180_deg };
 	Range<si::Angle>			v_range			{ -90_deg, +90_deg };
 	ShapeMaterial const&		material		{ };
-	MakeSphereMaterialCallback	setup_material	{ nullptr };
+	MakeSphereMaterialCallback	setup_material	{ std::monostate() };
 };
 
 
@@ -62,7 +65,7 @@ struct IrregularSphereShapeParameters
 	// Must be sorted:
 	std::span<si::Angle const>	stack_angles;
 	ShapeMaterial const&		material		{ };
-	MakeSphereMaterialCallback	setup_material	{ nullptr };
+	MakeSphereMaterialCallback	setup_material	{ std::monostate() };
 };
 
 
