@@ -706,7 +706,7 @@ RigidBodyPainter::paint (rigid_body::Constraint const& constraint)
 					_gl.rotate_y (alpha_beta[1] + 90_deg);
 
 					auto const shape = rigid_body::make_cylinder_shape ({
-						.length = 1_m * abs (diff / 1_m),
+						.length = abs (diff),
 						.radius = radius,
 						.num_faces = 16,
 						.with_bottom = front_back_faces,
