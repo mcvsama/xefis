@@ -34,6 +34,9 @@ class ShapeVertex
 {
   public:
 	// Ctor
+	ShapeVertex() = default;
+
+	// Ctor
 	ShapeVertex (std::initializer_list<si::Length> coordinates);
 
 	// Ctor
@@ -57,6 +60,20 @@ class ShapeVertex
 	 */
 	explicit
 	ShapeVertex (SpaceLength<BodyOrigin> const& position, SpaceVector<double, BodyOrigin> const& normal, ShapeMaterial const&);
+
+	// Copy ctor
+	ShapeVertex (ShapeVertex const&) = default;
+
+	// Move ctor
+	ShapeVertex (ShapeVertex&&) = default;
+
+	// Copy operator
+	ShapeVertex&
+	operator= (ShapeVertex const&) = default;
+
+	// Move operator
+	ShapeVertex&
+	operator= (ShapeVertex&&) = default;
 
 	/**
 	 * Return vertex position in space.
@@ -123,7 +140,7 @@ class ShapeVertex
         { _position += translation; }
 
   private:
-	SpaceLength<BodyOrigin>							_position;
+	SpaceLength<BodyOrigin>							_position	{ 0_m, 0_m, 0_m };
 	std::optional<SpaceVector<double, BodyOrigin>>	_normal;
 	ShapeMaterial									_material;
 };
