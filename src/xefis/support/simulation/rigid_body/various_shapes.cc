@@ -21,6 +21,7 @@
 
 // Neutrino:
 #include <neutrino/numeric.h>
+#include <neutrino/wait_group.h>
 
 // Standard:
 #include <algorithm>
@@ -107,10 +108,57 @@ make_cube_shape (xf::MassMomentsAtArm<BodyCOM> const& mm, ShapeMaterial const& m
 }
 
 
+/**
+ * Fill in missing vertex data on a sphere by copying shared vertices between adjacent triangle strips.
+ *
+ * In the sphere mesh, certain vertices (specifically, the odd-indexed ones in the upper triangle strip)
+ * are intentionally left uncomputed. This function iterates over each pair of adjacent triangle strips,
+ * and for every odd-indexed vertex in the upper strip, it copies the corresponding vertex from the lower strip.
+ * This ensures that the shared vertices between strips are consistent, which is important for correct mesh rendering.
+ *
+ * \param	shape
+ *			The Shape object containing the triangle strips that represent the sphere.
+ */
+void
+fill_in_uncomputed_points_on_sphere (Shape& shape)
+{
+	// Copy the vertices for shared points:
+	for (auto const strips: shape.triangle_strips() | std::views::slide (2))
+	{
+		auto const& lower = strips[0];
+		auto& upper = strips[1];
+
+		// Odd points are not calculated, need to be copied from the even points on the next strip.
+		for (std::size_t i = 1; i < lower.size(); i += 2)
+			upper[i] = lower[i - 1];
+	}
+}
+
+
+/**
+ * Compute and assign normalized normal vectors for each vertex of a sphere.
+ *
+ * \param	shape
+ *			The Shape object containing the sphere vertices.
+ * \param	radius
+ *			The radius of the sphere used to normalize the vertex positions.
+ */
+void
+set_sphere_normals (Shape& shape, si::Length radius)
+{
+	shape.for_all_vertices ([&] (ShapeVertex& v) {
+		v.set_normal (v.position() / radius);
+	});
+}
+
+
 template<class SetupMaterial>
 	Shape
 	make_centered_sphere_shape (SphereShapeParameters const& params, SetupMaterial const setup_material)
 	{
+		auto constexpr synchronous_setup_material = std::is_same<SetupMaterial, SynchronousSetupMaterial>();
+		auto constexpr asynchronous_setup_material = std::is_same<SetupMaterial, AsynchronousSetupMaterial>();
+
 		auto const n_slices = std::max<size_t> (params.slices, 3);
 		auto const n_stacks = std::max<size_t> (params.stacks, 2);
 
@@ -121,7 +169,6 @@ template<class SetupMaterial>
 		shape.triangle_strips().reserve (n_stacks);
 
 		si::Angle angle_v = params.v_range.min();
-		Shape::TriangleStrip* previous_strip = nullptr;
 
 		for (size_t iv = 0; iv < n_stacks; ++iv, angle_v += dv)
 		{
@@ -132,48 +179,42 @@ template<class SetupMaterial>
 			for (size_t ih = 0; ih < n_slices + 1; ++ih, angle_h += dh)
 			{
 				// TODO Optimize poles (setup_material is called multiple times for each pole)
-				auto const p1_lonlat = si::LonLat { angle_h, angle_v + dv }; // Higher latitude
-				auto const p1_cartesian = math::coordinate_system_cast<BodyOrigin, void> (cartesian (p1_lonlat));
+				auto const upper_lonlat = si::LonLat { angle_h, angle_v + dv }; // Higher latitude
+				auto const upper_cartesian = math::coordinate_system_cast<BodyOrigin, void> (cartesian (upper_lonlat));
 
-				if constexpr (std::is_same<SetupMaterial, SynchronousSetupMaterial>())
+				if constexpr (synchronous_setup_material || !asynchronous_setup_material)
 				{
-					auto p1_material = params.material;
-					setup_material (p1_material, p1_lonlat);
-					strip.emplace_back (p1_cartesian * params.radius, p1_material);
+					auto upper_material = params.material;
 
-					if (previous_strip)
+					if constexpr (synchronous_setup_material)
+						setup_material (upper_material, upper_lonlat);
+
+					strip.emplace_back (upper_cartesian * params.radius, upper_material);
+
+					if (iv == 0)
 					{
-						// Reuse vertex calculated for the same point from the previous stack strip:
-						strip.push_back ((*previous_strip)[2 * ih]);
+						auto const lower_lonlat = si::LonLat { angle_h, angle_v }; // Lower latitude
+						auto const lower_cartesian = math::coordinate_system_cast<BodyOrigin, void> (cartesian (lower_lonlat));
+						auto lower_material = params.material;
+
+						if constexpr (synchronous_setup_material)
+							setup_material (lower_material, lower_lonlat);
+
+						strip.emplace_back (lower_cartesian * params.radius, lower_material);
 					}
 					else
-					{
-						auto const p2_lonlat = si::LonLat { angle_h, angle_v }; // Lower latitude
-						auto const p2_cartesian = math::coordinate_system_cast<BodyOrigin, void> (cartesian (p2_lonlat));
-						auto p2_material = params.material;
-						setup_material (p2_material, p2_lonlat);
-						strip.emplace_back (p2_cartesian * params.radius, p2_material);
-					}
-				}
-				else if constexpr (std::is_same<SetupMaterial, AsynchronousSetupMaterial>())
-				{
-					// TODO
+						strip.emplace_back(); // This point will be calculated in fill_in_uncomputed_points_on_sphere().
 				}
 				else
 				{
-					auto const p2_lonlat = si::LonLat { angle_h, angle_v }; // Lower latitude
-					auto const p2_cartesian = math::coordinate_system_cast<BodyOrigin, void> (cartesian (p2_lonlat));
-					strip.emplace_back (p1_cartesian * params.radius, params.material);
-					strip.emplace_back (p2_cartesian * params.radius, params.material);
+					static_assert (asynchronous_setup_material);
+					// TODO
 				}
 			}
-
-			previous_strip = &strip;
 		}
 
-		shape.for_all_vertices ([&params] (ShapeVertex& v) {
-			v.set_normal (v.position() / params.radius);
-		});
+		fill_in_uncomputed_points_on_sphere (shape);
+		set_sphere_normals (shape, params.radius);
 
 		return shape;
 	}
@@ -201,6 +242,9 @@ template<class SetupMaterial>
 	Shape
 	make_centered_irregular_sphere_shape (IrregularSphereShapeParameters const& params, SetupMaterial const setup_material)
 	{
+		auto constexpr synchronous_setup_material = std::is_same<SetupMaterial, SynchronousSetupMaterial>();
+		auto constexpr asynchronous_setup_material = std::is_same<SetupMaterial, AsynchronousSetupMaterial>();
+
 		auto const n_slices = params.slice_angles.size();
 		auto const n_stacks = params.stack_angles.size();
 
@@ -213,14 +257,12 @@ template<class SetupMaterial>
 		Shape shape;
 		shape.triangle_strips().reserve (n_stacks);
 
-		auto constexpr using_asynchronous_setup_material = std::is_same<SetupMaterial, AsynchronousSetupMaterial>();
-		[[maybe_unused]] auto futures = std::conditional_t<using_asynchronous_setup_material, std::vector<std::future<void>>, std::monostate>();
+		[[maybe_unused]] auto all_materials_set_up = std::conditional_t<asynchronous_setup_material, neutrino::WaitGroup, std::monostate>();
 
-		if constexpr (using_asynchronous_setup_material)
-			futures.reserve (n_stacks * (2 * (n_slices + 1)));
-
-		Shape::TriangleStrip* previous_strip = nullptr;
-
+		auto first_strip = true;
+		// First, calculate only the lower-latitude points for each stack.
+		// The top ones are shared, so we'll just copy them later. This way
+		// we'll avoid calling setup_material() twice for the same points.
 		for (auto const latitudes: params.stack_angles | std::views::slide (2))
 		{
 			Shape::TriangleStrip& strip = shape.triangle_strips().emplace_back();
@@ -229,48 +271,50 @@ template<class SetupMaterial>
 			for (auto const [i, longitude]: std::views::enumerate (params.slice_angles))
 			{
 				// TODO Optimize poles (setup_material is called multiple times for each pole)
-				auto const p1_lonlat = si::LonLat { longitude, latitudes[1] }; // Higher latitude
-				auto const p1_cartesian = math::coordinate_system_cast<BodyOrigin, void> (cartesian (p1_lonlat));
+				// Higher latitude point:
+				auto const upper_lonlat = si::LonLat { longitude, latitudes[1] };
+				auto const upper_cartesian = math::coordinate_system_cast<BodyOrigin, void> (cartesian (upper_lonlat));
 
-				if constexpr (std::is_same<SetupMaterial, SynchronousSetupMaterial>())
+				if constexpr (synchronous_setup_material || !asynchronous_setup_material)
 				{
-					auto p1_material = params.material;
-					setup_material (p1_material, p1_lonlat);
-					strip.emplace_back (p1_cartesian * params.radius, p1_material);
+					auto upper_material = params.material;
 
-					if (previous_strip)
+					if constexpr (synchronous_setup_material)
+						setup_material (upper_material, upper_lonlat);
+
+					strip.emplace_back (upper_cartesian * params.radius, upper_material);
+
+					if (first_strip)
 					{
-						// Reuse vertex calculated for the same point from the previous stack strip:
-						strip.push_back ((*previous_strip)[neutrino::to_unsigned (2 * i)]);
+						// First strip has both lower and upper points.
+						auto const lower_lonlat = si::LonLat { longitude, latitudes[0] }; // Lower latitude
+						auto const lower_cartesian = math::coordinate_system_cast<BodyOrigin, void> (cartesian (lower_lonlat));
+						auto lower_material = params.material;
+
+						if constexpr (synchronous_setup_material)
+							setup_material (lower_material, lower_lonlat);
+
+						strip.emplace_back (lower_cartesian * params.radius, lower_material);
 					}
 					else
-					{
-						auto const p2_lonlat = si::LonLat { longitude, latitudes[0] }; // Lower latitude
-						auto const p2_cartesian = math::coordinate_system_cast<BodyOrigin, void> (cartesian (p2_lonlat));
-						auto p2_material = params.material;
-						setup_material (p2_material, p2_lonlat);
-						strip.emplace_back (p2_cartesian * params.radius, p2_material);
-					}
-				}
-				else if constexpr (std::is_same<SetupMaterial, AsynchronousSetupMaterial>())
-				{
-					// TODO
+						strip.emplace_back(); // This point will be calculated in fill_in_uncomputed_points_on_sphere().
 				}
 				else
 				{
-					auto const p2_lonlat = si::LonLat { longitude, latitudes[0] }; // Lower latitude
-					auto const p2_cartesian = math::coordinate_system_cast<BodyOrigin, void> (cartesian (p2_lonlat));
-					strip.emplace_back (p1_cartesian * params.radius, params.material);
-					strip.emplace_back (p2_cartesian * params.radius, params.material);
+					static_assert (asynchronous_setup_material);
+					// TODO
 				}
 			}
 
-			previous_strip = &strip;
+			first_strip = false;
 		}
 
-		shape.for_all_vertices ([&params] (ShapeVertex& v) {
-			v.set_normal (v.position() / params.radius);
-		});
+		// Wait until all setup_material() callbacks finish:
+		if constexpr (asynchronous_setup_material)
+			all_materials_set_up.wait();
+
+		fill_in_uncomputed_points_on_sphere (shape);
+		set_sphere_normals (shape, params.radius);
 
 		return shape;
 	}

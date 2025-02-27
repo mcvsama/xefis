@@ -23,6 +23,9 @@
 #include <xefis/support/simulation/rigid_body/shape_material.h>
 #include <xefis/support/simulation/rigid_body/various_materials.h>
 
+// Neutrino:
+#include <neutrino/wait_group.h>
+
 // Standard:
 #include <cstddef>
 #include <functional>
@@ -33,7 +36,7 @@
 namespace xf::rigid_body {
 
 using SynchronousSetupMaterial		= std::function<void (ShapeMaterial&, si::LonLat position)>;
-using AsynchronousSetupMaterial		= std::function<std::future<void> (ShapeMaterial&, si::LonLat position)>;
+using AsynchronousSetupMaterial		= std::function<void (ShapeMaterial&, si::LonLat position, WaitGroup::WorkToken&&)>;
 // Called by make_centered_sphere_shape() to get material for vertices.
 using MakeSphereMaterialCallback	= std::variant<std::monostate, SynchronousSetupMaterial, AsynchronousSetupMaterial>;
 
