@@ -16,6 +16,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/support/color/spaces.h>
 #include <xefis/support/earth/air/atmospheric_scattering.h>
 #include <xefis/support/math/rotations.h>
 #include <xefis/support/nature/constants.h>
@@ -931,8 +932,8 @@ RigidBodyPainter::draw_arrow (SpaceLength<WorldSpace> const& origin, SpaceLength
 }
 
 
-SpaceVector<double>
-RigidBodyPainter::tonemap_sky (SpaceVector<double> rgb) const
+SpaceVector<float, RGBSpace>
+RigidBodyPainter::tonemap_sky (SpaceVector<float, RGBSpace> rgb) const
 {
 	auto constexpr altitude_threshold = 4_deg;
 	auto constexpr reduce_green_to = 0.8;

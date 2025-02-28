@@ -240,6 +240,7 @@ MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/color/blackbody
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/color/blackbody.h
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/color/cie_1931.cc
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/color/cie_1931.h
+MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/color/spaces.h
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/control/pid_controller.h
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/core/single_loop_machine.cc
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/core/single_loop_machine.h

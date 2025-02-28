@@ -16,6 +16,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/support/color/spaces.h>
 
 // Qt:
 #include <QColor>
@@ -149,7 +150,7 @@ to_gl_color (QColor const& color)
 template<std::floating_point Float>
 	[[nodiscard]]
 	constexpr GLColor
-	to_gl_color (math::Vector<Float, 3> const& rgb_color)
+	to_gl_color (math::Vector<Float, 3, RGBSpace> const& rgb_color)
 	{
 		return GLColor (rgb_color[0], rgb_color[1], rgb_color[2], 1.0f);
 	}
@@ -158,7 +159,7 @@ template<std::floating_point Float>
 template<std::floating_point Float>
 	[[nodiscard]]
 	constexpr GLColor
-	to_gl_color (math::Vector<Float, 4> const& rgb_color)
+	to_gl_color (math::Vector<Float, 4, RGBSpace> const& rgb_color)
 	{
 		return GLColor (rgb_color[0], rgb_color[1], rgb_color[2], rgb_color[3]);
 	}

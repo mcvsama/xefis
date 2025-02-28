@@ -53,7 +53,7 @@ AtmosphericScattering::AtmosphericScattering (Parameters const& parameters):
 
 
 [[nodiscard]]
-SpaceVector<double>
+SpaceVector<float, RGBSpace>
 AtmosphericScattering::calculate_incident_light (SpaceLength<> const& observer_position,
 												 SpaceVector<double> const& ray_direction,
 												 SpaceVector<double> const& sun_direction,
@@ -140,7 +140,9 @@ AtmosphericScattering::calculate_incident_light (SpaceLength<> const& observer_p
 
 		auto const rayleigh_result = _rayleigh_factor * hadamard_product (contribution.r, kRayleighBeta) * phase.r;
 		auto const mie_result = _mie_factor * hadamard_product (contribution.m, kMieBeta) * phase.m;
-		return kIncidentLightScale * (rayleigh_result + mie_result);
+		auto const result = kIncidentLightScale * (rayleigh_result + mie_result);
+
+		return SpaceVector<float, RGBSpace> { result[0], result[1], result[2] };
 	}
 }
 

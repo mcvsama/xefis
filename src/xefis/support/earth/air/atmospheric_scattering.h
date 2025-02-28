@@ -16,6 +16,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/support/color/spaces.h>
 #include <xefis/support/math/geometry_types.h>
 #include <xefis/support/nature/constants.h>
 
@@ -87,7 +88,7 @@ class AtmosphericScattering
 	 *			The maximum distance along the ray where the calculation ends. It’s also adjusted based on where the ray exits the atmospheric sphere.
 	 */
 	[[nodiscard]]
-    SpaceVector<double>
+    SpaceVector<float, RGBSpace>
 	calculate_incident_light (
 		SpaceLength<> const& observer_position,
 		SpaceVector<double> const& ray_direction,
@@ -97,20 +98,20 @@ class AtmosphericScattering
 	) const;
 
 	[[nodiscard]]
-	static constexpr double
-	reinhard_tonemap (double value);
+	static constexpr float
+	reinhard_tonemap (float value);
 
 	[[nodiscard]]
-	static constexpr double
-	tonemap (double value);
+	static constexpr float
+	tonemap (float value);
 
 	[[nodiscard]]
-	static constexpr SpaceVector<double>
-	tonemap (SpaceVector<double> input);
+	static constexpr SpaceVector<float, RGBSpace>
+	tonemap (SpaceVector<float, RGBSpace> input);
 
 	[[nodiscard]]
-	static constexpr SpaceVector<double>
-	tonemap_separately (SpaceVector<double> input);
+	static constexpr SpaceVector<float, RGBSpace>
+	tonemap_separately (SpaceVector<float, RGBSpace> input);
 
   private:
 	/**
@@ -144,8 +145,8 @@ class AtmosphericScattering
 };
 
 
-constexpr double
-AtmosphericScattering::reinhard_tonemap (double value)
+constexpr float
+AtmosphericScattering::reinhard_tonemap (float value)
 {
 	// The Reinhard operator compresses high dynamic range values
 	// by mapping value to value / (1.0 + value), which approaches 1 as value increases:
@@ -153,8 +154,8 @@ AtmosphericScattering::reinhard_tonemap (double value)
 }
 
 
-constexpr double
-AtmosphericScattering::tonemap (double value)
+constexpr float
+AtmosphericScattering::tonemap (float value)
 {
 	// If the channel's value is below a threshold (1.413), apply gamma correction;
 	// otherwise, use an exponential curve to compress high values:
@@ -165,23 +166,23 @@ AtmosphericScattering::tonemap (double value)
 }
 
 
-constexpr SpaceVector<double>
-AtmosphericScattering::tonemap (SpaceVector<double> input)
+constexpr SpaceVector<float, RGBSpace>
+AtmosphericScattering::tonemap (SpaceVector<float, RGBSpace> input)
 {
 	// Compute luminance using Rec.709 weights:
-	auto const luminance = 0.2126 * input[0] + 0.7152 * input[1] + 0.0722 * input[2];
+	auto const luminance = 0.2126f * input[0] + 0.7152f * input[1] + 0.0722f * input[2];
 	auto const mapped_luminance = tonemap (luminance);
 
 	// Avoid division by zero:
-	if (luminance > 0.0)
+	if (luminance > 0.0f)
 		return input * (mapped_luminance / luminance);
 	else
 		return input;
 }
 
 
-constexpr SpaceVector<double>
-AtmosphericScattering::tonemap_separately (SpaceVector<double> input)
+constexpr SpaceVector<float, RGBSpace>
+AtmosphericScattering::tonemap_separately (SpaceVector<float, RGBSpace> input)
 {
 	// Apply tone mapping function to each color channel:
 	for (auto& v: input.array())

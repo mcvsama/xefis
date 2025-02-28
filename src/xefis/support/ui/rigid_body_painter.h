@@ -16,6 +16,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/support/color/spaces.h>
 #include <xefis/support/earth/air/atmospheric_scattering.h>
 #include <xefis/support/math/rotations.h>
 #include <xefis/support/simulation/rigid_body/system.h>
@@ -519,8 +520,8 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	draw_arrow (SpaceLength<WorldSpace> const& origin, SpaceLength<WorldSpace> const& vector, rigid_body::ShapeMaterial const& material = {});
 
 	[[nodiscard]]
-	SpaceVector<double>
-	tonemap_sky (SpaceVector<double> rgb) const;
+	SpaceVector<float, RGBSpace>
+	tonemap_sky (SpaceVector<float, RGBSpace> rgb) const;
 
 	[[nodiscard]]
 	SpaceLength<WorldSpace>
