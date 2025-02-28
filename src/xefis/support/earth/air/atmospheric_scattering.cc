@@ -41,14 +41,7 @@ template<class Value>
 
 
 AtmosphericScattering::AtmosphericScattering (Parameters const& parameters):
-	_earth_radius (parameters.earth_radius),
-	_atmosphere_radius (parameters.atmosphere_radius),
-	_rayleigh_threshold (parameters.rayleigh_threshold),
-	_mie_threshold (parameters.mie_threshold),
-	_rayleigh_factor (parameters.rayleigh_factor),
-	_mie_factor (parameters.mie_factor),
-	_num_viewing_direction_samples (parameters.num_viewing_direction_samples),
-	_num_light_direction_samples (parameters.num_light_direction_samples)
+	_p (parameters)
 { }
 
 
@@ -60,7 +53,7 @@ AtmosphericScattering::calculate_incident_light (SpaceLength<> const& observer_p
 												 si::Length min_distance,
 												 si::Length max_distance) const
 {
-	auto intersections = ray_sphere_intersections (observer_position, ray_direction, _atmosphere_radius);
+	auto intersections = ray_sphere_intersections (observer_position, ray_direction, _p.atmosphere_radius);
 
 	if (!intersections || intersections->second < 0_m)
 		return math::zero;
@@ -77,7 +70,7 @@ AtmosphericScattering::calculate_incident_light (SpaceLength<> const& observer_p
 		if (far < max_distance)
 			max_distance = far;
 
-		si::Length sky_segment_length = (max_distance - min_distance) / _num_viewing_direction_samples;
+		si::Length sky_segment_length = (max_distance - min_distance) / _p.num_viewing_direction_samples;
 		si::Length sky_current_distance = min_distance;
 
 		auto const g = 0.76;
@@ -91,41 +84,41 @@ AtmosphericScattering::calculate_incident_light (SpaceLength<> const& observer_p
 		auto sky_optical_depth = RayleighMie { 0.0_m, 0.0_m };
 
 		// Take multiple samples from the observer_position to the upper limit of the atmosphere:
-		for (uint32_t i = 0; i < _num_viewing_direction_samples; ++i)
+		for (uint32_t i = 0; i < _p.num_viewing_direction_samples; ++i)
 		{
 			auto const sky_sample_position = observer_position + (sky_current_distance + sky_segment_length * 0.5f) * ray_direction;
-			auto const light_intersections = ray_sphere_intersections (sky_sample_position, sun_direction, _atmosphere_radius);
+			auto const light_intersections = ray_sphere_intersections (sky_sample_position, sun_direction, _p.atmosphere_radius);
 
 			if (light_intersections)
 			{
-				auto const sky_sample_height = sky_sample_position.norm() - _earth_radius;
-				auto const hr = std::exp (-sky_sample_height / _rayleigh_threshold) * sky_segment_length;
-				auto const hm = std::exp (-sky_sample_height / _mie_threshold) * sky_segment_length;
+				auto const sky_sample_height = sky_sample_position.norm() - _p.earth_radius;
+				auto const hr = std::exp (-sky_sample_height / _p.rayleigh_threshold) * sky_segment_length;
+				auto const hm = std::exp (-sky_sample_height / _p.mie_threshold) * sky_segment_length;
 				sky_optical_depth.r += hr;
 				sky_optical_depth.m += hm;
 
 				auto const [light_near_intersection, light_far_intersection] = *light_intersections;
-				si::Length const light_segment_length = light_far_intersection / _num_light_direction_samples;
+				si::Length const light_segment_length = light_far_intersection / _p.num_light_direction_samples;
 				auto light_current_distance = 0_m;
 				auto light_optical_depth = RayleighMie { 0.0_m, 0.0_m };
 				auto light_samples_taken = 0u;
 
 				// At each atmospheric sampling point, calculate light reflected towards the observer by going in the direction
 				// of light source and taking multiple samples until the top of the atmosphere:
-				for (; light_samples_taken < _num_light_direction_samples; ++light_samples_taken)
+				for (; light_samples_taken < _p.num_light_direction_samples; ++light_samples_taken)
 				{
 					auto const light_sample_position = sky_sample_position + (light_current_distance + light_segment_length * 0.5f) * sun_direction;
-					auto const light_height = light_sample_position.norm() - _earth_radius;
+					auto const light_height = light_sample_position.norm() - _p.earth_radius;
 
 					if (light_height < 0_m)
 						break;
 
-					light_optical_depth.r += std::exp (-light_height / _rayleigh_threshold) * light_segment_length;
-					light_optical_depth.m += std::exp (-light_height / _mie_threshold) * light_segment_length;
+					light_optical_depth.r += std::exp (-light_height / _p.rayleigh_threshold) * light_segment_length;
+					light_optical_depth.m += std::exp (-light_height / _p.mie_threshold) * light_segment_length;
 					light_current_distance += light_segment_length;
 				}
 
-				if (light_samples_taken == _num_light_direction_samples)
+				if (light_samples_taken == _p.num_light_direction_samples)
 				{
 					SpaceVector<si::Length> tau = kRayleighBeta * (sky_optical_depth.r + light_optical_depth.r) + kMieBeta * 1.1f * (sky_optical_depth.m + light_optical_depth.m);
 					SpaceVector<double> const tau_float = tau / 1_m;
@@ -138,8 +131,8 @@ AtmosphericScattering::calculate_incident_light (SpaceLength<> const& observer_p
 			}
 		}
 
-		auto const rayleigh_result = _rayleigh_factor * hadamard_product (contribution.r, kRayleighBeta) * phase.r;
-		auto const mie_result = _mie_factor * hadamard_product (contribution.m, kMieBeta) * phase.m;
+		auto const rayleigh_result = _p.rayleigh_factor * hadamard_product (contribution.r, kRayleighBeta) * phase.r;
+		auto const mie_result = _p.mie_factor * hadamard_product (contribution.m, kMieBeta) * phase.m;
 		auto const result = kIncidentLightScale * (rayleigh_result + mie_result);
 
 		return SpaceVector<float, RGBSpace> { result[0], result[1], result[2] };
