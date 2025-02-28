@@ -109,6 +109,14 @@ class ShapeVertex
 	 * Shape material.
 	 */
 	[[nodiscard]]
+	ShapeMaterial&
+	material() noexcept
+		{ return _material; }
+
+	/**
+	 * Shape material.
+	 */
+	[[nodiscard]]
 	ShapeMaterial const&
 	material() const noexcept
 		{ return _material; }

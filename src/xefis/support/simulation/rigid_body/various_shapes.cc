@@ -158,6 +158,7 @@ template<class SetupMaterial>
 	{
 		auto constexpr synchronous_setup_material = std::is_same<SetupMaterial, SynchronousSetupMaterial>();
 		auto constexpr asynchronous_setup_material = std::is_same<SetupMaterial, AsynchronousSetupMaterial>();
+		auto constexpr future_based_setup_material = std::is_same<SetupMaterial, FutureBasedSetupMaterial>();
 
 		auto const n_slices = std::max<size_t> (params.slices, 3);
 		auto const n_stacks = std::max<size_t> (params.stacks, 2);
@@ -168,50 +169,53 @@ template<class SetupMaterial>
 		Shape shape;
 		shape.triangle_strips().reserve (n_stacks);
 
+		[[maybe_unused]] auto all_materials_set_up = std::conditional_t<asynchronous_setup_material, neutrino::WaitGroup, std::monostate>();
+		[[maybe_unused]] auto all_setup_material_futures = std::conditional_t<future_based_setup_material, std::vector<std::future<void>>, std::monostate>();
+
+		if constexpr (future_based_setup_material)
+		{
+			// +1 because first stack has both lower and upper points computed:
+			all_setup_material_futures.reserve ((params.stacks + 1) * (params.slices + 1));
+		}
+
 		si::Angle angle_v = params.v_range.min();
 
+		// TODO Optimize poles (setup_material is called multiple times for each pole)
 		for (size_t iv = 0; iv < n_stacks; ++iv, angle_v += dv)
 		{
 			Shape::TriangleStrip& strip = shape.triangle_strips().emplace_back();
 			strip.reserve (2 * (n_slices + 1));
 			si::Angle angle_h = params.h_range.min();
 
+			auto const add_vertex = [&] (si::LonLat const lonlat) {
+				auto const cartesian_position = math::coordinate_system_cast<BodyOrigin, void> (cartesian (lonlat));
+				auto& vertex = strip.emplace_back (cartesian_position * params.radius, params.material);
+
+				if constexpr (synchronous_setup_material)
+					setup_material (vertex.material(), lonlat);
+				else if constexpr (asynchronous_setup_material)
+					setup_material (vertex.material(), lonlat, all_materials_set_up.make_work_token());
+				else if constexpr (future_based_setup_material)
+					all_setup_material_futures.push_back (setup_material (vertex.material(), lonlat));
+			};
+
 			for (size_t ih = 0; ih < n_slices + 1; ++ih, angle_h += dh)
 			{
-				// TODO Optimize poles (setup_material is called multiple times for each pole)
-				auto const upper_lonlat = si::LonLat { angle_h, angle_v + dv }; // Higher latitude
-				auto const upper_cartesian = math::coordinate_system_cast<BodyOrigin, void> (cartesian (upper_lonlat));
+				add_vertex ({ angle_h, angle_v + dv });
 
-				if constexpr (synchronous_setup_material || !asynchronous_setup_material)
-				{
-					auto upper_material = params.material;
-
-					if constexpr (synchronous_setup_material)
-						setup_material (upper_material, upper_lonlat);
-
-					strip.emplace_back (upper_cartesian * params.radius, upper_material);
-
-					if (iv == 0)
-					{
-						auto const lower_lonlat = si::LonLat { angle_h, angle_v }; // Lower latitude
-						auto const lower_cartesian = math::coordinate_system_cast<BodyOrigin, void> (cartesian (lower_lonlat));
-						auto lower_material = params.material;
-
-						if constexpr (synchronous_setup_material)
-							setup_material (lower_material, lower_lonlat);
-
-						strip.emplace_back (lower_cartesian * params.radius, lower_material);
-					}
-					else
-						strip.emplace_back(); // This point will be calculated in fill_in_uncomputed_points_on_sphere().
-				}
+				if (iv == 0)
+					add_vertex ({ angle_h, angle_v });
 				else
-				{
-					static_assert (asynchronous_setup_material);
-					// TODO
-				}
+					strip.emplace_back(); // This point will be calculated in fill_in_uncomputed_points_on_sphere().
 			}
 		}
+
+		// Wait until all setup_material() callbacks finish:
+		if constexpr (asynchronous_setup_material)
+			all_materials_set_up.wait();
+		else if constexpr (future_based_setup_material)
+			for (auto& future: all_setup_material_futures)
+				future.get();
 
 		fill_in_uncomputed_points_on_sphere (shape);
 		set_sphere_normals (shape, params.radius);
@@ -244,6 +248,7 @@ template<class SetupMaterial>
 	{
 		auto constexpr synchronous_setup_material = std::is_same<SetupMaterial, SynchronousSetupMaterial>();
 		auto constexpr asynchronous_setup_material = std::is_same<SetupMaterial, AsynchronousSetupMaterial>();
+		auto constexpr future_based_setup_material = std::is_same<SetupMaterial, FutureBasedSetupMaterial>();
 
 		auto const n_slices = params.slice_angles.size();
 		auto const n_stacks = params.stack_angles.size();
@@ -258,52 +263,44 @@ template<class SetupMaterial>
 		shape.triangle_strips().reserve (n_stacks);
 
 		[[maybe_unused]] auto all_materials_set_up = std::conditional_t<asynchronous_setup_material, neutrino::WaitGroup, std::monostate>();
+		[[maybe_unused]] auto all_setup_material_futures = std::conditional_t<future_based_setup_material, std::vector<std::future<void>>, std::monostate>();
+
+		if constexpr (future_based_setup_material)
+		{
+			// +1 because first stack has both lower and upper points computed:
+			all_setup_material_futures.reserve ((params.stack_angles.size() + 1) * params.slice_angles.size());
+		}
 
 		auto first_strip = true;
 		// First, calculate only the lower-latitude points for each stack.
 		// The top ones are shared, so we'll just copy them later. This way
 		// we'll avoid calling setup_material() twice for the same points.
+		// TODO Optimize poles (setup_material is called multiple times for each pole)
 		for (auto const latitudes: params.stack_angles | std::views::slide (2))
 		{
 			Shape::TriangleStrip& strip = shape.triangle_strips().emplace_back();
-			strip.reserve (2 * (n_slices + 1));
+			strip.reserve (2 * n_slices);
 
-			for (auto const [i, longitude]: std::views::enumerate (params.slice_angles))
+			auto const add_vertex = [&] (si::LonLat const lonlat) {
+				auto const cartesian_position = math::coordinate_system_cast<BodyOrigin, void> (cartesian (lonlat));
+				auto& vertex = strip.emplace_back (cartesian_position * params.radius, params.material);
+
+				if constexpr (synchronous_setup_material)
+					setup_material (vertex.material(), lonlat);
+				else if constexpr (asynchronous_setup_material)
+					setup_material (vertex.material(), lonlat, all_materials_set_up.make_work_token());
+				else if constexpr (future_based_setup_material)
+					all_setup_material_futures.push_back (setup_material (vertex.material(), lonlat));
+			};
+
+			for (auto const longitude: params.slice_angles)
 			{
-				// TODO Optimize poles (setup_material is called multiple times for each pole)
-				// Higher latitude point:
-				auto const upper_lonlat = si::LonLat { longitude, latitudes[1] };
-				auto const upper_cartesian = math::coordinate_system_cast<BodyOrigin, void> (cartesian (upper_lonlat));
+				add_vertex ({ longitude, latitudes[1] });
 
-				if constexpr (synchronous_setup_material || !asynchronous_setup_material)
-				{
-					auto upper_material = params.material;
-
-					if constexpr (synchronous_setup_material)
-						setup_material (upper_material, upper_lonlat);
-
-					strip.emplace_back (upper_cartesian * params.radius, upper_material);
-
-					if (first_strip)
-					{
-						// First strip has both lower and upper points.
-						auto const lower_lonlat = si::LonLat { longitude, latitudes[0] }; // Lower latitude
-						auto const lower_cartesian = math::coordinate_system_cast<BodyOrigin, void> (cartesian (lower_lonlat));
-						auto lower_material = params.material;
-
-						if constexpr (synchronous_setup_material)
-							setup_material (lower_material, lower_lonlat);
-
-						strip.emplace_back (lower_cartesian * params.radius, lower_material);
-					}
-					else
-						strip.emplace_back(); // This point will be calculated in fill_in_uncomputed_points_on_sphere().
-				}
+				if (first_strip)
+					add_vertex ({ longitude, latitudes[0] });
 				else
-				{
-					static_assert (asynchronous_setup_material);
-					// TODO
-				}
+					strip.emplace_back(); // This point will be calculated in fill_in_uncomputed_points_on_sphere().
 			}
 
 			first_strip = false;
@@ -312,6 +309,9 @@ template<class SetupMaterial>
 		// Wait until all setup_material() callbacks finish:
 		if constexpr (asynchronous_setup_material)
 			all_materials_set_up.wait();
+		else if constexpr (future_based_setup_material)
+			for (auto& future: all_setup_material_futures)
+				future.get();
 
 		fill_in_uncomputed_points_on_sphere (shape);
 		set_sphere_normals (shape, params.radius);

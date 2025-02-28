@@ -413,7 +413,7 @@ RigidBodyPainter::paint_planet()
 				.slice_angles = _sky_slices,
 				.stack_angles = _sky_stacks,
 				.material = sky_material,
-				.setup_material = [&, this] (rigid_body::ShapeMaterial& material, si::LonLat const sphere_position) {
+				.setup_material = [&, this] (rigid_body::ShapeMaterial& material, si::LonLat const sphere_position, WaitGroup::WorkToken&&) {
 					auto const color = _atmospheric_scattering.calculate_incident_light (
 						{ 0_m, 0_m, _position_on_earth.radius() },
 						cartesian<void> (sphere_position),
