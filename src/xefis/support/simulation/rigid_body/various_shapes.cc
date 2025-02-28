@@ -227,15 +227,20 @@ template<class SetupMaterial>
 Shape
 make_centered_sphere_shape (SphereShapeParameters const& params)
 {
-	if (auto const* const synchronous_setup_material = std::get_if<SynchronousSetupMaterial> (&params.setup_material))
+	if (auto const* const callback = std::get_if<SynchronousSetupMaterial> (&params.setup_material))
 	{
-		if (*synchronous_setup_material)
-			return make_centered_sphere_shape (params, *synchronous_setup_material);
+		if (*callback)
+			return make_centered_sphere_shape (params, *callback);
 	}
-	else if (auto const* const asynchronous_setup_material = std::get_if<AsynchronousSetupMaterial> (&params.setup_material))
+	else if (auto const* const callback = std::get_if<AsynchronousSetupMaterial> (&params.setup_material))
 	{
-		if (*asynchronous_setup_material)
-			return make_centered_sphere_shape (params, *asynchronous_setup_material);
+		if (*callback)
+			return make_centered_sphere_shape (params, *callback);
+	}
+	else if (auto const* const callback = std::get_if<FutureBasedSetupMaterial> (&params.setup_material))
+	{
+		if (*callback)
+			return make_centered_sphere_shape (params, *callback);
 	}
 
 	return make_centered_sphere_shape (params, std::monostate());
@@ -323,15 +328,20 @@ template<class SetupMaterial>
 Shape
 make_centered_irregular_sphere_shape (IrregularSphereShapeParameters const& params)
 {
-	if (auto const* const synchronous_setup_material = std::get_if<SynchronousSetupMaterial> (&params.setup_material))
+	if (auto const* const callback = std::get_if<SynchronousSetupMaterial> (&params.setup_material))
 	{
-		if (*synchronous_setup_material)
-			return make_centered_irregular_sphere_shape (params, *synchronous_setup_material);
+		if (*callback)
+			return make_centered_irregular_sphere_shape (params, *callback);
 	}
-	else if (auto const* const asynchronous_setup_material = std::get_if<AsynchronousSetupMaterial> (&params.setup_material))
+	else if (auto const* const callback = std::get_if<AsynchronousSetupMaterial> (&params.setup_material))
 	{
-		if (*asynchronous_setup_material)
-			return make_centered_irregular_sphere_shape (params, *asynchronous_setup_material);
+		if (*callback)
+			return make_centered_irregular_sphere_shape (params, *callback);
+	}
+	else if (auto const* const callback = std::get_if<FutureBasedSetupMaterial> (&params.setup_material))
+	{
+		if (*callback)
+			return make_centered_irregular_sphere_shape (params, *callback);
 	}
 
 	return make_centered_irregular_sphere_shape (params, std::monostate());

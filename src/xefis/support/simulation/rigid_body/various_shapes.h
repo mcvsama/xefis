@@ -37,7 +37,7 @@ namespace xf::rigid_body {
 
 using SynchronousSetupMaterial		= std::function<void (ShapeMaterial&, si::LonLat position)>;
 using AsynchronousSetupMaterial		= std::function<void (ShapeMaterial&, si::LonLat position, WaitGroup::WorkToken&&)>;
-using FutureBasedSetupMaterial		= std::function<std::future<void> (ShapeMaterial&, si::LonLat position)>;
+using FutureBasedSetupMaterial		= std::function<std::future<void> (ShapeMaterial&, si::LonLat position)>; // In C++23 this requires explicit std::function() creation
 // Called by make_centered_sphere_shape() to get material for vertices.
 using MakeSphereMaterialCallback	= std::variant<std::monostate, SynchronousSetupMaterial, AsynchronousSetupMaterial, FutureBasedSetupMaterial>;
 
