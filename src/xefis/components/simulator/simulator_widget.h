@@ -37,6 +37,7 @@
 // Standard:
 #include <cstddef>
 #include <optional>
+#include <thread>
 
 
 namespace xf {
@@ -108,8 +109,10 @@ class SimulatorWidget: public QWidget
 	update_rigid_body_viewer_time();
 
   private:
+	Logger							_logger;
 	Machine*						_machine					{ nullptr };
 	Simulator&						_simulator;
+	neutrino::WorkPerformer			_graphics_work_performer	{ std::thread::hardware_concurrency(), _logger.with_context ("graphics work performer") };
 	std::optional<RigidBodyViewer>	_rigid_body_viewer;
 	// Warning: QStackedWidget deletes widgets added to it in its destructor:
 	std::optional<QStackedWidget>	_editors_stack;
