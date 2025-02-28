@@ -87,6 +87,13 @@ class RigidBodyViewer: public GLAnimationWidget
 		{ _rigid_body_painter.set_time (time); }
 
 	/**
+	 * Assign a thread pool for RigidBodyPainter.
+	 */
+	void
+	use_work_performer (neutrino::WorkPerformer* work_performer)
+		{ _rigid_body_painter.use_work_performer (work_performer); }
+
+	/**
 	 * Return used rigid body system. Might be nullptr.
 	 */
 	rigid_body::System const*

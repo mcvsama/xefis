@@ -413,15 +413,21 @@ RigidBodyPainter::paint_planet()
 				.slice_angles = _sky_slices,
 				.stack_angles = _sky_stacks,
 				.material = sky_material,
-				.setup_material = [&, this] (rigid_body::ShapeMaterial& material, si::LonLat const sphere_position, WaitGroup::WorkToken&&) {
-					auto const color = _atmospheric_scattering.calculate_incident_light (
-						{ 0_m, 0_m, _position_on_earth.radius() },
-						cartesian<void> (sphere_position),
-						_sun_position.cartesian_coordinates
-					);
-					auto const tonemapped_color = tonemap_sky (_atmospheric_scattering.tonemap_separately (color));
-					material.gl_emission_color = to_gl_color (tonemapped_color);
-					// TODO ground haze.
+				.setup_material = [&, this] (rigid_body::ShapeMaterial& material, si::LonLat const sphere_position, WaitGroup::WorkToken&& work_token) {
+					auto calculate = [this, &material, sphere_position, work_token = std::move (work_token)] {
+						auto const color = _atmospheric_scattering.calculate_incident_light (
+							{ 0_m, 0_m, _position_on_earth.radius() },
+							cartesian<void> (sphere_position),
+							_sun_position.cartesian_coordinates
+						);
+						auto const tonemapped_color = tonemap_sky (_atmospheric_scattering.tonemap_separately (color));
+						material.gl_emission_color = to_gl_color (tonemapped_color);
+					};
+
+					if (_work_performer)
+						_work_performer->submit (std::move (calculate));
+					else
+						calculate();
 				},
 			});
 			rigid_body::negate_normals (sky);

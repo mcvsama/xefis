@@ -24,6 +24,7 @@
 
 // Neutrino:
 #include <neutrino/concepts.h>
+#include <neutrino/work_performer.h>
 
 // Qt:
 #include <QOpenGLFunctions>
@@ -102,6 +103,14 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	void
 	set_time (si::Time const time)
 		{ _time = time; }
+
+	/**
+	 * Assign a thread pool to use, notably when calculating sky colors.
+	 * Pass nullptr to disable.
+	 */
+	void
+	use_work_performer (neutrino::WorkPerformer* work_performer)
+		{ _work_performer = work_performer; }
 
 	/**
 	 * Follow the selected object to keep it centered on the screen.
@@ -535,6 +544,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
   private:
 	si::PixelDensity			_pixel_density;
 	si::Time					_time;
+	neutrino::WorkPerformer*	_work_performer				{ nullptr };
 	// Camera position is relative to the followed body:
 	SpaceLength<WorldSpace>		_camera_position;
 	// Camera rotation in screen coordinates:
