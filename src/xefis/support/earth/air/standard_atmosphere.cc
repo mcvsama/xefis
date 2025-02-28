@@ -145,14 +145,16 @@ StandardAtmosphere::air_at_radius (si::Length const radius) const
 Air<ECEFSpace>
 StandardAtmosphere::air_at_amsl (si::Length const geometric_altitude_amsl) const
 {
-	Air<ECEFSpace> air;
-	air.density = standard_density (geometric_altitude_amsl);
-	air.pressure = standard_pressure (geometric_altitude_amsl);
-	air.temperature = standard_temperature (geometric_altitude_amsl);
-	air.dynamic_viscosity = dynamic_air_viscosity (air.temperature);
-	air.speed_of_sound = speed_of_sound (air.temperature);
-	air.velocity = { 0_mps, 0_mps, 0_mps }; // TODO model the wind
-	return air;
+	auto const temperature = standard_temperature (geometric_altitude_amsl);
+
+	return {
+		.density = standard_density (geometric_altitude_amsl),
+		.pressure = standard_pressure (geometric_altitude_amsl),
+		.temperature = temperature,
+		.dynamic_viscosity = dynamic_air_viscosity (temperature),
+		.speed_of_sound = speed_of_sound (temperature),
+		.velocity = { 0_mps, 0_mps, 0_mps }, // TODO model the wind
+	};
 }
 
 
