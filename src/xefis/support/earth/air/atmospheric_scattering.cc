@@ -133,9 +133,13 @@ AtmosphericScattering::calculate_incident_light (SpaceLength<> const& observer_p
 
 		auto const rayleigh_result = _p.rayleigh_factor * hadamard_product (contribution.r, kRayleighBeta) * phase.r;
 		auto const mie_result = _p.mie_factor * hadamard_product (contribution.m, kMieBeta) * phase.m;
-		auto const result = kIncidentLightScale * (rayleigh_result + mie_result);
+		auto const color_double = kIncidentLightScale * (rayleigh_result + mie_result);
+		auto color = SpaceVector<float, RGBSpace> { color_double[0], color_double[1], color_double[2] }; // TODO math::static_scalar_cast<float> ()...
 
-		return SpaceVector<float, RGBSpace> { result[0], result[1], result[2] };
+		if (_p.enable_tonemapping)
+			color = tonemap_separately (color);
+
+		return color;
 	}
 }
 

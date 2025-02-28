@@ -21,6 +21,7 @@
 #include <xefis/support/math/rotations.h>
 #include <xefis/support/simulation/rigid_body/system.h>
 #include <xefis/support/ui/gl_space.h>
+#include <xefis/support/ui/sky_dome.h>
 #include <xefis/support/universe/sun_position.h>
 
 // Neutrino:
@@ -102,8 +103,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	 * Set simulation time. It makes Sun rendered in different positions.
 	 */
 	void
-	set_time (si::Time const time)
-		{ _time = time; }
+	set_time (si::Time const time);
 
 	/**
 	 * Assign a thread pool to use, notably when calculating sky colors.
@@ -389,9 +389,6 @@ class RigidBodyPainter: protected QOpenGLFunctions
 
   private:
 	void
-	calculate_sun_color();
-
-	void
 	setup (QOpenGLPaintDevice&);
 
 	void
@@ -519,9 +516,12 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	void
 	draw_arrow (SpaceLength<WorldSpace> const& origin, SpaceLength<WorldSpace> const& vector, rigid_body::ShapeMaterial const& material = {});
 
+	/**
+	 * Correct the sky colors to be less green at dusk/dawn.
+	 */
 	[[nodiscard]]
 	SpaceVector<float, RGBSpace>
-	tonemap_sky (SpaceVector<float, RGBSpace> rgb) const;
+	sky_correction (SpaceVector<float, RGBSpace> rgb) const;
 
 	[[nodiscard]]
 	SpaceLength<WorldSpace>
@@ -531,12 +531,8 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	SpaceLength<WorldSpace>
 	get_center_of_mass (rigid_body::Group const&);
 
-	[[nodiscard]]
-	static SunPosition
-	calculate_sun_position (si::Time unix_time, si::LonLat observer_position);
-
 	void
-	calculate_sky_slices_and_stacks (HorizontalCoordinates const sun_position);
+	recalculate_sky_dome();
 
 	[[nodiscard]]
 	static QColor
@@ -551,6 +547,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	// Camera rotation in screen coordinates:
 	SpaceVector<si::Angle>		_camera_angles;
 	LonLatRadius				_position_on_earth			{ 0_deg, 0_deg, 0_m };
+	si::Length					_agl_height					{ 0_m };
 	GLSpace						_gl							{ 1.0 / 1_m }; // TODO experiment with 1.0 / 1_km
 	std::variant<std::monostate, rigid_body::Group const*, rigid_body::Body const*>
 								_followed;
@@ -573,13 +570,8 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	std::minstd_rand0			_air_particles_prng;
 	std::map<rigid_body::Group const*, SpaceLength<WorldSpace>>
 								_group_centers_of_mass_cache;
-	// Sun position:
-	SunPosition					_sun_position;
-
-	GLColor						_sun_color;
-	std::vector<si::Angle>		_sky_slices;
-	std::vector<si::Angle>		_sky_stacks;
-	AtmosphericScattering		_atmospheric_scattering		{{ .earth_radius = kEarthMeanRadius, .atmosphere_radius = kEarthMeanRadius + 10_km }};
+	AtmosphericScattering		_atmospheric_scattering		{{ .earth_radius = kEarthMeanRadius, .atmosphere_radius = kEarthMeanRadius + 10_km, .enable_tonemapping = true }};
+	SkyDome						_sky_dome;
 	std::array<SkyLight, 5>		_sky_lights;
 };
 
