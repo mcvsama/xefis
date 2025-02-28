@@ -133,7 +133,6 @@ class AtmosphericScattering
 	ray_sphere_intersections (SpaceLength<> const& ray_origin, SpaceVector<double> const& ray_direction, si::Length const sphere_radius);
 
   private:
-    SpaceVector<double>	_sun_direction;
 	si::Length			_earth_radius;
     si::Length			_atmosphere_radius;
 	si::Length			_rayleigh_threshold;
