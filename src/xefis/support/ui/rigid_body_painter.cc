@@ -90,12 +90,14 @@ RigidBodyPainter::RigidBodyPainter (si::PixelDensity const pixel_density):
 void
 RigidBodyPainter::set_time (si::Time const time)
 {
-	if (abs (time - _time) > 1_s)
+	if (abs (time - _sky_dome_update_time) > 1_s)
 	{
 		if (_work_performer)
 			_next_sky_dome = _work_performer->submit (&RigidBodyPainter::recalculate_sky_dome, this);
 		else
 			_sky_dome = recalculate_sky_dome();
+
+		_sky_dome_update_time = time;
 	}
 
 	_time = time;

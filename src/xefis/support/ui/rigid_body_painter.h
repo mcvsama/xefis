@@ -577,6 +577,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	AtmosphericScattering const	_atmospheric_scattering		{{ .earth_radius = kEarthMeanRadius, .atmosphere_radius = kEarthMeanRadius + 10_km, .enable_tonemapping = true }};
 	SkyDome						_sky_dome;
 	std::future<SkyDome>		_next_sky_dome;
+	si::Time					_sky_dome_update_time;
 	std::array<SkyLight, 5>		_sky_lights;
 };
 
