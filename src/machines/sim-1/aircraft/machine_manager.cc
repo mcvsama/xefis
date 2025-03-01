@@ -56,6 +56,10 @@ MachineManager::create_main_window()
 	simulation_menu->addAction ("&Restart", [&] {
 		restart_machine();
 	});
+	simulation_menu->addAction ("Show &configuration…", [&] {
+		if (_machine)
+			_machine->show_configurator();
+	});
 
 	_main_window->setMenuBar (main_menu);
 	_main_window->resize (QSize (ph.em_pixels (80.0), ph.em_pixels (40.0)));
