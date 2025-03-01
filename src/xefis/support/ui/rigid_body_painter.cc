@@ -31,6 +31,7 @@
 
 // Neutrino:
 #include <neutrino/stdexcept.h>
+#include <neutrino/utility.h>
 
 // Qt:
 #include <QImage>
@@ -81,6 +82,8 @@ RigidBodyPainter::RigidBodyPainter (si::PixelDensity const pixel_density):
 		.gl_number	= kSkyLight4,
 		.position	= { 0_deg, 90_deg },
 	};
+
+	_sky_dome = recalculate_sky_dome();
 }
 
 
@@ -88,7 +91,12 @@ void
 RigidBodyPainter::set_time (si::Time const time)
 {
 	if (abs (time - _time) > 1_s)
-		recalculate_sky_dome(); // TODO async
+	{
+		if (_work_performer)
+			_next_sky_dome = _work_performer->submit (&RigidBodyPainter::recalculate_sky_dome, this);
+		else
+			_sky_dome = recalculate_sky_dome();
+	}
 
 	_time = time;
 }
@@ -134,11 +142,16 @@ RigidBodyPainter::paint (rigid_body::System const& system, QOpenGLPaintDevice& c
 void
 RigidBodyPainter::setup (QOpenGLPaintDevice& canvas)
 {
+	using namespace std::chrono_literals;
+
 	auto const size = canvas.size();
 
 	_position_on_earth = xf::polar (math::coordinate_system_cast<ECEFSpace, void> (followed_position()));
 	_agl_height = abs (followed_position() + _camera_position) - kEarthMeanRadius;
-	recalculate_sky_dome(); // TODO async when needed
+
+	// If the next calculated SkyDome is ready, use it:
+	if (_next_sky_dome.valid() && is_ready (_next_sky_dome))
+		_sky_dome = _next_sky_dome.get();
 
 	glMatrixMode (GL_PROJECTION);
 	glLoadIdentity();
@@ -1014,10 +1027,10 @@ RigidBodyPainter::get_center_of_mass (rigid_body::Group const& group)
 
 
 // TODO also recalculate on change of followed object and its position > some delta (or in other words: on change of camera position (but not orientation))
-void
+SkyDome
 RigidBodyPainter::recalculate_sky_dome()
 {
-	_sky_dome = calculate_sky_dome ({
+	return calculate_sky_dome ({
 		.atmospheric_scattering = _atmospheric_scattering,
 		.observer_position = _position_on_earth,
 		.observer_height_agl = _agl_height,
