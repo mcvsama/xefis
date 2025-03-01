@@ -23,8 +23,10 @@
 
 // Qt:
 #include <QFont>
+#include <QFrame>
 #include <QPaintDevice>
 #include <QPalette>
+#include <QSpacerItem>
 #include <QWidget>
 
 // Standard:
@@ -47,24 +49,28 @@ class PaintHelper
 	/**
 	 * Return current PixelDensity.
 	 */
+	[[nodiscard]]
 	si::PixelDensity
 	pixel_density() const;
 
 	/**
 	 * Return number of pixels that correspond to the given real length on the screen.
 	 */
+	[[nodiscard]]
 	float
 	pixels (si::Length) const;
 
 	/**
 	 * Return number of pixels that correspond to the given line-heights of text.
 	 */
+	[[nodiscard]]
 	float
 	em_pixels (float ems = 1.0f) const;
 
 	/**
 	 * Like em_pixels(), but rounds to integers.
 	 */
+	[[nodiscard]]
 	int
 	em_pixels_int (float ems = 1.0f) const
 		{ return static_cast<int> (0.5 + em_pixels (ems)); }
@@ -74,6 +80,30 @@ class PaintHelper
 	 */
 	static void
 	setup_painter (QPainter&);
+
+	[[nodiscard]]
+	QSpacerItem*
+	new_fixed_horizontal_spacer (float ems = 1.0f) const
+		{ return new QSpacerItem (em_pixels_int (ems), 0, QSizePolicy::Fixed, QSizePolicy::Fixed); }
+
+	[[nodiscard]]
+	QSpacerItem*
+	new_fixed_vertical_spacer (float ems = 1.0f) const
+		{ return new QSpacerItem (0, em_pixels_int (ems), QSizePolicy::Fixed, QSizePolicy::Fixed); }
+
+	[[nodiscard]]
+	QSpacerItem*
+	new_expanding_horizontal_spacer (float minimum_ems = 1.0f) const
+		{ return new QSpacerItem (em_pixels_int (minimum_ems), 0, QSizePolicy::Expanding, QSizePolicy::Fixed); }
+
+	[[nodiscard]]
+	QSpacerItem*
+	new_expanding_vertical_spacer (float minimum_ems = 1.0f) const
+		{ return new QSpacerItem (0, em_pixels_int (minimum_ems), QSizePolicy::Fixed, QSizePolicy::Expanding); }
+
+	[[nodiscard]]
+	QFrame*
+	new_hline() const;
 
   private:
 	QPaintDevice const&	_canvas;
@@ -105,6 +135,15 @@ PaintHelper::em_pixels (float ems) const
 		return ems * v;
 	else
 		return ems * _font.pointSize() * xf::pixels_per_point (pixel_density());
+}
+
+
+inline QFrame*
+PaintHelper::new_hline() const
+{
+	auto* line = new QFrame();
+	line->setFrameShape (QFrame::HLine);
+	return line;
 }
 
 } // namespace xf
