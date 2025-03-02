@@ -53,6 +53,11 @@ AtmosphericScattering::calculate_incident_light (SpaceLength<> const& observer_p
 												 si::Length min_distance,
 												 si::Length max_distance) const
 {
+	// Precomputed values that correspond to the scattering coefficients of the sky at sea level, for wavelengths 680, 550 and 440 respectively:
+    static constexpr SpaceVector<double> kRayleighBeta	= { 5.8e-6f, 13.5e-6f, 33.1e-6f };
+	// Mie scattering doesn't change the color, so the coefficients are the same:
+    static constexpr SpaceVector<double> kMieBeta		= { 21e-6f, 21e-6f, 21e-6f };
+
 	auto intersections = ray_sphere_intersections (observer_position, ray_direction, _p.atmosphere_radius);
 
 	if (!intersections || intersections->second < 0_m)
