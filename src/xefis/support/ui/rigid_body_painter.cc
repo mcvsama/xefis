@@ -83,7 +83,7 @@ RigidBodyPainter::RigidBodyPainter (si::PixelDensity const pixel_density):
 		.position	= { 0_deg, 90_deg },
 	};
 
-	_sky_dome = recalculate_sky_dome();
+	_sky_dome = calculate_sky_dome();
 }
 
 
@@ -92,11 +92,7 @@ RigidBodyPainter::set_time (si::Time const time)
 {
 	if (abs (time - _sky_dome_update_time) > 1_s)
 	{
-		if (_work_performer)
-			_next_sky_dome = _work_performer->submit (&RigidBodyPainter::recalculate_sky_dome, this);
-		else
-			_sky_dome = recalculate_sky_dome();
-
+		_recalculate_sky_dome = true;
 		_sky_dome_update_time = time;
 	}
 
@@ -154,6 +150,9 @@ RigidBodyPainter::setup (QOpenGLPaintDevice& canvas)
 	// If the next calculated SkyDome is ready, use it:
 	if (_next_sky_dome.valid() && is_ready (_next_sky_dome))
 		_sky_dome = _next_sky_dome.get();
+
+	if (!_next_sky_dome.valid() && std::exchange (_recalculate_sky_dome, false))
+		schedule_sky_dome_recalculation();
 
 	glMatrixMode (GL_PROJECTION);
 	glLoadIdentity();
@@ -1028,11 +1027,21 @@ RigidBodyPainter::get_center_of_mass (rigid_body::Group const& group)
 }
 
 
+void
+RigidBodyPainter::schedule_sky_dome_recalculation()
+{
+	if (_work_performer)
+		_next_sky_dome = _work_performer->submit (&RigidBodyPainter::calculate_sky_dome, this);
+	else
+		_sky_dome = calculate_sky_dome();
+}
+
+
 // TODO also recalculate on change of followed object and its position > some delta (or in other words: on change of camera position (but not orientation))
 SkyDome
-RigidBodyPainter::recalculate_sky_dome()
+RigidBodyPainter::calculate_sky_dome()
 {
-	return calculate_sky_dome ({
+	return xf::calculate_sky_dome ({
 		.atmospheric_scattering = _atmospheric_scattering,
 		.observer_position = _position_on_earth,
 		.observer_height_agl = _agl_height,
