@@ -73,11 +73,14 @@ template<class O>
 	{
 		auto const ph = PaintHelper (*this);
 
+		_edited_object_widget_layout.setMargin (0);
+
 		auto [top_strip, top_label] = Widget::create_colored_strip_label ("–", strip_color, Qt::AlignBottom, this);
 		top_strip->setMinimumWidth (ph.em_pixels_int (25));
 		_object_label = top_label;
 
 		auto* layout = new QVBoxLayout (this);
+		layout->setMargin (0);
 		layout->addWidget (top_strip);
 		layout->addLayout (&_edited_object_widget_layout);
 		layout->addItem (new QSpacerItem (0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
