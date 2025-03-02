@@ -90,7 +90,7 @@ calculate_sky_slices_and_stacks (HorizontalCoordinates const sun_position)
 
 	// Latitude:
 	{
-		auto const sun_vicinity = Range { sun_position.altitude - 10_deg, sun_position.altitude + 10_deg };
+		auto const sun_vicinity = Range { sun_position.altitude - 15_deg, sun_position.altitude + 15_deg };
 
 		// Start below the horizon:
 		result.stack_angles = { -10_deg };
