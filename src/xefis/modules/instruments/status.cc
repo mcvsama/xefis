@@ -162,7 +162,7 @@ Status::process (xf::Cycle const& cycle)
 
 	// Update timestamp if there was anything new to show:
 	if (to_show < _hidden_messages.end())
-		_last_message_timestamp = xf::TimeHelper::now();
+		_last_message_timestamp = xf::TimeHelper::utc_now();
 
 	std::copy (to_show, _hidden_messages.end(), std::back_inserter (_visible_messages));
 	_hidden_messages.resize (neutrino::to_unsigned (std::distance (_hidden_messages.begin(), to_show)));
@@ -350,7 +350,7 @@ Status::recall()
 void
 Status::clear()
 {
-	if (xf::TimeHelper::now() - _last_message_timestamp > *_io.status_minimum_display_time)
+	if (xf::TimeHelper::utc_now() - _last_message_timestamp > *_io.status_minimum_display_time)
 	{
 		_hidden_messages.insert (_hidden_messages.end(), _visible_messages.begin(), _visible_messages.end());
 		_visible_messages.clear();

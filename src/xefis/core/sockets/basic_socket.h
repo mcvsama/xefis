@@ -128,7 +128,7 @@ class BasicSocket:
 	[[nodiscard]]
 	si::Time
 	modification_age() const noexcept
-		{ return TimeHelper::now() - modification_timestamp(); }
+		{ return TimeHelper::utc_now() - modification_timestamp(); }
 
 	/**
 	 * Return timestamp of the last non-nil value.
@@ -145,7 +145,7 @@ class BasicSocket:
 	[[nodiscard]]
 	si::Time
 	valid_age() const noexcept
-		{ return TimeHelper::now() - valid_timestamp(); }
+		{ return TimeHelper::utc_now() - valid_timestamp(); }
 
 	/**
 	 * Number of sockets reading value from this socket.

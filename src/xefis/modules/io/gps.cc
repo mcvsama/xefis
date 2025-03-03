@@ -228,7 +228,7 @@ GPS::Connection::process_nmea_sentence (xf::nmea::GPGGA const& sentence)
 	_gps_module._io.geoid_height = sentence.geoid_height;
 	_gps_module._io.dgps_station_id = sentence.dgps_station_id;
 	// Use system time as reference:
-	_gps_module._io.fix_system_timestamp = xf::TimeHelper::now();
+	_gps_module._io.fix_system_timestamp = xf::TimeHelper::utc_now();
 	_gps_module._reliable_fix_quality = sentence.reliable_fix_quality();
 }
 

@@ -43,7 +43,7 @@ ProcessingLoop::ProcessingLoop (std::string_view const& instance, si::Frequency 
 	_loop_timer->setTimerType (Qt::PreciseTimer);
 	_loop_timer->setInterval (_loop_period.in<si::Millisecond>());
 	QObject::connect (_loop_timer, &QTimer::timeout, this, [this] {
-		execute_cycle (TimeHelper::now());
+		execute_cycle (TimeHelper::utc_now());
 	});
 
 	_logger.set_logger_tag_provider (*this);

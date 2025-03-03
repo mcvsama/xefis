@@ -102,7 +102,7 @@ HandshakeMaster::parse_and_verify_slave_handshake_blob (BlobView const slave_han
 	if (extracted_signature != calculated_signature)
 		throw Exception (ErrorCode::WrongSignature, "wrong signature");
 
-	if (abs (1_ms * extracted.unix_timestamp_ms - neutrino::TimeHelper::now()) > _max_time_difference)
+	if (abs (1_ms * extracted.unix_timestamp_ms - neutrino::TimeHelper::utc_now()) > _max_time_difference)
 		throw Exception (ErrorCode::DeltaTimeTooHigh, "delta time too high");
 
 	if (extracted.handshake_id != _handshake_id)
@@ -131,7 +131,7 @@ HandshakeSlave::generate_handshake_blob_and_key (BlobView const master_handshake
 	if (_id_used_before && _id_used_before (master_handshake.handshake_id))
 		throw Exception (ErrorCode::ReusedHandshakeID, "reusing handshake ID");
 
-	if (abs (1_ms * master_handshake.unix_timestamp_ms - neutrino::TimeHelper::now()) > _max_time_difference)
+	if (abs (1_ms * master_handshake.unix_timestamp_ms - neutrino::TimeHelper::utc_now()) > _max_time_difference)
 		throw Exception (ErrorCode::DeltaTimeTooHigh, "delta time too high");
 
 	Blob const dhe_exchange_blob = _dhe_exchange.generate_exchange_blob();

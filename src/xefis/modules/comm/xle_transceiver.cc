@@ -179,7 +179,7 @@ MasterTransceiver::Session::HandshakeRequested::HandshakeRequested (CryptoParams
 		.hmac_size = params.hmac_size,
 		.max_time_difference = params.max_time_difference,
 	}),
-	handshake_request (handshake_master.generate_handshake_blob (neutrino::TimeHelper::now()))
+	handshake_request (handshake_master.generate_handshake_blob (neutrino::TimeHelper::utc_now()))
 { }
 
 
@@ -376,7 +376,7 @@ SlaveTransceiver::Session::Session (Blob const& handshake_request,
 		.hmac_size = params.hmac_size,
 		.max_time_difference = params.max_time_difference,
 	}, handshake_id_reused_check);
-	auto const response_and_key = handshake_slave.generate_handshake_blob_and_key (handshake_request, neutrino::TimeHelper::now());
+	auto const response_and_key = handshake_slave.generate_handshake_blob_and_key (handshake_request, neutrino::TimeHelper::utc_now());
 	_handshake_response = response_and_key.handshake_response;
 	_transmitter.emplace (transceiver_rnd, Transmitter::Params {
 		.ephemeral_session_key = *response_and_key.ephemeral_key,

@@ -171,7 +171,7 @@ NavigationComputer::compute_magnetic_variation()
 			mv.set_altitude_amsl (*_io.position_altitude_amsl);
 		else
 			mv.set_altitude_amsl (0_ft);
-		QDate today = QDateTime::fromTime_t (xf::TimeHelper::now().in<si::Second>()).date();
+		QDate today = QDateTime::fromTime_t (xf::TimeHelper::utc_now().in<si::Second>()).date();
 		mv.set_date (today.year(), today.month(), today.day());
 		mv.update();
 		_io.magnetic_declination = mv.magnetic_declination();

@@ -1037,7 +1037,7 @@ XBee::report_rssi (int dbm)
 
 	// Convert dBm to milliwatts:
 	si::Power power = 1_mW * std::pow (10.0, 0.1 * static_cast<double> (dbm));
-	si::Time now = xf::TimeHelper::now();
+	si::Time now = xf::TimeHelper::utc_now();
 	_io.rssi = _rssi_smoother (power, now - _last_rssi_time);
 	_last_rssi_time = now;
 }

@@ -54,8 +54,8 @@ AutoTest t1 ("Xefis Lossy Encryption/Handshake: correct handshake", []{
 	HandshakeMaster master (rnd, params);
 	HandshakeSlave slave (rnd, params, [](HandshakeID) { return false; });
 
-	Blob const master_handshake = master.generate_handshake_blob (neutrino::TimeHelper::now());
-	auto const slave_handshake_and_key = slave.generate_handshake_blob_and_key (master_handshake, neutrino::TimeHelper::now());
+	Blob const master_handshake = master.generate_handshake_blob (neutrino::TimeHelper::utc_now());
+	auto const slave_handshake_and_key = slave.generate_handshake_blob_and_key (master_handshake, neutrino::TimeHelper::utc_now());
 	Blob const master_key = master.calculate_key (*slave_handshake_and_key.handshake_response);
 	Blob const slave_key = *slave_handshake_and_key.ephemeral_key;
 
@@ -64,7 +64,7 @@ AutoTest t1 ("Xefis Lossy Encryption/Handshake: correct handshake", []{
 
 
 AutoTest t2 ("Xefis Lossy Encryption/Handshake: handshake with wrong signature", []{
-	si::Time const now = neutrino::TimeHelper::now();
+	si::Time const now = neutrino::TimeHelper::utc_now();
 	boost::random::random_device rnd;
 
 	{
@@ -126,7 +126,7 @@ AutoTest t2 ("Xefis Lossy Encryption/Handshake: handshake with wrong signature",
 
 
 AutoTest t3 ("Xefis Lossy Encryption/Handshake: reusing handshake ID", []{
-	si::Time const now = neutrino::TimeHelper::now();
+	si::Time const now = neutrino::TimeHelper::utc_now();
 	boost::random::random_device rnd;
 	HandshakeMaster master (rnd, params);
 	HandshakeSlave slave (rnd, params, [used_handshake_ids = std::set<HandshakeID>()] (HandshakeID const handshake_id) mutable {
@@ -155,7 +155,7 @@ AutoTest t4 ("Xefis Lossy Encryption/Handshake: wrong timestamp on master side",
 	HandshakeMaster master (rnd, params);
 	HandshakeSlave slave (rnd, params, [](HandshakeID) { return false; });
 
-	si::Time const now = neutrino::TimeHelper::now();
+	si::Time const now = neutrino::TimeHelper::utc_now();
 	Blob const master_handshake = master.generate_handshake_blob (now + 20_s);
 
 	bool thrown_delta_time_too_high = false;
@@ -178,7 +178,7 @@ AutoTest t5 ("Xefis Lossy Encryption/Handshake: wrong timestamp on slave side", 
 	HandshakeMaster master (rnd, params);
 	HandshakeSlave slave (rnd, params, [](HandshakeID) { return false; });
 
-	si::Time const now = neutrino::TimeHelper::now();
+	si::Time const now = neutrino::TimeHelper::utc_now();
 	Blob const master_handshake = master.generate_handshake_blob (now);
 	auto const slave_handshake_and_key = slave.generate_handshake_blob_and_key (master_handshake, now + 20_s);
 
@@ -198,7 +198,7 @@ AutoTest t5 ("Xefis Lossy Encryption/Handshake: wrong timestamp on slave side", 
 
 
 AutoTest t6 ("Xefis Lossy Encryption/Handshake: mismatched handshake IDs", []{
-	si::Time const now = neutrino::TimeHelper::now();
+	si::Time const now = neutrino::TimeHelper::utc_now();
 	boost::random::random_device rnd;
 	HandshakeMaster master_1 (rnd, params);
 	HandshakeMaster master_2 (rnd, params);

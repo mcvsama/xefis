@@ -86,8 +86,8 @@ ObservationWidget::ObservationWidget (rigid_body::Body* body):
 	if (_body)
 	{
 		auto basic_info_group = add_basic_observables();
-		basic_info_group.add_observable ("Load factor", [this, prev_time = TimeHelper::now()]() mutable {
-			auto const now = TimeHelper::now();
+		basic_info_group.add_observable ("Load factor", [this, prev_time = TimeHelper::utc_now()]() mutable {
+			auto const now = TimeHelper::utc_now();
 			auto const dt = now - prev_time;
 			prev_time = now;
 
