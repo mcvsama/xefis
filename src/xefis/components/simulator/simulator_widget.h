@@ -30,7 +30,9 @@
 #include <neutrino/responsibility.h>
 
 // Qt:
+#include <QDateTimeEdit>
 #include <QIcon>
+#include <QSlider>
 #include <QStackedWidget>
 #include <QWidget>
 
@@ -94,6 +96,10 @@ class SimulatorWidget: public QWidget
 
 	[[nodiscard]]
 	QWidget*
+	make_solar_time_controls (PaintHelper const&);
+
+	[[nodiscard]]
+	QWidget*
 	make_body_controls();
 
 	void
@@ -102,17 +108,34 @@ class SimulatorWidget: public QWidget
 	void
 	update_simulation_time_label();
 
+	[[nodiscard]]
+	si::Time
+	solar_time() const
+		{ return _simulator.simulation_time() + _solar_simulation_time_delta; }
+
+	void
+	set_solar_time (QDateTime const date_time);
+
+	void
+	update_solar_time_widgets();
+
+	void
+	update_viewer_time();
+
 	void
 	update_simulation_performance_label (si::Time dt);
 
-	void
-	update_rigid_body_viewer_time();
+	static std::optional<Responsibility>
+	bool_lock (bool& lock_variable);
 
   private:
 	Logger							_logger;
-	Machine*						_machine					{ nullptr };
+	Machine*						_machine						{ nullptr };
 	Simulator&						_simulator;
-	neutrino::WorkPerformer			_graphics_work_performer	{ std::thread::hardware_concurrency(), _logger.with_context ("graphics work performer") };
+	neutrino::WorkPerformer			_graphics_work_performer		{ std::thread::hardware_concurrency(), _logger.with_context ("graphics work performer") };
+
+	// Basic widgets
+
 	std::optional<RigidBodyViewer>	_rigid_body_viewer;
 	// Warning: QStackedWidget deletes widgets added to it in its destructor:
 	std::optional<QStackedWidget>	_editors_stack;
@@ -125,15 +148,21 @@ class SimulatorWidget: public QWidget
 	std::optional<ItemsTree>		_items_tree;
 	std::optional<QLabel>			_simulation_time_label;
 	std::optional<QLabel>			_simulation_performance_value_label;
-	QIcon							_start_icon					{ icons::start() };
-	QIcon							_pause_icon					{ icons::pause() };
-	float							_simulation_speed			{ 1.0f };
-	float							_last_finite_performance	{ 1.0f };
-	Smoother<float>					_performance_smoother		{ 100_ms, 10_ms };
+	QIcon							_start_icon						{ icons::start() };
+	QIcon							_pause_icon						{ icons::pause() };
+	float							_simulation_speed				{ 1.0f };
+	float							_last_finite_performance		{ 1.0f };
+	Smoother<float>					_performance_smoother			{ 100_ms, 10_ms };
 	std::optional<neutrino::Responsibility>
 									_disconnect_item_changed_signal;
-	int								_day_of_year				{ 0 };
-	si::Time						_time_of_day				{ 12 * 3600_s };
+
+	// Time tab
+
+	std::optional<QSlider>			_day_of_year_slider;
+	std::optional<QSlider>			_time_of_day_slider;
+	std::optional<QDateTimeEdit>	_solar_date_time_edit;
+	// Solar time minus simulation time:
+	si::Time						_solar_simulation_time_delta	{ 0_s };
 };
 
 
@@ -158,6 +187,20 @@ SimulatorWidget::set_followed (rigid_body::Body const& followed_body) noexcept
 {
 	_rigid_body_viewer->set_followed (followed_body);
 	_items_tree->refresh();
+}
+
+
+// TODO neutrino utils
+inline std::optional<Responsibility>
+SimulatorWidget::bool_lock (bool& lock_variable)
+{
+	if (lock_variable)
+		return std::nullopt;
+	else
+	{
+		lock_variable = true;
+		return Responsibility ([&lock_variable] { lock_variable = false; });
+	}
 }
 
 } // namespace xf

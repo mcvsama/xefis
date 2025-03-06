@@ -26,13 +26,16 @@
 #include <neutrino/qt/qstring.h>
 
 // Qt:
+#include <QDateTimeEdit>
 #include <QLabel>
 #include <QLayout>
 #include <QPushButton>
+#include <QSignalBlocker>
 #include <QSizePolicy>
 #include <QSlider>
 #include <QShortcut>
 #include <QSplitter>
+#include <QTabWidget>
 
 // Standard:
 #include <cstddef>
@@ -76,7 +79,7 @@ SimulatorWidget::make_viewer_widget()
 	_rigid_body_viewer->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Expanding);
 	_rigid_body_viewer->use_work_performer (&_graphics_work_performer);
 	_rigid_body_viewer->set_rigid_body_system (&_simulator.rigid_body_system());
-	_rigid_body_viewer->set_redraw_callback ([this] (std::optional<si::Time> const frame_duration) {
+	_rigid_body_viewer->set_redraw_callback ([this, prev_sim_time = 0_s] (std::optional<si::Time> const frame_duration) mutable {
 		if (frame_duration)
 			_simulator.evolve (*frame_duration * _simulation_speed);
 		else
@@ -84,6 +87,16 @@ SimulatorWidget::make_viewer_widget()
 
 		update_simulation_time_label();
 		update_simulation_performance_label (frame_duration.value_or (0_ms));
+
+		update_viewer_time();
+
+		// Avoid calling update_solar_time_widget() too often as it causes Qt signals and Qt's signals are extremely slow.
+		if (_simulator.simulation_time() - prev_sim_time > 1_s)
+		{
+			update_solar_time_widgets();
+			prev_sim_time = 1_s * std::floor (_simulator.simulation_time().in<si::Second>());
+		}
+
 		_group_editor->refresh();
 		_body_editor->refresh();
 		_constraint_editor->refresh();
@@ -135,7 +148,7 @@ SimulatorWidget::make_simulation_controls()
 		update_start_stop_icon();
 	});
 
-	auto* speed_label = new QLabel ("-");
+	auto* speed_label = new QLabel ("–");
 	speed_label->setFixedWidth (ph.em_pixels_int (4));
 
 	auto* speed_slider = new QSlider (Qt::Horizontal);
@@ -146,86 +159,178 @@ SimulatorWidget::make_simulation_controls()
 	speed_slider->setRange (1, 200);
 	QObject::connect (speed_slider, &QSlider::valueChanged, [this, speed_label] (int value) {
 		_simulation_speed = value / 100.0f;
-		speed_label->setText (to_qstring (std::format (" {:d}%", value)));
+		speed_label->setText (to_qstring (std::format ("{:d}%", value)));
 	});
 	speed_slider->setValue (100);
 
-	auto* day_of_year_slider = new QSlider (Qt::Horizontal);
-	day_of_year_slider->setTickPosition (QSlider::TicksAbove);
-	day_of_year_slider->setTracking (true);
-	day_of_year_slider->setTickInterval (30);
-	day_of_year_slider->setPageStep (30);
-	day_of_year_slider->setRange (0, 364);
-	day_of_year_slider->setMinimumWidth (ph.em_pixels_int (8.0));
-	QObject::connect (day_of_year_slider, &QSlider::valueChanged, [this] (int value) {
-		_day_of_year = value;
-		update_rigid_body_viewer_time();
-	});
-	day_of_year_slider->setValue (0);
-
-	auto* time_of_day_slider = new QSlider (Qt::Horizontal);
-	time_of_day_slider->setTickPosition (QSlider::TicksAbove);
-	time_of_day_slider->setTracking (true);
-	time_of_day_slider->setTickInterval (60);
-	time_of_day_slider->setPageStep (60);
-	time_of_day_slider->setRange (0, 60 * 24);
-	time_of_day_slider->setMinimumWidth (ph.em_pixels_int (8.0));
-	QObject::connect (time_of_day_slider, &QSlider::valueChanged, [this] (int value) {
-		_time_of_day = value * 60_s;
-		update_rigid_body_viewer_time();
-	});
-	time_of_day_slider->setValue (0);
-
-	auto* show_configurator_button = new QPushButton ("Show machine config", this);
-	QObject::connect (show_configurator_button, &QPushButton::clicked, [this] {
-		if (_machine)
-			_machine->show_configurator();
-	});
+	auto* tabs = new QTabWidget (this);
+	tabs->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Expanding);
+	tabs->addTab (make_solar_time_controls (ph), "Solar time");
 
 	auto* sim_controls = new QWidget (this);
 	sim_controls->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Fixed);
 
 	_simulation_time_label.emplace ("", this);
-	_simulation_time_label->setSizePolicy (QSizePolicy::Fixed, QSizePolicy::Fixed);
 	update_simulation_time_label();
 
-	_simulation_performance_value_label.emplace ("", this);
+	_simulation_performance_value_label.emplace ("–", this);
 	_simulation_performance_value_label->setFixedWidth (ph.em_pixels_int (4));
 
 	update_simulation_performance_label (0_ms);
 
-	auto* basis_colors_label = new QLabel ("<b><span style='color: red'>X (Null Island)</span> <span style='color: green'>Y</span> <span style='color: blue'>Z (North Pole)</span></b>", this);
+	auto* basic_controls = new QWidget (this);
+	basic_controls->setSizePolicy (QSizePolicy::Minimum, QSizePolicy::Fixed);
+	basic_controls->setMinimumWidth (ph.em_pixels_int (25));
 
-	auto* row1_layout = new QHBoxLayout();
-	row1_layout->setMargin (0);
-	row1_layout->addWidget (start_stop_sim_button);
-	row1_layout->addWidget (step_sim_button);
-	row1_layout->addItem (new QSpacerItem (ph.em_pixels_int (1.0), 0, QSizePolicy::Fixed, QSizePolicy::Fixed));
-	row1_layout->addWidget (basis_colors_label);
-	row1_layout->addItem (new QSpacerItem (0, 0, QSizePolicy::Expanding, QSizePolicy::Fixed));
-	row1_layout->addWidget (show_configurator_button);
+	// Layout:
+	{
+		auto* basic_controls_layout = new QGridLayout (basic_controls);
+		{
+			basic_controls_layout->setMargin (0);
+			auto row = 0;
+			auto* buttons_layout = new QHBoxLayout();
+			buttons_layout->addWidget (start_stop_sim_button);
+			buttons_layout->addWidget (step_sim_button);
+			basic_controls_layout->addLayout (buttons_layout, row, 0, 1, 3);
+			++row;
+			basic_controls_layout->addWidget (new QLabel ("Speed: "), row, 0);
+			speed_label->setAlignment (Qt::AlignRight);
+			basic_controls_layout->addWidget (speed_label, row, 1);
+			basic_controls_layout->addWidget (speed_slider, row, 2);
+			++row;
+			basic_controls_layout->addWidget (new QLabel ("Performance: "), row, 0);
+			_simulation_performance_value_label->setAlignment (Qt::AlignRight);
+			basic_controls_layout->addWidget (&*_simulation_performance_value_label, row, 1);
+			++row;
+			basic_controls_layout->addWidget (new QLabel ("Time: "), row, 0, 1, 1);
+			basic_controls_layout->addWidget (&*_simulation_time_label, row, 1, 1, 2);
+			++row;
+			basic_controls_layout->addWidget (ph.new_hline(), row, 0, 1, 3);
+			++row;
+			auto* basis_colors_label = new QLabel ("<b><span style='color: red'>X (Null Island)</span> <span style='color: green'>Y (90°E, 0°N)</span> <span style='color: blue'>Z (North Pole)</span></b>", this);
+			basic_controls_layout->addWidget (basis_colors_label, row, 0, 1, 3);
+		}
 
-	auto* row2_layout = new QHBoxLayout();
-	row2_layout->setMargin (0);
-	row2_layout->addWidget (new QLabel ("Speed: "));
-	row2_layout->addWidget (speed_slider);
-	row2_layout->addWidget (speed_label);
-	row2_layout->addWidget (new QLabel ("UTC year:"));
-	row2_layout->addWidget (day_of_year_slider);
-	row2_layout->addWidget (new QLabel ("UTC day:"));
-	row2_layout->addWidget (time_of_day_slider);
-	row2_layout->addItem (new QSpacerItem (ph.em_pixels_int (1.0), 0, QSizePolicy::Fixed, QSizePolicy::Fixed));
-	row2_layout->addWidget (new QLabel ("Performance: "));
-	row2_layout->addWidget (&*_simulation_performance_value_label);
-	row2_layout->addItem (new QSpacerItem (0, 0, QSizePolicy::Expanding, QSizePolicy::Fixed));
-	row2_layout->addWidget (&*_simulation_time_label);
-
-	auto* sim_controls_layout = new QVBoxLayout (sim_controls);
-	sim_controls_layout->setMargin (0);
-	sim_controls_layout->addLayout (row1_layout);
-	sim_controls_layout->addLayout (row2_layout);
+		auto* sim_controls_layout = new QHBoxLayout (sim_controls);
+		sim_controls_layout->setMargin (0);
+		sim_controls_layout->addWidget (basic_controls);
+		sim_controls_layout->addWidget (tabs);
+		sim_controls_layout->setStretch (0, 0);
+		sim_controls_layout->setStretch (1, 1);
+	}
 
 	return sim_controls;
+}
+
+
+QWidget*
+SimulatorWidget::make_solar_time_controls (PaintHelper const& ph)
+{
+	auto* time_widget = new QWidget (this);
+
+	_day_of_year_slider.emplace (Qt::Horizontal);
+	_day_of_year_slider->setTickPosition (QSlider::TicksAbove);
+	_day_of_year_slider->setTracking (true);
+	_day_of_year_slider->setTickInterval (30);
+	_day_of_year_slider->setPageStep (30);
+	_day_of_year_slider->setRange (0, 364);
+	_day_of_year_slider->setMinimumWidth (ph.em_pixels_int (8.0));
+	QObject::connect (&*_day_of_year_slider, &QSlider::valueChanged, [this, locked = false] (int day_of_year) mutable {
+		if (auto const lock = bool_lock (locked))
+		{
+			if (_solar_date_time_edit)
+			{
+				auto date_time = _solar_date_time_edit->dateTime().toUTC();
+				auto date = date_time.date();
+				date.setDate (date.year(), 1, 1);
+				date = date.addDays (day_of_year);
+				date_time.setDate (date);
+				set_solar_time (date_time);
+			}
+		}
+	});
+
+	_time_of_day_slider.emplace (Qt::Horizontal);
+	_time_of_day_slider->setTickPosition (QSlider::TicksAbove);
+	_time_of_day_slider->setTracking (true);
+	_time_of_day_slider->setTickInterval (60);
+	_time_of_day_slider->setPageStep (60);
+	_time_of_day_slider->setRange (0, 60 * 24);
+	_time_of_day_slider->setMinimumWidth (ph.em_pixels_int (8.0));
+	QObject::connect (&*_time_of_day_slider, &QSlider::valueChanged, [this, locked = false] (int minute_of_the_day) mutable {
+		if (auto const lock = bool_lock (locked))
+		{
+			if (_solar_date_time_edit)
+			{
+				auto date_time = _solar_date_time_edit->dateTime().toUTC();
+				auto time = _solar_date_time_edit->time();
+				time.setHMS (minute_of_the_day / 60, minute_of_the_day % 60, 0);
+				date_time.setTime (time);
+				set_solar_time (date_time);
+			}
+		}
+	});
+
+	_solar_date_time_edit.emplace();
+	_solar_date_time_edit->setTimeSpec (Qt::UTC);
+	QObject::connect (&*_solar_date_time_edit, &QDateTimeEdit::dateTimeChanged, [this, locked = false] (QDateTime const& date_time) mutable {
+		if (auto const lock = bool_lock (locked))
+			set_solar_time (date_time);
+	});
+
+	auto* set_to_simulation_time = new QPushButton ("Set to simulation time");
+	QObject::connect (set_to_simulation_time, &QPushButton::clicked, [this] {
+		_solar_simulation_time_delta = 0_s;
+		update_solar_time_widgets();
+	});
+
+	auto* set_to_system_time = new QPushButton ("Set to system time");
+	QObject::connect (set_to_system_time, &QPushButton::clicked, [this] {
+		_solar_simulation_time_delta = TimeHelper::utc_now() - _simulator.simulation_time();
+		update_solar_time_widgets();
+	});
+
+	auto* set_to_local_noon = new QPushButton ("Set to local noon");
+	auto set_to_local_noon_callback = [this] {
+		auto date_time = QDateTime::fromSecsSinceEpoch (TimeHelper::utc_now().in<si::Second>());
+		date_time.setTime (QTime (12, 0, 0));
+		_solar_simulation_time_delta = 1_s * date_time.toUTC().toSecsSinceEpoch() - _simulator.simulation_time();
+		update_solar_time_widgets();
+	};
+	QObject::connect (set_to_local_noon, &QPushButton::clicked, set_to_local_noon_callback);
+
+	// Layout:
+	{
+		auto* buttons_layout = new QHBoxLayout();
+		buttons_layout->addWidget (set_to_simulation_time);
+		buttons_layout->addWidget (set_to_system_time);
+		buttons_layout->addWidget (set_to_local_noon);
+		buttons_layout->addItem (ph.new_expanding_horizontal_spacer());
+
+		auto* utc_month_label = new QLabel ("UTC day of year: ");
+		auto* utc_time_of_day_label = new QLabel ("UTC time of day: ");
+		auto* utc_date_and_time = new QLabel ("UTC date and time: ");
+
+		for (auto* widget: { utc_month_label, utc_time_of_day_label, utc_date_and_time })
+			widget->setSizePolicy (QSizePolicy::Minimum, QSizePolicy::Fixed);
+
+		auto* layout = new QGridLayout (time_widget);
+		auto row = 0;
+		layout->addWidget (utc_month_label, row, 0);
+		layout->addWidget (&*_day_of_year_slider, row, 1, 1, 2);
+		++row;
+		layout->addWidget (utc_time_of_day_label, row, 0);
+		layout->addWidget (&*_time_of_day_slider, row, 1, 1, 2);
+		++row;
+		layout->addWidget (utc_date_and_time, row, 0);
+		layout->addWidget (&*_solar_date_time_edit, row, 1);
+		layout->addLayout (buttons_layout, row, 2);
+	}
+
+	// By default set solar time to local noon:
+	set_to_local_noon_callback();
+
+	return time_widget;
 }
 
 
@@ -338,9 +443,55 @@ void
 SimulatorWidget::update_simulation_time_label()
 {
 	auto const simulation_time = std::chrono::system_clock::from_time_t (_simulator.simulation_time().in<si::Second>());
+	auto const rounded_simulation_time = std::chrono::time_point_cast<std::chrono::seconds> (simulation_time);
 	auto const elapsed_time = _simulator.elapsed_time().in<si::Second>();
-	auto const text = std::format ("{:%Y-%m-%d %H:%M:%S} UTC ({:.6f} s)", simulation_time, elapsed_time);
+	auto const text = std::format ("{:%Y-%m-%d %H:%M:%S} UTC ({:.6f} s)", rounded_simulation_time, elapsed_time);
 	_simulation_time_label->setText (QString::fromStdString (text));
+}
+
+
+void
+SimulatorWidget::update_viewer_time()
+{
+	_rigid_body_viewer->set_time (solar_time());
+}
+
+
+void
+SimulatorWidget::set_solar_time (QDateTime const date_time)
+{
+	_solar_simulation_time_delta = 1_s * date_time.toUTC().toSecsSinceEpoch() - _simulator.simulation_time();
+	update_solar_time_widgets();
+}
+
+
+void
+SimulatorWidget::update_solar_time_widgets()
+{
+	auto const date_time = QDateTime::fromSecsSinceEpoch (solar_time().in<si::Second>(), Qt::UTC);
+	auto const date = date_time.date();
+	auto const time = date_time.time();
+
+	// Update the day of the year slider:
+	if (_day_of_year_slider)
+	{
+		auto const day_of_year_blocker = QSignalBlocker (&*_day_of_year_slider);
+		_day_of_year_slider->setValue (date.dayOfYear() - 1);
+	}
+	// Update the time of the day slider:
+	if (_time_of_day_slider)
+	{
+		auto const time_of_day_blocker = QSignalBlocker (&*_time_of_day_slider);
+		_time_of_day_slider->setValue (time.hour() * 60 + time.minute());
+	}
+	// Update date-time entry widget:
+	if (_solar_date_time_edit)
+	{
+		auto const blocker = QSignalBlocker (&*_solar_date_time_edit);
+		_solar_date_time_edit->setDateTime (QDateTime::fromSecsSinceEpoch (solar_time().in<si::Second>(), Qt::UTC));
+	}
+
+	update_viewer_time();
 }
 
 
@@ -359,13 +510,6 @@ SimulatorWidget::update_simulation_performance_label (si::Time const dt)
 	auto const prefix = perf < 1.0 ? "<span style='color: red'>" : "<span>";
 	auto const suffix = "</span>";
 	_simulation_performance_value_label->setText (prefix + QString::fromStdString (text) + suffix);
-}
-
-
-void
-SimulatorWidget::update_rigid_body_viewer_time()
-{
-	_rigid_body_viewer->set_time (_day_of_year * 24 * 3600_s + _time_of_day);
 }
 
 } // namespace xf
