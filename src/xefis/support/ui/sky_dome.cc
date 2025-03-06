@@ -144,7 +144,7 @@ calculate_sky_shape (xf::LonLatRadius const observer_position,
 		.material = rigid_body::kBlackMatte,
 		.setup_material = [&] (rigid_body::ShapeMaterial& material, si::LonLat const sphere_position, WaitGroup::WorkToken&& work_token) {
 			auto calculate = [&material, &atmospheric_scattering, &observer_position, &sun_position, sphere_position, work_token = std::move (work_token)] {
-				auto const color = atmospheric_scattering.calculate_incident_light (
+				auto const color = atmospheric_scattering.calculate_incident_light(
 					{ 0_m, 0_m, observer_position.radius() },
 					cartesian<void> (sphere_position),
 					sun_position.cartesian_coordinates
