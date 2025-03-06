@@ -149,8 +149,7 @@ calculate_sky_shape (xf::LonLatRadius const observer_position,
 					cartesian<void> (sphere_position),
 					sun_position.cartesian_coordinates
 				);
-				auto const tonemapped_color = color;
-				material.gl_emission_color = to_gl_color (tonemapped_color);
+				material.gl_emission_color = to_gl_color (color);
 			};
 
 			if (work_performer)
