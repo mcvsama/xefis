@@ -71,7 +71,7 @@ calculate_sky_slices_and_stacks (HorizontalCoordinates const sun_position)
 		result.slice_angles.clear();
 
 		auto constexpr sun_vicinity_slices = 13;
-		auto constexpr rest_slices = 30;
+		auto constexpr rest_slices = 50;
 
 		auto const sun_longitude = 180_deg - sun_position.azimuth;
 		auto const sun_vicinity = Range { sun_longitude - 20_deg, sun_longitude + 20_deg };
