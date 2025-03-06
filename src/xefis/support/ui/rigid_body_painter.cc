@@ -451,8 +451,8 @@ RigidBodyPainter::paint_planet()
 
 			// Enable blending, to blend well the Sun with the sky:
 			glDisable (GL_DEPTH_TEST);
-			glEnable (GL_BLEND);
 			glDisable (GL_LIGHTING);
+			glEnable (GL_BLEND);
 			// Same remark as for sky rendering about what's considered the front face here:
 			glFrontFace (GL_CW);
 
@@ -489,8 +489,8 @@ RigidBodyPainter::paint_planet()
 #endif
 
 			glFrontFace (GL_CCW);
-			glEnable (GL_DEPTH_TEST);
 			glDisable (GL_BLEND);
+			glEnable (GL_DEPTH_TEST);
 			glEnable (GL_LIGHTING);
 		});
 
