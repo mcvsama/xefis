@@ -398,7 +398,10 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	setup_natural_light();
 
 	void
-	setup_camera();
+	center_at_followed_object();
+
+	void
+	center_at_observer();
 
 	void
 	apply_camera_rotations();

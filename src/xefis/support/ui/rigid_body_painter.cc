@@ -219,7 +219,7 @@ RigidBodyPainter::setup_natural_light()
 		// Direct sunlight:
 		_gl.save_context ([&] {
 			glLoadIdentity();
-			setup_camera();
+			center_at_followed_object();
 			make_z_towards_the_sun();
 			glLightfv (kSunLight, GL_POSITION, GLArray { 0.0f, 0.0f, _gl.to_opengl (kSunDistance), 0.0f });
 		});
@@ -267,10 +267,20 @@ RigidBodyPainter::setup_natural_light()
 
 
 void
-RigidBodyPainter::setup_camera()
+RigidBodyPainter::center_at_followed_object()
 {
+	glLoadIdentity();
 	// Center the world at the followed body:
 	_gl.translate (-_camera_position);
+	// Rotate about that body:
+	apply_camera_rotations();
+}
+
+
+void
+RigidBodyPainter::center_at_observer()
+{
+	glLoadIdentity();
 	// Rotate about that body:
 	apply_camera_rotations();
 }
@@ -380,7 +390,7 @@ void
 RigidBodyPainter::paint_world (rigid_body::System const& system)
 {
 	_gl.save_context ([&] {
-		setup_camera();
+		center_at_followed_object();
 		setup_natural_light();
 		paint_planet();
 		paint_air_particles();
