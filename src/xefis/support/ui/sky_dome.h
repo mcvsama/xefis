@@ -59,8 +59,8 @@ struct SkyDomeParameters
 {
 	AtmosphericScattering const&	atmospheric_scattering;
 	xf::LonLatRadius				observer_position;
-	si::Length						observer_height_agl;
 	si::Length						horizon_radius;
+	si::Length						earth_radius;
 	si::Time						unix_time;
 };
 

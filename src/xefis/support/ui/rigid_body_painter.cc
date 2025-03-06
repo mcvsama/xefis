@@ -1054,8 +1054,8 @@ RigidBodyPainter::calculate_sky_dome()
 	return xf::calculate_sky_dome ({
 		.atmospheric_scattering = _atmospheric_scattering,
 		.observer_position = _position_on_earth,
-		.observer_height_agl = _agl_height,
 		.horizon_radius = kHorizonRadius,
+		.earth_radius = kEarthMeanRadius,
 		.unix_time = _time,
 	}, _work_performer);
 	// TODO apply sky_correction to vertices' materials
