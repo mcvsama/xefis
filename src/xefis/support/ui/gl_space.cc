@@ -51,7 +51,7 @@ GLSpace::set_material (rigid_body::ShapeMaterial const& material)
 
 	glFogCoordf (material.gl_fog_distance);
 	glColor4fv (material.gl_emission_color);
-	glMaterialf (GL_FRONT, GL_SHININESS, material.gl_shininess);
+	glMaterialf (GL_FRONT, GL_SHININESS, 128.0 * material.gl_shininess);
 	glMaterialfv (GL_FRONT, GL_EMISSION, material.gl_emission_color);
 
 	if (params.color_override)
