@@ -69,45 +69,56 @@ AtmosphericScattering::calculate_incident_light (SpaceLength<> const& observer_p
 		return math::zero;
 	else
 	{
+		// Adjust min/max distance to ensure we are sampling only within the valid range:
 		if (near > min_distance && near > 0_m)
 			min_distance = near;
 
 		if (far < max_distance)
 			max_distance = far;
 
+		// Compute the length of each sample segment along the view ray:
 		si::Length sky_segment_length = (max_distance - min_distance) / _p.num_viewing_direction_samples;
 		si::Length sky_current_distance = min_distance;
 
-		auto const g = 0.76;
+		// Compute phase functions (scattering intensity based on angle between sun and view direction):
+		auto const g = 0.76; // Mie asymmetry factor (approximates forward scattering).
 		auto const gg = neutrino::square (g);
 		auto const mu = dot_product (ray_direction, sun_direction); // Cosine of the angle between the sun direction and the ray direction.
 		auto const phase = RayleighMie<double> {
 			.r = 3.0 / (16.0 * std::numbers::pi) * (1.0 + mu * mu),
 			.m = 3.0 / (8.0 * std::numbers::pi) * ((1.0 - gg) * (1.0 + mu * mu)) / ((2.0 + gg) * std::pow (1.0 + gg - 2.0 * g * mu, 1.5)),
 		};
+
+		// Accumulate contributions from Rayleigh and Mie scattering:
 		auto contribution = RayleighMie<SpaceVector<double>> { math::zero, math::zero };
 		auto sky_optical_depth = RayleighMie { 0.0_m, 0.0_m };
 
 		// Take multiple samples from the observer_position to the upper limit of the atmosphere:
 		for (uint32_t i = 0; i < _p.num_viewing_direction_samples; ++i)
 		{
+			// Compute the position of the current sample:
 			auto const sky_sample_position = observer_position + (sky_current_distance + sky_segment_length * 0.5f) * ray_direction;
+			// Find where sunlight intersects the atmosphere from this sample point:
 			auto const light_intersections = ray_sphere_intersections (sky_sample_position, sun_direction, _p.atmosphere_radius);
 
 			if (light_intersections)
 			{
 				auto const sky_sample_height = sky_sample_position.norm() - _p.earth_radius;
+
+				// Compute optical depth for Rayleigh and Mie scattering:
 				auto const hr = std::exp (-sky_sample_height / _p.rayleigh_threshold) * sky_segment_length;
 				auto const hm = std::exp (-sky_sample_height / _p.mie_threshold) * sky_segment_length;
 				sky_optical_depth.r += hr;
 				sky_optical_depth.m += hm;
 
+				// Compute optical depth along the sunlight path:
 				auto const [light_near_intersection, light_far_intersection] = *light_intersections;
 				si::Length const light_segment_length = light_far_intersection / _p.num_light_direction_samples;
 				auto light_current_distance = 0_m;
 				auto light_optical_depth = RayleighMie { 0.0_m, 0.0_m };
 				auto light_samples_taken = 0u;
 
+				// Trace light through the atmosphere towards the sun.
 				// At each atmospheric sampling point, calculate light reflected towards the observer by going in the direction
 				// of light source and taking multiple samples until the top of the atmosphere:
 				for (; light_samples_taken < _p.num_light_direction_samples; ++light_samples_taken)
