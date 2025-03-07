@@ -103,9 +103,13 @@ RigidBodyPainter::set_time (si::Time const time)
 void
 RigidBodyPainter::set_camera_angles (si::Angle const x, si::Angle const y, si::Angle const z)
 {
-	_camera_angles[0] = x; // Pitch
-	_camera_angles[1] = y; // Yaw
-	_camera_angles[2] = z; // Roll
+	if (_camera_angles.x() != x || _camera_angles.y() != y || _camera_angles.z() != z)
+	{
+		_camera_angles[0] = x; // Pitch
+		_camera_angles[1] = y; // Yaw
+		_camera_angles[2] = z; // Roll
+		_camera_angles_transform.reset();
+	}
 }
 
 
@@ -289,49 +293,60 @@ RigidBodyPainter::center_at_observer()
 void
 RigidBodyPainter::apply_camera_rotations()
 {
-	// The camera always rotates about the screen Y axis and can be moved up and down using the screen X axis.
-	_gl.rotate_x (_camera_angles[0]); // Pitch
-	_gl.rotate_y (_camera_angles[1]); // Yaw
-	_gl.rotate_z (_camera_angles[2]); // Roll
-
-	auto const* followed_group = this->followed_group();
-	auto const* followed_body = this->followed_body();
-
-	// Match the screen coordinates with the group/body/planet coordinates.
-	if ((followed_group || followed_body) && followed_body != _planet_body)
+	if (!_camera_angles_transform || _camera_follows_orientation)
 	{
-		// Make an exception if we're following the planet body: we don't want to use aircraft coordinates
-		// for the planet, because it's unnatural:
-		if (followed_body && followed_body == _planet_body)
-			apply_screen_to_null_island_rotations();
-		else if (_camera_follows_orientation)
-		{
-			// Now the body will be shown in standard screen coordinates (X = right, Y = top, Z = towards the viewer).
-			// But we assume that bodies and groups use aircraft coordinates (X = front, Y = right wing, Z = down).
-			// So rotate again to be able to see the aircraft from behind (when camera rotations are all 0°):
-			_gl.rotate_z (-90_deg);
-			_gl.rotate_y (+90_deg);
+		_gl.save_context ([&] {
+			glLoadIdentity();
+			// The camera always rotates about the screen Y axis and can be moved up and down using the screen X axis.
+			_gl.rotate_x (_camera_angles[0]); // Pitch
+			_gl.rotate_y (_camera_angles[1]); // Yaw
+			_gl.rotate_z (_camera_angles[2]); // Roll
 
-			// Rotate body/group to match the screen coordinates:
-			if (followed_group)
-				if (auto const* rotation_reference_body = followed_group->rotation_reference_body())
-					followed_body = rotation_reference_body;
+			auto const* followed_group = this->followed_group();
+			auto const* followed_body = this->followed_body();
 
-			if (followed_body)
-				_gl.rotate (followed_body->placement().body_to_base_rotation());
+			// Match the screen coordinates with the group/body/planet coordinates.
+			if ((followed_group || followed_body) && followed_body != _planet_body)
+			{
+				// Make an exception if we're following the planet body: we don't want to use aircraft coordinates
+				// for the planet, because it's unnatural:
+				if (followed_body && followed_body == _planet_body)
+					apply_screen_to_null_island_rotations();
+				else if (_camera_follows_orientation)
+				{
+					// Now the body will be shown in standard screen coordinates (X = right, Y = top, Z = towards the viewer).
+					// But we assume that bodies and groups use aircraft coordinates (X = front, Y = right wing, Z = down).
+					// So rotate again to be able to see the aircraft from behind (when camera rotations are all 0°):
+					_gl.rotate_z (-90_deg);
+					_gl.rotate_y (+90_deg);
 
-		}
-		else
-		{
-			// Rotate the world so that down points to the center of _planet_body:
-			_gl.rotate_x (+_position_on_earth.lat() - 90_deg);
-			_gl.rotate_y (-_position_on_earth.lon());
-			apply_screen_to_null_island_rotations();
-		}
+					// Rotate body/group to match the screen coordinates:
+					if (followed_group)
+						if (auto const* rotation_reference_body = followed_group->rotation_reference_body())
+							followed_body = rotation_reference_body;
+
+					if (followed_body)
+						_gl.rotate (followed_body->placement().body_to_base_rotation());
+
+				}
+				else
+				{
+					// Rotate the world so that down points to the center of _planet_body:
+					_gl.rotate_x (+_position_on_earth.lat() - 90_deg);
+					_gl.rotate_y (-_position_on_earth.lon());
+					apply_screen_to_null_island_rotations();
+				}
+			}
+			// Nothing is followed, so default to planet body if it exists:
+			else if (_planet_body)
+				apply_screen_to_null_island_rotations();
+
+			_camera_angles_transform.emplace();
+			glGetFloatv (GL_MODELVIEW_MATRIX, _camera_angles_transform->data());
+		});
 	}
-	// Nothing is followed, so default to planet body if it exists:
-	else if (_planet_body)
-		apply_screen_to_null_island_rotations();
+
+	glMultMatrixf (_camera_angles_transform->data());
 }
 
 

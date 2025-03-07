@@ -78,6 +78,8 @@ class RigidBodyPainter: protected QOpenGLFunctions
 		SpaceVector<double>		cartesian_coordinates;
 	};
 
+	using GLMatrix = std::array<GLfloat, 16>;
+
   public:
 	struct GroupRenderingConfig
 	{
@@ -121,7 +123,10 @@ class RigidBodyPainter: protected QOpenGLFunctions
 		requires neutrino::SameAsAnyOf<Object, rigid_body::Group, rigid_body::Body>
 		void
 		set_followed (Object const& object) noexcept
-			{ _followed = &object; }
+		{
+			_followed = &object;
+			_camera_angles_transform.reset();
+		}
 
 	/**
 	 * Disable body/group following.
@@ -149,8 +154,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	 * Enabled by default.
 	 */
 	void
-	set_camera_follows_body_orientation (bool enabled) noexcept
-		{ _camera_follows_orientation = enabled; }
+	set_camera_follows_body_orientation (bool enabled) noexcept;
 
 	[[nodiscard]]
 	bool
@@ -259,8 +263,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	 * Can be nullptr to disable planet rendering.
 	 */
 	void
-	set_planet (rigid_body::Body const* planet_body) noexcept
-		{ _planet_body = planet_body; }
+	set_planet (rigid_body::Body const* planet_body) noexcept;
 
 	/**
 	 * Set camera focus point.
@@ -589,6 +592,8 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	bool						_recalculate_sky_dome		{ false };
 	si::Time					_sky_dome_update_time;
 	std::array<SkyLight, 5>		_sky_lights;
+	// Cached calculated OpenGL transforms:
+	std::optional<GLMatrix>		_camera_angles_transform;
 };
 
 
@@ -609,6 +614,22 @@ RigidBodyPainter::followed_body() const noexcept
 		return *body;
 	else
 		return nullptr;
+}
+
+
+inline void
+RigidBodyPainter::set_camera_follows_body_orientation (bool enabled) noexcept
+{
+	_camera_follows_orientation = enabled;
+	_camera_angles_transform.reset();
+}
+
+
+inline void
+RigidBodyPainter::set_planet (rigid_body::Body const* planet_body) noexcept
+{
+	_planet_body = planet_body;
+	_camera_angles_transform.reset();
 }
 
 } // namespace xf
