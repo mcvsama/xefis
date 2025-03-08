@@ -101,6 +101,13 @@ RigidBodyPainter::set_time (si::Time const time)
 
 
 void
+RigidBodyPainter::set_relative_camera_position (SpaceLength<WorldSpace> const& position)
+{
+	_relative_camera_position = position;
+}
+
+
+void
 RigidBodyPainter::set_camera_angles (si::Angle const x, si::Angle const y, si::Angle const z)
 {
 	if (_camera_angles.x() != x || _camera_angles.y() != y || _camera_angles.z() != z)
@@ -148,8 +155,8 @@ RigidBodyPainter::setup (QOpenGLPaintDevice& canvas)
 
 	auto const size = canvas.size();
 
-	_position_on_earth = xf::polar (math::coordinate_system_cast<ECEFSpace, void> (followed_position()));
-	_agl_height = abs (followed_position() + _camera_position) - kEarthMeanRadius;
+	_followed_position_on_earth = xf::polar (math::coordinate_system_cast<ECEFSpace, void> (followed_position()));
+	_agl_height = abs (followed_position() + _relative_camera_position) - kEarthMeanRadius;
 
 	// If the next calculated SkyDome is ready, use it:
 	if (_next_sky_dome.valid() && is_ready (_next_sky_dome))
@@ -239,7 +246,7 @@ RigidBodyPainter::setup_natural_light()
 				auto const number = sky_light.gl_number;
 				auto const light_direction = cartesian<void> (sky_light.position); // Azimuth (lon()) should possible be negated, but the sky dome is symmetric, so this is okay.
 				auto const color = _atmospheric_scattering.calculate_incident_light (
-					{ 0_m, 0_m, _position_on_earth.radius() },
+					{ 0_m, 0_m, _followed_position_on_earth.radius() },
 					light_direction,
 					_sky_dome.sun_position.cartesian_coordinates
 				);
@@ -275,7 +282,7 @@ RigidBodyPainter::center_at_followed_object()
 {
 	_gl.load_identity();
 	// Center the world at the followed body:
-	_gl.translate (-_camera_position);
+	_gl.translate (-_relative_camera_position);
 	// Rotate about that body:
 	apply_camera_rotations();
 }
@@ -332,8 +339,8 @@ RigidBodyPainter::apply_camera_rotations()
 				else
 				{
 					// Rotate the world so that down points to the center of _planet_body:
-					_gl.rotate_x (+_position_on_earth.lat() - 90_deg);
-					_gl.rotate_y (-_position_on_earth.lon());
+					_gl.rotate_x (+_followed_position_on_earth.lat() - 90_deg);
+					_gl.rotate_y (-_followed_position_on_earth.lon());
 					apply_screen_to_null_island_rotations();
 				}
 			}
@@ -370,7 +377,7 @@ RigidBodyPainter::make_z_towards_the_sun()
 	// Assuming we have identity rotations + camera rotations applied.
 
 	// Rotate sun depending on UTC time:
-	auto const greenwich_hour_angle = _sky_dome.sun_position.hour_angle - _position_on_earth.lon();
+	auto const greenwich_hour_angle = _sky_dome.sun_position.hour_angle - _followed_position_on_earth.lon();
 	_gl.rotate_z (-greenwich_hour_angle);
 
 	// Rotate sun depending on time of the year:
@@ -385,8 +392,8 @@ RigidBodyPainter::make_z_towards_the_sun()
 void
 RigidBodyPainter::make_z_sky_top_x_south()
 {
-	_gl.rotate_z (+_position_on_earth.lon());
-	_gl.rotate_y (-_position_on_earth.lat());
+	_gl.rotate_z (+_followed_position_on_earth.lon());
+	_gl.rotate_y (-_followed_position_on_earth.lat());
 	_gl.rotate_y (+90_deg);
 	// Z is now sky top, X is towards azimuth 180° (true south).
 }
@@ -440,8 +447,8 @@ RigidBodyPainter::paint_planet()
 		// Sky:
 		_gl.save_context ([&] {
 			// The sky is centered at the followed body. FIXME It should be centered at the observer
-			_gl.rotate_z (+_position_on_earth.lon());
-			_gl.rotate_y (-_position_on_earth.lat());
+			_gl.rotate_z (+_followed_position_on_earth.lon());
+			_gl.rotate_y (-_followed_position_on_earth.lat());
 			_gl.rotate_y (90_deg);
 			// Normally the outside of the sphere shape is rendered, inside is culled.
 			// But here we're inside the sphere, so tell OpenGL that the front faces are the
@@ -771,7 +778,7 @@ RigidBodyPainter::paint_helpers (rigid_body::Group const& group, GroupRenderingC
 			paint_center_of_mass();
 
 			if (group.rotation_reference_body())
-				paint_basis (_camera_position.z() / 15); // Rotation was taken into account in transform_gl_to_center_of_mass (Group).
+				paint_basis (_relative_camera_position.z() / 15); // Rotation was taken into account in transform_gl_to_center_of_mass (Group).
 		});
 	}
 }
@@ -797,7 +804,7 @@ RigidBodyPainter::paint_helpers (rigid_body::Body const& body, BodyRenderingConf
 				if (rendering.origin_visible)
 					paint_origin();
 
-				paint_basis (_camera_position.z() / 15);
+				paint_basis (_relative_camera_position.z() / 15);
 			}
 		});
 	}
@@ -807,7 +814,7 @@ RigidBodyPainter::paint_helpers (rigid_body::Body const& body, BodyRenderingConf
 void
 RigidBodyPainter::paint_center_of_mass()
 {
-	auto const com_shape = rigid_body::make_center_of_mass_symbol_shape (_camera_position.z() / 150);
+	auto const com_shape = rigid_body::make_center_of_mass_symbol_shape (_relative_camera_position.z() / 150);
 
 	_gl.save_context ([&] {
 		glDisable (GL_LIGHTING);
@@ -821,7 +828,7 @@ void
 RigidBodyPainter::paint_origin()
 {
 	auto const origin_material = rigid_body::make_material ({ 0xff, 0xff, 0x00 });
-	auto const origin_shape = rigid_body::make_centered_sphere_shape ({ .radius = _camera_position.z() / 150, .slices = 8, .stacks = 4, .material = origin_material });
+	auto const origin_shape = rigid_body::make_centered_sphere_shape ({ .radius = _relative_camera_position.z() / 150, .slices = 8, .stacks = 4, .material = origin_material });
 
 	_gl.save_context ([&] {
 		setup_feature_light();
@@ -1067,7 +1074,7 @@ RigidBodyPainter::calculate_sky_dome()
 {
 	return xf::calculate_sky_dome ({
 		.atmospheric_scattering = _atmospheric_scattering,
-		.observer_position = _position_on_earth,
+		.observer_position = _followed_position_on_earth,
 		.horizon_radius = kHorizonRadius,
 		.earth_radius = kEarthMeanRadius,
 		.unix_time = _time,

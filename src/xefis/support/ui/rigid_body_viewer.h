@@ -206,8 +206,8 @@ class RigidBodyViewer: public GLAnimationWidget
 	 */
 	[[nodiscard]]
 	SpaceLength<WorldSpace> const&
-	camera_position() const noexcept
-		{ return _camera_position; }
+	relative_camera_position() const noexcept
+		{ return _relative_camera_position; }
 
 	/**
 	 * Return current camera rotation about the X axis in screen coordinates.
@@ -309,7 +309,8 @@ class RigidBodyViewer: public GLAnimationWidget
 	bool						_prevent_menu_reappear: 1		{ false };
 	Playback					_playback						{ Playback::Paused };
 	std::size_t					_steps_to_do					{ 0 };
-	SpaceLength<WorldSpace>		_camera_position				{ kDefaultCameraPosition };
+	// Camera position relative to the followed body:
+	SpaceLength<WorldSpace>		_relative_camera_position		{ kDefaultCameraPosition };
 	si::Angle					_x_angle						{ kDefaultXAngle };
 	si::Angle					_y_angle						{ kDefaultYAngle };
 };

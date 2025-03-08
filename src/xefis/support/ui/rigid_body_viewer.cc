@@ -92,7 +92,7 @@ RigidBodyViewer::mousePressEvent (QMouseEvent* event)
 			event->accept();
 			_x_angle = kDefaultXAngle;
 			_y_angle = kDefaultYAngle;
-			_camera_position = kDefaultCameraPosition;
+			_relative_camera_position = kDefaultCameraPosition;
 			break;
 
 		default:
@@ -156,8 +156,8 @@ RigidBodyViewer::mouseMoveEvent (QMouseEvent* event)
 	if (_changing_translation)
 	{
 		auto const scale = precision() * kTranslationScale / pixel_density;
-		_camera_position[0] += scale * -delta.x();
-		_camera_position[1] += scale * +delta.y();
+		_relative_camera_position[0] += scale * -delta.x();
+		_relative_camera_position[1] += scale * +delta.y();
 	}
 }
 
@@ -166,7 +166,7 @@ void
 RigidBodyViewer::wheelEvent (QWheelEvent* event)
 {
 	auto const scale = precision() * 5_cm / 1_deg;
-	_camera_position[2] += scale * 1_deg * (-event->angleDelta().y() / 8.0);
+	_relative_camera_position[2] += scale * 1_deg * (-event->angleDelta().y() / 8.0);
 }
 
 
@@ -206,7 +206,7 @@ RigidBodyViewer::draw (QOpenGLPaintDevice& canvas)
 
 	if (_rigid_body_system)
 	{
-		_rigid_body_painter.set_camera_position (camera_position());
+		_rigid_body_painter.set_relative_camera_position (relative_camera_position());
 		_rigid_body_painter.set_camera_angles (x_angle(), -y_angle(), 0_deg);
 		_rigid_body_painter.paint (*_rigid_body_system, canvas);
 	}

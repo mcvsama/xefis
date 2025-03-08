@@ -264,14 +264,13 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	set_planet (rigid_body::Body const* planet_body) noexcept;
 
 	/**
-	 * Set camera focus point.
+	 * Set camera position.
 	 */
 	void
-	set_camera_position (SpaceLength<WorldSpace> const& position)
-		{ _camera_position = position; }
+	set_relative_camera_position (SpaceLength<WorldSpace> const& position);
 
 	/**
-	 * Set camera position about the focus point.
+	 * Set camera orientation about the focus point.
 	 */
 	void
 	set_camera_angles (si::Angle x, si::Angle y, si::Angle z);
@@ -557,10 +556,11 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	si::Time					_time;
 	neutrino::WorkPerformer*	_work_performer				{ nullptr };
 	// Camera position is relative to the followed body:
-	SpaceLength<WorldSpace>		_camera_position;
+	SpaceLength<WorldSpace>		_relative_camera_position;
 	// Camera rotation in screen coordinates:
 	SpaceVector<si::Angle>		_camera_angles;
-	LonLatRadius				_position_on_earth			{ 0_deg, 0_deg, 0_m };
+	// Position of the followed body:
+	LonLatRadius				_followed_position_on_earth	{ 0_deg, 0_deg, 0_m };
 	si::Length					_agl_height					{ 0_m };
 	GLSpace						_gl							{ 1.0 / 1_m }; // TODO experiment with 1.0 / 1_km
 	std::variant<std::monostate, rigid_body::Group const*, rigid_body::Body const*>
