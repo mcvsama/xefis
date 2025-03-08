@@ -125,13 +125,15 @@ class GLSpace
 	 */
 	template<math::CoordinateSystem Space>
 		static void
-		rotate (si::Angle const angle, SpaceVector<double, Space> const& axis);
+		rotate (si::Angle const angle, SpaceVector<double, Space> const& normalized_axis)
+			{ rotate (angle, normalized_axis.x(), normalized_axis.y(), normalized_axis.z()); }
 
 	/**
 	 * Rotate current OpenGL matrix by given angle about given vector.
 	 */
 	static void
-	rotate (si::Angle const angle, float x, float y, float z);
+	rotate (si::Angle const angle, float x, float y, float z)
+		{ glRotatef (angle.in<si::Degree>(), x, y, z); }
 
 	/**
 	 * Convenience shortcut.
@@ -158,27 +160,31 @@ class GLSpace
 	 * Translate current OpenGL matrix by given vector.
 	 */
 	static void
-	translate (float x, float y, float z);
+	translate (float x, float y, float z)
+		{ glTranslatef (x, y, z); }
 
 	/**
 	 * Translate current OpenGL matrix by given vector.
 	 */
 	void
-	translate (si::Length x, si::Length y, si::Length z);
+	translate (si::Length x, si::Length y, si::Length z)
+		{ glTranslatef (x * _position_scale, y * _position_scale, z * _position_scale); }
 
 	/**
 	 * Translate current OpenGL matrix by given vector.
 	 */
 	template<math::CoordinateSystem Space>
 		static void
-		translate (SpaceVector<double, Space>);
+		translate (SpaceVector<double, Space> const& offset)
+			{ glTranslatef (offset[0], offset[1], offset[2]); }
 
 	/**
 	 * Translate current OpenGL matrix by given vector.
 	 */
 	template<math::CoordinateSystem Space>
 		void
-		translate (SpaceVector<si::Length, Space>);
+		translate (SpaceVector<si::Length, Space> const& offset)
+			{ translate (offset * _position_scale); }
 
 	/**
 	 * Return value in OpenGL coordinates.
@@ -322,51 +328,6 @@ template<math::CoordinateSystem TargetSpace, math::CoordinateSystem SourceSpace>
 		};
 
 		glMultMatrixd (array.data());
-	}
-
-
-template<math::CoordinateSystem Space>
-	inline void
-	GLSpace::rotate (si::Angle const angle, SpaceVector<double, Space> const& normalized_axis)
-	{
-		rotate (angle, normalized_axis.x(), normalized_axis.y(), normalized_axis.z());
-	}
-
-
-inline void
-GLSpace::rotate (si::Angle const angle, float x, float y, float z)
-{
-	glRotatef (angle.in<si::Degree>(), x, y, z);
-}
-
-
-inline void
-GLSpace::translate (float x, float y, float z)
-{
-	glTranslatef (x, y, z);
-}
-
-
-inline void
-GLSpace::translate (si::Length x, si::Length y, si::Length z)
-{
-	glTranslatef (x * _position_scale, y * _position_scale, z * _position_scale);
-}
-
-
-template<math::CoordinateSystem Space>
-	inline void
-	GLSpace::translate (SpaceVector<double, Space> offset)
-	{
-		glTranslatef (offset[0], offset[1], offset[2]);
-	}
-
-
-template<math::CoordinateSystem Space>
-	inline void
-	GLSpace::translate (SpaceVector<si::Length, Space> offset)
-	{
-		translate (offset * _position_scale);
 	}
 
 
