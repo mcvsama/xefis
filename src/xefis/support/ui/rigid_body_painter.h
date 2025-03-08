@@ -557,6 +557,10 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	neutrino::WorkPerformer*	_work_performer				{ nullptr };
 	// Camera position is relative to the followed body:
 	SpaceLength<WorldSpace>		_relative_camera_position;
+	// Camera position in ECEF coordinate system:
+	SpaceLength<WorldSpace>		_ecef_camera_position;
+	// Camera position in Lon/Lat/Radius:
+	LonLatRadius				_camera_position_on_earth	{ 0_deg, 0_deg, 0_m };
 	// Camera rotation in screen coordinates:
 	SpaceVector<si::Angle>		_camera_angles;
 	// Position of the followed body:

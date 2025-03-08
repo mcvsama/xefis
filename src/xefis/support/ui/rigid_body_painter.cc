@@ -104,6 +104,8 @@ void
 RigidBodyPainter::set_relative_camera_position (SpaceLength<WorldSpace> const& position)
 {
 	_relative_camera_position = position;
+	_ecef_camera_position = followed_position() + _relative_camera_position;
+	_camera_position_on_earth = polar (_ecef_camera_position);
 }
 
 
@@ -377,7 +379,7 @@ RigidBodyPainter::make_z_towards_the_sun()
 	// Assuming we have identity rotations + camera rotations applied.
 
 	// Rotate sun depending on UTC time:
-	auto const greenwich_hour_angle = _sky_dome.sun_position.hour_angle - _followed_position_on_earth.lon();
+	auto const greenwich_hour_angle = _sky_dome.sun_position.hour_angle - _camera_position_on_earth.lon();
 	_gl.rotate_z (-greenwich_hour_angle);
 
 	// Rotate sun depending on time of the year:
@@ -392,8 +394,8 @@ RigidBodyPainter::make_z_towards_the_sun()
 void
 RigidBodyPainter::make_z_sky_top_x_south()
 {
-	_gl.rotate_z (+_followed_position_on_earth.lon());
-	_gl.rotate_y (-_followed_position_on_earth.lat());
+	_gl.rotate_z (+_camera_position_on_earth.lon());
+	_gl.rotate_y (-_camera_position_on_earth.lat());
 	_gl.rotate_y (+90_deg);
 	// Z is now sky top, X is towards azimuth 180° (true south).
 }
@@ -446,9 +448,8 @@ RigidBodyPainter::paint_planet()
 	_gl.save_context ([&] {
 		// Sky:
 		_gl.save_context ([&] {
-			// The sky is centered at the followed body. FIXME It should be centered at the observer
-			_gl.rotate_z (+_followed_position_on_earth.lon());
-			_gl.rotate_y (-_followed_position_on_earth.lat());
+			_gl.rotate_z (+_camera_position_on_earth.lon());
+			_gl.rotate_y (-_camera_position_on_earth.lat());
 			_gl.rotate_y (90_deg);
 			// Normally the outside of the sphere shape is rendered, inside is culled.
 			// But here we're inside the sphere, so tell OpenGL that the front faces are the
@@ -1074,7 +1075,7 @@ RigidBodyPainter::calculate_sky_dome()
 {
 	return xf::calculate_sky_dome ({
 		.atmospheric_scattering = _atmospheric_scattering,
-		.observer_position = _followed_position_on_earth,
+		.observer_position = _camera_position_on_earth,
 		.horizon_radius = kHorizonRadius,
 		.earth_radius = kEarthMeanRadius,
 		.unix_time = _time,
