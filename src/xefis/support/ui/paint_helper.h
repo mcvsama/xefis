@@ -102,8 +102,8 @@ class PaintHelper
 		{ return new QSpacerItem (0, em_pixels_int (minimum_ems), QSizePolicy::Fixed, QSizePolicy::Expanding); }
 
 	[[nodiscard]]
-	QFrame*
-	new_hline() const;
+	static QFrame*
+	new_hline();
 
   private:
 	QPaintDevice const&	_canvas;
@@ -139,7 +139,7 @@ PaintHelper::em_pixels (float ems) const
 
 
 inline QFrame*
-PaintHelper::new_hline() const
+PaintHelper::new_hline()
 {
 	auto* line = new QFrame();
 	line->setFrameShape (QFrame::HLine);
