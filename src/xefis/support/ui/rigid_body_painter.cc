@@ -159,8 +159,8 @@ RigidBodyPainter::setup (QOpenGLPaintDevice& canvas)
 		schedule_sky_dome_recalculation();
 
 	glMatrixMode (GL_PROJECTION);
-	glLoadIdentity();
-	glTranslatef (0.0, 0.0, -1.0);
+	_gl.load_identity();
+	_gl.translate (0.0, 0.0, -1.0);
 	_gl.set_hfov_perspective (size, 40_deg, _gl.to_opengl (1_m), _gl.to_opengl (100_km));
 
 	glMatrixMode (GL_MODELVIEW);
@@ -180,7 +180,7 @@ RigidBodyPainter::setup (QOpenGLPaintDevice& canvas)
 	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable (GL_LIGHTING);
 
-	glLoadIdentity();
+	_gl.load_identity();
 }
 
 
@@ -201,7 +201,7 @@ RigidBodyPainter::setup_feature_light()
 
 	_gl.save_context ([&] {
 		// Reset rotations and translations:
-		glLoadIdentity();
+		_gl.load_identity();
 		// Cast light from observer's position (Z = 1):
 		glLightfv (kFeatureLight, GL_POSITION, GLArray { 0.0f, 0.0f, 1.0f, 0.0f });
 	});
@@ -222,7 +222,7 @@ RigidBodyPainter::setup_natural_light()
 	{
 		// Direct sunlight:
 		_gl.save_context ([&] {
-			glLoadIdentity();
+			_gl.load_identity();
 			center_at_followed_object();
 			make_z_towards_the_sun();
 			glLightfv (kSunLight, GL_POSITION, GLArray { 0.0f, 0.0f, _gl.to_opengl (kSunDistance), 0.0f });
@@ -273,7 +273,7 @@ RigidBodyPainter::setup_natural_light()
 void
 RigidBodyPainter::center_at_followed_object()
 {
-	glLoadIdentity();
+	_gl.load_identity();
 	// Center the world at the followed body:
 	_gl.translate (-_camera_position);
 	// Rotate about that body:
@@ -284,7 +284,7 @@ RigidBodyPainter::center_at_followed_object()
 void
 RigidBodyPainter::center_at_observer()
 {
-	glLoadIdentity();
+	_gl.load_identity();
 	// Rotate about that body:
 	apply_camera_rotations();
 }
@@ -296,7 +296,7 @@ RigidBodyPainter::apply_camera_rotations()
 	if (!_camera_angles_transform || _camera_follows_orientation)
 	{
 		_gl.save_context ([&] {
-			glLoadIdentity();
+			_gl.load_identity();
 			// The camera always rotates about the screen Y axis and can be moved up and down using the screen X axis.
 			_gl.rotate_x (_camera_angles[0]); // Pitch
 			_gl.rotate_y (_camera_angles[1]); // Yaw
@@ -341,12 +341,11 @@ RigidBodyPainter::apply_camera_rotations()
 			else if (_planet_body)
 				apply_screen_to_null_island_rotations();
 
-			_camera_angles_transform.emplace();
-			glGetFloatv (GL_MODELVIEW_MATRIX, _camera_angles_transform->data());
+			_camera_angles_transform.emplace (_gl.extract_modelview_matrix());
 		});
 	}
 
-	glMultMatrixf (_camera_angles_transform->data());
+	_gl.multiply_matrix_by (*_camera_angles_transform);
 }
 
 
@@ -972,8 +971,8 @@ RigidBodyPainter::paint_ecef_basis (QOpenGLPaintDevice& canvas)
 	auto const ty = -1.0 + 2 * pixels_from_edge / canvas.height();
 
 	glMatrixMode (GL_PROJECTION);
-	glLoadIdentity();
-	glTranslatef (tx, ty, -1.0);
+	_gl.load_identity();
+	_gl.translate (tx, ty, -1.0);
 	_gl.set_hfov_perspective (canvas.size(), 60_deg, _gl.to_opengl (1_cm), _gl.to_opengl (10_m));
 	glMatrixMode (GL_MODELVIEW);
 	glDisable (GL_FOG);

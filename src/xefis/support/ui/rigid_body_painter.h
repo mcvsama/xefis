@@ -78,8 +78,6 @@ class RigidBodyPainter: protected QOpenGLFunctions
 		SpaceVector<double>		cartesian_coordinates;
 	};
 
-	using GLMatrix = std::array<GLfloat, 16>;
-
   public:
 	struct GroupRenderingConfig
 	{

@@ -72,6 +72,9 @@ template<class... Args>
 	GLArray (Args&&...) -> GLArray<std::common_type_t<Args...>, sizeof...(Args)>;
 
 
+using GLMatrix = std::array<GLfloat, 16>;
+
+
 /**
  * Support for various OpenGL stuff.
  */
@@ -265,6 +268,17 @@ class GLSpace
 	set_wireframe_enabled (bool enabled)
 		{ glPolygonMode (GL_FRONT_AND_BACK, enabled ? GL_LINE : GL_FILL); }
 
+	static void
+	load_identity()
+		{ glLoadIdentity(); }
+
+	static GLMatrix
+	extract_modelview_matrix();
+
+	static void
+	multiply_matrix_by (GLMatrix const& matrix)
+		{ glMultMatrixf (matrix.data()); }
+
   private:
 	void
 	push_context();
@@ -390,6 +404,15 @@ template<math::CoordinateSystem Space>
 		position += _global_offset;
 		add_vertex (position * _position_scale);
 	}
+
+
+inline GLMatrix
+GLSpace::extract_modelview_matrix()
+{
+	GLMatrix matrix;
+	glGetFloatv (GL_MODELVIEW_MATRIX, matrix.data());
+	return matrix;
+}
 
 } // namespace xf
 
