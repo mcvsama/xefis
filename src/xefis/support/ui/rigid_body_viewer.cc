@@ -45,6 +45,9 @@ RigidBodyViewer::RigidBodyViewer (QWidget* parent, RefreshRate const refresh_rat
 				_machine->show_configurator();
 		});
 	}
+
+	forward_camera_translation();
+	forward_camera_rotation();
 }
 
 
@@ -90,9 +93,10 @@ RigidBodyViewer::mousePressEvent (QMouseEvent* event)
 
 		case kResetViewButton:
 			event->accept();
-			_x_angle = kDefaultXAngle;
-			_y_angle = kDefaultYAngle;
-			_relative_camera_position = kDefaultCameraPosition;
+			_camera_translation = kDefaultCameraTranslation;
+			forward_camera_translation();
+			_camera_rotation = kDefaultCameraRotation;
+			forward_camera_rotation();
 			break;
 
 		default:
@@ -148,16 +152,18 @@ RigidBodyViewer::mouseMoveEvent (QMouseEvent* event)
 	if (_changing_rotation)
 	{
 		auto const scale = kRotationScale / pixel_density;
-		_x_angle += scale * delta.y();
-		_x_angle = clamped<si::Angle> (_x_angle, { -90_deg, +90_deg });
-		_y_angle = floored_mod (_y_angle - scale * delta.x(), 360_deg);
+		_camera_rotation.x() += scale * delta.y();
+		_camera_rotation.x() = clamped<si::Angle> (_camera_rotation.x(), { -90_deg, +90_deg });
+		_camera_rotation.y() = -floored_mod (-_camera_rotation.y() - scale * delta.x(), 360_deg);
+		forward_camera_rotation();
 	}
 
 	if (_changing_translation)
 	{
 		auto const scale = precision() * kTranslationScale / pixel_density;
-		_relative_camera_position[0] += scale * -delta.x();
-		_relative_camera_position[1] += scale * +delta.y();
+		_camera_translation[0] += scale * -delta.x();
+		_camera_translation[1] += scale * +delta.y();
+		forward_camera_translation();
 	}
 }
 
@@ -166,7 +172,8 @@ void
 RigidBodyViewer::wheelEvent (QWheelEvent* event)
 {
 	auto const scale = precision() * 5_cm / 1_deg;
-	_relative_camera_position[2] += scale * 1_deg * (-event->angleDelta().y() / 8.0);
+	_camera_translation[2] += scale * 1_deg * (-event->angleDelta().y() / 8.0);
+	forward_camera_translation();
 }
 
 
@@ -205,11 +212,7 @@ RigidBodyViewer::draw (QOpenGLPaintDevice& canvas)
 	}
 
 	if (_rigid_body_system)
-	{
-		_rigid_body_painter.set_relative_camera_position (relative_camera_position());
-		_rigid_body_painter.set_camera_angles (x_angle(), -y_angle(), 0_deg);
 		_rigid_body_painter.paint (*_rigid_body_system, canvas);
-	}
 }
 
 

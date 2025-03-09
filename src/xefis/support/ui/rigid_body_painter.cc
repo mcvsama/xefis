@@ -101,23 +101,29 @@ RigidBodyPainter::set_time (si::Time const time)
 
 
 void
-RigidBodyPainter::set_relative_camera_position (SpaceLength<WorldSpace> const& position)
+RigidBodyPainter::set_followed_to_none()
 {
-	_relative_camera_position = position;
-	_ecef_camera_position = followed_position() + _relative_camera_position;
-	_camera_position_on_earth = polar (_ecef_camera_position);
+	_followed = std::monostate();
+	calculate_camera_position();
 }
 
 
 void
-RigidBodyPainter::set_camera_angles (si::Angle const x, si::Angle const y, si::Angle const z)
+RigidBodyPainter::set_camera_translation (SpaceLength<WorldSpace> const& translation)
 {
-	if (_camera_angles.x() != x || _camera_angles.y() != y || _camera_angles.z() != z)
+	_camera_translation = translation;
+	calculate_camera_position();
+}
+
+
+void
+RigidBodyPainter::set_camera_rotation (SpaceVector<si::Angle> const& rotation)
+{
+	if (_camera_rotation != rotation)
 	{
-		_camera_angles[0] = x; // Pitch
-		_camera_angles[1] = y; // Yaw
-		_camera_angles[2] = z; // Roll
+		_camera_rotation = rotation;
 		_camera_angles_transform.reset();
+		calculate_camera_position();
 	}
 }
 
@@ -158,7 +164,7 @@ RigidBodyPainter::setup (QOpenGLPaintDevice& canvas)
 	auto const size = canvas.size();
 
 	_followed_position_on_earth = xf::polar (math::coordinate_system_cast<ECEFSpace, void> (followed_position()));
-	_agl_height = abs (followed_position() + _relative_camera_position) - kEarthMeanRadius;
+	_agl_height = abs (followed_position() + _camera_translation) - kEarthMeanRadius;
 
 	// If the next calculated SkyDome is ready, use it:
 	if (_next_sky_dome.valid() && is_ready (_next_sky_dome))
@@ -284,7 +290,7 @@ RigidBodyPainter::center_at_followed_object()
 {
 	_gl.load_identity();
 	// Center the world at the followed body:
-	_gl.translate (-_relative_camera_position);
+	_gl.translate (-_camera_translation);
 	// Rotate about that body:
 	apply_camera_rotations();
 }
@@ -307,9 +313,9 @@ RigidBodyPainter::apply_camera_rotations()
 		_gl.save_context ([&] {
 			_gl.load_identity();
 			// The camera always rotates about the screen Y axis and can be moved up and down using the screen X axis.
-			_gl.rotate_x (_camera_angles[0]); // Pitch
-			_gl.rotate_y (_camera_angles[1]); // Yaw
-			_gl.rotate_z (_camera_angles[2]); // Roll
+			_gl.rotate_x (_camera_rotation.x()); // Pitch
+			_gl.rotate_y (_camera_rotation.y()); // Yaw
+			_gl.rotate_z (_camera_rotation.z()); // Roll
 
 			auto const* followed_group = this->followed_group();
 			auto const* followed_body = this->followed_body();
@@ -779,7 +785,7 @@ RigidBodyPainter::paint_helpers (rigid_body::Group const& group, GroupRenderingC
 			paint_center_of_mass();
 
 			if (group.rotation_reference_body())
-				paint_basis (_relative_camera_position.z() / 15); // Rotation was taken into account in transform_gl_to_center_of_mass (Group).
+				paint_basis (_camera_translation.z() / 15); // Rotation was taken into account in transform_gl_to_center_of_mass (Group).
 		});
 	}
 }
@@ -805,7 +811,7 @@ RigidBodyPainter::paint_helpers (rigid_body::Body const& body, BodyRenderingConf
 				if (rendering.origin_visible)
 					paint_origin();
 
-				paint_basis (_relative_camera_position.z() / 15);
+				paint_basis (_camera_translation.z() / 15);
 			}
 		});
 	}
@@ -815,7 +821,7 @@ RigidBodyPainter::paint_helpers (rigid_body::Body const& body, BodyRenderingConf
 void
 RigidBodyPainter::paint_center_of_mass()
 {
-	auto const com_shape = rigid_body::make_center_of_mass_symbol_shape (_relative_camera_position.z() / 150);
+	auto const com_shape = rigid_body::make_center_of_mass_symbol_shape (_camera_translation.z() / 150);
 
 	_gl.save_context ([&] {
 		glDisable (GL_LIGHTING);
@@ -829,7 +835,7 @@ void
 RigidBodyPainter::paint_origin()
 {
 	auto const origin_material = rigid_body::make_material ({ 0xff, 0xff, 0x00 });
-	auto const origin_shape = rigid_body::make_centered_sphere_shape ({ .radius = _relative_camera_position.z() / 150, .slices = 8, .stacks = 4, .material = origin_material });
+	auto const origin_shape = rigid_body::make_centered_sphere_shape ({ .radius = _camera_translation.z() / 150, .slices = 8, .stacks = 4, .material = origin_material });
 
 	_gl.save_context ([&] {
 		setup_feature_light();
@@ -1081,6 +1087,15 @@ RigidBodyPainter::calculate_sky_dome()
 		.unix_time = _time,
 	}, _work_performer);
 	// TODO apply sky_correction to vertices' materials
+}
+
+
+void
+RigidBodyPainter::calculate_camera_position()
+{
+	auto const ecef_camera_position_on_earth = followed_position();
+	_camera_position_on_earth = polar (ecef_camera_position_on_earth);
+	_recalculate_sky_dome = true;
 }
 
 

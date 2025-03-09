@@ -61,18 +61,20 @@ class RigidBodyViewer: public GLAnimationWidget
 	};
 
   public:
-	static constexpr auto		kRotationButton			{ Qt::RightButton };
-	static constexpr auto		kTranslationButton		{ Qt::LeftButton };
-	static constexpr auto		kResetViewButton		{ Qt::BackButton };
+	static constexpr auto		kRotationButton				{ Qt::RightButton };
+	static constexpr auto		kTranslationButton			{ Qt::LeftButton };
+	static constexpr auto		kResetViewButton			{ Qt::BackButton };
 
-	static constexpr si::Angle	kDefaultXAngle			{ 0_deg };
-	static constexpr si::Angle	kDefaultYAngle			{ 0_deg };
+	static constexpr si::Angle	kDefaultXAngle				{ 0_deg };
+	static constexpr si::Angle	kDefaultYAngle				{ 0_deg };
 	static constexpr SpaceLength<WorldSpace>
-								kDefaultCameraPosition	{ 0_m, 0_m, 10_m };
+								kDefaultCameraTranslation	{ 0_m, 0_m, 10_m };
+	static constexpr SpaceVector<si::Angle>
+								kDefaultCameraRotation		{ 0_deg, 0_deg, 0_deg };
 
-	static constexpr auto		kRotationScale			{ 2_deg / 1_mm };
-	static constexpr auto		kTranslationScale		{ 2.5_cm / 1_mm };
-	static constexpr float		kHighPrecision			{ 0.05f };
+	static constexpr auto		kRotationScale				{ 2_deg / 1_mm };
+	static constexpr auto		kTranslationScale			{ 2.5_cm / 1_mm };
+	static constexpr float		kHighPrecision				{ 0.05f };
 
   public:
 	// Ctor
@@ -206,24 +208,16 @@ class RigidBodyViewer: public GLAnimationWidget
 	 */
 	[[nodiscard]]
 	SpaceLength<WorldSpace> const&
-	relative_camera_position() const noexcept
-		{ return _relative_camera_position; }
+	camera_translation() const noexcept
+		{ return _camera_translation; }
 
 	/**
-	 * Return current camera rotation about the X axis in screen coordinates.
+	 * Return current camera angles.
 	 */
 	[[nodiscard]]
-	si::Angle
-	x_angle() const noexcept
-		{ return _x_angle; }
-
-	/**
-	 * Return current camera rotation about the Y axis in screen coordinates.
-	 */
-	[[nodiscard]]
-	si::Angle
-	y_angle() const noexcept
-		{ return _y_angle; }
+	SpaceVector<si::Angle> const&
+	camera_rotation() const noexcept
+		{ return _camera_rotation; }
 
 	/**
 	 * Return playback mode.
@@ -295,6 +289,20 @@ class RigidBodyViewer: public GLAnimationWidget
 	bool
 	display_menu();
 
+	/**
+	 * Forward current camera position to the RigidBodyPainter.
+	 */
+	void
+	forward_camera_translation()
+		{ _rigid_body_painter.set_camera_translation (_camera_translation); }
+
+	/**
+	 * Forward current camera angles to the RigidBodyPainter.
+	 */
+	void
+	forward_camera_rotation()
+		{ _rigid_body_painter.set_camera_rotation (_camera_rotation); }
+
   private:
 	Machine*					_machine						{ nullptr };
 	rigid_body::System const*	_rigid_body_system				{ nullptr };
@@ -310,9 +318,8 @@ class RigidBodyViewer: public GLAnimationWidget
 	Playback					_playback						{ Playback::Paused };
 	std::size_t					_steps_to_do					{ 0 };
 	// Camera position relative to the followed body:
-	SpaceLength<WorldSpace>		_relative_camera_position		{ kDefaultCameraPosition };
-	si::Angle					_x_angle						{ kDefaultXAngle };
-	si::Angle					_y_angle						{ kDefaultYAngle };
+	SpaceLength<WorldSpace>		_camera_translation				{ kDefaultCameraTranslation };
+	SpaceVector<si::Angle>		_camera_rotation				{ kDefaultCameraRotation };
 };
 
 } // namespace xf

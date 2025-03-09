@@ -124,14 +124,14 @@ class RigidBodyPainter: protected QOpenGLFunctions
 		{
 			_followed = &object;
 			_camera_angles_transform.reset();
+			calculate_camera_position();
 		}
 
 	/**
 	 * Disable body/group following.
 	 */
 	void
-	set_followed_to_none() noexcept
-		{ _followed = std::monostate(); }
+	set_followed_to_none();
 
 	/**
 	 * Return a followed group, if set, or nullptr.
@@ -267,13 +267,13 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	 * Set camera position.
 	 */
 	void
-	set_relative_camera_position (SpaceLength<WorldSpace> const& position);
+	set_camera_translation (SpaceLength<WorldSpace> const& translation);
 
 	/**
 	 * Set camera orientation about the focus point.
 	 */
 	void
-	set_camera_angles (si::Angle x, si::Angle y, si::Angle z);
+	set_camera_rotation (SpaceVector<si::Angle> const& rotation);
 
 	/**
 	 * Return true if constraints are set to be visible.
@@ -547,6 +547,9 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	SkyDome
 	calculate_sky_dome();
 
+	void
+	calculate_camera_position();
+
 	[[nodiscard]]
 	static QColor
 	hsl_interpolation (float x, QColor const& color0, QColor const& color1);
@@ -556,13 +559,11 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	si::Time					_time;
 	neutrino::WorkPerformer*	_work_performer				{ nullptr };
 	// Camera position is relative to the followed body:
-	SpaceLength<WorldSpace>		_relative_camera_position;
-	// Camera position in ECEF coordinate system:
-	SpaceLength<WorldSpace>		_ecef_camera_position;
+	SpaceLength<WorldSpace>		_camera_translation;
 	// Camera position in Lon/Lat/Radius:
 	LonLatRadius				_camera_position_on_earth	{ 0_deg, 0_deg, 0_m };
 	// Camera rotation in screen coordinates:
-	SpaceVector<si::Angle>		_camera_angles;
+	SpaceVector<si::Angle>		_camera_rotation;
 	// Position of the followed body:
 	LonLatRadius				_followed_position_on_earth	{ 0_deg, 0_deg, 0_m };
 	si::Length					_agl_height					{ 0_m };
@@ -624,6 +625,7 @@ RigidBodyPainter::set_camera_follows_body_orientation (bool enabled) noexcept
 {
 	_camera_follows_orientation = enabled;
 	_camera_angles_transform.reset();
+	calculate_camera_position();
 }
 
 
@@ -632,6 +634,7 @@ RigidBodyPainter::set_planet (rigid_body::Body const* planet_body) noexcept
 {
 	_planet_body = planet_body;
 	_camera_angles_transform.reset();
+	calculate_camera_position();
 }
 
 } // namespace xf
