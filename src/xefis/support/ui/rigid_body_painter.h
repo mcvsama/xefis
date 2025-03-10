@@ -538,7 +538,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	 * Request that the new SkyDome is calculated and put into _next_sky_dome.
 	 */
 	void
-	schedule_sky_dome_recalculation();
+	start_sky_dome_recalculation();
 
 	/**
 	 * \threadsafe	As long as _atmospheric_scattering is unmodified.

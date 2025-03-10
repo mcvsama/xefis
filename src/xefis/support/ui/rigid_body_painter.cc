@@ -171,7 +171,7 @@ RigidBodyPainter::setup (QOpenGLPaintDevice& canvas)
 		_sky_dome = _next_sky_dome.get();
 
 	if (!_next_sky_dome.valid() && std::exchange (_recalculate_sky_dome, false))
-		schedule_sky_dome_recalculation();
+		start_sky_dome_recalculation();
 
 	glMatrixMode (GL_PROJECTION);
 	_gl.load_identity();
@@ -1066,7 +1066,7 @@ RigidBodyPainter::get_center_of_mass (rigid_body::Group const& group)
 
 
 void
-RigidBodyPainter::schedule_sky_dome_recalculation()
+RigidBodyPainter::start_sky_dome_recalculation()
 {
 	if (_work_performer)
 		_next_sky_dome = _work_performer->submit (&RigidBodyPainter::calculate_sky_dome, this);
