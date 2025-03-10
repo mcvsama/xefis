@@ -1068,10 +1068,15 @@ RigidBodyPainter::get_center_of_mass (rigid_body::Group const& group)
 void
 RigidBodyPainter::start_sky_dome_recalculation()
 {
-	if (_work_performer)
-		_next_sky_dome = _work_performer->submit (&RigidBodyPainter::calculate_sky_dome, this);
+	if (_next_sky_dome.valid())
+		throw Exception ("can only start_sky_dome_recalculation() after previous calculation is finished");
 	else
-		_sky_dome = calculate_sky_dome();
+	{
+		if (_work_performer)
+			_next_sky_dome = _work_performer->submit (&RigidBodyPainter::calculate_sky_dome, this);
+		else
+			_sky_dome = calculate_sky_dome();
+	}
 }
 
 
