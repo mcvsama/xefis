@@ -644,14 +644,14 @@ template<class Unit>
 			if (socket)
 			{
 				if (settings.preferred_units.empty())
-					return std::format (settings.numeric_format_double, socket->value()) + ' ' + unit_symbol (*socket);
+					return std::format (settings.numeric_format_double, socket->value()) + unit_suffix (*socket);
 				else
 				{
 					for (si::DynamicUnit const& du: settings.preferred_units)
 						if (si::is_convertible (Unit::dynamic_unit(), du))
 							return std::format (settings.numeric_format_double, si::convert (Unit::dynamic_unit(), socket->value(), du)) + " " + du.symbol();
 
-					return std::format (settings.numeric_format_double, socket->value()) + ' ' + unit_symbol (*socket);
+					return std::format (settings.numeric_format_double, socket->value()) + unit_suffix (*socket);
 				}
 			}
 			else
