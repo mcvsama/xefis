@@ -24,6 +24,7 @@
 // Qt:
 #include <QFont>
 #include <QFrame>
+#include <QLabel>
 #include <QPaintDevice>
 #include <QPalette>
 #include <QSpacerItem>
@@ -145,6 +146,14 @@ PaintHelper::new_hline()
 	line->setFrameShape (QFrame::HLine);
 	return line;
 }
+
+
+inline QLabel*
+align_right (QLabel* const label)
+{
+	label->setAlignment (Qt::AlignRight);
+	return label;
+};
 
 } // namespace xf
 
