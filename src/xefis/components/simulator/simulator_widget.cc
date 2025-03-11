@@ -217,6 +217,9 @@ SimulatorWidget::make_simulation_controls()
 		sim_controls_layout->addWidget (tabs);
 		sim_controls_layout->setStretch (0, 0);
 		sim_controls_layout->setStretch (1, 1);
+
+		// setTabOrder() must be after setting up the layout:
+		QWidget::setTabOrder (step_sim_button, speed_slider);
 	}
 
 	return sim_controls;
