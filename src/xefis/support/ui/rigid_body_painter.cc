@@ -181,7 +181,7 @@ RigidBodyPainter::setup (QOpenGLPaintDevice& canvas)
 	glMatrixMode (GL_MODELVIEW);
 	glFrontFace (GL_CCW);
 	glCullFace (GL_BACK);
-	glClearColor (0.1, 0.1, 0.1, 0.0);
+	glClearColor (0.0, 0.0, 0.0, 0.0);
 	glPolygonMode (GL_BACK, GL_LINE);
 	glShadeModel (GL_SMOOTH);
 	glHint (GL_POLYGON_SMOOTH_HINT, GL_NICEST);
@@ -454,6 +454,7 @@ RigidBodyPainter::paint_planet()
 	_gl.save_context ([&] {
 		// Sky:
 		_gl.save_context ([&] {
+			// Rotate so that down is -Z.
 			_gl.rotate_z (+_camera_position_on_earth.lon());
 			_gl.rotate_y (-_camera_position_on_earth.lat());
 			_gl.rotate_y (90_deg);
@@ -463,7 +464,14 @@ RigidBodyPainter::paint_planet()
 			// But here we're inside the sphere, so tell OpenGL that the front faces are the
 			// inside faces:
 			glFrontFace (GL_CW);
+			// No lights, the sky itself is the light source:
+			glDisable (GL_LIGHTING);
+			// Blend with the universe:
+			glBlendFunc (GL_ONE, GL_ONE);
+			glEnable (GL_BLEND);
 			_gl.draw (_sky_dome.sky_shape);
+			glDisable (GL_BLEND);
+			glEnable (GL_LIGHTING);
 			glFrontFace (GL_CCW);
 		});
 
