@@ -67,6 +67,10 @@ class AtmosphericScattering
 	explicit
     AtmosphericScattering (Parameters const&);
 
+	Parameters const&
+	parameters() const noexcept
+		{ return _p; }
+
 	/**
 	 * Calculate the light that reaches a `observer_position` point along a ray as it travels through the atmosphere, accounting for scattering effects.
 	 * Kind of like ray-tracing of sky dome. Include both Rayleigh and Mie effects.
@@ -107,7 +111,6 @@ class AtmosphericScattering
 	static constexpr SpaceVector<float, RGBSpace>
 	tonemap_separately (SpaceVector<float, RGBSpace> input);
 
-  private:
 	/**
 	 * Determine whether a ray intersects a sphere.
 	 *

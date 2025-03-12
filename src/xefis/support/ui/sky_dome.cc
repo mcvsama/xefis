@@ -34,6 +34,30 @@ struct SlicesStacks
 };
 
 
+/**
+ * Calculate angle for the point on circle when viewed from above (`vertical_shift`) the
+ * center of the circle.
+ */
+[[nodiscard]]
+constexpr si::Angle
+calculate_view_angle (si::Angle const origin_angle, si::Length const vertical_shift, si::Length const radius)
+{
+    return 1_rad * atan2 (radius * sin (origin_angle) - vertical_shift, radius * cos (origin_angle));
+}
+
+
+/**
+ * Inverse for view_angle() (assuming vertical_shift and radius are the same as for
+ * view_angle()).
+ */
+[[nodiscard]]
+constexpr si::Angle
+calculate_origin_angle (si::Angle const view_angle, si::Length const vertical_shift, si::Length const radius)
+{
+    return view_angle + 1_rad * asin ((vertical_shift * cos (view_angle)) / radius);
+}
+
+
 [[nodiscard]]
 SkyDome::SunPosition
 calculate_sun_position (si::LonLat const observer_position, si::Time const time)
@@ -62,7 +86,7 @@ calculate_sun_position (si::LonLat const observer_position, si::Time const time)
 
 [[nodiscard]]
 SlicesStacks
-calculate_sky_slices_and_stacks (HorizontalCoordinates const sun_position)
+calculate_sky_slices_and_stacks (HorizontalCoordinates const sun_position, si::Length const observer_position_radius, si::Length const atmosphere_radius)
 {
 	SlicesStacks result;
 
@@ -90,21 +114,22 @@ calculate_sky_slices_and_stacks (HorizontalCoordinates const sun_position)
 
 	// Latitude:
 	{
-		auto const sun_vicinity = Range { sun_position.altitude - 15_deg, sun_position.altitude + 15_deg };
+		auto const sun_vicinity = Range { sun_position.altitude - 20_deg, sun_position.altitude + 20_deg };
 
 		// Start below the horizon:
-		result.stack_angles = { -10_deg };
+		result.stack_angles = { -1_deg };
 
-		for (auto latitude = 0_deg; latitude < 90_deg; )
+		for (auto latitude = result.stack_angles[0]; latitude < 90_deg; )
 		{
-			result.stack_angles.push_back (latitude);
+			result.stack_angles.push_back (calculate_origin_angle (latitude, observer_position_radius, atmosphere_radius));
 
+			// TODO denser around the earth's visible border
 			if (latitude <= 3_deg)
 				latitude += 0.25_deg;
 			else if (latitude <= 6_deg)
 				latitude += 0.5_deg;
-			else if (sun_vicinity.includes (latitude))
-				latitude += 1_deg;
+			else if (latitude <= 12_deg || sun_vicinity.includes (latitude))
+				latitude += 1.5_deg;
 			else
 			{
 				auto const big_step = 5_deg;
@@ -112,7 +137,7 @@ calculate_sky_slices_and_stacks (HorizontalCoordinates const sun_position)
 				if (latitude < sun_vicinity.min() && sun_vicinity.includes (latitude + big_step))
 				{
 					latitude = sun_vicinity.min() + 0.1_deg; // +0.1° prevents infinite loop.
-					result.stack_angles.push_back (latitude);
+					result.stack_angles.push_back (calculate_origin_angle (latitude, observer_position_radius, atmosphere_radius));
 				}
 				else
 					latitude += big_step;
@@ -131,22 +156,26 @@ calculate_sky_slices_and_stacks (HorizontalCoordinates const sun_position)
 rigid_body::Shape
 calculate_sky_shape (xf::LonLatRadius const observer_position,
 					 SkyDome::SunPosition const sun_position,
-					 si::Length const horizon_radius,
 					 AtmosphericScattering const& atmospheric_scattering,
 					 neutrino::WorkPerformer* work_performer = nullptr)
 {
-	auto const ss = calculate_sky_slices_and_stacks (sun_position.horizontal_coordinates);
+	auto const atmosphere_radius = atmospheric_scattering.parameters().atmosphere_radius;
+	auto const ss = calculate_sky_slices_and_stacks (sun_position.horizontal_coordinates, observer_position.radius(), atmosphere_radius);
 	// Sphere pole is at the top of the observer. Stacks are perpendicular to observer's local horizon:
 	auto sky = rigid_body::make_centered_irregular_sphere_shape ({
-		.radius = horizon_radius,
+		.radius = atmosphere_radius,
 		.slice_angles = ss.slice_angles,
 		.stack_angles = ss.stack_angles,
 		.material = rigid_body::kBlackMatte,
 		.setup_material = [&] (rigid_body::ShapeMaterial& material, si::LonLat const sphere_position, WaitGroup::WorkToken&& work_token) {
-			auto calculate = [&material, &atmospheric_scattering, &observer_position, &sun_position, sphere_position, work_token = std::move (work_token)] {
+			auto calculate = [&material, &atmospheric_scattering, &observer_position, &sun_position, atmosphere_radius, sphere_position, work_token = std::move (work_token)] {
+				auto const lat = sphere_position.lat();
+				auto const view_angle = calculate_view_angle (lat, observer_position.radius(), atmosphere_radius);
+				auto const polar_ray_direction = si::LonLat (sphere_position.lon(), view_angle);
+				auto const ray_direction = cartesian<void> (polar_ray_direction);
 				auto const color = atmospheric_scattering.calculate_incident_light(
 					{ 0_m, 0_m, observer_position.radius() },
-					cartesian<void> (sphere_position),
+					ray_direction,
 					sun_position.cartesian_coordinates
 				);
 				material.gl_emission_color = to_gl_color (color);
@@ -189,7 +218,7 @@ calculate_sky_dome (SkyDomeParameters const& params, neutrino::WorkPerformer* wo
 	auto const sun_position = calculate_sun_position (params.observer_position, params.unix_time);
 
 	return {
-		.sky_shape = calculate_sky_shape (params.observer_position, sun_position, params.horizon_radius, params.atmospheric_scattering, work_performer),
+		.sky_shape = calculate_sky_shape (params.observer_position, sun_position, params.atmospheric_scattering, work_performer),
 		.ground_shape = calculate_ground_shape(),
 		.sun_position = sun_position,
 		.sun_light_color = calculate_sun_light_color (params.observer_position, sun_position.cartesian_coordinates, params.atmospheric_scattering),

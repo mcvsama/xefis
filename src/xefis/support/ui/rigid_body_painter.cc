@@ -457,6 +457,8 @@ RigidBodyPainter::paint_planet()
 			_gl.rotate_z (+_camera_position_on_earth.lon());
 			_gl.rotate_y (-_camera_position_on_earth.lat());
 			_gl.rotate_y (90_deg);
+			// Move the center of painted sky dome to the ECEF origin:
+			_gl.translate (0_m, 0_m, -followed_position().norm());
 			// Normally the outside of the sphere shape is rendered, inside is culled.
 			// But here we're inside the sphere, so tell OpenGL that the front faces are the
 			// inside faces:
