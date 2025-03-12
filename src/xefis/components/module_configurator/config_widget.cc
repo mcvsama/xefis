@@ -44,7 +44,7 @@ ConfigWidget::create_performance_widget (QWidget* parent, QString const& title) 
 	auto* stats_widget = new xf::HistogramStatsWidget (group_box);
 
 	auto* group_layout = new QVBoxLayout (group_box);
-	group_layout->setMargin (0);
+	group_layout->setContentsMargins (0, 0, 0, 0);
 	group_layout->addWidget (histogram_widget);
 	group_layout->addWidget (stats_widget);
 	group_layout->setContentsMargins (margins);

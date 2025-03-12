@@ -49,7 +49,7 @@ ModuleConfigurator::ModuleConfigurator (Machine& machine, QWidget* parent):
 	_stack->addWidget (_no_module_selected);
 
 	QHBoxLayout* layout = new QHBoxLayout (this);
-	layout->setMargin (0);
+	layout->setContentsMargins (0, 0, 0, 0);
 	layout->addWidget (_configurable_items_list);
 	layout->addWidget (_stack);
 }

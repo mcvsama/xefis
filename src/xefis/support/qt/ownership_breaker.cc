@@ -28,7 +28,7 @@ OwnershipBreaker::OwnershipBreaker (QWidget* child, QWidget* parent):
 	_child (child)
 {
 	QHBoxLayout* layout = new QHBoxLayout (this);
-	layout->setMargin (0);
+	layout->setContentsMargins (0, 0, 0, 0);
 	layout->setSpacing (0);
 	layout->addWidget (child, 0, Qt::AlignTop | Qt::AlignLeft);
 	layout->addItem (new QSpacerItem (0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding));

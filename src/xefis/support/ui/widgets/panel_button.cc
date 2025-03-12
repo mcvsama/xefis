@@ -66,7 +66,7 @@ PanelButton::PanelButton (QWidget* parent, Panel* panel, LEDColor color, Socket<
 	QObject::connect (_button, &QPushButton::released, this, &PanelButton::write);
 
 	QVBoxLayout* layout = new QVBoxLayout (this);
-	layout->setMargin (0);
+	layout->setContentsMargins (0, 0, 0, 0);
 	layout->setSpacing (0);
 	layout->addWidget (_button, 0, Qt::AlignCenter);
 

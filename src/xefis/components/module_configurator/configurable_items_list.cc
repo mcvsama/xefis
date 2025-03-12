@@ -54,7 +54,7 @@ ConfigurableItemsList::ConfigurableItemsList (Machine& machine, QWidget* parent)
 	QObject::connect (_list, &QTreeWidget::currentItemChanged, this, &ConfigurableItemsList::item_selected);
 
 	QHBoxLayout* layout = new QHBoxLayout (this);
-	layout->setMargin (0);
+	layout->setContentsMargins (0, 0, 0, 0);
 	layout->addWidget (_list);
 
 	auto lh = default_line_height (this);

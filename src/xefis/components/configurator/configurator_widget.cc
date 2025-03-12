@@ -44,7 +44,8 @@ ConfiguratorWidget::ConfiguratorWidget (Machine& machine, QWidget* parent):
 	_tabs->addTab (_data_recorder, "&Data recorder");
 
 	auto* layout = new QVBoxLayout (this);
-	layout->setMargin (ph.em_pixels (0.15f));
+	auto const margin = ph.em_pixels (0.15f);
+	layout->setContentsMargins (margin, margin, margin, margin);
 	layout->addWidget (_tabs);
 
 	auto* esc = new QShortcut (this);

@@ -61,7 +61,7 @@ ObservationWidgetGroup::add_observable (std::string_view const name, std::string
 
 ObservationWidget::ObservationWidget()
 {
-	_layout.setMargin (0);
+	_layout.setContentsMargins (0, 0, 0, 0);
 }
 
 

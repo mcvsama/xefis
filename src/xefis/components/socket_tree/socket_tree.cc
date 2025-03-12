@@ -50,7 +50,7 @@ SocketTree::SocketTree (QWidget* parent):
 	_tree->setHeaderLabels ({ "Socket", "Use count", "Actual value",  "Set value", "Fallback value" });
 
 	QHBoxLayout* layout = new QHBoxLayout (this);
-	layout->setMargin (0);
+	layout->setContentsMargins (0, 0, 0, 0);
 	layout->addWidget (_tree);
 
 	_refresh_timer = new QTimer (this);

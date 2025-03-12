@@ -69,7 +69,7 @@ Widget::create_colored_strip_label (QString const& text, QColor color, Qt::Align
 	label->setFont (font);
 
 	auto* layout = new QGridLayout (widget);
-	layout->setMargin (0);
+	layout->setContentsMargins (0, 0, 0, 0);
 	layout->setSpacing (0);
 
 	if (strip_position & Qt::AlignLeft)

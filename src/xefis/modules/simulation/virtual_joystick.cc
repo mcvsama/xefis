@@ -448,7 +448,7 @@ VirtualJoystick::VirtualJoystick (xf::ProcessingLoop& loop, xf::Machine* machine
 	_pedals_widget->set_value (0.0f);
 
 	auto* layout = new QGridLayout (_widget);
-	layout->setMargin (0);
+	layout->setContentsMargins (0, 0, 0, 0);
 	layout->setSpacing (0);
 	layout->addWidget (_throttle_widget, 0, 0);
 	layout->addWidget (_joystick_widget, 0, 1);

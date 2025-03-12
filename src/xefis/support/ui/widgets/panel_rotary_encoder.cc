@@ -38,7 +38,7 @@ PanelRotaryEncoder::PanelRotaryEncoder (QWidget* parent, Panel* panel, QString c
 	_click_socket (click_socket)
 {
 	QVBoxLayout* layout = new QVBoxLayout (this);
-	layout->setMargin (0);
+	layout->setContentsMargins (0, 0, 0, 0);
 	layout->setSpacing (0);
 	layout->addItem (new QSpacerItem (KnobSize.width(), KnobSize.height(), QSizePolicy::Fixed, QSizePolicy::Fixed));
 

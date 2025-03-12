@@ -32,7 +32,7 @@ GraphsStack::GraphsStack (QWidget* parent):
 	setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Expanding);
 
 	_layout = new QVBoxLayout (this);
-	_layout->setMargin (0);
+	_layout->setContentsMargins (0, 0, 0, 0);
 }
 
 

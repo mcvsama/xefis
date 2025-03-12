@@ -44,7 +44,7 @@ ScreenWidget::ScreenWidget (Screen& screen, QWidget* parent):
 	tabs->addTab (create_performance_tab(), "Performance");
 
 	auto* layout = new QVBoxLayout (this);
-	layout->setMargin (0);
+	layout->setContentsMargins (0, 0, 0, 0);
 	layout->addWidget (name_strip);
 	layout->addItem (new QSpacerItem (0, ph.em_pixels (0.15f), QSizePolicy::Fixed, QSizePolicy::Fixed));
 	layout->addWidget (tabs);
@@ -147,7 +147,7 @@ ScreenWidget::create_performance_tab()
 				= create_performance_widget (tab, QString::fromStdString ("Total latency (request start to painting finish)"));
 
 			auto* tab_layout = new QGridLayout (tab);
-			tab_layout->setMargin (0);
+			tab_layout->setContentsMargins (0, 0, 0, 0);
 			tab_layout->addWidget (widgets.start_latency_group, 0, 0);
 			tab_layout->addWidget (widgets.total_latency_group, 1, 0);
 			tab_layout->addItem (new QSpacerItem (0, ph.em_pixels (0.5f), QSizePolicy::Expanding, QSizePolicy::Fixed), 2, 0);
@@ -158,7 +158,7 @@ ScreenWidget::create_performance_tab()
 	}
 
 	auto* widget_layout = new QGridLayout (widget);
-	widget_layout->setMargin (0);
+	widget_layout->setContentsMargins (0, 0, 0, 0);
 	widget_layout->addWidget (tabs, 0, 0);
 	widget_layout->addItem (new QSpacerItem (0, 0, QSizePolicy::Expanding, QSizePolicy::Fixed), 0, 1);
 	widget_layout->addItem (new QSpacerItem (0, 0, QSizePolicy::Fixed, QSizePolicy::Expanding), 1, 0);

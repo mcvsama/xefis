@@ -55,7 +55,7 @@ WingWidget::setup_airfoil_info_widget()
 
 	auto* airfoil_frame_layout = new QVBoxLayout (&_airfoil_frame);
 	airfoil_frame_layout->addWidget (&_airfoil_spline_widget);
-	airfoil_frame_layout->setMargin (0);
+	airfoil_frame_layout->setContentsMargins (0, 0, 0, 0);
 }
 
 

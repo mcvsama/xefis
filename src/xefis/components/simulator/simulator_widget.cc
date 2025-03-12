@@ -111,7 +111,7 @@ SimulatorWidget::make_viewer_widget()
 
 	auto* layout = new QHBoxLayout (viewer_frame);
 	layout->addWidget (&*_rigid_body_viewer);
-	layout->setMargin (0);
+	layout->setContentsMargins (0, 0, 0, 0);
 
 	return viewer_frame;
 }
@@ -188,7 +188,7 @@ SimulatorWidget::make_simulation_controls()
 	{
 		auto* basic_controls_layout = new QGridLayout (basic_controls);
 		{
-			basic_controls_layout->setMargin (0);
+			basic_controls_layout->setContentsMargins (0, 0, 0, 0);
 			auto row = 0;
 			auto* buttons_layout = new QHBoxLayout();
 			buttons_layout->addWidget (start_stop_sim_button);
@@ -214,7 +214,7 @@ SimulatorWidget::make_simulation_controls()
 		}
 
 		auto* sim_controls_layout = new QHBoxLayout (sim_controls);
-		sim_controls_layout->setMargin (0);
+		sim_controls_layout->setContentsMargins (0, 0, 0, 0);
 		sim_controls_layout->addWidget (basic_controls);
 		sim_controls_layout->addWidget (tabs);
 		sim_controls_layout->setStretch (0, 0);
@@ -403,7 +403,7 @@ SimulatorWidget::make_body_controls()
 	body_controls->setSizePolicy (QSizePolicy::Fixed, QSizePolicy::Expanding);
 
 	auto* layout = new QHBoxLayout (body_controls);
-	layout->setMargin (0);
+	layout->setContentsMargins (0, 0, 0, 0);
 	layout->addWidget (&*_items_tree);
 	layout->addWidget (&*_editors_stack);
 

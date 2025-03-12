@@ -69,7 +69,7 @@ ModuleWidget::ModuleWidget (Module& module, QWidget* parent):
 	}
 
 	auto* layout = new QVBoxLayout (this);
-	layout->setMargin (0);
+	layout->setContentsMargins (0, 0, 0, 0);
 	layout->addWidget (name_strip);
 	layout->addItem (new QSpacerItem (0, ph.em_pixels (0.15f), QSizePolicy::Fixed, QSizePolicy::Fixed));
 	layout->addWidget (tabs);
@@ -153,7 +153,7 @@ ModuleWidget::create_performance_tab()
 		std::tie (_painting_time_histogram, _painting_time_stats, painting_time_group) = create_performance_widget (widget, "Painting time");
 
 	auto layout = new QGridLayout (widget);
-	layout->setMargin (0);
+	layout->setContentsMargins (0, 0, 0, 0);
 	layout->addWidget (_communication_time_group, 0, 0);
 	layout->addWidget (_processing_time_group, 1, 0);
 
