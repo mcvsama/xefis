@@ -92,8 +92,6 @@ calculate_sky_slices_and_stacks (HorizontalCoordinates const sun_position, si::L
 
 	// Longitude:
 	{
-		result.slice_angles.clear();
-
 		auto constexpr sun_vicinity_slices = 13;
 		auto constexpr rest_slices = 50;
 
