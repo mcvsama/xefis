@@ -215,7 +215,7 @@ template<class SetupMaterial>
 			all_materials_set_up.wait();
 		else if constexpr (future_based_setup_material)
 			for (auto& future: all_setup_material_futures)
-				future.get();
+				future.wait();
 
 		fill_in_uncomputed_points_on_sphere (shape);
 		set_sphere_normals (shape, params.radius);
@@ -316,7 +316,7 @@ template<class SetupMaterial>
 			all_materials_set_up.wait();
 		else if constexpr (future_based_setup_material)
 			for (auto& future: all_setup_material_futures)
-				future.get();
+				future.wait();
 
 		fill_in_uncomputed_points_on_sphere (shape);
 		set_sphere_normals (shape, params.radius);
