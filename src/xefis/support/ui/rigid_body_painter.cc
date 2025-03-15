@@ -83,6 +83,7 @@ RigidBodyPainter::RigidBodyPainter (si::PixelDensity const pixel_density):
 		.position	= { 0_deg, 90_deg },
 	};
 
+	calculate_camera_position();
 	_sky_dome = calculate_sky_dome();
 }
 
@@ -163,8 +164,7 @@ RigidBodyPainter::setup (QOpenGLPaintDevice& canvas)
 
 	auto const size = canvas.size();
 
-	_followed_position_on_earth = xf::polar (math::coordinate_system_cast<ECEFSpace, void> (followed_position()));
-	_agl_height = abs (followed_position() + _camera_translation) - kEarthMeanRadius;
+	_followed_position_on_earth = xf::polar (math::coordinate_system_cast<ECEFSpace, void> (followed_position() - planet_position()));
 
 	// If the next calculated SkyDome is ready, use it:
 	if (_next_sky_dome.valid() && is_ready (_next_sky_dome))
@@ -226,6 +226,7 @@ RigidBodyPainter::setup_feature_light()
 void
 RigidBodyPainter::setup_natural_light()
 {
+	// TODO if above atmosphere, get the sun color from black body radiation.
 	auto const sun_color = to_gl_color (_sky_dome.sun_light_color);
 	glDisable (kFeatureLight);
 	glEnable (kSunLight);
@@ -434,22 +435,8 @@ RigidBodyPainter::paint_planet()
 	if (!_planet_body)
 		return;
 
-	float normalized_altitude = renormalize (_agl_height, Range { 0_km, 15_km }, Range { 0.0f, 1.0f });
-	normalized_altitude = std::clamp (normalized_altitude, 0.0f, 1.0f);
-
-	auto const low_fog_color = QColor (0x58, 0x72, 0x92).lighter (200);
-	auto const high_fog_color = QColor (0xa5, 0xc9, 0xd3);
-
-	auto const ground_color = QColor (0xaa, 0x55, 0x00).darker (150);
-	auto const high_ground_fog_color = high_fog_color;
-	auto const low_ground_fog_color = low_fog_color;
-	auto const ground_fog_density = renormalize (normalized_altitude, Range { 0.0f, 1.0f }, Range { 0.001f, 0.0015f });
-
 	// Draw stuff like we were located at Lon/Lat 0°/0° looking towards south pole.
 	// In other words match ECEF coordinates with standard OpenGL screen coordinates.
-
-	// Offset by planet position in the simulation: // FIXME wrong if the center of the world is focused object?
-	_gl.translate (_planet_body->placement().position());
 
 	_gl.save_context ([&] {
 		// Sky:
@@ -533,29 +520,39 @@ RigidBodyPainter::paint_planet()
 		});
 
 		// Ground:
+		// TODO it would be best if there was a shader that adds the ground sphere color to the drawn feature
 		_gl.save_context ([&] {
-			auto const ground_fog_color = hsl_interpolation (normalized_altitude, low_ground_fog_color, high_ground_fog_color);
+			auto const ground_color = QColor (0xaa, 0x55, 0x00);
 
 			rigid_body::ShapeMaterial ground_material;
-			ground_material.set_emission_color (ground_color);
-			ground_material.set_ambient_color (Qt::black);
-			ground_material.set_diffuse_color (Qt::black);
-			ground_material.set_specular_color (Qt::black);
-			ground_material.set_shininess (0.0f);
+			ground_material.set_emission_color (ground_color.darker (1000));
+			ground_material.set_ambient_color (ground_color.darker (600));
+			ground_material.set_diffuse_color (ground_color);
 
-			glFogi (GL_FOG_MODE, GL_EXP);
-			glFogi (GL_FOG_COORD_SRC, GL_FRAGMENT_DEPTH);
-			glFogf (GL_FOG_DENSITY, ground_fog_density);
-			glFogf (GL_FOG_START, _gl.to_opengl (0_m));
-			glFogf (GL_FOG_END, _gl.to_opengl (kHorizonRadius));
-			glFogfv (GL_FOG_COLOR, to_gl_color (ground_fog_color));
+			_gl.save_context ([&] {
+				make_z_sky_top_x_south();
+				_gl.translate (0_m, 0_m, -_camera_position_on_earth.radius());
 
-			make_z_sky_top_x_south();
-			_gl.translate (0_m, 0_m, -_agl_height);
+				// Make a globe that will act as a ground shape:
+				auto surface_globe = _sky_dome.ground_shape;
+				surface_globe.for_all_vertices ([&ground_material] (rigid_body::ShapeVertex& vertex) {
+					vertex.set_material (ground_material);
+				});
 
-			glEnable (GL_FOG);
-			_gl.draw (rigid_body::make_solid_circle (kHorizonRadius, { 0_deg, 360_deg }, 10, ground_material));
-			glDisable (GL_FOG);
+				// Normal ground:
+				_gl.draw (surface_globe);
+
+				// Ground haze:
+				// Blend with existing ground: final_color = (1 - transmittance) * atmosphere_color + ground_color
+				glBlendFunc (GL_SRC_ALPHA, GL_ONE);
+				glDisable (GL_DEPTH_TEST);
+				glDisable (GL_LIGHTING);
+				glEnable (GL_BLEND);
+				_gl.draw (_sky_dome.ground_shape);
+				glDisable (GL_BLEND);
+				glEnable (GL_LIGHTING);
+				glEnable (GL_DEPTH_TEST);
+			});
 		});
 	});
 }
@@ -611,8 +608,6 @@ RigidBodyPainter::paint_air_particles()
 void
 RigidBodyPainter::paint (rigid_body::System const& system)
 {
-	glDisable (GL_FOG);
-
 	_gl.save_context ([&] {
 		for (auto const& body: system.bodies())
 			paint (*body, get_rendering_config (*body));
@@ -640,6 +635,7 @@ RigidBodyPainter::paint (rigid_body::System const& system)
 			auto const* focused_body = this->focused_body();
 
 			glEnable (GL_BLEND);
+			glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 			_gl.clear_z_buffer();
 
 			for (auto const& group: system.groups())
@@ -999,7 +995,6 @@ RigidBodyPainter::paint_ecef_basis (QOpenGLPaintDevice& canvas)
 	_gl.translate (tx, ty, -1.0);
 	_gl.set_hfov_perspective (canvas.size(), 60_deg, _gl.to_opengl (1_cm), _gl.to_opengl (10_m));
 	glMatrixMode (GL_MODELVIEW);
-	glDisable (GL_FOG);
 
 	_gl.save_context ([&] {
 		_gl.translate (0_m, 0_m, -1_m);
@@ -1063,6 +1058,16 @@ RigidBodyPainter::followed_position()
 
 
 SpaceLength<WorldSpace>
+RigidBodyPainter::planet_position() const
+{
+	if (_planet_body)
+		return _planet_body->placement().position();
+	else
+		return SpaceLength<WorldSpace> (math::zero);
+}
+
+
+SpaceLength<WorldSpace>
 RigidBodyPainter::get_center_of_mass (rigid_body::Group const& group)
 {
 	if (auto const it = _group_centers_of_mass_cache.find (&group);
@@ -1097,7 +1102,6 @@ RigidBodyPainter::calculate_sky_dome()
 	return xf::calculate_sky_dome ({
 		.atmospheric_scattering = _atmospheric_scattering,
 		.observer_position = _camera_position_on_earth,
-		.horizon_radius = kHorizonRadius,
 		.earth_radius = kEarthMeanRadius,
 		.unix_time = _time,
 	}, _work_performer);
@@ -1108,7 +1112,7 @@ RigidBodyPainter::calculate_sky_dome()
 void
 RigidBodyPainter::calculate_camera_position()
 {
-	auto const ecef_camera_position_on_earth = followed_position();
+	auto const ecef_camera_position_on_earth = followed_position() - planet_position();
 	_camera_position_on_earth = polar (ecef_camera_position_on_earth);
 	_recalculate_sky_dome = true;
 }

@@ -55,7 +55,6 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	static constexpr si::Length	kDefaultHingeDiameter		= 3_cm;
 
 	static constexpr auto		kSkyHeight					= 60_km;
-	static constexpr auto		kHorizonRadius				= 500_km;
 	static constexpr auto		kSunRadius					= 696'340_km;
 	static constexpr auto		kSunDistance				= 147'000'000_km;
 	static constexpr auto		kSunNoonEnlargement			= 1.0;
@@ -532,6 +531,10 @@ class RigidBodyPainter: protected QOpenGLFunctions
 
 	[[nodiscard]]
 	SpaceLength<WorldSpace>
+	planet_position() const;
+
+	[[nodiscard]]
+	SpaceLength<WorldSpace>
 	get_center_of_mass (rigid_body::Group const&);
 
 	/**
@@ -566,7 +569,6 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	SpaceVector<si::Angle>		_camera_rotation;
 	// Position of the followed body:
 	LonLatRadius				_followed_position_on_earth	{ 0_deg, 0_deg, 0_m };
-	si::Length					_agl_height					{ 0_m };
 	GLSpace						_gl							{ 1.0 / 1_m }; // TODO experiment with 1.0 / 1_km
 	std::variant<std::monostate, rigid_body::Group const*, rigid_body::Body const*>
 								_followed;
