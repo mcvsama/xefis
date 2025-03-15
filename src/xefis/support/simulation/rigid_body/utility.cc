@@ -38,7 +38,7 @@ make_earth (bool include_actual_sphere)
 			.n_stacks = n_stacks,
 			.material = rigid_body::kBlackMatte,
 			.setup_material = [](rigid_body::ShapeMaterial& material, si::LonLat const position) {
-				auto const [r, g, b] = cartesian (position);
+				auto const [r, g, b] = to_cartesian (position);
 
 				auto const pos_r = std::clamp<float> (r, 0.0f, +1.0f);
 				auto const pos_g = std::clamp<float> (g, 0.0f, +1.0f);

@@ -188,7 +188,7 @@ template<class SetupMaterial>
 			si::Angle angle_h = params.h_range.min();
 
 			auto const add_vertex = [&] (si::LonLat const lonlat) {
-				auto const cartesian_position = math::coordinate_system_cast<BodyOrigin, void> (cartesian (lonlat));
+				auto const cartesian_position = math::coordinate_system_cast<BodyOrigin, void> (to_cartesian (lonlat));
 				auto& vertex = strip.emplace_back (cartesian_position * params.radius, params.material);
 
 				if constexpr (synchronous_setup_material)
@@ -287,7 +287,7 @@ template<class SetupMaterial>
 			strip.reserve (2 * n_slices);
 
 			auto const add_vertex = [&] (si::LonLat const lonlat) {
-				auto const cartesian_position = math::coordinate_system_cast<BodyOrigin, void> (cartesian (lonlat));
+				auto const cartesian_position = math::coordinate_system_cast<BodyOrigin, void> (to_cartesian (lonlat));
 				auto& vertex = strip.emplace_back (cartesian_position * params.radius, params.material);
 
 				if constexpr (synchronous_setup_material)

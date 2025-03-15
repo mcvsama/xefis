@@ -130,7 +130,7 @@ calculate_sun_position (si::LonLat const observer_position, si::Time const time)
 	auto const declination = sun_equatorial_position.declination;
 	auto const horizontal_coordinates = calculate_sun_horizontal_position (declination, observer_position.lat(), hour_angle);
 	// Azimuth 0° is North, Hour angle 0° is Noon, so add 180_deg. And the direction is opposite, so negate.
-	auto const cartesian_coordinates = cartesian<void> (si::LonLat (-horizontal_coordinates.azimuth + 180_deg, horizontal_coordinates.altitude));
+	auto const cartesian_coordinates = to_cartesian<void> (si::LonLat (-horizontal_coordinates.azimuth + 180_deg, horizontal_coordinates.altitude));
 
 	return {
 		.hour_angle = hour_angle,
@@ -285,7 +285,7 @@ calculate_sky_shape (xf::LonLatRadius const observer_position,
 				auto const lat = sphere_position.lat();
 				auto const view_angle = calculate_view_angle (lat, atmosphere_radius, observer_position.radius());
 				auto const polar_ray_direction = si::LonLat (sphere_position.lon(), view_angle);
-				auto const ray_direction = cartesian<void> (polar_ray_direction);
+				auto const ray_direction = to_cartesian<void> (polar_ray_direction);
 				auto const color = atmospheric_scattering.calculate_incident_light(
 					{ 0_m, 0_m, observer_position.radius() },
 					ray_direction,
@@ -326,7 +326,7 @@ calculate_ground_shape (xf::LonLatRadius const observer_position,
 				auto const cartesian_observer_position = SpaceLength (0_m, 0_m, observer_position.radius());
 				auto const view_angle = calculate_view_angle_above_sphere_from_sphere_latitude (sphere_position.lat(), earth_radius, observer_position.radius());
 				auto const polar_ray_direction = si::LonLat (sphere_position.lon(), -90_deg + view_angle);
-				auto const ray_direction = cartesian<void> (polar_ray_direction);
+				auto const ray_direction = to_cartesian<void> (polar_ray_direction);
 				si::Length max_distance = std::numeric_limits<si::Length>::infinity();
 
 				if (auto const intersections = atmospheric_scattering.ray_sphere_intersections (cartesian_observer_position, ray_direction, earth_radius))

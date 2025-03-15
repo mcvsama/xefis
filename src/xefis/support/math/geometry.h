@@ -344,7 +344,7 @@ is_point_2d_inside_triangle_tester (TriangleConcept auto const& triangle)
 template<math::CoordinateSystem TargetSpace = ECEFSpace>
 	[[nodiscard]]
 	constexpr SpaceVector<double, TargetSpace>
-	cartesian (si::LonLat const& position)
+	to_cartesian (si::LonLat const& position)
 	{
 		auto const cos_lat = cos (position.lat());
 		auto const x = cos_lat * cos (position.lon());
@@ -358,16 +358,16 @@ template<math::CoordinateSystem TargetSpace = ECEFSpace>
 template<math::CoordinateSystem TargetSpace = ECEFSpace>
 	[[nodiscard]]
 	constexpr SpaceVector<si::Length, TargetSpace>
-	cartesian (LonLatRadius const& position)
+	to_cartesian (LonLatRadius const& position)
 	{
-		return position.radius() * cartesian<TargetSpace> (static_cast<si::LonLat const&> (position));
+		return position.radius() * to_cartesian<TargetSpace> (static_cast<si::LonLat const&> (position));
 	}
 
 
 template<math::CoordinateSystem Space>
 	[[nodiscard]]
 	constexpr LonLatRadius
-	polar (SpaceVector<si::Length, Space> const& vector)
+	to_polar (SpaceVector<si::Length, Space> const& vector)
 	{
 		std::complex<double> const xy (vector[0].value(), vector[1].value());
 		std::complex<double> const wz (std::abs (xy), vector[2].value());

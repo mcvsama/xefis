@@ -138,7 +138,7 @@ ObservationWidget::update_observed_values (rigid_body::Body const* planet_body)
 		auto const position = _body ? _body->placement().position() : _mass_moments.center_of_mass_position();
 		auto const position_on_planet = position - planet_body->placement().position();
 		// Assuming the planet is in ECEF orientation.
-		_polar_location = xf::polar (math::coordinate_system_cast<ECEFSpace, void> (position_on_planet));
+		_polar_location = to_polar (math::coordinate_system_cast<ECEFSpace, void> (position_on_planet));
 
 		if (_body)
 			_velocity_moments = _body->velocity_moments<WorldSpace>() - planet_body->velocity_moments<WorldSpace>();

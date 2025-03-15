@@ -164,7 +164,7 @@ RigidBodyPainter::setup (QOpenGLPaintDevice& canvas)
 
 	auto const size = canvas.size();
 
-	_followed_position_on_earth = xf::polar (math::coordinate_system_cast<ECEFSpace, void> (followed_position() - planet_position()));
+	_followed_position_on_earth = to_polar (math::coordinate_system_cast<ECEFSpace, void> (followed_position() - planet_position()));
 
 	// If the next calculated SkyDome is ready, use it:
 	if (_next_sky_dome.valid() && is_ready (_next_sky_dome))
@@ -253,7 +253,7 @@ RigidBodyPainter::setup_natural_light()
 				_gl.rotate_y (-sky_light.position.lat());
 
 				auto const number = sky_light.gl_number;
-				auto const light_direction = cartesian<void> (sky_light.position); // Azimuth (lon()) should possible be negated, but the sky dome is symmetric, so this is okay.
+				auto const light_direction = to_cartesian<void> (sky_light.position); // Azimuth (lon()) should possible be negated, but the sky dome is symmetric, so this is okay.
 				auto const color = _atmospheric_scattering.calculate_incident_light (
 					{ 0_m, 0_m, _followed_position_on_earth.radius() },
 					light_direction,
@@ -1113,7 +1113,7 @@ void
 RigidBodyPainter::calculate_camera_position()
 {
 	auto const ecef_camera_position_on_earth = followed_position() - planet_position();
-	_camera_position_on_earth = polar (ecef_camera_position_on_earth);
+	_camera_position_on_earth = to_polar (ecef_camera_position_on_earth);
 	_recalculate_sky_dome = true;
 }
 

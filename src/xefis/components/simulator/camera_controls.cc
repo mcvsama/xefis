@@ -90,14 +90,14 @@ CameraControls::CameraControls()
 	};
 
 	auto const update_polar_from_ecef = [=] {
-		coordinates->polar = polar (coordinates->ecef);
+		coordinates->polar = to_polar (coordinates->ecef);
 		load_to_spinbox (polar_lon, coordinates->polar.lon().to<si::Degree>());
 		load_to_spinbox (polar_lat, coordinates->polar.lat().to<si::Degree>());
 		load_to_spinbox (polar_radius, coordinates->polar.radius());
 	};
 
 	auto const update_ecef_from_polar = [=] {
-		coordinates->ecef = cartesian (coordinates->polar);
+		coordinates->ecef = to_cartesian (coordinates->polar);
 		load_to_spinbox (ecef_x, coordinates->ecef.x());
 		load_to_spinbox (ecef_y, coordinates->ecef.y());
 		load_to_spinbox (ecef_z, coordinates->ecef.z());

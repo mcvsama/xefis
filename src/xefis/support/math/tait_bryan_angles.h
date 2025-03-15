@@ -100,7 +100,7 @@ tait_bryan_angles (RotationQuaternion<ECEFSpace, AirframeSpace> const& body_rota
 inline TaitBryanAngles
 tait_bryan_angles (RotationMatrix<ECEFSpace, AirframeSpace> const& body_coordinates, SpaceVector<si::Length, ECEFSpace> const& position)
 {
-	return tait_bryan_angles (RotationQuaternion (body_coordinates), polar (position));
+	return tait_bryan_angles (RotationQuaternion (body_coordinates), to_polar (position));
 }
 
 
@@ -108,7 +108,7 @@ tait_bryan_angles (RotationMatrix<ECEFSpace, AirframeSpace> const& body_coordina
 inline TaitBryanAngles
 tait_bryan_angles (RotationQuaternion<ECEFSpace, AirframeSpace> const& body_rotation, SpaceVector<si::Length, ECEFSpace> const& position)
 {
-	return tait_bryan_angles (body_rotation, polar (position));
+	return tait_bryan_angles (body_rotation, to_polar (position));
 }
 
 
@@ -116,7 +116,7 @@ tait_bryan_angles (RotationQuaternion<ECEFSpace, AirframeSpace> const& body_rota
 inline TaitBryanAngles
 tait_bryan_angles (Placement<ECEFSpace, AirframeSpace> const& placement)
 {
-	return tait_bryan_angles (placement.body_to_base_rotation(), polar (placement.position()));
+	return tait_bryan_angles (placement.body_to_base_rotation(), to_polar (placement.position()));
 }
 
 } // namespace xf
