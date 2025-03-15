@@ -48,6 +48,14 @@ auto constexpr kGreyMatte = ShapeMaterial {
 	.gl_shininess		= 0.0f,
 };
 
+auto constexpr kTransparentBlack = ShapeMaterial {
+	.gl_emission_color	= GLColor { 0.0f, 0.0f, 0.0f, 0.0f },
+	.gl_ambient_color	= GLColor { 0.0f, 0.0f, 0.0f, 0.0f },
+	.gl_diffuse_color	= GLColor { 0.0f, 0.0f, 0.0f, 0.0f },
+	.gl_specular_color	= GLColor { 0.0f, 0.0f, 0.0f, 0.0f },
+	.gl_shininess		= 0.0f,
+};
+
 
 inline ShapeMaterial
 make_material (QColor const& material_color, QColor const& emission_color = Qt::black)
