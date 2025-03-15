@@ -35,18 +35,15 @@ struct SlicesStacks
 
 
 /**
- * Calculate how much of a sphere is visible from a given distance.
- * At infinite distance the result is 90°. At zero distance it's 0°.
+ * Calculate angle at which the horizon is seen at given distance from sphere of a given radius.
+ * At infinite distance the result is 90°. At zero distance from sphere's tangent, it's 0°.
  * `distance_from_center` must be >= `sphere_radius` or you'll get NaNs.
  */
 [[nodiscard]]
 constexpr si::Angle
-calculate_visibility_angle (si::Length const sphere_radius, si::Length const distance_from_center)
+calculate_horizon_angle (si::Length const sphere_radius, si::Length const distance_from_center)
 {
-	if (distance_from_center <= sphere_radius)
-		return 0_rad;
-	else
-		return 1_rad * acos (sphere_radius / distance_from_center);
+	return -1_rad * acos (sphere_radius / distance_from_center);
 }
 
 
@@ -314,50 +311,56 @@ calculate_ground_shape (si::LonLatRadius const observer_position,
 						AtmosphericScattering const& atmospheric_scattering,
 						neutrino::WorkPerformer* const work_performer = nullptr)
 {
-	auto const visibility_angle = calculate_visibility_angle (earth_radius, observer_position.radius());
-	auto const ss = calculate_ground_slices_and_stacks (visibility_angle, earth_radius, observer_position.radius());
-	auto ground = rigid_body::make_centered_irregular_sphere_shape ({
-		.radius = earth_radius,
-		.slice_angles = ss.slice_angles,
-		.stack_angles = ss.stack_angles,
-		.material = rigid_body::kTransparentBlack,
-		.setup_material = [&] (rigid_body::ShapeMaterial& material, si::LonLat const sphere_position, WaitGroup::WorkToken&& work_token) {
-			auto calculate = [&material, &atmospheric_scattering, &observer_position, &sun_position, sphere_position, earth_radius, ground_haze_alpha, work_token = std::move (work_token)] {
-				auto const cartesian_observer_position = SpaceLength (0_m, 0_m, observer_position.radius());
-				auto const view_angle = calculate_view_angle_above_sphere_from_sphere_latitude (sphere_position.lat(), earth_radius, observer_position.radius());
-				auto const polar_ray_direction = si::LonLat (sphere_position.lon(), -90_deg + view_angle);
-				auto const ray_direction = to_cartesian<void> (polar_ray_direction);
-				si::Length max_distance = std::numeric_limits<si::Length>::infinity();
+	auto const horizon_angle = calculate_horizon_angle (earth_radius, observer_position.radius());
 
-				if (auto const intersections = atmospheric_scattering.ray_sphere_intersections (cartesian_observer_position, ray_direction, earth_radius))
-				{
-					// If the ray intersects the Earth's sphere (planetary body) and the intersection is ahead of the camera:
-					if (intersections->second > 0_m)
-						// Limit the ray's effective length to the first intersection point.
-						max_distance = std::max (0_m, intersections->first);
-				}
+	if (isfinite (horizon_angle))
+	{
+		auto const ss = calculate_ground_slices_and_stacks (-horizon_angle, earth_radius, observer_position.radius());
+		auto ground = rigid_body::make_centered_irregular_sphere_shape ({
+			.radius = earth_radius,
+			.slice_angles = ss.slice_angles,
+			.stack_angles = ss.stack_angles,
+			.material = rigid_body::kTransparentBlack,
+			.setup_material = [&] (rigid_body::ShapeMaterial& material, si::LonLat const sphere_position, WaitGroup::WorkToken&& work_token) {
+				auto calculate = [&material, &atmospheric_scattering, &observer_position, &sun_position, sphere_position, earth_radius, ground_haze_alpha, work_token = std::move (work_token)] {
+					auto const cartesian_observer_position = SpaceLength (0_m, 0_m, observer_position.radius());
+					auto const view_angle = calculate_view_angle_above_sphere_from_sphere_latitude (sphere_position.lat(), earth_radius, observer_position.radius());
+					auto const polar_ray_direction = si::LonLat (sphere_position.lon(), -90_deg + view_angle);
+					auto const ray_direction = to_cartesian<void> (polar_ray_direction);
+					si::Length max_distance = std::numeric_limits<si::Length>::infinity();
 
-				auto const color = atmospheric_scattering.calculate_incident_light(
-					cartesian_observer_position,
-					ray_direction,
-					sun_position.cartesian_coordinates,
-					0_m,
-					max_distance
-				);
-				material.gl_emission_color = to_gl_color (color);
-				material.gl_emission_color[3] = ground_haze_alpha;
-				material.gl_ambient_color[3] = 0.0f;
-				material.gl_diffuse_color[3] = 0.0f;
-				material.gl_specular_color[3] = 0.0f;
-			};
+					if (auto const intersections = atmospheric_scattering.ray_sphere_intersections (cartesian_observer_position, ray_direction, earth_radius))
+					{
+						// If the ray intersects the Earth's sphere (planetary body) and the intersection is ahead of the camera:
+						if (intersections->second > 0_m)
+							// Limit the ray's effective length to the first intersection point.
+							max_distance = std::max (0_m, intersections->first);
+					}
 
-			if (work_performer)
-				work_performer->submit (std::move (calculate));
-			else
-				calculate();
-		},
-	});
-	return ground;
+					auto const color = atmospheric_scattering.calculate_incident_light(
+						cartesian_observer_position,
+						ray_direction,
+						sun_position.cartesian_coordinates,
+						0_m,
+						max_distance
+					);
+					material.gl_emission_color = to_gl_color (color);
+					material.gl_emission_color[3] = ground_haze_alpha;
+					material.gl_ambient_color[3] = 0.0f;
+					material.gl_diffuse_color[3] = 0.0f;
+					material.gl_specular_color[3] = 0.0f;
+				};
+
+				if (work_performer)
+					work_performer->submit (std::move (calculate));
+				else
+					calculate();
+			},
+		});
+		return ground;
+	}
+	else
+		return {};
 }
 
 
