@@ -167,7 +167,7 @@ calculate_sky_shape (xf::LonLatRadius const observer_position,
 		.radius = atmosphere_radius,
 		.slice_angles = ss.slice_angles,
 		.stack_angles = ss.stack_angles,
-		.material = rigid_body::kBlackMatte,
+		.material = rigid_body::kTransparentBlack,
 		.setup_material = [&] (rigid_body::ShapeMaterial& material, si::LonLat const sphere_position, WaitGroup::WorkToken&& work_token) {
 			auto calculate = [&material, &atmospheric_scattering, &observer_position, &sun_position, atmosphere_radius, sphere_position, work_token = std::move (work_token)] {
 				auto const lat = sphere_position.lat();
