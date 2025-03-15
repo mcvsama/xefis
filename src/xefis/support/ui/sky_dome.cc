@@ -212,7 +212,7 @@ calculate_sky_slices_and_stacks (HorizontalCoordinates const sun_position, si::L
 
 [[nodiscard]]
 SlicesStacks
-calculate_ground_slices_and_stacks (si::Angle const visibility_angle, si::Length const earth_radius, si::Length const observer_position_radius)
+calculate_ground_slices_and_stacks (si::Angle const horizon_angle, si::Length const earth_radius, si::Length const observer_position_radius)
 {
 	SlicesStacks result;
 
@@ -232,7 +232,7 @@ calculate_ground_slices_and_stacks (si::Angle const visibility_angle, si::Length
 	// Latitude:
 	{
 		auto const n_stacks = 50u;
-		auto const visibility_latitude = 90_deg - visibility_angle;
+		auto const visibility_latitude = 90_deg + horizon_angle;
 		auto view_angle = calculate_view_angle_above_sphere_from_sphere_latitude (visibility_latitude, earth_radius, observer_position_radius);
 		auto const delta = view_angle / n_stacks;
 
@@ -315,7 +315,7 @@ calculate_ground_shape (si::LonLatRadius const observer_position,
 
 	if (isfinite (horizon_angle))
 	{
-		auto const ss = calculate_ground_slices_and_stacks (-horizon_angle, earth_radius, observer_position.radius());
+		auto const ss = calculate_ground_slices_and_stacks (horizon_angle, earth_radius, observer_position.radius());
 		auto ground = rigid_body::make_centered_irregular_sphere_shape ({
 			.radius = earth_radius,
 			.slice_angles = ss.slice_angles,
