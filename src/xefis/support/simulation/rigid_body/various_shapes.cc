@@ -160,8 +160,8 @@ template<class SetupMaterial>
 		auto constexpr asynchronous_setup_material = std::is_same<SetupMaterial, AsynchronousSetupMaterial>();
 		auto constexpr future_based_setup_material = std::is_same<SetupMaterial, FutureBasedSetupMaterial>();
 
-		auto const n_slices = std::max<size_t> (params.slices, 3);
-		auto const n_stacks = std::max<size_t> (params.stacks, 2);
+		auto const n_slices = std::max<size_t> (params.n_slices, 3);
+		auto const n_stacks = std::max<size_t> (params.n_stacks, 2);
 
 		si::Angle const dh = params.h_range.extent() / n_slices;
 		si::Angle const dv = params.v_range.extent() / n_stacks;
@@ -175,7 +175,7 @@ template<class SetupMaterial>
 		if constexpr (future_based_setup_material)
 		{
 			// +1 because first stack has both lower and upper points computed:
-			all_setup_material_futures.reserve ((params.stacks + 1) * (params.slices + 1));
+			all_setup_material_futures.reserve ((n_stacks + 1) * (n_slices + 1));
 		}
 
 		si::Angle angle_v = params.v_range.min();
@@ -732,14 +732,14 @@ make_motor_shape (MotorShapeParameters const& params)
 Shape
 make_center_of_mass_symbol_shape (si::Length const radius, ShapeMaterial const& a, ShapeMaterial const& b)
 {
-	return make_centered_sphere_shape ({ .radius = radius, .slices = 8, .stacks = 4, .h_range = {   0_deg,  90_deg }, .v_range = { -90_deg,   0_deg }, .material = a })
-		 + make_centered_sphere_shape ({ .radius = radius, .slices = 8, .stacks = 4, .h_range = {   0_deg,  90_deg }, .v_range = {   0_deg, +90_deg }, .material = b })
-		 + make_centered_sphere_shape ({ .radius = radius, .slices = 8, .stacks = 4, .h_range = {  90_deg, 180_deg }, .v_range = { -90_deg,   0_deg }, .material = b })
-		 + make_centered_sphere_shape ({ .radius = radius, .slices = 8, .stacks = 4, .h_range = {  90_deg, 180_deg }, .v_range = {   0_deg, +90_deg }, .material = a })
-		 + make_centered_sphere_shape ({ .radius = radius, .slices = 8, .stacks = 4, .h_range = { 180_deg, 270_deg }, .v_range = { -90_deg,   0_deg }, .material = a })
-		 + make_centered_sphere_shape ({ .radius = radius, .slices = 8, .stacks = 4, .h_range = { 180_deg, 270_deg }, .v_range = {   0_deg, +90_deg }, .material = b })
-		 + make_centered_sphere_shape ({ .radius = radius, .slices = 8, .stacks = 4, .h_range = { 270_deg, 360_deg }, .v_range = { -90_deg,   0_deg }, .material = b })
-		 + make_centered_sphere_shape ({ .radius = radius, .slices = 8, .stacks = 4, .h_range = { 270_deg, 360_deg }, .v_range = {   0_deg, +90_deg }, .material = a });
+	return make_centered_sphere_shape ({ .radius = radius, .n_slices = 8, .n_stacks = 4, .h_range = {   0_deg,  90_deg }, .v_range = { -90_deg,   0_deg }, .material = a })
+		 + make_centered_sphere_shape ({ .radius = radius, .n_slices = 8, .n_stacks = 4, .h_range = {   0_deg,  90_deg }, .v_range = {   0_deg, +90_deg }, .material = b })
+		 + make_centered_sphere_shape ({ .radius = radius, .n_slices = 8, .n_stacks = 4, .h_range = {  90_deg, 180_deg }, .v_range = { -90_deg,   0_deg }, .material = b })
+		 + make_centered_sphere_shape ({ .radius = radius, .n_slices = 8, .n_stacks = 4, .h_range = {  90_deg, 180_deg }, .v_range = {   0_deg, +90_deg }, .material = a })
+		 + make_centered_sphere_shape ({ .radius = radius, .n_slices = 8, .n_stacks = 4, .h_range = { 180_deg, 270_deg }, .v_range = { -90_deg,   0_deg }, .material = a })
+		 + make_centered_sphere_shape ({ .radius = radius, .n_slices = 8, .n_stacks = 4, .h_range = { 180_deg, 270_deg }, .v_range = {   0_deg, +90_deg }, .material = b })
+		 + make_centered_sphere_shape ({ .radius = radius, .n_slices = 8, .n_stacks = 4, .h_range = { 270_deg, 360_deg }, .v_range = { -90_deg,   0_deg }, .material = b })
+		 + make_centered_sphere_shape ({ .radius = radius, .n_slices = 8, .n_stacks = 4, .h_range = { 270_deg, 360_deg }, .v_range = {   0_deg, +90_deg }, .material = a });
 }
 
 

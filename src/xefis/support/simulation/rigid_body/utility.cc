@@ -30,12 +30,12 @@ namespace xf::rigid_body {
 std::unique_ptr<Body>
 make_earth (bool include_actual_sphere)
 {
-	auto const make_orb = [](si::Length const radius, std::size_t slices, std::size_t stacks) {
+	auto const make_orb = [](si::Length const radius, std::size_t n_slices, std::size_t n_stacks) {
 		// An orb colored with ECEF colors: X/Null Island = red, Y/(90°/0°) = green, Z/North = blue:
 		return rigid_body::make_centered_sphere_shape ({
 			.radius = radius,
-			.slices = slices,
-			.stacks = stacks,
+			.n_slices = n_slices,
+			.n_stacks = n_stacks,
 			.material = rigid_body::kBlackMatte,
 			.setup_material = [](rigid_body::ShapeMaterial& material, si::LonLat const position) {
 				auto const [r, g, b] = cartesian (position);

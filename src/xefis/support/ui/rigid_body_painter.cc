@@ -494,8 +494,8 @@ RigidBodyPainter::paint_planet()
 
 			auto black_sun = rigid_body::make_centered_sphere_shape ({
 				.radius = 30_m,
-				.slices = 10,
-				.stacks = 10,
+				.n_slices = 10,
+				.n_stacks = 10,
 				.material = rigid_body::kBlackMatte,
 			});
 
@@ -567,7 +567,7 @@ RigidBodyPainter::paint_air_particles()
 		auto const grid_size = 5_m;
 		auto dust_material = rigid_body::kWhiteMatte;
 		dust_material.set_emission_color (Qt::white);
-		auto const dust = rigid_body::make_centered_sphere_shape ({ .radius = dust_size, .slices = 3, .stacks = 3, .material = dust_material });
+		auto const dust = rigid_body::make_centered_sphere_shape ({ .radius = dust_size, .n_slices = 3, .n_stacks = 3, .material = dust_material });
 		auto const range = 3 * grid_size;
 
 		// Figure out nearest 3D grid points.
@@ -841,7 +841,7 @@ void
 RigidBodyPainter::paint_origin()
 {
 	auto const origin_material = rigid_body::make_material ({ 0xff, 0xff, 0x00 });
-	auto const origin_shape = rigid_body::make_centered_sphere_shape ({ .radius = _camera_translation.z() / 150, .slices = 8, .stacks = 4, .material = origin_material });
+	auto const origin_shape = rigid_body::make_centered_sphere_shape ({ .radius = _camera_translation.z() / 150, .n_slices = 8, .n_stacks = 4, .material = origin_material });
 
 	_gl.save_context ([&] {
 		setup_feature_light();
@@ -1019,7 +1019,7 @@ RigidBodyPainter::paint_basis (si::Length const length)
 	setup_feature_light();
 
 	// Root ball:
-	_gl.draw (rigid_body::make_centered_sphere_shape ({ .radius = 2 * radius, .slices = 8, .stacks = 4 }));
+	_gl.draw (rigid_body::make_centered_sphere_shape ({ .radius = 2 * radius, .n_slices = 8, .n_stacks = 4 }));
 	// X axis:
 	_gl.save_context ([&] {
 		_gl.rotate_y (+90_deg);
