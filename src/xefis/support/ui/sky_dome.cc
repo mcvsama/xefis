@@ -92,8 +92,10 @@ calculate_sky_slices_and_stacks (HorizontalCoordinates const sun_position, si::L
 
 	// Longitude:
 	{
-		auto constexpr sun_vicinity_slices = 13;
-		auto constexpr rest_slices = 50;
+		auto constexpr sun_vicinity_slices = 13u;
+		auto constexpr rest_slices = 50u;
+
+		result.slice_angles.reserve (sun_vicinity_slices + rest_slices + 1);
 
 		auto const sun_longitude = 180_deg - sun_position.azimuth;
 		auto const sun_vicinity = Range { sun_longitude - 20_deg, sun_longitude + 20_deg };
@@ -118,7 +120,8 @@ calculate_sky_slices_and_stacks (HorizontalCoordinates const sun_position, si::L
 		auto const sun_vicinity = Range { sun_position.altitude - 20_deg, sun_position.altitude + 20_deg };
 
 		// Start below the horizon:
-		result.stack_angles = { -1_deg };
+		result.stack_angles.reserve (100);
+		result.stack_angles.push_back (-1_deg);
 
 		for (auto latitude = result.stack_angles[0]; latitude < 90_deg; )
 		{
