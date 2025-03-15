@@ -564,11 +564,11 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	// Camera position is relative to the followed body:
 	SpaceLength<WorldSpace>		_camera_translation;
 	// Camera position in Lon/Lat/Radius:
-	LonLatRadius				_camera_position_on_earth	{ 0_deg, 0_deg, 0_m };
+	si::LonLatRadius			_camera_position_on_earth	{ 0_deg, 0_deg, 0_m };
 	// Camera rotation in screen coordinates:
 	SpaceVector<si::Angle>		_camera_rotation;
 	// Position of the followed body:
-	LonLatRadius				_followed_position_on_earth	{ 0_deg, 0_deg, 0_m };
+	si::LonLatRadius			_followed_position_on_earth	{ 0_deg, 0_deg, 0_m };
 	GLSpace						_gl							{ 1.0 / 1_m }; // TODO experiment with 1.0 / 1_km
 	std::variant<std::monostate, rigid_body::Group const*, rigid_body::Body const*>
 								_followed;

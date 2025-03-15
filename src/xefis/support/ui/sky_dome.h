@@ -18,7 +18,6 @@
 #include <xefis/config/all.h>
 #include <xefis/support/color/spaces.h>
 #include <xefis/support/earth/air/atmospheric_scattering.h>
-#include <xefis/support/math/lonlat_radius.h>
 #include <xefis/support/simulation/rigid_body/shape.h>
 #include <xefis/support/universe/sun_position.h>
 
@@ -58,7 +57,7 @@ class SkyDome
 struct SkyDomeParameters
 {
 	AtmosphericScattering const&	atmospheric_scattering;
-	xf::LonLatRadius				observer_position;
+	si::LonLatRadius				observer_position;
 	si::Length						earth_radius;
 	si::Time						unix_time;
 	float							ground_haze_alpha	{ 0.3f };

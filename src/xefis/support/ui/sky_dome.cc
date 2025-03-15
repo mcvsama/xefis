@@ -267,7 +267,7 @@ calculate_ground_slices_and_stacks (si::Angle const visibility_angle, si::Length
 
 [[nodiscard]]
 rigid_body::Shape
-calculate_sky_shape (xf::LonLatRadius const observer_position,
+calculate_sky_shape (si::LonLatRadius const observer_position,
 					 SkyDome::SunPosition const sun_position,
 					 AtmosphericScattering const& atmospheric_scattering,
 					 neutrino::WorkPerformer* work_performer = nullptr)
@@ -307,7 +307,7 @@ calculate_sky_shape (xf::LonLatRadius const observer_position,
 
 [[nodiscard]]
 rigid_body::Shape
-calculate_ground_shape (xf::LonLatRadius const observer_position,
+calculate_ground_shape (si::LonLatRadius const observer_position,
 						SkyDome::SunPosition const sun_position,
 						si::Length const earth_radius,
 						float const ground_haze_alpha,
@@ -363,7 +363,7 @@ calculate_ground_shape (xf::LonLatRadius const observer_position,
 
 [[nodiscard]]
 SpaceVector<float, RGBSpace>
-calculate_sun_light_color (xf::LonLatRadius const observer_position, SpaceVector<double> const sun_position, AtmosphericScattering const& atmospheric_scattering)
+calculate_sun_light_color (si::LonLatRadius const observer_position, SpaceVector<double> const sun_position, AtmosphericScattering const& atmospheric_scattering)
 {
 	return atmospheric_scattering.calculate_incident_light ({ 0_m, 0_m, observer_position.radius() }, sun_position, sun_position);
 }

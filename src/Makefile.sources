@@ -289,7 +289,6 @@ MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/math/algorithms
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/math/concepts.h
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/math/coordinate_systems.h
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/math/geometry.h
-MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/math/lonlat_radius.h
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/math/matrix_rotations.h
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/math/north_east_down.h
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/math/placement.h

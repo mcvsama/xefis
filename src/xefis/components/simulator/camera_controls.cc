@@ -19,7 +19,6 @@
 #include <xefis/support/math/coordinate_systems.h>
 #include <xefis/support/math/geometry.h>
 #include <xefis/support/math/geometry_types.h>
-#include <xefis/support/math/lonlat_radius.h>
 #include <xefis/support/ui/paint_helper.h>
 
 // Neutrino:
@@ -43,7 +42,7 @@ CameraControls::CameraControls()
 	struct EarthCoordinates
 	{
 		SpaceLength<ECEFSpace>	ecef	{ 0_m, 0_m, 0_m };
-		LonLatRadius			polar	{ 0_deg, 0_deg, 0_m };
+		si::LonLatRadius		polar	{ 0_deg, 0_deg, 0_m };
 	};
 
 	auto const ph = PaintHelper (*this);

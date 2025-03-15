@@ -18,7 +18,6 @@
 #include <xefis/config/all.h>
 #include <xefis/support/math/concepts.h>
 #include <xefis/support/math/coordinate_systems.h>
-#include <xefis/support/math/lonlat_radius.h>
 #include <xefis/support/math/geometry_types.h>
 #include <xefis/support/math/rotations.h>
 
@@ -358,7 +357,7 @@ template<math::CoordinateSystem TargetSpace = ECEFSpace>
 template<math::CoordinateSystem TargetSpace = ECEFSpace>
 	[[nodiscard]]
 	constexpr SpaceVector<si::Length, TargetSpace>
-	to_cartesian (LonLatRadius const& position)
+	to_cartesian (si::LonLatRadius const& position)
 	{
 		return position.radius() * to_cartesian<TargetSpace> (static_cast<si::LonLat const&> (position));
 	}
@@ -366,13 +365,13 @@ template<math::CoordinateSystem TargetSpace = ECEFSpace>
 
 template<math::CoordinateSystem Space>
 	[[nodiscard]]
-	constexpr LonLatRadius
+	constexpr si::LonLatRadius
 	to_polar (SpaceVector<si::Length, Space> const& vector)
 	{
 		std::complex<double> const xy (vector[0].value(), vector[1].value());
 		std::complex<double> const wz (std::abs (xy), vector[2].value());
 
-		return LonLatRadius {
+		return si::LonLatRadius {
 			si::LonLat (1_rad * std::arg (xy), 1_rad * std::arg (wz)),
 			si::Length (std::abs (wz))
 		};

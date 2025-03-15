@@ -42,7 +42,7 @@ xf::Logger g_null_logger;
 std::unique_ptr<rigid_body::Body>
 make_iss()
 {
-	xf::SpaceLength<xf::ECEFSpace> const iss_ecef_position = to_cartesian (xf::LonLatRadius (0_deg, 0_deg, kISSHeight));
+	xf::SpaceLength<xf::ECEFSpace> const iss_ecef_position = to_cartesian (si::LonLatRadius (0_deg, 0_deg, kISSHeight));
 	xf::RotationQuaternion<WorldSpace> const iss_ecef_rotation =
 		math::coordinate_system_cast<WorldSpace, WorldSpace> (
 			xf::airframe_to_ecef_rotation (xf::TaitBryanAngles { 0_deg, 0_deg, 0_deg }, iss_ecef_position)

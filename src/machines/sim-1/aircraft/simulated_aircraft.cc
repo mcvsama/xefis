@@ -23,7 +23,6 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/math/geometry.h>
-#include <xefis/support/math/lonlat_radius.h>
 #include <xefis/support/math/placement.h>
 #include <xefis/support/nature/various_inertia_tensors.h>
 #include <xefis/support/simulation/constraints/angular_limits_constraint.h>
