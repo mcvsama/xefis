@@ -40,21 +40,21 @@ struct SlicesStacks
  */
 [[nodiscard]]
 constexpr si::Angle
-calculate_view_angle (si::Angle const origin_angle, si::Length const vertical_shift, si::Length const radius)
+calculate_view_angle (si::Angle const origin_angle, si::Length const radius, si::Length const distance_from_center)
 {
-    return 1_rad * atan2 (radius * sin (origin_angle) - vertical_shift, radius * cos (origin_angle));
+    return 1_rad * atan2 (radius * sin (origin_angle) - distance_from_center, radius * cos (origin_angle));
 }
 
 
 /**
- * Inverse for view_angle() (assuming vertical_shift and radius are the same as for
+ * Inverse for view_angle() (assuming distance_from_center and radius are the same as for
  * view_angle()).
  */
 [[nodiscard]]
 constexpr si::Angle
-calculate_origin_angle (si::Angle const view_angle, si::Length const vertical_shift, si::Length const radius)
+calculate_origin_angle (si::Angle const view_angle, si::Length const radius, si::Length const distance_from_center)
 {
-    return view_angle + 1_rad * asin ((vertical_shift * cos (view_angle)) / radius);
+    return view_angle + 1_rad * asin ((distance_from_center * cos (view_angle)) / radius);
 }
 
 
@@ -122,7 +122,7 @@ calculate_sky_slices_and_stacks (HorizontalCoordinates const sun_position, si::L
 
 		for (auto latitude = result.stack_angles[0]; latitude < 90_deg; )
 		{
-			result.stack_angles.push_back (calculate_origin_angle (latitude, observer_position_radius, atmosphere_radius));
+			result.stack_angles.push_back (calculate_origin_angle (latitude, atmosphere_radius, observer_position_radius));
 
 			// TODO denser around the earth's visible border
 			if (latitude <= 3_deg)
@@ -138,7 +138,7 @@ calculate_sky_slices_and_stacks (HorizontalCoordinates const sun_position, si::L
 				if (latitude < sun_vicinity.min() && sun_vicinity.includes (latitude + big_step))
 				{
 					latitude = sun_vicinity.min() + 0.1_deg; // +0.1° prevents infinite loop.
-					result.stack_angles.push_back (calculate_origin_angle (latitude, observer_position_radius, atmosphere_radius));
+					result.stack_angles.push_back (calculate_origin_angle (latitude, atmosphere_radius, observer_position_radius));
 				}
 				else
 					latitude += big_step;
@@ -171,7 +171,7 @@ calculate_sky_shape (xf::LonLatRadius const observer_position,
 		.setup_material = [&] (rigid_body::ShapeMaterial& material, si::LonLat const sphere_position, WaitGroup::WorkToken&& work_token) {
 			auto calculate = [&material, &atmospheric_scattering, &observer_position, &sun_position, atmosphere_radius, sphere_position, work_token = std::move (work_token)] {
 				auto const lat = sphere_position.lat();
-				auto const view_angle = calculate_view_angle (lat, observer_position.radius(), atmosphere_radius);
+				auto const view_angle = calculate_view_angle (lat, atmosphere_radius, observer_position.radius());
 				auto const polar_ray_direction = si::LonLat (sphere_position.lon(), view_angle);
 				auto const ray_direction = cartesian<void> (polar_ray_direction);
 				auto const color = atmospheric_scattering.calculate_incident_light(
