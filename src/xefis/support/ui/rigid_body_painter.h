@@ -589,7 +589,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	std::minstd_rand0			_air_particles_prng;
 	std::map<rigid_body::Group const*, SpaceLength<WorldSpace>>
 								_group_centers_of_mass_cache;
-	AtmosphericScattering const	_atmospheric_scattering		{{ .earth_radius = kEarthMeanRadius, .atmosphere_radius = kEarthMeanRadius + 10_km, .enable_tonemapping = true }};
+	AtmosphericScattering const	_atmospheric_scattering		{{ .earth_radius = kEarthMeanRadius, .atmosphere_radius = kEarthMeanRadius + 8.4_km, .enable_tonemapping = true }};
 	SkyDome						_sky_dome;
 	std::future<SkyDome>		_next_sky_dome;
 	bool						_recalculate_sky_dome		{ false };
