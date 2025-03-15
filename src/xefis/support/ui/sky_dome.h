@@ -62,6 +62,7 @@ struct SkyDomeParameters
 	si::Length						horizon_radius;
 	si::Length						earth_radius;
 	si::Time						unix_time;
+	float							ground_haze_alpha	{ 0.3f };
 };
 
 
