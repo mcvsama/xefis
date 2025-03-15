@@ -46,7 +46,7 @@ ScreenWidget::ScreenWidget (Screen& screen, QWidget* parent):
 	auto* layout = new QVBoxLayout (this);
 	layout->setContentsMargins (0, 0, 0, 0);
 	layout->addWidget (name_strip);
-	layout->addItem (new QSpacerItem (0, ph.em_pixels (0.15f), QSizePolicy::Fixed, QSizePolicy::Fixed));
+	layout->addItem (ph.new_fixed_vertical_spacer (0.15f));
 	layout->addWidget (tabs);
 
 	_refresh_timer = new QTimer (this);
@@ -152,16 +152,16 @@ ScreenWidget::create_performance_tab()
 			tab_layout->addWidget (widgets.total_latency_group, 1, 0);
 			tab_layout->addItem (new QSpacerItem (0, ph.em_pixels (0.5f), QSizePolicy::Expanding, QSizePolicy::Fixed), 2, 0);
 			tab_layout->addWidget (handled_modules_info, 3, 0);
-			tab_layout->addItem (new QSpacerItem (0, 0, QSizePolicy::Expanding, QSizePolicy::Fixed), 0, 1);
-			tab_layout->addItem (new QSpacerItem (0, 0, QSizePolicy::Fixed, QSizePolicy::Expanding), 4, 0);
+			tab_layout->addItem (ph.new_expanding_horizontal_spacer(), 0, 1);
+			tab_layout->addItem (ph.new_expanding_vertical_spacer(), 4, 0);
 		}
 	}
 
 	auto* widget_layout = new QGridLayout (widget);
 	widget_layout->setContentsMargins (0, 0, 0, 0);
 	widget_layout->addWidget (tabs, 0, 0);
-	widget_layout->addItem (new QSpacerItem (0, 0, QSizePolicy::Expanding, QSizePolicy::Fixed), 0, 1);
-	widget_layout->addItem (new QSpacerItem (0, 0, QSizePolicy::Fixed, QSizePolicy::Expanding), 1, 0);
+	widget_layout->addItem (ph.new_expanding_horizontal_spacer(), 0, 1);
+	widget_layout->addItem (ph.new_expanding_vertical_spacer(), 1, 0);
 
 	return widget;
 }
