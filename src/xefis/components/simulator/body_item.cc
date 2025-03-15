@@ -17,8 +17,8 @@
 // Xefis:
 #include <xefis/config/all.h>
 
-// Neutrino:
-#include <neutrino/qt/qsignals_blocker.h>
+// Qt:
+#include <QSignalBlocker>
 
 // Standard:
 #include <cstddef>
@@ -47,7 +47,7 @@ BodyItem::BodyItem (QTreeWidgetItem& parent, rigid_body::Body& body):
 void
 BodyItem::refresh()
 {
-	auto const signals_blocker = QSignalsBlocker (treeWidget());
+	auto const signals_blocker = QSignalBlocker (treeWidget());
 
 	setText (0, QString::fromStdString (_body.label()));
 

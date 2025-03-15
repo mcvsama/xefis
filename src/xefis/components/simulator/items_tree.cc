@@ -20,12 +20,10 @@
 // Xefis:
 #include <xefis/config/all.h>
 
-// Neutrino:
-#include <neutrino/qt/qsignals_blocker.h>
-
 // Qt:
 #include <QCursor>
 #include <QMenu>
+#include <QSignalBlocker>
 #include <QTreeWidgetItemIterator>
 
 // Standard:
@@ -56,7 +54,7 @@ void
 ItemsTree::refresh()
 {
 	// Prevent sending itemChanged() signals when creating new items:
-	auto const signals_blocker = QSignalsBlocker (this);
+	auto const signals_blocker = QSignalBlocker (this);
 
 	auto groups = std::set<rigid_body::Group*>();
 
