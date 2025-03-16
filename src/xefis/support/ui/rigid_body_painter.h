@@ -569,7 +569,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	SpaceVector<si::Angle>		_camera_rotation;
 	// Position of the followed body:
 	si::LonLatRadius			_followed_position_on_earth	{ 0_deg, 0_deg, 0_m };
-	GLSpace						_gl							{ 1.0 / 1_m }; // TODO experiment with 1.0 / 1_km
+	GLSpace						_gl							{ 1.0 / 1_m };
 	std::variant<std::monostate, rigid_body::Group const*, rigid_body::Body const*>
 								_followed;
 	bool						_camera_follows_orientation	{ true };
