@@ -48,67 +48,29 @@ calculate_horizon_angle (si::Length const sphere_radius, si::Length const distan
 
 
 /**
- * Calculate angle for the point on circle when viewed from above (`distance_from_center`) the
- * center of the circle.
+ * Calculate an angle at which a point on a circle is visible when viewed not from a center of the circle, but from some distance from its center.
  */
 [[nodiscard]]
 constexpr si::Angle
-calculate_view_angle (si::Angle const origin_angle, si::Length const radius, si::Length const distance_from_center)
+calculate_angle_from_offset_viewpoint (si::Angle const origin_angle, si::Length const radius, si::Length const distance_from_center)
 {
-    return 1_rad * atan2 (radius * sin (origin_angle) - distance_from_center, radius * cos (origin_angle));
+	return 1_rad * atan2 (radius * sin (origin_angle) - distance_from_center, radius * cos (origin_angle));
 }
 
 
 /**
- * Inverse for view_angle() (assuming distance_from_center and radius are the same as for
- * view_angle()).
+ * Inverse for calculate_angle_from_offset_viewpoint() (assuming distance_from_center and radius are the same as for view_angle()).
+ * If distance_from_center > radius, it's possible that at some angles there will be no intersection of viewing direction
+ * and the circle's radius. In such case function returns NaN.
  */
 [[nodiscard]]
 constexpr si::Angle
-calculate_origin_angle (si::Angle const view_angle, si::Length const radius, si::Length const distance_from_center)
+calculate_angle_from_origin_viewpoint (si::Angle const view_angle, si::Length const radius, si::Length const distance_from_center)
 {
-    return view_angle + 1_rad * asin ((distance_from_center * cos (view_angle)) / radius);
-}
-
-
-/**
- * Calculate the latitude angle on a sphere's surface where an observer's line of sight intersects,
- * given the observer's viewing angle relative to horizontal, distance from sphere's center, and sphere radius.
- * Returns NaN if no valid intersection occurs.
- * TODO refer to the ChatGPT docs
- */
-[[nodiscard]]
-constexpr si::Angle
-calculate_sphere_latitude_from_view_angle_above_sphere (si::Angle const view_angle, si::Length const radius, si::Length const distance_from_center)
-{
-	auto const alpha = view_angle;
-	auto const height = distance_from_center - radius;
-	auto const n = sin (alpha) * (1.0 + height / radius);
-
-	if (n < -1.0 || 1.0 < n)
-		return std::numeric_limits<si::Angle>::quiet_NaN();
+	if (distance_from_center <= radius)
+		return 1_rad * asin (distance_from_center * cos (view_angle) / radius) + view_angle;
 	else
-	{
-		auto const x = 1_rad * acos (n);
-		auto const result1 = alpha + x;
-		auto const result2 = alpha - x;
-		// Pick the first one that lies in the expected solution range:
-		if (0_deg <= result1 && result1 <= 90_deg)
-			return result1;
-		else
-			return result2;
-	}
-}
-
-
-/**
- * Inverse for calculate_sphere_latitude_from_view_angle_above_sphere() for the same distance_from_center and radius.
- */
-[[nodiscard]]
-constexpr si::Angle
-calculate_view_angle_above_sphere_from_sphere_latitude (si::Angle const latitude, si::Length const radius, si::Length const distance_from_center)
-{
-	return 1_rad * atan2 (radius * cos (latitude), distance_from_center - radius * sin (latitude));
+		return 1_rad * asin (distance_from_center * cos (view_angle) / radius) - view_angle;
 }
 
 
@@ -140,7 +102,7 @@ calculate_sun_position (si::LonLat const observer_position, si::Time const time)
 
 [[nodiscard]]
 SlicesStacks
-calculate_sky_slices_and_stacks (HorizontalCoordinates const sun_position, si::Length const observer_position_radius, si::Length const atmosphere_radius)
+calculate_sky_slices_and_stacks (HorizontalCoordinates const sun_position, si::Length const observer_position_radius, si::Length const earth_radius, si::Length const atmosphere_radius)
 {
 	SlicesStacks result;
 
@@ -179,7 +141,7 @@ calculate_sky_slices_and_stacks (HorizontalCoordinates const sun_position, si::L
 
 		for (auto latitude = result.stack_angles[0]; latitude < 90_deg; )
 		{
-			result.stack_angles.push_back (calculate_origin_angle (latitude, atmosphere_radius, observer_position_radius));
+			result.stack_angles.push_back (calculate_angle_from_origin_viewpoint (latitude, atmosphere_radius, observer_position_radius));
 
 			// TODO denser around the earth's visible border
 			if (latitude <= 3_deg)
@@ -195,7 +157,7 @@ calculate_sky_slices_and_stacks (HorizontalCoordinates const sun_position, si::L
 				if (latitude < sun_vicinity.min() && sun_vicinity.includes (latitude + big_step))
 				{
 					latitude = sun_vicinity.min() + 0.1_deg; // +0.1° prevents infinite loop.
-					result.stack_angles.push_back (calculate_origin_angle (latitude, atmosphere_radius, observer_position_radius));
+					result.stack_angles.push_back (calculate_angle_from_origin_viewpoint (latitude, atmosphere_radius, observer_position_radius));
 				}
 				else
 					latitude += big_step;
@@ -233,25 +195,26 @@ calculate_ground_slices_and_stacks (si::Angle const horizon_angle, si::Length co
 	{
 		auto const n_stacks = 50u;
 		auto const visibility_latitude = 90_deg + horizon_angle;
-		auto view_angle = calculate_view_angle_above_sphere_from_sphere_latitude (visibility_latitude, earth_radius, observer_position_radius);
-		auto const delta = view_angle / n_stacks;
+		auto view_angle = calculate_angle_from_offset_viewpoint (visibility_latitude, earth_radius, observer_position_radius);
+		auto const delta = (90_deg + view_angle) / n_stacks;
 
 		result.stack_angles.reserve (n_stacks + 1);
 
-		auto const delta_modifier = [&view_angle]() {
-			return view_angle > 89_deg
+		auto const dynamic_delta = [&view_angle, &delta]() {
+			auto const factor = view_angle > -1_deg
 				? 0.05
-				: view_angle > 85_deg
+				: view_angle > -5_deg
 					? 0.3
-					: view_angle > 80_deg
+					: view_angle > -10_deg
 						? 0.5
 						: 1.0;
+			return factor * delta;
 		};
 
 		// Denser near horizon at the expense of density directly under the camera:
-		for (auto i = 0u; i < n_stacks; ++i, view_angle -= delta_modifier() * delta)
+		for (auto i = 0u; i < n_stacks; ++i, view_angle -= dynamic_delta())
 		{
-			auto const latitude = calculate_sphere_latitude_from_view_angle_above_sphere (view_angle, earth_radius, observer_position_radius);
+			auto const latitude = calculate_angle_from_origin_viewpoint (view_angle, earth_radius, observer_position_radius);
 			result.stack_angles.push_back (latitude);
 		}
 
@@ -266,11 +229,12 @@ calculate_ground_slices_and_stacks (si::Angle const horizon_angle, si::Length co
 rigid_body::Shape
 calculate_sky_shape (si::LonLatRadius const observer_position,
 					 SkyDome::SunPosition const sun_position,
+					 si::Length const earth_radius,
 					 AtmosphericScattering const& atmospheric_scattering,
 					 neutrino::WorkPerformer* work_performer = nullptr)
 {
 	auto const atmosphere_radius = atmospheric_scattering.parameters().atmosphere_radius;
-	auto const ss = calculate_sky_slices_and_stacks (sun_position.horizontal_coordinates, observer_position.radius(), atmosphere_radius);
+	auto const ss = calculate_sky_slices_and_stacks (sun_position.horizontal_coordinates, observer_position.radius(), earth_radius, atmosphere_radius);
 	// Sphere pole is at the top of the observer. Stacks are perpendicular to observer's local horizon:
 	auto sky = rigid_body::make_centered_irregular_sphere_shape ({
 		.radius = atmosphere_radius,
@@ -279,8 +243,7 @@ calculate_sky_shape (si::LonLatRadius const observer_position,
 		.material = rigid_body::kTransparentBlack,
 		.setup_material = [&] (rigid_body::ShapeMaterial& material, si::LonLat const sphere_position, WaitGroup::WorkToken&& work_token) {
 			auto calculate = [&material, &atmospheric_scattering, &observer_position, &sun_position, atmosphere_radius, sphere_position, work_token = std::move (work_token)] {
-				auto const lat = sphere_position.lat();
-				auto const view_angle = calculate_view_angle (lat, atmosphere_radius, observer_position.radius());
+				auto const view_angle = calculate_angle_from_offset_viewpoint (sphere_position.lat(), atmosphere_radius, observer_position.radius());
 				auto const polar_ray_direction = si::LonLat (sphere_position.lon(), view_angle);
 				auto const ray_direction = to_cartesian<void> (polar_ray_direction);
 				auto const color = atmospheric_scattering.calculate_incident_light(
@@ -324,8 +287,8 @@ calculate_ground_shape (si::LonLatRadius const observer_position,
 			.setup_material = [&] (rigid_body::ShapeMaterial& material, si::LonLat const sphere_position, WaitGroup::WorkToken&& work_token) {
 				auto calculate = [&material, &atmospheric_scattering, &observer_position, &sun_position, sphere_position, earth_radius, ground_haze_alpha, work_token = std::move (work_token)] {
 					auto const cartesian_observer_position = SpaceLength (0_m, 0_m, observer_position.radius());
-					auto const view_angle = calculate_view_angle_above_sphere_from_sphere_latitude (sphere_position.lat(), earth_radius, observer_position.radius());
-					auto const polar_ray_direction = si::LonLat (sphere_position.lon(), -90_deg + view_angle);
+					auto const view_angle = calculate_angle_from_offset_viewpoint (sphere_position.lat(), earth_radius, observer_position.radius());
+					auto const polar_ray_direction = si::LonLat (sphere_position.lon(), view_angle);
 					auto const ray_direction = to_cartesian<void> (polar_ray_direction);
 					si::Length max_distance = std::numeric_limits<si::Length>::infinity();
 
@@ -378,7 +341,7 @@ calculate_sky_dome (SkyDomeParameters const& params, neutrino::WorkPerformer* wo
 	auto const sun_position = calculate_sun_position (params.observer_position, params.unix_time);
 
 	return {
-		.sky_shape = calculate_sky_shape (params.observer_position, sun_position, params.atmospheric_scattering, work_performer),
+		.sky_shape = calculate_sky_shape (params.observer_position, sun_position, params.earth_radius, params.atmospheric_scattering, work_performer),
 		.ground_shape = calculate_ground_shape (params.observer_position, sun_position, params.earth_radius, params.ground_haze_alpha, params.atmospheric_scattering, work_performer),
 		.sun_position = sun_position,
 		.sun_light_color = calculate_sun_light_color (params.observer_position, sun_position.cartesian_coordinates, params.atmospheric_scattering),
