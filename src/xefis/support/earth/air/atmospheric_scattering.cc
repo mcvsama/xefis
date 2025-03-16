@@ -155,6 +155,11 @@ AtmosphericScattering::calculate_incident_light (SpaceLength<> const& observer_p
 		if (_p.enable_tonemapping)
 			color = tonemap_separately (color);
 
+		// Change NaNs to 0 (in case we were trying to get color from some invalid out-of-atmosphere point):
+		for (auto& component: color.array())
+			if (!std::isfinite (component))
+				component = 0.0f;
+
 		return color;
 	}
 }
