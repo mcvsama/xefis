@@ -245,7 +245,7 @@ RigidBodyPainter::setup_natural_light()
 			_gl.load_identity();
 			center_at_followed_object();
 			make_z_towards_the_sun();
-			glLightfv (kSunLight, GL_POSITION, GLArray { 0.0f, 0.0f, _gl.to_opengl (kSunDistance), 0.0f });
+			glLightfv (kSunLight, GL_POSITION, GLArray { 0.0f, 0.0f, _gl.to_opengl (kSunDistance), 1.0f });
 		});
 
 		// Sky lights:
