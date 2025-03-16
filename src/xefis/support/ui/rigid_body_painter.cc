@@ -226,11 +226,15 @@ RigidBodyPainter::setup_feature_light()
 void
 RigidBodyPainter::setup_natural_light()
 {
-	// TODO if above atmosphere, get the sun color from black body radiation.
-	auto const sun_color = to_gl_color (_sky_dome.sun_light_color);
+	// Blend the original sun color with color as seen through the atmosphere:
+	auto const original_sun_color = QColor (Qt::white);
+	auto const atmospheric_sun_color = QColor::fromRgbF (_sky_dome.sun_light_color[0], _sky_dome.sun_light_color[1], _sky_dome.sun_light_color[2]);
+	auto const x = neutrino::renormalize (_followed_position_on_earth.radius(), Range { kEarthMeanRadius, kAtmosphereRadius }, Range { 0.0f, 1.0f });
+	auto const sun_color = to_gl_color (hsl_interpolation (x, atmospheric_sun_color, original_sun_color));
+
 	glDisable (kFeatureLight);
 	glEnable (kSunLight);
-	glLightfv (kSunLight, GL_AMBIENT, sun_color.scaled (0.2f));
+	glLightfv (kSunLight, GL_AMBIENT, sun_color.scaled (0.2f)); // TODO no ambient light in space
 	glLightfv (kSunLight, GL_DIFFUSE, sun_color.scaled (0.4f));
 	glLightfv (kSunLight, GL_SPECULAR, sun_color.scaled (0.1f));
 
@@ -261,12 +265,13 @@ RigidBodyPainter::setup_natural_light()
 				);
 				auto const corrected_color = sky_correction (color);
 				auto const gl_color = to_gl_color (corrected_color);
+				auto const sky_height = kAtmosphereRadius - kEarthMeanRadius;
 
 				glEnable (number);
 				glLightfv (number, GL_AMBIENT, gl_color.scaled (0.0f));
 				glLightfv (number, GL_DIFFUSE, gl_color.scaled (0.2f));
 				glLightfv (number, GL_SPECULAR, gl_color.scaled (0.0f));
-				glLightfv (number, GL_POSITION, GLArray { _gl.to_opengl (kSkyHeight), 0.0f, 0.0f, 0.0f });
+				glLightfv (number, GL_POSITION, GLArray { _gl.to_opengl (sky_height), 0.0f, 0.0f, 0.0f });
 			});
 		}
 	}
