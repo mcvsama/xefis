@@ -137,9 +137,11 @@ calculate_sky_slices_and_stacks (HorizontalCoordinates const sun_position, si::L
 
 		// Start below the horizon:
 		result.stack_angles.reserve (100);
-		result.stack_angles.push_back (-1_deg);
+		// Start at horizon (or a bit below):
+		auto const horizon_angle = calculate_horizon_angle (earth_radius, observer_position_radius) - 0.5_deg;
+		result.stack_angles.push_back (calculate_angle_from_origin_viewpoint (horizon_angle, atmosphere_radius, observer_position_radius));
 
-		for (auto latitude = result.stack_angles[0]; latitude < 90_deg; )
+		for (auto latitude = horizon_angle; latitude < 90_deg; )
 		{
 			result.stack_angles.push_back (calculate_angle_from_origin_viewpoint (latitude, atmosphere_radius, observer_position_radius));
 
