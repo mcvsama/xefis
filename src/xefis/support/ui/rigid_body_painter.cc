@@ -444,29 +444,6 @@ RigidBodyPainter::paint_planet()
 	// In other words match ECEF coordinates with standard OpenGL screen coordinates.
 
 	_gl.save_context ([&] {
-		// Sky:
-		_gl.save_context ([&] {
-			// Rotate so that down is -Z.
-			_gl.rotate_z (+_camera_position_on_earth.lon());
-			_gl.rotate_y (-_camera_position_on_earth.lat());
-			_gl.rotate_y (90_deg);
-			// Move the center of painted sky dome to the ECEF origin:
-			_gl.translate (0_m, 0_m, -followed_position().norm());
-			// Normally the outside of the sphere shape is rendered, inside is culled.
-			// But here we're inside the sphere, so tell OpenGL that the front faces are the
-			// inside faces:
-			glFrontFace (GL_CW);
-			// No lights, the sky itself is the light source:
-			glDisable (GL_LIGHTING);
-			// Blend with the universe:
-			glBlendFunc (GL_ONE, GL_ONE);
-			glEnable (GL_BLEND);
-			_gl.draw (_sky_dome.sky_shape);
-			glDisable (GL_BLEND);
-			glEnable (GL_LIGHTING);
-			glFrontFace (GL_CCW);
-		});
-
 		// Sun:
 		_gl.save_context ([&] {
 			// TODO to func: get_sun_face_shape(); recalculated occassionally
@@ -546,18 +523,28 @@ RigidBodyPainter::paint_planet()
 
 				// Normal ground:
 				_gl.draw (surface_globe);
-
-				// Ground haze:
-				// Blend with existing ground: final_color = (1 - transmittance) * atmosphere_color + ground_color
-				glBlendFunc (GL_SRC_ALPHA, GL_ONE);
-				glDisable (GL_DEPTH_TEST);
-				glDisable (GL_LIGHTING);
-				glEnable (GL_BLEND);
-				_gl.draw (_sky_dome.ground_shape);
-				glDisable (GL_BLEND);
-				glEnable (GL_LIGHTING);
-				glEnable (GL_DEPTH_TEST);
 			});
+		});
+
+		// Sky and ground dome around the observer: // TODO now it's the followed object, make it camera in future
+		_gl.save_context ([&] {
+			// Rotate so that down is -Z.
+			make_z_sky_top_x_south();
+			// Normally the outside of the sphere shape is rendered, inside is culled.
+			// But here we're inside the sphere, so tell OpenGL that the front faces are the
+			// inside faces:
+			glFrontFace (GL_CW);
+			// No lights, the sky itself is the light source:
+			glDisable (GL_LIGHTING);
+			glDisable (GL_DEPTH_TEST);
+			// Blend with the universe: final_color = (1 - transmittance) * atmosphere_color + universe_color
+			glBlendFunc (GL_SRC_ALPHA, GL_ONE);
+			glEnable (GL_BLEND);
+			_gl.draw (_sky_dome.dome_shape);
+			glDisable (GL_BLEND);
+			glEnable (GL_LIGHTING);
+			glEnable (GL_DEPTH_TEST);
+			glFrontFace (GL_CCW);
 		});
 	});
 }

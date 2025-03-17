@@ -228,6 +228,117 @@ calculate_ground_slices_and_stacks (si::Angle const horizon_angle, si::Length co
 
 
 [[nodiscard]]
+SlicesStacks
+calculate_dome_slices_and_stacks (HorizontalCoordinates const sun_position, si::Angle const horizon_angle)
+{
+	SlicesStacks result;
+
+	// Longitude:
+	{
+		auto constexpr sun_vicinity_slices = 13u;
+		auto constexpr rest_slices = 50u;
+
+		result.slice_angles.reserve (sun_vicinity_slices + rest_slices + 1);
+
+		auto const sun_longitude = 180_deg - sun_position.azimuth;
+		auto const sun_vicinity = Range { sun_longitude - 20_deg, sun_longitude + 20_deg };
+		auto const sun_vicinity_delta = sun_vicinity.extent() / sun_vicinity_slices;
+		auto const rest_range = 360_deg - sun_vicinity.extent();
+		auto const rest_delta = rest_range / rest_slices;
+
+		auto longitude = sun_vicinity.min();
+
+		for (auto i = 0u; i < sun_vicinity_slices; ++i, longitude += sun_vicinity_delta)
+			result.slice_angles.push_back (longitude);
+
+		for (auto i = 0u; i < rest_slices; ++i, longitude += rest_delta)
+			result.slice_angles.push_back (longitude);
+
+		// Complete the circle where we started:
+		result.slice_angles.push_back (result.slice_angles[0]);
+	}
+
+	// Latitude:
+	{
+		auto const n_ground_stacks = 50u;
+		auto const horizon_epsilon = 0.001_deg;
+
+		result.stack_angles.reserve (n_ground_stacks + 1 + 100);
+
+		// Ground:
+		{
+			// TODO far fewer slices if really far away
+			auto const delta = (horizon_angle + 90_deg) / n_ground_stacks;
+
+			// Start from top, reverse later:
+			auto latitude = horizon_angle - horizon_epsilon;
+
+			// Denser near horizon at the expense of density directly under the camera:
+			auto const dynamic_delta = [&latitude, &delta]() {
+				auto const factor = latitude > -1_deg
+					? 0.05
+					: latitude > -5_deg
+						? 0.3
+						: latitude > -10_deg
+							? 0.5
+							: 1.0;
+				return factor * delta;
+			};
+
+			for (auto i = 0u; i < n_ground_stacks; ++i, latitude -= dynamic_delta())
+				result.stack_angles.push_back (latitude);
+
+			// Final pole:
+			result.stack_angles.push_back (-90_deg);
+
+			// Latitudes must be in ascending order:
+			std::ranges::reverse (result.stack_angles);
+		}
+
+		// FIXME there are rendering problems around the horizon_angle
+
+		// Sky:
+		{
+			auto const sun_vicinity = Range { sun_position.altitude - 20_deg, sun_position.altitude + 20_deg };
+
+			// Start at horizon:
+			result.stack_angles.push_back (horizon_angle + horizon_epsilon);
+
+			for (auto latitude = horizon_angle; latitude < 90_deg; )
+			{
+				result.stack_angles.push_back (latitude);
+
+				// TODO denser around the earth's visible border when seen from space
+				if (latitude <= horizon_angle + 3_deg)
+					latitude += 0.25_deg;
+				else if (latitude <= horizon_angle + 6_deg)
+					latitude += 0.5_deg;
+				else if (latitude <= horizon_angle + 12_deg || sun_vicinity.includes (latitude))
+					latitude += 1.5_deg;
+				else
+				{
+					auto const big_step = 5_deg;
+
+					if (latitude < sun_vicinity.min() && sun_vicinity.includes (latitude + big_step))
+					{
+						latitude = sun_vicinity.min() + 0.001_deg; // +0.001° prevents infinite loop.
+						result.stack_angles.push_back (latitude);
+					}
+					else
+						latitude += big_step;
+				}
+			}
+
+			// Top of the dome:
+			result.stack_angles.push_back (90_deg);
+		}
+	}
+
+	return result;
+}
+
+
+[[nodiscard]]
 rigid_body::Shape
 calculate_sky_shape (si::LonLatRadius const observer_position,
 					 SkyDome::SunPosition const sun_position,
@@ -311,9 +422,82 @@ calculate_ground_shape (si::LonLatRadius const observer_position,
 					);
 					material.gl_emission_color = to_gl_color (color);
 					material.gl_emission_color[3] = ground_haze_alpha;
-					material.gl_ambient_color[3] = 0.0f;
-					material.gl_diffuse_color[3] = 0.0f;
-					material.gl_specular_color[3] = 0.0f;
+				};
+
+				if (work_performer)
+					work_performer->submit (std::move (calculate));
+				else
+					calculate();
+			},
+		});
+		return ground;
+	}
+	else
+		return {};
+}
+
+
+[[nodiscard]]
+rigid_body::Shape
+calculate_dome_shape (si::LonLatRadius const observer_position,
+					  SkyDome::SunPosition const sun_position,
+					  si::Length const earth_radius,
+					  float const ground_haze_alpha,
+					  AtmosphericScattering const& atmospheric_scattering,
+					  neutrino::WorkPerformer* const work_performer = nullptr)
+{
+	auto const horizon_angle = calculate_horizon_angle (earth_radius, observer_position.radius());
+
+	// TODO still draw sky if horizon_angle is nan (assume it's 0° then)
+	if (isfinite (horizon_angle))
+	{
+		auto const ss = calculate_dome_slices_and_stacks (sun_position.horizontal_coordinates, horizon_angle);
+		auto ground = rigid_body::make_centered_irregular_sphere_shape ({
+			// TODO 10 mm around the camera
+			.radius = earth_radius,
+			.slice_angles = ss.slice_angles,
+			.stack_angles = ss.stack_angles,
+			.material = rigid_body::kTransparentBlack,
+			.setup_material = [&] (rigid_body::ShapeMaterial& material, si::LonLat const sphere_position, WaitGroup::WorkToken&& work_token) {
+				auto calculate = [=, &material, &atmospheric_scattering, &observer_position, &sun_position, work_token = std::move (work_token)] {
+					if (sphere_position.lat() > horizon_angle)
+					{
+						// Sky:
+						auto const polar_ray_direction = si::LonLat (sphere_position.lon(), sphere_position.lat());
+						auto const ray_direction = to_cartesian<void> (polar_ray_direction);
+						auto const color = atmospheric_scattering.calculate_incident_light(
+							{ 0_m, 0_m, observer_position.radius() },
+							ray_direction,
+							sun_position.cartesian_coordinates
+						);
+						material.gl_emission_color = to_gl_color (color);
+					}
+					else
+					{
+						// Ground haze:
+						auto const cartesian_observer_position = SpaceLength (0_m, 0_m, observer_position.radius());
+						auto const polar_ray_direction = si::LonLat (sphere_position.lon(), sphere_position.lat());
+						auto const ray_direction = to_cartesian<void> (polar_ray_direction);
+						si::Length max_distance = std::numeric_limits<si::Length>::infinity();
+
+						if (auto const intersections = atmospheric_scattering.ray_sphere_intersections (cartesian_observer_position, ray_direction, earth_radius))
+						{
+							// If the ray intersects the Earth's sphere (planetary body) and the intersection is ahead of the camera:
+							if (intersections->second > 0_m)
+								// Limit the ray's effective length to the first intersection point.
+								max_distance = std::max (0_m, intersections->first);
+						}
+
+						auto const color = atmospheric_scattering.calculate_incident_light(
+							cartesian_observer_position,
+							ray_direction,
+							sun_position.cartesian_coordinates,
+							0_m,
+							max_distance
+						);
+						material.gl_emission_color = to_gl_color (color);
+						material.gl_emission_color[3] = ground_haze_alpha;
+					}
 				};
 
 				if (work_performer)
@@ -345,6 +529,7 @@ calculate_sky_dome (SkyDomeParameters const& params, neutrino::WorkPerformer* wo
 	return {
 		.sky_shape = calculate_sky_shape (params.observer_position, sun_position, params.earth_radius, params.atmospheric_scattering, work_performer),
 		.ground_shape = calculate_ground_shape (params.observer_position, sun_position, params.earth_radius, params.ground_haze_alpha, params.atmospheric_scattering, work_performer),
+		.dome_shape = calculate_dome_shape (params.observer_position, sun_position, params.earth_radius, params.ground_haze_alpha, params.atmospheric_scattering, work_performer),
 		.sun_position = sun_position,
 		.sun_light_color = calculate_sun_light_color (params.observer_position, sun_position.cartesian_coordinates, params.atmospheric_scattering),
 	};

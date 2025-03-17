@@ -49,6 +49,7 @@ class SkyDome
   public:
 	rigid_body::Shape				sky_shape;
 	rigid_body::Shape				ground_shape;
+	rigid_body::Shape				dome_shape;
 	SunPosition						sun_position;
 	SpaceVector<float, RGBSpace>	sun_light_color;
 };
