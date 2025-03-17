@@ -196,8 +196,8 @@ calculate_ground_slices_and_stacks (si::Angle const horizon_angle, si::Length co
 	// Latitude:
 	{
 		auto const n_stacks = 50u;
-		auto const visibility_latitude = 90_deg + horizon_angle;
-		auto view_angle = calculate_angle_from_offset_viewpoint (visibility_latitude, earth_radius, observer_position_radius);
+		auto const visible_angle = 90_deg + horizon_angle;
+		auto view_angle = calculate_angle_from_offset_viewpoint (visible_angle, earth_radius, observer_position_radius);
 		auto const delta = (90_deg + view_angle) / n_stacks;
 
 		result.stack_angles.reserve (n_stacks + 1);
