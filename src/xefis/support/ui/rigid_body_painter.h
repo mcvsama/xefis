@@ -16,6 +16,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/support/color/blackbody.h>
 #include <xefis/support/color/spaces.h>
 #include <xefis/support/earth/air/atmospheric_scattering.h>
 #include <xefis/support/math/rotations.h>
@@ -596,6 +597,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	std::future<SkyDome>		_next_sky_dome;
 	bool						_recalculate_sky_dome		{ false };
 	si::Time					_sky_dome_update_time;
+	QColor						_sun_color_in_space			{ qcolor_from_temperature (kSunSurfaceTemperature) };
 	std::array<SkyLight, 5>		_sky_lights;
 	// Cached calculated OpenGL transforms:
 	std::optional<GLMatrix>		_camera_angles_transform;
