@@ -295,69 +295,67 @@ calculate_dome_shape (si::LonLatRadius const observer_position,
 					  AtmosphericScattering const& atmospheric_scattering,
 					  neutrino::WorkPerformer* const work_performer = nullptr)
 {
-	auto const horizon_angle = calculate_horizon_angle (earth_radius, observer_position.radius());
+	auto horizon_angle = calculate_horizon_angle (earth_radius, observer_position.radius());
 
-	// TODO still draw sky if horizon_angle is nan (assume it's 0° then)
-	if (isfinite (horizon_angle))
-	{
-		auto const ss = calculate_dome_slices_and_stacks (sun_position.horizontal_coordinates, horizon_angle);
-		auto dome = rigid_body::make_centered_irregular_sphere_shape ({
-			.radius = earth_radius, // TODO 10 mm around the camera
-			.slice_angles = ss.slice_angles,
-			.stack_angles = ss.stack_angles,
-			.material = rigid_body::kTransparentBlack,
-			.setup_material = [&] (rigid_body::ShapeMaterial& material, si::LonLat const sphere_position, WaitGroup::WorkToken&& work_token) {
-				auto calculate = [=, &material, &atmospheric_scattering, &observer_position, &sun_position, work_token = std::move (work_token)] {
-					if (sphere_position.lat() > horizon_angle)
-					{
-						// Sky:
-						auto const polar_ray_direction = si::LonLat (sphere_position.lon(), sphere_position.lat());
-						auto const ray_direction = to_cartesian<void> (polar_ray_direction);
-						auto const color = atmospheric_scattering.calculate_incident_light(
-							{ 0_m, 0_m, observer_position.radius() },
-							ray_direction,
-							sun_position.cartesian_coordinates
-						);
-						material.gl_emission_color = to_gl_color (color);
-					}
-					else
-					{
-						// Ground haze:
-						auto const cartesian_observer_position = SpaceLength (0_m, 0_m, observer_position.radius());
-						auto const polar_ray_direction = si::LonLat (sphere_position.lon(), sphere_position.lat());
-						auto const ray_direction = to_cartesian<void> (polar_ray_direction);
-						si::Length max_distance = std::numeric_limits<si::Length>::infinity();
+	// Still draw sky if horizon_angle is nan (assume it's 0° then):
+	if (!isfinite (horizon_angle))
+		horizon_angle = 0_deg;
 
-						if (auto const intersections = atmospheric_scattering.ray_sphere_intersections (cartesian_observer_position, ray_direction, earth_radius))
-						{
-							// If the ray intersects the Earth's sphere (planetary body) and the intersection is ahead of the camera:
-							if (intersections->second > 0_m)
-								// Limit the ray's effective length to the first intersection point.
-								max_distance = std::max (0_m, intersections->first);
-						}
-
-						auto const color = atmospheric_scattering.calculate_incident_light(
-							cartesian_observer_position,
-							ray_direction,
-							sun_position.cartesian_coordinates,
-							0_m,
-							max_distance
-						);
-						material.gl_emission_color = to_gl_color (color);
-						material.gl_emission_color[3] = ground_haze_alpha;
-					}
-				};
-
-				if (work_performer)
-					work_performer->submit (std::move (calculate));
+	auto const ss = calculate_dome_slices_and_stacks (sun_position.horizontal_coordinates, horizon_angle);
+	auto dome = rigid_body::make_centered_irregular_sphere_shape ({
+		.radius = earth_radius, // TODO 10 mm around the camera
+		.slice_angles = ss.slice_angles,
+		.stack_angles = ss.stack_angles,
+		.material = rigid_body::kTransparentBlack,
+		.setup_material = [&] (rigid_body::ShapeMaterial& material, si::LonLat const sphere_position, WaitGroup::WorkToken&& work_token) {
+			auto calculate = [=, &material, &atmospheric_scattering, &observer_position, &sun_position, work_token = std::move (work_token)] {
+				if (sphere_position.lat() > horizon_angle)
+				{
+					// Sky:
+					auto const polar_ray_direction = si::LonLat (sphere_position.lon(), sphere_position.lat());
+					auto const ray_direction = to_cartesian<void> (polar_ray_direction);
+					auto const color = atmospheric_scattering.calculate_incident_light(
+						{ 0_m, 0_m, observer_position.radius() },
+						ray_direction,
+						sun_position.cartesian_coordinates
+					);
+					material.gl_emission_color = to_gl_color (color);
+				}
 				else
-					calculate();
-			},
-		});
-		return dome;
-	}
-	else
-		return {};
+				{
+					// Ground haze:
+					auto const cartesian_observer_position = SpaceLength (0_m, 0_m, observer_position.radius());
+					auto const polar_ray_direction = si::LonLat (sphere_position.lon(), sphere_position.lat());
+					auto const ray_direction = to_cartesian<void> (polar_ray_direction);
+					si::Length max_distance = std::numeric_limits<si::Length>::infinity();
+
+					if (auto const intersections = atmospheric_scattering.ray_sphere_intersections (cartesian_observer_position, ray_direction, earth_radius))
+					{
+						// If the ray intersects the Earth's sphere (planetary body) and the intersection is ahead of the camera:
+						if (intersections->second > 0_m)
+							// Limit the ray's effective length to the first intersection point.
+							max_distance = std::max (0_m, intersections->first);
+					}
+
+					auto const color = atmospheric_scattering.calculate_incident_light(
+						cartesian_observer_position,
+						ray_direction,
+						sun_position.cartesian_coordinates,
+						0_m,
+						max_distance
+					);
+					material.gl_emission_color = to_gl_color (color);
+					material.gl_emission_color[3] = ground_haze_alpha;
+				}
+			};
+
+			if (work_performer)
+				work_performer->submit (std::move (calculate));
+			else
+				calculate();
+		},
+	});
+	return dome;
 }
 
 
