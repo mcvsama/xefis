@@ -540,7 +540,7 @@ RigidBodyPainter::paint_planet()
 			// Blend with the universe: final_color = (1 - transmittance) * atmosphere_color + universe_color
 			glBlendFunc (GL_SRC_ALPHA, GL_ONE);
 			glEnable (GL_BLEND);
-			_gl.draw (_sky_dome.dome_shape);
+			_gl.draw (_sky_dome.atmospheric_dome_shape);
 			glDisable (GL_BLEND);
 			glEnable (GL_LIGHTING);
 			glEnable (GL_DEPTH_TEST);

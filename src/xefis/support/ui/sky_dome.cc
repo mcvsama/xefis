@@ -103,80 +103,6 @@ calculate_sun_position (si::LonLat const observer_position, si::Time const time)
 
 [[nodiscard]]
 SlicesStacks
-calculate_sky_slices_and_stacks (HorizontalCoordinates const sun_position, si::Length const observer_position_radius, si::Length const earth_radius, si::Length const atmosphere_radius)
-{
-	SlicesStacks result;
-
-	// Longitude:
-	{
-		auto constexpr sun_vicinity_slices = 13u;
-		auto constexpr rest_slices = 50u;
-
-		result.slice_angles.reserve (sun_vicinity_slices + rest_slices + 1);
-
-		auto const sun_longitude = 180_deg - sun_position.azimuth;
-		auto const sun_vicinity = Range { sun_longitude - 20_deg, sun_longitude + 20_deg };
-		auto const sun_vicinity_delta = sun_vicinity.extent() / sun_vicinity_slices;
-		auto const rest_range = 360_deg - sun_vicinity.extent();
-		auto const rest_delta = rest_range / rest_slices;
-
-		auto longitude = sun_vicinity.min();
-
-		for (auto i = 0u; i < sun_vicinity_slices; ++i, longitude += sun_vicinity_delta)
-			result.slice_angles.push_back (longitude);
-
-		for (auto i = 0u; i < rest_slices; ++i, longitude += rest_delta)
-			result.slice_angles.push_back (longitude);
-
-		// Complete the circle where we started:
-		result.slice_angles.push_back (result.slice_angles[0]);
-	}
-
-	// Latitude:
-	{
-		auto const sun_vicinity = Range { sun_position.altitude - 20_deg, sun_position.altitude + 20_deg };
-
-		// Start below the horizon:
-		result.stack_angles.reserve (100);
-		// Start at horizon (or a bit below):
-		auto const horizon_angle = calculate_horizon_angle (earth_radius, observer_position_radius) - 0.5_deg;
-		result.stack_angles.push_back (calculate_angle_from_origin_viewpoint (horizon_angle, atmosphere_radius, observer_position_radius));
-
-		for (auto latitude = horizon_angle; latitude < 90_deg; )
-		{
-			result.stack_angles.push_back (calculate_angle_from_origin_viewpoint (latitude, atmosphere_radius, observer_position_radius));
-
-			// TODO denser around the earth's visible border
-			if (latitude <= 3_deg)
-				latitude += 0.25_deg;
-			else if (latitude <= 6_deg)
-				latitude += 0.5_deg;
-			else if (latitude <= 12_deg || sun_vicinity.includes (latitude))
-				latitude += 1.5_deg;
-			else
-			{
-				auto const big_step = 5_deg;
-
-				if (latitude < sun_vicinity.min() && sun_vicinity.includes (latitude + big_step))
-				{
-					latitude = sun_vicinity.min() + 0.1_deg; // +0.1° prevents infinite loop.
-					result.stack_angles.push_back (calculate_angle_from_origin_viewpoint (latitude, atmosphere_radius, observer_position_radius));
-				}
-				else
-					latitude += big_step;
-			}
-		}
-
-		// Top of the dome:
-		result.stack_angles.push_back (90_deg);
-	}
-
-	return result;
-}
-
-
-[[nodiscard]]
-SlicesStacks
 calculate_ground_slices_and_stacks (si::Angle const horizon_angle, si::Length const earth_radius, si::Length const observer_position_radius)
 {
 	SlicesStacks result;
@@ -341,97 +267,19 @@ calculate_dome_slices_and_stacks (HorizontalCoordinates const sun_position, si::
 
 [[nodiscard]]
 rigid_body::Shape
-calculate_sky_shape (si::LonLatRadius const observer_position,
-					 SkyDome::SunPosition const sun_position,
-					 si::Length const earth_radius,
-					 AtmosphericScattering const& atmospheric_scattering,
-					 neutrino::WorkPerformer* work_performer = nullptr)
-{
-	auto const atmosphere_radius = atmospheric_scattering.parameters().atmosphere_radius;
-	auto const ss = calculate_sky_slices_and_stacks (sun_position.horizontal_coordinates, observer_position.radius(), earth_radius, atmosphere_radius);
-	// Sphere pole is at the top of the observer. Stacks are perpendicular to observer's local horizon:
-	auto sky = rigid_body::make_centered_irregular_sphere_shape ({
-		.radius = atmosphere_radius,
-		.slice_angles = ss.slice_angles,
-		.stack_angles = ss.stack_angles,
-		.material = rigid_body::kTransparentBlack,
-		.setup_material = [&] (rigid_body::ShapeMaterial& material, si::LonLat const sphere_position, WaitGroup::WorkToken&& work_token) {
-			auto calculate = [&material, &atmospheric_scattering, &observer_position, &sun_position, atmosphere_radius, sphere_position, work_token = std::move (work_token)] {
-				auto const view_angle = calculate_angle_from_offset_viewpoint (sphere_position.lat(), atmosphere_radius, observer_position.radius());
-				auto const polar_ray_direction = si::LonLat (sphere_position.lon(), view_angle);
-				auto const ray_direction = to_cartesian<void> (polar_ray_direction);
-				auto const color = atmospheric_scattering.calculate_incident_light(
-					{ 0_m, 0_m, observer_position.radius() },
-					ray_direction,
-					sun_position.cartesian_coordinates
-				);
-				material.gl_emission_color = to_gl_color (color);
-			};
-
-			if (work_performer)
-				work_performer->submit (std::move (calculate));
-			else
-				calculate();
-		},
-	});
-	rigid_body::negate_normals (sky);
-	return sky;
-}
-
-
-[[nodiscard]]
-rigid_body::Shape
-calculate_ground_shape (si::LonLatRadius const observer_position,
-						SkyDome::SunPosition const sun_position,
-						si::Length const earth_radius,
-						float const ground_haze_alpha,
-						AtmosphericScattering const& atmospheric_scattering,
-						neutrino::WorkPerformer* const work_performer = nullptr)
+calculate_ground_shape (si::LonLatRadius const observer_position, si::Length const earth_radius)
 {
 	auto const horizon_angle = calculate_horizon_angle (earth_radius, observer_position.radius());
 
 	if (isfinite (horizon_angle))
 	{
 		auto const ss = calculate_ground_slices_and_stacks (horizon_angle, earth_radius, observer_position.radius());
-		auto ground = rigid_body::make_centered_irregular_sphere_shape ({
+		return rigid_body::make_centered_irregular_sphere_shape ({
 			.radius = earth_radius,
 			.slice_angles = ss.slice_angles,
 			.stack_angles = ss.stack_angles,
 			.material = rigid_body::kTransparentBlack,
-			.setup_material = [&] (rigid_body::ShapeMaterial& material, si::LonLat const sphere_position, WaitGroup::WorkToken&& work_token) {
-				auto calculate = [&material, &atmospheric_scattering, &observer_position, &sun_position, sphere_position, earth_radius, ground_haze_alpha, work_token = std::move (work_token)] {
-					auto const cartesian_observer_position = SpaceLength (0_m, 0_m, observer_position.radius());
-					auto const view_angle = calculate_angle_from_offset_viewpoint (sphere_position.lat(), earth_radius, observer_position.radius());
-					auto const polar_ray_direction = si::LonLat (sphere_position.lon(), view_angle);
-					auto const ray_direction = to_cartesian<void> (polar_ray_direction);
-					si::Length max_distance = std::numeric_limits<si::Length>::infinity();
-
-					if (auto const intersections = atmospheric_scattering.ray_sphere_intersections (cartesian_observer_position, ray_direction, earth_radius))
-					{
-						// If the ray intersects the Earth's sphere (planetary body) and the intersection is ahead of the camera:
-						if (intersections->second > 0_m)
-							// Limit the ray's effective length to the first intersection point.
-							max_distance = std::max (0_m, intersections->first);
-					}
-
-					auto const color = atmospheric_scattering.calculate_incident_light(
-						cartesian_observer_position,
-						ray_direction,
-						sun_position.cartesian_coordinates,
-						0_m,
-						max_distance
-					);
-					material.gl_emission_color = to_gl_color (color);
-					material.gl_emission_color[3] = ground_haze_alpha;
-				};
-
-				if (work_performer)
-					work_performer->submit (std::move (calculate));
-				else
-					calculate();
-			},
 		});
-		return ground;
 	}
 	else
 		return {};
@@ -453,9 +301,8 @@ calculate_dome_shape (si::LonLatRadius const observer_position,
 	if (isfinite (horizon_angle))
 	{
 		auto const ss = calculate_dome_slices_and_stacks (sun_position.horizontal_coordinates, horizon_angle);
-		auto ground = rigid_body::make_centered_irregular_sphere_shape ({
-			// TODO 10 mm around the camera
-			.radius = earth_radius,
+		auto dome = rigid_body::make_centered_irregular_sphere_shape ({
+			.radius = earth_radius, // TODO 10 mm around the camera
 			.slice_angles = ss.slice_angles,
 			.stack_angles = ss.stack_angles,
 			.material = rigid_body::kTransparentBlack,
@@ -507,7 +354,7 @@ calculate_dome_shape (si::LonLatRadius const observer_position,
 					calculate();
 			},
 		});
-		return ground;
+		return dome;
 	}
 	else
 		return {};
@@ -528,9 +375,8 @@ calculate_sky_dome (SkyDomeParameters const& params, neutrino::WorkPerformer* wo
 	auto const sun_position = calculate_sun_position (params.observer_position, params.unix_time);
 
 	return {
-		.sky_shape = calculate_sky_shape (params.observer_position, sun_position, params.earth_radius, params.atmospheric_scattering, work_performer),
-		.ground_shape = calculate_ground_shape (params.observer_position, sun_position, params.earth_radius, params.ground_haze_alpha, params.atmospheric_scattering, work_performer),
-		.dome_shape = calculate_dome_shape (params.observer_position, sun_position, params.earth_radius, params.ground_haze_alpha, params.atmospheric_scattering, work_performer),
+		.ground_shape = calculate_ground_shape (params.observer_position, params.earth_radius),
+		.atmospheric_dome_shape = calculate_dome_shape (params.observer_position, sun_position, params.earth_radius, params.ground_haze_alpha, params.atmospheric_scattering, work_performer),
 		.sun_position = sun_position,
 		.sun_light_color = calculate_sun_light_color (params.observer_position, sun_position.cartesian_coordinates, params.atmospheric_scattering),
 	};
