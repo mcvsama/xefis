@@ -180,7 +180,8 @@ RigidBodyPainter::paint (rigid_body::System const& system, QOpenGLPaintDevice& c
 
 	painter.translate (center);
 	painter.beginNativePainting();
-	setup (canvas);
+	precalculate();
+	setup_camera (canvas);
 	paint_world (system);
 
 	// ECEF basis should be always "on top":
@@ -193,12 +194,8 @@ RigidBodyPainter::paint (rigid_body::System const& system, QOpenGLPaintDevice& c
 
 
 void
-RigidBodyPainter::setup (QOpenGLPaintDevice& canvas)
+RigidBodyPainter::precalculate()
 {
-	using namespace std::chrono_literals;
-
-	auto const size = canvas.size();
-
 	_followed_polar_position = to_polar (math::coordinate_system_cast<ECEFSpace, void> (followed_position() - planet_position()));
 
 	// If the next calculated SkyDome is ready, use it:
@@ -207,12 +204,31 @@ RigidBodyPainter::setup (QOpenGLPaintDevice& canvas)
 
 	if (!_next_sky_dome.valid() && std::exchange (_recalculate_sky_dome, false))
 		start_sky_dome_recalculation();
+}
 
+
+void
+RigidBodyPainter::setup_camera (QOpenGLPaintDevice& canvas)
+{
+	setup_camera_projection (canvas.size());
+	setup_modelview();
+	setup_camera_transform();
+}
+
+
+void
+RigidBodyPainter::setup_camera_projection (QSize const size)
+{
 	glMatrixMode (GL_PROJECTION);
 	_gl.load_identity();
 	_gl.translate (0.0, 0.0, -1.0);
 	_gl.set_hfov_perspective (size, 40_deg, _gl.to_opengl (1_m), _gl.to_opengl (100_km));
+}
 
+
+void
+RigidBodyPainter::setup_modelview()
+{
 	glMatrixMode (GL_MODELVIEW);
 	glFrontFace (GL_CCW);
 	glCullFace (GL_BACK);
@@ -221,7 +237,6 @@ RigidBodyPainter::setup (QOpenGLPaintDevice& canvas)
 	glShadeModel (GL_SMOOTH);
 	glHint (GL_POLYGON_SMOOTH_HINT, GL_NICEST);
 	glHint (GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-
 	glEnable (GL_NORMALIZE);
 	glEnable (GL_DEPTH_TEST);
 	glEnable (GL_CULL_FACE);
@@ -229,7 +244,6 @@ RigidBodyPainter::setup (QOpenGLPaintDevice& canvas)
 	glDepthMask (GL_TRUE);
 	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable (GL_LIGHTING);
-
 	_gl.load_identity();
 }
 
@@ -327,27 +341,7 @@ RigidBodyPainter::setup_natural_light()
 
 
 void
-RigidBodyPainter::center_at_followed_object()
-{
-	_gl.load_identity();
-	// Center the world at the followed body:
-	_gl.translate (-_user_camera_translation);
-	// Rotate about that body:
-	apply_camera_rotations();
-}
-
-
-void
-RigidBodyPainter::center_at_observer()
-{
-	_gl.load_identity();
-	// Rotate about that body:
-	apply_camera_rotations();
-}
-
-
-void
-RigidBodyPainter::apply_camera_rotations()
+RigidBodyPainter::apply_camera_rotation()
 {
 	if (!_camera_angles_transform || _camera_follows_orientation)
 	{
@@ -402,6 +396,25 @@ RigidBodyPainter::apply_camera_rotations()
 	}
 
 	_gl.multiply_matrix_by (*_camera_angles_transform);
+}
+
+
+void
+RigidBodyPainter::setup_camera_transform()
+{
+	_gl.load_identity();
+	apply_camera_rotation();
+}
+
+
+void
+RigidBodyPainter::center_at_followed_object()
+{
+	_gl.load_identity();
+	// Center the world at the followed body:
+	_gl.translate (-_user_camera_translation);
+	// Rotate about that body:
+	apply_camera_rotation();
 }
 
 
@@ -1025,7 +1038,7 @@ RigidBodyPainter::paint_ecef_basis (QOpenGLPaintDevice& canvas)
 
 	_gl.save_context ([&] {
 		_gl.translate (0_m, 0_m, -1_m);
-		apply_camera_rotations();
+		apply_camera_rotation();
 		paint_basis (8_cm);
 	});
 }

@@ -410,7 +410,16 @@ class RigidBodyPainter: protected QOpenGLFunctions
 
   private:
 	void
-	setup (QOpenGLPaintDevice&);
+	precalculate();
+
+	void
+	setup_camera (QOpenGLPaintDevice&);
+
+	void
+	setup_camera_projection (QSize const size);
+
+	void
+	setup_modelview();
 
 	void
 	setup_feature_light();
@@ -419,13 +428,13 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	setup_natural_light();
 
 	void
+	apply_camera_rotation();
+
+	void
+	setup_camera_transform();
+
+	void
 	center_at_followed_object();
-
-	void
-	center_at_observer();
-
-	void
-	apply_camera_rotations();
 
 	/**
 	 * Rotate the world from screen coordinates (Earth visible from top of North (Z) with Null Island on the Right (X))
