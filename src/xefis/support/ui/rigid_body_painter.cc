@@ -237,7 +237,6 @@ RigidBodyPainter::setup_modelview()
 	glShadeModel (GL_SMOOTH);
 	glHint (GL_POLYGON_SMOOTH_HINT, GL_NICEST);
 	glHint (GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-	glEnable (GL_NORMALIZE);
 	glEnable (GL_DEPTH_TEST);
 	glEnable (GL_CULL_FACE);
 	glDepthFunc (GL_LEQUAL);
