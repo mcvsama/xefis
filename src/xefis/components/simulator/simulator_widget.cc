@@ -167,7 +167,7 @@ SimulatorWidget::make_simulation_controls()
 	auto* tabs = new QTabWidget (this);
 	tabs->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Expanding);
 	tabs->addTab (make_solar_time_controls (ph), "Solar time");
-	tabs->addTab (new CameraControls(), "Camera");
+	tabs->addTab (new CameraControls (*_rigid_body_viewer), "Camera");
 
 	auto* sim_controls = new QWidget (this);
 	sim_controls->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Fixed);

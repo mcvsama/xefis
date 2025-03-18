@@ -25,6 +25,7 @@
 #include <QFont>
 #include <QFrame>
 #include <QLabel>
+#include <QMargins>
 #include <QPaintDevice>
 #include <QPalette>
 #include <QSpacerItem>
@@ -105,6 +106,10 @@ class PaintHelper
 	[[nodiscard]]
 	static QFrame*
 	new_hline();
+
+	[[nodiscard]]
+	QMargins
+	group_box_margins() const;
 
   private:
 	QPaintDevice const&	_canvas;

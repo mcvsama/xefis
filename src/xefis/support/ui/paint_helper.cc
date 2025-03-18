@@ -48,5 +48,14 @@ PaintHelper::setup_painter (QPainter& painter)
 	painter.setRenderHint (QPainter::SmoothPixmapTransform, true);
 }
 
+
+QMargins
+PaintHelper::group_box_margins() const
+{
+	auto const s = em_pixels_int (0.5f);
+	auto const x = em_pixels_int (1.0f);
+	return QMargins (s, s, x, s);
+}
+
 } // namespace xf
 

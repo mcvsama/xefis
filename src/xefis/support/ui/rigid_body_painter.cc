@@ -110,22 +110,57 @@ RigidBodyPainter::set_followed_to_none()
 
 
 void
-RigidBodyPainter::set_camera_translation (SpaceLength<WorldSpace> const& translation)
+RigidBodyPainter::set_camera_mode (CameraMode const mode)
 {
-	_camera_translation = translation;
+	_camera_mode = mode;
+	_camera_angles_transform.reset(); // XXX? needed
 	calculate_camera_position();
 }
 
 
 void
-RigidBodyPainter::set_camera_rotation (SpaceVector<si::Angle> const& rotation)
+RigidBodyPainter::set_camera_position (si::LonLatRadius const position)
 {
-	if (_camera_rotation != rotation)
+	_requested_camera_polar_position = position;
+	_camera_angles_transform.reset(); // XXX? needed
+}
+
+
+void
+RigidBodyPainter::set_user_camera_translation (SpaceLength<WorldSpace> const& translation)
+{
+	_user_camera_translation = translation;
+	calculate_camera_position();
+}
+
+
+void
+RigidBodyPainter::set_user_camera_rotation (SpaceVector<si::Angle> const& rotation)
+{
+	if (_user_camera_rotation != rotation)
 	{
-		_camera_rotation = rotation;
+		_user_camera_rotation = rotation;
 		_camera_angles_transform.reset();
 		calculate_camera_position();
 	}
+}
+
+
+void
+RigidBodyPainter::set_camera_follows_body_orientation (bool enabled)
+{
+	_camera_follows_orientation = enabled;
+	_camera_angles_transform.reset();
+	calculate_camera_position();
+}
+
+
+void
+RigidBodyPainter::set_planet (rigid_body::Body const* planet_body)
+{
+	_planet_body = planet_body;
+	_camera_angles_transform.reset();
+	calculate_camera_position();
 }
 
 
@@ -164,7 +199,7 @@ RigidBodyPainter::setup (QOpenGLPaintDevice& canvas)
 
 	auto const size = canvas.size();
 
-	_followed_position_on_earth = to_polar (math::coordinate_system_cast<ECEFSpace, void> (followed_position() - planet_position()));
+	_followed_polar_position = to_polar (math::coordinate_system_cast<ECEFSpace, void> (followed_position() - planet_position()));
 
 	// If the next calculated SkyDome is ready, use it:
 	if (_next_sky_dome.valid() && is_ready (_next_sky_dome))
@@ -229,7 +264,7 @@ RigidBodyPainter::setup_natural_light()
 	// TODO only recalculate occasionally:
 	// Blend the original sun color with color as seen through the atmosphere:
 	auto const atmospheric_sun_color = QColor::fromRgbF (_sky_dome.sun_light_color[0], _sky_dome.sun_light_color[1], _sky_dome.sun_light_color[2]);
-	auto const x = neutrino::renormalize (_followed_position_on_earth.radius(), Range { kEarthMeanRadius, kAtmosphereRadius }, Range { 0.0f, 1.0f });
+	auto const x = neutrino::renormalize (_followed_polar_position.radius(), Range { kEarthMeanRadius, kAtmosphereRadius }, Range { 0.0f, 1.0f });
 	auto const sun_color = to_gl_color (hsl_interpolation (x, atmospheric_sun_color, _sun_color_in_space));
 
 	glDisable (kFeatureLight);
@@ -259,7 +294,7 @@ RigidBodyPainter::setup_natural_light()
 				auto const number = sky_light.gl_number;
 				auto const light_direction = to_cartesian<void> (sky_light.position); // Azimuth (lon()) should possible be negated, but the sky dome is symmetric, so this is okay.
 				auto const color = _atmospheric_scattering.calculate_incident_light (
-					{ 0_m, 0_m, _followed_position_on_earth.radius() },
+					{ 0_m, 0_m, _followed_polar_position.radius() },
 					light_direction,
 					_sky_dome.sun_position.cartesian_coordinates
 				);
@@ -296,7 +331,7 @@ RigidBodyPainter::center_at_followed_object()
 {
 	_gl.load_identity();
 	// Center the world at the followed body:
-	_gl.translate (-_camera_translation);
+	_gl.translate (-_user_camera_translation);
 	// Rotate about that body:
 	apply_camera_rotations();
 }
@@ -319,9 +354,9 @@ RigidBodyPainter::apply_camera_rotations()
 		_gl.save_context ([&] {
 			_gl.load_identity();
 			// The camera always rotates about the screen Y axis and can be moved up and down using the screen X axis.
-			_gl.rotate_x (_camera_rotation.x()); // Pitch
-			_gl.rotate_y (_camera_rotation.y()); // Yaw
-			_gl.rotate_z (_camera_rotation.z()); // Roll
+			_gl.rotate_x (_user_camera_rotation.x()); // Pitch
+			_gl.rotate_y (_user_camera_rotation.y()); // Yaw
+			_gl.rotate_z (_user_camera_rotation.z()); // Roll
 
 			auto const* followed_group = this->followed_group();
 			auto const* followed_body = this->followed_body();
@@ -353,8 +388,8 @@ RigidBodyPainter::apply_camera_rotations()
 				else
 				{
 					// Rotate the world so that down points to the center of _planet_body:
-					_gl.rotate_x (+_followed_position_on_earth.lat() - 90_deg);
-					_gl.rotate_y (-_followed_position_on_earth.lon());
+					_gl.rotate_x (+_followed_polar_position.lat() - 90_deg);
+					_gl.rotate_y (-_followed_polar_position.lon());
 					apply_screen_to_null_island_rotations();
 				}
 			}
@@ -391,7 +426,7 @@ RigidBodyPainter::make_z_towards_the_sun()
 	// Assuming we have identity rotations + camera rotations applied.
 
 	// Rotate sun depending on UTC time:
-	auto const greenwich_hour_angle = _sky_dome.sun_position.hour_angle - _camera_position_on_earth.lon();
+	auto const greenwich_hour_angle = _sky_dome.sun_position.hour_angle - _camera_polar_position.lon();
 	_gl.rotate_z (-greenwich_hour_angle);
 
 	// Rotate sun depending on time of the year:
@@ -406,8 +441,8 @@ RigidBodyPainter::make_z_towards_the_sun()
 void
 RigidBodyPainter::make_z_sky_top_x_south()
 {
-	_gl.rotate_z (+_camera_position_on_earth.lon());
-	_gl.rotate_y (-_camera_position_on_earth.lat());
+	_gl.rotate_z (+_camera_polar_position.lon());
+	_gl.rotate_y (-_camera_polar_position.lat());
 	_gl.rotate_y (+90_deg);
 	// Z is now sky top, X is towards azimuth 180° (true south).
 }
@@ -513,7 +548,7 @@ RigidBodyPainter::paint_planet()
 
 			_gl.save_context ([&] {
 				make_z_sky_top_x_south();
-				_gl.translate (0_m, 0_m, -_camera_position_on_earth.radius());
+				_gl.translate (0_m, 0_m, -_camera_polar_position.radius());
 
 				// Make a globe that will act as a ground shape:
 				auto surface_globe = _sky_dome.ground_shape;
@@ -783,7 +818,7 @@ RigidBodyPainter::paint_helpers (rigid_body::Group const& group, GroupRenderingC
 			paint_center_of_mass();
 
 			if (group.rotation_reference_body())
-				paint_basis (_camera_translation.z() / 15); // Rotation was taken into account in transform_gl_to_center_of_mass (Group).
+				paint_basis (_user_camera_translation.z() / 15); // Rotation was taken into account in transform_gl_to_center_of_mass (Group).
 		});
 	}
 }
@@ -809,7 +844,7 @@ RigidBodyPainter::paint_helpers (rigid_body::Body const& body, BodyRenderingConf
 				if (rendering.origin_visible)
 					paint_origin();
 
-				paint_basis (_camera_translation.z() / 15);
+				paint_basis (_user_camera_translation.z() / 15);
 			}
 		});
 	}
@@ -819,7 +854,7 @@ RigidBodyPainter::paint_helpers (rigid_body::Body const& body, BodyRenderingConf
 void
 RigidBodyPainter::paint_center_of_mass()
 {
-	auto const com_shape = rigid_body::make_center_of_mass_symbol_shape (_camera_translation.z() / 150);
+	auto const com_shape = rigid_body::make_center_of_mass_symbol_shape (_user_camera_translation.z() / 150);
 
 	_gl.save_context ([&] {
 		glDisable (GL_LIGHTING);
@@ -833,7 +868,7 @@ void
 RigidBodyPainter::paint_origin()
 {
 	auto const origin_material = rigid_body::make_material ({ 0xff, 0xff, 0x00 });
-	auto const origin_shape = rigid_body::make_centered_sphere_shape ({ .radius = _camera_translation.z() / 150, .n_slices = 8, .n_stacks = 4, .material = origin_material });
+	auto const origin_shape = rigid_body::make_centered_sphere_shape ({ .radius = _user_camera_translation.z() / 150, .n_slices = 8, .n_stacks = 4, .material = origin_material });
 
 	_gl.save_context ([&] {
 		setup_feature_light();
@@ -1093,7 +1128,7 @@ RigidBodyPainter::calculate_sky_dome()
 {
 	return xf::calculate_sky_dome ({
 		.atmospheric_scattering = _atmospheric_scattering,
-		.observer_position = _camera_position_on_earth,
+		.observer_position = _camera_polar_position,
 		.earth_radius = kEarthMeanRadius,
 		.unix_time = _time,
 	}, _work_performer);
@@ -1105,7 +1140,7 @@ void
 RigidBodyPainter::calculate_camera_position()
 {
 	auto const ecef_camera_position_on_earth = followed_position() - planet_position();
-	_camera_position_on_earth = to_polar (ecef_camera_position_on_earth);
+	_camera_polar_position = to_polar (ecef_camera_position_on_earth);
 	_recalculate_sky_dome = true;
 }
 

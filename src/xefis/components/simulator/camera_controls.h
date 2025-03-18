@@ -16,6 +16,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/support/ui/rigid_body_viewer.h>
 
 // Qt:
 #include <QDoubleSpinBox>
@@ -30,7 +31,10 @@ class CameraControls: public QWidget
 {
   public:
 	// Ctor
-	CameraControls();
+	CameraControls (RigidBodyViewer&, QWidget* parent = nullptr);
+
+  private:
+	RigidBodyViewer& _rigid_body_viewer;
 };
 
 } // namespace xf

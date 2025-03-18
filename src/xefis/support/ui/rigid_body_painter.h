@@ -79,6 +79,14 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	};
 
   public:
+	enum CameraMode
+	{
+		CockpitView,
+		ChaseView,
+		RCPilotView,
+		FixedView,
+	};
+
 	struct GroupRenderingConfig
 	{
 		bool	center_of_mass_visible { false };
@@ -148,13 +156,38 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	followed_body() const noexcept;
 
 	/**
+	 * Set camera mode.
+	 */
+	void
+	set_camera_mode (CameraMode);
+
+	/**
+	 * Set camera position.
+	 */
+	void
+	set_camera_position (si::LonLatRadius);
+
+	/**
+	 * Set camera position.
+	 */
+	void
+	set_user_camera_translation (SpaceLength<WorldSpace> const& translation);
+
+	/**
+	 * Set camera orientation about the focus point.
+	 */
+	void
+	set_user_camera_rotation (SpaceVector<si::Angle> const& rotation);
+
+	/**
 	 * Enable camera orientation following the main body.
 	 * Enabled by default.
 	 */
+	[[deprecated]]
 	void
-	set_camera_follows_body_orientation (bool enabled) noexcept;
+	set_camera_follows_body_orientation (bool enabled);
 
-	[[nodiscard]]
+	[[nodiscard,deprecated]]
 	bool
 	camera_follows_body_orientation() const noexcept
 		{ return _camera_follows_orientation; }
@@ -261,19 +294,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	 * Can be nullptr to disable planet rendering.
 	 */
 	void
-	set_planet (rigid_body::Body const* planet_body) noexcept;
-
-	/**
-	 * Set camera position.
-	 */
-	void
-	set_camera_translation (SpaceLength<WorldSpace> const& translation);
-
-	/**
-	 * Set camera orientation about the focus point.
-	 */
-	void
-	set_camera_rotation (SpaceVector<si::Angle> const& rotation);
+	set_planet (rigid_body::Body const* planet_body);
 
 	/**
 	 * Return true if constraints are set to be visible.
@@ -562,14 +583,17 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	si::PixelDensity			_pixel_density;
 	si::Time					_time;
 	neutrino::WorkPerformer*	_work_performer				{ nullptr };
-	// Camera position is relative to the followed body:
-	SpaceLength<WorldSpace>		_camera_translation;
-	// Camera position in Lon/Lat/Radius:
-	si::LonLatRadius			_camera_position_on_earth	{ 0_deg, 0_deg, 0_m };
+	CameraMode					_camera_mode				{ FixedView };
+	// Requested camera position:
+	si::LonLatRadius			_requested_camera_polar_position;
+	// User offset (whether it's actually WorldSpace or BodySpace depends on camera mode):
+	SpaceLength<WorldSpace>		_user_camera_translation;
+	// Final computed camera position (from requested camera position and user camera translation):
+	si::LonLatRadius			_camera_polar_position;
 	// Camera rotation in screen coordinates:
-	SpaceVector<si::Angle>		_camera_rotation;
+	SpaceVector<si::Angle>		_user_camera_rotation;
 	// Position of the followed body:
-	si::LonLatRadius			_followed_position_on_earth	{ 0_deg, 0_deg, 0_m };
+	si::LonLatRadius			_followed_polar_position;
 	GLSpace						_gl							{ 1.0 / 1_m };
 	std::variant<std::monostate, rigid_body::Group const*, rigid_body::Body const*>
 								_followed;
@@ -621,24 +645,6 @@ RigidBodyPainter::followed_body() const noexcept
 		return *body;
 	else
 		return nullptr;
-}
-
-
-inline void
-RigidBodyPainter::set_camera_follows_body_orientation (bool enabled) noexcept
-{
-	_camera_follows_orientation = enabled;
-	_camera_angles_transform.reset();
-	calculate_camera_position();
-}
-
-
-inline void
-RigidBodyPainter::set_planet (rigid_body::Body const* planet_body) noexcept
-{
-	_planet_body = planet_body;
-	_camera_angles_transform.reset();
-	calculate_camera_position();
 }
 
 } // namespace xf

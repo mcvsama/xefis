@@ -27,6 +27,8 @@
 // Qt:
 #include <QLabel>
 #include <QGridLayout>
+#include <QGroupBox>
+#include <QRadioButton>
 
 // Standard:
 #include <cstddef>
@@ -37,7 +39,9 @@
 
 namespace xf {
 
-CameraControls::CameraControls()
+CameraControls::CameraControls (RigidBodyViewer& viewer, QWidget* parent):
+	QWidget (parent),
+	_rigid_body_viewer (viewer)
 {
 	struct EarthCoordinates
 	{
@@ -71,17 +75,68 @@ CameraControls::CameraControls()
 	auto const ecef_step = 1_m;
 	auto const ecef_decimals = 3;
 
-	auto* ecef_x = new_spinbox.operator()<si::Length> (ecef_range, ecef_step, ecef_decimals, coordinates->ecef.x());
-	auto* ecef_y = new_spinbox.operator()<si::Length> (ecef_range, ecef_step, ecef_decimals, coordinates->ecef.y());
-	auto* ecef_z = new_spinbox.operator()<si::Length> (ecef_range, ecef_step, ecef_decimals, coordinates->ecef.z());
+	auto* const ecef_x = new_spinbox.operator()<si::Length> (ecef_range, ecef_step, ecef_decimals, coordinates->ecef.x());
+	auto* const ecef_y = new_spinbox.operator()<si::Length> (ecef_range, ecef_step, ecef_decimals, coordinates->ecef.y());
+	auto* const ecef_z = new_spinbox.operator()<si::Length> (ecef_range, ecef_step, ecef_decimals, coordinates->ecef.z());
 
 	auto const polar_step = 1e-3_deg;
 	auto const polar_decimals = 6;
 
 	// Note: order of creation is important for tab-order:
-	auto* polar_lat = new_spinbox.operator()<si::Quantity<si::Degree>> ({ -90_deg, +90_deg }, polar_step, polar_decimals, coordinates->polar.lat());
-	auto* polar_lon = new_spinbox.operator()<si::Quantity<si::Degree>> ({ -180_deg, +180_deg }, polar_step, polar_decimals, coordinates->polar.lon());
-	auto* polar_radius = new_spinbox.operator()<si::Length> (ecef_range, ecef_step, ecef_decimals, coordinates->polar.radius());
+	auto* const polar_lat = new_spinbox.operator()<si::Quantity<si::Degree>> ({ -90_deg, +90_deg }, polar_step, polar_decimals, coordinates->polar.lat());
+	auto* const polar_lon = new_spinbox.operator()<si::Quantity<si::Degree>> ({ -180_deg, +180_deg }, polar_step, polar_decimals, coordinates->polar.lon());
+	auto* const polar_radius = new_spinbox.operator()<si::Length> (ecef_range, ecef_step, ecef_decimals, coordinates->polar.radius());
+
+	auto* const cockpit_view = new QRadioButton ("Cockpit view", this);
+	auto* const chase_view = new QRadioButton ("Chase view", this);
+	auto* const rc_pilot_view = new QRadioButton ("RC pilot view", this);
+	auto* const fixed_view = new QRadioButton ("Manual view", this);
+	fixed_view->setChecked (true);
+	auto* const view_group_box = new QGroupBox (this);
+
+	auto* const mode_layout = new QVBoxLayout();
+	mode_layout->setContentsMargins (ph.group_box_margins());
+	mode_layout->addWidget (cockpit_view);
+	mode_layout->addWidget (chase_view);
+	mode_layout->addWidget (rc_pilot_view);
+	mode_layout->addWidget (fixed_view);
+	view_group_box->setLayout (mode_layout);
+
+	auto* const layout = new QGridLayout (this);
+	auto column = 0;
+	layout->addWidget (view_group_box, 0, column, 3, 1);
+	++column;
+	layout->addItem (ph.new_fixed_horizontal_spacer (1.0), 0, column);
+	++column;
+	layout->addWidget (new QLabel ("ECEF position:"), 0, column);
+	++column;
+	layout->addItem (ph.new_fixed_horizontal_spacer (1.0), 0, column);
+	++column;
+	layout->addWidget (align_right (new QLabel ("X")), 0, column);
+	layout->addWidget (align_right (new QLabel ("Y")), 1, column);
+	layout->addWidget (align_right (new QLabel ("Z")), 2, column);
+	++column;
+	layout->addWidget (ecef_x, 0, column);
+	layout->addWidget (ecef_y, 1, column);
+	layout->addWidget (ecef_z, 2, column);
+	++column;
+	layout->addItem (ph.new_fixed_horizontal_spacer (2.0), 0, column);
+	++column;
+	layout->addWidget (new QLabel ("Polar position:"), 0, column);
+	++column;
+	layout->addItem (ph.new_fixed_horizontal_spacer (1.0), 0, column);
+	++column;
+	layout->addWidget (align_right (new QLabel ("Latitude")), 0, column);
+	layout->addWidget (align_right (new QLabel ("Longitude")), 1, column);
+	layout->addWidget (align_right (new QLabel ("Radius")), 2, column);
+	++column;
+	layout->addWidget (polar_lat, 0, column);
+	layout->addWidget (polar_lon, 1, column);
+	layout->addWidget (polar_radius, 2, column);
+	++column;
+	layout->addItem (ph.new_expanding_horizontal_spacer(), 0, column);
+
+	// -- Behavior --
 
 	auto const load_to_spinbox = []<class Value> (QDoubleSpinBox* const spinbox, Value const value) {
 		auto const signals_blocker = QSignalBlocker (spinbox);
@@ -110,35 +165,18 @@ CameraControls::CameraControls()
 	on_value_change (polar_lon, update_ecef_from_polar);
 	on_value_change (polar_radius, update_ecef_from_polar);
 
-	auto* layout = new QGridLayout (this);
-	auto column = 0;
-	layout->addWidget (new QLabel ("ECEF position:"), 0, column);
-	++column;
-	layout->addItem (ph.new_fixed_horizontal_spacer (1.0), 0, column);
-	++column;
-	layout->addWidget (align_right (new QLabel ("X")), 0, column);
-	layout->addWidget (align_right (new QLabel ("Y")), 1, column);
-	layout->addWidget (align_right (new QLabel ("Z")), 2, column);
-	++column;
-	layout->addWidget (ecef_x, 0, column);
-	layout->addWidget (ecef_y, 1, column);
-	layout->addWidget (ecef_z, 2, column);
-	++column;
-	layout->addItem (ph.new_fixed_horizontal_spacer (2.0), 0, column);
-	++column;
-	layout->addWidget (new QLabel ("Polar position:"), 0, column);
-	++column;
-	layout->addItem (ph.new_fixed_horizontal_spacer (1.0), 0, column);
-	++column;
-	layout->addWidget (align_right (new QLabel ("Latitude")), 0, column);
-	layout->addWidget (align_right (new QLabel ("Longitude")), 1, column);
-	layout->addWidget (align_right (new QLabel ("Radius")), 2, column);
-	++column;
-	layout->addWidget (polar_lat, 0, column);
-	layout->addWidget (polar_lon, 1, column);
-	layout->addWidget (polar_radius, 2, column);
-	++column;
-	layout->addItem (ph.new_expanding_horizontal_spacer(), 0, column);
+	QObject::connect (cockpit_view, &QRadioButton::clicked, [this](bool) {
+		_rigid_body_viewer.set_camera_mode (RigidBodyPainter::CockpitView);
+	});
+	QObject::connect (chase_view, &QRadioButton::clicked, [this](bool) {
+		_rigid_body_viewer.set_camera_mode (RigidBodyPainter::ChaseView);
+	});
+	QObject::connect (rc_pilot_view, &QRadioButton::clicked, [this](bool) {
+		_rigid_body_viewer.set_camera_mode (RigidBodyPainter::RCPilotView);
+	});
+	QObject::connect (fixed_view, &QRadioButton::clicked, [this](bool) {
+		_rigid_body_viewer.set_camera_mode (RigidBodyPainter::FixedView);
+	});
 }
 
 } // namespace xf

@@ -204,6 +204,13 @@ class RigidBodyViewer: public GLAnimationWidget
 		{ _rigid_body_painter.set_planet (planet_body); }
 
 	/**
+	 * Forward the mode to RigidBodyPainter.
+	 */
+	void
+	set_camera_mode (RigidBodyPainter::CameraMode const mode)
+		{ _rigid_body_painter.set_camera_mode (mode); }
+
+	/**
 	 * Return current camera position.
 	 */
 	[[nodiscard]]
@@ -294,14 +301,14 @@ class RigidBodyViewer: public GLAnimationWidget
 	 */
 	void
 	forward_camera_translation()
-		{ _rigid_body_painter.set_camera_translation (_camera_translation); }
+		{ _rigid_body_painter.set_user_camera_translation (_camera_translation); }
 
 	/**
 	 * Forward current camera angles to the RigidBodyPainter.
 	 */
 	void
 	forward_camera_rotation()
-		{ _rigid_body_painter.set_camera_rotation (_camera_rotation); }
+		{ _rigid_body_painter.set_user_camera_rotation (_camera_rotation); }
 
   private:
 	Machine*					_machine						{ nullptr };

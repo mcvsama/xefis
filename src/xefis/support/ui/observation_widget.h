@@ -156,7 +156,7 @@ class ObservationWidget: public QWidget
 	// Typical observables:
 	si::Energy						_translational_kinetic_energy;
 	si::Energy						_rotational_kinetic_energy;
-	si::LonLatRadius				_polar_location			{ 0_deg, 0_deg, 0_m };
+	si::LonLatRadius				_polar_location;
 	VelocityMoments<WorldSpace>		_velocity_moments;
 	MassMomentsAtArm<WorldSpace>	_mass_moments;
 	Smoother<float>					_load_factor_smoother	{ 100_ms, 10_ms };
