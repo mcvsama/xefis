@@ -569,10 +569,11 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	get_center_of_mass (rigid_body::Group const&);
 
 	/**
-	 * Request that the new SkyDome is calculated and put into _next_sky_dome.
+	 * Check if calculation of new SkyDome was requested.
+	 * Also if it has been finished, start using it.
 	 */
 	void
-	start_sky_dome_recalculation();
+	check_sky_dome();
 
 	/**
 	 * \threadsafe	As long as _atmospheric_scattering is unmodified.
@@ -628,7 +629,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	AtmosphericScattering const	_atmospheric_scattering		{{ .earth_radius = kEarthMeanRadius, .atmosphere_radius = kEarthMeanRadius + 8.4_km, .enable_tonemapping = true }};
 	SkyDome						_sky_dome;
 	std::future<SkyDome>		_next_sky_dome;
-	bool						_recalculate_sky_dome		{ false };
+	bool						_need_new_sky_dome			{ false };
 	si::Time					_sky_dome_update_time;
 	QColor						_sun_color_in_space			{ qcolor_from_temperature (kSunSurfaceTemperature) };
 	std::array<SkyLight, 5>		_sky_lights;

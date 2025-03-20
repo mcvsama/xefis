@@ -93,7 +93,7 @@ RigidBodyPainter::set_time (si::Time const time)
 {
 	if (abs (time - _sky_dome_update_time) > 1_s)
 	{
-		_recalculate_sky_dome = true;
+		_need_new_sky_dome = true;
 		_sky_dome_update_time = time;
 	}
 
@@ -197,13 +197,7 @@ void
 RigidBodyPainter::precalculate()
 {
 	_followed_polar_position = to_polar (math::coordinate_system_cast<ECEFSpace, void> (followed_position() - planet_position()));
-
-	// If the next calculated SkyDome is ready, use it:
-	if (_next_sky_dome.valid() && is_ready (_next_sky_dome))
-		_sky_dome = _next_sky_dome.get();
-
-	if (!_next_sky_dome.valid() && std::exchange (_recalculate_sky_dome, false))
-		start_sky_dome_recalculation();
+	check_sky_dome();
 }
 
 
@@ -1120,11 +1114,13 @@ RigidBodyPainter::get_center_of_mass (rigid_body::Group const& group)
 
 
 void
-RigidBodyPainter::start_sky_dome_recalculation()
+RigidBodyPainter::check_sky_dome()
 {
-	if (_next_sky_dome.valid())
-		throw Exception ("can only start_sky_dome_recalculation() after previous calculation is finished");
-	else
+	// If the next calculated SkyDome is ready, use it:
+	if (_next_sky_dome.valid() && is_ready (_next_sky_dome))
+		_sky_dome = _next_sky_dome.get();
+
+	if (!_next_sky_dome.valid() && std::exchange (_need_new_sky_dome, false))
 	{
 		if (_work_performer)
 			_next_sky_dome = _work_performer->submit (&RigidBodyPainter::calculate_sky_dome, this);
@@ -1153,7 +1149,6 @@ RigidBodyPainter::calculate_camera_position()
 {
 	auto const ecef_camera_position_on_earth = followed_position() - planet_position();
 	_camera_polar_position = to_polar (ecef_camera_position_on_earth);
-	_recalculate_sky_dome = true;
 }
 
 
