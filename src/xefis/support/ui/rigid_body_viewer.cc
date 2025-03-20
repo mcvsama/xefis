@@ -276,15 +276,6 @@ RigidBodyViewer::display_menu()
 		action->setChecked (_rigid_body_painter.angular_momenta_visible());
 	}
 
-	// "Camera follows the group/body"
-	{
-		auto* action = menu.addAction ("Camera orientation &follows the group or body", [&] {
-			_rigid_body_painter.set_camera_follows_body_orientation (!_rigid_body_painter.camera_follows_body_orientation());
-		});
-		action->setCheckable (true);
-		action->setChecked (_rigid_body_painter.camera_follows_body_orientation());
-	}
-
 	return !!menu.exec (QCursor::pos());
 }
 

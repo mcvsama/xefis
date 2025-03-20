@@ -83,7 +83,7 @@ RigidBodyPainter::RigidBodyPainter (si::PixelDensity const pixel_density):
 		.position	= { 0_deg, 90_deg },
 	};
 
-	calculate_camera_position();
+	calculate_camera_transform();
 	_sky_dome = calculate_sky_dome();
 }
 
@@ -105,7 +105,7 @@ void
 RigidBodyPainter::set_followed_to_none()
 {
 	_followed = std::monostate();
-	calculate_camera_position();
+	calculate_camera_transform();
 }
 
 
@@ -113,8 +113,7 @@ void
 RigidBodyPainter::set_camera_mode (CameraMode const mode)
 {
 	_camera_mode = mode;
-	_camera_angles_transform.reset(); // XXX? needed
-	calculate_camera_position();
+	calculate_camera_transform();
 }
 
 
@@ -122,7 +121,6 @@ void
 RigidBodyPainter::set_camera_position (si::LonLatRadius const position)
 {
 	_requested_camera_polar_position = position;
-	_camera_angles_transform.reset(); // XXX? needed
 }
 
 
@@ -130,28 +128,24 @@ void
 RigidBodyPainter::set_user_camera_translation (SpaceLength<WorldSpace> const& translation)
 {
 	_user_camera_translation = translation;
-	calculate_camera_position();
+	calculate_camera_transform();
 }
 
 
 void
-RigidBodyPainter::set_user_camera_rotation (SpaceVector<si::Angle> const& rotation)
+RigidBodyPainter::set_user_camera_rotation (SpaceVector<si::Angle> const& angles)
 {
-	if (_user_camera_rotation != rotation)
+	if (_user_camera_angles != angles)
 	{
-		_user_camera_rotation = rotation;
-		_camera_angles_transform.reset();
-		calculate_camera_position();
+		_user_camera_angles = angles;
+
+		auto const x = x_rotation (angles.x());
+		auto const y = y_rotation (angles.y());
+		auto const z = z_rotation (angles.z());
+		_user_camera_rotation = x * y * z;
+
+		calculate_camera_transform();
 	}
-}
-
-
-void
-RigidBodyPainter::set_camera_follows_body_orientation (bool enabled)
-{
-	_camera_follows_orientation = enabled;
-	_camera_angles_transform.reset();
-	calculate_camera_position();
 }
 
 
@@ -159,8 +153,7 @@ void
 RigidBodyPainter::set_planet (rigid_body::Body const* planet_body)
 {
 	_planet_body = planet_body;
-	_camera_angles_transform.reset();
-	calculate_camera_position();
+	calculate_camera_transform();
 }
 
 
@@ -336,59 +329,7 @@ RigidBodyPainter::setup_natural_light()
 void
 RigidBodyPainter::apply_camera_rotation()
 {
-	if (!_camera_angles_transform || _camera_follows_orientation)
-	{
-		_gl.save_context ([&] {
-			_gl.load_identity();
-			// The camera always rotates about the screen Y axis and can be moved up and down using the screen X axis.
-			_gl.rotate_x (_user_camera_rotation.x()); // Pitch
-			_gl.rotate_y (_user_camera_rotation.y()); // Yaw
-			_gl.rotate_z (_user_camera_rotation.z()); // Roll
-
-			auto const* followed_group = this->followed_group();
-			auto const* followed_body = this->followed_body();
-
-			// Match the screen coordinates with the group/body/planet coordinates.
-			if ((followed_group || followed_body) && followed_body != _planet_body)
-			{
-				// Make an exception if we're following the planet body: we don't want to use aircraft coordinates
-				// for the planet, because it's unnatural:
-				if (followed_body && followed_body == _planet_body)
-					apply_screen_to_null_island_rotations();
-				else if (_camera_follows_orientation)
-				{
-					// Now the body will be shown in standard screen coordinates (X = right, Y = top, Z = towards the viewer).
-					// But we assume that bodies and groups use aircraft coordinates (X = front, Y = right wing, Z = down).
-					// So rotate again to be able to see the aircraft from behind (when camera rotations are all 0°):
-					_gl.rotate_z (-90_deg);
-					_gl.rotate_y (+90_deg);
-
-					// Rotate body/group to match the screen coordinates:
-					if (followed_group)
-						if (auto const* rotation_reference_body = followed_group->rotation_reference_body())
-							followed_body = rotation_reference_body;
-
-					if (followed_body)
-						_gl.rotate (followed_body->placement().body_to_base_rotation());
-
-				}
-				else
-				{
-					// Rotate the world so that down points to the center of _planet_body:
-					_gl.rotate_x (+_followed_polar_position.lat() - 90_deg);
-					_gl.rotate_y (-_followed_polar_position.lon());
-					apply_screen_to_null_island_rotations();
-				}
-			}
-			// Nothing is followed, so default to planet body if it exists:
-			else if (_planet_body)
-				apply_screen_to_null_island_rotations();
-
-			_camera_angles_transform.emplace (_gl.extract_modelview_matrix());
-		});
-	}
-
-	_gl.multiply_matrix_by (*_camera_angles_transform);
+	_gl.rotate (~_camera_rotation);
 }
 
 
@@ -396,6 +337,7 @@ void
 RigidBodyPainter::setup_camera_transform()
 {
 	_gl.load_identity();
+	calculate_camera_transform();
 	apply_camera_rotation();
 }
 
@@ -408,21 +350,6 @@ RigidBodyPainter::center_at_followed_object()
 	_gl.translate (-_user_camera_translation);
 	// Rotate about that body:
 	apply_camera_rotation();
-}
-
-
-void
-RigidBodyPainter::apply_screen_to_null_island_rotations()
-{
-	// Start with assumption that OpenGL coordinates are equal to ECEF coordinates:
-	// X = Null Island, Y = lon/lat 90°/0° and Z = North.
-
-	// Rotate -90° around X-axis to align the Y-axis with the equator
-	// (so that Z points towards the prime meridian instead of North):
-	_gl.rotate_x (-90_deg);
-	// Rotate -90° around Z-axis to shift the X-axis from Null Island towards
-	// the prime meridian and align Y with the correct eastward direction:
-	_gl.rotate_z (-90_deg);
 }
 
 
@@ -1145,10 +1072,51 @@ RigidBodyPainter::calculate_sky_dome()
 
 
 void
-RigidBodyPainter::calculate_camera_position()
+RigidBodyPainter::calculate_camera_transform()
 {
-	auto const ecef_camera_position_on_earth = followed_position() - planet_position();
-	_camera_polar_position = to_polar (ecef_camera_position_on_earth);
+	auto const* followed_group = this->followed_group();
+	auto const* followed_body = this->followed_body();
+
+	switch (_camera_mode)
+	{
+		case CockpitView:
+		{
+			_camera_polar_position = to_polar (followed_position() - planet_position());
+
+			if (followed_group)
+				if (auto const* rotation_reference_body = followed_group->rotation_reference_body())
+					followed_body = rotation_reference_body;
+
+			if (followed_body)
+			{
+				auto const body_rotation = math::coordinate_system_cast<void, void> (followed_body->placement().base_to_body_rotation());
+				// Make an exception if we're following the planet body: we don't want to use aircraft coordinates
+				// for the planet, because it's unnatural:
+				if (followed_body == _planet_body)
+					_camera_rotation = _user_camera_rotation * kScreenToNullIslandRotation * body_rotation;
+				else
+					_camera_rotation = _user_camera_rotation * kAircraftToBehindViewRotation * body_rotation;
+			}
+		}
+		break;
+
+		case ChaseView:
+		{
+			_camera_polar_position = to_polar (followed_position() - planet_position());
+			_camera_rotation = _user_camera_rotation * gravity_down_rotation (_followed_polar_position) * kScreenToNullIslandRotation;
+		}
+		break;
+
+		case RCPilotView:
+			// TODO unimplemented yet
+			break;
+
+		case FixedView:
+			// TODO unimplemented yet
+			break;
+	}
+
+	_need_new_sky_dome = true;
 }
 
 
