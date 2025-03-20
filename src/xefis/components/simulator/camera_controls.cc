@@ -91,7 +91,6 @@ CameraControls::CameraControls (RigidBodyViewer& viewer, QWidget* parent):
 	auto* const chase_view = new QRadioButton ("Chase view", this);
 	auto* const rc_pilot_view = new QRadioButton ("RC pilot view", this);
 	auto* const fixed_view = new QRadioButton ("Manual view", this);
-	fixed_view->setChecked (true);
 	auto* const view_group_box = new QGroupBox (this);
 
 	auto* const mode_layout = new QVBoxLayout();
@@ -177,6 +176,8 @@ CameraControls::CameraControls (RigidBodyViewer& viewer, QWidget* parent):
 	QObject::connect (fixed_view, &QRadioButton::clicked, [this](bool) {
 		_rigid_body_viewer.set_camera_mode (RigidBodyPainter::FixedView);
 	});
+
+	cockpit_view->setChecked (true);
 }
 
 } // namespace xf
