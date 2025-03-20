@@ -199,7 +199,7 @@ RigidBodyPainter::setup_camera (QOpenGLPaintDevice& canvas)
 {
 	setup_camera_projection (canvas.size());
 	setup_modelview();
-	setup_camera_transform();
+	calculate_camera_transform();
 }
 
 
@@ -330,15 +330,6 @@ void
 RigidBodyPainter::apply_camera_rotation()
 {
 	_gl.rotate (~_camera_rotation);
-}
-
-
-void
-RigidBodyPainter::setup_camera_transform()
-{
-	_gl.load_identity();
-	calculate_camera_transform();
-	apply_camera_rotation();
 }
 
 
