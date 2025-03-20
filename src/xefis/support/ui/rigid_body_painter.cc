@@ -941,13 +941,13 @@ RigidBodyPainter::paint_ecef_basis (QOpenGLPaintDevice& canvas)
 	auto const tx = -1.0 + 2 * pixels_from_edge / canvas.width();
 	auto const ty = -1.0 + 2 * pixels_from_edge / canvas.height();
 
-	glMatrixMode (GL_PROJECTION);
-	_gl.load_identity();
-	_gl.translate (tx, ty, -1.0);
-	_gl.set_hfov_perspective (canvas.size(), 60_deg, _gl.to_opengl (1_cm), _gl.to_opengl (10_m));
-	glMatrixMode (GL_MODELVIEW);
-
 	_gl.save_context ([&] {
+		glMatrixMode (GL_PROJECTION);
+		_gl.load_identity();
+		_gl.translate (tx, ty, -1.0);
+		_gl.set_hfov_perspective (canvas.size(), 60_deg, _gl.to_opengl (1_cm), _gl.to_opengl (10_m));
+
+		glMatrixMode (GL_MODELVIEW);
 		_gl.translate (0_m, 0_m, -1_m);
 		apply_camera_rotation();
 		paint_basis (8_cm);
