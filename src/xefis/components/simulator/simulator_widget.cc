@@ -209,7 +209,7 @@ SimulatorWidget::make_simulation_controls()
 			++row;
 			basic_controls_layout->addWidget (ph.new_hline(), row, 0, 1, 3);
 			++row;
-			auto* basis_colors_label = new QLabel ("<b><span style='color: red'>X (Null Island)</span> <span style='color: green'>Y (90°E, 0°N)</span> <span style='color: blue'>Z (North Pole)</span></b>", this);
+			auto* basis_colors_label = new QLabel ("<span style='color: green'>↑ Y (90°E, 0°N)</span><br/><span style='color: blue'>⊙ Z (North Pole)</span> <span style='color: red'>→ X (Null Island)</span>", this);
 			basic_controls_layout->addWidget (basis_colors_label, row, 0, 1, 3);
 		}
 
