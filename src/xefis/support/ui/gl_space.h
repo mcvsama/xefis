@@ -17,6 +17,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/math/geometry.h>
+#include <xefis/support/math/placement.h>
 #include <xefis/support/simulation/rigid_body/shape.h>
 #include <xefis/support/simulation/rigid_body/shape_material.h>
 #include <xefis/support/simulation/rigid_body/shape_vertex.h>
@@ -77,6 +78,7 @@ using GLMatrix = std::array<GLfloat, 16>;
 
 /**
  * Support for various OpenGL stuff.
+ * Adds a concept of camera and allows double-precision translation of camera-related stuff before forwarding translation to OpenGL library (which uses floats).
  */
 class GLSpace
 {
@@ -94,7 +96,7 @@ class GLSpace
 	 * Add given offset to all vertex positions that are drawn.
 	 */
 	void
-	set_global_offset (SpaceLength<BodyOrigin> const& offset) noexcept;
+	set_global_offset (SpaceLength<WorldSpace> const& offset) noexcept;
 
 	/**
 	 * Store current OpenGL matrix, call the lambda and restore matrix.
@@ -108,6 +110,20 @@ class GLSpace
 	 */
 	static void
 	set_hfov_perspective (QSize, si::Angle hfov, float near_plane, float far_plane);
+
+	/**
+	 * Set camera placement. If enabled (non-nullopt Placement passed), the
+	 * camera will be at the origin on OpenGL space, and all added objects
+	 * will be translated by -camera_position.
+	 */
+	void
+	set_camera (std::optional<Placement<WorldSpace, WorldSpace>> const& camera);
+
+	/**
+	 * Set camera rotations. Position will be set to 0.
+	 */
+	void
+	set_camera_rotation_only (Placement<WorldSpace, WorldSpace>);
 
 	/**
 	 * Rotate current OpenGL matrix by given rotation quaternion.
@@ -190,6 +206,19 @@ class GLSpace
 			{ translate (offset * _position_scale); }
 
 	/**
+	 * Apply translation and rotation.
+	 */
+	template<math::CoordinateSystem BaseSpace, math::CoordinateSystem Space>
+		void
+		transform (Placement<BaseSpace, Space> const&);
+
+	/**
+	 * Disable translation by zeroing last row and column of the transformation matrix.
+	 */
+	void
+	reset_translation();
+
+	/**
 	 * Return value in OpenGL coordinates.
 	 */
 	float
@@ -199,8 +228,8 @@ class GLSpace
 	/**
 	 * Return value in OpenGL coordinates.
 	 */
-	SpaceVector<double, BodyOrigin>
-	vector_to_opengl (SpaceLength<BodyOrigin> const value)
+	SpaceVector<double, WorldSpace>
+	vector_to_opengl (SpaceLength<WorldSpace> const value)
 		{ return value * _position_scale; }
 
 	/**
@@ -246,7 +275,8 @@ class GLSpace
 	 */
 	template<math::CoordinateSystem Space>
 		void
-		add_vertex (SpaceVector<si::Length, Space> position);
+		add_vertex (SpaceVector<si::Length, Space> position)
+			{ add_vertex (position * _position_scale); }
 
 	/**
 	 * Return reference to current additional parameters struct.
@@ -287,18 +317,19 @@ class GLSpace
 	pop_context();
 
   private:
-	SpaceLength<BodyOrigin>				_global_offset;
-	SpaceVector<double, BodyOrigin>		_global_offset_float;
-	decltype (1 / 1_m)					_position_scale { 1 };
+	bool								_camera_offset_enabled			{ false };
+	std::optional<Placement<WorldSpace, WorldSpace>>
+										_camera;
+	SpaceLength<WorldSpace>				_global_offset;
+	decltype (1 / 1_m)					_position_scale					{ 1 };
 	std::stack<AdditionalParameters>	_additional_parameters_stack;
 };
 
 
 inline void
-GLSpace::set_global_offset (SpaceLength<BodyOrigin> const& offset) noexcept
+GLSpace::set_global_offset (SpaceLength<WorldSpace> const& offset) noexcept
 {
 	_global_offset = offset;
-	_global_offset_float = offset * _position_scale;
 }
 
 
@@ -345,6 +376,16 @@ template<math::CoordinateSystem TargetSpace, math::CoordinateSystem SourceSpace>
 	}
 
 
+template<math::CoordinateSystem BaseSpace, math::CoordinateSystem Space>
+	inline void
+	GLSpace::transform (Placement<BaseSpace, Space> const& placement)
+	{
+		translate (placement.position());
+		// With OpenGL it's base→body, not body→space as one would normally expect:
+		rotate (placement.base_to_body_rotation());
+	}
+
+
 inline void
 GLSpace::begin (GLenum const mode, auto&& lambda)
 {
@@ -384,7 +425,7 @@ inline void
 GLSpace::add_vertex (rigid_body::ShapeVertex const& vertex)
 {
 	set_vertex (vertex);
-	add_vertex (vertex.position());
+	add_vertex (math::coordinate_system_cast<WorldSpace, void> (vertex.position()));
 }
 
 
@@ -392,17 +433,13 @@ template<math::CoordinateSystem Space>
 	inline void
 	GLSpace::add_vertex (SpaceVector<double, Space> position)
 	{
-		position += _global_offset_float;
+		auto offset = _global_offset;
+
+		if (_camera)
+			offset -= _camera->position();
+
+		position += offset * _position_scale;
 		glVertex3f (position[0], position[1], position[2]);
-	}
-
-
-template<math::CoordinateSystem Space>
-	inline void
-	GLSpace::add_vertex (SpaceVector<si::Length, Space> position)
-	{
-		position += _global_offset;
-		add_vertex (position * _position_scale);
 	}
 
 

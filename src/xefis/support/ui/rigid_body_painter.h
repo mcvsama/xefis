@@ -62,7 +62,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	static constexpr auto		kSunSunsetEnlargement		= 2.0;
 
 	// Rotates the aircraft so that it's visible from behind:
-	static constexpr auto		kAircraftToBehindViewRotation	= z_rotation (-90_deg) * y_rotation (90_deg);
+	static constexpr auto		kAircraftToBehindViewRotation	= z_rotation<WorldSpace> (-90_deg) * y_rotation<WorldSpace> (90_deg);
 
 	// Rotates the world from screen coordinates (Earth visible from top of North (Z) with Null Island on the Right (X))
 	// to Null Island being visible from above (Z) with North on top of the screen (Y) and 90°/0° on the right (X).
@@ -75,7 +75,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	// 3. Rotate -90° around Z-axis to shift the X-axis from Null Island towards
 	//    the prime meridian and align Y with the correct eastward direction:
 	//        z_rotation (-90_deg)
-	static constexpr auto		kScreenToNullIslandRotation		= x_rotation (-90_deg) * z_rotation (-90_deg);
+	static constexpr auto		kScreenToNullIslandRotation		= x_rotation<WorldSpace> (-90_deg) * z_rotation<WorldSpace> (-90_deg);
 
 	struct SkyLight
 	{
@@ -178,18 +178,19 @@ class RigidBodyPainter: protected QOpenGLFunctions
 
 	/**
 	 * Set camera position.
+	 * Used in camera modes RCPilotView and FixedView.
 	 */
 	void
 	set_camera_position (si::LonLatRadius);
 
 	/**
-	 * Set camera position.
+	 * Set camera position offset from followed object position.
 	 */
 	void
 	set_user_camera_translation (SpaceLength<WorldSpace> const& translation);
 
 	/**
-	 * Set camera orientation about the focus point.
+	 * Set camera orientation about the followed object.
 	 */
 	void
 	set_user_camera_rotation (SpaceVector<si::Angle> const& rotation);
@@ -429,12 +430,6 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	void
 	setup_natural_light();
 
-	void
-	apply_camera_rotation();
-
-	void
-	center_at_followed_object();
-
 	/**
 	 * Rotates OpenGL world so that Z direction is towards the Sun.
 	 * Preconditions:
@@ -478,10 +473,6 @@ class RigidBodyPainter: protected QOpenGLFunctions
 
 	void
 	paint (rigid_body::System const&);
-
-	template<math::CoordinateSystem BaseSpace, math::CoordinateSystem Space>
-		void
-		transform_gl_to (Placement<BaseSpace, Space> const&);
 
 	/**
 	 * Translate and rotate OpenGL space to the center of mass of the group.
@@ -582,9 +573,9 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	hsl_interpolation (float x, QColor const& color0, QColor const& color1);
 
 	[[nodiscard]]
-	static RotationQuaternion<>
+	RotationQuaternion<WorldSpace>
 	gravity_down_rotation (si::LonLat const position)
-		{ return x_rotation (position.lat() - 90_deg) * y_rotation (-position.lon()); }
+		{ return x_rotation<WorldSpace> (position.lat() - 90_deg) * y_rotation<WorldSpace> (-position.lon()); }
 
   private:
 	si::PixelDensity			_pixel_density;
@@ -593,15 +584,18 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	CameraMode					_camera_mode				{ CockpitView };
 	// Requested camera position:
 	si::LonLatRadius			_requested_camera_polar_position;
-	// User offset (whether it's actually WorldSpace or BodySpace depends on camera mode):
+	// User offset (it's actually in CameraSpace):
 	SpaceLength<WorldSpace>		_user_camera_translation;
 	// Final computed camera position (from requested camera position and user camera translation):
 	si::LonLatRadius			_camera_polar_position;
 	// Requested camera rotation in screen coordinates:
 	SpaceVector<si::Angle>		_user_camera_angles;
-	RotationQuaternion<>		_user_camera_rotation		{ math::identity };
+	RotationQuaternion<WorldSpace>
+								_user_camera_rotation		{ math::identity };
 	// Final computed camera rotation:
-	RotationQuaternion<>		_camera_rotation			{ math::identity };
+	Placement<WorldSpace, WorldSpace>
+								_camera;
+	SpaceLength<WorldSpace>		_camera_position_for_sky_dome;
 	// Position of the followed body:
 	si::LonLatRadius			_followed_polar_position;
 	GLSpace						_gl							{ 1.0 / 1_m };
