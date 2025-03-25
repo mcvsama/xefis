@@ -57,6 +57,9 @@ constexpr auto kSkyLight2		= GL_LIGHT4;
 constexpr auto kSkyLight3		= GL_LIGHT5;
 constexpr auto kSkyLight4		= GL_LIGHT6;
 
+// For debugging:
+constexpr auto kBlackSunsEnabled	= false;
+
 
 RigidBodyPainter::RigidBodyPainter (si::PixelDensity const pixel_density):
 	_pixel_density (pixel_density),
@@ -404,30 +407,31 @@ RigidBodyPainter::paint_planet()
 				_gl.draw (sun_face);
 			});
 
-#if 0
-			// For debugging.
-			// Draw black balls at the positions of additional source of lights.
-
-			auto black_sun = rigid_body::make_centered_sphere_shape ({
-				.radius = 30_m,
-				.n_slices = 10,
-				.n_stacks = 10,
-				.material = rigid_body::kBlackMatte,
-			});
-
-			for (auto& sky_light: _sky_lights)
+			if constexpr (kBlackSunsEnabled)
 			{
-				_gl.save_context ([&] {
-					make_z_sky_top_x_sun_azimuth();
-					_gl.save_context ([&] {
-						_gl.rotate_z (+sky_light.position.lon());
-						_gl.rotate_y (-sky_light.position.lat());
-						_gl.translate (1_km, 0_m, 0_m);
-						_gl.draw (black_sun);
-					});
+				// For debugging.
+				// Draw black balls at the positions of additional source of lights.
+
+				auto black_sun = rigid_body::make_centered_sphere_shape ({
+					.radius = 30_m,
+					.n_slices = 10,
+					.n_stacks = 10,
+					.material = rigid_body::kBlackMatte,
 				});
+
+				for (auto& sky_light: _sky_lights)
+				{
+					_gl.save_context ([&] {
+						make_z_sky_top_x_sun_azimuth(); // TODO?
+						_gl.save_context ([&] {
+							_gl.rotate_z (+sky_light.position.lon());
+							_gl.rotate_y (-sky_light.position.lat());
+							_gl.translate (1_km, 0_m, 0_m);
+							_gl.draw (black_sun);
+						});
+					});
+				}
 			}
-#endif
 		});
 
 		// Ground:
