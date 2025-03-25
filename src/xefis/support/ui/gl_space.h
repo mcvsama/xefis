@@ -90,7 +90,7 @@ class GLSpace
 
   public:
 	// Ctor
-	GLSpace (decltype (1 / 1_m) position_scale);
+	GLSpace (decltype (1 / 1_m) position_scale = 1.0 / 1_m);
 
 	/**
 	 * Add given offset to all vertex positions that are drawn.
