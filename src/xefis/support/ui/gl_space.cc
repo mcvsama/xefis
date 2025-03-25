@@ -45,6 +45,44 @@ GLSpace::set_hfov_perspective (QSize const size, si::Angle hfov, float near_plan
 
 
 void
+GLSpace::set_camera (std::optional<Placement<WorldSpace, WorldSpace>> const& camera)
+{
+	_camera = camera;
+	load_identity();
+
+	// Apply camera rotation (inverse, that is base→body, since OpenGL rotates the world, not the objects):
+	if (_camera)
+		rotate (_camera->base_to_body_rotation());
+
+	// Don't translate now. The GL matrix has 32-bit floats, we need to apply translation when applying verices using 64-bit floats (si::Length).
+}
+
+
+void
+GLSpace::set_camera_rotation_only (Placement<WorldSpace, WorldSpace> camera)
+{
+	camera.set_position (math::zero);
+	set_camera (camera);
+}
+
+
+void
+GLSpace::reset_translation()
+{
+	GLfloat matrix[16];
+	glGetFloatv (GL_MODELVIEW_MATRIX, matrix);
+
+	// Remove translation (set the last column’s x, y, z to 0):
+	matrix[12] = 0.0f; // X translation
+	matrix[13] = 0.0f; // Y translation
+	matrix[14] = 0.0f; // Z translation
+
+	glMatrixMode (GL_MODELVIEW);
+	glLoadMatrixf (matrix);
+}
+
+
+void
 GLSpace::set_material (rigid_body::ShapeMaterial const& material)
 {
 	auto const& params = additional_parameters();
