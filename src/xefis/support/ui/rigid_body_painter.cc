@@ -435,7 +435,7 @@ RigidBodyPainter::paint_planet()
 		});
 
 		// Ground:
-		// TODO it would be best if there was a shader that adds the ground sphere color to the drawn feature
+		// TODO it would be best if there was a shader that adds the dome sphere color to the drawn feature
 		_gl.save_context ([&] {
 			auto const ground_color = QColor (0xaa, 0x55, 0x00);
 
@@ -493,7 +493,7 @@ RigidBodyPainter::paint_air_particles()
 {
 	_gl.save_context ([&] {
 		_gl.set_camera_rotation_only (_camera);
-		// Trick with rotating cameraand then subtracting camera position from the object is to avoid problems with low precision OpenGL floats:
+		// Trick with rotating camera and then subtracting camera position from the object is to avoid problems with low precision OpenGL floats:
 		// followed_position() - _camera.position() uses doubles; but _gl.translate() internally reduces them to floats:
 		_gl.translate (followed_position() - _camera.position());
 
@@ -603,7 +603,7 @@ void
 RigidBodyPainter::transform_gl_to_center_of_mass (rigid_body::Body const& body)
 {
 	// Transform so that center-of-mass is at the OpenGL space origin.
-	// Trick with rotating cameraand then subtracting camera position from the object is to avoid problems with low precision OpenGL floats:
+	// Trick with rotating camera and then subtracting camera position from the object is to avoid problems with low precision OpenGL floats:
 	// body.placement() - _camera.position() uses doubles; but _gl.transform() internally reduces them to floats:
 	_gl.transform (body.placement() - _camera.position());
 }
