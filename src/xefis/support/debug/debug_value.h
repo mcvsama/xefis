@@ -51,7 +51,7 @@ template<class Value>
 	inline Value
 	debug_slider (std::string const& name,
 				  neutrino::Range<Value> const range,
-				  std::optional<Value> default_value,
+				  std::optional<Value> default_value = std::nullopt,
 				  Value const step = Value (1),
 				  std::function<void()> const callback = nullptr)
 	{
