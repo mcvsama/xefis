@@ -160,7 +160,7 @@ calculate_dome_slices_and_stacks (HorizontalCoordinates const sun_position, si::
 {
 	SlicesStacks result;
 
-	// Longitude:
+	// Sky longitude:
 	{
 		auto constexpr sun_vicinity_slices = 13u;
 		auto constexpr rest_slices = 50u;
@@ -201,12 +201,13 @@ calculate_dome_slices_and_stacks (HorizontalCoordinates const sun_position, si::
 			auto latitude = horizon_angle - horizon_epsilon;
 
 			// Denser near horizon at the expense of density directly under the camera:
-			auto const dynamic_delta = [&latitude, &delta]() {
-				auto const factor = latitude > -1_deg
+			auto const dynamic_delta = [&latitude, &delta, &horizon_angle]() {
+				auto const nl = neutrino::renormalize (latitude, Range<si::Angle> { -90_deg, horizon_angle }, Range<si::Angle> { -90_deg, 0_deg });
+				auto const factor = nl > -1_deg
 					? 0.05
-					: latitude > -5_deg
+					: nl > -5_deg
 						? 0.3
-						: latitude > -10_deg
+						: nl > -10_deg
 							? 0.5
 							: 1.0;
 				return factor * delta;
