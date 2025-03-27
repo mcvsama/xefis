@@ -517,6 +517,9 @@ RigidBodyPainter::paint_planet()
 
 			_gl.set_camera (_camera);
 			_gl.translate (planet_position());
+			_gl.translate (-_camera.position());
+			make_z_sky_top_x_south();
+			_gl.translate (_camera.position());
 
 			// Make a globe that will act as a ground shape:
 			auto surface_globe = rigid_body::make_centered_sphere_shape ({
