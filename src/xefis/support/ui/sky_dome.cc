@@ -222,8 +222,6 @@ calculate_dome_slices_and_stacks (HorizontalCoordinates const sun_position, si::
 			std::ranges::reverse (result.stack_angles);
 		}
 
-		// FIXME there are rendering problems around the horizon_angle
-
 		// Sky:
 		{
 			auto const sun_vicinity = Range { sun_position.altitude - 20_deg, sun_position.altitude + 20_deg };
@@ -309,7 +307,7 @@ calculate_dome_shape (si::LonLatRadius const observer_position,
 		.material = rigid_body::kTransparentBlack,
 		.setup_material = [&] (rigid_body::ShapeMaterial& material, si::LonLat const sphere_position, WaitGroup::WorkToken&& work_token) {
 			auto calculate = [=, &material, &atmospheric_scattering, &observer_position, &sun_position, work_token = std::move (work_token)] {
-				if (sphere_position.lat() > horizon_angle)
+				if (sphere_position.lat() >= horizon_angle)
 				{
 					// Sky:
 					auto const polar_ray_direction = si::LonLat (sphere_position.lon(), sphere_position.lat());
