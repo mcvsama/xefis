@@ -419,9 +419,7 @@ RigidBodyPainter::make_z_towards_the_sun()
 void
 RigidBodyPainter::make_z_sky_top_x_south()
 {
-	_gl.rotate_z (+_camera_polar_position.lon());
-	_gl.rotate_y (-_camera_polar_position.lat());
-	_gl.rotate_y (+90_deg);
+	_gl.rotate (~(z_rotation<WorldSpace> (_camera_polar_position.lon()) * y_rotation<WorldSpace> (-_camera_polar_position.lat() + 90_deg)));
 	// Z is now sky top, X is towards azimuth 180° (true south).
 }
 
