@@ -522,11 +522,9 @@ RigidBodyPainter::paint_planet()
 			_gl.translate (_camera.position());
 
 			// Make a globe that will act as a ground shape:
-			auto surface_globe = rigid_body::make_centered_sphere_shape ({
-				.radius = kEarthMeanRadius,
-				.n_slices = 100,
-				.n_stacks = 50,
-				.material = ground_material,
+			auto surface_globe = _sky_dome.ground_shape;
+			surface_globe.for_all_vertices ([&](rigid_body::ShapeVertex& vertex) {
+				vertex.set_material (ground_material);
 			});
 
 			glFrontFace (GL_CCW);
