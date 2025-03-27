@@ -317,20 +317,11 @@ class GLSpace
 	pop_context();
 
   private:
-	bool								_camera_offset_enabled			{ false };
 	std::optional<Placement<WorldSpace, WorldSpace>>
 										_camera;
-	SpaceLength<WorldSpace>				_global_offset;
 	decltype (1 / 1_m)					_position_scale					{ 1 };
 	std::stack<AdditionalParameters>	_additional_parameters_stack;
 };
-
-
-inline void
-GLSpace::set_global_offset (SpaceLength<WorldSpace> const& offset) noexcept
-{
-	_global_offset = offset;
-}
 
 
 inline void
@@ -433,12 +424,9 @@ template<math::CoordinateSystem Space>
 	inline void
 	GLSpace::add_vertex (SpaceVector<double, Space> position)
 	{
-		auto offset = _global_offset;
-
 		if (_camera)
-			offset -= _camera->position();
+			position -= _camera->position() * _position_scale;
 
-		position += offset * _position_scale;
 		glVertex3f (position[0], position[1], position[2]);
 	}
 
