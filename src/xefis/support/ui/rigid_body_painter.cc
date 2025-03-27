@@ -511,8 +511,8 @@ RigidBodyPainter::paint_planet()
 			auto const ground_color = QColor (0xaa, 0x55, 0x00);
 
 			rigid_body::ShapeMaterial ground_material;
-			ground_material.set_emission_color (ground_color.darker (1000));
-			ground_material.set_ambient_color (ground_color.darker (600));
+			ground_material.set_emission_color (ground_color.darker (900));
+			ground_material.set_ambient_color (ground_color.darker (500));
 			ground_material.set_diffuse_color (ground_color);
 
 			_gl.set_camera (_camera);
