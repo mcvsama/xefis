@@ -49,13 +49,14 @@
 
 namespace xf {
 
-constexpr auto kSunLight		= GL_LIGHT0;
-constexpr auto kFeatureLight	= GL_LIGHT1;
-constexpr auto kSkyLight0		= GL_LIGHT2;
-constexpr auto kSkyLight1		= GL_LIGHT3;
-constexpr auto kSkyLight2		= GL_LIGHT4;
-constexpr auto kSkyLight3		= GL_LIGHT5;
-constexpr auto kSkyLight4		= GL_LIGHT6;
+constexpr auto kGLAtmosphericSunLight	= GL_LIGHT0;
+constexpr auto kGLCosmicSunLight		= GL_LIGHT1;
+constexpr auto kGLFeatureLight			= GL_LIGHT2;
+constexpr auto kGLSkyLight0				= GL_LIGHT3;
+constexpr auto kGLSkyLight1				= GL_LIGHT4;
+constexpr auto kGLSkyLight2				= GL_LIGHT5;
+constexpr auto kGLSkyLight3				= GL_LIGHT6;
+constexpr auto kGLSkyLight4				= GL_LIGHT7;
 
 // For debugging:
 constexpr auto kBlackSunsEnabled	= false;
@@ -66,23 +67,23 @@ RigidBodyPainter::RigidBodyPainter (si::PixelDensity const pixel_density):
 	_gl (pixel_density * kDefaultPositionScale)
 {
 	_sky_lights[0] = SkyLight {
-		.gl_number	= kSkyLight0,
+		.gl_number	= kGLSkyLight0,
 		.position	= { 0_deg, 0_deg },
 	};
 	_sky_lights[1] = SkyLight {
-		.gl_number	= kSkyLight1,
+		.gl_number	= kGLSkyLight1,
 		.position	= { 90_deg, 5_deg },
 	};
 	_sky_lights[2] = SkyLight {
-		.gl_number	= kSkyLight2,
+		.gl_number	= kGLSkyLight2,
 		.position	= { 180_deg, 5_deg },
 	};
 	_sky_lights[3] = SkyLight {
-		.gl_number	= kSkyLight3,
+		.gl_number	= kGLSkyLight3,
 		.position	= { 270_deg, 5_deg },
 	};
 	_sky_lights[4] = {
-		.gl_number	= kSkyLight4,
+		.gl_number	= kGLSkyLight4,
 		.position	= { 0_deg, 90_deg },
 	};
 
@@ -176,6 +177,7 @@ RigidBodyPainter::paint (rigid_body::System const& system, QOpenGLPaintDevice& c
 	painter.beginNativePainting();
 	precalculate();
 	setup_camera (canvas);
+	setup_lights();
 	paint_world (system);
 	paint_ecef_basis (canvas);
 	painter.endNativePainting();
@@ -231,96 +233,168 @@ RigidBodyPainter::setup_modelview()
 
 
 void
+RigidBodyPainter::setup_lights()
+{
+	setup_sun_light();
+	setup_sky_light();
+	setup_feature_light();
+
+	// Disable all lights by default:
+	enable_only_lights (0);
+}
+
+
+void
+RigidBodyPainter::setup_sun_light()
+{
+	// Blend the original sun color with color as seen through the atmosphere:
+	auto const q_atmospheric_sun_color = QColor::fromRgbF (_sky_dome.sun_light_color[0], _sky_dome.sun_light_color[1], _sky_dome.sun_light_color[2]);
+	auto const x = neutrino::renormalize (_followed_polar_position.radius(), Range { kEarthMeanRadius, kAtmosphereRadius }, Range { 0.0f, 1.0f });
+	auto const atmospheric_sun_color = to_gl_color (hsl_interpolation (x, q_atmospheric_sun_color, _sun_color_in_space));
+	auto const cosmic_sun_color = to_gl_color (_sun_color_in_space);
+
+	glLightfv (kGLAtmosphericSunLight, GL_AMBIENT, atmospheric_sun_color.scaled (0.0f));
+	glLightfv (kGLAtmosphericSunLight, GL_DIFFUSE, atmospheric_sun_color.scaled (0.4f));
+	glLightfv (kGLAtmosphericSunLight, GL_SPECULAR, atmospheric_sun_color.scaled (0.1f));
+
+	glLightfv (kGLCosmicSunLight, GL_AMBIENT, cosmic_sun_color.scaled (0.0f));
+	glLightfv (kGLCosmicSunLight, GL_DIFFUSE, cosmic_sun_color.scaled (0.4f));
+	glLightfv (kGLCosmicSunLight, GL_SPECULAR, cosmic_sun_color.scaled (0.1f));
+
+	_gl.save_context ([&] {
+		_gl.set_camera (_camera);
+
+		if (_planet_body)
+		{
+			_gl.save_context ([&] {
+				_gl.load_identity();
+				_gl.set_camera_rotation_only (_camera);
+				make_z_towards_the_sun();
+				// Direct atmospheric sunlight:
+				glLightfv (kGLAtmosphericSunLight, GL_POSITION, GLArray { 0.0f, 0.0f, _gl.to_opengl (kSunDistance), 1.0f });
+				// Direct cosmic sunlight:
+				glLightfv (kGLCosmicSunLight, GL_POSITION, GLArray { 0.0f, 0.0f, _gl.to_opengl (kSunDistance), 1.0f });
+			});
+		}
+		else
+		{
+			// Otherwise let the observer cast the light:
+			glLightfv (kGLAtmosphericSunLight, GL_POSITION, GLArray { 0.0f, 0.0f, 1.0f, 0.0f });
+			glLightfv (kGLCosmicSunLight, GL_POSITION, GLArray { 0.0f, 0.0f, 1.0f, 0.0f });
+		}
+	});
+
+	// TODO GL_SPOT_DIRECTION
+	// TODO GL_SPOT_EXPONENT
+	// TODO GL_SPOT_CUTOFF
+}
+
+
+void
+RigidBodyPainter::set_atmospheric_sun_light_enabled (bool enabled)
+{
+	if (enabled)
+		glEnable (kGLAtmosphericSunLight);
+	else
+		glDisable (kGLAtmosphericSunLight);
+}
+
+
+void
+RigidBodyPainter::set_cosmic_sun_light_enabled (bool enabled)
+{
+	if (enabled)
+		glEnable (kGLCosmicSunLight);
+	else
+		glDisable (kGLCosmicSunLight);
+}
+
+
+void
+RigidBodyPainter::setup_sky_light()
+{
+	// Sky lights:
+	for (auto& sky_light: _sky_lights)
+	{
+		_gl.save_context ([&] {
+			make_z_sky_top_x_sun_azimuth();
+			_gl.rotate_z (+sky_light.position.lon());
+			_gl.rotate_y (-sky_light.position.lat());
+
+			auto const number = sky_light.gl_number;
+			auto const light_direction = to_cartesian<void> (sky_light.position); // Azimuth (lon()) should possible be negated, but the sky dome is symmetric, so this is okay.
+			auto const color = _atmospheric_scattering.calculate_incident_light (
+				{ 0_m, 0_m, _followed_polar_position.radius() },
+				light_direction,
+				_sky_dome.sun_position.cartesian_coordinates
+			);
+			auto const corrected_color = sky_correction (color);
+			auto const gl_color = to_gl_color (corrected_color);
+			auto const sky_height = kAtmosphereRadius - kEarthMeanRadius;
+
+			glEnable (number);
+			glLightfv (number, GL_AMBIENT, gl_color.scaled (0.0f));
+			glLightfv (number, GL_DIFFUSE, gl_color.scaled (0.2f));
+			glLightfv (number, GL_SPECULAR, gl_color.scaled (0.0f));
+			glLightfv (number, GL_POSITION, GLArray { _gl.to_opengl (sky_height), 0.0f, 0.0f, 0.0f });
+		});
+	}
+}
+
+
+void
+RigidBodyPainter::set_sky_light_enabled (bool enabled)
+{
+	for (auto& sky_light: _sky_lights)
+	{
+		if (enabled)
+			glEnable (sky_light.gl_number);
+		else
+			glDisable (sky_light.gl_number);
+	}
+}
+
+
+void
 RigidBodyPainter::setup_feature_light()
 {
-	// Disable natural lights:
-	glDisable (kSunLight);
-
-	for (auto& sky_light: _sky_lights)
-		glDisable (sky_light.gl_number);
-
 	// Enable feature light:
-	glEnable (kFeatureLight);
-	glLightfv (kFeatureLight, GL_AMBIENT, GLArray { 0.25f, 0.25f, 0.25f, 1.0f });
-	glLightfv (kFeatureLight, GL_DIFFUSE, GLArray { 0.5f, 0.5f, 0.5f, 1.0f });
-	glLightfv (kFeatureLight, GL_SPECULAR, GLArray { 0.9f, 0.9f, 0.9f, 1.0f });
+	glLightfv (kGLFeatureLight, GL_AMBIENT, GLArray { 0.25f, 0.25f, 0.25f, 1.0f });
+	glLightfv (kGLFeatureLight, GL_DIFFUSE, GLArray { 0.5f, 0.5f, 0.5f, 1.0f });
+	glLightfv (kGLFeatureLight, GL_SPECULAR, GLArray { 0.9f, 0.9f, 0.9f, 1.0f });
 
 	_gl.save_context ([&] {
 		// Reset rotations and translations:
 		_gl.load_identity();
 		// Cast light from observer's position (Z = 1):
-		glLightfv (kFeatureLight, GL_POSITION, GLArray { 0.0f, 0.0f, 1.0f, 0.0f });
+		glLightfv (kGLFeatureLight, GL_POSITION, GLArray { 0.0f, 0.0f, 1.0f, 0.0f });
 	});
 }
 
 
 void
-RigidBodyPainter::setup_natural_light()
+RigidBodyPainter::set_feature_light_enabled (bool enabled)
 {
-	_gl.set_camera (_camera);
+	if (enabled)
+		glEnable (kGLFeatureLight);
+	else
+		glDisable (kGLFeatureLight);
+}
 
-	// TODO only recalculate occasionally:
-	// Blend the original sun color with color as seen through the atmosphere:
-	auto const atmospheric_sun_color = QColor::fromRgbF (_sky_dome.sun_light_color[0], _sky_dome.sun_light_color[1], _sky_dome.sun_light_color[2]);
-	auto const x = neutrino::renormalize (_followed_polar_position.radius(), Range { kEarthMeanRadius, kAtmosphereRadius }, Range { 0.0f, 1.0f });
-	auto const sun_color = to_gl_color (hsl_interpolation (x, atmospheric_sun_color, _sun_color_in_space));
 
-	glDisable (kFeatureLight);
-	glEnable (kSunLight);
-	glLightfv (kSunLight, GL_AMBIENT, sun_color.scaled (0.2f)); // TODO no ambient light in space
-	glLightfv (kSunLight, GL_DIFFUSE, sun_color.scaled (0.4f));
-	glLightfv (kSunLight, GL_SPECULAR, sun_color.scaled (0.1f));
-
-	if (_planet_body)
+void
+RigidBodyPainter::enable_only_lights (uint32_t lights)
+{
+	if (lights > 0)
 	{
-		// Direct sunlight:
-		_gl.save_context ([&] {
-			_gl.load_identity();
-			_gl.set_camera_rotation_only (_camera);
-			make_z_towards_the_sun();
-			glLightfv (kSunLight, GL_POSITION, GLArray { 0.0f, 0.0f, _gl.to_opengl (kSunDistance), 1.0f });
-		});
-
-		// Sky lights:
-		for (auto& sky_light: _sky_lights)
-		{
-			_gl.save_context ([&] {
-				make_z_sky_top_x_sun_azimuth();
-				_gl.rotate_z (+sky_light.position.lon());
-				_gl.rotate_y (-sky_light.position.lat());
-
-				auto const number = sky_light.gl_number;
-				auto const light_direction = to_cartesian<void> (sky_light.position); // Azimuth (lon()) should possible be negated, but the sky dome is symmetric, so this is okay.
-				auto const color = _atmospheric_scattering.calculate_incident_light (
-					{ 0_m, 0_m, _followed_polar_position.radius() },
-					light_direction,
-					_sky_dome.sun_position.cartesian_coordinates
-				);
-				auto const corrected_color = sky_correction (color);
-				auto const gl_color = to_gl_color (corrected_color);
-				auto const sky_height = kAtmosphereRadius - kEarthMeanRadius;
-
-				glEnable (number);
-				glLightfv (number, GL_AMBIENT, gl_color.scaled (0.0f));
-				glLightfv (number, GL_DIFFUSE, gl_color.scaled (0.2f));
-				glLightfv (number, GL_SPECULAR, gl_color.scaled (0.0f));
-				glLightfv (number, GL_POSITION, GLArray { _gl.to_opengl (sky_height), 0.0f, 0.0f, 0.0f });
-			});
-		}
+		glEnable (GL_LIGHTING);
+		set_atmospheric_sun_light_enabled (lights & kAtmosphericSunLight);
+		set_cosmic_sun_light_enabled (lights & kCosmicSunLight);
+		set_sky_light_enabled (lights & kSkyLight);
+		set_feature_light_enabled (lights & kFeatureLight);
 	}
 	else
-	{
-		// Otherwise let the observer cast the light:
-		glLightfv (kSunLight, GL_POSITION, GLArray { 0.0f, 0.0f, 1.0f, 0.0f });
-
-		// Disable sky lights:
-		for (auto& sky_light: _sky_lights)
-			glDisable (sky_light.gl_number);
-	}
-
-	// TODO GL_SPOT_DIRECTION
-	// TODO GL_SPOT_EXPONENT
-	// TODO GL_SPOT_CUTOFF
+		glDisable (GL_LIGHTING);
 }
 
 
@@ -364,7 +438,6 @@ void
 RigidBodyPainter::paint_world (rigid_body::System const& system)
 {
 	_gl.save_context ([&] {
-		setup_natural_light();
 		paint_planet();
 		paint_air_particles();
 		paint (system);
@@ -455,11 +528,10 @@ RigidBodyPainter::paint_planet()
 				.material = ground_material,
 			});
 
-			// Normal ground:
 			glFrontFace (GL_CCW);
 			glDisable (GL_BLEND);
 			glEnable (GL_DEPTH_TEST);
-			glEnable (GL_LIGHTING);
+			enable_only_lights (kCosmicSunLight);
 			_gl.draw (surface_globe);
 		});
 
@@ -492,6 +564,7 @@ void
 RigidBodyPainter::paint_air_particles()
 {
 	_gl.save_context ([&] {
+		enable_only_lights (kAtmosphericSunLight | kSkyLight);
 		_gl.set_camera_rotation_only (_camera);
 		// Trick with rotating camera and then subtracting camera position from the object is to avoid problems with low precision OpenGL floats:
 		// followed_position() - _camera.position() uses doubles; but _gl.translate() internally reduces them to floats:
@@ -544,6 +617,7 @@ void
 RigidBodyPainter::paint (rigid_body::System const& system)
 {
 	_gl.save_context ([&] {
+		enable_only_lights (kAtmosphericSunLight | kSkyLight);
 		_gl.set_camera_rotation_only (_camera);
 
 		for (auto const& body: system.bodies())
@@ -574,6 +648,7 @@ RigidBodyPainter::paint (rigid_body::System const& system)
 			glEnable (GL_BLEND);
 			glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 			_gl.clear_z_buffer();
+			enable_only_lights (kFeatureLight);
 
 			for (auto const& group: system.groups())
 				paint_helpers (*group, get_rendering_config (*group), group.get() == focused_group);
@@ -772,12 +847,7 @@ RigidBodyPainter::paint_origin()
 {
 	auto const origin_material = rigid_body::make_material ({ 0xff, 0xff, 0x00 });
 	auto const origin_shape = rigid_body::make_centered_sphere_shape ({ .radius = _user_camera_translation.norm() / 150, .n_slices = 8, .n_stacks = 4, .material = origin_material });
-
-	_gl.save_context ([&] {
-		setup_feature_light();
-		_gl.draw (origin_shape);
-		setup_natural_light();
-	});
+	_gl.draw (origin_shape);
 }
 
 

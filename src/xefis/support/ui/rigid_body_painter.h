@@ -61,6 +61,11 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	static constexpr auto		kSunNoonEnlargement			= 1.0;
 	static constexpr auto		kSunSunsetEnlargement		= 2.0;
 
+	static constexpr uint32_t	kAtmosphericSunLight		= 0b0001;
+	static constexpr uint32_t	kCosmicSunLight				= 0b0010;
+	static constexpr uint32_t	kSkyLight					= 0b0100;
+	static constexpr uint32_t	kFeatureLight				= 0b1000;
+
 	// Rotates the aircraft so that it's visible from behind:
 	static constexpr auto		kAircraftToBehindViewRotation	= z_rotation<WorldSpace> (-90_deg) * y_rotation<WorldSpace> (90_deg);
 
@@ -425,10 +430,31 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	setup_modelview();
 
 	void
+	setup_lights();
+
+	void
+	setup_sun_light();
+
+	void
+	set_atmospheric_sun_light_enabled (bool);
+
+	void
+	set_cosmic_sun_light_enabled (bool);
+
+	void
+	setup_sky_light();
+
+	void
+	set_sky_light_enabled (bool);
+
+	void
 	setup_feature_light();
 
 	void
-	setup_natural_light();
+	set_feature_light_enabled (bool);
+
+	void
+	enable_only_lights (uint32_t light_flags);
 
 	/**
 	 * Rotates OpenGL world so that Z direction is towards the Sun.
