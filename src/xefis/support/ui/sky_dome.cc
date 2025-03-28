@@ -133,11 +133,11 @@ calculate_ground_slices_and_stacks (si::Angle const horizon_angle, si::Length co
 
 		auto const dynamic_delta = [&view_angle, &delta]() {
 			auto const factor = view_angle > -1_deg
-				? 0.05
+				? 0.2
 				: view_angle > -5_deg
-					? 0.3
+					? 0.4
 					: view_angle > -10_deg
-						? 0.5
+						? 0.6
 						: 1.0;
 			return factor * delta;
 		};
@@ -215,7 +215,10 @@ calculate_dome_slices_and_stacks (HorizontalCoordinates const sun_position, si::
 				return factor * delta;
 			};
 
-			for (auto i = 0u; i < n_ground_stacks; ++i, latitude -= dynamic_delta())
+			// More stacks to correct for the denser mesh near the horizon:
+			auto const more_stacks = 18;
+
+			for (auto i = 0u; i < n_ground_stacks + more_stacks; ++i, latitude -= dynamic_delta())
 				result.stack_angles.push_back (latitude);
 
 			// Final pole:
