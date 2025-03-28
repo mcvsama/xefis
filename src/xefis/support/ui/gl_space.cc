@@ -17,6 +17,9 @@
 // Xefis:
 #include <xefis/config/all.h>
 
+// System:
+#include <GL/glext.h>
+
 // Standard:
 #include <cstddef>
 #include <optional>
@@ -91,6 +94,13 @@ GLSpace::set_material (rigid_body::ShapeMaterial const& material)
 	glColor4fv (material.gl_emission_color);
 	glMaterialf (GL_FRONT, GL_SHININESS, 128.0 * material.gl_shininess);
 	glMaterialfv (GL_FRONT, GL_EMISSION, material.gl_emission_color);
+
+	if (material.texture)
+	{
+		material.texture->bind();
+		auto const pos = material.texture_position;
+		glTexCoord2f (pos.x(), pos.y());
+	}
 
 	if (params.color_override)
 	{

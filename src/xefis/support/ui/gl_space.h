@@ -14,6 +14,8 @@
 #ifndef XEFIS__SUPPORT__UI__GL_SPACE_H__INCLUDED
 #define XEFIS__SUPPORT__UI__GL_SPACE_H__INCLUDED
 
+#define GL_GLEXT_PROTOTYPES // What kind of joke is that?
+
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/math/geometry.h>
@@ -26,7 +28,6 @@
 #include <QSize>
 
 // System:
-#define GL_GLEXT_PROTOTYPES // What kind of joke is that?
 #include <GL/gl.h>
 
 // Standard:
