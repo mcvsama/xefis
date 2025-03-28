@@ -68,10 +68,12 @@ calculate_angle_from_offset_viewpoint (si::Angle const origin_angle, si::Length 
 constexpr si::Angle
 calculate_angle_from_origin_viewpoint (si::Angle const view_angle, si::Length const radius, si::Length const distance_from_center)
 {
+	auto const arg = std::clamp (distance_from_center * cos (view_angle) / radius, -1.0, +1.0);
+
 	if (distance_from_center <= radius)
-		return 1_rad * asin (distance_from_center * cos (view_angle) / radius) + view_angle;
+		return 1_rad * asin (arg) + view_angle;
 	else
-		return 1_rad * asin (distance_from_center * cos (view_angle) / radius) - view_angle;
+		return 1_rad * asin (arg) - view_angle;
 }
 
 
