@@ -21,9 +21,11 @@
 
 // Qt:
 #include <QColor>
+#include <QOpenGLTexture>
 
 // Standard:
 #include <cstddef>
+#include <memory>
 
 
 namespace xf::rigid_body {
@@ -33,12 +35,14 @@ namespace xf::rigid_body {
  */
 struct ShapeMaterial
 {
-	GLColor	gl_emission_color	{ 0.0f, 0.0f, 0.0f, 1.0f };
-	GLColor	gl_ambient_color	{ 1.0f, 1.0f, 1.0f, 1.0f };
-	GLColor	gl_diffuse_color	{ 1.0f, 1.0f, 1.0f, 1.0f };
-	GLColor	gl_specular_color	{ 1.0f, 1.0f, 1.0f, 1.0f };
-	float	gl_shininess		{ 0.0f };
-	float	gl_fog_distance		{ 0.0f };
+	GLColor							gl_emission_color	{ 0.0f, 0.0f, 0.0f, 1.0f };
+	GLColor							gl_ambient_color	{ 1.0f, 1.0f, 1.0f, 1.0f };
+	GLColor							gl_diffuse_color	{ 1.0f, 1.0f, 1.0f, 1.0f };
+	GLColor							gl_specular_color	{ 1.0f, 1.0f, 1.0f, 1.0f };
+	float							gl_shininess		{ 0.0f };
+	float							gl_fog_distance		{ 0.0f };
+	std::shared_ptr<QOpenGLTexture>	texture				{ nullptr };
+	PlaneVector<float>				texture_position	{ math::zero };
 
 	void
 	set_emission_color (QColor const color)

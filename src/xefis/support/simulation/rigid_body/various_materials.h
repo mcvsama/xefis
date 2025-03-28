@@ -24,7 +24,7 @@
 
 namespace xf::rigid_body {
 
-auto constexpr kBlackMatte = ShapeMaterial {
+auto const kBlackMatte = ShapeMaterial {
 	.gl_emission_color	= GLColor { 0.0f, 0.0f, 0.0f, 1.0f },
 	.gl_ambient_color	= GLColor { 0.0f, 0.0f, 0.0f, 1.0f },
 	.gl_diffuse_color	= GLColor { 0.0f, 0.0f, 0.0f, 1.0f },
@@ -32,7 +32,7 @@ auto constexpr kBlackMatte = ShapeMaterial {
 	.gl_shininess		= 0.0f,
 };
 
-auto constexpr kWhiteMatte = ShapeMaterial {
+auto const kWhiteMatte = ShapeMaterial {
 	.gl_emission_color	= GLColor { 1.0f, 1.0f, 1.0f, 1.0f },
 	.gl_ambient_color	= GLColor { 1.0f, 1.0f, 1.0f, 1.0f },
 	.gl_diffuse_color	= GLColor { 1.0f, 1.0f, 1.0f, 1.0f },
@@ -40,7 +40,7 @@ auto constexpr kWhiteMatte = ShapeMaterial {
 	.gl_shininess		= 0.0f,
 };
 
-auto constexpr kGreyMatte = ShapeMaterial {
+auto const kGreyMatte = ShapeMaterial {
 	.gl_emission_color	= GLColor { 0.7f, 0.7f, 0.7f, 1.0f },
 	.gl_ambient_color	= GLColor { 0.7f, 0.7f, 0.7f, 1.0f },
 	.gl_diffuse_color	= GLColor { 0.7f, 0.7f, 0.7f, 1.0f },
@@ -48,7 +48,7 @@ auto constexpr kGreyMatte = ShapeMaterial {
 	.gl_shininess		= 0.0f,
 };
 
-auto constexpr kTransparentBlack = ShapeMaterial {
+auto const kTransparentBlack = ShapeMaterial {
 	.gl_emission_color	= GLColor { 0.0f, 0.0f, 0.0f, 0.0f },
 	.gl_ambient_color	= GLColor { 0.0f, 0.0f, 0.0f, 0.0f },
 	.gl_diffuse_color	= GLColor { 0.0f, 0.0f, 0.0f, 0.0f },
