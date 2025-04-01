@@ -46,7 +46,7 @@ CameraControls::CameraControls (RigidBodyViewer& viewer, QWidget* parent):
 	struct EarthCoordinates
 	{
 		SpaceLength<ECEFSpace>	ecef	{ 0_m, 0_m, 0_m };
-		si::LonLatRadius		polar	{ 0_deg, 0_deg, 0_m };
+		si::LonLatRadius<>		polar	{ 0_deg, 0_deg, 0_m };
 	};
 
 	auto const ph = PaintHelper (*this);

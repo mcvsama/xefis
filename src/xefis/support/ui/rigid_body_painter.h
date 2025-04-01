@@ -186,7 +186,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	 * Used in camera modes RCPilotView and FixedView.
 	 */
 	void
-	set_camera_position (si::LonLatRadius);
+	set_camera_position (si::LonLatRadius<>);
 
 	/**
 	 * Set camera position offset from followed object position.
@@ -609,11 +609,11 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	neutrino::WorkPerformer*	_work_performer				{ nullptr };
 	CameraMode					_camera_mode				{ CockpitView };
 	// Requested camera position:
-	si::LonLatRadius			_requested_camera_polar_position;
+	si::LonLatRadius<>			_requested_camera_polar_position;
 	// User offset (it's actually in CameraSpace):
 	SpaceLength<WorldSpace>		_user_camera_translation;
 	// Final computed camera position (from requested camera position and user camera translation):
-	si::LonLatRadius			_camera_polar_position;
+	si::LonLatRadius<>			_camera_polar_position;
 	// Requested camera rotation in screen coordinates:
 	SpaceVector<si::Angle>		_user_camera_angles;
 	RotationQuaternion<WorldSpace>
@@ -623,7 +623,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 								_camera;
 	SpaceLength<WorldSpace>		_camera_position_for_sky_dome;
 	// Position of the followed body:
-	si::LonLatRadius			_followed_polar_position;
+	si::LonLatRadius<>			_followed_polar_position;
 	GLSpace						_gl							{ 1.0 / 1_m };
 	std::variant<std::monostate, rigid_body::Group const*, rigid_body::Body const*>
 								_followed;

@@ -122,7 +122,7 @@ RigidBodyPainter::set_camera_mode (CameraMode const mode)
 
 
 void
-RigidBodyPainter::set_camera_position (si::LonLatRadius const position)
+RigidBodyPainter::set_camera_position (si::LonLatRadius<> const position)
 {
 	_requested_camera_polar_position = position;
 }
