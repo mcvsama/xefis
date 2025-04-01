@@ -649,6 +649,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	SkyDome						_sky_dome;
 	std::future<SkyDome>		_next_sky_dome;
 	bool						_need_new_sky_dome			{ false };
+	rigid_body::Shape			_ground_shape;
 	si::Time					_sky_dome_update_time;
 	QColor						_sun_color_in_space			{ qcolor_from_temperature (kSunSurfaceTemperature) };
 	std::array<SkyLight, 5>		_sky_lights;

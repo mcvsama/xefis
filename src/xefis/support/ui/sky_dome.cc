@@ -269,12 +269,14 @@ calculate_dome_slices_and_stacks (HorizontalCoordinates const sun_position, si::
 }
 
 
-[[nodiscard]]
 rigid_body::Shape
-calculate_ground_shape (SlicesStacks const& ss, si::Length const earth_radius, si::Angle const horizon_angle)
+calculate_ground_shape (si::Length const earth_radius, si::Length const observer_position_radius)
 {
-	if (isfinite (horizon_angle))
+	if (auto const horizon_angle = calculate_horizon_angle (earth_radius, observer_position_radius);
+		isfinite (horizon_angle))
 	{
+		auto const ss = calculate_ground_slices_and_stacks (horizon_angle, earth_radius, observer_position_radius);
+
 		return rigid_body::make_centered_irregular_sphere_shape ({
 			.radius = earth_radius,
 			.slice_angles = ss.slice_angles,
@@ -289,8 +291,7 @@ calculate_ground_shape (SlicesStacks const& ss, si::Length const earth_radius, s
 
 [[nodiscard]]
 rigid_body::Shape
-calculate_dome_shape (SlicesStacks const& ss,
-					  si::LonLatRadius<> const observer_position,
+calculate_dome_shape (si::LonLatRadius<> const observer_position,
 					  SkyDome::SunPosition const sun_position,
 					  si::Length const earth_radius,
 					  si::Angle horizon_angle,
@@ -298,6 +299,8 @@ calculate_dome_shape (SlicesStacks const& ss,
 					  AtmosphericScattering const& atmospheric_scattering,
 					  neutrino::WorkPerformer* const work_performer = nullptr)
 {
+	auto const ss = calculate_dome_slices_and_stacks (sun_position.horizontal_coordinates, horizon_angle);
+
 	// Still draw sky if horizon_angle is nan (assume it's 0° then):
 	if (!isfinite (horizon_angle))
 		horizon_angle = 0_deg;
@@ -372,17 +375,9 @@ calculate_sky_dome (SkyDomeParameters const& p, neutrino::WorkPerformer* work_pe
 {
 	auto const sun_position = calculate_sun_position (p.observer_position, p.unix_time);
 	auto const horizon_angle = calculate_horizon_angle (p.earth_radius, p.observer_position.radius());
-	auto const ground_slices_stacks = calculate_ground_slices_and_stacks (horizon_angle, p.earth_radius, p.observer_position.radius());
-	auto const dome_slices_stacks = calculate_dome_slices_and_stacks (sun_position.horizontal_coordinates, horizon_angle);
 
 	return {
-		.ground_shape = calculate_ground_shape(
-			ground_slices_stacks,
-			p.earth_radius,
-			horizon_angle
-		),
 		.atmospheric_dome_shape = calculate_dome_shape(
-			dome_slices_stacks,
 			p.observer_position,
 			sun_position,
 			p.earth_radius,
