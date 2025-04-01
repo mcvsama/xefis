@@ -290,7 +290,7 @@ calculate_ground_shape (SlicesStacks const& ss, si::Length const earth_radius, s
 [[nodiscard]]
 rigid_body::Shape
 calculate_dome_shape (SlicesStacks const& ss,
-					  si::LonLatRadius const observer_position,
+					  si::LonLatRadius<> const observer_position,
 					  SkyDome::SunPosition const sun_position,
 					  si::Length const earth_radius,
 					  si::Angle horizon_angle,
@@ -361,7 +361,7 @@ calculate_dome_shape (SlicesStacks const& ss,
 
 [[nodiscard]]
 SpaceVector<float, RGBSpace>
-calculate_sun_light_color (si::LonLatRadius const observer_position, SpaceVector<double> const sun_position, AtmosphericScattering const& atmospheric_scattering)
+calculate_sun_light_color (si::LonLatRadius<> const observer_position, SpaceVector<double> const sun_position, AtmosphericScattering const& atmospheric_scattering)
 {
 	return atmospheric_scattering.calculate_incident_light ({ 0_m, 0_m, observer_position.radius() }, sun_position, sun_position);
 }

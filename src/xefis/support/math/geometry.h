@@ -357,7 +357,7 @@ template<math::CoordinateSystem TargetSpace = ECEFSpace>
 template<math::CoordinateSystem TargetSpace = ECEFSpace>
 	[[nodiscard]]
 	constexpr SpaceVector<si::Length, TargetSpace>
-	to_cartesian (si::LonLatRadius const& position)
+	to_cartesian (si::LonLatRadius<> const& position)
 	{
 		return position.radius() * to_cartesian<TargetSpace> (static_cast<si::LonLat const&> (position));
 	}
@@ -365,7 +365,7 @@ template<math::CoordinateSystem TargetSpace = ECEFSpace>
 
 template<math::CoordinateSystem Space>
 	[[nodiscard]]
-	constexpr si::LonLatRadius
+	constexpr si::LonLatRadius<>
 	to_polar (SpaceVector<si::Length, Space> const& vector)
 	{
 		std::complex<double> const xy (vector[0].value(), vector[1].value());
