@@ -508,30 +508,18 @@ RigidBodyPainter::paint_planet()
 		// Ground:
 		// TODO it would be best if there was a shader that adds the dome sphere color to the drawn feature
 		_gl.save_context ([&] {
-			auto const ground_color = QColor (0xaa, 0x55, 0x00);
-
-			rigid_body::ShapeMaterial ground_material;
-			ground_material.set_emission_color (ground_color.darker (900));
-			ground_material.set_ambient_color (ground_color.darker (500));
-			ground_material.set_diffuse_color (ground_color);
-
 			_gl.set_camera (_camera);
 			_gl.translate (planet_position());
 			_gl.translate (-_camera.position());
 			make_z_sky_top_x_south();
 			_gl.translate (_camera.position());
 
-			// Make a globe that will act as a ground shape:
-			auto surface_globe = _sky_dome.ground_shape;
-			surface_globe.for_all_vertices ([&](rigid_body::ShapeVertex& vertex) {
-				vertex.set_material (ground_material);
-			});
 
 			glFrontFace (GL_CCW);
 			glDisable (GL_BLEND);
 			glEnable (GL_DEPTH_TEST);
 			enable_only_lights (kCosmicSunLight);
-			_gl.draw (surface_globe);
+			_gl.draw (_ground_shape);
 		});
 
 		// Sky and ground dome around the observer:
@@ -1170,6 +1158,8 @@ RigidBodyPainter::calculate_camera_transform()
 
 	if (abs (_camera_position_for_sky_dome - _camera.position()) > 10_m)
 		_need_new_sky_dome = true;
+
+	_ground_shape = calculate_ground_shape (kEarthMeanRadius, _camera_polar_position.radius());
 }
 
 

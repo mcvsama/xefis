@@ -47,7 +47,6 @@ class SkyDome
 	};
 
   public:
-	rigid_body::Shape				ground_shape;
 	rigid_body::Shape				atmospheric_dome_shape;
 	SunPosition						sun_position;
 	SpaceVector<float, RGBSpace>	sun_light_color;
@@ -64,6 +63,11 @@ struct SkyDomeParameters
 };
 
 
+[[nodiscard]]
+rigid_body::Shape
+calculate_ground_shape (si::Length const earth_radius, si::Length const observer_position_radius);
+
+[[nodiscard]]
 SkyDome
 calculate_sky_dome (SkyDomeParameters const& params, neutrino::WorkPerformer* work_performer = nullptr);
 
