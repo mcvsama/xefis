@@ -51,29 +51,29 @@ make_centered_cube_shape (SpaceLength<BodyOrigin> const& dimensions, ShapeMateri
 
 	shape.triangles() = {
 		// Front:
-		{ { +x, +y, +z }, { -x, +y, +z }, { -x, -y, +z } },
-		{ { +x, +y, +z }, { -x, -y, +z }, { +x, -y, +z } },
+		{ .vertices = { { +x, +y, +z }, { -x, +y, +z }, { -x, -y, +z } } },
+		{ .vertices = { { +x, +y, +z }, { -x, -y, +z }, { +x, -y, +z } } },
 		// Right:
-		{ { +x, +y, +z }, { +x, -y, +z }, { +x, -y, -z } },
-		{ { +x, +y, +z }, { +x, -y, -z }, { +x, +y, -z } },
+		{ .vertices = { { +x, +y, +z }, { +x, -y, +z }, { +x, -y, -z } } },
+		{ .vertices = { { +x, +y, +z }, { +x, -y, -z }, { +x, +y, -z } } },
 		// Top:
-		{ { +x, +y, +z }, { +x, +y, -z }, { -x, +y, -z } },
-		{ { +x, +y, +z }, { -x, +y, -z }, { -x, +y, +z } },
+		{ .vertices = { { +x, +y, +z }, { +x, +y, -z }, { -x, +y, -z } } },
+		{ .vertices = { { +x, +y, +z }, { -x, +y, -z }, { -x, +y, +z } } },
 		// Back:
-		{ { -x, -y, -z }, { +x, +y, -z }, { +x, -y, -z } },
-		{ { -x, -y, -z }, { -x, +y, -z }, { +x, +y, -z } },
+		{ .vertices = { { -x, -y, -z }, { +x, +y, -z }, { +x, -y, -z } } },
+		{ .vertices = { { -x, -y, -z }, { -x, +y, -z }, { +x, +y, -z } } },
 		// Left:
-		{ { -x, -y, -z }, { -x, +y, +z }, { -x, +y, -z } },
-		{ { -x, -y, -z }, { -x, -y, +z }, { -x, +y, +z } },
+		{ .vertices = { { -x, -y, -z }, { -x, +y, +z }, { -x, +y, -z } } },
+		{ .vertices = { { -x, -y, -z }, { -x, -y, +z }, { -x, +y, +z } } },
 		// Bottom:
-		{ { -x, -y, -z }, { +x, -y, +z }, { -x, -y, +z } },
-		{ { -x, -y, -z }, { +x, -y, -z }, { +x, -y, +z } },
+		{ .vertices = { { -x, -y, -z }, { +x, -y, +z }, { -x, -y, +z } } },
+		{ .vertices = { { -x, -y, -z }, { +x, -y, -z }, { +x, -y, +z } } },
 	};
 
 	for (auto& triangle: shape.triangles())
 	{
 		set_planar_normal (triangle);
-		set_material (triangle, material);
+		set_material (triangle.vertices, material);
 	}
 
 	return shape;
@@ -129,8 +129,8 @@ fill_in_uncomputed_points_on_sphere (Shape& shape)
 		auto& upper = strips[1];
 
 		// Odd points are not calculated, need to be copied from the even points on the next strip.
-		for (std::size_t i = 1; i < lower.size(); i += 2)
-			upper[i] = lower[i - 1];
+		for (std::size_t i = 1; i < lower.vertices.size(); i += 2)
+			upper.vertices[i] = lower.vertices[i - 1];
 	}
 }
 
@@ -184,12 +184,14 @@ template<class SetupMaterial>
 		for (size_t iv = 0; iv < n_stacks; ++iv, angle_v += dv)
 		{
 			Shape::TriangleStrip& strip = shape.triangle_strips().emplace_back();
-			strip.reserve (2 * (n_slices + 1));
+			strip.texture = params.texture;
+			auto& vertices = strip.vertices;
+			vertices.reserve (2 * (n_slices + 1));
 			si::Angle angle_h = params.h_range.min();
 
 			auto const add_vertex = [&] (si::LonLat const lonlat) {
 				auto const cartesian_position = math::coordinate_system_cast<BodyOrigin, void> (to_cartesian (lonlat));
-				auto& vertex = strip.emplace_back (cartesian_position * params.radius, params.material);
+				auto& vertex = vertices.emplace_back (cartesian_position * params.radius, params.material);
 
 				if constexpr (synchronous_setup_material)
 					setup_material (vertex.material(), lonlat);
@@ -206,7 +208,7 @@ template<class SetupMaterial>
 				if (iv == 0)
 					add_vertex ({ angle_h, angle_v });
 				else
-					strip.emplace_back(); // This point will be calculated in fill_in_uncomputed_points_on_sphere().
+					vertices.emplace_back(); // This point will be calculated in fill_in_uncomputed_points_on_sphere().
 			}
 		}
 
@@ -284,11 +286,13 @@ template<class SetupMaterial>
 		for (auto const latitudes: params.stack_angles | std::views::slide (2))
 		{
 			Shape::TriangleStrip& strip = shape.triangle_strips().emplace_back();
-			strip.reserve (2 * n_slices);
+			strip.texture = params.texture;
+			auto& vertices = strip.vertices;
+			vertices.reserve (2 * n_slices);
 
 			auto const add_vertex = [&] (si::LonLat const lonlat) {
 				auto const cartesian_position = math::coordinate_system_cast<BodyOrigin, void> (to_cartesian (lonlat));
-				auto& vertex = strip.emplace_back (cartesian_position * params.radius, params.material);
+				auto& vertex = vertices.emplace_back (cartesian_position * params.radius, params.material);
 
 				if constexpr (synchronous_setup_material)
 					setup_material (vertex.material(), lonlat);
@@ -305,7 +309,7 @@ template<class SetupMaterial>
 				if (first_strip)
 					add_vertex ({ longitude, latitudes[0] });
 				else
-					strip.emplace_back(); // This point will be calculated in fill_in_uncomputed_points_on_sphere().
+					vertices.emplace_back(); // This point will be calculated in fill_in_uncomputed_points_on_sphere().
 			}
 
 			first_strip = false;
@@ -354,22 +358,23 @@ make_cylinder_shape (CylinderShapeParameters const& params)
 	auto const num_faces = params.num_faces < 3u ? 3u : params.num_faces;
 	Shape shape;
 	Shape::TriangleStrip& strip = shape.triangle_strips().emplace_back();
-	strip.reserve (2 * (num_faces + 1));
+	auto& vertices = strip.vertices;
+	vertices.reserve (2 * (num_faces + 1));
 	std::optional<Shape::TriangleFan> bottom;
 	std::optional<Shape::TriangleFan> top;
 
 	if (params.with_bottom)
 	{
 		bottom.emplace();
-		bottom->reserve (2 + num_faces);
-		bottom->emplace_back (SpaceLength<BodyOrigin> (0_m, 0_m, 0_m), SpaceVector<double, BodyOrigin> (0.0, 0.0, -1.0), params.material);
+		bottom->vertices.reserve (2 + num_faces);
+		bottom->vertices.emplace_back (SpaceLength<BodyOrigin> (0_m, 0_m, 0_m), SpaceVector<double, BodyOrigin> (0.0, 0.0, -1.0), params.material);
 	}
 
 	if (params.with_top)
 	{
 		top.emplace();
-		top->reserve (2 + num_faces);
-		top->emplace_back (SpaceLength<BodyOrigin> (0_m, 0_m, params.length), SpaceVector<double, BodyOrigin> (0.0, 0.0, +1.0), params.material);
+		top->vertices.reserve (2 + num_faces);
+		top->vertices.emplace_back (SpaceLength<BodyOrigin> (0_m, 0_m, params.length), SpaceVector<double, BodyOrigin> (0.0, 0.0, +1.0), params.material);
 	}
 
 	si::Angle const delta = params.range.extent() / num_faces;
@@ -385,14 +390,14 @@ make_cylinder_shape (CylinderShapeParameters const& params)
 		SpaceLength<BodyOrigin> const p1 (x_len, y_len, 0_m);
 		SpaceLength<BodyOrigin> const p2 (x_len, y_len, params.length);
 
-		strip.emplace_back (p1, normal, params.material);
-		strip.emplace_back (p2, normal, params.material);
+		vertices.emplace_back (p1, normal, params.material);
+		vertices.emplace_back (p2, normal, params.material);
 
 		if (params.with_bottom)
-			bottom->emplace_back (p1, SpaceVector<double, BodyOrigin> (0.0, 0.0, -1.0), params.material);
+			bottom->vertices.emplace_back (p1, SpaceVector<double, BodyOrigin> (0.0, 0.0, -1.0), params.material);
 
 		if (params.with_top)
-			top->emplace_back (p2, SpaceVector<double, BodyOrigin> (0.0, 0.0, +1.0), params.material);
+			top->vertices.emplace_back (p2, SpaceVector<double, BodyOrigin> (0.0, 0.0, +1.0), params.material);
 	}
 
 	if (params.with_bottom)
@@ -401,7 +406,7 @@ make_cylinder_shape (CylinderShapeParameters const& params)
 	if (params.with_top)
 	{
 		// Reverse order to keep the face facing outside:
-		std::reverse (std::next (top->begin()), top->end());
+		std::reverse (std::next (top->vertices.begin()), top->vertices.end());
 		shape.triangle_fans().push_back (std::move (*top));
 	}
 
@@ -430,7 +435,7 @@ make_truncated_cone_shape (TruncatedConeShapeParameters const& params)
 	auto const num_faces = params.num_faces < 3u ? 3u : params.num_faces;
 	Shape shape;
 	Shape::TriangleStrip& cone_strip = shape.triangle_strips().emplace_back();
-	cone_strip.reserve (2 * (num_faces + 1));
+	cone_strip.vertices.reserve (2 * (num_faces + 1));
 	std::optional<Shape::TriangleFan> top_fan;
 	std::optional<Shape::TriangleFan> bottom_fan;
 
@@ -440,15 +445,15 @@ make_truncated_cone_shape (TruncatedConeShapeParameters const& params)
 	if (params.with_bottom)
 	{
 		bottom_fan.emplace();
-		bottom_fan->reserve (2 + num_faces);
-		bottom_fan->emplace_back (SpaceLength<BodyOrigin> (0_m, 0_m, 0_m), SpaceVector<double, BodyOrigin> (0.0, 0.0, -1.0), params.material);
+		bottom_fan->vertices.reserve (2 + num_faces);
+		bottom_fan->vertices.emplace_back (SpaceLength<BodyOrigin> (0_m, 0_m, 0_m), SpaceVector<double, BodyOrigin> (0.0, 0.0, -1.0), params.material);
 	}
 
 	if (params.with_top)
 	{
 		top_fan.emplace();
-		top_fan->reserve (2 + num_faces);
-		top_fan->emplace_back (SpaceLength<BodyOrigin> (0_m, 0_m, params.length), SpaceVector<double, BodyOrigin> (0.0, 0.0, +1.0), params.material);
+		top_fan->vertices.reserve (2 + num_faces);
+		top_fan->vertices.emplace_back (SpaceLength<BodyOrigin> (0_m, 0_m, params.length), SpaceVector<double, BodyOrigin> (0.0, 0.0, +1.0), params.material);
 	}
 
 	si::Angle const delta = params.range.extent() / num_faces;
@@ -466,21 +471,21 @@ make_truncated_cone_shape (TruncatedConeShapeParameters const& params)
 		SpaceLength<BodyOrigin> const p_bottom (x * params.bottom_radius, y * params.bottom_radius, 0_m);
 		SpaceLength<BodyOrigin> const p_top (x * params.top_radius, y * params.top_radius, params.length);
 
-		cone_strip.emplace_back (p_bottom, normal, params.material);
-		cone_strip.emplace_back (p_top, normal, params.material);
+		cone_strip.vertices.emplace_back (p_bottom, normal, params.material);
+		cone_strip.vertices.emplace_back (p_top, normal, params.material);
 
 		if (params.with_top)
-			top_fan->emplace_back (p_top, SpaceVector<double, BodyOrigin> (0.0, 0.0, +1.0), params.material);
+			top_fan->vertices.emplace_back (p_top, SpaceVector<double, BodyOrigin> (0.0, 0.0, +1.0), params.material);
 
 		if (params.with_bottom)
-			bottom_fan->emplace_back (p_bottom, SpaceVector<double, BodyOrigin> (0.0, 0.0, -1.0), params.material);
+			bottom_fan->vertices.emplace_back (p_bottom, SpaceVector<double, BodyOrigin> (0.0, 0.0, -1.0), params.material);
 	}
 
 	if (params.with_bottom)
 		shape.triangle_fans().push_back (std::move (*bottom_fan));
 
 	if (top_fan)
-		std::ranges::reverse (*top_fan);
+		std::ranges::reverse (top_fan->vertices);
 
 	if (params.with_top)
 		shape.triangle_fans().push_back (std::move (*top_fan));
@@ -497,8 +502,9 @@ make_solid_circle (si::Length const radius, Range<si::Angle> const range, size_t
 
 	Shape shape;
 	Shape::TriangleFan& fan = shape.triangle_fans().emplace_back();
-	fan.reserve (2 + num_slices);
-	fan.emplace_back (SpaceLength<BodyOrigin> (0_m, 0_m, 0_m), SpaceVector<double, BodyOrigin> (0.0, 0.0, 1.0), material);
+	auto& vertices = fan.vertices;
+	vertices.reserve (2 + num_slices);
+	vertices.emplace_back (SpaceLength<BodyOrigin> (0_m, 0_m, 0_m), SpaceVector<double, BodyOrigin> (0.0, 0.0, 1.0), material);
 
 	si::Angle const delta = range.extent() / num_slices;
 	si::Angle angle = range.min();
@@ -508,7 +514,7 @@ make_solid_circle (si::Length const radius, Range<si::Angle> const range, size_t
 		auto const y = sin (angle);
 		auto const x = cos (angle);
 
-		fan.emplace_back (SpaceLength<BodyOrigin> (x * radius, y * radius, 0_m), SpaceVector<double, BodyOrigin> (0.0, 0.0, +1.0), material);
+		vertices.emplace_back (SpaceLength<BodyOrigin> (x * radius, y * radius, 0_m), SpaceVector<double, BodyOrigin> (0.0, 0.0, +1.0), material);
 	}
 
 	return shape;
@@ -521,22 +527,22 @@ make_airfoil_shape (AirfoilShapeParameters const& params)
 	auto const n_points = params.spline.points().size();
 	Shape shape;
 	Shape::TriangleStrip& strip = shape.triangle_strips().emplace_back();
-	strip.reserve (2 * (n_points + 1));
+	strip.vertices.reserve (2 * (n_points + 1));
 	std::optional<Shape::TriangleFan> bottom;
 	std::optional<Shape::TriangleFan> top;
 
 	if (params.with_bottom)
 	{
 		bottom.emplace();
-		bottom->reserve (2 + n_points);
-		bottom->emplace_back (SpaceLength<BodyOrigin> (0_m, 0_m, 0_m), SpaceVector<double, BodyOrigin> (0.0, 0.0, -1.0), params.material);
+		bottom->vertices.reserve (2 + n_points);
+		bottom->vertices.emplace_back (SpaceLength<BodyOrigin> (0_m, 0_m, 0_m), SpaceVector<double, BodyOrigin> (0.0, 0.0, -1.0), params.material);
 	}
 
 	if (params.with_top)
 	{
 		top.emplace();
-		top->reserve (2 + n_points);
-		top->emplace_back (SpaceLength<BodyOrigin> (0_m, 0_m, params.wing_length), SpaceVector<double, BodyOrigin> (0.0, 0.0, +1.0), params.material);
+		top->vertices.reserve (2 + n_points);
+		top->vertices.emplace_back (SpaceLength<BodyOrigin> (0_m, 0_m, params.wing_length), SpaceVector<double, BodyOrigin> (0.0, 0.0, +1.0), params.material);
 	}
 
 	for (ptrdiff_t i = neutrino::to_signed (n_points) + 1; i > 0; --i)
@@ -557,14 +563,14 @@ make_airfoil_shape (AirfoilShapeParameters const& params)
 		SpaceVector<double, BodyOrigin> const normal_with_next (cross_product (k_towards_next, z_versor));
 		SpaceVector<double, BodyOrigin> const normal = (normal_with_prev + normal_with_next).normalized();
 
-		strip.emplace_back (p1, normal, params.material);
-		strip.emplace_back (p2, normal, params.material);
+		strip.vertices.emplace_back (p1, normal, params.material);
+		strip.vertices.emplace_back (p2, normal, params.material);
 
 		if (params.with_bottom)
-			bottom->emplace_back (p1, SpaceVector<double, BodyOrigin> (0.0, 0.0, -1.0), params.material);
+			bottom->vertices.emplace_back (p1, SpaceVector<double, BodyOrigin> (0.0, 0.0, -1.0), params.material);
 
 		if (params.with_top)
-			top->emplace_back (p2, SpaceVector<double, BodyOrigin> (0.0, 0.0, +1.0), params.material);
+			top->vertices.emplace_back (p2, SpaceVector<double, BodyOrigin> (0.0, 0.0, +1.0), params.material);
 	}
 
 	if (params.with_bottom)
@@ -573,7 +579,7 @@ make_airfoil_shape (AirfoilShapeParameters const& params)
 	if (params.with_top)
 	{
 		// Reverse order to keep the face facing outside:
-		std::reverse (std::next (top->begin()), top->end());
+		std::reverse (std::next (top->vertices.begin()), top->vertices.end());
 		shape.triangle_fans().push_back (std::move (*top));
 	}
 
@@ -605,12 +611,13 @@ make_propeller_shape (PropellerShapeParameters const& params)
 			shape.rotate (xf::z_rotation<BodyOrigin> (angle_between_blades));
 
 		auto strip = Shape::TriangleStrip();
+		auto& vertices = strip.vertices;
 		auto const total_strip_size = 1 // (center of the blade)
 									+ 2 * params.points_per_blade
 									+ 2; // Tip of the blade;
-		strip.reserve (total_strip_size);
+		vertices.reserve (total_strip_size);
 		// Center of the blade:
-		strip.emplace_back (SpaceLength<BodyOrigin> { 0_m, 0_m, 0_m }, params.material);
+		vertices.emplace_back (SpaceLength<BodyOrigin> { 0_m, 0_m, 0_m }, params.material);
 
 		for (uint32_t p = 0; p < params.points_per_blade; ++p)
 		{
@@ -622,24 +629,24 @@ make_propeller_shape (PropellerShapeParameters const& params)
 			auto const x_t = x_l * 0.5; // Trailing edge is flatter.
 			auto const z_b = pitch_height_b * std::pow (std::sin (std::pow (p_norm, 0.7) * pi), 3.0);
 			auto const z_f = pitch_height_f * square (std::sin (p_norm * pi));
-			strip.emplace_back (SpaceLength<BodyOrigin> { -x_t, y, -z_b }, params.material);
-			strip.emplace_back (SpaceLength<BodyOrigin> { +x_l, y, +z_f }, params.material);
+			vertices.emplace_back (SpaceLength<BodyOrigin> { -x_t, y, -z_b }, params.material);
+			vertices.emplace_back (SpaceLength<BodyOrigin> { +x_l, y, +z_f }, params.material);
 		}
 
 		// Tip of the blade:
-		strip.emplace_back (SpaceLength<BodyOrigin> { 0_m, blade_length, -0.01 * width }, params.material);
-		strip.emplace_back (SpaceLength<BodyOrigin> { 0_m, blade_length, 0_m }, params.material);
+		vertices.emplace_back (SpaceLength<BodyOrigin> { 0_m, blade_length, -0.01 * width }, params.material);
+		vertices.emplace_back (SpaceLength<BodyOrigin> { 0_m, blade_length, 0_m }, params.material);
 
-		for (auto triangle: strip | std::views::slide (3))
+		for (auto triangle: vertices | std::views::slide (3))
 			set_planar_normal (triangle);
 
 		// For back faces, add the same points in the reverse order:
-		auto back_strip = strip;
-		std::ranges::reverse (back_strip);
-		back_strip.pop_back();
+		auto back_vertices = vertices;
+		std::ranges::reverse (back_vertices);
+		back_vertices.pop_back();
 
-		shape.triangle_strips().push_back (strip);
-		shape.triangle_strips().push_back (back_strip);
+		shape.triangle_strips().push_back (rigid_body::Shape::TriangleStrip { .vertices = vertices });
+		shape.triangle_strips().push_back (rigid_body::Shape::TriangleStrip { .vertices = back_vertices });
 	}
 
 	shape.translate ({ 0_m, 0_m, pitch_height_b });
@@ -746,14 +753,14 @@ make_center_of_mass_symbol_shape (si::Length const radius, ShapeMaterial const& 
 void
 set_planar_normal (Shape::Triangle& triangle)
 {
-	if (triangle.size() != 3)
+	if (triangle.vertices.size() != 3)
 		throw InvalidArgument ("set_planar_normal (Shape::Triangle&): std::size (triangle) must be 3");
 
-	auto const normal = triangle_surface_normal (triangle[0].position(),
-												 triangle[1].position(),
-												 triangle[2].position());
+	auto const normal = triangle_surface_normal (triangle.vertices[0].position(),
+												 triangle.vertices[1].position(),
+												 triangle.vertices[2].position());
 
-	for (auto& vertex: triangle)
+	for (auto& vertex: triangle.vertices)
 		vertex.set_normal (normal);
 }
 
@@ -786,13 +793,13 @@ void
 negate_normals (Shape& shape)
 {
 	for (auto& triangle: shape.triangles())
-		negate_normals (triangle);
+		negate_normals (triangle.vertices);
 
 	for (auto& strip: shape.triangle_strips())
-		negate_normals (strip);
+		negate_normals (strip.vertices);
 
 	for (auto& fan: shape.triangle_fans())
-		negate_normals (fan);
+		negate_normals (fan.vertices);
 }
 
 

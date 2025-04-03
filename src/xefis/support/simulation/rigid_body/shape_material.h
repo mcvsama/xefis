@@ -41,7 +41,6 @@ struct ShapeMaterial
 	GLColor							gl_specular_color	{ 1.0f, 1.0f, 1.0f, 1.0f };
 	float							gl_shininess		{ 0.0f };
 	float							gl_fog_distance		{ 0.0f };
-	std::shared_ptr<QOpenGLTexture>	texture				{ nullptr };
 	PlaneVector<float>				texture_position	{ math::zero };
 
 	void
