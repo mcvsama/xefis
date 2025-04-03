@@ -44,6 +44,7 @@
 
 // Standard:
 #include <cstddef>
+#include <future>
 #include <random>
 
 
@@ -165,6 +166,20 @@ RigidBodyPainter::paint (rigid_body::System const& system, QOpenGLPaintDevice& c
 	_group_centers_of_mass_cache.clear();
 
 	initializeOpenGLFunctions();
+
+	// If loading of Earth texture wasn't started yet:
+	if (!_earth_texture && !_next_earth_texture_image.valid())
+	{
+		auto const load = [] {
+			return QImage ("share/images/textures/earth-day-with-clouds.jpg");
+		};
+
+		if (_work_performer)
+			_next_earth_texture_image = _work_performer->submit (load);
+		else
+			_next_earth_texture_image = std::async (std::launch::deferred, load);
+	}
+
 	auto const ph = PaintHelper (canvas);
 
 	QPainter painter (&canvas);
@@ -188,6 +203,7 @@ void
 RigidBodyPainter::precalculate()
 {
 	_followed_polar_position = to_polar (math::coordinate_system_cast<ECEFSpace, void> (followed_position() - planet_position()));
+	check_earth_texture();
 	check_sky_dome();
 }
 
@@ -518,8 +534,10 @@ RigidBodyPainter::paint_planet()
 			glFrontFace (GL_CCW);
 			glDisable (GL_BLEND);
 			glEnable (GL_DEPTH_TEST);
+			glEnable (GL_TEXTURE_2D);
 			enable_only_lights (kCosmicSunLight);
 			_gl.draw (_ground_shape);
+			glDisable (GL_TEXTURE_2D);
 		});
 
 		// Sky and ground dome around the observer:
@@ -1072,6 +1090,22 @@ RigidBodyPainter::get_center_of_mass (rigid_body::Group const& group)
 
 
 void
+RigidBodyPainter::check_earth_texture()
+{
+	if (_next_earth_texture_image.valid() && is_ready (_next_earth_texture_image))
+	{
+		_earth_texture = std::make_shared<QOpenGLTexture> (QOpenGLTexture::Target2D);
+		_earth_texture->setData (_next_earth_texture_image.get());
+		_earth_texture->setWrapMode (QOpenGLTexture::Repeat);
+		_earth_texture->setMinificationFilter (QOpenGLTexture::Linear);
+		_earth_texture->setMagnificationFilter (QOpenGLTexture::Linear);
+		// Reload SkyDome to include the Earth texture:
+		_need_new_sky_dome = true;
+	}
+}
+
+
+void
 RigidBodyPainter::check_sky_dome()
 {
 	// If the next calculated SkyDome is ready, use it:
@@ -1098,6 +1132,7 @@ RigidBodyPainter::calculate_sky_dome()
 		.observer_position = _camera_polar_position,
 		.earth_radius = kEarthMeanRadius,
 		.unix_time = _time,
+		.earth_texture = _earth_texture,
 	}, _work_performer);
 	// TODO apply sky_correction to vertices' materials
 }
@@ -1159,7 +1194,7 @@ RigidBodyPainter::calculate_camera_transform()
 	if (abs (_camera_position_for_sky_dome - _camera.position()) > 10_m)
 		_need_new_sky_dome = true;
 
-	_ground_shape = calculate_ground_shape (kEarthMeanRadius, _camera_polar_position.radius());
+	_ground_shape = calculate_ground_shape (_camera_polar_position, kEarthMeanRadius, _earth_texture);
 }
 
 

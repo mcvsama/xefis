@@ -32,6 +32,7 @@
 // Qt:
 #include <QOpenGLFunctions>
 #include <QOpenGLPaintDevice>
+#include <QOpenGLTexture>
 #include <QRect>
 #include <QPoint>
 
@@ -578,6 +579,13 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	get_center_of_mass (rigid_body::Group const&);
 
 	/**
+	 * Check if loading of Earth texture is needed.
+	 * Loads it or starts loading on a thread if WorkPerformer was provided.
+	 */
+	void
+	check_earth_texture();
+
+	/**
 	 * Check if calculation of new SkyDome was requested.
 	 * Also if it has been finished, start using it.
 	 */
@@ -653,6 +661,9 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	si::Time					_sky_dome_update_time;
 	QColor						_sun_color_in_space			{ qcolor_from_temperature (kSunSurfaceTemperature) };
 	std::array<SkyLight, 5>		_sky_lights;
+	std::shared_ptr<QOpenGLTexture>
+								_earth_texture;
+	std::future<QImage>			_next_earth_texture_image;
 };
 
 
