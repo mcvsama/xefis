@@ -54,15 +54,15 @@ void
 Shape::for_all_vertices (std::function<void (ShapeVertex&)> const vertex_function)
 {
 	for (auto& geometry: _triangles)
-		for (auto& vertex: geometry)
+		for (auto& vertex: geometry.vertices)
 			vertex_function (vertex);
 
 	for (auto& geometry: _triangle_strips)
-		for (auto& vertex: geometry)
+		for (auto& vertex: geometry.vertices)
 			vertex_function (vertex);
 
 	for (auto& geometry: _triangle_fans)
-		for (auto& vertex: geometry)
+		for (auto& vertex: geometry.vertices)
 			vertex_function (vertex);
 }
 

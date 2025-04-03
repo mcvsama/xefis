@@ -34,9 +34,15 @@ namespace xf::rigid_body {
 class Shape
 {
   public:
-	using Triangle		= std::vector<ShapeVertex>;
-	using TriangleStrip	= std::vector<ShapeVertex>;
-	using TriangleFan	= std::vector<ShapeVertex>;
+	struct Geometry
+	{
+		std::vector<ShapeVertex>		vertices;
+		std::shared_ptr<QOpenGLTexture>	texture		{ nullptr };
+	};
+
+	using Triangle		= Geometry;
+	using TriangleStrip	= Geometry;
+	using TriangleFan	= Geometry;
 
   public:
 	/**

@@ -51,25 +51,27 @@ enum RotationDirection
 
 struct SphereShapeParameters
 {
-	si::Length					radius;
-	std::size_t					n_slices		{ 10 };
-	std::size_t					n_stacks		{ 10 };
-	Range<si::Angle>			h_range			{ -180_deg, +180_deg };
-	Range<si::Angle>			v_range			{ -90_deg, +90_deg };
-	ShapeMaterial const&		material		{ };
-	MakeSphereMaterialCallback	setup_material	{ std::monostate() };
+	si::Length						radius;
+	std::size_t						n_slices		{ 10 };
+	std::size_t						n_stacks		{ 10 };
+	Range<si::Angle>				h_range			{ -180_deg, +180_deg };
+	Range<si::Angle>				v_range			{ -90_deg, +90_deg };
+	ShapeMaterial const&			material		{ };
+	std::shared_ptr<QOpenGLTexture>	texture			{ nullptr };
+	MakeSphereMaterialCallback		setup_material	{ std::monostate() };
 };
 
 
 struct IrregularSphereShapeParameters
 {
-	si::Length					radius;
+	si::Length						radius;
 	// Must be sorted:
-	std::span<si::Angle const>	slice_angles;
+	std::span<si::Angle const>		slice_angles;
 	// Must be sorted:
-	std::span<si::Angle const>	stack_angles;
-	ShapeMaterial const&		material		{ };
-	MakeSphereMaterialCallback	setup_material	{ std::monostate() };
+	std::span<si::Angle const>		stack_angles;
+	ShapeMaterial const&			material		{ };
+	std::shared_ptr<QOpenGLTexture>	texture			{ nullptr };
+	MakeSphereMaterialCallback		setup_material	{ std::monostate() };
 };
 
 

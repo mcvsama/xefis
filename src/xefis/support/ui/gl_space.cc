@@ -91,16 +91,9 @@ GLSpace::set_material (rigid_body::ShapeMaterial const& material)
 	auto const& params = additional_parameters();
 
 	glFogCoordf (material.gl_fog_distance);
-	glColor4fv (material.gl_emission_color);
 	glMaterialf (GL_FRONT, GL_SHININESS, 128.0 * material.gl_shininess);
+	glColor4fv (material.gl_emission_color);
 	glMaterialfv (GL_FRONT, GL_EMISSION, material.gl_emission_color);
-
-	if (material.texture)
-	{
-		material.texture->bind();
-		auto const pos = material.texture_position;
-		glTexCoord2f (pos.x(), pos.y());
-	}
 
 	if (params.color_override)
 	{
@@ -118,41 +111,25 @@ GLSpace::set_material (rigid_body::ShapeMaterial const& material)
 
 
 void
+GLSpace::set_texture (rigid_body::ShapeMaterial const& material)
+{
+	glFogCoordf (material.gl_fog_distance);
+	glTexCoord2f (material.texture_position.x(), material.texture_position.y());
+}
+
+
+void
 GLSpace::draw (rigid_body::Shape const& shape)
 {
-	save_context ([&] {
-		if (!shape.triangles().empty())
-		{
-			for (auto const& triangle: shape.triangles())
-			{
-				begin (GL_TRIANGLES, [&] {
-					for (auto const& vertex: triangle)
-						add_vertex (vertex);
-				});
-			}
-		}
+	save_context ([&] { // TODO remove save_context
+		for (auto const& triangle: shape.triangles())
+			begin (GL_TRIANGLES, triangle);
 
-		if (!shape.triangle_strips().empty())
-		{
-			for (auto const& strip: shape.triangle_strips())
-			{
-				begin (GL_TRIANGLE_STRIP, [&] {
-					for (auto const& vertex: strip)
-						add_vertex (vertex);
-				});
-			}
-		}
+		for (auto const& strip: shape.triangle_strips())
+			begin (GL_TRIANGLE_STRIP, strip);
 
-		if (!shape.triangle_fans().empty())
-		{
-			for (auto const& fan: shape.triangle_fans())
-			{
-				begin (GL_TRIANGLE_FAN, [&] {
-					for (auto const& vertex: fan)
-						add_vertex (vertex);
-				});
-			}
-		}
+		for (auto const& fan: shape.triangle_fans())
+			begin (GL_TRIANGLE_FAN, fan);
 	});
 }
 

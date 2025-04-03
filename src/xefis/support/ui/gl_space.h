@@ -241,28 +241,41 @@ class GLSpace
 	begin (GLenum mode, auto&& lambda);
 
 	/**
+	 * Call glBegin(), then set_vertex() for the geometry, then glEnd().
+	 * Exception-safe.
+	 */
+	void
+	begin (GLenum const mode, rigid_body::Shape::Geometry const& geometry);
+
+	/**
 	 * Set current OpenGL normal vector to the vertex' normal.
 	 */
 	static void
 	set_normal (rigid_body::ShapeVertex const&);
 
 	/**
-	 * Set current OpenGL material parameters.
+	 * Set current OpenGL material parameters if texture is not used.
 	 */
 	void
 	set_material (rigid_body::ShapeMaterial const&);
 
 	/**
+	 * Set texture UV parameters.
+	 */
+	void
+	set_texture (rigid_body::ShapeMaterial const&);
+
+	/**
 	 * Set current OpenGL material/normal from vertex parameters.
 	 */
 	void
-	set_vertex (rigid_body::ShapeVertex const&);
+	set_vertex (rigid_body::ShapeVertex const&, rigid_body::Shape::Geometry const&);
 
 	/**
 	 * Add vertex with its normal and material information.
 	 */
 	void
-	add_vertex (rigid_body::ShapeVertex const&);
+	add_vertex (rigid_body::ShapeVertex const&, rigid_body::Shape::Geometry const& geometry);
 
 	/**
 	 * Add OpenGL vertex at given position.
@@ -395,6 +408,28 @@ GLSpace::begin (GLenum const mode, auto&& lambda)
 
 
 inline void
+GLSpace::begin (GLenum const mode, rigid_body::Shape::Geometry const& geometry)
+{
+	try {
+		if (geometry.texture)
+			geometry.texture->bind();
+
+		glBegin (mode);
+
+		for (auto const& vertex: geometry.vertices)
+			add_vertex (vertex, geometry);
+
+		glEnd();
+	}
+	catch (...)
+	{
+		glEnd();
+		throw;
+	}
+}
+
+
+inline void
 GLSpace::set_normal (rigid_body::ShapeVertex const& vertex)
 {
 	if (auto const opt_n = vertex.normal())
@@ -406,17 +441,21 @@ GLSpace::set_normal (rigid_body::ShapeVertex const& vertex)
 
 
 inline void
-GLSpace::set_vertex (rigid_body::ShapeVertex const& vertex)
+GLSpace::set_vertex (rigid_body::ShapeVertex const& vertex, rigid_body::Shape::Geometry const& geometry)
 {
 	set_normal (vertex);
-	set_material (vertex.material());
+
+	if (geometry.texture)
+		set_texture (vertex.material());
+	else
+		set_material (vertex.material());
 }
 
 
 inline void
-GLSpace::add_vertex (rigid_body::ShapeVertex const& vertex)
+GLSpace::add_vertex (rigid_body::ShapeVertex const& vertex, rigid_body::Shape::Geometry const& geometry)
 {
-	set_vertex (vertex);
+	set_vertex (vertex, geometry);
 	add_vertex (math::coordinate_system_cast<WorldSpace, void> (vertex.position()));
 }
 
