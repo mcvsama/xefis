@@ -618,7 +618,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	CameraMode					_camera_mode				{ CockpitView };
 	// Requested camera position:
 	si::LonLatRadius<>			_requested_camera_polar_position;
-	// User offset (it's actually in CameraSpace):
+	// User offset (it's actually in camera space):
 	SpaceLength<WorldSpace>		_user_camera_translation;
 	// Final computed camera position (from requested camera position and user camera translation):
 	si::LonLatRadius<>			_camera_polar_position;

@@ -164,7 +164,6 @@ void
 RigidBodyPainter::paint (rigid_body::System const& system, QOpenGLPaintDevice& canvas)
 {
 	_group_centers_of_mass_cache.clear();
-
 	initializeOpenGLFunctions();
 
 	// If loading of Earth texture wasn't started yet:
@@ -509,7 +508,7 @@ RigidBodyPainter::paint_planet()
 				for (auto& sky_light: _sky_lights)
 				{
 					_gl.save_context ([&] {
-						make_z_sky_top_x_sun_azimuth(); // TODO?
+						make_z_sky_top_x_sun_azimuth();
 						_gl.save_context ([&] {
 							_gl.rotate_z (+sky_light.position.lon());
 							_gl.rotate_y (-sky_light.position.lat());
@@ -529,7 +528,6 @@ RigidBodyPainter::paint_planet()
 			_gl.translate (-_camera.position());
 			make_z_sky_top_x_south();
 			_gl.translate (_camera.position());
-
 
 			glFrontFace (GL_CCW);
 			glDisable (GL_BLEND);
