@@ -22,6 +22,7 @@
 // Standard:
 #include <cstddef>
 #include <atomic>
+#include <functional>
 #include <memory>
 
 
@@ -108,39 +109,33 @@ calculate_ground_slices_and_stacks (si::Angle const horizon_angle, si::Length co
 
 	// Longitude:
 	{
-		auto const n_slices = 50u;
+		auto const n_slices = 80u;
 		auto const delta = 360_deg / n_slices + 0.01_deg;
 		result.slice_angles.reserve (360_deg / delta + 1);
 
-		for (auto longitude = 0_deg; longitude < 360_deg; longitude += delta)
+		for (auto longitude = -180_deg; longitude < 180_deg; longitude += delta)
 			result.slice_angles.push_back (longitude);
 
 		// Complete the circle where we started:
-		result.slice_angles.push_back (360_deg);
+		result.slice_angles.push_back (180_deg);
 	}
 
 	// Latitude:
 	{
-		auto const n_stacks = 20u;
+		auto const stacks_const = 8u;
 		auto const visible_angle = 90_deg + horizon_angle;
 		auto view_angle = calculate_angle_from_offset_viewpoint (visible_angle, earth_radius, observer_position_radius);
-		auto const delta = (90_deg + view_angle) / n_stacks;
+		auto const delta = (90_deg + view_angle) / stacks_const;
 
-		result.stack_angles.reserve (n_stacks + 1);
+		result.stack_angles.reserve (4 * stacks_const);
 
-		auto const dynamic_delta = [&view_angle, &delta]() {
-			auto const factor = view_angle > -1_deg
-				? 0.2
-				: view_angle > -5_deg
-					? 0.4
-					: view_angle > -10_deg
-						? 0.6
-						: 1.0;
+		auto const dynamic_delta = [&view_angle, horizon_angle, delta]() {
+			auto const factor = neutrino::renormalize (view_angle, Range<si::Angle> { horizon_angle, -90_deg }, Range { 0.05f, 1.0f });
 			return factor * delta;
 		};
 
 		// Denser near horizon at the expense of density directly under the camera:
-		for (auto i = 0u; i < n_stacks; ++i, view_angle -= dynamic_delta())
+		for (; view_angle > -90_deg; view_angle -= dynamic_delta())
 		{
 			auto const latitude = calculate_angle_from_origin_viewpoint (view_angle, earth_radius, observer_position_radius);
 			result.stack_angles.push_back (latitude);
@@ -267,18 +262,29 @@ calculate_dome_slices_and_stacks (HorizontalCoordinates const sun_position, si::
 
 
 rigid_body::Shape
-calculate_ground_shape (si::Length const earth_radius, si::Length const observer_position_radius)
+calculate_ground_shape (si::LonLatRadius<> const observer_position,
+						si::Length const earth_radius,
+						std::shared_ptr<QOpenGLTexture> earth_texture)
 {
-	if (auto const horizon_angle = calculate_horizon_angle (earth_radius, observer_position_radius);
+	if (auto const horizon_angle = calculate_horizon_angle (earth_radius, observer_position.radius());
 		isfinite (horizon_angle))
 	{
-		auto const ss = calculate_ground_slices_and_stacks (horizon_angle, earth_radius, observer_position_radius);
+		auto const ss = calculate_ground_slices_and_stacks (horizon_angle, earth_radius, observer_position.radius());
+		auto const rotation = z_rotation<ECEFSpace> (observer_position.lon()) * y_rotation<ECEFSpace> (-observer_position.lat() + 90_deg);
 
 		return rigid_body::make_centered_irregular_sphere_shape ({
 			.radius = earth_radius,
 			.slice_angles = ss.slice_angles,
 			.stack_angles = ss.stack_angles,
-			.material = rigid_body::kTransparentBlack,
+			.material = rigid_body::kBlackMatte,
+			.texture = earth_texture,
+			.setup_material = [&] (rigid_body::ShapeMaterial& material, si::LonLat const sphere_position) {
+				auto const rotated = to_polar (rotation * to_cartesian (si::LonLatRadius (sphere_position, earth_radius)));
+				material.texture_position = {
+					neutrino::renormalize (rotated.lon(), Range { -180_deg, +180_deg }, Range { 0.0f, 1.0f }),
+					neutrino::renormalize (rotated.lat(), Range { -90_deg, +90_deg }, Range { 1.0f, 0.0f }),
+				};
+			},
 		});
 	}
 	else
@@ -291,22 +297,22 @@ rigid_body::Shape
 calculate_dome_shape (si::LonLatRadius<> const observer_position,
 					  SkyDome::SunPosition const sun_position,
 					  si::Length const earth_radius,
-					  si::Angle horizon_angle,
 					  float const ground_haze_alpha,
 					  AtmosphericScattering const& atmospheric_scattering,
 					  neutrino::WorkPerformer* const work_performer = nullptr)
 {
-	auto const ss = calculate_dome_slices_and_stacks (sun_position.horizontal_coordinates, horizon_angle);
+	auto horizon_angle = calculate_horizon_angle (earth_radius, observer_position.radius());
 
 	// Still draw sky if horizon_angle is nan (assume it's 0° then):
 	if (!isfinite (horizon_angle))
 		horizon_angle = 0_deg;
 
+	auto const ss = calculate_dome_slices_and_stacks (sun_position.horizontal_coordinates, horizon_angle);
 	auto dome = rigid_body::make_centered_irregular_sphere_shape ({
 		.radius = earth_radius, // TODO 10 mm around the camera
 		.slice_angles = ss.slice_angles,
 		.stack_angles = ss.stack_angles,
-		.material = rigid_body::kTransparentBlack,
+		.material = rigid_body::kBlackMatte,
 		.setup_material = [&] (rigid_body::ShapeMaterial& material, si::LonLat const sphere_position, WaitGroup::WorkToken&& work_token) {
 			auto calculate = [=, &material, &atmospheric_scattering, &observer_position, &sun_position, work_token = std::move (work_token)] {
 				if (sphere_position.lat() >= horizon_angle)
@@ -371,14 +377,12 @@ SkyDome
 calculate_sky_dome (SkyDomeParameters const& p, neutrino::WorkPerformer* work_performer)
 {
 	auto const sun_position = calculate_sun_position (p.observer_position, p.unix_time);
-	auto const horizon_angle = calculate_horizon_angle (p.earth_radius, p.observer_position.radius());
 
 	return {
 		.atmospheric_dome_shape = calculate_dome_shape(
 			p.observer_position,
 			sun_position,
 			p.earth_radius,
-			horizon_angle,
 			p.ground_haze_alpha,
 			p.atmospheric_scattering,
 			work_performer

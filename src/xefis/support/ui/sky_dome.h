@@ -59,13 +59,17 @@ struct SkyDomeParameters
 	si::LonLatRadius<>				observer_position;
 	si::Length						earth_radius;
 	si::Time						unix_time;
-	float							ground_haze_alpha	{ 0.5f };
+	float							ground_haze_alpha		{ 0.5f };
+	std::shared_ptr<QOpenGLTexture>	earth_texture;
+	RotationQuaternion<WorldSpace>	earth_texture_rotation	{ math::identity };
 };
 
 
 [[nodiscard]]
 rigid_body::Shape
-calculate_ground_shape (si::Length const earth_radius, si::Length const observer_position_radius);
+calculate_ground_shape (si::LonLatRadius<> const observer_position,
+						si::Length const earth_radius,
+						std::shared_ptr<QOpenGLTexture> earth_texture);
 
 [[nodiscard]]
 SkyDome
