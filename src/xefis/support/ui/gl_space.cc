@@ -130,6 +130,9 @@ GLSpace::draw (rigid_body::Shape const& shape)
 
 		for (auto const& fan: shape.triangle_fans())
 			begin (GL_TRIANGLE_FAN, fan);
+
+		for (auto const& quad: shape.quads())
+			begin (GL_QUADS, quad);
 	});
 }
 

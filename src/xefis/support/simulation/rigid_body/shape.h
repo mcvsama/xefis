@@ -43,6 +43,7 @@ class Shape
 	using Triangle		= Geometry;
 	using TriangleStrip	= Geometry;
 	using TriangleFan	= Geometry;
+	using Quad			= Geometry;
 
   public:
 	/**
@@ -91,6 +92,20 @@ class Shape
 		{ return _triangle_fans; }
 
 	/**
+	 * Return vector of quads.
+	 */
+	std::vector<Quad>&
+	quads() noexcept
+		{ return _quads; }
+
+	/**
+	 * Return vector of quads.
+	 */
+	std::vector<Quad> const&
+	quads() const noexcept
+		{ return _quads; }
+
+	/**
 	 * Transform each point by given matrix.
 	 */
 	void
@@ -118,6 +133,7 @@ class Shape
 	std::vector<Triangle>		_triangles;
 	std::vector<TriangleStrip>	_triangle_strips;
 	std::vector<TriangleFan>	_triangle_fans;
+	std::vector<Quad>			_quads;
 };
 
 
@@ -132,6 +148,7 @@ operator+= (Shape& a, Shape const& b)
 	a.triangles().insert (a.triangles().end(), b.triangles().begin(), b.triangles().end());
 	a.triangle_strips().insert (a.triangle_strips().end(), b.triangle_strips().begin(), b.triangle_strips().end());
 	a.triangle_fans().insert (a.triangle_fans().end(), b.triangle_fans().begin(), b.triangle_fans().end());
+	a.quads().insert (a.quads().end(), b.quads().begin(), b.quads().end());
 	return a;
 }
 
