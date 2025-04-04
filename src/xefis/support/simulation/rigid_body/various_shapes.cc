@@ -50,24 +50,24 @@ make_centered_cube_shape (SpaceLength<BodyOrigin> const& dimensions, ShapeMateri
 	auto const z = 0.5 * dimensions[2];
 
 	shape.triangles() = {
-		// Front:
-		{ .vertices = { { +x, +y, +z }, { -x, +y, +z }, { -x, -y, +z } } },
-		{ .vertices = { { +x, +y, +z }, { -x, -y, +z }, { +x, -y, +z } } },
-		// Right:
+		// Right (+X):
 		{ .vertices = { { +x, +y, +z }, { +x, -y, +z }, { +x, -y, -z } } },
 		{ .vertices = { { +x, +y, +z }, { +x, -y, -z }, { +x, +y, -z } } },
-		// Top:
-		{ .vertices = { { +x, +y, +z }, { +x, +y, -z }, { -x, +y, -z } } },
-		{ .vertices = { { +x, +y, +z }, { -x, +y, -z }, { -x, +y, +z } } },
-		// Back:
-		{ .vertices = { { -x, -y, -z }, { +x, +y, -z }, { +x, -y, -z } } },
-		{ .vertices = { { -x, -y, -z }, { -x, +y, -z }, { +x, +y, -z } } },
-		// Left:
+		// Left (-X):
 		{ .vertices = { { -x, -y, -z }, { -x, +y, +z }, { -x, +y, -z } } },
 		{ .vertices = { { -x, -y, -z }, { -x, -y, +z }, { -x, +y, +z } } },
-		// Bottom:
+		// Top (+Y):
+		{ .vertices = { { +x, +y, +z }, { +x, +y, -z }, { -x, +y, -z } } },
+		{ .vertices = { { +x, +y, +z }, { -x, +y, -z }, { -x, +y, +z } } },
+		// Bottom (-Y):
 		{ .vertices = { { -x, -y, -z }, { +x, -y, +z }, { -x, -y, +z } } },
 		{ .vertices = { { -x, -y, -z }, { +x, -y, -z }, { +x, -y, +z } } },
+		// Front (+Z):
+		{ .vertices = { { +x, +y, +z }, { -x, +y, +z }, { -x, -y, +z } } },
+		{ .vertices = { { +x, +y, +z }, { -x, -y, +z }, { +x, -y, +z } } },
+		// Back (-Z):
+		{ .vertices = { { -x, -y, -z }, { +x, +y, -z }, { +x, -y, -z } } },
+		{ .vertices = { { -x, -y, -z }, { -x, +y, -z }, { +x, +y, -z } } },
 	};
 
 	for (auto& triangle: shape.triangles())
