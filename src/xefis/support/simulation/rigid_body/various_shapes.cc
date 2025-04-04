@@ -100,6 +100,84 @@ make_centered_cube_shape (xf::MassMoments<BodyCOM> const& mm, ShapeMaterial cons
 
 
 Shape
+make_sky_box (SkyBoxParameters const& parameters)
+{
+	auto const d = 0.5 * parameters.edge_length;
+	auto const vertex = [](si::Length const x, si::Length const y, si::Length const z, int u, int v) {
+		return ShapeVertex ({ x, y, z }, ShapeMaterial { .texture_position = { 1.0 * u, 1.0 * v } });
+	};
+
+	Shape shape;
+	shape.quads() = {
+		// Right face (positive X)
+		{
+			.vertices = {
+				vertex (+d, +d, -d, 0, 0),
+				vertex (+d, -d, -d, 0, 1),
+				vertex (+d, -d, +d, 1, 1),
+				vertex (+d, +d, +d, 1, 0),
+			},
+			.texture = parameters.texture_pos_x,
+		},
+		// Left face (negative X)
+		{
+			.vertices = {
+				vertex (-d, +d, +d, 0, 0),
+				vertex (-d, -d, +d, 0, 1),
+				vertex (-d, -d, -d, 1, 1),
+				vertex (-d, +d, -d, 1, 0),
+			},
+			.texture = parameters.texture_neg_x,
+		},
+		// Top face (positive Y)
+		{
+			.vertices = {
+				vertex (-d, +d, +d, 0, 0),
+				vertex (-d, +d, -d, 0, 1),
+				vertex (+d, +d, -d, 1, 1),
+				vertex (+d, +d, +d, 1, 0),
+			},
+			.texture = parameters.texture_pos_y,
+		},
+		// Bottom face (negative Y)
+		{
+			.vertices = {
+				vertex (-d, -d, -d, 0, 0),
+				vertex (-d, -d, +d, 0, 1),
+				vertex (+d, -d, +d, 1, 1),
+				vertex (+d, -d, -d, 1, 0),
+			},
+			.texture = parameters.texture_neg_y,
+		},
+		// Back face (negative Z).
+		// It appears that the standard set of sky box images are usually in
+		// left-handed coordinate system, so front and back seems to be swapped.
+		{
+			.vertices = {
+				vertex (+d, +d, +d, 0, 0),
+				vertex (+d, -d, +d, 0, 1),
+				vertex (-d, -d, +d, 1, 1),
+				vertex (-d, +d, +d, 1, 0),
+			},
+			.texture = parameters.texture_neg_z,
+		},
+		// Front face (positive Z)
+		{
+			.vertices = {
+				vertex (-d, +d, -d, 0, 0),
+				vertex (-d, -d, -d, 0, 1),
+				vertex (+d, -d, -d, 1, 1),
+				vertex (+d, +d, -d, 1, 0),
+			},
+			.texture = parameters.texture_pos_z,
+		},
+	};
+
+	return shape;
+}
+
+
+Shape
 make_cube_shape (xf::MassMomentsAtArm<BodyCOM> const& mm, ShapeMaterial const& material)
 {
 	auto shape = make_centered_cube_shape (mm.centered_at_center_of_mass(), material);

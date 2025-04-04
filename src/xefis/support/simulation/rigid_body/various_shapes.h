@@ -49,6 +49,18 @@ enum RotationDirection
 };
 
 
+struct SkyBoxParameters
+{
+	si::Length						edge_length;
+	std::shared_ptr<QOpenGLTexture>	texture_neg_x;
+	std::shared_ptr<QOpenGLTexture>	texture_neg_y;
+	std::shared_ptr<QOpenGLTexture>	texture_neg_z;
+	std::shared_ptr<QOpenGLTexture>	texture_pos_x;
+	std::shared_ptr<QOpenGLTexture>	texture_pos_y;
+	std::shared_ptr<QOpenGLTexture>	texture_pos_z;
+};
+
+
 struct SphereShapeParameters
 {
 	si::Length						radius;
@@ -180,6 +192,12 @@ make_centered_cube_shape (SpaceLength<BodyOrigin> const& dimensions, ShapeMateri
  */
 Shape
 make_centered_cube_shape (xf::MassMoments<BodyCOM> const&, ShapeMaterial const& material = {});
+
+/**
+ * Make a sky-box cube with internal faces configured to display selected texture.
+ */
+Shape
+make_sky_box (SkyBoxParameters const&);
 
 /**
  * Make cube that represents given moments of inertia.
