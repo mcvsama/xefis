@@ -1,0 +1,2 @@
+The map is in celestial coordinates.
+
