@@ -177,8 +177,7 @@ RigidBodyPainter::paint (rigid_body::System const& system, QOpenGLPaintDevice& c
 	}
 
 	auto const ph = PaintHelper (canvas);
-
-	QPainter painter (&canvas);
+	auto painter = QPainter (&canvas);
 	ph.setup_painter (painter);
 
 	QRectF rect (0, 0, canvas.width(), canvas.height());
