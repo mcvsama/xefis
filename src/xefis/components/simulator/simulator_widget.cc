@@ -76,7 +76,7 @@ SimulatorWidget::SimulatorWidget (Simulator& simulator, QWidget* parent):
 QWidget*
 SimulatorWidget::make_viewer_widget()
 {
-	_rigid_body_viewer.emplace (this, RigidBodyViewer::AutoFPS);
+	_rigid_body_viewer.emplace (this, RigidBodyViewer::AutoFPS, &_graphics_work_performer);
 	_rigid_body_viewer->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Expanding);
 	_rigid_body_viewer->use_work_performer (&_graphics_work_performer);
 	_rigid_body_viewer->set_rigid_body_system (&_simulator.rigid_body_system());

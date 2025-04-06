@@ -28,6 +28,7 @@
 // Neutrino:
 #include <neutrino/concepts.h>
 #include <neutrino/work_performer.h>
+#include <neutrino/value_or_ptr.h>
 
 // Qt:
 #include <QOpenGLFunctions>
@@ -149,7 +150,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
   public:
 	// Ctor
 	explicit
-	RigidBodyPainter (si::PixelDensity);
+	RigidBodyPainter (si::PixelDensity, WorkPerformer* = nullptr);
 
 	/**
 	 * Set simulation time. It makes Sun rendered in different positions.
@@ -637,8 +638,9 @@ class RigidBodyPainter: protected QOpenGLFunctions
 
   private:
 	si::PixelDensity			_pixel_density;
+	neutrino::ValueOrPtr<neutrino::WorkPerformer, std::size_t, xf::Logger const&>
+								_work_performer;
 	si::Time					_time;
-	neutrino::WorkPerformer*	_work_performer				{ nullptr };
 	CameraMode					_camera_mode				{ CockpitView };
 	// Requested camera position:
 	si::LonLatRadius<>			_requested_camera_polar_position;

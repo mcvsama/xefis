@@ -22,6 +22,7 @@
 
 // Neutrino:
 #include <neutrino/qt/qutils.h>
+#include <neutrino/work_performer.h>
 
 // Qt:
 #include <QKeyEvent>
@@ -79,7 +80,7 @@ class RigidBodyViewer: public GLAnimationWidget
   public:
 	// Ctor
 	explicit
-	RigidBodyViewer (QWidget* parent, RefreshRate);
+	RigidBodyViewer (QWidget* parent, RefreshRate, neutrino::WorkPerformer* work_performer = nullptr);
 
 	/**
 	 * Set time for RigidBodyPainter.

@@ -60,10 +60,14 @@ constexpr auto kGLSkyLight3				= GL_LIGHT6;
 constexpr auto kGLSkyLight4				= GL_LIGHT7;
 
 
-RigidBodyPainter::RigidBodyPainter (si::PixelDensity const pixel_density):
+RigidBodyPainter::RigidBodyPainter (si::PixelDensity const pixel_density, WorkPerformer* work_performer):
 	_pixel_density (pixel_density),
+	_work_performer (work_performer, std::in_place, 1, Logger()),
 	_gl (pixel_density * kDefaultPositionScale)
 {
+	use_work_performer (work_performer);
+
+	// Initialize sky lights:
 	_sky_lights[0] = SkyLight {
 		.gl_number	= kGLSkyLight0,
 		.position	= { 0_deg, 0_deg },
@@ -87,6 +91,19 @@ RigidBodyPainter::RigidBodyPainter (si::PixelDensity const pixel_density):
 
 	calculate_camera_transform();
 	_sky_dome = calculate_sky_dome();
+
+	// Start loading texture images:
+	_texture_images = _work_performer->submit ([] {
+		return TextureImages {
+			.earth			= QImage ("share/images/textures/earth/earth-day-2004-07.jpg"),
+			.universe_neg_x	= QImage ("share/images/textures/universe/nx.jpg"),
+			.universe_neg_y	= QImage ("share/images/textures/universe/ny.jpg"),
+			.universe_neg_z	= QImage ("share/images/textures/universe/nz.jpg"),
+			.universe_pos_x	= QImage ("share/images/textures/universe/px.jpg"),
+			.universe_pos_y	= QImage ("share/images/textures/universe/py.jpg"),
+			.universe_pos_z	= QImage ("share/images/textures/universe/pz.jpg"),
+		};
+	});
 }
 
 
@@ -1077,29 +1094,6 @@ RigidBodyPainter::get_center_of_mass (rigid_body::Group const& group)
 void
 RigidBodyPainter::check_textures()
 {
-	// Load images if not yet loaded:
-	if (!_texture_images.valid() && !_textures)
-	{
-		// TODO if WorkPerformer is mandatory, this goes to the constructor:
-		auto const load = [] -> TextureImages {
-			return {
-				.earth			= QImage ("share/images/textures/earth/july-day.jpg"),
-				.universe_neg_x	= QImage ("share/images/textures/universe/nx.jpg"),
-				.universe_neg_y	= QImage ("share/images/textures/universe/ny.jpg"),
-				.universe_neg_z	= QImage ("share/images/textures/universe/nz.jpg"),
-				.universe_pos_x	= QImage ("share/images/textures/universe/px.jpg"),
-				.universe_pos_y	= QImage ("share/images/textures/universe/py.jpg"),
-				.universe_pos_z	= QImage ("share/images/textures/universe/pz.jpg"),
-			};
-		};
-
-		// TODO make _work_performer mandatory
-		if (_work_performer)
-			_texture_images = _work_performer->submit (load);
-		else
-			_texture_images = std::async (std::launch::deferred, load);
-	}
-
 	if (is_valid_and_ready (_texture_images))
 	{
 		auto images = _texture_images.get();
@@ -1136,12 +1130,7 @@ RigidBodyPainter::check_sky_dome()
 		_sky_dome = _next_sky_dome.get();
 
 	if (!_next_sky_dome.valid() && std::exchange (_need_new_sky_dome, false))
-	{
-		if (_work_performer)
-			_next_sky_dome = _work_performer->submit (&RigidBodyPainter::calculate_sky_dome, this);
-		else
-			_sky_dome = calculate_sky_dome();
-	}
+		_next_sky_dome = _work_performer->submit (&RigidBodyPainter::calculate_sky_dome, this);
 }
 
 
@@ -1156,7 +1145,7 @@ RigidBodyPainter::calculate_sky_dome()
 		.earth_radius = kEarthMeanRadius,
 		.unix_time = _time,
 		.earth_texture = _textures ? _textures->earth : nullptr,
-	}, _work_performer);
+	}, &*_work_performer);
 	// TODO apply sky_correction to vertices' materials
 }
 
