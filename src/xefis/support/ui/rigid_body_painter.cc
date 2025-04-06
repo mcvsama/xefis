@@ -512,7 +512,6 @@ RigidBodyPainter::paint_planet()
 		// Ground:
 		// TODO it would be best if there was a shader that adds the dome sphere color to the drawn feature
 		_gl.save_context ([&] {
-			_gl.set_camera (_camera);
 			_gl.translate (planet_position());
 			_gl.translate (-_camera.position());
 			make_z_sky_top_x_south();
