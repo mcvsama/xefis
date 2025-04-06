@@ -465,8 +465,6 @@ RigidBodyPainter::paint_universe()
 	if (_textures)
 	{
 		_gl.save_context ([&] {
-			// The universe sky box is probably not rotated correctly, but it's not that important.
-			_gl.set_camera_rotation_only (_camera);
 			auto const sky_box = rigid_body::make_sky_box ({
 				.edge_length = 1000_m,
 				.texture_neg_x = _textures->universe_neg_x,
@@ -476,12 +474,16 @@ RigidBodyPainter::paint_universe()
 				.texture_pos_y = _textures->universe_pos_y,
 				.texture_pos_z = _textures->universe_pos_z,
 			});
+
 			glFrontFace (GL_CCW);
 			glDisable (GL_BLEND);
 			glEnable (GL_DEPTH_TEST);
 			glDisable (GL_LIGHTING);
 			glEnable (GL_TEXTURE_2D);
 			glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+			_gl.set_camera_rotation_only (_camera);
+			// Rotate the sky box with the sun (sky box is in celestial coordinates):
+			make_z_towards_the_sun();
 			_gl.draw (sky_box);
 			_gl.clear_z_buffer();
 			glDisable (GL_TEXTURE_2D);
