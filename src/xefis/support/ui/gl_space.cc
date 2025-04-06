@@ -121,19 +121,17 @@ GLSpace::set_texture (rigid_body::ShapeMaterial const& material)
 void
 GLSpace::draw (rigid_body::Shape const& shape)
 {
-	save_context ([&] { // TODO remove save_context
-		for (auto const& triangle: shape.triangles())
-			begin (GL_TRIANGLES, triangle);
+	for (auto const& triangle: shape.triangles())
+		begin (GL_TRIANGLES, triangle);
 
-		for (auto const& strip: shape.triangle_strips())
-			begin (GL_TRIANGLE_STRIP, strip);
+	for (auto const& strip: shape.triangle_strips())
+		begin (GL_TRIANGLE_STRIP, strip);
 
-		for (auto const& fan: shape.triangle_fans())
-			begin (GL_TRIANGLE_FAN, fan);
+	for (auto const& fan: shape.triangle_fans())
+		begin (GL_TRIANGLE_FAN, fan);
 
-		for (auto const& quad: shape.quads())
-			begin (GL_QUADS, quad);
-	});
+	for (auto const& quad: shape.quads())
+		begin (GL_QUADS, quad);
 }
 
 
