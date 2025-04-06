@@ -93,14 +93,6 @@ class RigidBodyPainter: protected QOpenGLFunctions
 		si::LonLat			position;
 	};
 
-	struct SunPosition
-	{
-		si::Angle				hour_angle;
-		si::Angle				declination;
-		HorizontalCoordinates	horizontal_coordinates;
-		SpaceVector<double>		cartesian_coordinates;
-	};
-
 	struct TextureImages
 	{
 		QImage	earth;
@@ -621,8 +613,8 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	 * \threadsafe	As long as _atmospheric_scattering is unmodified.
 	 */
 	[[nodiscard]]
-	SkyDome
-	calculate_sky_dome();
+	rigid_body::Shape
+	calculate_sky_dome_shape();
 
 	void
 	calculate_camera_transform();
@@ -680,11 +672,13 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	std::map<rigid_body::Group const*, SpaceLength<WorldSpace>>
 								_group_centers_of_mass_cache;
 	AtmosphericScattering const	_atmospheric_scattering		{{ .earth_radius = kEarthMeanRadius, .atmosphere_radius = kEarthMeanRadius + 8.4_km, .enable_tonemapping = true }};
-	SkyDome						_sky_dome;
-	std::future<SkyDome>		_next_sky_dome;
+	rigid_body::Shape			_sky_dome_shape;
+	std::future<rigid_body::Shape>
+								_next_sky_dome_shape;
 	bool						_need_new_sky_dome			{ false };
 	rigid_body::Shape			_ground_shape;
 	si::Time					_sky_dome_update_time;
+	SunPosition					_sun_position;
 	QColor						_sun_color_in_space			{ qcolor_from_temperature (kSunSurfaceTemperature) };
 	std::array<SkyLight, 5>		_sky_lights;
 	std::future<TextureImages>	_texture_images;

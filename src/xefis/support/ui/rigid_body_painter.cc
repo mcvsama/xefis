@@ -90,7 +90,7 @@ RigidBodyPainter::RigidBodyPainter (si::PixelDensity const pixel_density, WorkPe
 	};
 
 	calculate_camera_transform();
-	_sky_dome = calculate_sky_dome();
+	_sky_dome_shape = this->calculate_sky_dome_shape();
 
 	// Start loading texture images:
 	_texture_images = _work_performer->submit ([] {
@@ -204,6 +204,7 @@ RigidBodyPainter::precalculate()
 	_followed_polar_position = to_polar (math::coordinate_system_cast<ECEFSpace, void> (followed_position() - planet_position()));
 	check_textures();
 	check_sky_dome();
+	_sun_position = calculate_sun_position (_camera_polar_position, _time); // TODO maybe _followed_position?
 }
 
 
@@ -263,7 +264,8 @@ void
 RigidBodyPainter::setup_sun_light()
 {
 	// Blend the original sun color with color as seen through the atmosphere:
-	auto const q_atmospheric_sun_color = QColor::fromRgbF (_sky_dome.sun_light_color[0], _sky_dome.sun_light_color[1], _sky_dome.sun_light_color[2]);
+	auto const sun_light_color = calculate_sun_light_color (_camera_polar_position, _sun_position.cartesian_coordinates, _atmospheric_scattering);
+	auto const q_atmospheric_sun_color = QColor::fromRgbF (sun_light_color[0], sun_light_color[1], sun_light_color[2]);
 	auto const x = neutrino::renormalize (_followed_polar_position.radius(), Range { kEarthMeanRadius, kAtmosphereRadius }, Range { 0.0f, 1.0f });
 	auto const atmospheric_sun_color = to_gl_color (hsl_interpolation (x, q_atmospheric_sun_color, _sun_color_in_space));
 	auto const cosmic_sun_color = to_gl_color (_sun_color_in_space);
@@ -341,7 +343,7 @@ RigidBodyPainter::setup_sky_light()
 			auto const color = _atmospheric_scattering.calculate_incident_light (
 				{ 0_m, 0_m, _followed_polar_position.radius() },
 				light_direction,
-				_sky_dome.sun_position.cartesian_coordinates
+				_sun_position.cartesian_coordinates
 			);
 			auto const corrected_color = sky_correction (color);
 			auto const gl_color = to_gl_color (corrected_color);
@@ -419,11 +421,11 @@ RigidBodyPainter::make_z_towards_the_sun()
 	// Assuming we have identity rotations + camera rotations applied.
 
 	// Rotate sun depending on UTC time:
-	auto const greenwich_hour_angle = _sky_dome.sun_position.hour_angle - _camera_polar_position.lon();
+	auto const greenwich_hour_angle = _sun_position.hour_angle - _camera_polar_position.lon();
 	_gl.rotate_z (-greenwich_hour_angle);
 
 	// Rotate sun depending on time of the year:
-	_gl.rotate_y (-_sky_dome.sun_position.declination);
+	_gl.rotate_y (-_sun_position.declination);
 
 	// Our sun is located over the North Pole (+Z in ECEF). Rotate it to be straight over Null Island
 	// that is lon/lat 0°/0° (+X in ECEF):
@@ -443,7 +445,7 @@ void
 RigidBodyPainter::make_z_sky_top_x_sun_azimuth()
 {
 	make_z_sky_top_x_south();
-	_gl.rotate_z (-_sky_dome.sun_position.horizontal_coordinates.azimuth + 180_deg);
+	_gl.rotate_z (-_sun_position.horizontal_coordinates.azimuth + 180_deg);
 }
 
 
@@ -482,7 +484,8 @@ RigidBodyPainter::paint_universe()
 			glEnable (GL_TEXTURE_2D);
 			glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 			_gl.set_camera_rotation_only (_camera);
-			// Rotate the sky box with the sun (sky box is in celestial coordinates):
+			// Rotate the sky box with the sun (sky box is in celestial coordinates, so this
+			// is not quite right, but good enough for now): TODO fix it
 			make_z_towards_the_sun();
 			_gl.draw (sky_box);
 			_gl.clear_z_buffer();
@@ -495,7 +498,7 @@ RigidBodyPainter::paint_universe()
 		// TODO to func: get_sun_face_shape(); recalculated occassionally
 		auto sun_face_material = rigid_body::kWhiteMatte;
 		sun_face_material.gl_emission_color = GLColor (1.0, 1.0, 1.0);
-		auto enlargement = neutrino::renormalize (_sky_dome.sun_position.horizontal_coordinates.altitude, Range { 0_deg, 90_deg }, Range { kSunSunsetEnlargement, kSunNoonEnlargement });
+		auto enlargement = neutrino::renormalize (_sun_position.horizontal_coordinates.altitude, Range { 0_deg, 90_deg }, Range { kSunSunsetEnlargement, kSunNoonEnlargement });
 		auto sun_face = rigid_body::make_solid_circle (enlargement * kSunRadius, { 0_deg, 360_deg }, 19, sun_face_material);
 
 		// Disable Z-testing so that the sun gets rendered even if it's far behind the sky dome sphere:
@@ -559,7 +562,7 @@ RigidBodyPainter::paint_planet()
 			// Blend with the universe: final_color = (1 - transmittance) * atmosphere_color + universe_color
 			glBlendFunc (GL_SRC_ALPHA, GL_ONE);
 			glEnable (GL_BLEND);
-			_gl.draw (_sky_dome.atmospheric_dome_shape);
+			_gl.draw (_sky_dome_shape);
 			glDisable (GL_BLEND);
 			glEnable (GL_LIGHTING);
 			glEnable (GL_DEPTH_TEST);
@@ -974,15 +977,15 @@ RigidBodyPainter::sky_correction (SpaceVector<float, RGBSpace> rgb) const
 	auto constexpr reduce_green_to = 0.8;
 	auto constexpr reduce_green_to_sqrt = std::sqrt (reduce_green_to);
 
-	if (_sky_dome.sun_position.hour_angle > 0_deg && _sky_dome.sun_position.hour_angle < 180_deg)
+	if (_sun_position.hour_angle > 0_deg && _sun_position.hour_angle < 180_deg)
 	{
-		auto const abs_altitude = abs (_sky_dome.sun_position.horizontal_coordinates.altitude);
+		auto const abs_altitude = abs (_sun_position.horizontal_coordinates.altitude);
 
 		if (abs_altitude < altitude_threshold)
 		{
 			auto const from = Range { altitude_threshold, 0_deg };
 			auto const to = Range { 1.0, reduce_green_to_sqrt };
-			auto const factor = neutrino::renormalize (_sky_dome.sun_position.horizontal_coordinates.altitude, from, to);
+			auto const factor = neutrino::renormalize (_sun_position.horizontal_coordinates.altitude, from, to);
 			rgb[1] *= square (factor);
 		}
 	}
@@ -1127,24 +1130,24 @@ void
 RigidBodyPainter::check_sky_dome()
 {
 	// If the next calculated SkyDome is ready, use it:
-	if (_next_sky_dome.valid() && is_ready (_next_sky_dome))
-		_sky_dome = _next_sky_dome.get();
+	if (_next_sky_dome_shape.valid() && is_ready (_next_sky_dome_shape))
+		_sky_dome_shape = _next_sky_dome_shape.get();
 
-	if (!_next_sky_dome.valid() && std::exchange (_need_new_sky_dome, false))
-		_next_sky_dome = _work_performer->submit (&RigidBodyPainter::calculate_sky_dome, this);
+	if (!_next_sky_dome_shape.valid() && std::exchange (_need_new_sky_dome, false))
+		_next_sky_dome_shape = _work_performer->submit (&RigidBodyPainter::calculate_sky_dome_shape, this);
 }
 
 
-SkyDome
-RigidBodyPainter::calculate_sky_dome()
+rigid_body::Shape
+RigidBodyPainter::calculate_sky_dome_shape()
 {
 	_camera_position_for_sky_dome = _camera.position();
 
-	return xf::calculate_sky_dome ({
+	return xf::calculate_sky_dome_shape ({
 		.atmospheric_scattering = _atmospheric_scattering,
 		.observer_position = _camera_polar_position,
+		.sun_position = _sun_position,
 		.earth_radius = kEarthMeanRadius,
-		.unix_time = _time,
 		.earth_texture = _textures ? _textures->earth : nullptr,
 	}, &*_work_performer);
 	// TODO apply sky_correction to vertices' materials

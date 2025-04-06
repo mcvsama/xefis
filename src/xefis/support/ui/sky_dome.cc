@@ -76,32 +76,6 @@ calculate_angle_from_origin_viewpoint (si::Angle const view_angle, si::Length co
 
 
 [[nodiscard]]
-SkyDome::SunPosition
-calculate_sun_position (si::LonLat const observer_position, si::Time const time)
-{
-	// Reposition Sun according to time:
-	auto const days_since_J2000 = unix_time_to_days_since_J2000 (time);
-	auto const sun_ecliptic_position = calculate_sun_ecliptic_position (days_since_J2000);
-	auto const sun_equatorial_position = calculate_sun_equatorial_position (sun_ecliptic_position.longitude, days_since_J2000);
-	// Since equatorial coordinate system doesn't rotate with Earth, we need to take
-	// that rotation into account manually (calculate hour-angle and rotate the sun again):
-	auto const local_sidereal_time = unix_time_to_local_sidereal_time (time, observer_position.lon());
-	auto const hour_angle = calculate_hour_angle (local_sidereal_time, sun_equatorial_position.right_ascension);
-	auto const declination = sun_equatorial_position.declination;
-	auto const horizontal_coordinates = calculate_sun_horizontal_position (declination, observer_position.lat(), hour_angle);
-	// Azimuth 0° is North, Hour angle 0° is Noon, so add 180_deg. And the direction is opposite, so negate.
-	auto const cartesian_coordinates = to_cartesian<void> (si::LonLat (-horizontal_coordinates.azimuth + 180_deg, horizontal_coordinates.altitude));
-
-	return {
-		.hour_angle = hour_angle,
-		.declination = declination,
-		.horizontal_coordinates = horizontal_coordinates,
-		.cartesian_coordinates = cartesian_coordinates,
-	};
-}
-
-
-[[nodiscard]]
 SlicesStacks
 calculate_ground_slices_and_stacks (si::Angle const horizon_angle, si::Length const earth_radius, si::Length const observer_position_radius)
 {
@@ -261,6 +235,38 @@ calculate_dome_slices_and_stacks (HorizontalCoordinates const sun_position, si::
 }
 
 
+SunPosition
+calculate_sun_position (si::LonLat const observer_position, si::Time const time)
+{
+	// Reposition Sun according to time:
+	auto const days_since_J2000 = unix_time_to_days_since_J2000 (time);
+	auto const sun_ecliptic_position = calculate_sun_ecliptic_position (days_since_J2000);
+	auto const sun_equatorial_position = calculate_sun_equatorial_position (sun_ecliptic_position.longitude, days_since_J2000);
+	// Since equatorial coordinate system doesn't rotate with Earth, we need to take
+	// that rotation into account manually (calculate hour-angle and rotate the sun again):
+	auto const local_sidereal_time = unix_time_to_local_sidereal_time (time, observer_position.lon());
+	auto const hour_angle = calculate_hour_angle (local_sidereal_time, sun_equatorial_position.right_ascension);
+	auto const declination = sun_equatorial_position.declination;
+	auto const horizontal_coordinates = calculate_sun_horizontal_position (declination, observer_position.lat(), hour_angle);
+	// Azimuth 0° is North, Hour angle 0° is Noon, so add 180_deg. And the direction is opposite, so negate.
+	auto const cartesian_coordinates = to_cartesian<void> (si::LonLat (-horizontal_coordinates.azimuth + 180_deg, horizontal_coordinates.altitude));
+
+	return {
+		.hour_angle = hour_angle,
+		.declination = declination,
+		.horizontal_coordinates = horizontal_coordinates,
+		.cartesian_coordinates = cartesian_coordinates,
+	};
+}
+
+
+SpaceVector<float, RGBSpace>
+calculate_sun_light_color (si::LonLatRadius<> const observer_position, SpaceVector<double> const sun_position, AtmosphericScattering const& atmospheric_scattering)
+{
+	return atmospheric_scattering.calculate_incident_light ({ 0_m, 0_m, observer_position.radius() }, sun_position, sun_position);
+}
+
+
 rigid_body::Shape
 calculate_ground_shape (si::LonLatRadius<> const observer_position,
 						si::Length const earth_radius,
@@ -292,50 +298,44 @@ calculate_ground_shape (si::LonLatRadius<> const observer_position,
 }
 
 
-[[nodiscard]]
 rigid_body::Shape
-calculate_dome_shape (si::LonLatRadius<> const observer_position,
-					  SkyDome::SunPosition const sun_position,
-					  si::Length const earth_radius,
-					  float const ground_haze_alpha,
-					  AtmosphericScattering const& atmospheric_scattering,
-					  neutrino::WorkPerformer* const work_performer = nullptr)
+calculate_sky_dome_shape (SkyDomeParameters const& p, neutrino::WorkPerformer* const work_performer)
 {
-	auto horizon_angle = calculate_horizon_angle (earth_radius, observer_position.radius());
+	auto horizon_angle = calculate_horizon_angle (p.earth_radius, p.observer_position.radius());
 
 	// Still draw sky if horizon_angle is nan (assume it's 0° then):
 	if (!isfinite (horizon_angle))
 		horizon_angle = 0_deg;
 
-	auto const ss = calculate_dome_slices_and_stacks (sun_position.horizontal_coordinates, horizon_angle);
+	auto const ss = calculate_dome_slices_and_stacks (p.sun_position.horizontal_coordinates, horizon_angle);
 	auto dome = rigid_body::make_centered_irregular_sphere_shape ({
-		.radius = earth_radius, // TODO 10 mm around the camera
+		.radius = p.earth_radius, // TODO 10 mm around the camera
 		.slice_angles = ss.slice_angles,
 		.stack_angles = ss.stack_angles,
 		.material = rigid_body::kBlackMatte,
 		.setup_material = [&] (rigid_body::ShapeMaterial& material, si::LonLat const sphere_position, WaitGroup::WorkToken&& work_token) {
-			auto calculate = [=, &material, &atmospheric_scattering, &observer_position, &sun_position, work_token = std::move (work_token)] {
+			auto calculate = [=, &material, &p, work_token = std::move (work_token)] {
 				if (sphere_position.lat() >= horizon_angle)
 				{
 					// Sky:
 					auto const polar_ray_direction = si::LonLat (sphere_position.lon(), sphere_position.lat());
 					auto const ray_direction = to_cartesian<void> (polar_ray_direction);
-					auto const color = atmospheric_scattering.calculate_incident_light(
-						{ 0_m, 0_m, observer_position.radius() },
+					auto const color = p.atmospheric_scattering.calculate_incident_light(
+						{ 0_m, 0_m, p.observer_position.radius() },
 						ray_direction,
-						sun_position.cartesian_coordinates
+						p.sun_position.cartesian_coordinates
 					);
 					material.gl_emission_color = to_gl_color (color);
 				}
 				else
 				{
 					// Ground haze:
-					auto const cartesian_observer_position = SpaceLength (0_m, 0_m, observer_position.radius());
+					auto const cartesian_observer_position = SpaceLength (0_m, 0_m, p.observer_position.radius());
 					auto const polar_ray_direction = si::LonLat (sphere_position.lon(), sphere_position.lat());
 					auto const ray_direction = to_cartesian<void> (polar_ray_direction);
 					si::Length max_distance = std::numeric_limits<si::Length>::infinity();
 
-					if (auto const intersections = atmospheric_scattering.ray_sphere_intersections (cartesian_observer_position, ray_direction, earth_radius))
+					if (auto const intersections = p.atmospheric_scattering.ray_sphere_intersections (cartesian_observer_position, ray_direction, p.earth_radius))
 					{
 						// If the ray intersects the Earth's sphere (planetary body) and the intersection is ahead of the camera:
 						if (intersections->second > 0_m)
@@ -343,15 +343,15 @@ calculate_dome_shape (si::LonLatRadius<> const observer_position,
 							max_distance = std::max (0_m, intersections->first);
 					}
 
-					auto const color = atmospheric_scattering.calculate_incident_light(
+					auto const color = p.atmospheric_scattering.calculate_incident_light(
 						cartesian_observer_position,
 						ray_direction,
-						sun_position.cartesian_coordinates,
+						p.sun_position.cartesian_coordinates,
 						0_m,
 						max_distance
 					);
 					material.gl_emission_color = to_gl_color (color);
-					material.gl_emission_color[3] = ground_haze_alpha;
+					material.gl_emission_color[3] = p.ground_haze_alpha;
 				}
 			};
 
@@ -362,38 +362,6 @@ calculate_dome_shape (si::LonLatRadius<> const observer_position,
 		},
 	});
 	return dome;
-}
-
-
-[[nodiscard]]
-SpaceVector<float, RGBSpace>
-calculate_sun_light_color (si::LonLatRadius<> const observer_position, SpaceVector<double> const sun_position, AtmosphericScattering const& atmospheric_scattering)
-{
-	return atmospheric_scattering.calculate_incident_light ({ 0_m, 0_m, observer_position.radius() }, sun_position, sun_position);
-}
-
-
-SkyDome
-calculate_sky_dome (SkyDomeParameters const& p, neutrino::WorkPerformer* work_performer)
-{
-	auto const sun_position = calculate_sun_position (p.observer_position, p.unix_time);
-
-	return {
-		.atmospheric_dome_shape = calculate_dome_shape(
-			p.observer_position,
-			sun_position,
-			p.earth_radius,
-			p.ground_haze_alpha,
-			p.atmospheric_scattering,
-			work_performer
-		),
-		.sun_position = sun_position,
-		.sun_light_color = calculate_sun_light_color(
-			p.observer_position,
-			sun_position.cartesian_coordinates,
-			p.atmospheric_scattering
-		),
-	};
 }
 
 } // namespace xf

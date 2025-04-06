@@ -32,24 +32,12 @@
 
 namespace xf {
 
-/**
- * Shapes for sky and ground haze. Also sun stuff useful for some world drawing.
- */
-class SkyDome
+struct SunPosition
 {
-  public:
-	struct SunPosition
-	{
-		si::Angle				hour_angle;
-		si::Angle				declination;
-		HorizontalCoordinates	horizontal_coordinates;
-		SpaceVector<double>		cartesian_coordinates;
-	};
-
-  public:
-	rigid_body::Shape				atmospheric_dome_shape;
-	SunPosition						sun_position;
-	SpaceVector<float, RGBSpace>	sun_light_color;
+	si::Angle				hour_angle;
+	si::Angle				declination;
+	HorizontalCoordinates	horizontal_coordinates;
+	SpaceVector<double>		cartesian_coordinates;
 };
 
 
@@ -57,13 +45,20 @@ struct SkyDomeParameters
 {
 	AtmosphericScattering const&	atmospheric_scattering;
 	si::LonLatRadius<>				observer_position;
+	SunPosition						sun_position;
 	si::Length						earth_radius;
-	si::Time						unix_time;
-	float							ground_haze_alpha		{ 0.5f };
+	float							ground_haze_alpha { 0.5f };
 	std::shared_ptr<QOpenGLTexture>	earth_texture;
-	RotationQuaternion<WorldSpace>	earth_texture_rotation	{ math::identity };
 };
 
+
+[[nodiscard]]
+SunPosition
+calculate_sun_position (si::LonLat const observer_position, si::Time const time);
+
+[[nodiscard]]
+SpaceVector<float, RGBSpace>
+calculate_sun_light_color (si::LonLatRadius<> const observer_position, SpaceVector<double> const sun_position, AtmosphericScattering const&);
 
 [[nodiscard]]
 rigid_body::Shape
@@ -72,8 +67,8 @@ calculate_ground_shape (si::LonLatRadius<> const observer_position,
 						std::shared_ptr<QOpenGLTexture> earth_texture);
 
 [[nodiscard]]
-SkyDome
-calculate_sky_dome (SkyDomeParameters const& params, neutrino::WorkPerformer* work_performer = nullptr);
+rigid_body::Shape
+calculate_sky_dome_shape (SkyDomeParameters const& params, neutrino::WorkPerformer* work_performer = nullptr);
 
 } // namespace xf
 
