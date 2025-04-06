@@ -518,12 +518,10 @@ RigidBodyPainter::paint_planet()
 			// Same remark as for sky rendering about what's considered the front face here:
 			glFrontFace (GL_CW);
 
-			_gl.save_context ([&] {
-				make_z_towards_the_sun();
-				// Z is now direction towards the Sun:
-				_gl.translate (0_m, 0_m, kSunDistance);
-				_gl.draw (sun_face);
-			});
+			make_z_towards_the_sun();
+			// Z is now direction towards the Sun:
+			_gl.translate (0_m, 0_m, kSunDistance);
+			_gl.draw (sun_face);
 		});
 
 		// Ground:
