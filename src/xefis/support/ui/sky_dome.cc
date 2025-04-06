@@ -279,7 +279,7 @@ calculate_ground_shape (si::LonLatRadius<> const observer_position,
 			.material = rigid_body::kBlackMatte,
 			.texture = earth_texture,
 			.setup_material = [&] (rigid_body::ShapeMaterial& material, si::LonLat const sphere_position) {
-				auto const rotated = to_polar (rotation * to_cartesian (si::LonLatRadius (sphere_position, earth_radius)));
+				auto const rotated = to_polar (rotation * to_cartesian (si::LonLat (sphere_position)));
 				material.texture_position = {
 					neutrino::renormalize (rotated.lon(), Range { -180_deg, +180_deg }, Range { 0.0f, 1.0f }),
 					neutrino::renormalize (rotated.lat(), Range { -90_deg, +90_deg }, Range { 1.0f, 0.0f }),

@@ -363,17 +363,17 @@ template<math::CoordinateSystem TargetSpace = ECEFSpace>
 	}
 
 
-template<math::CoordinateSystem Space>
+template<class Length, math::CoordinateSystem Space>
 	[[nodiscard]]
-	constexpr si::LonLatRadius<>
-	to_polar (SpaceVector<si::Length, Space> const& vector)
+	constexpr si::LonLatRadius<Length>
+	to_polar (SpaceVector<Length, Space> const& vector)
 	{
-		std::complex<double> const xy (vector[0].value(), vector[1].value());
-		std::complex<double> const wz (std::abs (xy), vector[2].value());
+		std::complex<double> const xy (si::quantity (vector[0]), si::quantity (vector[1]));
+		std::complex<double> const wz (std::abs (xy), si::quantity (vector[2]));
 
 		return si::LonLatRadius {
 			si::LonLat (1_rad * std::arg (xy), 1_rad * std::arg (wz)),
-			si::Length (std::abs (wz))
+			Length (std::abs (wz))
 		};
 	}
 
