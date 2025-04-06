@@ -1,0 +1,10 @@
+Images obtained from NASA Earth Observatory.
+
+https://visibleearth.nasa.gov/images/74092/july-blue-marble-next-generation/74094l
+	world.200407.3x16000x8000.jpg
+		Photo by Reto Stöckli, NASA Earth Observatory
+
+https://visibleearth.nasa.gov/images/144898/earth-at-night-black-marble-2016-color-maps/144947l
+	BlackMarble_2016_3km.jpg
+		NASA Earth Observatory images by Joshua Stevens, using Suomi NPP VIIRS data from Miguel Román, NASA GSFC.
+
