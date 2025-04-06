@@ -487,6 +487,32 @@ RigidBodyPainter::paint_universe()
 			glDisable (GL_TEXTURE_2D);
 		});
 	}
+
+	// Sun:
+	_gl.save_context ([&] {
+		// TODO to func: get_sun_face_shape(); recalculated occassionally
+		auto sun_face_material = rigid_body::kWhiteMatte;
+		sun_face_material.gl_emission_color = GLColor (1.0, 1.0, 1.0);
+		auto enlargement = neutrino::renormalize (_sky_dome.sun_position.horizontal_coordinates.altitude, Range { 0_deg, 90_deg }, Range { kSunSunsetEnlargement, kSunNoonEnlargement });
+		auto sun_face = rigid_body::make_solid_circle (enlargement * kSunRadius, { 0_deg, 360_deg }, 19, sun_face_material);
+
+		// Disable Z-testing so that the sun gets rendered even if it's far behind the sky dome sphere:
+		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glDisable (GL_ALPHA_TEST);
+
+		// Enable blending, to blend well the Sun with the sky:
+		glDisable (GL_DEPTH_TEST);
+		glDisable (GL_LIGHTING);
+		glEnable (GL_BLEND);
+		// Same remark as for sky rendering about what's considered the front face here:
+		glFrontFace (GL_CW);
+
+		_gl.set_camera (_camera);
+		make_z_towards_the_sun();
+		// Z is now direction towards the Sun:
+		_gl.translate (0_m, 0_m, kSunDistance);
+		_gl.draw (sun_face);
+	});
 }
 
 
@@ -498,31 +524,6 @@ RigidBodyPainter::paint_planet()
 
 	_gl.save_context ([&] {
 		_gl.set_camera (_camera);
-
-		// Sun:
-		_gl.save_context ([&] {
-			// TODO to func: get_sun_face_shape(); recalculated occassionally
-			auto sun_face_material = rigid_body::kWhiteMatte;
-			sun_face_material.gl_emission_color = GLColor (1.0, 1.0, 1.0);
-			auto enlargement = neutrino::renormalize (_sky_dome.sun_position.horizontal_coordinates.altitude, Range { 0_deg, 90_deg }, Range { kSunSunsetEnlargement, kSunNoonEnlargement });
-			auto sun_face = rigid_body::make_solid_circle (enlargement * kSunRadius, { 0_deg, 360_deg }, 19, sun_face_material);
-
-			// Disable Z-testing so that the sun gets rendered even if it's far behind the sky dome sphere:
-			glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-			glDisable (GL_ALPHA_TEST);
-
-			// Enable blending, to blend well the Sun with the sky:
-			glDisable (GL_DEPTH_TEST);
-			glDisable (GL_LIGHTING);
-			glEnable (GL_BLEND);
-			// Same remark as for sky rendering about what's considered the front face here:
-			glFrontFace (GL_CW);
-
-			make_z_towards_the_sun();
-			// Z is now direction towards the Sun:
-			_gl.translate (0_m, 0_m, kSunDistance);
-			_gl.draw (sun_face);
-		});
 
 		// Ground:
 		// TODO it would be best if there was a shader that adds the dome sphere color to the drawn feature
