@@ -100,6 +100,28 @@ class RigidBodyPainter: protected QOpenGLFunctions
 		SpaceVector<double>		cartesian_coordinates;
 	};
 
+	struct TextureImages
+	{
+		QImage	earth;
+		QImage	universe_neg_x;
+		QImage	universe_neg_y;
+		QImage	universe_neg_z;
+		QImage	universe_pos_x;
+		QImage	universe_pos_y;
+		QImage	universe_pos_z;
+	};
+
+	struct Textures
+	{
+		std::shared_ptr<QOpenGLTexture>	earth;
+		std::shared_ptr<QOpenGLTexture>	universe_neg_x;
+		std::shared_ptr<QOpenGLTexture>	universe_neg_y;
+		std::shared_ptr<QOpenGLTexture>	universe_neg_z;
+		std::shared_ptr<QOpenGLTexture>	universe_pos_x;
+		std::shared_ptr<QOpenGLTexture>	universe_pos_y;
+		std::shared_ptr<QOpenGLTexture>	universe_pos_z;
+	};
+
   public:
 	enum CameraMode
 	{
@@ -493,6 +515,9 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	paint_basis (si::Length arrow_length);
 
 	void
+	paint_universe();
+
+	void
 	paint_planet();
 
 	void
@@ -579,11 +604,10 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	get_center_of_mass (rigid_body::Group const&);
 
 	/**
-	 * Check if loading of Earth texture is needed.
-	 * Loads it or starts loading on a thread if WorkPerformer was provided.
+	 * Check if loading of textures is needed.
 	 */
 	void
-	check_earth_texture();
+	check_textures();
 
 	/**
 	 * Check if calculation of new SkyDome was requested.
@@ -661,9 +685,8 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	si::Time					_sky_dome_update_time;
 	QColor						_sun_color_in_space			{ qcolor_from_temperature (kSunSurfaceTemperature) };
 	std::array<SkyLight, 5>		_sky_lights;
-	std::shared_ptr<QOpenGLTexture>
-								_earth_texture;
-	std::future<QImage>			_next_earth_texture_image;
+	std::future<TextureImages>	_texture_images;
+	std::optional<Textures>		_textures;
 };
 
 

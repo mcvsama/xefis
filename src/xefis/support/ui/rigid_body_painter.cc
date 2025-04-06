@@ -163,19 +163,6 @@ RigidBodyPainter::paint (rigid_body::System const& system, QOpenGLPaintDevice& c
 	_group_centers_of_mass_cache.clear();
 	initializeOpenGLFunctions();
 
-	// If loading of Earth texture wasn't started yet:
-	if (!_earth_texture && !_next_earth_texture_image.valid())
-	{
-		auto const load = [] {
-			return QImage ("share/images/textures/earth-day-with-clouds.jpg");
-		};
-
-		if (_work_performer)
-			_next_earth_texture_image = _work_performer->submit (load);
-		else
-			_next_earth_texture_image = std::async (std::launch::deferred, load);
-	}
-
 	auto const ph = PaintHelper (canvas);
 	auto painter = QPainter (&canvas);
 	ph.setup_painter (painter);
@@ -198,7 +185,7 @@ void
 RigidBodyPainter::precalculate()
 {
 	_followed_polar_position = to_polar (math::coordinate_system_cast<ECEFSpace, void> (followed_position() - planet_position()));
-	check_earth_texture();
+	check_textures();
 	check_sky_dome();
 }
 
@@ -233,8 +220,8 @@ RigidBodyPainter::setup_modelview()
 	glShadeModel (GL_SMOOTH);
 	glHint (GL_POLYGON_SMOOTH_HINT, GL_NICEST);
 	glHint (GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-	glEnable (GL_DEPTH_TEST);
 	glEnable (GL_CULL_FACE);
+	glEnable (GL_DEPTH_TEST);
 	glDepthFunc (GL_LEQUAL);
 	glDepthMask (GL_TRUE);
 	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -447,10 +434,42 @@ void
 RigidBodyPainter::paint_world (rigid_body::System const& system)
 {
 	_gl.save_context ([&] {
+		paint_universe();
 		paint_planet();
 		paint_air_particles();
 		paint (system);
 	});
+}
+
+
+void
+RigidBodyPainter::paint_universe()
+{
+	if (_textures)
+	{
+		_gl.save_context ([&] {
+			// The universe sky box is probably not rotated correctly, but it's not that important.
+			_gl.set_camera_rotation_only (_camera);
+			auto const sky_box = rigid_body::make_sky_box ({
+				.edge_length = 1000_m,
+				.texture_neg_x = _textures->universe_neg_x,
+				.texture_neg_y = _textures->universe_neg_y,
+				.texture_neg_z = _textures->universe_neg_z,
+				.texture_pos_x = _textures->universe_pos_x,
+				.texture_pos_y = _textures->universe_pos_y,
+				.texture_pos_z = _textures->universe_pos_z,
+			});
+			glFrontFace (GL_CCW);
+			glDisable (GL_BLEND);
+			glEnable (GL_DEPTH_TEST);
+			glDisable (GL_LIGHTING);
+			glEnable (GL_TEXTURE_2D);
+			glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+			_gl.draw (sky_box);
+			_gl.clear_z_buffer();
+			glDisable (GL_TEXTURE_2D);
+		});
+	}
 }
 
 
@@ -971,8 +990,7 @@ RigidBodyPainter::paint_ecef_basis (QOpenGLPaintDevice& canvas)
 
 		glMatrixMode (GL_MODELVIEW);
 		// ECEF basis should be always "on top":
-		glClearDepth (1.0f);
-		glClear (GL_DEPTH_BUFFER_BIT);
+		_gl.clear_z_buffer();
 		_gl.set_camera (std::nullopt);
 		// TODO Try to use set_camera instead of manually managing the matrix:
 		_gl.load_identity();
@@ -1058,15 +1076,53 @@ RigidBodyPainter::get_center_of_mass (rigid_body::Group const& group)
 
 
 void
-RigidBodyPainter::check_earth_texture()
+RigidBodyPainter::check_textures()
 {
-	if (_next_earth_texture_image.valid() && is_ready (_next_earth_texture_image))
+	// Load images if not yet loaded:
+	if (!_texture_images.valid() && !_textures)
 	{
-		_earth_texture = std::make_shared<QOpenGLTexture> (QOpenGLTexture::Target2D);
-		_earth_texture->setData (_next_earth_texture_image.get());
-		_earth_texture->setWrapMode (QOpenGLTexture::Repeat);
-		_earth_texture->setMinificationFilter (QOpenGLTexture::Linear);
-		_earth_texture->setMagnificationFilter (QOpenGLTexture::Linear);
+		// TODO if WorkPerformer is mandatory, this goes to the constructor:
+		auto const load = [] -> TextureImages {
+			return {
+				.earth			= QImage ("share/images/textures/earth/july-day.jpg"),
+				.universe_neg_x	= QImage ("share/images/textures/universe/nx.jpg"),
+				.universe_neg_y	= QImage ("share/images/textures/universe/ny.jpg"),
+				.universe_neg_z	= QImage ("share/images/textures/universe/nz.jpg"),
+				.universe_pos_x	= QImage ("share/images/textures/universe/px.jpg"),
+				.universe_pos_y	= QImage ("share/images/textures/universe/py.jpg"),
+				.universe_pos_z	= QImage ("share/images/textures/universe/pz.jpg"),
+			};
+		};
+
+		// TODO make _work_performer mandatory
+		if (_work_performer)
+			_texture_images = _work_performer->submit (load);
+		else
+			_texture_images = std::async (std::launch::deferred, load);
+	}
+
+	if (is_valid_and_ready (_texture_images))
+	{
+		auto images = _texture_images.get();
+		auto const make_texture = [](QImage&& image) {
+			auto texture = std::make_shared<QOpenGLTexture> (QOpenGLTexture::Target2D);
+			texture->setData (image);
+			texture->setWrapMode (QOpenGLTexture::Repeat);
+			texture->setMinificationFilter (QOpenGLTexture::Linear);
+			texture->setMagnificationFilter (QOpenGLTexture::Linear);
+			return texture;
+		};
+
+		_textures = Textures {
+			.earth = make_texture (std::move (images.earth)),
+			.universe_neg_x = make_texture (std::move (images.universe_neg_x)),
+			.universe_neg_y = make_texture (std::move (images.universe_neg_y)),
+			.universe_neg_z = make_texture (std::move (images.universe_neg_z)),
+			.universe_pos_x = make_texture (std::move (images.universe_pos_x)),
+			.universe_pos_y = make_texture (std::move (images.universe_pos_y)),
+			.universe_pos_z = make_texture (std::move (images.universe_pos_z)),
+		};
+
 		// Reload SkyDome to include the Earth texture:
 		_need_new_sky_dome = true;
 	}
@@ -1100,7 +1156,7 @@ RigidBodyPainter::calculate_sky_dome()
 		.observer_position = _camera_polar_position,
 		.earth_radius = kEarthMeanRadius,
 		.unix_time = _time,
-		.earth_texture = _earth_texture,
+		.earth_texture = _textures ? _textures->earth : nullptr,
 	}, _work_performer);
 	// TODO apply sky_correction to vertices' materials
 }
@@ -1162,7 +1218,8 @@ RigidBodyPainter::calculate_camera_transform()
 	if (abs (_camera_position_for_sky_dome - _camera.position()) > 10_m)
 		_need_new_sky_dome = true;
 
-	_ground_shape = calculate_ground_shape (_camera_polar_position, kEarthMeanRadius, _earth_texture);
+	if (_textures)
+		_ground_shape = calculate_ground_shape (_camera_polar_position, kEarthMeanRadius, _textures->earth);
 }
 
 
