@@ -473,8 +473,11 @@ RigidBodyPainter::paint_universe()
 	if (_textures)
 	{
 		_gl.save_context ([&] {
+			auto material = rigid_body::kWhiteMatte;
+			material.gl_texture_color = GLColor (1.0f, 1.0f, 1.0f, _camera_normalized_amsl_height);
 			auto const sky_box = rigid_body::make_sky_box ({
 				.edge_length = 1000_m,
+				.material = material,
 				.texture_neg_x = _textures->universe_neg_x,
 				.texture_neg_y = _textures->universe_neg_y,
 				.texture_neg_z = _textures->universe_neg_z,
@@ -483,12 +486,16 @@ RigidBodyPainter::paint_universe()
 				.texture_pos_z = _textures->universe_pos_z,
 			});
 
+			// Enable blending for alpha modulation:
+			glEnable (GL_BLEND);
+			glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			glDisable (GL_ALPHA_TEST);
+
 			glFrontFace (GL_CCW);
-			glDisable (GL_BLEND);
 			glEnable (GL_DEPTH_TEST);
 			glDisable (GL_LIGHTING);
 			glEnable (GL_TEXTURE_2D);
-			glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+			glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 			_gl.set_camera_rotation_only (_camera);
 			// Rotate the sky box with the sun (sky box is in celestial coordinates, so this
 			// is not quite right, but good enough for now): TODO fix it
@@ -496,6 +503,7 @@ RigidBodyPainter::paint_universe()
 			_gl.draw (sky_box);
 			_gl.clear_z_buffer();
 			glDisable (GL_TEXTURE_2D);
+			glDisable (GL_BLEND);
 		});
 	}
 

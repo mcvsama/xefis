@@ -52,6 +52,7 @@ enum RotationDirection
 struct SkyBoxParameters
 {
 	si::Length						edge_length;
+	ShapeMaterial const&			material { };
 	std::shared_ptr<QOpenGLTexture>	texture_neg_x;
 	std::shared_ptr<QOpenGLTexture>	texture_neg_y;
 	std::shared_ptr<QOpenGLTexture>	texture_neg_z;

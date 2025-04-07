@@ -103,8 +103,10 @@ Shape
 make_sky_box (SkyBoxParameters const& parameters)
 {
 	auto const d = 0.5 * parameters.edge_length;
-	auto const vertex = [](si::Length const x, si::Length const y, si::Length const z, int u, int v) {
-		return ShapeVertex ({ x, y, z }, ShapeMaterial { .texture_position = { 1.0 * u, 1.0 * v } });
+	auto const vertex = [&parameters] (si::Length const x, si::Length const y, si::Length const z, int u, int v) {
+		auto material = parameters.material;
+		material.texture_position = { 1.0 * u, 1.0 * v };
+		return ShapeVertex ({ x, y, z }, material);
 	};
 
 	Shape shape;
