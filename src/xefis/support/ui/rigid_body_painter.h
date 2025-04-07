@@ -57,7 +57,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	static constexpr si::Length	kDefaultConstraintDiameter	= 1.5_cm;
 	static constexpr si::Length	kDefaultHingeDiameter		= 3_cm;
 
-	static constexpr auto		kAtmosphereRadius			= kEarthMeanRadius + 60_km;
+	static constexpr auto		kAtmosphereRadius			= kEarthMeanRadius + 8.4_km;
 	static constexpr auto		kSunRadius					= 696'340_km;
 	static constexpr auto		kSunDistance				= 147'000'000_km;
 	static constexpr auto		kSunNoonMagnification		= 1.0f;
@@ -675,7 +675,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	std::minstd_rand0			_air_particles_prng;
 	std::map<rigid_body::Group const*, SpaceLength<WorldSpace>>
 								_group_centers_of_mass_cache;
-	AtmosphericScattering const	_atmospheric_scattering		{{ .earth_radius = kEarthMeanRadius, .atmosphere_radius = kEarthMeanRadius + 8.4_km, .enable_tonemapping = true }};
+	AtmosphericScattering const	_atmospheric_scattering		{{ .earth_radius = kEarthMeanRadius, .atmosphere_radius = kAtmosphereRadius, .enable_tonemapping = true }};
 	rigid_body::Shape			_sky_dome_shape;
 	std::future<rigid_body::Shape>
 								_next_sky_dome_shape;
