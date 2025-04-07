@@ -1141,7 +1141,7 @@ RigidBodyPainter::check_textures()
 			auto texture = std::make_shared<QOpenGLTexture> (QOpenGLTexture::Target2D);
 			texture->setData (image);
 			texture->setWrapMode (QOpenGLTexture::Repeat);
-			texture->setMinificationFilter (QOpenGLTexture::Linear);
+			texture->setMinificationFilter (QOpenGLTexture::LinearMipMapLinear);
 			texture->setMagnificationFilter (QOpenGLTexture::Linear);
 			return texture;
 		};
