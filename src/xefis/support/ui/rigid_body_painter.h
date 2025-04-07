@@ -586,7 +586,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 
 	[[nodiscard]]
 	SpaceLength<WorldSpace>
-	followed_position();
+	calculate_followed_position();
 
 	[[nodiscard]]
 	SpaceLength<WorldSpace>
@@ -649,7 +649,9 @@ class RigidBodyPainter: protected QOpenGLFunctions
 								_camera;
 	SpaceLength<WorldSpace>		_camera_position_for_sky_dome;
 	// Position of the followed body:
+	SpaceLength<WorldSpace>		_followed_position;
 	si::LonLatRadius<>			_followed_polar_position;
+
 	GLSpace						_gl							{ 1.0 / 1_m };
 	std::variant<std::monostate, rigid_body::Group const*, rigid_body::Body const*>
 								_followed;

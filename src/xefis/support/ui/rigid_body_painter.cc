@@ -201,7 +201,8 @@ RigidBodyPainter::paint (rigid_body::System const& system, QOpenGLPaintDevice& c
 void
 RigidBodyPainter::precalculate()
 {
-	_followed_polar_position = to_polar (math::coordinate_system_cast<ECEFSpace, void> (followed_position() - planet_position()));
+	_followed_position = calculate_followed_position();
+	_followed_polar_position = to_polar (math::coordinate_system_cast<ECEFSpace, void> (_followed_position - planet_position()));
 	check_textures();
 	check_sky_dome();
 	_sun_position = calculate_sun_position (_camera_polar_position, _time); // TODO maybe _followed_position?
@@ -579,8 +580,8 @@ RigidBodyPainter::paint_air_particles()
 		enable_only_lights (kAtmosphericSunLight | kSkyLight);
 		_gl.set_camera_rotation_only (_camera);
 		// Trick with rotating camera and then subtracting camera position from the object is to avoid problems with low precision OpenGL floats:
-		// followed_position() - _camera.position() uses doubles; but _gl.translate() internally reduces them to floats:
-		_gl.translate (followed_position() - _camera.position());
+		// _followed_position - _camera.position() uses doubles; but _gl.translate() internally reduces them to floats:
+		_gl.translate (_followed_position - _camera.position());
 
 		// Air 'particles' only appear if we have a planet:
 		auto const dust_size = 2_cm;
@@ -592,7 +593,7 @@ RigidBodyPainter::paint_air_particles()
 
 		// Figure out nearest 3D grid points.
 		// Then wiggle each one pseudo-randomly.
-		auto const body_pos = followed_position();
+		auto const body_pos = _followed_position;
 		auto const inv_grid_size = 1 / grid_size;
 		auto const rounded_to_grid = body_pos.transformed ([inv_grid_size, grid_size] (auto const value) {
 			return std::round (value * inv_grid_size) * grid_size;
@@ -1061,7 +1062,7 @@ RigidBodyPainter::paint_basis (si::Length const length)
 
 
 SpaceLength<WorldSpace>
-RigidBodyPainter::followed_position()
+RigidBodyPainter::calculate_followed_position()
 {
 	if (auto const* followed_body = this->followed_body())
 		return followed_body->placement().position();
@@ -1182,7 +1183,7 @@ RigidBodyPainter::calculate_camera_transform()
 			}
 
 			_camera.set_body_to_base_rotation (rotation);
-			_camera.set_position (followed_position() - planet_position() + ~rotation * _user_camera_translation);
+			_camera.set_position (_followed_position - planet_position() + ~rotation * _user_camera_translation);
 			_camera_polar_position = to_polar (_camera.position());
 		}
 		break;
@@ -1191,7 +1192,7 @@ RigidBodyPainter::calculate_camera_transform()
 		{
 			auto const rotation = _user_camera_rotation * gravity_down_rotation (_followed_polar_position) * kScreenToNullIslandRotation;
 			_camera.set_body_to_base_rotation (rotation);
-			_camera.set_position (followed_position() - planet_position() + ~rotation * _user_camera_translation);
+			_camera.set_position (_followed_position - planet_position() + ~rotation * _user_camera_translation);
 			_camera_polar_position = to_polar (_camera.position());
 		}
 		break;
