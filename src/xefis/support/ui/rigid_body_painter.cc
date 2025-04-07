@@ -549,7 +549,7 @@ RigidBodyPainter::paint_planet()
 
 		// Sky and ground dome around the observer:
 		_gl.save_context ([&] {
-            _gl.set_camera_rotation_only (_camera);
+			_gl.set_camera_rotation_only (_camera);
 			// Rotate so that down is -Z.
 			make_z_sky_top_x_south();
 			// Normally the outside of the sphere shape is rendered, inside is culled.
