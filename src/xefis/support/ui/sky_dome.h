@@ -34,10 +34,10 @@ namespace xf {
 
 struct SunPosition
 {
-	si::Angle				hour_angle;
-	si::Angle				declination;
-	HorizontalCoordinates	horizontal_coordinates;
-	SpaceVector<double>		cartesian_coordinates;
+	si::Angle						hour_angle;
+	si::Angle						declination;
+	HorizontalCoordinates			horizontal_coordinates;
+	SpaceVector<double>				horizontal_cartesian_coordinates;
 };
 
 

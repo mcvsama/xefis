@@ -349,7 +349,7 @@ RigidBodyPainter::setup_sky_light()
 			auto const color = _atmospheric_scattering.calculate_incident_light (
 				{ 0_m, 0_m, _followed_polar_position.radius() },
 				light_direction,
-				_sun_position.cartesian_coordinates
+				_sun_position.horizontal_cartesian_coordinates
 			);
 			auto const corrected_color = sky_correction (color);
 			auto const gl_color = to_gl_color (corrected_color);
@@ -504,8 +504,11 @@ RigidBodyPainter::paint_universe()
 		// TODO to func: get_sun_face_shape(); recalculated occassionally
 		auto sun_face_material = rigid_body::kWhiteMatte;
 		sun_face_material.gl_emission_color = GLColor (1.0, 1.0, 1.0);
-		auto enlargement = neutrino::renormalize (_sun_position.horizontal_coordinates.altitude, Range { 0_deg, 90_deg }, Range { kSunSunsetEnlargement, kSunNoonEnlargement });
-		auto sun_face = rigid_body::make_solid_circle (enlargement * kSunRadius, { 0_deg, 360_deg }, 19, sun_face_material);
+		auto const sun_altitude = _sun_position.horizontal_coordinates.altitude;
+		auto const magnification = neutrino::renormalize (sun_altitude, Range { 0_deg, 90_deg }, Range { kSunSunsetMagnification, kSunNoonMagnification });
+		// Correct for the fact that the magnification only happens inside atmosphere:
+		auto const corrected_magnification = 1 + (magnification - 1) * (1.0 - _camera_normalized_amsl_height);
+		auto sun_face = rigid_body::make_solid_circle (corrected_magnification * kSunRadius, { 0_deg, 360_deg }, 19, sun_face_material);
 
 		// Disable Z-testing so that the sun gets rendered even if it's far behind the sky dome sphere:
 		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
