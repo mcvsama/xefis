@@ -561,7 +561,7 @@ void
 RigidBodyPainter::paint_planet()
 {
 	if (!_planet_body)
-		return; // TODO at least draw then sun with shines
+		return;
 
 	_gl.save_context ([&] {
 		_gl.set_camera (_camera);
