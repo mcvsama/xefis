@@ -60,8 +60,8 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	static constexpr auto		kAtmosphereRadius			= kEarthMeanRadius + 60_km;
 	static constexpr auto		kSunRadius					= 696'340_km;
 	static constexpr auto		kSunDistance				= 147'000'000_km;
-	static constexpr auto		kSunNoonEnlargement			= 1.0;
-	static constexpr auto		kSunSunsetEnlargement		= 2.0;
+	static constexpr auto		kSunNoonMagnification		= 1.0f;
+	static constexpr auto		kSunSunsetMagnification		= 1.03f; // 3% magnification at sunset/sunrise
 
 	static constexpr uint32_t	kAtmosphericSunLight		= 0b0001;
 	static constexpr uint32_t	kCosmicSunLight				= 0b0010;
@@ -83,6 +83,8 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	//    the prime meridian and align Y with the correct eastward direction:
 	//        z_rotation (-90_deg)
 	static constexpr auto		kScreenToNullIslandRotation		= x_rotation<WorldSpace> (-90_deg) * z_rotation<WorldSpace> (-90_deg);
+	static inline const auto	kSunQColorInSpace				= qcolor_from_temperature (kSunSurfaceTemperature);
+	static inline const auto	kSunColorInSpace				= to_gl_color (kSunQColorInSpace);
 
 	struct SkyLight
 	{
@@ -681,7 +683,9 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	rigid_body::Shape			_ground_shape;
 	si::Time					_sky_dome_update_time;
 	SunPosition					_sun_position;
-	QColor						_sun_color_in_space			{ qcolor_from_temperature (kSunSurfaceTemperature) };
+	GLColor						_sun_color_on_followed;
+	float						_camera_normalized_amsl_height			{ 0.0f }; // Range: 0…1
+	float						_followed_body_normalized_amsl_height	{ 0.0f }; // Range: 0…1
 	std::array<SkyLight, 5>		_sky_lights;
 	std::future<TextureImages>	_texture_images;
 	std::optional<Textures>		_textures;
