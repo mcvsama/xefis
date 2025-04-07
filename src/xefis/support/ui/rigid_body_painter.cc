@@ -201,11 +201,19 @@ RigidBodyPainter::paint (rigid_body::System const& system, QOpenGLPaintDevice& c
 void
 RigidBodyPainter::precalculate()
 {
+	auto const followed_body_normalized_height = neutrino::renormalize (_followed_polar_position.radius(), Range { kEarthMeanRadius, kAtmosphereRadius }, Range { 0.0f, 1.0f });
+	_followed_body_normalized_amsl_height = std::clamp<float> (followed_body_normalized_height, 0.0f, 1.0f);
+
+	auto const camera_normalized_height = neutrino::renormalize (_camera_polar_position.radius(), Range { kEarthMeanRadius, kAtmosphereRadius }, Range { 0.0f, 1.0f });
+	_camera_normalized_amsl_height = std::clamp<float> (camera_normalized_height, 0.0f, 1.0f);
+
 	_followed_position = calculate_followed_position();
 	_followed_polar_position = to_polar (math::coordinate_system_cast<ECEFSpace, void> (_followed_position - planet_position()));
+
+	_sun_position = calculate_sun_position (_camera_polar_position, _time); // TODO maybe _followed_position?
+	_sun_color_on_followed = to_gl_color (calculate_sun_light_color (_camera_polar_position, _sun_position.horizontal_cartesian_coordinates, _atmospheric_scattering));
 	check_textures();
 	check_sky_dome();
-	_sun_position = calculate_sun_position (_camera_polar_position, _time); // TODO maybe _followed_position?
 }
 
 
@@ -265,19 +273,16 @@ void
 RigidBodyPainter::setup_sun_light()
 {
 	// Blend the original sun color with color as seen through the atmosphere:
-	auto const sun_light_color = calculate_sun_light_color (_camera_polar_position, _sun_position.cartesian_coordinates, _atmospheric_scattering);
-	auto const q_atmospheric_sun_color = QColor::fromRgbF (sun_light_color[0], sun_light_color[1], sun_light_color[2]);
-	auto const x = neutrino::renormalize (_followed_polar_position.radius(), Range { kEarthMeanRadius, kAtmosphereRadius }, Range { 0.0f, 1.0f });
-	auto const atmospheric_sun_color = to_gl_color (hsl_interpolation (x, q_atmospheric_sun_color, _sun_color_in_space));
-	auto const cosmic_sun_color = to_gl_color (_sun_color_in_space);
+	auto const qcolor = QColor::fromRgbF (_sun_color_on_followed[0], _sun_color_on_followed[1], _sun_color_on_followed[2]);
+	auto const atmospheric_sun_color = to_gl_color (hsl_interpolation (_followed_body_normalized_amsl_height, qcolor, kSunQColorInSpace));
 
 	glLightfv (kGLAtmosphericSunLight, GL_AMBIENT, atmospheric_sun_color.scaled (0.0f));
 	glLightfv (kGLAtmosphericSunLight, GL_DIFFUSE, atmospheric_sun_color.scaled (0.4f));
 	glLightfv (kGLAtmosphericSunLight, GL_SPECULAR, atmospheric_sun_color.scaled (0.1f));
 
-	glLightfv (kGLCosmicSunLight, GL_AMBIENT, cosmic_sun_color.scaled (0.0f));
-	glLightfv (kGLCosmicSunLight, GL_DIFFUSE, cosmic_sun_color.scaled (0.4f));
-	glLightfv (kGLCosmicSunLight, GL_SPECULAR, cosmic_sun_color.scaled (0.1f));
+	glLightfv (kGLCosmicSunLight, GL_AMBIENT, kSunColorInSpace.scaled (0.0f));
+	glLightfv (kGLCosmicSunLight, GL_DIFFUSE, kSunColorInSpace.scaled (0.4f));
+	glLightfv (kGLCosmicSunLight, GL_SPECULAR, kSunColorInSpace.scaled (0.1f));
 
 	_gl.save_context ([&] {
 		_gl.set_camera (_camera);
