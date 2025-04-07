@@ -578,6 +578,7 @@ RigidBodyPainter::paint_planet()
 			glDisable (GL_BLEND);
 			glEnable (GL_DEPTH_TEST);
 			glEnable (GL_TEXTURE_2D);
+			glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 			enable_only_lights (kCosmicSunLight);
 			_gl.draw (_ground_shape);
 			glDisable (GL_TEXTURE_2D);
