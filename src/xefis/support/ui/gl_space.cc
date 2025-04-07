@@ -114,6 +114,8 @@ void
 GLSpace::set_texture (rigid_body::ShapeMaterial const& material)
 {
 	glFogCoordf (material.gl_fog_distance);
+	glColor4fv (material.gl_texture_color);
+	glMaterialfv (GL_FRONT, GL_DIFFUSE, material.gl_texture_color);
 	glTexCoord2f (material.texture_position.x(), material.texture_position.y());
 }
 

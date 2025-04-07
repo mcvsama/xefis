@@ -39,6 +39,7 @@ struct ShapeMaterial
 	GLColor				gl_ambient_color	{ 1.0f, 1.0f, 1.0f, 1.0f };
 	GLColor				gl_diffuse_color	{ 1.0f, 1.0f, 1.0f, 1.0f };
 	GLColor				gl_specular_color	{ 1.0f, 1.0f, 1.0f, 1.0f };
+	GLColor				gl_texture_color	{ 1.0f, 1.0f, 1.0f, 1.0f };
 	float				gl_shininess		{ 0.0f };
 	float				gl_fog_distance		{ 0.0f };
 	PlaneVector<float>	texture_position	{ math::zero };
