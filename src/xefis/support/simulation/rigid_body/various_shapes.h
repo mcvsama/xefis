@@ -69,8 +69,8 @@ struct SphereShapeParameters
 	Range<si::Angle>				h_range			{ -180_deg, +180_deg };
 	Range<si::Angle>				v_range			{ -90_deg, +90_deg };
 	ShapeMaterial const&			material		{ };
-	std::shared_ptr<QOpenGLTexture>	texture			{ nullptr };
 	MakeSphereMaterialCallback		setup_material	{ std::monostate() };
+	std::shared_ptr<QOpenGLTexture>	texture			{ nullptr };
 };
 
 
@@ -82,8 +82,8 @@ struct IrregularSphereShapeParameters
 	// Must be sorted:
 	std::span<si::Angle const>		stack_angles;
 	ShapeMaterial const&			material		{ };
-	std::shared_ptr<QOpenGLTexture>	texture			{ nullptr };
 	MakeSphereMaterialCallback		setup_material	{ std::monostate() };
+	std::shared_ptr<QOpenGLTexture>	texture			{ nullptr };
 };
 
 
