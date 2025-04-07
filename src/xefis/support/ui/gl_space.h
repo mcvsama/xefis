@@ -420,10 +420,17 @@ GLSpace::begin (GLenum const mode, rigid_body::Shape::Geometry const& geometry)
 			add_vertex (vertex, geometry);
 
 		glEnd();
+
+		if (geometry.texture)
+			geometry.texture->release();
 	}
 	catch (...)
 	{
 		glEnd();
+
+		if (geometry.texture)
+			geometry.texture->release();
+
 		throw;
 	}
 }
