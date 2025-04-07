@@ -283,7 +283,6 @@ calculate_ground_shape (si::LonLatRadius<> const observer_position,
 			.slice_angles = ss.slice_angles,
 			.stack_angles = ss.stack_angles,
 			.material = rigid_body::kBlackMatte,
-			.texture = earth_texture,
 			.setup_material = [&] (rigid_body::ShapeMaterial& material, si::LonLat const sphere_position) {
 				auto const rotated = to_polar (rotation * to_cartesian (si::LonLat (sphere_position)));
 				material.texture_position = {
@@ -291,6 +290,7 @@ calculate_ground_shape (si::LonLatRadius<> const observer_position,
 					neutrino::renormalize (rotated.lat(), Range { -90_deg, +90_deg }, Range { 1.0f, 0.0f }),
 				};
 			},
+			.texture = earth_texture,
 		});
 	}
 	else
