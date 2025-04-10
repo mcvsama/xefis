@@ -60,6 +60,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	static constexpr auto		kAtmosphereRadius			= kEarthMeanRadius + 8.4_km;
 	static constexpr auto		kSunRadius					= 696'340_km;
 	static constexpr auto		kSunDistance				= 147'000'000_km;
+	static constexpr auto		kSunFaceAngularRadius		= 1_rad * std::atan (kSunRadius / kSunDistance);
 	static constexpr auto		kSunNoonMagnification		= 1.0f;
 	static constexpr auto		kSunSunsetMagnification		= 1.03f; // 3% magnification at sunset/sunrise
 
@@ -630,6 +631,10 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	gravity_down_rotation (si::LonLat const position)
 		{ return x_rotation<WorldSpace> (position.lat() - 90_deg) * y_rotation<WorldSpace> (-position.lon()); }
 
+	[[nodiscard]]
+	constexpr float
+	calculate_sun_visible_surface_factor (si::Angle const sun_altitude_above_horizon);
+
   private:
 	si::PixelDensity			_pixel_density;
 	neutrino::ValueOrPtr<neutrino::WorkPerformer, std::size_t, xf::Logger const&>
@@ -709,6 +714,16 @@ RigidBodyPainter::followed_body() const noexcept
 		return *body;
 	else
 		return nullptr;
+}
+
+
+constexpr float
+RigidBodyPainter::calculate_sun_visible_surface_factor (si::Angle const sun_altitude_above_horizon)
+{
+	auto const v = neutrino::renormalize (sun_altitude_above_horizon,
+										  Range { -kSunFaceAngularRadius, +kSunFaceAngularRadius },
+										  Range { 0.0f, 1.0f });
+	return std::clamp<float> (v, 0.0f, 1.0f);
 }
 
 } // namespace xf
