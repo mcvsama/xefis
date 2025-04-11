@@ -509,18 +509,17 @@ RigidBodyPainter::paint_universe()
 
 	// Sun:
 	_gl.save_context ([&] {
-		auto sun_face_material = rigid_body::kWhiteMatte;
-		sun_face_material.gl_emission_color = GLColor (1.0, 1.0, 1.0);
+		auto const horizon_angle = calculate_horizon_angle (kEarthMeanRadius, _camera_polar_position.radius());
 		auto const sun_altitude = _sun_position.horizontal_coordinates.altitude;
-		auto const magnification = neutrino::renormalize (sun_altitude, Range { 0_deg, 90_deg }, Range { kSunSunsetMagnification, kSunNoonMagnification });
+		auto const sun_altitude_above_horizon = sun_altitude - horizon_angle;
+		auto const magnification = neutrino::renormalize (sun_altitude_above_horizon, Range { 0_deg, 90_deg }, Range { kSunSunsetMagnification, kSunNoonMagnification });
 		// Correct for the fact that the magnification only happens inside atmosphere:
 		auto const corrected_magnification = 1 + (magnification - 1) * (1.0 - _camera_normalized_amsl_height);
+		auto sun_face_material = rigid_body::kWhiteMatte;
+		sun_face_material.gl_emission_color = GLColor (1.0, 1.0, 1.0);
 		auto sun_face = rigid_body::make_solid_circle (corrected_magnification * kSunRadius, { 0_deg, 360_deg }, 19, sun_face_material);
-		auto const horizon_angle = calculate_horizon_angle (kEarthMeanRadius, _camera_polar_position.radius());
-		auto const sun_altitude_above_horizon = sun_altitude - horizon_angle;
 		auto const sun_visibility = 1.0f - square (1.0f - calculate_sun_visible_surface_factor (sun_altitude_above_horizon));
 
-		// TODO definitely cache/store this somewhere and recalculate only as camera_position changes by > X_m
 		auto sun_shines = rigid_body::make_centered_sphere_shape ({
 			.radius = kSunDistance,
 			.n_slices = 9,
