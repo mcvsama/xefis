@@ -689,6 +689,8 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	std::map<rigid_body::Group const*, SpaceLength<WorldSpace>>
 								_group_centers_of_mass_cache;
 	AtmosphericScattering const	_atmospheric_scattering		{{ .earth_radius = kEarthMeanRadius, .atmosphere_radius = kAtmosphereRadius, .enable_tonemapping = true }};
+
+	// Sky and ground:
 	rigid_body::Shape			_sky_dome_shape;
 	std::future<rigid_body::Shape>
 								_next_sky_dome_shape;
@@ -696,13 +698,17 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	rigid_body::Shape			_ground_shape;
 	si::Time					_sky_dome_update_time;
 	si::Angle					_horizon_angle;
+
+	// Sun:
 	SunPosition					_sun_position;
 	HorizontalCoordinates		_corrected_sun_position_horizontal_coordinates;
 	SpaceVector<double>			_corrected_sun_position_cartesian_horizontal_coordinates;
 	float						_sun_magnification						{ 1.0f };
 	GLColor						_sun_color_on_followed;
+
 	float						_camera_normalized_amsl_height			{ 0.0f }; // Range: 0…1
 	float						_followed_body_normalized_amsl_height	{ 0.0f }; // Range: 0…1
+
 	std::array<SkyLight, 5>		_sky_lights;
 	std::future<TextureImages>	_texture_images;
 	std::optional<Textures>		_textures;
