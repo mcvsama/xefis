@@ -356,11 +356,12 @@ RigidBodyPainter::setup_sky_light()
 			auto const corrected_color = sky_correction (color);
 			auto const gl_color = to_gl_color (corrected_color);
 			auto const sky_height = kAtmosphereRadius - kEarthMeanRadius;
+			auto const black = GLColor (0.0f, 0.0f, 0.0f);
 
 			glEnable (number);
-			glLightfv (number, GL_AMBIENT, gl_color.scaled (0.0f));
+			glLightfv (number, GL_AMBIENT, black);
 			glLightfv (number, GL_DIFFUSE, gl_color.scaled (0.2f));
-			glLightfv (number, GL_SPECULAR, gl_color.scaled (0.0f));
+			glLightfv (number, GL_SPECULAR, black);
 			glLightfv (number, GL_POSITION, GLArray { _gl.to_opengl (sky_height), 0.0f, 0.0f, 0.0f });
 		});
 	}
