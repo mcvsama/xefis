@@ -62,7 +62,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	static constexpr auto		kSunDistance				= 147'000'000_km;
 	static constexpr auto		kSunFaceAngularRadius		= 1_rad * std::atan (kSunRadius / kSunDistance);
 	static constexpr auto		kSunNoonMagnification		= 1.0f;
-	static constexpr auto		kSunSunsetMagnification		= 1.03f; // 3% magnification at sunset/sunrise
+	static constexpr auto		kSunSunsetMagnification		= 1.5f; // In reality it's 3% magnification at sunset/sunrise, but looks better with 50%
 
 	static constexpr uint32_t	kAtmosphericSunLight		= 0b0001;
 	static constexpr uint32_t	kCosmicSunLight				= 0b0010;
