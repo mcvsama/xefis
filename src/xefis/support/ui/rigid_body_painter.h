@@ -635,6 +635,14 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	constexpr float
 	calculate_sun_visible_surface_factor (si::Angle const sun_altitude_above_horizon);
 
+	/**
+	 * When sun face starts to become obscured by the horizon, pretend that the center of the sun
+	 * is not where it was, but at the center of visible (unobscured) shape.
+	 */
+	[[nodiscard]]
+	HorizontalCoordinates
+	corrected_sun_position_near_horizon (HorizontalCoordinates) const;
+
   private:
 	si::PixelDensity			_pixel_density;
 	neutrino::ValueOrPtr<neutrino::WorkPerformer, std::size_t, xf::Logger const&>
@@ -687,7 +695,11 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	bool						_need_new_sky_dome			{ false };
 	rigid_body::Shape			_ground_shape;
 	si::Time					_sky_dome_update_time;
+	si::Angle					_horizon_angle;
 	SunPosition					_sun_position;
+	HorizontalCoordinates		_corrected_sun_position_horizontal_coordinates;
+	SpaceVector<double>			_corrected_sun_position_cartesian_horizontal_coordinates;
+	float						_sun_magnification						{ 1.0f };
 	GLColor						_sun_color_on_followed;
 	float						_camera_normalized_amsl_height			{ 0.0f }; // Range: 0…1
 	float						_followed_body_normalized_amsl_height	{ 0.0f }; // Range: 0…1

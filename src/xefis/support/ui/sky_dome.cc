@@ -238,13 +238,13 @@ calculate_sun_position (si::LonLat const observer_position, si::Time const time)
 	auto const declination = sun_equatorial_position.declination;
 	auto const horizontal_coordinates = calculate_sun_horizontal_position (declination, observer_position.lat(), hour_angle);
 	// Azimuth 0° is North, Hour angle 0° is Noon, so add 180_deg. And the direction is opposite, so negate.
-	auto const horizontal_cartesian_coordinates = to_cartesian<void> (si::LonLat (-horizontal_coordinates.azimuth + 180_deg, horizontal_coordinates.altitude));
+	auto const cartesian_horizontal_coordinates = calculate_cartesian_horizontal_coordinates (horizontal_coordinates);
 
 	return {
 		.hour_angle = hour_angle,
 		.declination = declination,
 		.horizontal_coordinates = horizontal_coordinates,
-		.horizontal_cartesian_coordinates = horizontal_cartesian_coordinates,
+		.cartesian_horizontal_coordinates = cartesian_horizontal_coordinates,
 	};
 }
 
@@ -296,7 +296,8 @@ calculate_sky_dome_shape (SkyDomeParameters const& p, neutrino::WorkPerformer* c
 	if (!isfinite (horizon_angle))
 		horizon_angle = 0_deg;
 
-	auto const ss = calculate_dome_slices_and_stacks (p.sun_position.horizontal_coordinates, horizon_angle);
+	auto const ss = calculate_dome_slices_and_stacks (p.sun_position, horizon_angle);
+	auto const cartesian_sun_position = calculate_cartesian_horizontal_coordinates (p.sun_position);
 	auto dome = rigid_body::make_centered_irregular_sphere_shape ({
 		.radius = p.earth_radius, // TODO 10 mm around the camera
 		.slice_angles = ss.slice_angles,
@@ -312,7 +313,7 @@ calculate_sky_dome_shape (SkyDomeParameters const& p, neutrino::WorkPerformer* c
 					auto const color = p.atmospheric_scattering.calculate_incident_light(
 						{ 0_m, 0_m, p.observer_position.radius() },
 						ray_direction,
-						p.sun_position.horizontal_cartesian_coordinates
+						cartesian_sun_position
 					);
 					material.gl_emission_color = to_gl_color (color);
 				}
@@ -335,7 +336,7 @@ calculate_sky_dome_shape (SkyDomeParameters const& p, neutrino::WorkPerformer* c
 					auto const color = p.atmospheric_scattering.calculate_incident_light(
 						cartesian_observer_position,
 						ray_direction,
-						p.sun_position.horizontal_cartesian_coordinates,
+						cartesian_sun_position,
 						0_m,
 						max_distance
 					);

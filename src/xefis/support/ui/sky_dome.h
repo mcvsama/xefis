@@ -37,7 +37,7 @@ struct SunPosition
 	si::Angle						hour_angle;
 	si::Angle						declination;
 	HorizontalCoordinates			horizontal_coordinates;
-	SpaceVector<double>				horizontal_cartesian_coordinates;
+	SpaceVector<double>				cartesian_horizontal_coordinates;
 };
 
 
@@ -45,7 +45,7 @@ struct SkyDomeParameters
 {
 	AtmosphericScattering const&	atmospheric_scattering;
 	si::LonLatRadius<>				observer_position;
-	SunPosition						sun_position;
+	HorizontalCoordinates			sun_position;
 	si::Length						earth_radius;
 	float							ground_haze_alpha { 0.5f };
 	std::shared_ptr<QOpenGLTexture>	earth_texture;
@@ -67,17 +67,28 @@ calculate_horizon_angle (si::Length const sphere_radius, si::Length const distan
 
 [[nodiscard]]
 SunPosition
-calculate_sun_position (si::LonLat const observer_position, si::Time const time);
+calculate_sun_position (si::LonLat const observer_position, si::Time const);
+
+
+[[nodiscard]]
+constexpr SpaceVector<double>
+calculate_cartesian_horizontal_coordinates (HorizontalCoordinates const& horizontal_coordinates)
+{
+	return to_cartesian<void> (si::LonLat (-horizontal_coordinates.azimuth + 180_deg, horizontal_coordinates.altitude));
+}
+
 
 [[nodiscard]]
 SpaceVector<float, RGBSpace>
 calculate_sun_light_color (si::LonLatRadius<> const observer_position, SpaceVector<double> const sun_position, AtmosphericScattering const&);
+
 
 [[nodiscard]]
 rigid_body::Shape
 calculate_ground_shape (si::LonLatRadius<> const observer_position,
 						si::Length const earth_radius,
 						std::shared_ptr<QOpenGLTexture> earth_texture);
+
 
 [[nodiscard]]
 rigid_body::Shape
