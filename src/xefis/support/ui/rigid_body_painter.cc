@@ -211,7 +211,9 @@ RigidBodyPainter::precalculate()
 	_followed_polar_position = to_polar (math::coordinate_system_cast<ECEFSpace, void> (_followed_position - planet_position()));
 
 	_sun_position = calculate_sun_position (_camera_polar_position, _time); // TODO maybe _followed_position?
-	_sun_color_on_followed = to_gl_color (calculate_sun_light_color (_camera_polar_position, _sun_position.horizontal_cartesian_coordinates, _atmospheric_scattering));
+	_corrected_sun_position_horizontal_coordinates = corrected_sun_position_near_horizon (_sun_position.horizontal_coordinates);
+	_corrected_sun_position_cartesian_horizontal_coordinates = calculate_cartesian_horizontal_coordinates (_corrected_sun_position_horizontal_coordinates);
+	_sun_color_on_followed = to_gl_color (calculate_sun_light_color (_camera_polar_position, _corrected_sun_position_cartesian_horizontal_coordinates, _atmospheric_scattering));
 	check_textures();
 	check_sky_dome();
 }
@@ -349,7 +351,7 @@ RigidBodyPainter::setup_sky_light()
 			auto const color = _atmospheric_scattering.calculate_incident_light (
 				{ 0_m, 0_m, _followed_polar_position.radius() },
 				light_direction,
-				_sun_position.horizontal_cartesian_coordinates
+				_sun_position.cartesian_horizontal_coordinates
 			);
 			auto const corrected_color = sky_correction (color);
 			auto const gl_color = to_gl_color (corrected_color);
@@ -509,15 +511,15 @@ RigidBodyPainter::paint_universe()
 
 	// Sun:
 	_gl.save_context ([&] {
-		auto const horizon_angle = calculate_horizon_angle (kEarthMeanRadius, _camera_polar_position.radius());
+		_horizon_angle = calculate_horizon_angle (kEarthMeanRadius, _camera_polar_position.radius());
 		auto const sun_altitude = _sun_position.horizontal_coordinates.altitude;
-		auto const sun_altitude_above_horizon = sun_altitude - horizon_angle;
-		auto const magnification = neutrino::renormalize (sun_altitude_above_horizon, Range { 0_deg, 90_deg }, Range { kSunSunsetMagnification, kSunNoonMagnification });
+		auto const sun_altitude_above_horizon = sun_altitude - _horizon_angle;
+		auto const magnification_at_0_amsl = neutrino::renormalize (sun_altitude_above_horizon, Range { 0_deg, 90_deg }, Range { kSunSunsetMagnification, kSunNoonMagnification });
 		// Correct for the fact that the magnification only happens inside atmosphere:
-		auto const corrected_magnification = 1 + (magnification - 1) * (1.0 - _camera_normalized_amsl_height);
+		_sun_magnification = 1 + (magnification_at_0_amsl - 1) * (1.0 - _camera_normalized_amsl_height);
 		auto sun_face_material = rigid_body::kWhiteMatte;
 		sun_face_material.gl_emission_color = GLColor (1.0, 1.0, 1.0);
-		auto sun_face = rigid_body::make_solid_circle (corrected_magnification * kSunRadius, { 0_deg, 360_deg }, 19, sun_face_material);
+		auto sun_face = rigid_body::make_solid_circle (_sun_magnification * kSunRadius, { 0_deg, 360_deg }, 19, sun_face_material);
 		auto const sun_visibility = 1.0f - square (1.0f - calculate_sun_visible_surface_factor (sun_altitude_above_horizon));
 
 		auto sun_shines = rigid_body::make_centered_sphere_shape ({
@@ -1184,7 +1186,7 @@ RigidBodyPainter::calculate_sky_dome_shape()
 	return xf::calculate_sky_dome_shape ({
 		.atmospheric_scattering = _atmospheric_scattering,
 		.observer_position = _camera_polar_position,
-		.sun_position = _sun_position,
+		.sun_position = _corrected_sun_position_horizontal_coordinates,
 		.earth_radius = kEarthMeanRadius,
 		.earth_texture = _textures ? _textures->earth : nullptr,
 	}, &*_work_performer);
@@ -1267,6 +1269,20 @@ RigidBodyPainter::hsl_interpolation (float x, QColor const& color0, QColor const
 	auto const a = static_cast<int> (hsv1.alpha() + x * (hsv2.alpha() - hsv1.alpha()));
 
 	return QColor::fromHsl (h, s, l, a);
+}
+
+
+HorizontalCoordinates
+RigidBodyPainter::corrected_sun_position_near_horizon (HorizontalCoordinates orig) const
+{
+	auto const R = _sun_magnification * kSunFaceAngularRadius;
+	auto alt = orig.altitude - _horizon_angle;
+
+	if (alt < R)
+		alt = 0.5 * (alt + R);
+
+	orig.altitude = alt + _horizon_angle;
+	return orig;
 }
 
 } // namespace xf
