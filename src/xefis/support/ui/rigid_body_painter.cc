@@ -573,16 +573,12 @@ RigidBodyPainter::paint_planet()
 		// Ground:
 		// TODO it would be best if there was a shader that adds the dome sphere color to the drawn feature
 		_gl.save_context ([&] {
-			_gl.translate (planet_position());
-			_gl.translate (-_camera.position());
-			make_z_sky_top_x_south();
-			_gl.translate (_camera.position());
-
 			glFrontFace (GL_CCW);
 			glDisable (GL_BLEND);
 			glEnable (GL_DEPTH_TEST);
 			glEnable (GL_TEXTURE_2D);
 			glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+			_gl.translate (planet_position());
 			enable_only_lights (kCosmicSunLight);
 			_gl.draw (_ground_shape);
 			glDisable (GL_TEXTURE_2D);
@@ -1145,9 +1141,10 @@ RigidBodyPainter::check_textures()
 		auto const make_texture = [](QImage&& image) {
 			auto texture = std::make_shared<QOpenGLTexture> (QOpenGLTexture::Target2D);
 			texture->setData (image);
-			texture->setWrapMode (QOpenGLTexture::Repeat);
+			texture->setWrapMode (QOpenGLTexture::DirectionS, QOpenGLTexture::Repeat);
+			texture->setWrapMode (QOpenGLTexture::DirectionT, QOpenGLTexture::MirroredRepeat);
 			texture->setMinificationFilter (QOpenGLTexture::LinearMipMapLinear);
-			texture->setMagnificationFilter (QOpenGLTexture::Linear);
+			texture->setMagnificationFilter (QOpenGLTexture::Nearest);
 			return texture;
 		};
 

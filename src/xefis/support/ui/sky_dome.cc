@@ -35,6 +35,11 @@ struct SlicesStacks
 };
 
 
+struct LonLatRanges
+{
+	Range<si::Angle>	longitude;
+	Range<si::Angle>	latitude;
+};
 
 
 /**
@@ -65,46 +70,64 @@ calculate_angle_from_origin_viewpoint (si::Angle const view_angle, si::Length co
 
 
 [[nodiscard]]
+LonLatRanges
+calculate_visible_lon_lat_ranges (si::Angle const horizon_angle, si::Length const earth_radius, si::LonLatRadius<> const observer_position)
+{
+	auto longitude_range = Range<si::Angle>();
+
+	auto const alpha = -horizon_angle;
+
+	auto const observer_position_in_ecef = to_cartesian (observer_position);
+	auto const pole_visible = abs (observer_position_in_ecef.z()) > earth_radius;
+
+	if (pole_visible)
+		longitude_range = Range<si::Angle> { -180_deg, +180_deg };
+	else
+	{
+		auto const x = (cos (alpha) - square (sin (observer_position.lat()))) / square (cos (observer_position.lat()));
+		auto const b = 1_rad * std::acos (std::clamp (x, -1.0, +1.0));
+		longitude_range = Range (observer_position.lon() - b, observer_position.lon() + b);
+	}
+
+	auto const latitude_range = Range (std::max<si::Angle> (-90_deg, observer_position.lat() - alpha), std::min<si::Angle> (90_deg, observer_position.lat() + alpha));
+
+	return {
+		.longitude = longitude_range,
+		.latitude = latitude_range,
+	};
+}
+
+
+[[nodiscard]]
 SlicesStacks
-calculate_ground_slices_and_stacks (si::Angle const horizon_angle, si::Length const earth_radius, si::Length const observer_position_radius)
+calculate_ground_slices_and_stacks (si::Angle const horizon_angle, si::Length const earth_radius, si::LonLatRadius<> const observer_position)
 {
 	SlicesStacks result;
+	// Determine required ranges of longitude and latitude:
+	auto const ranges = calculate_visible_lon_lat_ranges (horizon_angle, earth_radius, observer_position);
 
 	// Longitude:
 	{
 		auto const n_slices = 80u;
-		auto const delta = 360_deg / n_slices + 0.01_deg;
-		result.slice_angles.reserve (360_deg / delta + 1);
+		auto const delta = ranges.longitude.extent() / n_slices;
+		result.slice_angles.reserve (n_slices + 2);
 
-		for (auto longitude = -180_deg; longitude < 180_deg; longitude += delta)
+		for (auto longitude = ranges.longitude.min(); longitude <= ranges.longitude.max(); longitude += delta)
 			result.slice_angles.push_back (longitude);
-
-		// Complete the circle where we started:
-		result.slice_angles.push_back (180_deg);
 	}
 
 	// Latitude:
 	{
-		auto const stacks_const = 8u;
-		auto const visible_angle = 90_deg + horizon_angle;
-		auto view_angle = calculate_angle_from_offset_viewpoint (visible_angle, earth_radius, observer_position_radius);
-		auto const delta = (90_deg + view_angle) / stacks_const;
+		auto const n_stacks = 20u;
+		auto const delta = ranges.latitude.extent() / n_stacks;
+		result.stack_angles.reserve (n_stacks + 4);
 
-		result.stack_angles.reserve (4 * stacks_const);
+		result.stack_angles.push_back (-90_deg);
 
-		auto const dynamic_delta = [&view_angle, horizon_angle, delta]() {
-			auto const factor = neutrino::renormalize (view_angle, Range<si::Angle> { horizon_angle, -90_deg }, Range { 0.05f, 1.0f });
-			return factor * delta;
-		};
-
-		// Denser near horizon at the expense of density directly under the camera:
-		for (; view_angle > -90_deg; view_angle -= dynamic_delta())
-		{
-			auto const latitude = calculate_angle_from_origin_viewpoint (view_angle, earth_radius, observer_position_radius);
+		for (auto latitude = ranges.latitude.min(); latitude <= ranges.latitude.max(); latitude += delta)
 			result.stack_angles.push_back (latitude);
-		}
 
-		result.stack_angles.push_back (90_deg);
+		result.stack_angles.push_back (+90_deg);
 	}
 
 	return result;
@@ -264,8 +287,10 @@ calculate_ground_shape (si::LonLatRadius<> const observer_position,
 	if (auto const horizon_angle = calculate_horizon_angle (earth_radius, observer_position.radius());
 		isfinite (horizon_angle))
 	{
-		auto const ss = calculate_ground_slices_and_stacks (horizon_angle, earth_radius, observer_position.radius());
-		auto const rotation = z_rotation<ECEFSpace> (observer_position.lon()) * y_rotation<ECEFSpace> (-observer_position.lat() + 90_deg);
+		auto const ss = calculate_ground_slices_and_stacks (horizon_angle, earth_radius, observer_position);
+
+		if (ss.slice_angles.empty())
+			return {};
 
 		return rigid_body::make_centered_irregular_sphere_shape ({
 			.radius = earth_radius,
@@ -273,10 +298,9 @@ calculate_ground_shape (si::LonLatRadius<> const observer_position,
 			.stack_angles = ss.stack_angles,
 			.material = rigid_body::kBlackMatte,
 			.setup_material = [&] (rigid_body::ShapeMaterial& material, si::LonLat const sphere_position) {
-				auto const rotated = to_polar (rotation * to_cartesian (si::LonLat (sphere_position)));
 				material.texture_position = {
-					neutrino::renormalize (rotated.lon(), Range { -180_deg, +180_deg }, Range { 0.0f, 1.0f }),
-					neutrino::renormalize (rotated.lat(), Range { -90_deg, +90_deg }, Range { 1.0f, 0.0f }),
+					neutrino::renormalize (sphere_position.lon(), Range { -180_deg, +180_deg }, Range { 0.0f, 1.0f }),
+					neutrino::renormalize (sphere_position.lat(), Range { -90_deg, +90_deg }, Range { 1.0f, 0.0f }),
 				};
 			},
 			.texture = earth_texture,
@@ -298,7 +322,7 @@ calculate_sky_dome_shape (SkyDomeParameters const& p, neutrino::WorkPerformer* c
 
 	auto const ss = calculate_dome_slices_and_stacks (p.sun_position, horizon_angle);
 	auto const cartesian_sun_position = calculate_cartesian_horizontal_coordinates (p.sun_position);
-	auto dome = rigid_body::make_centered_irregular_sphere_shape ({
+	return rigid_body::make_centered_irregular_sphere_shape ({
 		.radius = p.earth_radius, // TODO 10 mm around the camera
 		.slice_angles = ss.slice_angles,
 		.stack_angles = ss.stack_angles,
@@ -351,7 +375,6 @@ calculate_sky_dome_shape (SkyDomeParameters const& p, neutrino::WorkPerformer* c
 				calculate();
 		},
 	});
-	return dome;
 }
 
 } // namespace xf
