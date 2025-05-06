@@ -353,6 +353,19 @@ is_visible_from (si::LonLatRadius<> const observer_position, si::LonLatRadius<> 
 }
 
 
+/**
+ * Calculate angle at which the horizon is seen at given distance from sphere of a given radius.
+ * At infinite distance the result is -90°. At zero distance from sphere's tangent, it's 0°.
+ * `distance_from_center` must be >= `sphere_radius` or you'll get NaNs.
+ */
+[[nodiscard]]
+constexpr si::Angle
+calculate_horizon_angle (si::Length const sphere_radius, si::Length const distance_from_center)
+{
+	return -1_rad * acos (sphere_radius / distance_from_center);
+}
+
+
 /*
  * Polar-cartesian conversions
  */
