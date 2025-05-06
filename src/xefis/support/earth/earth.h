@@ -136,6 +136,14 @@ unix_time_to_local_sidereal_time (si::Time const unix_time, si::Angle const obse
 	return unix_time_to_greenwich_mean_sidereal_time_at_0h_ut (unix_time) + observer_longitude;
 }
 
+
+/**
+ * Build quaternion for ECEF→Celestial rotation.
+ */
+[[nodiscard]]
+RotationQuaternion<WorldSpace>
+calculate_ecef_to_celestial_rotation (double const julian_date);
+
 } // namespace xf
 
 #endif

@@ -16,6 +16,8 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/support/math/rotations.h>
+#include <xefis/support/universe/sun_position.h>
 
 // Neutrino:
 #include <neutrino/numeric.h>
@@ -141,6 +143,20 @@ mean (si::Angle const lhs, si::Angle const rhs)
 	si::Angle::Value y = 0.5 * sin (lhs) + sin (rhs);
 
 	return 1_rad * atan2 (y, x);
+}
+
+
+RotationQuaternion<WorldSpace>
+calculate_ecef_to_celestial_rotation (double const julian_date)
+{
+	auto const theta = calculate_greenwich_mean_sidereal_time_at_0h_ut (julian_date);
+	auto const half  = 0.5 * theta;
+	return {
+		cos (half),	// w
+		0.0,		// x
+		0.0,		// y
+		sin (half),	// z
+	};
 }
 
 } // namespace xf
