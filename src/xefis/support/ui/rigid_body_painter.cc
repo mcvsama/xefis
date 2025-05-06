@@ -18,6 +18,7 @@
 #include <xefis/config/all.h>
 #include <xefis/support/color/spaces.h>
 #include <xefis/support/earth/air/atmospheric_scattering.h>
+#include <xefis/support/earth/earth.h>
 #include <xefis/support/math/rotations.h>
 #include <xefis/support/nature/constants.h>
 #include <xefis/support/simulation/constraints/fixed_constraint.h>
@@ -28,6 +29,7 @@
 #include <xefis/support/simulation/rigid_body/various_shapes.h>
 #include <xefis/support/ui/gl_space.h>
 #include <xefis/support/ui/paint_helper.h>
+#include <xefis/support/universe/julian_calendar.h>
 
 // Neutrino:
 #include <neutrino/stdexcept.h>
@@ -114,6 +116,10 @@ RigidBodyPainter::set_time (si::Time const time)
 	{
 		_need_new_sky_dome = true;
 		_sky_dome_update_time = time;
+
+		// Universe sky box rotation:
+		auto const julian_date = unix_time_to_julian_date (time);
+		_ecef_to_celestial_rotation = calculate_ecef_to_celestial_rotation (julian_date);
 	}
 
 	_time = time;
@@ -500,9 +506,7 @@ RigidBodyPainter::paint_universe()
 			glEnable (GL_TEXTURE_2D);
 			glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 			_gl.set_camera_rotation_only (_camera);
-			// Rotate the sky box with the sun (sky box is in celestial coordinates, so this
-			// is not quite right, but good enough for now): TODO fix it
-			make_z_towards_the_sun();
+			_gl.rotate (kScreenToNullIslandRotation * _ecef_to_celestial_rotation);
 			_gl.draw (sky_box);
 			_gl.clear_z_buffer();
 			glDisable (GL_TEXTURE_2D);

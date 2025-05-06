@@ -698,6 +698,9 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	rigid_body::Shape			_ground_shape;
 	si::Time					_sky_dome_update_time;
 	si::Angle					_horizon_angle;
+	// Recalculated from time to time:
+	RotationQuaternion<WorldSpace>
+								_ecef_to_celestial_rotation;
 
 	// Sun:
 	SunPosition					_sun_position;
