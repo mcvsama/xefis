@@ -335,6 +335,24 @@ is_point_2d_inside_triangle_tester (TriangleConcept auto const& triangle)
 }
 
 
+/**
+ * Return true if point `point` on Earth is visible from point `from_where`.
+ */
+[[nodiscard]]
+inline bool
+is_visible_from (si::LonLatRadius<> const observer_position, si::LonLatRadius<> const point_on_sphere)
+{
+	auto const& o = observer_position;
+	auto const& p = point_on_sphere;
+	// Horizon cosine:
+	auto const cos_horizon = p.radius() / o.radius();
+	// Central‐angle cosine via spherical law of cosines:
+	auto const cos_theta = sin (o.lat()) * sin (p.lat()) + cos (o.lat()) * cos (p.lat()) * cos (p.lon() - o.lon());
+	// Visible if cos_theta >= cos_horizon:
+	return cos_theta >= cos_horizon;
+}
+
+
 /*
  * Polar-cartesian conversions
  */
