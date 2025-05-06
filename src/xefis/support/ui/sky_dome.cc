@@ -46,7 +46,7 @@ struct LonLatRanges
 
 /**
  * Calculate an angle at which a point on a circle is visible when viewed not from a center of the circle, but from some distance from its center.
- * FIXME This works only for distance_from_center <= radius
+ * This works only for distance_from_center <= radius
  */
 [[nodiscard]]
 constexpr si::Angle
