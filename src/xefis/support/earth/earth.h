@@ -18,6 +18,7 @@
 #include <xefis/config/all.h>
 #include <xefis/support/math/geometry.h>
 #include <xefis/support/nature/constants.h>
+#include <xefis/support/universe/julian_calendar.h>
 
 // Standard:
 #include <cstddef>
@@ -40,8 +41,11 @@ haversine (si::LonLat const& a, si::LonLat const& b);
  * Result is in nautical miles.
  */
 [[nodiscard]]
-si::Length
-haversine_earth (si::LonLat const& a, si::LonLat const& b);
+inline si::Length
+haversine_earth (si::LonLat const& a, si::LonLat const& b)
+{
+	return haversine (a, b) * kEarthMeanRadius;
+}
 
 
 /**
@@ -87,16 +91,49 @@ si::Angle
 mean (si::Angle a, si::Angle b);
 
 
-/*
- * Implementation
+/**
+ * Calculate Greenwich Mean Sidereal Time (GMST) at 0h UT.
  */
-
-
 [[nodiscard]]
-inline si::Length
-haversine_earth (si::LonLat const& a, si::LonLat const& b)
+constexpr si::Angle
+calculate_greenwich_mean_sidereal_time_at_0h_ut (double const julian_date)
 {
-	return haversine (a, b) * kEarthMeanRadius;
+	auto const midnight = std::floor (julian_date) + 0.5;
+	auto const days_since_midnight = julian_date - midnight;
+	auto const hours_since_midnight = 24.0 * days_since_midnight;
+	auto const days_since_epoch = julian_date - kJ2000Epoch;
+	auto const centuries_since_epoch = days_since_epoch / 36525.0;
+	auto const whole_days_since_epoch = midnight - kJ2000Epoch;
+	// See <https://aa.usno.navy.mil/faq/GAST>.
+	auto const gmst_hours = 6.697374558
+		+ 0.065707485828 * whole_days_since_epoch
+		+ 1.00273790935 * hours_since_midnight
+		+ 0.0854103 * centuries_since_epoch
+		+ 0.0000258 * neutrino::square (centuries_since_epoch);
+	return 15_deg * floored_mod (gmst_hours, 24.0);
+}
+
+
+/**
+ * Calculate Greenwich Mean Sidereal Time (GMST) at 0h UT.
+ */
+[[nodiscard]]
+constexpr si::Angle
+unix_time_to_greenwich_mean_sidereal_time_at_0h_ut (si::Time const unix_time)
+{
+	auto const jd = unix_time_to_julian_date (unix_time);
+	return calculate_greenwich_mean_sidereal_time_at_0h_ut (jd);
+}
+
+
+/**
+ * Calculate Greenwich Mean Sidereal Time (GMST).
+ */
+[[nodiscard]]
+constexpr si::Angle
+unix_time_to_local_sidereal_time (si::Time const unix_time, si::Angle const observer_longitude)
+{
+	return unix_time_to_greenwich_mean_sidereal_time_at_0h_ut (unix_time) + observer_longitude;
 }
 
 } // namespace xf

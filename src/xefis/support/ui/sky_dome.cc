@@ -18,6 +18,8 @@
 #include <xefis/config/all.h>
 #include <xefis/support/simulation/rigid_body/various_shapes.h>
 #include <xefis/support/ui/gl_color.h>
+#include <xefis/support/universe/julian_calendar.h>
+#include <xefis/support/earth/earth.h>
 
 // Standard:
 #include <cstddef>
