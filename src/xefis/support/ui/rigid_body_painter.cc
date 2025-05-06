@@ -112,7 +112,7 @@ RigidBodyPainter::RigidBodyPainter (si::PixelDensity const pixel_density, WorkPe
 void
 RigidBodyPainter::set_time (si::Time const time)
 {
-	if (abs (time - _sky_dome_update_time) > 1_s)
+	if (abs (time - _sky_dome_update_time) > 5_s)
 	{
 		_need_new_sky_dome = true;
 		_sky_dome_update_time = time;
