@@ -74,6 +74,11 @@ class GLColor
 	constexpr GLColor
 	darker (float factor) const;
 
+	[[nodiscard]]
+	constexpr float
+	norm() const
+		{ return std::sqrt (square (_color_array[0]) + square (_color_array[1]) + square (_color_array[2])); }
+
 	/**
 	 * Factor is in range [0, 1].
 	 */
