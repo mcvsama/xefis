@@ -27,6 +27,10 @@
 
 namespace xf {
 
+/**
+ * A color class that can be passed to GL functions (by using operator float const*()).
+ * Internally stores RGBA values in range 0…1.
+ */
 class GLColor
 {
   public:
