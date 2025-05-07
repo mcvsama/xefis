@@ -57,7 +57,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	static constexpr si::Length	kDefaultConstraintDiameter	= 1.5_cm;
 	static constexpr si::Length	kDefaultHingeDiameter		= 3_cm;
 
-	static constexpr auto		kAtmosphereRadius			= kEarthMeanRadius + 8.4_km;
+	static constexpr auto		kAtmosphereRadius			= kEarthMeanRadius + 50_km;
 	static constexpr auto		kSunRadius					= 696'340_km;
 	static constexpr auto		kSunDistance				= 147'000'000_km;
 	static constexpr auto		kSunFaceAngularRadius		= 1_rad * std::atan (kSunRadius / kSunDistance);
