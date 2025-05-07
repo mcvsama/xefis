@@ -211,8 +211,8 @@ RigidBodyPainter::precalculate()
 	auto const followed_body_normalized_height = neutrino::renormalize (_followed_polar_position.radius(), Range { kEarthMeanRadius, kAtmosphereRadius }, Range { 0.0f, 1.0f });
 	_followed_body_normalized_amsl_height = std::clamp<float> (followed_body_normalized_height, 0.0f, 1.0f);
 
-	auto const camera_normalized_height = neutrino::renormalize (_camera_polar_position.radius(), Range { kEarthMeanRadius, kAtmosphereRadius }, Range { 0.0f, 1.0f });
-	_camera_normalized_amsl_height = std::clamp<float> (camera_normalized_height, 0.0f, 1.0f);
+	_camera_normalized_amsl_height = neutrino::renormalize (_camera_polar_position.radius(), Range { kEarthMeanRadius, kAtmosphereRadius }, Range { 0.0f, 1.0f });
+	_camera_clamped_normalized_amsl_height = std::clamp<float> (_camera_normalized_amsl_height, 0.0f, 1.0f);
 
 	_followed_position = calculate_followed_position();
 	_followed_polar_position = to_polar (math::coordinate_system_cast<ECEFSpace, void> (_followed_position - planet_position()));
@@ -480,11 +480,19 @@ RigidBodyPainter::paint_world (rigid_body::System const& system)
 void
 RigidBodyPainter::paint_universe()
 {
+	_horizon_angle = calculate_horizon_angle (kEarthMeanRadius, _camera_polar_position.radius());
+	auto const sun_altitude = _sun_position.horizontal_coordinates.altitude;
+	auto const sun_altitude_above_horizon = sun_altitude - _horizon_angle;
+
 	if (_textures)
 	{
 		_gl.save_context ([&] {
 			auto material = rigid_body::kWhiteMatte;
-			material.gl_texture_color = GLColor (1.0f, 1.0f, 1.0f, _camera_normalized_amsl_height);
+			// Make the universe sky box visible when high above the surface, but also at night:
+			auto const night_time_visibility = neutrino::renormalize (sun_altitude_above_horizon, Range { -3_deg, -8_deg }, Range { 0.0f, 0.5f });
+			auto const altitude_visibility = neutrino::renormalize (_camera_normalized_amsl_height, Range { 0.8f, 1.5f }, Range { 0.0f, 1.0f });
+			auto const universe_visibility = std::max (altitude_visibility, night_time_visibility);
+			material.gl_texture_color = GLColor (1.0f, 1.0f, 1.0f, universe_visibility);
 			auto const sky_box = rigid_body::make_sky_box ({
 				.edge_length = 1000_m,
 				.material = material,
@@ -517,12 +525,9 @@ RigidBodyPainter::paint_universe()
 
 	// Sun:
 	_gl.save_context ([&] {
-		_horizon_angle = calculate_horizon_angle (kEarthMeanRadius, _camera_polar_position.radius());
-		auto const sun_altitude = _sun_position.horizontal_coordinates.altitude;
-		auto const sun_altitude_above_horizon = sun_altitude - _horizon_angle;
 		auto const magnification_at_0_amsl = neutrino::renormalize (sun_altitude_above_horizon, Range { 0_deg, 90_deg }, Range { kSunSunsetMagnification, kSunNoonMagnification });
 		// Correct for the fact that the magnification only happens inside atmosphere:
-		_sun_magnification = 1 + (magnification_at_0_amsl - 1) * (1.0 - _camera_normalized_amsl_height);
+		_sun_magnification = 1 + (magnification_at_0_amsl - 1) * (1.0 - _camera_clamped_normalized_amsl_height);
 		auto sun_face_material = rigid_body::kWhiteMatte;
 		sun_face_material.gl_emission_color = GLColor (1.0, 1.0, 1.0);
 		auto sun_face = rigid_body::make_solid_circle (_sun_magnification * kSunRadius, { 0_deg, 360_deg }, 19, sun_face_material);
@@ -538,7 +543,7 @@ RigidBodyPainter::paint_universe()
 				float const actual_radius = 0.02f;
 				float const norm = renormalize<si::Angle> (position.lat(), Range { 0_deg, 90_deg }, Range { 0.0f, 1.0f });
 				float const alpha = std::clamp<float> (sun_visibility * std::pow (norm + actual_radius, 6.0f), 0.0f, 1.0f);
-				material.gl_emission_color = { 1.0f, 1.0f, 1.0f, alpha * _camera_normalized_amsl_height };
+				material.gl_emission_color = { 1.0f, 1.0f, 1.0f, alpha * _camera_clamped_normalized_amsl_height };
 			},
 		});
 		rigid_body::negate_normals (sun_shines);

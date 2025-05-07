@@ -705,7 +705,8 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	float						_sun_magnification						{ 1.0f };
 	GLColor						_sun_color_on_followed;
 
-	float						_camera_normalized_amsl_height			{ 0.0f }; // Range: 0…1
+	float						_camera_normalized_amsl_height			{ 0.0f };
+	float						_camera_clamped_normalized_amsl_height	{ 0.0f }; // Range: 0…1
 	float						_followed_body_normalized_amsl_height	{ 0.0f }; // Range: 0…1
 
 	std::array<SkyLight, 5>		_sky_lights;
