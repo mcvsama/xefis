@@ -16,6 +16,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/support/color/hsl.h>
 #include <xefis/support/color/spaces.h>
 #include <xefis/support/earth/air/atmospheric_scattering.h>
 #include <xefis/support/earth/earth.h>
@@ -1254,23 +1255,6 @@ RigidBodyPainter::calculate_camera_transform()
 
 	if (_textures)
 		_ground_shape = calculate_ground_shape (_camera_polar_position, kEarthMeanRadius, _textures->earth);
-}
-
-
-QColor
-RigidBodyPainter::hsl_interpolation (float x, QColor const& color0, QColor const& color1)
-{
-	x = std::clamp (x, 0.0f, 1.0f);
-
-	auto const hsv1 = color0.toHsl();
-	auto const hsv2 = color1.toHsl();
-
-	auto const h = static_cast<int> (hsv1.hue() + x * (hsv2.hue() - hsv1.hue()));
-	auto const s = static_cast<int> (hsv1.saturation() + x * (hsv2.saturation() - hsv1.saturation()));
-	auto const l = static_cast<int> (hsv1.lightness() + x * (hsv2.lightness() - hsv1.lightness()));
-	auto const a = static_cast<int> (hsv1.alpha() + x * (hsv2.alpha() - hsv1.alpha()));
-
-	return QColor::fromHsl (h, s, l, a);
 }
 
 

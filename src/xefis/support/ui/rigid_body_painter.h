@@ -623,10 +623,6 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	calculate_camera_transform();
 
 	[[nodiscard]]
-	static QColor
-	hsl_interpolation (float x, QColor const& color0, QColor const& color1);
-
-	[[nodiscard]]
 	RotationQuaternion<WorldSpace>
 	gravity_down_rotation (si::LonLat const position)
 		{ return x_rotation<WorldSpace> (position.lat() - 90_deg) * y_rotation<WorldSpace> (-position.lon()); }
