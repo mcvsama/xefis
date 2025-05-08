@@ -143,7 +143,12 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	};
 
   public:
-	// Ctor
+	/**
+	 * Ctor
+	 *
+	 * \param	WorkPerformer
+	 *			If provided, must have at least 2 threads.
+	 */
 	explicit
 	RigidBodyPainter (si::PixelDensity, WorkPerformer* = nullptr);
 
