@@ -132,7 +132,7 @@ class SimulatorWidget: public QWidget
 	Logger							_logger;
 	Machine*						_machine						{ nullptr };
 	Simulator&						_simulator;
-	neutrino::WorkPerformer			_graphics_work_performer		{ std::thread::hardware_concurrency(), _logger.with_context ("graphics work performer") };
+	neutrino::WorkPerformer			_graphics_work_performer		{ 2 * std::thread::hardware_concurrency(), _logger.with_context ("graphics work performer") };
 
 	// Basic widgets
 
