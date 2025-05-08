@@ -147,6 +147,9 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	explicit
 	RigidBodyPainter (si::PixelDensity, WorkPerformer* = nullptr);
 
+	// Dtor
+	~RigidBodyPainter();
+
 	/**
 	 * Set simulation time. It makes Sun rendered in different positions.
 	 */
