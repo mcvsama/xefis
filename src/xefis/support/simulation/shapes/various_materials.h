@@ -11,12 +11,12 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__SUPPORT__SIMULATION__RIGID_BODY__VARIOUS_MATERIALS_H__INCLUDED
-#define XEFIS__SUPPORT__SIMULATION__RIGID_BODY__VARIOUS_MATERIALS_H__INCLUDED
+#ifndef XEFIS__SUPPORT__SIMULATION__SHAPES__VARIOUS_MATERIALS_H__INCLUDED
+#define XEFIS__SUPPORT__SIMULATION__SHAPES__VARIOUS_MATERIALS_H__INCLUDED
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/support/simulation/rigid_body/shape_material.h>
+#include <xefis/support/simulation/shapes/shape_material.h>
 
 // Standard:
 #include <cstddef>

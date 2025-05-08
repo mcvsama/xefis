@@ -35,7 +35,7 @@
 #include <xefis/support/simulation/devices/wing.h>
 #include <xefis/support/simulation/rigid_body/concepts.h>
 #include <xefis/support/simulation/rigid_body/group.h>
-#include <xefis/support/simulation/rigid_body/various_shapes.h>
+#include <xefis/support/simulation/shapes/various_shapes.h>
 
 // Neutrino:
 #include <neutrino/math/math.h>

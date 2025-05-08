@@ -19,7 +19,7 @@
 #include <xefis/support/math/geometry.h>
 #include <xefis/support/math/triangle.h>
 #include <xefis/support/math/triangulation.h>
-#include <xefis/support/simulation/rigid_body/various_shapes.h>
+#include <xefis/support/simulation/shapes/various_shapes.h>
 
 // Standard:
 #include <cstddef>

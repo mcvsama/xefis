@@ -20,9 +20,9 @@
 #include <xefis/config/all.h>
 #include <xefis/support/math/geometry.h>
 #include <xefis/support/math/placement.h>
-#include <xefis/support/simulation/rigid_body/shape.h>
-#include <xefis/support/simulation/rigid_body/shape_material.h>
-#include <xefis/support/simulation/rigid_body/shape_vertex.h>
+#include <xefis/support/simulation/shapes/shape.h>
+#include <xefis/support/simulation/shapes/shape_material.h>
+#include <xefis/support/simulation/shapes/shape_vertex.h>
 
 // Qt:
 #include <QSize>

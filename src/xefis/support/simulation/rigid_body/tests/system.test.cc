@@ -27,7 +27,7 @@
 #include <xefis/support/simulation/rigid_body/concepts.h>
 #include <xefis/support/simulation/rigid_body/impulse_solver.h>
 #include <xefis/support/simulation/rigid_body/utility.h>
-#include <xefis/support/simulation/rigid_body/various_shapes.h>
+#include <xefis/support/simulation/shapes/various_shapes.h>
 #include <xefis/support/simulation/evolver.h>
 #include <xefis/support/ui/rigid_body_viewer.h>
 
