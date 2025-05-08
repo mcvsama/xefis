@@ -110,6 +110,16 @@ RigidBodyPainter::RigidBodyPainter (si::PixelDensity const pixel_density, WorkPe
 }
 
 
+RigidBodyPainter::~RigidBodyPainter()
+{
+	if (_next_sky_dome_shape.valid())
+		_next_sky_dome_shape.wait();
+
+	if (_texture_images.valid())
+		_texture_images.wait();
+}
+
+
 void
 RigidBodyPainter::set_time (si::Time const time)
 {
