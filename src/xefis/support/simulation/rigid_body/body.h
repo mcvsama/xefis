@@ -27,7 +27,7 @@
 #include <xefis/support/nature/wrench.h>
 #include <xefis/support/simulation/rigid_body/body_iteration.h>
 #include <xefis/support/simulation/rigid_body/concepts.h>
-#include <xefis/support/simulation/rigid_body/shape.h>
+#include <xefis/support/simulation/shapes/shape.h>
 
 // Neutrino:
 #include <neutrino/noncopyable.h>
