@@ -627,6 +627,19 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	rigid_body::Shape
 	calculate_sky_dome_shape();
 
+	/**
+	 * Check whether sky box can be computed, and if so, compute it.
+	 */
+	void
+	check_sky_box();
+
+	/**
+	 * Return sky box alpha (visibility) to use when painting sky box.
+	 * Depends on time of day and camera altitude.
+	 */
+	float
+	compute_sky_box_visibility (si::Angle const sun_altitude_above_horizon) const;
+
 	void
 	calculate_camera_transform();
 
@@ -698,6 +711,8 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	rigid_body::Shape			_sky_dome_shape;
 	std::future<rigid_body::Shape>
 								_next_sky_dome_shape;
+	std::optional<rigid_body::Shape>
+								_sky_box_shape;
 	bool						_need_new_sky_dome			{ false };
 	rigid_body::Shape			_ground_shape;
 	si::Time					_sky_dome_update_time;

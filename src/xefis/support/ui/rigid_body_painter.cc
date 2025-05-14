@@ -500,24 +500,15 @@ RigidBodyPainter::paint_universe()
 	auto const sun_altitude = _sun_position.horizontal_coordinates.altitude;
 	auto const sun_altitude_above_horizon = sun_altitude - _horizon_angle;
 
-	if (_textures)
+	check_sky_box();
+
+	if (_sky_box_shape)
 	{
 		_gl.save_context ([&] {
-			auto material = rigid_body::kWhiteMatte;
-			// Make the universe sky box visible when high above the surface, but also at night:
-			auto const night_time_visibility = neutrino::renormalize (sun_altitude_above_horizon, Range { -3_deg, -8_deg }, Range { 0.0f, 0.5f });
-			auto const altitude_visibility = neutrino::renormalize (_camera_normalized_amsl_height, Range { 0.8f, 1.5f }, Range { 0.0f, 1.0f });
-			auto const universe_visibility = std::max (altitude_visibility, night_time_visibility);
-			material.gl_texture_color = GLColor (1.0f, 1.0f, 1.0f, universe_visibility);
-			auto const sky_box = rigid_body::make_sky_box ({
-				.edge_length = 1000_m,
-				.material = material,
-				.texture_neg_x = _textures->universe_neg_x,
-				.texture_neg_y = _textures->universe_neg_y,
-				.texture_neg_z = _textures->universe_neg_z,
-				.texture_pos_x = _textures->universe_pos_x,
-				.texture_pos_y = _textures->universe_pos_y,
-				.texture_pos_z = _textures->universe_pos_z,
+			auto const color = GLColor (1.0f, 1.0f, 1.0f, compute_sky_box_visibility (sun_altitude_above_horizon));
+
+			_sky_box_shape->for_all_vertices ([color] (rigid_body::ShapeVertex& vertex) {
+				vertex.material().gl_texture_color = color;
 			});
 
 			// Enable blending for alpha modulation:
@@ -532,7 +523,7 @@ RigidBodyPainter::paint_universe()
 			glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 			_gl.set_camera_rotation_only (_camera);
 			_gl.rotate (kScreenToNullIslandRotation * _ecef_to_celestial_rotation);
-			_gl.draw (sky_box);
+			_gl.draw (*_sky_box_shape);
 			_gl.clear_z_buffer();
 			glDisable (GL_TEXTURE_2D);
 			glDisable (GL_BLEND);
@@ -1215,6 +1206,44 @@ RigidBodyPainter::calculate_sky_dome_shape()
 		.earth_texture = _textures ? _textures->earth : nullptr,
 	}, &*_work_performer);
 	// TODO apply sky_correction to vertices' materials
+}
+
+
+void
+RigidBodyPainter::check_sky_box()
+{
+	if (_textures && !_sky_box_shape)
+	{
+		auto material = rigid_body::kWhiteMatte;
+		_sky_box_shape = rigid_body::make_sky_box ({
+			.edge_length = 1000_m,
+			.material = material,
+			.texture_neg_x = _textures->universe_neg_x,
+			.texture_neg_y = _textures->universe_neg_y,
+			.texture_neg_z = _textures->universe_neg_z,
+			.texture_pos_x = _textures->universe_pos_x,
+			.texture_pos_y = _textures->universe_pos_y,
+			.texture_pos_z = _textures->universe_pos_z,
+		});
+	}
+}
+
+
+float
+RigidBodyPainter::compute_sky_box_visibility (si::Angle const sun_altitude_above_horizon) const
+{
+	// Update sky box visibility (none near the ground, except at night):
+	auto universe_visibility = 1.0f;
+
+	if (_planet_body)
+	{
+		// Make the universe sky box visible when high above the surface, but also at night:
+		auto const night_time_visibility = neutrino::renormalize (sun_altitude_above_horizon, Range { -3_deg, -8_deg }, Range { 0.0f, 0.5f });
+		auto const altitude_visibility = neutrino::renormalize (_camera_normalized_amsl_height, Range { 0.8f, 1.5f }, Range { 0.0f, 1.0f });
+		universe_visibility = std::max (altitude_visibility, night_time_visibility);
+	}
+
+	return universe_visibility;
 }
 
 
