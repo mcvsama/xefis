@@ -285,8 +285,7 @@ get_ground_transceiver (xf::ProcessingLoop& loop)
 xle::SlaveTransceiver
 get_air_transceiver (xf::ProcessingLoop& loop)
 {
-	auto handshake_id_reuse_check = [](xle::HandshakeID) { return false; };
-	return xle::SlaveTransceiver (loop, crypto_params, handshake_id_reuse_check, g_logger.with_context ("air-transceiver"), "air/transceiver");
+	return xle::SlaveTransceiver (loop, crypto_params, {}, g_logger.with_context ("air-transceiver"), "air/transceiver");
 }
 
 
