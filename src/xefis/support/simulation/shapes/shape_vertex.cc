@@ -21,7 +21,7 @@
 #include <cstddef>
 
 
-namespace xf::rigid_body {
+namespace xf {
 
 void
 ShapeVertex::transform (AffineTransform<BodyOrigin> const& transformation)
@@ -42,5 +42,5 @@ ShapeVertex::rotate (RotationQuaternion<BodyOrigin> const& rotation)
 		_normal = rotation * *_normal;
 }
 
-} // namespace xf::rigid_body
+} // namespace xf
 

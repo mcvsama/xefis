@@ -86,7 +86,7 @@ GLSpace::reset_translation()
 
 
 void
-GLSpace::set_material (rigid_body::ShapeMaterial const& material)
+GLSpace::set_material (ShapeMaterial const& material)
 {
 	auto const& params = additional_parameters();
 
@@ -111,7 +111,7 @@ GLSpace::set_material (rigid_body::ShapeMaterial const& material)
 
 
 void
-GLSpace::set_texture (rigid_body::ShapeMaterial const& material)
+GLSpace::set_texture (ShapeMaterial const& material)
 {
 	glFogCoordf (material.gl_fog_distance);
 	glColor4fv (material.gl_texture_color);
@@ -121,7 +121,7 @@ GLSpace::set_texture (rigid_body::ShapeMaterial const& material)
 
 
 void
-GLSpace::draw (rigid_body::Shape const& shape)
+GLSpace::draw (Shape const& shape)
 {
 	for (auto const& triangle: shape.triangles())
 		begin (GL_TRIANGLES, triangle);

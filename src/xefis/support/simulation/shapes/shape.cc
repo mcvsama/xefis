@@ -21,7 +21,7 @@
 #include <cstddef>
 
 
-namespace xf::rigid_body {
+namespace xf {
 
 void
 Shape::transform (AffineTransform<BodyOrigin> const& transform)
@@ -59,5 +59,5 @@ Shape::for_all_vertices (std::function<void (ShapeVertex&)> const vertex_functio
 				vertex_function (vertex);
 }
 
-} // namespace xf::rigid_body
+} // namespace xf
 

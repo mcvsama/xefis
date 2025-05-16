@@ -31,7 +31,7 @@ Wing::Wing (Airfoil const& airfoil, si::Density const material_density):
 	Body (calculate_body_com_mass_moments (airfoil, material_density)),
 	_airfoil (airfoil)
 {
-	set_shape (rigid_body::make_airfoil_shape ({
+	set_shape (make_airfoil_shape ({
 		.spline = _airfoil.spline(),
 		.chord_length = _airfoil.chord_length(),
 		.wing_length = _airfoil.wing_length(),

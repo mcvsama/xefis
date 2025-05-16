@@ -245,37 +245,37 @@ class GLSpace
 	 * Exception-safe.
 	 */
 	void
-	begin (GLenum const mode, rigid_body::Shape::Geometry const& geometry);
+	begin (GLenum const mode, Shape::Geometry const& geometry);
 
 	/**
 	 * Set current OpenGL normal vector to the vertex' normal.
 	 */
 	static void
-	set_normal (rigid_body::ShapeVertex const&);
+	set_normal (ShapeVertex const&);
 
 	/**
 	 * Set current OpenGL material parameters if texture is not used.
 	 */
 	void
-	set_material (rigid_body::ShapeMaterial const&);
+	set_material (ShapeMaterial const&);
 
 	/**
 	 * Set texture UV parameters.
 	 */
 	void
-	set_texture (rigid_body::ShapeMaterial const&);
+	set_texture (ShapeMaterial const&);
 
 	/**
 	 * Set current OpenGL material/normal from vertex parameters.
 	 */
 	void
-	set_vertex (rigid_body::ShapeVertex const&, rigid_body::Shape::Geometry const&);
+	set_vertex (ShapeVertex const&, Shape::Geometry const&);
 
 	/**
 	 * Add vertex with its normal and material information.
 	 */
 	void
-	add_vertex (rigid_body::ShapeVertex const&, rigid_body::Shape::Geometry const& geometry);
+	add_vertex (ShapeVertex const&, Shape::Geometry const& geometry);
 
 	/**
 	 * Add OpenGL vertex at given position.
@@ -303,7 +303,7 @@ class GLSpace
 	 * Draw given shape in OpenGL.
 	 */
 	void
-	draw (rigid_body::Shape const& shape);
+	draw (Shape const& shape);
 
 	void
 	clear_z_buffer (float value = 1.0f);
@@ -408,7 +408,7 @@ GLSpace::begin (GLenum const mode, auto&& lambda)
 
 
 inline void
-GLSpace::begin (GLenum const mode, rigid_body::Shape::Geometry const& geometry)
+GLSpace::begin (GLenum const mode, Shape::Geometry const& geometry)
 {
 	try {
 		if (geometry.texture)
@@ -437,7 +437,7 @@ GLSpace::begin (GLenum const mode, rigid_body::Shape::Geometry const& geometry)
 
 
 inline void
-GLSpace::set_normal (rigid_body::ShapeVertex const& vertex)
+GLSpace::set_normal (ShapeVertex const& vertex)
 {
 	if (auto const opt_n = vertex.normal())
 	{
@@ -448,7 +448,7 @@ GLSpace::set_normal (rigid_body::ShapeVertex const& vertex)
 
 
 inline void
-GLSpace::set_vertex (rigid_body::ShapeVertex const& vertex, rigid_body::Shape::Geometry const& geometry)
+GLSpace::set_vertex (ShapeVertex const& vertex, Shape::Geometry const& geometry)
 {
 	set_normal (vertex);
 
@@ -460,7 +460,7 @@ GLSpace::set_vertex (rigid_body::ShapeVertex const& vertex, rigid_body::Shape::G
 
 
 inline void
-GLSpace::add_vertex (rigid_body::ShapeVertex const& vertex, rigid_body::Shape::Geometry const& geometry)
+GLSpace::add_vertex (ShapeVertex const& vertex, Shape::Geometry const& geometry)
 {
 	set_vertex (vertex, geometry);
 	add_vertex (math::coordinate_system_cast<WorldSpace, void> (vertex.position()));

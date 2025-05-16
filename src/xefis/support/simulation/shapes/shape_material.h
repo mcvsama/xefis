@@ -28,7 +28,7 @@
 #include <memory>
 
 
-namespace xf::rigid_body {
+namespace xf {
 
 /**
  * Traits of the material of which ShapeVertices are made.
@@ -68,7 +68,7 @@ struct ShapeMaterial
 		{ gl_shininess = shininess; }
 };
 
-} // namespace xf::rigid_body
+} // namespace xf
 
 #endif
 

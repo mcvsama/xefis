@@ -22,7 +22,7 @@
 #include <cstddef>
 
 
-namespace xf::rigid_body {
+namespace xf {
 
 auto const kBlackMatte = ShapeMaterial {
 	.gl_emission_color	= GLColor { 0.0f, 0.0f, 0.0f, 1.0f },
@@ -61,7 +61,7 @@ inline ShapeMaterial
 make_material (QColor const& material_color, QColor const& emission_color = Qt::black)
 {
 	auto const gl_color = to_gl_color (material_color);
-	return rigid_body::ShapeMaterial {
+	return ShapeMaterial {
 		.gl_emission_color	= to_gl_color (emission_color),
 		.gl_ambient_color	= gl_color,
 		.gl_diffuse_color	= gl_color,
@@ -69,7 +69,7 @@ make_material (QColor const& material_color, QColor const& emission_color = Qt::
 	};
 }
 
-} // namespace xf::rigid_body
+} // namespace xf
 
 #endif
 

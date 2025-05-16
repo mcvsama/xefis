@@ -32,12 +32,12 @@ make_earth (bool include_actual_sphere)
 {
 	auto const make_orb = [](si::Length const radius, std::size_t n_slices, std::size_t n_stacks) {
 		// An orb colored with ECEF colors: X/Null Island = red, Y/(90°/0°) = green, Z/North = blue:
-		return rigid_body::make_centered_sphere_shape ({
+		return make_centered_sphere_shape ({
 			.radius = radius,
 			.n_slices = n_slices,
 			.n_stacks = n_stacks,
-			.material = rigid_body::kBlackMatte,
-			.setup_material = [](rigid_body::ShapeMaterial& material, si::LonLat const position) {
+			.material = kBlackMatte,
+			.setup_material = [](ShapeMaterial& material, si::LonLat const position) {
 				auto const [r, g, b] = to_cartesian (position);
 
 				auto const pos_r = std::clamp<float> (r, 0.0f, +1.0f);
