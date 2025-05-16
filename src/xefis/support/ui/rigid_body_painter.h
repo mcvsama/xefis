@@ -118,6 +118,16 @@ class RigidBodyPainter: protected QOpenGLFunctions
 		std::shared_ptr<QOpenGLTexture>	universe_pos_z;
 	};
 
+	struct FeaturesConfig
+	{
+		bool	constraints_visible:1			{ false };
+		bool	gravity_visible:1				{ false };
+		bool	external_forces_visible:1		{ false };
+		bool	aerodynamic_forces_visible:1	{ false };
+		bool	angular_velocities_visible:1	{ false };
+		bool	angular_momenta_visible:1		{ false };
+	};
+
   public:
 	enum CameraMode
 	{
@@ -332,94 +342,12 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	set_planet (rigid_body::Body const* planet_body);
 
 	/**
-	 * Return true if constraints are set to be visible.
+	 * Return FeaturesConfig structure. It can be modified.
 	 */
 	[[nodiscard]]
-	bool
-	constraints_visible() const noexcept
-		{ return _constraints_visible; }
-
-	/**
-	 * Show/hide constraints.
-	 */
-	void
-	set_constraints_visible (bool visible) noexcept
-		{ _constraints_visible = visible; }
-
-	/**
-	 * Return true if gravity forces are set to be visible.
-	 */
-	[[nodiscard]]
-	bool
-	gravity_visible() const noexcept
-		{ return _gravity_visible; }
-
-	/**
-	 * Show/hide gravity forces.
-	 */
-	void
-	set_gravity_visible (bool visible) noexcept
-		{ _gravity_visible = visible; }
-
-	/**
-	 * Return true if aerodynamic forces are set to be visible.
-	 */
-	[[nodiscard]]
-	bool
-	aerodynamic_forces_visible() const noexcept
-		{ return _aerodynamic_forces_visible; }
-
-	/**
-	 * Show/hide aerodynamic forces.
-	 */
-	void
-	set_aerodynamic_forces_visible (bool visible) noexcept
-		{ _aerodynamic_forces_visible = visible; }
-
-	/**
-	 * Return true if external forces are set to be visible.
-	 */
-	[[nodiscard]]
-	bool
-	external_forces_visible() const noexcept
-		{ return _external_forces_visible; }
-
-	/**
-	 * Show/hide external forces.
-	 */
-	void
-	set_external_forces_visible (bool visible) noexcept
-		{ _external_forces_visible = visible; }
-
-	/**
-	 * Return true if angular velocity are set to be visible.
-	 */
-	[[nodiscard]]
-	bool
-	angular_velocities_visible() const noexcept
-		{ return _angular_velocities_visible; }
-
-	/**
-	 * Show/hide angular velocity.
-	 */
-	void
-	set_angular_velocities_visible (bool visible) noexcept
-		{ _angular_velocities_visible = visible; }
-
-	/**
-	 * Return true if angular momentum are set to be visible.
-	 */
-	[[nodiscard]]
-	bool
-	angular_momenta_visible() const noexcept
-		{ return _angular_momenta_visible; }
-
-	/**
-	 * Show/hide angular momentum.
-	 */
-	void
-	set_angular_momenta_visible (bool visible) noexcept
-		{ _angular_momenta_visible = visible; }
+	FeaturesConfig&
+	features_config()
+		{ return _features_config; }
 
 	/**
 	 * Return config object for given group.
@@ -692,12 +620,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	std::variant<std::monostate, rigid_body::Body const*, rigid_body::Constraint const*>
 								_hovered;
 	rigid_body::Body const*		_planet_body				{ nullptr };
-	bool						_constraints_visible		{ false };
-	bool						_gravity_visible			{ false };
-	bool						_external_forces_visible	{ false };
-	bool						_aerodynamic_forces_visible	{ false };
-	bool						_angular_velocities_visible	{ false };
-	bool						_angular_momenta_visible	{ false };
+	FeaturesConfig				_features_config;
 	std::map<rigid_body::Group const*, GroupRenderingConfig>
 								_group_rendering_config;
 	std::map<rigid_body::Body const*, BodyRenderingConfig>
