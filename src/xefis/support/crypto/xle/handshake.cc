@@ -114,9 +114,9 @@ HandshakeMaster::parse_and_verify_slave_handshake_blob (BlobView const slave_han
 
 HandshakeSlave::HandshakeSlave (boost::random::random_device& rnd,
                                 Params const& params,
-                                IDReuseCheckCallback const id_reuse_check_callback):
+                                KeyCheckFunctions const key_check_callbacks):
     Handshake (rnd, params),
-    _id_used_before (id_reuse_check_callback)
+	_key_check_callbacks (key_check_callbacks)
 { }
 
 
@@ -128,8 +128,11 @@ HandshakeSlave::generate_handshake_blob_and_key (BlobView const master_handshake
 	// Handshake receiver should verify that new handshake has never been used before,
 	// to prevent replay attacks. Only correct handshakes should be checked,
 	// otherwise we'd be vulnerable to DoS attacks.
-	if (_id_used_before && _id_used_before (master_handshake.handshake_id))
+	if (_key_check_callbacks.contains_key_function && _key_check_callbacks.contains_key_function (master_handshake.handshake_id))
 		throw Exception (ErrorCode::ReusedHandshakeID, "reusing handshake ID");
+
+	if (_key_check_callbacks.store_key_function)
+		_key_check_callbacks.store_key_function (master_handshake.handshake_id);
 
 	if (abs (1_ms * master_handshake.unix_timestamp_ms - neutrino::TimeHelper::utc_now()) > _max_time_difference)
 		throw Exception (ErrorCode::DeltaTimeTooHigh, "delta time too high");

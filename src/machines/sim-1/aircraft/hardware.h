@@ -56,7 +56,7 @@ class Hardware
 	xle::SlaveTransceiver slave_transceiver {
 		_loop,
 		sim1::kCryptoParams,
-		[] (xle::HandshakeID) { return false; }, // TODO Should store used IDs somewhere
+		{}, // TODO Should store used IDs somewhere
 		_logger.with_context ("slave transceiver"),
 		"slave transceiver",
 	};

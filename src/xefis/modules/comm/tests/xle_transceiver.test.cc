@@ -97,7 +97,7 @@ AutoTestT1::auto_test_t1()
 		// it will cause master to be processed first, since slave depends
 		// on master. So in the end master.process() will be called first,
 		// then slave.process().
-		auto slave = xle::SlaveTransceiver (loop, crypto_params, [](xle::HandshakeID) { return false; }, TestProcessingLoop::logger);
+		auto slave = xle::SlaveTransceiver (loop, crypto_params, {}, TestProcessingLoop::logger);
 		auto master = xle::MasterTransceiver (loop, crypto_params, TestProcessingLoop::logger);
 
 		slave.handshake_request << master.handshake_request;
@@ -572,7 +572,7 @@ auto_test_t2()
 	};
 
 	auto loop = TestProcessingLoop (0.01_s);
-	auto slave = xle::SlaveTransceiver (loop, crypto_params, [](xle::HandshakeID) { return false; }, TestProcessingLoop::logger);
+	auto slave = xle::SlaveTransceiver (loop, crypto_params, {}, TestProcessingLoop::logger);
 	auto master = xle::MasterTransceiver (loop, crypto_params, TestProcessingLoop::logger);
 
 	slave.handshake_request << std::function (make_random_loss ("master → slave")) << master.handshake_request;

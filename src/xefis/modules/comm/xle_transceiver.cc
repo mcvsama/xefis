@@ -367,7 +367,7 @@ MasterTransceiver::shift_sessions()
 
 SlaveTransceiver::Session::Session (Blob const& handshake_request,
 									CryptoParams const& params,
-									std::function<bool (HandshakeID)> handshake_id_reused_check):
+									HandshakeSlave::KeyCheckFunctions const key_check_callbacks):
 	Transceiver::Session ("S", _id_generator)
 {
 	auto handshake_slave = HandshakeSlave (transceiver_rnd, {
@@ -375,7 +375,7 @@ SlaveTransceiver::Session::Session (Blob const& handshake_request,
 		.slave_signature_key = params.slave_signature_key,
 		.hmac_size = params.hmac_size,
 		.max_time_difference = params.max_time_difference,
-	}, handshake_id_reused_check);
+	}, key_check_callbacks);
 	auto const response_and_key = handshake_slave.generate_handshake_blob_and_key (handshake_request, neutrino::TimeHelper::utc_now());
 	_handshake_response = response_and_key.handshake_response;
 	_transmitter.emplace (transceiver_rnd, Transmitter::Params {
@@ -399,13 +399,13 @@ SlaveTransceiver::Session::Session (Blob const& handshake_request,
 
 SlaveTransceiver::SlaveTransceiver (xf::ProcessingLoop& loop,
 									CryptoParams const& params,
-									std::function<bool (HandshakeID)> handshake_id_reuse_check,
+									HandshakeSlave::KeyCheckFunctions const key_check_functions,
 									xf::Logger const& logger,
 									std::string_view const& instance):
 	Transceiver (Role::Slave, Transport::ciphertext_expansion (params.hmac_size), logger.with_context (std::string (kLoggerScope) + "#" + instance)),
 	Module (loop, "SlaveTransceiver"),
 	_crypto_params (params),
-	_handshake_id_reuse_check (handshake_id_reuse_check)
+	_key_check_functions (key_check_functions)
 { }
 
 
@@ -435,7 +435,7 @@ SlaveTransceiver::process (Cycle const&)
 	try {
 		if (_handshake_request_changed.value_changed() && this->handshake_request.valid())
 		{
-			_next_session_candidate = std::make_unique<Session> (to_blob (*this->handshake_request), _crypto_params, _handshake_id_reuse_check);
+			_next_session_candidate = std::make_unique<Session> (to_blob (*this->handshake_request), _crypto_params, _key_check_functions);
 			this->handshake_response = to_string (*_next_session_candidate->handshake_response());
 		}
 	}

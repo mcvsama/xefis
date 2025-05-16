@@ -170,9 +170,15 @@ class HandshakeSlave: public Handshake
   public:
 	/**
      * This function should return true if and only if given handshake ID
-     * has been used before.
+     * has been used before. It should also store given key as 'used before'.
      */
-	using IDReuseCheckCallback = std::function<bool (HandshakeID)>;
+	using IDReuseCheckCallback = std::function<bool (HandshakeID)>;//XXX
+
+	// This function should store provided key in a storage (mark is at used).
+	using StoreKeyFunction = std::function<void (HandshakeID)>;
+
+	// This function should return true if provided key is present in the key storage.
+	using ContainsKeyFunction = std::function<bool (HandshakeID)>;
 
 	enum class ErrorCode: uint8_t
 	{
@@ -200,9 +206,15 @@ class HandshakeSlave: public Handshake
 		Secure<Blob>	ephemeral_key;
 	};
 
+	struct KeyCheckFunctions
+	{
+		StoreKeyFunction	store_key_function		{ nullptr };
+		ContainsKeyFunction	contains_key_function	{ nullptr };
+	};
+
   public:
 	// Ctor
-	HandshakeSlave (boost::random::random_device&, Params const&, IDReuseCheckCallback);
+	HandshakeSlave (boost::random::random_device&, Params const&, KeyCheckFunctions);
 
 	/**
 	 * Generate handshake response blob to be sent to the initiator and the resulting
@@ -222,7 +234,7 @@ class HandshakeSlave: public Handshake
 	parse_and_verify_master_handshake_blob (BlobView);
 
   private:
-	IDReuseCheckCallback _id_used_before;
+	KeyCheckFunctions _key_check_callbacks;
 };
 
 

@@ -594,7 +594,7 @@ class SlaveTransceiver:
 		explicit
 		Session (Blob const& handshake_request,
 				 CryptoParams const&,
-				 std::function<bool (HandshakeID)> handshake_id_reuse_check);
+				 HandshakeSlave::KeyCheckFunctions const);
 
 		[[nodiscard]]
 		Secure<Blob> const&
@@ -639,7 +639,7 @@ class SlaveTransceiver:
 		Secure<Blob>						_handshake_response;
 		std::optional<Transmitter>			_transmitter;
 		std::optional<Receiver>				_receiver;
-		std::function<bool (HandshakeID)>	_handshake_id_reuse_check;
+		HandshakeSlave::KeyCheckFunctions	_key_check_functions;
 	};
 
   public:
@@ -647,7 +647,7 @@ class SlaveTransceiver:
 	explicit
 	SlaveTransceiver (xf::ProcessingLoop&,
 					  CryptoParams const&,
-					  std::function<bool (HandshakeID)> handshake_id_reuse_check,
+					  HandshakeSlave::KeyCheckFunctions const,
 					  xf::Logger const&,
 					  std::string_view const& instance = {});
 
@@ -714,7 +714,7 @@ class SlaveTransceiver:
   private:
 	CryptoParams						_crypto_params;
 	xf::SocketValueChanged<std::string>	_handshake_request_changed { handshake_request };
-	std::function<bool (HandshakeID)>	_handshake_id_reuse_check;
+	HandshakeSlave::KeyCheckFunctions	_key_check_functions;
 	// Active session means connected and confirmed correct encryption+authentication:
 	std::unique_ptr<Session>			_active_session;
 	std::unique_ptr<Session>			_next_session_candidate;
