@@ -246,10 +246,10 @@ MasterTransceiver::Session::set_handshake_response (Blob const& handshake_respon
 void
 MasterTransceiver::Session::abort (AbortReason const reason)
 {
-	if (!is_ready (_session_prepared_future))
+	if (!neutrino::ready (_session_prepared_future))
 		_session_prepared_promise.set_exception (std::make_exception_ptr (HandshakeAborted({ reason })));
 
-	if (!is_ready (_session_activated_future))
+	if (!neutrino::ready (_session_activated_future))
 		_session_activated_promise.set_exception (std::make_exception_ptr (HandshakeAborted({ reason })));
 }
 

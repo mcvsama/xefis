@@ -276,7 +276,7 @@ Screen::update_instruments()
 
 		if (details->computed_position->isValid())
 		{
-			if (is_valid_and_ready (details->result))
+			if (valid_and_ready (details->result))
 			{
 				Exception::catch_and_log (_logger, [&] {
 					auto const perf_metrics = details->result.get();
@@ -358,7 +358,7 @@ Screen::wait_for_async_paint (InstrumentDetails& details)
 {
 	auto const& result = details.result;
 
-	while (result.valid() && !is_ready (result))
+	while (result.valid() && !ready (result))
 		result.wait();
 }
 

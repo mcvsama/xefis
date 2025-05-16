@@ -1152,7 +1152,7 @@ RigidBodyPainter::get_center_of_mass (rigid_body::Group const& group)
 void
 RigidBodyPainter::check_textures()
 {
-	if (is_valid_and_ready (_texture_images))
+	if (valid_and_ready (_texture_images))
 	{
 		auto images = _texture_images.get();
 		auto const make_texture = [](QImage&& image) {
@@ -1185,7 +1185,7 @@ void
 RigidBodyPainter::check_sky_dome()
 {
 	// If the next calculated SkyDome is ready, use it:
-	if (is_valid_and_ready (_next_sky_dome_shape))
+	if (valid_and_ready (_next_sky_dome_shape))
 		_sky_dome_shape = _next_sky_dome_shape.get();
 
 	if (!_next_sky_dome_shape.valid() && std::exchange (_need_new_sky_dome, false))
