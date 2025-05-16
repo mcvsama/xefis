@@ -616,7 +616,7 @@ AutoTest t6 ("modules/io/link: protocol: encrypted channel works", []{
 	auto [session_prepared, session_activated] = ground_transceiver.start_handshake();
 	auto constexpr kMaxCycles = 6u;
 
-	for (size_t cycles = 0; !is_ready (session_prepared) && !is_ready (session_activated); ++cycles)
+	for (size_t cycles = 0; !ready (session_prepared) && !ready (session_activated); ++cycles)
 	{
 		test_asserts::verify (std::format ("handshake completes in {} cycles", cycles), cycles < kMaxCycles);
 		loop.next_cycle();

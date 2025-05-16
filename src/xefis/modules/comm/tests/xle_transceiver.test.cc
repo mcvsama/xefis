@@ -198,11 +198,11 @@ AutoTestT1::auto_test_t1()
 				test_asserts::verify (p + "session_prepared_future is valid", expectations.session_prepared_future->valid());
 
 				if (expectations.session_prepared_future_is_ready)
-					test_asserts::verify (p + "session_prepared_future is ready", is_ready (*expectations.session_prepared_future));
+					test_asserts::verify (p + "session_prepared_future is ready", ready (*expectations.session_prepared_future));
 				else
-					test_asserts::verify (p + "session_prepared_future is not ready", !is_ready (*expectations.session_prepared_future));
+					test_asserts::verify (p + "session_prepared_future is not ready", !ready (*expectations.session_prepared_future));
 
-				if (is_ready (*expectations.session_prepared_future))
+				if (ready (*expectations.session_prepared_future))
 				{
 					bool got_generic_handshake_exception = false;
 
@@ -223,11 +223,11 @@ AutoTestT1::auto_test_t1()
 				test_asserts::verify (p + "session_activated_future is valid", expectations.session_activated_future->valid());
 
 				if (expectations.session_activated_future_is_ready)
-					test_asserts::verify (p + "session_activated_future is ready", is_ready (*expectations.session_activated_future));
+					test_asserts::verify (p + "session_activated_future is ready", ready (*expectations.session_activated_future));
 				else
-					test_asserts::verify (p + "session_activated_future is not ready", !is_ready (*expectations.session_activated_future));
+					test_asserts::verify (p + "session_activated_future is not ready", !ready (*expectations.session_activated_future));
 
-				if (is_ready (*expectations.session_activated_future))
+				if (ready (*expectations.session_activated_future))
 				{
 					bool got_generic_handshake_exception = false;
 
@@ -246,7 +246,7 @@ AutoTestT1::auto_test_t1()
 			if (expectations.previous_session_activated_future)
 			{
 				test_asserts::verify (p + "previous_session_activated_future is valid", expectations.previous_session_activated_future->valid());
-				test_asserts::verify (p + "previous_session_activated_future is ready", is_ready (*expectations.previous_session_activated_future));
+				test_asserts::verify (p + "previous_session_activated_future is ready", ready (*expectations.previous_session_activated_future));
 
 				bool got_generic_handshake_exception = false;
 				bool got_handshake_aborted_exception = false;
@@ -626,12 +626,12 @@ auto_test_t2()
 
 		do {
 			loop.next_cycles (2);
-		} while (!is_ready (session_prepared));
+		} while (!ready (session_prepared));
 
 		do {
 			loop.next_cycles (2);
 			test_communication ("just after calling start_handshake()");
-		} while (!is_ready (session_activated));
+		} while (!ready (session_activated));
 
 		session_prepared.get();
 	}
