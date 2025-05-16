@@ -276,7 +276,7 @@ Screen::update_instruments()
 
 		if (details->computed_position->isValid())
 		{
-			if (details->result.valid() && is_ready (details->result))
+			if (is_valid_and_ready (details->result))
 			{
 				Exception::catch_and_log (_logger, [&] {
 					auto const perf_metrics = details->result.get();
