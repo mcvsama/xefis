@@ -586,7 +586,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	paint_angular_momentum (rigid_body::Body const&);
 
 	void
-	draw_arrow (SpaceLength<WorldSpace> const& origin, SpaceLength<WorldSpace> const& vector, rigid_body::ShapeMaterial const& material = {});
+	draw_arrow (SpaceLength<WorldSpace> const& origin, SpaceLength<WorldSpace> const& vector, ShapeMaterial const& material = {});
 
 	/**
 	 * Correct the sky colors to be less green at dusk/dawn.
@@ -624,7 +624,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	 * \threadsafe	As long as _atmospheric_scattering is unmodified.
 	 */
 	[[nodiscard]]
-	rigid_body::Shape
+	Shape
 	calculate_sky_dome_shape();
 
 	/**
@@ -708,13 +708,11 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	AtmosphericScattering const	_atmospheric_scattering		{{ .earth_radius = kEarthMeanRadius, .atmosphere_radius = kAtmosphereRadius, .enable_tonemapping = true }};
 
 	// Sky and ground:
-	rigid_body::Shape			_sky_dome_shape;
-	std::future<rigid_body::Shape>
-								_next_sky_dome_shape;
-	std::optional<rigid_body::Shape>
-								_sky_box_shape;
+	Shape						_sky_dome_shape;
+	std::future<Shape>			_next_sky_dome_shape;
+	std::optional<Shape>		_sky_box_shape;
 	bool						_need_new_sky_dome			{ false };
-	rigid_body::Shape			_ground_shape;
+	Shape						_ground_shape;
 	si::Time					_sky_dome_update_time;
 	si::Angle					_horizon_angle;
 	// Recalculated from time to time:

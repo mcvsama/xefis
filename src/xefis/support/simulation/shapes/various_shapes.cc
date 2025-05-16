@@ -32,7 +32,7 @@
 #include <vector>
 
 
-namespace xf::rigid_body {
+namespace xf {
 
 Shape
 make_centered_cube_shape (si::Length const edge_length, ShapeMaterial const& material)
@@ -725,8 +725,8 @@ make_propeller_shape (PropellerShapeParameters const& params)
 		std::ranges::reverse (back_vertices);
 		back_vertices.pop_back();
 
-		shape.triangle_strips().push_back (rigid_body::Shape::TriangleStrip { .vertices = vertices });
-		shape.triangle_strips().push_back (rigid_body::Shape::TriangleStrip { .vertices = back_vertices });
+		shape.triangle_strips().push_back (Shape::TriangleStrip { .vertices = vertices });
+		shape.triangle_strips().push_back (Shape::TriangleStrip { .vertices = back_vertices });
 	}
 
 	shape.translate ({ 0_m, 0_m, pitch_height_b });
@@ -890,5 +890,5 @@ set_material (std::vector<ShapeVertex>& vertices, ShapeMaterial const& material)
 		vertex.set_material (material);
 }
 
-} // namespace xf::rigid_body
+} // namespace xf
 

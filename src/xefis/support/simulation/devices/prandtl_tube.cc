@@ -31,8 +31,8 @@ PrandtlTube::PrandtlTube (Atmosphere const& atmosphere, PrandtlTubeParameters co
 	Body (MassMoments<BodyCOM>()),
 	_atmosphere (&atmosphere)
 {
-	auto const material = rigid_body::make_material ({ 0xff, 0xaa, 0x00 });
-	auto shape = rigid_body::make_cylinder_shape ({
+	auto const material = make_material ({ 0xff, 0xaa, 0x00 });
+	auto shape = make_cylinder_shape ({
 		.length { params.length },
 		.radius { 0.5 * params.diameter },
 		.num_faces { 7 },

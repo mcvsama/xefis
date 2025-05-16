@@ -26,7 +26,7 @@
 #include <vector>
 
 
-namespace xf::rigid_body {
+namespace xf {
 
 /**
  * Defines a 3D shape for a rigid body.
@@ -159,7 +159,7 @@ operator+ (Shape a, Shape const& b)
 	return a += b;
 }
 
-} // namespace xf::rigid_body
+} // namespace xf
 
 #endif
 

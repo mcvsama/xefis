@@ -33,7 +33,7 @@
 #include <span>
 
 
-namespace xf::rigid_body {
+namespace xf {
 
 using SynchronousSetupMaterial		= std::function<void (ShapeMaterial&, si::LonLat position)>;
 using AsynchronousSetupMaterial		= std::function<void (ShapeMaterial&, si::LonLat position, WaitGroup::WorkToken&&)>;
@@ -323,7 +323,7 @@ negate_normals (Shape& shape);
 void
 set_material (std::vector<ShapeVertex>& vertices, ShapeMaterial const& material);
 
-} // namespace xf::rigid_body
+} // namespace xf
 
 #endif
 

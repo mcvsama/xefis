@@ -71,14 +71,14 @@ calculate_sun_light_color (si::LonLatRadius<> const observer_position, SpaceVect
 
 
 [[nodiscard]]
-rigid_body::Shape
+Shape
 calculate_ground_shape (si::LonLatRadius<> const observer_position,
 						si::Length const earth_radius,
 						std::shared_ptr<QOpenGLTexture> earth_texture);
 
 
 [[nodiscard]]
-rigid_body::Shape
+Shape
 calculate_sky_dome_shape (SkyDomeParameters const& params, neutrino::WorkPerformer* work_performer = nullptr);
 
 } // namespace xf

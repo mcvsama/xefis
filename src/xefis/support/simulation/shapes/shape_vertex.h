@@ -25,7 +25,7 @@
 #include <initializer_list>
 
 
-namespace xf::rigid_body {
+namespace xf {
 
 /**
  * Vertex of the shape used to define usually triangular surfaces.
@@ -187,7 +187,7 @@ ShapeVertex::ShapeVertex (SpaceLength<BodyOrigin> const& position, SpaceVector<d
 	_material (material)
 { }
 
-} // namespace xf::rigid_body
+} // namespace xf
 
 #endif
 

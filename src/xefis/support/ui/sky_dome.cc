@@ -282,7 +282,7 @@ calculate_sun_light_color (si::LonLatRadius<> const observer_position, SpaceVect
 }
 
 
-rigid_body::Shape
+Shape
 calculate_ground_shape (si::LonLatRadius<> const observer_position,
 						si::Length const earth_radius,
 						std::shared_ptr<QOpenGLTexture> earth_texture)
@@ -295,12 +295,12 @@ calculate_ground_shape (si::LonLatRadius<> const observer_position,
 		if (ss.slice_angles.empty())
 			return {};
 
-		return rigid_body::make_centered_irregular_sphere_shape ({
+		return make_centered_irregular_sphere_shape ({
 			.radius = earth_radius,
 			.slice_angles = ss.slice_angles,
 			.stack_angles = ss.stack_angles,
-			.material = rigid_body::kBlackMatte,
-			.setup_material = [&] (rigid_body::ShapeMaterial& material, si::LonLat const sphere_position) {
+			.material = kBlackMatte,
+			.setup_material = [&] (ShapeMaterial& material, si::LonLat const sphere_position) {
 				material.texture_position = {
 					neutrino::renormalize (sphere_position.lon(), Range { -180_deg, +180_deg }, Range { 0.0f, 1.0f }),
 					neutrino::renormalize (sphere_position.lat(), Range { -90_deg, +90_deg }, Range { 1.0f, 0.0f }),
@@ -314,7 +314,7 @@ calculate_ground_shape (si::LonLatRadius<> const observer_position,
 }
 
 
-rigid_body::Shape
+Shape
 calculate_sky_dome_shape (SkyDomeParameters const& p, neutrino::WorkPerformer* const work_performer)
 {
 	auto horizon_angle = calculate_horizon_angle (p.earth_radius, p.observer_position.radius());
@@ -325,12 +325,12 @@ calculate_sky_dome_shape (SkyDomeParameters const& p, neutrino::WorkPerformer* c
 
 	auto const ss = calculate_dome_slices_and_stacks (p.sun_position, horizon_angle);
 	auto const cartesian_sun_position = calculate_cartesian_horizontal_coordinates (p.sun_position);
-	return rigid_body::make_centered_irregular_sphere_shape ({
+	return make_centered_irregular_sphere_shape ({
 		.radius = p.earth_radius, // TODO 10 mm around the camera
 		.slice_angles = ss.slice_angles,
 		.stack_angles = ss.stack_angles,
-		.material = rigid_body::kBlackMatte,
-		.setup_material = [&] (rigid_body::ShapeMaterial& material, si::LonLat const sphere_position, WaitGroup::WorkToken&& work_token) {
+		.material = kBlackMatte,
+		.setup_material = [&] (ShapeMaterial& material, si::LonLat const sphere_position, WaitGroup::WorkToken&& work_token) {
 			auto calculate = [=, &material, &p, work_token = std::move (work_token)] {
 				if (sphere_position.lat() >= horizon_angle)
 				{
