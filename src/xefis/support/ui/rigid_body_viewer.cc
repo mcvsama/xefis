@@ -224,56 +224,62 @@ RigidBodyViewer::display_menu()
 	// "Show constraints"
 	if (_rigid_body_system && !_rigid_body_system->constraints().empty())
 	{
-		auto* action = menu.addAction ("Show &constraints", [&] {
-			_rigid_body_painter.set_constraints_visible (!_rigid_body_painter.constraints_visible());
+		auto* action = menu.addAction ("Show &constraints", [this] {
+			auto& conf = _rigid_body_painter.features_config();
+			conf.constraints_visible = !conf.constraints_visible;
 		});
 		action->setCheckable (true);
-		action->setChecked (_rigid_body_painter.constraints_visible());
+		action->setChecked (_rigid_body_painter.features_config().constraints_visible);
 	}
 
 	// "Show gravity"
 	{
-		auto* action = menu.addAction ("Show &gravity", [&] {
-			_rigid_body_painter.set_gravity_visible (!_rigid_body_painter.gravity_visible());
+		auto* action = menu.addAction ("Show &gravity", [this] {
+			auto& conf = _rigid_body_painter.features_config();
+			conf.gravity_visible = !conf.gravity_visible;
 		});
 		action->setCheckable (true);
-		action->setChecked (_rigid_body_painter.gravity_visible());
+		action->setChecked (_rigid_body_painter.features_config().gravity_visible);
 	}
 
 	// "Show aerodynamic forces"
 	{
-		auto* action = menu.addAction ("Show &aerodynamic forces", [&] {
-			_rigid_body_painter.set_aerodynamic_forces_visible (!_rigid_body_painter.aerodynamic_forces_visible());
+		auto* action = menu.addAction ("Show &aerodynamic forces", [this] {
+			auto& conf = _rigid_body_painter.features_config();
+			conf.aerodynamic_forces_visible = !conf.aerodynamic_forces_visible;
 		});
 		action->setCheckable (true);
-		action->setChecked (_rigid_body_painter.aerodynamic_forces_visible());
+		action->setChecked (_rigid_body_painter.features_config().aerodynamic_forces_visible);
 	}
 
 	// "Show external forces"
 	{
-		auto* action = menu.addAction ("Show &external forces", [&] {
-			_rigid_body_painter.set_external_forces_visible (!_rigid_body_painter.external_forces_visible());
+		auto* action = menu.addAction ("Show &external forces", [this] {
+			auto& conf = _rigid_body_painter.features_config();
+			conf.external_forces_visible = !conf.external_forces_visible;
 		});
 		action->setCheckable (true);
-		action->setChecked (_rigid_body_painter.external_forces_visible());
+		action->setChecked (_rigid_body_painter.features_config().external_forces_visible);
 	}
 
 	// "Show angular velocities"
 	{
-		auto* action = menu.addAction ("Show angula&r velocities", [&] {
-			_rigid_body_painter.set_angular_velocities_visible (!_rigid_body_painter.angular_velocities_visible());
+		auto* action = menu.addAction ("Show angula&r velocities", [this] {
+			auto& conf = _rigid_body_painter.features_config();
+			conf.angular_velocities_visible = !conf.angular_velocities_visible;
 		});
 		action->setCheckable (true);
-		action->setChecked (_rigid_body_painter.angular_velocities_visible());
+		action->setChecked (_rigid_body_painter.features_config().angular_velocities_visible);
 	}
 
 	// "Show angular momenta"
 	{
-		auto* action = menu.addAction ("Show angular &momenta", [&] {
-			_rigid_body_painter.set_angular_momenta_visible (!_rigid_body_painter.angular_momenta_visible());
+		auto* action = menu.addAction ("Show angular &momenta", [this] {
+			auto& conf = _rigid_body_painter.features_config();
+			conf.angular_momenta_visible = !conf.angular_momenta_visible;
 		});
 		action->setCheckable (true);
-		action->setChecked (_rigid_body_painter.angular_momenta_visible());
+		action->setChecked (_rigid_body_painter.features_config().angular_momenta_visible);
 	}
 
 	return !!menu.exec (QCursor::pos());

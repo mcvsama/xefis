@@ -689,19 +689,19 @@ RigidBodyPainter::paint (rigid_body::System const& system)
 		for (auto const& body: system.bodies())
 			paint (*body, get_rendering_config (*body));
 
-		if (constraints_visible())
+		if (_features_config.constraints_visible)
 			for (auto const& constraint: system.constraints())
 				paint (*constraint);
 
-		if (gravity_visible() || aerodynamic_forces_visible() || external_forces_visible())
+		if (_features_config.gravity_visible || _features_config.aerodynamic_forces_visible || _features_config.external_forces_visible)
 			for (auto const& body: system.bodies())
 				paint_forces (*body);
 
-		if (angular_velocities_visible())
+		if (_features_config.angular_velocities_visible)
 			for (auto const& body: system.bodies())
 				paint_angular_velocity (*body);
 
-		if (angular_momenta_visible())
+		if (_features_config.angular_momenta_visible)
 			for (auto const& body: system.bodies())
 				paint_angular_momentum (*body);
 
@@ -945,10 +945,10 @@ RigidBodyPainter::paint_forces (rigid_body::Body const& body)
 	auto const cp = _camera.position();
 	auto const com = body.placement().position() - cp;
 
-	if (_gravity_visible)
+	if (_features_config.gravity_visible)
 		draw_arrow (com, gfm.force() * force_to_length, make_material (gravity_color));
 
-	if (_aerodynamic_forces_visible)
+	if (_features_config.aerodynamic_forces_visible)
 	{
 		if (auto const* wing = dynamic_cast<sim::Wing const*> (&body))
 		{
@@ -966,7 +966,7 @@ RigidBodyPainter::paint_forces (rigid_body::Body const& body)
 		}
 	}
 
-	if (_external_forces_visible)
+	if (_features_config.external_forces_visible)
 	{
 		draw_arrow (com, efm.force() * force_to_length, make_material (external_force_color));
 		draw_arrow (com, efm.torque() * torque_to_length, make_material (external_torque_color));
