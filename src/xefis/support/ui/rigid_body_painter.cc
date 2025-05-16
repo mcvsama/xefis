@@ -1185,7 +1185,7 @@ void
 RigidBodyPainter::check_sky_dome()
 {
 	// If the next calculated SkyDome is ready, use it:
-	if (_next_sky_dome_shape.valid() && is_ready (_next_sky_dome_shape))
+	if (is_valid_and_ready (_next_sky_dome_shape))
 		_sky_dome_shape = _next_sky_dome_shape.get();
 
 	if (!_next_sky_dome_shape.valid() && std::exchange (_need_new_sky_dome, false))
