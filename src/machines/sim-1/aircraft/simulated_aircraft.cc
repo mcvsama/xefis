@@ -25,6 +25,7 @@
 #include <xefis/support/math/geometry.h>
 #include <xefis/support/math/placement.h>
 #include <xefis/support/nature/various_inertia_tensors.h>
+#include <xefis/support/shapes/various_shapes.h>
 #include <xefis/support/simulation/constraints/angular_limits_constraint.h>
 #include <xefis/support/simulation/constraints/angular_servo_constraint.h>
 #include <xefis/support/simulation/constraints/angular_spring_constraint.h>
@@ -35,7 +36,6 @@
 #include <xefis/support/simulation/devices/wing.h>
 #include <xefis/support/simulation/rigid_body/concepts.h>
 #include <xefis/support/simulation/rigid_body/group.h>
-#include <xefis/support/simulation/shapes/various_shapes.h>
 
 // Neutrino:
 #include <neutrino/math/math.h>

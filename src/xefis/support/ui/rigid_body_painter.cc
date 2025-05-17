@@ -22,12 +22,12 @@
 #include <xefis/support/earth/earth.h>
 #include <xefis/support/math/rotations.h>
 #include <xefis/support/nature/constants.h>
+#include <xefis/support/shapes/various_materials.h>
+#include <xefis/support/shapes/various_shapes.h>
 #include <xefis/support/simulation/constraints/fixed_constraint.h>
 #include <xefis/support/simulation/constraints/hinge_constraint.h>
 #include <xefis/support/simulation/constraints/slider_constraint.h>
 #include <xefis/support/simulation/devices/wing.h>
-#include <xefis/support/simulation/shapes/various_materials.h>
-#include <xefis/support/simulation/shapes/various_shapes.h>
 #include <xefis/support/ui/gl_space.h>
 #include <xefis/support/ui/paint_helper.h>
 #include <xefis/support/universe/julian_calendar.h>

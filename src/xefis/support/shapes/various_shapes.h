@@ -11,17 +11,17 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__SUPPORT__SIMULATION__SHAPES__VARIOUS_SHAPES_H__INCLUDED
-#define XEFIS__SUPPORT__SIMULATION__SHAPES__VARIOUS_SHAPES_H__INCLUDED
+#ifndef XEFIS__SUPPORT__SHAPES__VARIOUS_SHAPES_H__INCLUDED
+#define XEFIS__SUPPORT__SHAPES__VARIOUS_SHAPES_H__INCLUDED
 
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/aerodynamics/airfoil_spline.h>
 #include <xefis/support/math/geometry.h>
 #include <xefis/support/nature/mass_moments.h>
-#include <xefis/support/simulation/shapes/shape.h>
-#include <xefis/support/simulation/shapes/shape_material.h>
-#include <xefis/support/simulation/shapes/various_materials.h>
+#include <xefis/support/shapes/shape.h>
+#include <xefis/support/shapes/shape_material.h>
+#include <xefis/support/shapes/various_materials.h>
 
 // Neutrino:
 #include <neutrino/wait_group.h>

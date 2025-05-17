@@ -18,6 +18,7 @@
 #include <xefis/support/nature/constants.h>
 #include <xefis/support/nature/mass_moments.h>
 #include <xefis/support/nature/various_inertia_tensors.h>
+#include <xefis/support/shapes/various_shapes.h>
 #include <xefis/support/simulation/constraints/angular_limits_constraint.h>
 #include <xefis/support/simulation/constraints/angular_servo_constraint.h>
 #include <xefis/support/simulation/constraints/fixed_constraint.h>
@@ -27,7 +28,6 @@
 #include <xefis/support/simulation/rigid_body/concepts.h>
 #include <xefis/support/simulation/rigid_body/impulse_solver.h>
 #include <xefis/support/simulation/rigid_body/utility.h>
-#include <xefis/support/simulation/shapes/various_shapes.h>
 #include <xefis/support/simulation/evolver.h>
 #include <xefis/support/ui/rigid_body_viewer.h>
 

@@ -18,7 +18,7 @@
 #include <xefis/config/all.h>
 #include <xefis/support/nature/constants.h>
 #include <xefis/support/nature/mass_moments.h>
-#include <xefis/support/simulation/shapes/various_shapes.h>
+#include <xefis/support/shapes/various_shapes.h>
 
 // Standard:
 #include <cstddef>
