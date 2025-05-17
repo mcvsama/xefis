@@ -63,7 +63,7 @@ class PerformanceComputerIO: public xf::Module
 	xf::ModuleIn<si::Acceleration>	load						{ this, "load" };
 	xf::ModuleIn<si::Angle>			bank_angle					{ this, "bank-angle" };
 	xf::ModuleIn<si::Acceleration>	y_acceleration				{ this, "acceleration.y" };
-	xf::ModuleIn<si::Acceleration>	z_acceleration				{ this, "acceleration.x" };
+	xf::ModuleIn<si::Acceleration>	z_acceleration				{ this, "acceleration.z" };
 
 	/*
 	 * Output
