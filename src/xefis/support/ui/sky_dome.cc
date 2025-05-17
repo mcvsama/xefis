@@ -145,7 +145,7 @@ calculate_dome_slices_and_stacks (HorizontalCoordinates const sun_position, si::
 
 	// Sky longitude:
 	{
-		auto constexpr sun_vicinity_slices = 13u;
+		auto constexpr sun_vicinity_slices = 9u;
 		auto constexpr rest_slices = 50u;
 
 		result.slice_angles.reserve (sun_vicinity_slices + rest_slices + 1);
