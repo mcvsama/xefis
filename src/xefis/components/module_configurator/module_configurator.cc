@@ -16,7 +16,6 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/support/qt/ownership_breaker.h>
 
 // Qt:
 #include <QBoxLayout>

@@ -17,7 +17,6 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/components/module_configurator/config_widget.h>
-#include <xefis/support/qt/ownership_breaker.h>
 #include <xefis/support/ui/paint_helper.h>
 
 // Neutrino:
