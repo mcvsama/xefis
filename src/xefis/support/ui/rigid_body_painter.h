@@ -633,10 +633,11 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	// Sky and ground:
 	Shape						_sky_dome_shape;
 	std::future<Shape>			_next_sky_dome_shape;
-	std::optional<Shape>		_sky_box_shape;
+	// If set to true, a recalculation of _sky_dome_shape will be requested (and put in _next_sky_dome_shape):
 	bool						_need_new_sky_dome			{ false };
-	Shape						_ground_shape;
 	si::Time					_sky_dome_update_time;
+	Shape						_ground_shape;
+	std::optional<Shape>		_sky_box_shape;
 	si::Angle					_horizon_angle;
 	// Recalculated from time to time:
 	RotationQuaternion<WorldSpace>
@@ -644,9 +645,12 @@ class RigidBodyPainter: protected QOpenGLFunctions
 
 	// Sun:
 	SunPosition					_sun_position;
+	// Corrected position is for the case when sun sets or rises and the face is partially covered by earth;
+	// In such case the corrected position is the center of the visible part of sun's face, not the center of the circle:
 	HorizontalCoordinates		_corrected_sun_position_horizontal_coordinates;
 	SpaceVector<double>			_corrected_sun_position_cartesian_horizontal_coordinates;
 	float						_sun_magnification						{ 1.0f };
+	// Color to use when setting up OpenGL light:
 	GLColor						_sun_color_on_followed;
 
 	float						_camera_normalized_amsl_height			{ 0.0f };
