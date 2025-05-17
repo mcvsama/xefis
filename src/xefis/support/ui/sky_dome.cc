@@ -170,39 +170,25 @@ calculate_dome_slices_and_stacks (HorizontalCoordinates const sun_position, si::
 
 	// Latitude:
 	{
-		auto const n_ground_stacks = 50u;
 		auto const horizon_epsilon = 0.001_deg;
+		auto const n_ground_stacks = 12u;
+		auto const n_sky_stacks = 30u;
 
-		result.stack_angles.reserve (n_ground_stacks + 1 + 100);
+		result.stack_angles.reserve (n_ground_stacks + n_sky_stacks);
 
 		// Ground:
 		{
-			// TODO far fewer slices if really far away
-			auto const delta = (horizon_angle + 90_deg) / n_ground_stacks;
+			auto const step = 1.0f / n_ground_stacks;
 
-			// Start from top, reverse later:
-			auto latitude = horizon_angle - horizon_epsilon;
-
-			// Denser near horizon at the expense of density directly under the camera:
-			auto const dynamic_delta = [&latitude, &delta, &horizon_angle]() {
-				auto const nl = neutrino::renormalize (latitude, Range<si::Angle> { -90_deg, horizon_angle }, Range<si::Angle> { -90_deg, 0_deg });
-				auto const factor = nl > -1_deg
-					? 0.05
-					: nl > -5_deg
-						? 0.3
-						: nl > -10_deg
-							? 0.5
-							: 1.0;
-				return factor * delta;
-			};
-
-			// More stacks to correct for the denser mesh near the horizon:
-			auto const more_stacks = 18;
-
-			for (auto i = 0u; i < n_ground_stacks + more_stacks; ++i, latitude -= dynamic_delta())
+			for (auto f = 0.0f; f < 1.0f; )
+			{
+				auto const curved = f * f * f * f;
+				auto const latitude = neutrino::renormalize (curved, Range { 0.0f, 1.0f }, Range<si::Angle> { horizon_angle - horizon_epsilon, -90_deg });
 				result.stack_angles.push_back (latitude);
+				f += step;
+			}
 
-			// Final pole:
+			// Bottom of the dome:
 			result.stack_angles.push_back (-90_deg);
 
 			// Latitudes must be in ascending order:
@@ -211,34 +197,16 @@ calculate_dome_slices_and_stacks (HorizontalCoordinates const sun_position, si::
 
 		// Sky:
 		{
-			auto const sun_vicinity = Range { sun_position.altitude - 20_deg, sun_position.altitude + 20_deg };
+			auto const step = 1.0f / n_sky_stacks;
+			auto const power_factor = neutrino::renormalize (horizon_angle, Range<si::Angle> { 0_deg, -90_deg }, Range { 3.0, 6.0 });
+			auto const limit = 1 - horizon_angle / -120_deg; // 120 instead of 90 is to avoid artifacts when there are too few stacks.
 
-			// Start at horizon:
-			result.stack_angles.push_back (horizon_angle + horizon_epsilon);
-
-			for (auto latitude = horizon_angle; latitude < 90_deg; )
+			for (auto f = 0.0f; f < limit; )
 			{
+				auto const curved = std::pow (f, power_factor);
+				auto const latitude = neutrino::renormalize (curved, Range { 0.0f, 1.0f }, Range<si::Angle> { horizon_angle + horizon_epsilon, +90_deg });
 				result.stack_angles.push_back (latitude);
-
-				// TODO denser around the earth's visible border when seen from space
-				if (latitude <= horizon_angle + 3_deg)
-					latitude += 0.25_deg;
-				else if (latitude <= horizon_angle + 6_deg)
-					latitude += 0.5_deg;
-				else if (latitude <= horizon_angle + 12_deg || sun_vicinity.includes (latitude))
-					latitude += 1.5_deg;
-				else
-				{
-					auto const big_step = 5_deg;
-
-					if (latitude < sun_vicinity.min() && sun_vicinity.includes (latitude + big_step))
-					{
-						latitude = sun_vicinity.min() + 0.001_deg; // +0.001° prevents infinite loop.
-						result.stack_angles.push_back (latitude);
-					}
-					else
-						latitude += big_step;
-				}
+				f += step;
 			}
 
 			// Top of the dome:
