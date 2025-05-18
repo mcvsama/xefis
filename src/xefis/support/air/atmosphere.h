@@ -11,12 +11,12 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__SUPPORT__EARTH__ATMOSPHERIC_MODEL_H__INCLUDED
-#define XEFIS__SUPPORT__EARTH__ATMOSPHERIC_MODEL_H__INCLUDED
+#ifndef XEFIS__SUPPORT__ATMOSPHERIC_MODEL_H__INCLUDED
+#define XEFIS__SUPPORT__ATMOSPHERIC_MODEL_H__INCLUDED
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/support/earth/air/air.h>
+#include <xefis/support/air/air.h>
 #include <xefis/support/math/geometry.h>
 
 // Standard:
