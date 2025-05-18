@@ -118,9 +118,6 @@ RigidBodyPainter::RigidBodyPainter (si::PixelDensity const pixel_density, WorkPe
 
 RigidBodyPainter::~RigidBodyPainter()
 {
-	if (_next_sky_dome_shape.valid())
-		_next_sky_dome_shape.wait();
-
 	if (_texture_images.valid())
 		_texture_images.wait();
 }
@@ -1184,12 +1181,8 @@ RigidBodyPainter::check_textures()
 void
 RigidBodyPainter::check_sky_dome()
 {
-	// If the next calculated SkyDome is ready, use it:
-	if (valid_and_ready (_next_sky_dome_shape))
-		_sky_dome_shape = _next_sky_dome_shape.get();
-
-	if (!_next_sky_dome_shape.valid() && std::exchange (_need_new_sky_dome, false))
-		_next_sky_dome_shape = _work_performer->submit (&RigidBodyPainter::calculate_sky_dome_shape, this);
+	if (std::exchange (_need_new_sky_dome, false))
+		_sky_dome_shape = calculate_sky_dome_shape();
 }
 
 
