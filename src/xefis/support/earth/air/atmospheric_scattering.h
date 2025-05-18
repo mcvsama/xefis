@@ -54,7 +54,7 @@ class AtmosphericScattering
 		// Automatically tonemap output values:
 		bool				enable_tonemapping				{ false };
 		// Number of samples taken along the view direction (casted ray):
-		uint32_t			num_viewing_direction_samples	{ 32 };
+		uint32_t			num_viewing_direction_samples	{ 64 };
 		// Number of samples taken to the light source:
 		uint32_t			num_light_direction_samples		{ 8 };
 	};
