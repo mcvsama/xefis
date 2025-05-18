@@ -146,8 +146,8 @@ calculate_dome_slices_and_stacks (si::Angle const horizon_angle)
 	// Sky longitude:
 	{
 		auto constexpr sun_vicinity_lr = 20_deg;
-		auto constexpr sun_vicinity_delta = 4_deg;
-		auto constexpr far_delta = 7_deg;
+		auto constexpr sun_vicinity_delta = 3_deg;
+		auto constexpr far_delta = 4_deg;
 		auto constexpr n_sun_vicinity_slices = static_cast<std::size_t> (std::ceil (sun_vicinity_lr / sun_vicinity_delta));
 		auto constexpr n_far_slices = static_cast<std::size_t> (std::ceil ((180_deg - sun_vicinity_lr) / far_delta));
 
