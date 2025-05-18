@@ -5,7 +5,7 @@ MIHAU_VERSION_FILE											:= neutrino/core/version.cc
 MIHAU.modules												+= xefis
 
 MIHAU.modules[xefis].pkgconfigs								+= $(MIHAU.modules[neutrino].pkgconfigs)
-MIHAU.modules[xefis].pkgconfigs								+= Qt5Core Qt5Gui Qt5Network Qt5Xml Qt5Widgets Qt5X11Extras Qt5Svg Qt5OpenGL
+MIHAU.modules[xefis].pkgconfigs								+= Qt6Core Qt6Gui Qt6Network Qt6Xml Qt6Widgets Qt6Svg Qt6OpenGL Qt6OpenGLWidgets
 MIHAU.modules[xefis].cpp_flags								+= $(MIHAU.modules[neutrino].cpp_flags)
 MIHAU.modules[xefis].cpp_defines							+= $(MIHAU.modules[neutrino].cpp_defines)
 MIHAU.modules[xefis].cpp_includes							+= $(MIHAU.modules[nautrino].cpp_includes)
@@ -512,7 +512,7 @@ MIHAU.modules[xefis].products[manualtest].sources			+= xefis/support/simulation/
 MIHAU.modules												+= watchdog
 
 MIHAU.modules[watchdog].pkgconfigs							+= $(MIHAU.modules[neutrino].pkgconfigs)
-MIHAU.modules[watchdog].pkgconfigs							+= Qt5Core
+MIHAU.modules[watchdog].pkgconfigs							+= Qt6Core
 MIHAU.modules[watchdog].cpp_flags							+= $(MIHAU.modules[neutrino].cpp_flags)
 MIHAU.modules[watchdog].cpp_defines							+= $(MIHAU.modules[neutrino].cpp_defines)
 MIHAU.modules[watchdog].cpp_includes						+= $(MIHAU.modules[nautrino].cpp_includes)
