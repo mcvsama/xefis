@@ -16,7 +16,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/support/earth/air/air.h>
+#include <xefis/support/air/air.h>
 #include <xefis/support/nature/wrench.h>
 
 // Standard:

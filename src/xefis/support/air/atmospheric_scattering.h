@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__SUPPORT__EARTH__AIR__ATMOSPHERIC_SCATTERING_H__INCLUDED
-#define XEFIS__SUPPORT__EARTH__AIR__ATMOSPHERIC_SCATTERING_H__INCLUDED
+#ifndef XEFIS__SUPPORT__AIR__ATMOSPHERIC_SCATTERING_H__INCLUDED
+#define XEFIS__SUPPORT__AIR__ATMOSPHERIC_SCATTERING_H__INCLUDED
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -178,7 +178,7 @@ constexpr SpaceVector<float, RGBSpace>
 AtmosphericScattering::tonemap_separately (SpaceVector<float, RGBSpace> input)
 {
 	// Apply tone mapping function to each color channel:
-	for (auto& v: input.array())
+	for (auto& v: input.components())
 		v = tonemap (v);
 
 	return input;

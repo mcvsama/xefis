@@ -19,7 +19,7 @@
 #include <xefis/support/aerodynamics/airfoil_characteristics.h>
 #include <xefis/support/aerodynamics/airfoil_aerodynamic_parameters.h>
 #include <xefis/support/aerodynamics/reynolds_number.h>
-#include <xefis/support/earth/air/air.h>
+#include <xefis/support/air/air.h>
 #include <xefis/support/math/geometry.h>
 #include <xefis/support/nature/mass_moments_at_arm.h>
 

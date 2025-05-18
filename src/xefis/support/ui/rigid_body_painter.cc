@@ -16,9 +16,9 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/support/air/atmospheric_scattering.h>
 #include <xefis/support/color/hsl.h>
 #include <xefis/support/color/spaces.h>
-#include <xefis/support/earth/air/atmospheric_scattering.h>
 #include <xefis/support/earth/earth.h>
 #include <xefis/support/math/rotations.h>
 #include <xefis/support/nature/constants.h>

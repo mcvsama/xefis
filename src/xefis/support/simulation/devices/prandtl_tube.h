@@ -16,7 +16,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/support/earth/air/atmosphere.h>
+#include <xefis/support/air/atmosphere.h>
 #include <xefis/support/simulation/devices/prandtl_tube_widget.h>
 #include <xefis/support/simulation/rigid_body/body.h>
 #include <xefis/support/ui/observation_widget.h>
