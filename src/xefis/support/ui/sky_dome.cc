@@ -171,7 +171,7 @@ calculate_dome_slices_and_stacks (si::Angle const horizon_angle)
 	// Latitude:
 	{
 		auto const horizon_epsilon = 0.001_deg;
-		auto const n_ground_stacks = 12u;
+		auto const n_ground_stacks = 20u;
 		auto const n_sky_stacks = 30u;
 
 		result.stack_angles.reserve (n_ground_stacks + n_sky_stacks);
@@ -182,7 +182,7 @@ calculate_dome_slices_and_stacks (si::Angle const horizon_angle)
 
 			for (auto f = 0.0f; f < 1.0f; )
 			{
-				auto const curved = f * f * f * f;
+				auto const curved = f * f * f;
 				auto const latitude = neutrino::renormalize (curved, Range { 0.0f, 1.0f }, Range<si::Angle> { horizon_angle - horizon_epsilon, -90_deg });
 				result.stack_angles.push_back (latitude);
 				f += step;
