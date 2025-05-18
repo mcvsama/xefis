@@ -37,7 +37,7 @@ InstrumentAids::FontInfo::get_digit_width (QFont const& font)
 	float digit_width = 0;
 
 	for (char c: InstrumentAids::kDigits)
-		digit_width = std::max<float> (digit_width, font_metrics.width (c));
+		digit_width = std::max<float> (digit_width, font_metrics.horizontalAdvance (c));
 
 	return digit_width;
 }

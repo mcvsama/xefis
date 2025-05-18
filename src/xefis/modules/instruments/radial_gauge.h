@@ -220,8 +220,8 @@ template<class Value>
 		}
 
 		float const margin = 0.4f * q;
-		float const zero_width = metrics.width ('0');
-		float const small_zero_width = small_metrics.width ('0');
+		float const zero_width = metrics.horizontalAdvance ('0');
+		float const small_zero_width = small_metrics.horizontalAdvance ('0');
 
 		float box_text_width_f = 0.0f;
 
@@ -231,7 +231,7 @@ template<class Value>
 			if (paint_request.size_changed() || !*box_text_width)
 			{
 				QString const sample_text = QString::fromStdString (std::format (values.format, 0.0));
-				*box_text_width = metrics.width (sample_text);
+				*box_text_width = metrics.horizontalAdvance (sample_text);
 			}
 
 			box_text_width_f = **box_text_width;

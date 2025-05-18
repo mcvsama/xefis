@@ -478,13 +478,13 @@ PaintingWork::paint_aircraft()
 				QFont font_2 (_aids.font_5.font);
 				QFontMetricsF metrics_1 (font_1);
 				QFontMetricsF metrics_2 (font_2);
-				QRectF rect_v (0.f, 0.f, metrics_2.width (text_v), metrics_2.height());
+				QRectF rect_v (0.f, 0.f, metrics_2.horizontalAdvance (text_v), metrics_2.height());
 				_aids.centrify (rect_v);
 				rect_v.adjust (-margin, 0.f, +margin, 0.f);
-				QRectF rect_1 (0.f, 0.f, metrics_1.width (text_1), metrics_1.height());
+				QRectF rect_1 (0.f, 0.f, metrics_1.horizontalAdvance (text_1), metrics_1.height());
 				_aids.centrify (rect_1);
 				rect_1.moveRight (rect_v.left() - 0.2f * _c.q);
-				QRectF rect_2 (0.f, 0.f, metrics_1.width (text_2), metrics_1.height());
+				QRectF rect_2 (0.f, 0.f, metrics_1.horizontalAdvance (text_2), metrics_1.height());
 				_aids.centrify (rect_2);
 				rect_2.moveLeft (rect_v.right() + 0.2f * _c.q);
 
@@ -798,7 +798,7 @@ PaintingWork::paint_track (bool paint_heading_triangle)
 
 			if (draw_text)
 			{
-				QRectF half_range_rect (0.f, 0.f, metrics.width (half_range_str), metrics.height());
+				QRectF half_range_rect (0.f, 0.f, metrics.horizontalAdvance (half_range_str), metrics.height());
 				_aids.centrify (half_range_rect);
 				half_range_rect.moveRight (-2.f * range_tick_hpx);
 				half_range_rect.translate (0.f, -range_tick_vpx);
@@ -1493,7 +1493,7 @@ PaintingWork::paint_range()
 		else
 			r = QString::fromStdString (std::format ("{:d}", static_cast<int> (_p.range.in<si::NauticalMile>())));
 
-		QRectF rect (0.f, 0.f, std::max (metr_a.width (s), metr_b.width (r)) + 0.4f * _c.q, metr_a.height() + metr_b.height());
+		QRectF rect (0.f, 0.f, std::max (metr_a.horizontalAdvance (s), metr_b.horizontalAdvance (r)) + 0.4f * _c.q, metr_a.height() + metr_b.height());
 
 		_painter.setClipping (false);
 		_painter.resetTransform();
@@ -1853,7 +1853,7 @@ PaintingWork::paint_locs()
 		_painter.drawLine (pt_0, pt_1);
 		_painter.drawLine (pt_0, pt_2);
 
-		QPointF text_offset (0.5f * font_metrics.width (navaid.identifier()), -0.35f * font_metrics.height());
+		QPointF text_offset (0.5f * font_metrics.horizontalAdvance (navaid.identifier()), -0.35f * font_metrics.height());
 		texts_to_paint.emplace_back (transform.map (pt_0 + QPointF (0.f, 0.6f * _c.q)) - text_offset, navaid.identifier());
 	};
 

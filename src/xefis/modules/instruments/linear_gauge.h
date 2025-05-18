@@ -338,7 +338,7 @@ template<class Value>
 		QFont font (aids.font_5.font);
 		font.setPixelSize (font.pixelSize() * values.font_scale);
 		QFontMetricsF const metrics (font);
-		float const char_width = metrics.width ("0");
+		float const char_width = metrics.horizontalAdvance ("0");
 		float const hcorr = 0.025f * metrics.height();
 
 		QPen text_pen = aids.get_pen (Qt::white, 0.8f);

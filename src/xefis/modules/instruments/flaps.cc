@@ -88,7 +88,7 @@ Flaps::async_paint (xf::PaintRequest const& paint_request, PaintingParams const&
 	// Cyan vertical text:
 	painter.setFont (label_font);
 	painter.setPen (cyan);
-	painter.fast_draw_vertical_text (QPointF (block.left() - QFontMetricsF (label_font).width ("0"), 0.f), Qt::AlignVCenter | Qt::AlignRight, "FLAPS");
+	painter.fast_draw_vertical_text (QPointF (block.left() - QFontMetricsF (label_font).horizontalAdvance ("0"), 0.f), Qt::AlignVCenter | Qt::AlignRight, "FLAPS");
 
 	// Flaps white box:
 	painter.setPen (aids->get_pen (Qt::white, 1.f));
