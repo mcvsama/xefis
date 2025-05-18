@@ -83,8 +83,10 @@ struct IrregularSphereShapeParameters
 	// Must be sorted:
 	std::span<si::Angle const>		stack_angles;
 	ShapeMaterial const&			material		{ };
-	MakeSphereMaterialCallback		setup_material	{ std::monostate() };
 	std::shared_ptr<QOpenGLTexture>	texture			{ nullptr };
+	// When symmetric_0_180 is true, user should only provide longitudes in range (0°, 180°).
+	bool							symmetric_0_180	{ false };
+	MakeSphereMaterialCallback		setup_material	{ std::monostate() };
 };
 
 
