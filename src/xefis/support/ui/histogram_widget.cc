@@ -81,7 +81,7 @@ HistogramWidget::update_canvas()
 	ph.setup_painter (painter);
 
 	QFontMetricsF const font_metrics (font());
-	float const y_max_str_width = _y_legend_visible ? std::max (font_metrics.width (_y_max_str), font_metrics.width ("0000")) : 0.0f;
+	float const y_max_str_width = _y_legend_visible ? std::max (font_metrics.horizontalAdvance (_y_max_str), font_metrics.horizontalAdvance ("0000")) : 0.0f;
 	auto const axes_width = ph.em_pixels (0.1f);
 	auto const chart_width = ph.em_pixels (0.05f);
 	auto const grid_width = ph.em_pixels (0.03f);
@@ -197,7 +197,7 @@ HistogramWidget::update_canvas()
 		// Min/expected/max values:
 		auto paint_x_value = [&] (QString const& text, std::size_t bin_number, Qt::Alignment alignment) {
 			auto const x = chart_rect.left() + bin_number * bin_width;
-			QRectF text_rect (QPointF (0, axes_rect.bottom() + bug_length), QSizeF (font_metrics.width (text), text_height));
+			QRectF text_rect (QPointF (0, axes_rect.bottom() + bug_length), QSizeF (font_metrics.horizontalAdvance (text), text_height));
 
 			if (alignment & Qt::AlignRight)
 				text_rect.moveRight (x);

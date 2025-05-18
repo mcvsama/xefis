@@ -34,9 +34,9 @@ TextPainter::Cache::Glyph::Glyph (QFont const& font, QColor color, QChar charact
 	data (std::make_shared<Data>())
 {
 	QFontMetricsF metrics (font);
-	position_correction.setX (position_correction.x() * metrics.width("0"));
+	position_correction.setX (position_correction.x() * metrics.horizontalAdvance ("0"));
 	position_correction.setY (position_correction.y() * metrics.height());
-	QSize size (std::ceil (metrics.width (character)) + 1, std::ceil (metrics.height()) + 1);
+	QSize size (std::ceil (metrics.horizontalAdvance (character)) + 1, std::ceil (metrics.height()) + 1);
 	QImage image (size, QImage::Format_ARGB32_Premultiplied);
 	QColor alpha = color;
 	alpha.setAlpha (0);
@@ -115,7 +115,7 @@ QRectF
 TextPainter::get_text_box (QPointF const& position, Qt::Alignment flags, QString const& text) const
 {
 	QFontMetricsF metrics (font());
-	QRectF target (position.x(), position.y(), metrics.width (text), metrics.height());
+	QRectF target (position.x(), position.y(), metrics.horizontalAdvance (text), metrics.height());
 	apply_alignment (target, flags);
 
 	return target;
@@ -129,7 +129,7 @@ TextPainter::get_vertical_text_box (QPointF const& position, Qt::Alignment flags
 
 	float widest_char = 0.f;
 	for (auto const& c: text)
-		widest_char = std::max<float> (widest_char, metrics.width (c));
+		widest_char = std::max<float> (widest_char, metrics.horizontalAdvance (c));
 
 	QRectF target (position.x(), position.y(), widest_char, metrics.height() * text.size());
 	apply_alignment (target, flags);
@@ -142,7 +142,7 @@ void
 TextPainter::fast_draw_text (QPointF const& position, QString const& text, std::optional<Shadow> shadow)
 {
 	QFontMetricsF metrics (font());
-	QRectF target (position - QPointF (0.f, metrics.ascent()), QSizeF (metrics.width (text), metrics.height()));
+	QRectF target (position - QPointF (0.f, metrics.ascent()), QSizeF (metrics.horizontalAdvance (text), metrics.height()));
 	fast_draw_text (target, {}, text, shadow);
 }
 
@@ -162,9 +162,9 @@ TextPainter::fast_draw_text (QRectF const& target, Qt::Alignment flags, QString 
 	QPointF offset;
 
 	if (flags & Qt::AlignHCenter)
-		offset.setX (target_center.x() - 0.5f * metrics.width (text));
+		offset.setX (target_center.x() - 0.5f * metrics.horizontalAdvance (text));
 	else if (flags & Qt::AlignRight)
-		offset.setX (target.right() - metrics.width (text));
+		offset.setX (target.right() - metrics.horizontalAdvance (text));
 	else // default: AlignLeft
 		offset.setX (target.left());
 
@@ -222,7 +222,7 @@ TextPainter::fast_draw_text (QRectF const& target, Qt::Alignment flags, QString 
 		int dx = clamped<int> (fx * Cache::Glyph::Rank, 0, Cache::Glyph::Rank - 1);
 		int dy = clamped<int> (fy * Cache::Glyph::Rank, 0, Cache::Glyph::Rank - 1);
 		drawImage (QPoint (offset.x(), offset.y()), glyph->second.data->positions[dx][dy]);
-		offset.rx() += metrics.width (*c);
+		offset.rx() += metrics.horizontalAdvance (*c);
 	}
 
 	if (saved_transform)

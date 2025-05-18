@@ -281,7 +281,7 @@ void
 AdiPaintRequest::paint_dashed_zone (QColor const& color, QRectF const& target)
 {
 	QFontMetricsF const metrics (painter.font());
-	float const w = 0.7f * metrics.width ("0");
+	float const w = 0.7f * metrics.horizontalAdvance ("0");
 	float const h = 0.55f * metrics.height();
 	QPointF const center = target.center();
 	QRectF box (center - QPointF (w / 2.f, h / 1.9f), QSizeF (w, h));
@@ -305,7 +305,7 @@ AdiPaintRequest::paint_horizontal_failure_flag (QString const& message, QPointF 
 {
 	QPen const normal_pen = aids.get_pen (color, 1.0f);
 	QFontMetricsF const metrics (font);
-	QRectF box (0.f, 0.f, metrics.width (message) + 0.65f * metrics.width ("0"), metrics.height());
+	QRectF box (0.f, 0.f, metrics.horizontalAdvance (message) + 0.65f * metrics.horizontalAdvance ("0"), metrics.height());
 
 	aids.centrify (box);
 	box.translate (center);
@@ -1411,7 +1411,7 @@ VelocityLadder::paint_novspd_flag (AdiPaintRequest& pr) const
 		QFontMetricsF const metrics (font);
 		float const font_height = 0.9f * metrics.height();
 
-		QRectF rect (0.f, 0.f, metrics.width (sa), font_height * (sb.size() + 1));
+		QRectF rect (0.f, 0.f, metrics.horizontalAdvance (sa), font_height * (sb.size() + 1));
 		rect.moveLeft (0.9f * pr.q);
 		rect.moveBottom (-0.4f * pr.q);
 
@@ -1612,8 +1612,8 @@ AltitudeLadder::paint_black_box (AdiPaintRequest& pr, float const x) const
 			});
 
 			// Metric value:
-			float xcorr = 0.25f * m_metrics.width (" ");
-			QPointF m_pos (_metric_box_rect.right() - 1.5f * m_metrics.width ("M"), _metric_box_rect.center().y());
+			float xcorr = 0.25f * m_metrics.horizontalAdvance (" ");
+			QPointF m_pos (_metric_box_rect.right() - 1.5f * m_metrics.horizontalAdvance ("M"), _metric_box_rect.center().y());
 			pr.painter.setPen (pr.aids.get_pen (QColor (0x00, 0xee, 0xff), 1.f));
 			pr.painter.setFont (m_font);
 			pr.painter.fast_draw_text (m_pos, Qt::AlignLeft | Qt::AlignVCenter, "M", pr.default_shadow);
@@ -2108,8 +2108,8 @@ AltitudeLadder::paint_pressure (AdiPaintRequest& pr, float const x) const
 		int precision = pr.params.pressure_display_hpa ? 0 : 2;
 		QString pressure_str = QString ("%1").arg (pr.params.pressure_display_hpa ? pr.params.pressure_qnh->in<si::HectoPascal>() : pr.params.pressure_qnh->in<si::InchOfMercury>(), 0, 'f', precision);
 
-		QRectF nn_rect (0.f, _ladder_rect.bottom(), metrics_a.width (pressure_str), 1.2f * pr.aids.font_3.digit_height);
-		QRectF uu_rect (0.f, nn_rect.top(), metrics_b.width (unit_str), nn_rect.height());
+		QRectF nn_rect (0.f, _ladder_rect.bottom(), metrics_a.horizontalAdvance (pressure_str), 1.2f * pr.aids.font_3.digit_height);
+		QRectF uu_rect (0.f, nn_rect.top(), metrics_b.horizontalAdvance (unit_str), nn_rect.height());
 		nn_rect.moveLeft (-0.5f * (uu_rect.width() + nn_rect.width()));
 		// Correct position of uu_rect to get correct baseline position:
 		uu_rect.translate (0.f, metrics_b.descent() - metrics_a.descent());
@@ -2180,8 +2180,8 @@ AltitudeLadder::paint_ap_setting (AdiPaintRequest& pr) const
 			}
 
 			// Metric value:
-			float xcorr = 0.25f * m_metrics.width (" ");
-			QPointF const m_pos (metric_rect.right() - 1.4f * m_metrics.width ("M"), metric_rect.center().y());
+			float xcorr = 0.25f * m_metrics.horizontalAdvance (" ");
+			QPointF const m_pos (metric_rect.right() - 1.4f * m_metrics.horizontalAdvance ("M"), metric_rect.center().y());
 			pr.painter.setPen (pr.aids.get_pen (QColor (0x00, 0xee, 0xff), 1.f));
 			pr.painter.setFont (m_font);
 			pr.painter.fast_draw_text (m_pos, Qt::AlignLeft | Qt::AlignVCenter, "M", pr.default_shadow);
@@ -2587,9 +2587,9 @@ PaintingWork::paint_decision_height_setting (AdiPaintRequest& pr) const
 		QString mins_str = pr.params.decision_height_type;
 		QString alt_str = QString ("%1").arg (pr.params.decision_height_setting.in<si::Foot>(), 0, 'f', 0);
 
-		QRectF mins_rect (1.35f * x, 1.8f * x, metrics_a.width (mins_str), metrics_a.height());
+		QRectF mins_rect (1.35f * x, 1.8f * x, metrics_a.horizontalAdvance (mins_str), metrics_a.height());
 		mins_rect.moveRight (mins_rect.left());
-		QRectF alt_rect (0.f, 0.f, metrics_b.width (alt_str), metrics_b.height());
+		QRectF alt_rect (0.f, 0.f, metrics_b.horizontalAdvance (alt_str), metrics_b.height());
 		alt_rect.moveTopRight (mins_rect.bottomRight());
 
 		QPen decision_height_pen = pr.aids.get_pen (pr.get_decision_height_color(), 1.f);
@@ -3010,7 +3010,7 @@ PaintingWork::paint_input_alert (AdiPaintRequest& pr) const
 	QString alert = "NO INPUT";
 
 	QFontMetricsF const font_metrics (font);
-	int width = font_metrics.width (alert);
+	int width = font_metrics.horizontalAdvance (alert);
 
 	QPen pen = pr.aids.get_pen (Qt::white, 2.f);
 

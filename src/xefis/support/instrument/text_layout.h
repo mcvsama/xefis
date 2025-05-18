@@ -243,7 +243,7 @@ TextLayout::Fragment::Fragment (QString const& text, QFont const& font, QColor c
 	_metrics (_font),
 	_line_height_factor (line_height_factor)
 {
-	_width = _metrics.width (text);
+	_width = _metrics.horizontalAdvance (text);
 	double const hardcoded_additional_factor = 0.9;
 	_height = _line_height_factor * hardcoded_additional_factor * _metrics.height();
 }
