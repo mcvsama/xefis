@@ -112,7 +112,7 @@ class Shape
 	transform (AffineTransform<BodyOrigin> const&);
 
 	/**
-	 * Rotate the shape about space origin by provided rotation matrix.
+	 * Rotate the shape about space origin by provided rotation quaternion.
 	 */
 	void
 	rotate (RotationQuaternion<BodyOrigin> const&);
