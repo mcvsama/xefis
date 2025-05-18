@@ -632,8 +632,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 
 	// Sky and ground:
 	Shape						_sky_dome_shape;
-	std::future<Shape>			_next_sky_dome_shape;
-	// If set to true, a recalculation of _sky_dome_shape will be requested (and put in _next_sky_dome_shape):
+	// If set to true, _sky_dome_shape will be recalculated:
 	bool						_need_new_sky_dome			{ false };
 	si::Time					_sky_dome_update_time;
 	Shape						_ground_shape;
