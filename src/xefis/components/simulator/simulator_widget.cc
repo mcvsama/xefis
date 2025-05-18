@@ -277,7 +277,7 @@ SimulatorWidget::make_solar_time_controls (PaintHelper const& ph)
 	});
 
 	_solar_date_time_edit.emplace();
-	_solar_date_time_edit->setTimeSpec (Qt::UTC);
+	_solar_date_time_edit->setTimeZone (QTimeZone::UTC);
 	QObject::connect (&*_solar_date_time_edit, &QDateTimeEdit::dateTimeChanged, [this, locked = false] (QDateTime const& date_time) mutable {
 		if (auto const lock = bool_lock (locked))
 			set_solar_time (date_time);
@@ -473,7 +473,7 @@ SimulatorWidget::set_solar_time (QDateTime const date_time)
 void
 SimulatorWidget::update_solar_time_widgets()
 {
-	auto const date_time = QDateTime::fromSecsSinceEpoch (solar_time().in<si::Second>(), Qt::UTC);
+	auto const date_time = QDateTime::fromSecsSinceEpoch (solar_time().in<si::Second>(), QTimeZone::UTC);
 	auto const date = date_time.date();
 	auto const time = date_time.time();
 
@@ -493,7 +493,7 @@ SimulatorWidget::update_solar_time_widgets()
 	if (_solar_date_time_edit)
 	{
 		auto const blocker = QSignalBlocker (&*_solar_date_time_edit);
-		_solar_date_time_edit->setDateTime (QDateTime::fromSecsSinceEpoch (solar_time().in<si::Second>(), Qt::UTC));
+		_solar_date_time_edit->setDateTime (QDateTime::fromSecsSinceEpoch (solar_time().in<si::Second>(), QTimeZone::UTC));
 	}
 
 	update_viewer_time();
