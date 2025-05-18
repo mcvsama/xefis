@@ -139,33 +139,33 @@ calculate_ground_slices_and_stacks (si::Angle const horizon_angle, si::Length co
 
 [[nodiscard]]
 SlicesStacks
-calculate_dome_slices_and_stacks (HorizontalCoordinates const sun_position, si::Angle const horizon_angle)
+calculate_dome_slices_and_stacks (si::Angle const horizon_angle)
 {
 	SlicesStacks result;
 
 	// Sky longitude:
 	{
-		auto constexpr sun_vicinity_slices = 9u;
-		auto constexpr rest_slices = 50u;
+		auto constexpr sun_vicinity_lr = 20_deg;
+		auto constexpr sun_vicinity_delta = 4_deg;
+		auto constexpr far_delta = 7_deg;
+		auto constexpr n_sun_vicinity_slices = static_cast<std::size_t> (std::ceil (sun_vicinity_lr / sun_vicinity_delta));
+		auto constexpr n_far_slices = static_cast<std::size_t> (std::ceil ((180_deg - sun_vicinity_lr) / far_delta));
 
-		result.slice_angles.reserve (sun_vicinity_slices + rest_slices + 1);
+		result.slice_angles.reserve (n_sun_vicinity_slices + n_far_slices + 2); // +2 for safe margin.
 
-		auto const sun_longitude = 180_deg - sun_position.azimuth;
-		auto const sun_vicinity = Range { sun_longitude - 20_deg, sun_longitude + 20_deg };
-		auto const sun_vicinity_delta = sun_vicinity.extent() / sun_vicinity_slices;
-		auto const rest_range = 360_deg - sun_vicinity.extent();
-		auto const rest_delta = rest_range / rest_slices;
+		// Assume that sun is always at position 0°. The shape will have to be later rotated to actual sun position (180° - azimuth).
+		// Also create only slices in range (0, 180°), because the shape will be symmetric and we'll use the symmetric_0_180 = true option
+		// in IrregularSphereShapeParameters.
 
-		auto longitude = sun_vicinity.min();
+		auto longitude = 0_deg;
 
-		for (auto i = 0u; i < sun_vicinity_slices; ++i, longitude += sun_vicinity_delta)
+		for (; longitude < sun_vicinity_lr; longitude += sun_vicinity_delta)
 			result.slice_angles.push_back (longitude);
 
-		for (auto i = 0u; i < rest_slices; ++i, longitude += rest_delta)
+		for (; longitude < 180_deg; longitude += far_delta)
 			result.slice_angles.push_back (longitude);
 
-		// Complete the circle where we started:
-		result.slice_angles.push_back (result.slice_angles[0]);
+		result.slice_angles.push_back (180_deg);
 	}
 
 	// Latitude:
@@ -268,13 +268,13 @@ calculate_ground_shape (si::LonLatRadius<> const observer_position,
 			.slice_angles = ss.slice_angles,
 			.stack_angles = ss.stack_angles,
 			.material = kBlackMatte,
+			.texture = earth_texture,
 			.setup_material = [&] (ShapeMaterial& material, si::LonLat const sphere_position) {
 				material.texture_position = {
 					neutrino::renormalize (sphere_position.lon(), Range { -180_deg, +180_deg }, Range { 0.0f, 1.0f }),
 					neutrino::renormalize (sphere_position.lat(), Range { -90_deg, +90_deg }, Range { 1.0f, 0.0f }),
 				};
 			},
-			.texture = earth_texture,
 		});
 	}
 	else
@@ -291,19 +291,23 @@ calculate_sky_dome_shape (SkyDomeParameters const& p, neutrino::WorkPerformer* c
 	if (!isfinite (horizon_angle))
 		horizon_angle = 0_deg;
 
-	auto const ss = calculate_dome_slices_and_stacks (p.sun_position, horizon_angle);
+	auto const ss = calculate_dome_slices_and_stacks (horizon_angle);
 	auto const cartesian_sun_position = calculate_cartesian_horizontal_coordinates (p.sun_position);
-	return make_centered_irregular_sphere_shape ({
+	auto shape = make_centered_irregular_sphere_shape ({
 		.radius = p.earth_radius, // TODO 10 mm around the camera
 		.slice_angles = ss.slice_angles,
 		.stack_angles = ss.stack_angles,
 		.material = kBlackMatte,
+		.symmetric_0_180 = true,
 		.setup_material = [&] (ShapeMaterial& material, si::LonLat const sphere_position, WaitGroup::WorkToken&& work_token) {
+			// The shape originally assumes that the sun is always at 0° (more dense net is around 0°).
+			// This needs a correction when used with AtmosphericScattering so that the sun is also always at 0° to match the mesh:
+			auto const sky_position = si::LonLat (sphere_position.lon() + 180_deg - p.sun_position.azimuth, sphere_position.lat());
 			auto calculate = [=, &material, &p, work_token = std::move (work_token)] {
-				if (sphere_position.lat() >= horizon_angle)
+				if (sky_position.lat() >= horizon_angle)
 				{
 					// Sky:
-					auto const polar_ray_direction = si::LonLat (sphere_position.lon(), sphere_position.lat());
+					auto const polar_ray_direction = si::LonLat (sky_position.lon(), sky_position.lat());
 					auto const ray_direction = to_cartesian<void> (polar_ray_direction);
 					auto const color = p.atmospheric_scattering.calculate_incident_light(
 						{ 0_m, 0_m, p.observer_position.radius() },
@@ -316,7 +320,7 @@ calculate_sky_dome_shape (SkyDomeParameters const& p, neutrino::WorkPerformer* c
 				{
 					// Ground haze:
 					auto const cartesian_observer_position = SpaceLength (0_m, 0_m, p.observer_position.radius());
-					auto const polar_ray_direction = si::LonLat (sphere_position.lon(), sphere_position.lat());
+					auto const polar_ray_direction = si::LonLat (sky_position.lon(), sky_position.lat());
 					auto const ray_direction = to_cartesian<void> (polar_ray_direction);
 					si::Length max_distance = std::numeric_limits<si::Length>::infinity();
 
@@ -346,6 +350,11 @@ calculate_sky_dome_shape (SkyDomeParameters const& p, neutrino::WorkPerformer* c
 				calculate();
 		},
 	});
+
+	// Since the shape assumed sun always at 0° in its spherical coordinates, we need to actually rotate it now to match the real position of the sun:
+	shape.rotate (z_rotation<BodyOrigin> (180_deg - p.sun_position.azimuth));
+
+	return shape;
 }
 
 } // namespace xf

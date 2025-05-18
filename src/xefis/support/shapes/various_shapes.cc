@@ -216,6 +216,42 @@ fill_in_uncomputed_points_on_sphere (Shape& shape)
 
 
 /**
+ * Copy shape materials from vertices at longitudes (0°, 180°) to vertices at longitudes (0°, -180°).
+ */
+void
+copy_symmetric_0_180_materials (Shape& shape)
+{
+	for (auto& strip: shape.triangle_strips())
+	{
+		// Pairs of points are on the same longitude, but different latitudes:
+		// This is what the symmetry should look like:
+		//
+		//  l  u  l  u  |  l  u  l  u (l = lower, u = upper)
+		// [a, b, c, d] | [c, d, a, b]
+		//  ^^^^  ^^^^     ^^^^  ^^^^
+		//  pair1 pair2    pair2 pair1
+
+		auto& vertices = strip.vertices;
+		auto const n_pairs = vertices.size() / 2; // 2 points in a pair.
+		auto const half_pairs = n_pairs / 2;
+
+		for (auto pair = 0u; pair < half_pairs; ++pair)
+		{
+			// sl = source lower; su = source upper
+			auto const sl = 2 * pair;
+			auto const su = sl + 1;
+			// tl = target lower; tu = target upper
+			auto const tl = 2 * (n_pairs - 1 - pair);
+			auto const tu = tl + 1;
+
+			vertices[tl].material() = vertices[sl].material();
+			vertices[tu].material() = vertices[su].material();
+		}
+	}
+}
+
+
+/**
  * Compute and assign normalized normal vectors for each vertex of a sphere.
  *
  * \param	shape
@@ -368,18 +404,21 @@ template<class SetupMaterial>
 			Shape::TriangleStrip& strip = shape.triangle_strips().emplace_back();
 			strip.texture = params.texture;
 			auto& vertices = strip.vertices;
-			vertices.reserve (2 * n_slices);
+			vertices.reserve (2 * n_slices * (params.symmetric_0_180 ? 2u : 1u));
 
-			auto const add_vertex = [&] (si::LonLat const lonlat) {
+			auto const add_vertex = [&] (si::LonLat const lonlat, bool call_setup_material = true) {
 				auto const cartesian_position = math::coordinate_system_cast<BodyOrigin, void> (to_cartesian (lonlat));
 				auto& vertex = vertices.emplace_back (cartesian_position * params.radius, params.material);
 
-				if constexpr (synchronous_setup_material)
-					setup_material (vertex.material(), lonlat);
-				else if constexpr (asynchronous_setup_material)
-					setup_material (vertex.material(), lonlat, all_materials_set_up.make_work_token());
-				else if constexpr (future_based_setup_material)
-					all_setup_material_futures.push_back (setup_material (vertex.material(), lonlat));
+				if (call_setup_material)
+				{
+					if constexpr (synchronous_setup_material)
+						setup_material (vertex.material(), lonlat);
+					else if constexpr (asynchronous_setup_material)
+						setup_material (vertex.material(), lonlat, all_materials_set_up.make_work_token());
+					else if constexpr (future_based_setup_material)
+						all_setup_material_futures.push_back (setup_material (vertex.material(), lonlat));
+				}
 			};
 
 			for (auto const longitude: params.slice_angles)
@@ -390,6 +429,23 @@ template<class SetupMaterial>
 					add_vertex ({ longitude, latitudes[0] });
 				else
 					vertices.emplace_back(); // This point will be calculated in fill_in_uncomputed_points_on_sphere().
+			}
+
+			if (params.symmetric_0_180)
+			{
+				for (auto const longitude: std::views::reverse (params.slice_angles))
+				{
+					// Skip exact 180° (but keep 0° to have a full circle):
+					if (longitude == 180_deg)
+						continue;
+
+					add_vertex ({ -longitude, latitudes[1] }, false);
+
+					if (first_strip)
+						add_vertex ({ -longitude, latitudes[0] }, false);
+					else
+						vertices.emplace_back(); // This point will be calculated in fill_in_uncomputed_points_on_sphere().
+				}
 			}
 
 			first_strip = false;
@@ -403,6 +459,10 @@ template<class SetupMaterial>
 				future.wait();
 
 		fill_in_uncomputed_points_on_sphere (shape);
+
+		if (params.symmetric_0_180)
+			copy_symmetric_0_180_materials (shape);
+
 		set_sphere_normals (shape, params.radius);
 
 		return shape;
