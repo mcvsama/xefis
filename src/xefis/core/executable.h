@@ -21,9 +21,6 @@
 #include <neutrino/backtrace.h>
 #include <neutrino/fail.h>
 
-// Qt:
-#include <QtCore/QTextCodec>
-
 // System:
 #include <signal.h>
 #include <locale.h>

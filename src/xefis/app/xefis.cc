@@ -33,9 +33,6 @@
 #include <neutrino/time_helper.h>
 #include <neutrino/work_performer.h>
 
-// Qt:
-#include <QtCore/QTextCodec>
-
 // System:
 #include <signal.h>
 
@@ -55,10 +52,6 @@ Xefis::Xefis (int& argc, char** argv):
 	QApplication (argc, argv)
 {
 	parse_args (argc, argv);
-
-	// Casting QString to std::string|const char* should yield UTF-8 encoded strings.
-	// Also encode std::strings and const chars* in UTF-8:
-	QTextCodec::setCodecForLocale (QTextCodec::codecForName ("UTF-8"));
 
 	// Print warnings about broken rendering when using QT_SCALE_FACTOR:
 	if (const char* QT_SCALE_FACTOR = std::getenv ("QT_SCALE_FACTOR"))
