@@ -1,4 +1,4 @@
-export QT_SELECT = qt5
+export QT_SELECT = qt6
 
 MIHAU_VERSION_FILE											:= neutrino/core/version.cc
 
