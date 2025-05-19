@@ -21,6 +21,7 @@
 
 // Lib:
 #include <boost/endian/conversion.hpp>
+#include <gsl/gsl_util>
 
 // Neutrino:
 #include <neutrino/qt/qdom.h>
@@ -63,7 +64,7 @@ UDP::process (xf::Cycle const&)
 		if (this->send)
 		{
 			std::string const& data = *this->send;
-			QByteArray blob (data.data(), data.size());
+			QByteArray blob (data.data(), gsl::narrow<qsizetype> (data.size()));
 
 			if (_parameters.tx_interference)
 				interfere (blob);
