@@ -18,6 +18,7 @@
 #include <xefis/config/all.h>
 
 // Neutrino:
+#include <neutrino/qt/qfontmetrics.h>
 #include <neutrino/time_helper.h>
 
 // Standard:
@@ -209,7 +210,7 @@ Status::async_paint (xf::PaintRequest const& paint_request, PaintingParams const
 		cache->font = aids->font_3.font;
 		float margin = aids->pen_width (2.f);
 		QFontMetricsF metrics (cache->font);
-		cache->line_height = 0.85 * metrics.height();
+		cache->line_height = 0.85 * neutrino::line_height (metrics);
 		// Compute space needed for more-up/more-down arrows and actual
 		// messages viewport.
 		cache->arrow_height = 0.5f * cache->line_height;

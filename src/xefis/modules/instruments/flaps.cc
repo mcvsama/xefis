@@ -19,6 +19,7 @@
 
 // Neutrino:
 #include <neutrino/numeric.h>
+#include <neutrino/qt/qfontmetrics.h>
 
 // Standard:
 #include <cstddef>
@@ -78,7 +79,7 @@ Flaps::async_paint (xf::PaintRequest const& paint_request, PaintingParams const&
 	QFont setting_font = aids->font_3.font;
 	QFont label_font = aids->font_2.font;
 
-	float block_height = aids->height() - QFontMetricsF (setting_font).height();
+	float block_height = aids->height() - neutrino::line_height (QFontMetricsF (setting_font));
 	float block_width = 6.0 / 40.0 * block_height;
 	QRectF block (0.f, 0.f, block_width, block_height);
 	aids->centrify (block);

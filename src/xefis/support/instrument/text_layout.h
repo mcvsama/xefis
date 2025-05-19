@@ -19,6 +19,9 @@
 #include <xefis/support/instrument/shadow.h>
 #include <xefis/support/instrument/text_painter.h>
 
+// Neutrino:
+#include <neutrino/qt/qfontmetrics.h>
+
 // Qt:
 #include <QtCore/QString>
 #include <QtGui/QFont>
@@ -245,7 +248,7 @@ TextLayout::Fragment::Fragment (QString const& text, QFont const& font, QColor c
 {
 	_width = _metrics.horizontalAdvance (text);
 	double const hardcoded_additional_factor = 0.9;
-	_height = _line_height_factor * hardcoded_additional_factor * _metrics.height();
+	_height = _line_height_factor * hardcoded_additional_factor * neutrino::line_height (_metrics);
 }
 
 

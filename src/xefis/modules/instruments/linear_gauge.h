@@ -27,6 +27,7 @@
 #include <xefis/support/sockets/socket_observer.h>
 
 // Neutrino:
+#include <neutrino/qt/qfontmetrics.h>
 #include <neutrino/synchronized.h>
 
 // Standard:
@@ -339,7 +340,7 @@ template<class Value>
 		font.setPixelSize (font.pixelSize() * values.font_scale);
 		QFontMetricsF const metrics (font);
 		float const char_width = metrics.horizontalAdvance ("0");
-		float const hcorr = 0.025f * metrics.height();
+		float const hcorr = 0.025f * neutrino::line_height (metrics);
 
 		QPen text_pen = aids.get_pen (Qt::white, 0.8f);
 		QPen box_pen = text_pen;

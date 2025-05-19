@@ -237,7 +237,7 @@ template<class Value>
 			box_text_width_f = **box_text_width;
 		}
 
-		QRectF text_rect (0.5f * text_pen.width(), -0.6f * q, box_text_width_f, 0.9f * metrics.height());
+		QRectF text_rect (0.5f * text_pen.width(), -0.6f * q, box_text_width_f, 0.9f * neutrino::line_height (metrics));
 		text_rect.translate (margin, -text_rect.height());
 		QRectF rect = text_rect.adjusted (-margin, 0, margin, 0);
 
