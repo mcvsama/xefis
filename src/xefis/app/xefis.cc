@@ -1,6 +1,6 @@
 /* vim:ts=4
  *
- * Copyleft 2012…2022  Michał Gawron
+ * Copyleft 2025  Michał Gawron
  * Marduk Unix Labs, http://mulabs.org/
  *
  * This program is free software: you can redistribute it and/or modify
@@ -50,6 +50,36 @@
 
 
 namespace xf {
+
+/**
+ * Scaling in Qt6 is horribly broken. You can't get reliably physical DPI of the screen to properly draw stuff.
+ * These workarounds are figured out experimentally to disable automatic scaling in Qt6 and make Xefis look more or less not-ugly.
+ * Without these literally everything we draw with a QPainter would be blurred/pixelated, with wrong font sizes and the window sizes would be completely
+ * bonkers.
+ *
+ * The size of fonts on KDE/Plasma will still be wrong even with those settings, so I added an option to manually provide font size to be used by Xefis when run
+ * in KDE.
+ */
+bool
+fix_broken_qt6_scaling()
+{
+	auto const overwrite_existing = 1;
+
+	// Without this Qt always reports DPI=96 (what the actual fuck):
+	setenv ("QT_ENABLE_HIGHDPI_SCALING", "0", overwrite_existing);
+
+	setenv ("QT_SCALE_FACTOR", "1", overwrite_existing);
+	setenv ("QT_USE_PHYSICAL_DPI", "1", overwrite_existing);
+	setenv ("QT_SCREEN_SCALE_FACTORS", "", overwrite_existing);
+	setenv ("QT_AUTO_SCREEN_SCALE_FACTOR", "0", overwrite_existing);
+
+	return true;
+}
+
+
+// Needs to be executed before main(), so make it a static variable:
+static bool fixed = fix_broken_qt6_scaling();
+
 
 Xefis::Xefis (int& argc, char** argv):
 	QApplication (argc, argv)
