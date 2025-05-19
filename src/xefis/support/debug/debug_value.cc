@@ -77,8 +77,8 @@ debug_bool (std::string const& name, bool default_value, std::function<void()> c
 		auto& check_box = *details.check_box;
 		check_box.setChecked (details.value);
 
-		QObject::connect (&check_box, &QCheckBox::stateChanged, [&details, callback] (int state) {
-			details.value = state != 0;
+		QObject::connect (&check_box, &QCheckBox::checkStateChanged, [&details, callback] (Qt::CheckState const state) {
+			details.value = state != Qt::Unchecked;
 
 			if (callback)
 				callback();
