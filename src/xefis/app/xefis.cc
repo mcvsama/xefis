@@ -36,6 +36,9 @@
 // System:
 #include <signal.h>
 
+// Qt:
+#include <QImageReader>
+
 // Standard:
 #include <cstddef>
 #include <cstdlib>
@@ -76,6 +79,8 @@ Xefis::Xefis (int& argc, char** argv):
 	}
 
 	Exception::log (_logger, [&] {
+		QImageReader::setAllocationLimit (512);
+
 		_system = std::make_unique<System> (_logger);
 		_graphics = std::make_unique<Graphics> (_logger);
 		_machine_manager = make_xefis_machine_manager (*this);
