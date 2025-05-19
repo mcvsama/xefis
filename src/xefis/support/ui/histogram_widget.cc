@@ -18,6 +18,9 @@
 #include <xefis/config/all.h>
 #include <xefis/support/ui/paint_helper.h>
 
+// Neutrino:
+#include <neutrino/qt/qfontmetrics.h>
+
 // Qt:
 #include <QPainter>
 #include <QPen>
@@ -85,7 +88,7 @@ HistogramWidget::update_canvas()
 	auto const axes_width = ph.em_pixels (0.1f);
 	auto const chart_width = ph.em_pixels (0.05f);
 	auto const grid_width = ph.em_pixels (0.03f);
-	auto const text_height = font_metrics.height();
+	auto const text_height = neutrino::line_height (font_metrics);
 	auto const bug_length = ph.em_pixels (0.4f);
 
 	QRectF const drawable_rect = rect().adjusted (axes_width, axes_width, -axes_width, -axes_width);
@@ -190,7 +193,7 @@ HistogramWidget::update_canvas()
 		// Top-value text:
 		if (_y_legend_visible)
 		{
-			QRectF y_max_text_rect (rect().topLeft(), rect().topLeft() + QPointF (y_max_str_width, font_metrics.height()));
+			QRectF y_max_text_rect (rect().topLeft(), rect().topLeft() + QPointF (y_max_str_width, neutrino::line_height (font_metrics)));
 			painter.drawText (y_max_text_rect, Qt::AlignVCenter | Qt::AlignRight, _y_max_str);
 		}
 

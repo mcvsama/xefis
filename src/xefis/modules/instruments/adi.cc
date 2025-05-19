@@ -20,6 +20,7 @@
 
 // Neutrino:
 #include <neutrino/numeric.h>
+#include <neutrino/qt/qfontmetrics.h>
 #include <neutrino/si/utils.h>
 
 // Standard:
@@ -218,7 +219,7 @@ AdiPaintRequest::paint_rotating_value (QRectF const& rect, float position, float
 
 	QFont const font = painter.font();
 	QFontMetricsF const font_metrics (font);
-	float height = height_scale * font_metrics.height();
+	float height = height_scale * neutrino::line_height (font_metrics);
 
 	// A little bit father to ensure next/prev are hidden beyond clipping area:
 	auto const a_little_bit_farther = 1.0f;
@@ -282,7 +283,7 @@ AdiPaintRequest::paint_dashed_zone (QColor const& color, QRectF const& target)
 {
 	QFontMetricsF const metrics (painter.font());
 	float const w = 0.7f * metrics.horizontalAdvance ("0");
-	float const h = 0.55f * metrics.height();
+	float const h = 0.55f * neutrino::line_height (metrics);
 	QPointF const center = target.center();
 	QRectF box (center - QPointF (w / 2.f, h / 1.9f), QSizeF (w, h));
 	QPen pen = aids.get_pen (color, 1.2f);
@@ -305,7 +306,7 @@ AdiPaintRequest::paint_horizontal_failure_flag (QString const& message, QPointF 
 {
 	QPen const normal_pen = aids.get_pen (color, 1.0f);
 	QFontMetricsF const metrics (font);
-	QRectF box (0.f, 0.f, metrics.horizontalAdvance (message) + 0.65f * metrics.horizontalAdvance ("0"), metrics.height());
+	QRectF box (0.f, 0.f, metrics.horizontalAdvance (message) + 0.65f * metrics.horizontalAdvance ("0"), neutrino::line_height (metrics));
 
 	aids.centrify (box);
 	box.translate (center);
@@ -328,7 +329,7 @@ AdiPaintRequest::paint_vertical_failure_flag (QString const& message, QPointF co
 {
 	QPen const normal_pen = aids.get_pen (color, 1.0f);
 	float const digit_width = 1.6f * xf::InstrumentAids::FontInfo::get_digit_width (font);
-	float const digit_height = 1.f * QFontMetricsF (font).height();
+	float const digit_height = 1.f * neutrino::line_height (QFontMetricsF (font));
 
 	QRectF box (0.f, 0.f, 1.f * digit_width, message.size() * digit_height);
 	aids.centrify (box);
@@ -1409,7 +1410,7 @@ VelocityLadder::paint_novspd_flag (AdiPaintRequest& pr) const
 		QString const sb = "VSPD";
 		QFont const font = pr.aids.scaled_default_font (1.8f);
 		QFontMetricsF const metrics (font);
-		float const font_height = 0.9f * metrics.height();
+		float const font_height = 0.9f * neutrino::line_height (metrics);
 
 		QRectF rect (0.f, 0.f, metrics.horizontalAdvance (sa), font_height * (sb.size() + 1));
 		rect.moveLeft (0.9f * pr.q);
@@ -2112,7 +2113,7 @@ AltitudeLadder::paint_pressure (AdiPaintRequest& pr, float const x) const
 		QRectF uu_rect (0.f, nn_rect.top(), metrics_b.horizontalAdvance (unit_str), nn_rect.height());
 		nn_rect.moveLeft (-0.5f * (uu_rect.width() + nn_rect.width()));
 		// Correct position of uu_rect to get correct baseline position:
-		uu_rect.translate (0.f, metrics_b.descent() - metrics_a.descent());
+		uu_rect.translate (0.f, std::abs (metrics_b.descent()) - std::abs (metrics_a.descent()));
 		uu_rect.moveLeft (nn_rect.right());
 
 		pr.painter.setPen (QPen (pr.aids.kNavigationColor, pr.aids.pen_width (1.f), Qt::SolidLine, Qt::RoundCap));
@@ -2121,7 +2122,7 @@ AltitudeLadder::paint_pressure (AdiPaintRequest& pr, float const x) const
 		{
 			pr.painter.setFont (pr.aids.font_3.font);
 			pr.painter.fast_draw_text (QPointF (0.5f * (nn_rect.left() + uu_rect.right()), nn_rect.bottom()), Qt::AlignHCenter | Qt::AlignBottom, "STD", pr.default_shadow);
-			pr.painter.translate (0.f, 0.9f * metrics_a.height());
+			pr.painter.translate (0.f, 0.9f * neutrino::line_height (metrics_a));
 			pr.painter.setPen (QPen (Qt::white, 1.f, Qt::SolidLine, Qt::RoundCap));
 		}
 
@@ -2160,7 +2161,7 @@ AltitudeLadder::paint_ap_setting (AdiPaintRequest& pr) const
 		QRectF s_digits_box (0.f, 0.f, s_digits * s_digit_width + margin, 1.3f * b_digit_height);
 		QRectF box_rect (_ladder_rect.left(), _ladder_rect.top() - 1.4f * b_digits_box.height(),
 						 b_digits_box.width() + s_digits_box.width(), b_digits_box.height());
-		QRectF metric_rect (box_rect.topLeft() - QPointF (0.f, 1.25f * m_metrics.height()), box_rect.topRight());
+		QRectF metric_rect (box_rect.topLeft() - QPointF (0.f, 1.25f * neutrino::line_height (m_metrics)), box_rect.topRight());
 		b_digits_box.translate (box_rect.left(), box_rect.top());
 		s_digits_box.translate (b_digits_box.right(), b_digits_box.top());
 
@@ -2587,9 +2588,9 @@ PaintingWork::paint_decision_height_setting (AdiPaintRequest& pr) const
 		QString mins_str = pr.params.decision_height_type;
 		QString alt_str = QString ("%1").arg (pr.params.decision_height_setting.in<si::Foot>(), 0, 'f', 0);
 
-		QRectF mins_rect (1.35f * x, 1.8f * x, metrics_a.horizontalAdvance (mins_str), metrics_a.height());
+		QRectF mins_rect (1.35f * x, 1.8f * x, metrics_a.horizontalAdvance (mins_str), neutrino::line_height (metrics_a));
 		mins_rect.moveRight (mins_rect.left());
-		QRectF alt_rect (0.f, 0.f, metrics_b.horizontalAdvance (alt_str), metrics_b.height());
+		QRectF alt_rect (0.f, 0.f, metrics_b.horizontalAdvance (alt_str), neutrino::line_height (metrics_b));
 		alt_rect.moveTopRight (mins_rect.bottomRight());
 
 		QPen decision_height_pen = pr.aids.get_pen (pr.get_decision_height_color(), 1.f);
@@ -3026,7 +3027,7 @@ PaintingWork::paint_input_alert (AdiPaintRequest& pr) const
 	pr.painter.setBrush (QBrush (QColor (0xdd, 0, 0)));
 	pr.painter.setFont (font);
 
-	QRectF rect (-0.6f * width, -0.5f * font_metrics.height(), 1.2f * width, 1.2f * font_metrics.height());
+	QRectF rect (-0.6f * width, -0.5f * neutrino::line_height (font_metrics), 1.2f * width, 1.2f * neutrino::line_height (font_metrics));
 
 	pr.painter.drawRect (rect);
 	pr.painter.fast_draw_text (rect, Qt::AlignVCenter | Qt::AlignHCenter, alert, pr.default_shadow);

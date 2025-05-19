@@ -19,6 +19,7 @@
 
 // Neutrino:
 #include <neutrino/exception_support.h>
+#include <neutrino/qt/qfontmetrics.h>
 
 // Qt:
 #include <QtWidgets/QLayout>
@@ -131,7 +132,7 @@ Datatable::async_paint (xf::PaintRequest const& paint_request) const
 	label_font.setPixelSize (aids->font_pixel_size (_label_font_size));
 	value_font.setPixelSize (aids->font_pixel_size (_value_font_size));
 
-	double line_height = std::max (QFontMetricsF (label_font).height(), QFontMetricsF (value_font).height());
+	double line_height = std::max (neutrino::line_height (QFontMetricsF (label_font)), neutrino::line_height (QFontMetricsF (value_font)));
 	double empty_height = aids->height() - line_height * _list.size();
 
 	if (_alignment & Qt::AlignVCenter)

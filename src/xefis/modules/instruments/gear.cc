@@ -19,6 +19,7 @@
 
 // Neutrino:
 #include <neutrino/numeric.h>
+#include <neutrino/qt/qfontmetrics.h>
 
 // Standard:
 #include <cstddef>
@@ -100,8 +101,8 @@ Gear::async_paint (xf::PaintRequest const& paint_request, PaintingParams const& 
 
 	// Positioning:
 	painter.setFont (box_font);
-	float const vmargin = -0.015f * box_metrics.height();
-	float const hmargin = 0.1f * box_metrics.height();
+	float const vmargin = -0.015f * neutrino::line_height (box_metrics);
+	float const hmargin = 0.1f * neutrino::line_height (box_metrics);
 	QRectF box = painter.get_text_box (QPointF (0.f, 0.f), Qt::AlignHCenter | Qt::AlignVCenter, "DOWN");
 	box.adjust (-hmargin, -vmargin, hmargin, vmargin);
 
@@ -109,7 +110,7 @@ Gear::async_paint (xf::PaintRequest const& paint_request, PaintingParams const& 
 		painter.setFont (box_font);
 		painter.setPen (aids->get_pen (gray, 1.0f));
 
-		float z = 0.61f * box_metrics.height();
+		float z = 0.61f * neutrino::line_height (box_metrics);
 		float d = 1.5f * z;
 
 		// Painting:

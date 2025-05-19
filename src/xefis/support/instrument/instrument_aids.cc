@@ -17,6 +17,9 @@
 // Xefis:
 #include <xefis/config/all.h>
 
+// Neutrino:
+#include <neutrino/qt/qfontmetrics.h>
+
 // Standard:
 #include <cstddef>
 
@@ -47,7 +50,7 @@ float
 InstrumentAids::FontInfo::get_digit_height (QFont const& font)
 {
 	constexpr float scale_down_line_height_factor = 0.7;
-	return scale_down_line_height_factor * QFontMetricsF (font).height();
+	return scale_down_line_height_factor * neutrino::line_height (QFontMetricsF (font));
 }
 
 
