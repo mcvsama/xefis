@@ -14,16 +14,18 @@
 // Local:
 #include "kde.h"
 
-// Lib:
-#include <X11/Xlib.h>
-#include <X11/Xatom.h>
-
 // Qt:
-#include <QX11Info>
+#include <QApplication>
+#include <QGuiApplication>
 #include <QWidget>
 
 // Standard:
 #include <cstddef>
+
+// Because the Xlib API is completely fucked up and uses #defines instead of constants, these headers have to go last,
+// otherwise there will be UB or compilation errors:
+#include <X11/Xlib.h>
+#include <X11/Xatom.h>
 
 
 namespace xf {
@@ -31,7 +33,9 @@ namespace xf {
 void
 set_kde_blur_background (QWidget& widget, bool enabled)
 {
-	auto* x_display = QX11Info::display();
+	auto* app = qobject_cast<QGuiApplication*> (QApplication::instance());
+	auto* x11 = app->nativeInterface<QNativeInterface::QX11Application>();
+	Display* x_display = x11->display();
 	auto blur_atom = XInternAtom (x_display, "_KDE_NET_WM_BLUR_BEHIND_REGION", False);
 
 	widget.setAttribute (Qt::WA_TranslucentBackground, enabled);
