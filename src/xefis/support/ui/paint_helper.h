@@ -121,7 +121,7 @@ class PaintHelper
 inline si::PixelDensity
 PaintHelper::pixel_density() const
 {
-	return si::PixelDensity (_canvas.logicalDpiY());
+	return si::PixelDensity (_canvas.physicalDpiY());
 }
 
 
