@@ -2223,7 +2223,7 @@ AltitudeLadder::paint_ap_setting (AdiPaintRequest& pr) const
 		// 00111 part of the altitude setting:
 		QRectF box_00111 = s_digits_box.adjusted (0.f, margin, -margin, -margin);
 		pr.painter.fast_draw_text (box_00111, Qt::AlignVCenter | Qt::AlignLeft,
-								   QString ("%1").arg (static_cast<int> (std::round (std::abs (cmd_altitude.in<si::Foot>()))) % 1000, 3, 'f', 0, '0'),
+								   QString ("%1").arg (static_cast<int> (std::round (std::abs (cmd_altitude.in<si::Foot>()))) % 1000, 3, 10, QChar (u'0')),
 								   pr.default_shadow);
 	}
 }
