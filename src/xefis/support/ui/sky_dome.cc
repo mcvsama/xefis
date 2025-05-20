@@ -122,7 +122,7 @@ calculate_ground_slices_and_stacks (si::Angle const horizon_angle, si::Length co
 
 	// Latitude:
 	{
-		auto const n_stacks = 20u;
+		auto const n_stacks = 40u;
 		// Ensure delta is non-zero, to avoid infinite loop later:
 		auto const delta = std::max<si::Angle> (ranges.latitude.extent() / n_stacks, 1e-6_deg);
 		result.stack_angles.reserve (n_stacks + 4);
