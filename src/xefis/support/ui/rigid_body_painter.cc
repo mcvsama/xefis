@@ -1293,11 +1293,25 @@ RigidBodyPainter::calculate_camera_transform()
 			break;
 	}
 
+	fix_camera_position();
+
 	if (abs (_camera_position_for_sky_dome - _camera.position()) > 10_m)
 		_need_new_sky_dome = true;
 
 	if (_textures)
 		_ground_shape = calculate_ground_shape (_camera_polar_position, kEarthMeanRadius, _textures->earth);
+}
+
+
+void
+RigidBodyPainter::fix_camera_position()
+{
+	if (_camera_polar_position.radius() < kEarthMeanRadius)
+	{
+		// Just a bit above the ground to ensure the earth surface is properly drawn:
+		_camera_polar_position.radius() = kEarthMeanRadius + 1_m;
+		_camera.set_position (to_cartesian<WorldSpace> (_camera_polar_position));
+	}
 }
 
 

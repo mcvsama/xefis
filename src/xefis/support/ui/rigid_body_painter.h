@@ -571,6 +571,12 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	void
 	calculate_camera_transform();
 
+	/**
+	 * Make sure camera never goes under the surface of the Earth.
+	 */
+	void
+	fix_camera_position();
+
 	[[nodiscard]]
 	RotationQuaternion<WorldSpace>
 	gravity_down_rotation (si::LonLat const position)
