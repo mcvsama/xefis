@@ -238,6 +238,13 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	set_user_camera_rotation (SpaceVector<si::Angle> const& rotation);
 
 	/**
+	 * Get camera distance from the followed object.
+	 */
+	[[nodiscard]]
+	si::Length
+	camera_distance_to_followed() const;
+
+	/**
 	 * Draw given object as focused (painted differently).
 	 */
 	template<class Object>

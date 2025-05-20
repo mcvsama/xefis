@@ -171,8 +171,13 @@ RigidBodyViewer::mouseMoveEvent (QMouseEvent* event)
 void
 RigidBodyViewer::wheelEvent (QWheelEvent* event)
 {
-	auto const scale = precision() * 5_cm / 1_deg;
-	_camera_translation[2] += scale * 1_deg * (-event->angleDelta().y() / 8.0);
+	auto const distance_from_followed_object = _rigid_body_painter.camera_distance_to_followed();
+	auto const unlimited_scale = precision() * 1e-3 * distance_from_followed_object / 0.2_deg;
+	auto const scale = std::max (unlimited_scale, 0.01_m / 1_deg);
+	auto const unlimited_z = _camera_translation.z() + scale * 1_deg * (-event->angleDelta().y() / 8.0);
+	auto const z = std::clamp (unlimited_z, 3_m, 100 * kEarthMeanRadius);
+	_camera_translation.z() = z;
+
 	forward_camera_translation();
 }
 
