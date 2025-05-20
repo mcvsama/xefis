@@ -17,6 +17,9 @@
 // Neutrino:
 #include <neutrino/test/manual_test.h>
 
+// Qt:
+#include <QImageReader>
+
 // Standard:
 #include <cstddef>
 
@@ -24,6 +27,7 @@
 int
 main (int, char**, char**)
 {
+	QImageReader::setAllocationLimit (512);
 	neutrino::ManualTest::run_all();
 	return EXIT_SUCCESS;
 }
