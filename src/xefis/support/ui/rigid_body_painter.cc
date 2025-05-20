@@ -186,6 +186,13 @@ RigidBodyPainter::set_user_camera_rotation (SpaceVector<si::Angle> const& angles
 }
 
 
+si::Length
+RigidBodyPainter::camera_distance_to_followed() const
+{
+	return (_followed_position - _camera.position()).norm();
+}
+
+
 void
 RigidBodyPainter::set_planet (rigid_body::Body const* planet_body)
 {
