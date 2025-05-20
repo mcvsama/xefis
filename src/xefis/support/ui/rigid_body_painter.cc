@@ -1316,7 +1316,7 @@ RigidBodyPainter::fix_camera_position()
 	if (_camera_polar_position.radius() < kEarthMeanRadius)
 	{
 		// Just a bit above the ground to ensure the earth surface is properly drawn:
-		_camera_polar_position.radius() = kEarthMeanRadius + 1_m;
+		_camera_polar_position.radius() = kEarthMeanRadius + 10_m;
 		_camera.set_position (to_cartesian<WorldSpace> (_camera_polar_position));
 	}
 }
