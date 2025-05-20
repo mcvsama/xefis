@@ -75,7 +75,7 @@ class RigidBodyViewer: public GLAnimationWidget
 
 	static constexpr auto		kRotationScale				{ 2_deg / 1_mm };
 	static constexpr auto		kTranslationScale			{ 2.5_cm / 1_mm };
-	static constexpr float		kHighPrecision				{ 0.05f };
+	static constexpr float		kHighPrecisionFactor		{ 0.05f };
 
   public:
 	// Ctor
@@ -284,12 +284,12 @@ class RigidBodyViewer: public GLAnimationWidget
 	draw (QOpenGLPaintDevice&);
 
 	/**
-	 * Return 1.0 normally or kHighPrecision value when Shift is pressed on the keyboard.
+	 * Return 1.0 normally or kHighPrecisionFactor value when Shift is pressed on the keyboard.
 	 */
 	[[nodiscard]]
 	float
 	precision()
-		{ return (QGuiApplication::queryKeyboardModifiers() & Qt::ShiftModifier) ? kHighPrecision : 1.0; }
+		{ return (QGuiApplication::queryKeyboardModifiers() & Qt::ShiftModifier) ? kHighPrecisionFactor : 1.0; }
 
 	/**
 	 * Display popup menu. Return true if user selected any action from the menu.
