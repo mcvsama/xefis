@@ -210,6 +210,7 @@ LinkProtocol::Bitfield::failsafe()
 
 LinkProtocol::Signature::Signature (Params&& params):
 	Sequence (params.packets),
+	_name (params.name),
 	_nonce_bytes (params.nonce_bytes),
 	_signature_bytes (params.signature_bytes),
 	_key (params.key),
@@ -283,6 +284,7 @@ LinkProtocol::Signature::consume (Blob::const_iterator begin, Blob::const_iterat
 
 LinkProtocol::Envelope::Envelope (Params&& params):
 	Sequence (params.packets),
+	_name (params.name),
 	_unique_prefix (params.unique_prefix),
 	_send_every (params.send_every),
 	_send_offset (params.send_offset),

@@ -54,12 +54,14 @@ class GroundToAirProtocol: public LinkProtocol
 			LinkProtocol ({
 				// XLE handshake envelope:
 				envelope ({
+					.name			= "XLE handshake",
 					.unique_prefix	= { 0xf3, 0x3f },
 					// Only send this envelope when handshake request is ready:
 					.send_predicate	= [&data] { return data.encryption_handshake_request.valid(); },
 					.packets		= {
 						// Always good to have at least basic checksum:
 						signature ({
+							.name				= "XLE handshake signature",
 							.nonce_bytes		= 0,
 							.signature_bytes	= 4,
 							.key				= neutrino::to_blob ("ground-to-air-handshake"),
@@ -70,6 +72,7 @@ class GroundToAirProtocol: public LinkProtocol
 					},
 				}),
 				envelope ({
+					.name			= "controls",
 					.unique_prefix	= { 0xfe, 0x5a },
 					.transceiver	= &transceiver,
 					.packets		= {
