@@ -41,8 +41,10 @@ class InputLink: public xf::Module
 	xf::ModuleOut<bool>			link_valid				{ this, "link-valid" };
 	xf::ModuleOut<int64_t>		link_failsafes			{ this, "failsafes" };
 	xf::ModuleOut<int64_t>		link_reacquires			{ this, "reacquires" };
+	// This is set by the LinkProtocol:
 	xf::ModuleOut<int64_t>		link_error_bytes		{ this, "error-bytes" };
 	xf::ModuleOut<int64_t>		link_valid_bytes		{ this, "valid-bytes" };
+	// This is set by the LinkProtocol:
 	xf::ModuleOut<int64_t>		link_valid_envelopes	{ this, "valid-envelopes" };
 
   private:
