@@ -45,12 +45,14 @@ class AirToGroundProtocol: public LinkProtocol
 			LinkProtocol ({
 				// XLE handshake envelope:
 				envelope ({
+					.name			= "XLE handshake",
 					.unique_prefix	= { 0xaf, 0xfa },
 					// Only send this envelope when handshake response is ready:
 					.send_predicate	= [&data] { return data.encryption_handshake_response.valid(); },
 					.packets		= {
 						// Always good to have at least basic checksum:
 						signature ({
+							.name				= "XLE handshake signature",
 							.nonce_bytes		= 0,
 							.signature_bytes	= 4,
 							.key				= neutrino::to_blob ("air-to-ground-handshake"),
@@ -62,6 +64,7 @@ class AirToGroundProtocol: public LinkProtocol
 				}),
 				// Normal data envelope:
 				envelope ({
+					.name			= "sensors",
 					.unique_prefix	= { 0xf6, 0x6f },
 					.transceiver	= &transceiver,
 					.packets		= {

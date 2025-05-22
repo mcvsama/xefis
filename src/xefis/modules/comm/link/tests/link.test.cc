@@ -143,10 +143,12 @@ class GroundToAirLinkProtocol: public LinkProtocol
 				// Must be first envelope (its data will be messed with to test
 				// if it's discarded in such case):
 				envelope ({
+					.name			= "data 1",
 					.unique_prefix	= { 0x00, 0x01 },
 					.transceiver	= transceiver,
 					.packets		= {
 						signature ({
+							.name				= "data 1 signature",
 							.nonce_bytes		= 9,
 							.signature_bytes	= 12,
 							.key				= { 0x88, 0x99, 0xaa, 0xbb },
@@ -173,11 +175,13 @@ class GroundToAirLinkProtocol: public LinkProtocol
 				}),
 				// XLE handshake envelope:
 				envelope ({
+					.name			= "XLE handshake",
 					.unique_prefix	= { 0x00, 0x00 },
 					.send_predicate	= [&io] { return io.handshake_request.valid(); },
 					.packets		= {
 						// Always good to have at least basic checksum:
 						signature ({
+							.name				= "XLE handshake signature",
 							.nonce_bytes		= 0,
 							.signature_bytes	= 4,
 							.key				= { 0xaa, 0xaa },
@@ -190,9 +194,11 @@ class GroundToAirLinkProtocol: public LinkProtocol
 				// This must be last on the list of envelopes
 				// that are transmitted immediately (not delayed):
 				envelope ({
+					.name			= "data 2",
 					.unique_prefix	= { 0x00, 0x02 },
 					.packets		= {
 						signature ({
+							.name				= "data 2 signature",
 							.nonce_bytes		= 8,
 							.signature_bytes	= 8,
 							.key				= { 0x55, 0x37, 0x12, 0xf9 },
@@ -210,6 +216,7 @@ class GroundToAirLinkProtocol: public LinkProtocol
 				// Envelope that will not be transmitted until some time
 				// passes:
 				envelope ({
+					.name			= "data 3",
 					.unique_prefix	= { 0x00, 0x03 },
 					.send_every		= 10,
 					.send_offset	= 8,
@@ -232,11 +239,13 @@ class AirToGroundLinkProtocol: public LinkProtocol
 			LinkProtocol ({
 				// XLE handshake envelope:
 				envelope ({
+					.name			= "XLE handshake",
 					.unique_prefix	= { 0xff, 0x00 },
 					.send_predicate	= [&io] { return io.handshake_response.valid(); },
 					.packets		= {
 						// Always good to have at least basic checksum:
 						signature ({
+							.name				= "XLE handshake signature",
 							.nonce_bytes		= 0,
 							.signature_bytes	= 4,
 							.key				= { 0xbb, 0xbb },
@@ -248,6 +257,7 @@ class AirToGroundLinkProtocol: public LinkProtocol
 				}),
 				// Normal data envelope:
 				envelope ({
+					.name			= "data",
 					.unique_prefix	= { 0xff, 0x01 },
 					.transceiver	= transceiver,
 					.packets		= {

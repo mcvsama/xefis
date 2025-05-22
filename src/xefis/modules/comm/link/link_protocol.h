@@ -409,6 +409,7 @@ class LinkProtocol
 	  public:
 		struct Params
 		{
+			std::string		name;
 			uint8_t			nonce_bytes;
 			uint8_t			signature_bytes;
 			Blob			key;
@@ -429,6 +430,7 @@ class LinkProtocol
 		consume (Blob::const_iterator, Blob::const_iterator, xf::Logger const&) override;
 
 	  private:
+		std::string		_name;
 		uint8_t			_nonce_bytes		{ 0 };
 		uint8_t			_signature_bytes	{ 0 };
 		Blob			_key;
@@ -446,6 +448,8 @@ class LinkProtocol
 	  public:
 		struct Params
 		{
+			// Name used to identify envelope eg. in logs:
+			std::string						name;
 			// Magic is a unique envelope identifier vector:
 			Blob							unique_prefix;
 			// Only send this envelope every Nth time:
@@ -480,6 +484,7 @@ class LinkProtocol
 		consume (Blob::const_iterator, Blob::const_iterator, xf::Logger const&) override;
 
 	  private:
+		std::string						_name;
 		Blob							_unique_prefix;
 		uint64_t						_send_every;
 		uint64_t						_send_offset;
