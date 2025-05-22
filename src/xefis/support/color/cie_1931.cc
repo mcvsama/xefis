@@ -35,7 +35,7 @@ cie_xyz_to_rgb (math::Vector<double, 3> const& xyz)
 	auto rgb = transform * xyz;
 
 	// Clamp negative values to 0:
-	for (auto& v: rgb.array())
+	for (auto& v: rgb.components())
 		v = std::max (v, 0.0);
 
 	// Normalize if any component exceeds 1:
