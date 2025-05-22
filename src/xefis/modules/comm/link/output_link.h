@@ -30,7 +30,6 @@ class OutputLink: public xf::Module
 {
   public:
 	xf::ModuleOut<std::string>	link_output				{ this, "output" };
-	xf::ModuleOut<int64_t>		link_valid_bytes		{ this, "valid-bytes" };
 
   private:
 	static constexpr char kLoggerScope[] = "mod::OutputLink";
