@@ -34,7 +34,13 @@ class CameraControls: public QWidget
 	CameraControls (RigidBodyViewer&, QWidget* parent = nullptr);
 
   private:
-	RigidBodyViewer& _rigid_body_viewer;
+	RigidBodyViewer&	_rigid_body_viewer;
+	QDoubleSpinBox*		_ecef_x;
+	QDoubleSpinBox*		_ecef_y;
+	QDoubleSpinBox*		_ecef_z;
+	QDoubleSpinBox*		_polar_lat;
+	QDoubleSpinBox*		_polar_lon;
+	QDoubleSpinBox*		_polar_radius;
 };
 
 } // namespace xf
