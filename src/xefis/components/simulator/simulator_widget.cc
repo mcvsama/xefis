@@ -37,6 +37,7 @@
 #include <QShortcut>
 #include <QSplitter>
 #include <QTabWidget>
+#include <QTimeZone>
 
 // Standard:
 #include <cstddef>
