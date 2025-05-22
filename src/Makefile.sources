@@ -6,7 +6,7 @@ MIHAU.modules												+= xefis
 
 MIHAU.modules[xefis].pkgconfigs								+= $(MIHAU.modules[neutrino].pkgconfigs)
 MIHAU.modules[xefis].pkgconfigs								+= Qt6Core Qt6Gui Qt6Network Qt6Xml Qt6Widgets Qt6Svg Qt6OpenGL Qt6OpenGLWidgets
-MIHAU.modules[xefis].cpp_flags								+= $(MIHAU.modules[neutrino].cpp_flags)
+MIHAU.modules[xefis].cpp_flags								+= $(MIHAU.modules[neutrino].cpp_flags) -Wno-maybe-uninitialized
 MIHAU.modules[xefis].cpp_defines							+= $(MIHAU.modules[neutrino].cpp_defines)
 MIHAU.modules[xefis].cpp_includes							+= $(MIHAU.modules[nautrino].cpp_includes)
 MIHAU.modules[xefis].cpp_includes							+= . lib/
