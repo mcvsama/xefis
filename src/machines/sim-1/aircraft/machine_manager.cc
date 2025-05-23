@@ -38,10 +38,10 @@ MachineManager::MachineManager (xf::Xefis& xefis):
 }
 
 
-std::unique_ptr<xf::Machine>
-MachineManager::make_machine()
+xf::Machine&
+MachineManager::machine()
 {
-	return std::make_unique<Machine> (xefis());
+	return _machine.value();
 }
 
 

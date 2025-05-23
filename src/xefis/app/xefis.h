@@ -1,6 +1,6 @@
 /* vim:ts=4
  *
- * Copyleft 2012…2022  Michał Gawron
+ * Copyleft 2025  Michał Gawron
  * Marduk Unix Labs, http://mulabs.org/
  *
  * This program is free software: you can redistribute it and/or modify
@@ -38,6 +38,7 @@
 namespace xf {
 
 class Machine;
+class MachineManager;
 
 
 class Xefis: public QApplication
@@ -115,15 +116,6 @@ class Xefis: public QApplication
 	graphics() const;
 
 	/**
-	 * Return configurator widget.
-	 * May return nullptr, if configurator widget is disabled
-	 * (eg. for instrument-less configurations of XEFIS).
-	 */
-	[[nodiscard]]
-	ConfiguratorWidget&
-	configurator_widget() const;
-
-	/**
 	 * Return Options object that contains values provided on command-line.
 	 */
 	[[nodiscard]]
@@ -147,6 +139,9 @@ class Xefis: public QApplication
 	fallback_exception_logger();
 
   private:
+	void
+	setup_unix_signals_handler();
+
 	/**
 	 * Parse command line options and fill _options map.
 	 */
@@ -167,10 +162,8 @@ class Xefis: public QApplication
 
 	// Basic subsystems:
 	std::unique_ptr<System>				_system;
-	std::unique_ptr<ConfiguratorWidget>	_configurator_widget;
 	std::unique_ptr<Graphics>			_graphics;
 	std::unique_ptr<MachineManager>		_machine_manager;
-	std::unique_ptr<Machine>			_machine;
 };
 
 
@@ -209,16 +202,6 @@ Xefis::graphics() const
 		throw UninitializedServiceException ("Graphics");
 
 	return *_graphics.get();
-}
-
-
-inline ConfiguratorWidget&
-Xefis::configurator_widget() const
-{
-	if (!_configurator_widget)
-		throw UninitializedServiceException ("ConfiguratorWidget");
-
-	return *_configurator_widget.get();
 }
 
 } // namespace xf
