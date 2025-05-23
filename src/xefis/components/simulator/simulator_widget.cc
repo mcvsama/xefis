@@ -401,7 +401,7 @@ SimulatorWidget::make_body_controls()
 	});
 
 	auto* body_controls = new QWidget (this);
-	body_controls->setSizePolicy (QSizePolicy::Fixed, QSizePolicy::Expanding);
+	body_controls->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Expanding);
 
 	auto* layout = new QHBoxLayout (body_controls);
 	layout->setContentsMargins (0, 0, 0, 0);
