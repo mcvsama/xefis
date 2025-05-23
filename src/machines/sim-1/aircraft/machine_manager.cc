@@ -53,25 +53,58 @@ MachineManager::create_main_window()
 
 	auto* main_menu = new QMenuBar (&*_main_window);
 	auto* simulation_menu = main_menu->addMenu ("&Machine");
-	simulation_menu->addAction ("&Restart", [&] {
+	simulation_menu->addAction ("&Restart", [this] {
 		restart_machine();
 	});
-	simulation_menu->addAction ("Show &configuration…", [&] {
-		if (_machine)
-			_machine->show_configurator();
+
+	{
+		auto* restart_in_menu = simulation_menu->addMenu ("Restart &in");
+
+		restart_in_menu->addAction ("Wrocław", [this] {
+			restart_machine (si::LonLatRadius (17.0386_deg, 51.1093_deg, _height));
+		});
+		restart_in_menu->addAction ("Oslo", [this] {
+			restart_machine (si::LonLatRadius (10.7522_deg, 59.9139_deg, _height));
+		});
+		restart_in_menu->addAction ("Angola", [this] {
+			restart_machine (si::LonLatRadius (-8.8147_deg, 13.2302_deg, _height));
+		});
+		restart_in_menu->addAction ("Ottawa", [this] {
+			restart_machine (si::LonLatRadius (-75.7003_deg, 45.4201_deg, _height));
+		});
+		restart_in_menu->addAction ("North pole (+Z)", [this] {
+			restart_machine (si::LonLatRadius (0_deg, 89.9999_deg, _height)); // FIXME at 0/90° exactly there are numerical errors
+		});
+		restart_in_menu->addAction ("South pole (-Z)", [this] {
+			restart_machine (si::LonLatRadius (0_deg, -89.9999_deg, _height)); // FIXME at 0/90° exactly there are numerical errors
+		});
+		restart_in_menu->addAction ("Null Island (+X)", [this] {
+			restart_machine (si::LonLatRadius (0_deg, 0_deg, _height));
+		});
+		restart_in_menu->addAction ("East (+Y)", [this] {
+			restart_machine (si::LonLatRadius (90_deg, 0_deg, _height));
+		});
+	}
+
+	simulation_menu->addAction ("Show &configuration…", [this] {
+		_machine.value().show_configurator();
 	});
 
 	_main_window->setMenuBar (main_menu);
 	_main_window->resize (QSize (ph.em_pixels (80.0), ph.em_pixels (40.0)));
 	_main_window->show();
+
 	restart_machine();
 }
 
 
 void
-MachineManager::restart_machine()
+MachineManager::restart_machine (std::optional<si::LonLatRadius<>> const location)
 {
-	_machine.emplace (xefis());
+	if (location)
+		_last_location = *location;
+
+	_machine.emplace (xefis(), _last_location);
 	// Note: Machine must be deleted first so that simulator widget unregisters itself from QMainWindow, before QMainWindow tries to delete it
 	// in its destructor:
 	_main_window->setCentralWidget (&_machine->simulator_widget());

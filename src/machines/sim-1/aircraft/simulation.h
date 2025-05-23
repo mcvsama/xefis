@@ -48,7 +48,7 @@ class Simulation: public neutrino::Noncopyable
   public:
 	// Ctor
 	explicit
-	Simulation (Machine&, Models&, neutrino::Logger const&);
+	Simulation (Machine&, Models&, si::LonLatRadius<> const location, neutrino::Logger const&);
 
 	SimulatedAircraft&
 	aircraft() noexcept

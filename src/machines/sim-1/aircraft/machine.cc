@@ -24,8 +24,9 @@
 
 namespace sim1::aircraft {
 
-Machine::Machine (xf::Xefis& xefis):
-	xf::SingleLoopMachine (xefis, xefis.logger(), 120_Hz)
+Machine::Machine (xf::Xefis& xefis, si::LonLatRadius<> const location):
+	xf::SingleLoopMachine (xefis, xefis.logger(), 120_Hz),
+	_simulation (*this, _models, location, logger().with_context ("simulation"))
 {
 	start();
 }
