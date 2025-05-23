@@ -49,10 +49,10 @@ class MachineManager: private Noncopyable
 		{ return _xefis; }
 
 	/**
-	 * Allocate and return new Machine.
+	 * Return the managed machine.
 	 */
-	virtual std::unique_ptr<Machine>
-	make_machine() = 0;
+	virtual Machine&
+	machine() = 0;
 
   private:
 	Xefis& _xefis;

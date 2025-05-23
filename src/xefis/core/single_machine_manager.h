@@ -11,50 +11,40 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__MACHINES__SIM_1__AIRCRAFT__MACHINE_MANAGER_H__INCLUDED
-#define XEFIS__MACHINES__SIM_1__AIRCRAFT__MACHINE_MANAGER_H__INCLUDED
-
-// Local:
-#include "machine.h"
+#ifndef XEFIS__CORE__SINGLE_MACHINE_MANAGER_H__INCLUDED
+#define XEFIS__CORE__SINGLE_MACHINE_MANAGER_H__INCLUDED
 
 // Xefis:
-#include <xefis/app/xefis.h>
 #include <xefis/config/all.h>
 #include <xefis/core/machine_manager.h>
 
-// Qt:
-#include <QMainWindow>
-
 // Standard:
 #include <cstddef>
-#include <optional>
 
 
-namespace sim1::aircraft {
+namespace xf {
 
-class MachineManager: public xf::MachineManager
+class Xefis;
+class ConfiguratorWidget;
+
+
+class SingleMachineManager: public MachineManager
 {
   public:
 	// Ctor
-	MachineManager (xf::Xefis&);
+	SingleMachineManager (std::unique_ptr<Machine> machine, Xefis& xefis);
 
-	// xf::MachineManager API
-	xf::Machine&
-	machine();
-
-  private:
-	void
-	create_main_window();
-
-	void
-	restart_machine();
+	// MachineManager API
+	Machine&
+	machine() override
+		{ return *_machine; }
 
   private:
-	std::optional<QMainWindow>	_main_window;
-	std::optional<Machine>		_machine;
+	std::unique_ptr<Machine>			_machine;
+	std::unique_ptr<ConfiguratorWidget>	_configurator_widget;
 };
 
-} // namespace sim1::aircraft
+} // namespace xf
 
 #endif
 
