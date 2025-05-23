@@ -214,6 +214,14 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	followed_body() const noexcept;
 
 	/**
+	 * Return position of the followed body or group.
+	 */
+	[[nodiscard]]
+	si::LonLatRadius<>
+	followed_position() const noexcept
+		{ return _followed_polar_position; }
+
+	/**
 	 * Set camera mode.
 	 */
 	void

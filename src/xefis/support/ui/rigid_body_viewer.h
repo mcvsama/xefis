@@ -162,6 +162,14 @@ class RigidBodyViewer: public GLAnimationWidget
 		{ return _rigid_body_painter.followed_body(); }
 
 	/**
+	 * Return position of the followed body or group.
+	 */
+	[[nodiscard]]
+	si::LonLatRadius<>
+	followed_position() const noexcept
+		{ return _rigid_body_painter.followed_position(); }
+
+	/**
 	 * Calls set_focused() on internal RigidBodyPainter.
 	 */
 	void

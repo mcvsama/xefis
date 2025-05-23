@@ -298,10 +298,14 @@ SimulatorWidget::make_solar_time_controls (PaintHelper const& ph)
 
 	auto* set_to_local_noon = new QPushButton ("Set to local noon");
 	auto set_to_local_noon_callback = [this] {
-		auto date_time = QDateTime::fromSecsSinceEpoch (TimeHelper::utc_now().in<si::Second>());
-		date_time.setTime (QTime (12, 0, 0));
-		_solar_simulation_time_delta = 1_s * date_time.toUTC().toSecsSinceEpoch() - _simulator.simulation_time();
-		update_solar_time_widgets();
+		if (_rigid_body_viewer)
+		{
+			auto const longitude = _rigid_body_viewer->followed_position().lon();
+			auto const time_delta = (longitude / 360_deg) * 24_h;
+			auto const time_rounded_to_days = std::floor (TimeHelper::utc_now() / 86400_s) * 86400_s;
+			_solar_simulation_time_delta = time_rounded_to_days + 12_h - time_delta - _simulator.simulation_time();
+			update_solar_time_widgets();
+		}
 	};
 	QObject::connect (set_to_local_noon, &QPushButton::clicked, set_to_local_noon_callback);
 
