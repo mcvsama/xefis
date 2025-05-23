@@ -27,6 +27,7 @@
 
 // Neutrino:
 #include <neutrino/concepts.h>
+#include <neutrino/synchronized.h>
 #include <neutrino/work_performer.h>
 #include <neutrino/value_or_ptr.h>
 
@@ -378,6 +379,13 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	void
 	paint (rigid_body::System const& system, QOpenGLPaintDevice& canvas);
 
+	/**
+	 * Deletes textures allocated on first creation of RigidBodyPainter
+	 * and reused by other instances. Saves memory.
+	 */
+	static void
+	drop_resources();
+
   private:
 	void
 	precalculate();
@@ -543,7 +551,14 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	get_center_of_mass (rigid_body::Group const&);
 
 	/**
-	 * Check if loading of textures is needed.
+	 * Check if texture images need loading.
+	 */
+	void
+	check_texture_images();
+
+	/**
+	 * Check if loading of textures is needed. First the check_texture_images()
+	 * should be called to load images that will be needed by the textures.
 	 */
 	void
 	check_textures();
@@ -670,7 +685,8 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	float						_followed_body_normalized_amsl_height	{ 0.0f }; // Range: 0…1
 
 	std::array<SkyLight, 5>		_sky_lights;
-	std::future<TextureImages>	_texture_images;
+	static Synchronized<std::shared_future<TextureImages>>
+								_texture_images;
 	std::optional<Textures>		_textures;
 };
 
