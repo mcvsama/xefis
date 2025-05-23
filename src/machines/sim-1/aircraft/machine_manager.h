@@ -22,6 +22,9 @@
 #include <xefis/config/all.h>
 #include <xefis/core/machine_manager.h>
 
+// Neutrino:
+#include <neutrino/si/lonlat_radius.h>
+
 // Qt:
 #include <QMainWindow>
 
@@ -47,9 +50,11 @@ class MachineManager: public xf::MachineManager
 	create_main_window();
 
 	void
-	restart_machine();
+	restart_machine (std::optional<si::LonLatRadius<>> const location = std::nullopt);
 
   private:
+	si::Length					_height			{ xf::kEarthMeanRadius + 500_m };
+	si::LonLatRadius<>			_last_location	{ 17.0386_deg, 51.1093_deg, _height };
 	std::optional<QMainWindow>	_main_window;
 	std::optional<Machine>		_machine;
 };

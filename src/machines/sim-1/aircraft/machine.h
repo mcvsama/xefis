@@ -42,7 +42,7 @@ class Machine: public xf::SingleLoopMachine
 {
   public:
 	// Ctor
-	Machine (xf::Xefis&);
+	Machine (xf::Xefis&, si::LonLatRadius<> const location);
 
 	DataCenter&
 	data_center() noexcept
@@ -65,7 +65,7 @@ class Machine: public xf::SingleLoopMachine
 	Models		_models;
 	Hardware	_hardware		{ loop(), logger() };
 	Computers	_computers;
-	Simulation	_simulation		{ *this, _models, logger().with_context ("simulation") };
+	Simulation	_simulation;
 };
 
 } // namespace sim1::aircraft
