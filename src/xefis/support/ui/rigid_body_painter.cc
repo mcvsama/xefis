@@ -100,9 +100,7 @@ RigidBodyPainter::RigidBodyPainter (si::PixelDensity const pixel_density, WorkPe
 		.position	= { 0_deg, 90_deg },
 	};
 
-	check_texture_images();
 	calculate_camera_transform();
-	_sky_dome_shape = this->calculate_sky_dome_shape();
 }
 
 
@@ -188,6 +186,16 @@ RigidBodyPainter::set_planet (rigid_body::Body const* planet_body)
 {
 	_planet_body = planet_body;
 	calculate_camera_transform();
+
+	if (_planet_body)
+	{
+		check_texture_images();
+
+		if (!_sky_dome_shape)
+			_sky_dome_shape = this->calculate_sky_dome_shape();
+	}
+	else
+		_sky_dome_shape.reset();
 }
 
 
@@ -238,6 +246,7 @@ RigidBodyPainter::precalculate()
 	_corrected_sun_position_horizontal_coordinates = corrected_sun_position_near_horizon (_sun_position.horizontal_coordinates);
 	_corrected_sun_position_cartesian_horizontal_coordinates = calculate_cartesian_horizontal_coordinates (_corrected_sun_position_horizontal_coordinates);
 	_sun_color_on_followed = to_gl_color (calculate_sun_light_color (_camera_polar_position, _corrected_sun_position_cartesian_horizontal_coordinates, _atmospheric_scattering));
+
 	check_textures();
 	check_sky_dome();
 }
@@ -602,27 +611,30 @@ RigidBodyPainter::paint_planet()
 			glDisable (GL_TEXTURE_2D);
 		});
 
-		// Sky and ground dome around the observer:
-		_gl.save_context ([&] {
-			_gl.set_camera_rotation_only (_camera);
-			// Rotate so that down is -Z.
-			make_z_sky_top_x_south();
-			// Normally the outside of the sphere shape is rendered, inside is culled.
-			// But here we're inside the sphere, so tell OpenGL that the front faces are the
-			// inside faces:
-			glFrontFace (GL_CW);
-			// No lights, the sky itself is the light source:
-			glDisable (GL_LIGHTING);
-			glDisable (GL_DEPTH_TEST);
-			// Blend with the universe: final_color = (1 - transmittance) * atmosphere_color + universe_color
-			glBlendFunc (GL_SRC_ALPHA, GL_ONE);
-			glEnable (GL_BLEND);
-			_gl.draw (_sky_dome_shape);
-			glDisable (GL_BLEND);
-			glEnable (GL_LIGHTING);
-			glEnable (GL_DEPTH_TEST);
-			glFrontFace (GL_CCW);
-		});
+		if (_sky_dome_shape)
+		{
+			// Sky and ground dome around the observer:
+			_gl.save_context ([&] {
+				_gl.set_camera_rotation_only (_camera);
+				// Rotate so that down is -Z.
+				make_z_sky_top_x_south();
+				// Normally the outside of the sphere shape is rendered, inside is culled.
+				// But here we're inside the sphere, so tell OpenGL that the front faces are the
+				// inside faces:
+				glFrontFace (GL_CW);
+				// No lights, the sky itself is the light source:
+				glDisable (GL_LIGHTING);
+				glDisable (GL_DEPTH_TEST);
+				// Blend with the universe: final_color = (1 - transmittance) * atmosphere_color + universe_color
+				glBlendFunc (GL_SRC_ALPHA, GL_ONE);
+				glEnable (GL_BLEND);
+				_gl.draw (*_sky_dome_shape);
+				glDisable (GL_BLEND);
+				glEnable (GL_LIGHTING);
+				glEnable (GL_DEPTH_TEST);
+				glFrontFace (GL_CCW);
+			});
+		}
 	});
 }
 
@@ -1178,7 +1190,7 @@ RigidBodyPainter::check_texture_images()
 void
 RigidBodyPainter::check_textures()
 {
-	if (!_textures)
+	if (_planet_body && !_textures)
 	{
 		auto texture_images = _texture_images.lock();
 
@@ -1217,7 +1229,8 @@ void
 RigidBodyPainter::check_sky_dome()
 {
 	if (std::exchange (_need_new_sky_dome, false))
-		_sky_dome_shape = calculate_sky_dome_shape();
+		if (_planet_body)
+			_sky_dome_shape = calculate_sky_dome_shape();
 }
 
 

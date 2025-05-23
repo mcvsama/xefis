@@ -667,7 +667,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	AtmosphericScattering const	_atmospheric_scattering		{{ .earth_radius = kEarthMeanRadius, .atmosphere_radius = kAtmosphereRadius, .enable_tonemapping = true }};
 
 	// Sky and ground:
-	Shape						_sky_dome_shape;
+	std::optional<Shape>		_sky_dome_shape;
 	// If set to true, _sky_dome_shape will be recalculated:
 	bool						_need_new_sky_dome			{ false };
 	si::Time					_sky_dome_update_time;
