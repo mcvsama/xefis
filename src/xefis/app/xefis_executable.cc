@@ -12,9 +12,9 @@
  */
 
 // Xefis:
-#include <xefis/app/xefis.h>
 #include <xefis/config/all.h>
 #include <xefis/core/executable.h>
+#include <xefis/core/xefis.h>
 
 // Standard:
 #include <cstddef>

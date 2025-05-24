@@ -15,9 +15,9 @@
 #include "single_machine_manager.h"
 
 // Xefis:
-#include <xefis/app/xefis.h>
 #include <xefis/config/all.h>
 #include <xefis/components/configurator/configurator_widget.h>
+#include <xefis/core/xefis.h>
 
 // Standard:
 #include <cstddef>

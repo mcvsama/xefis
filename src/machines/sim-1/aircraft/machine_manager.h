@@ -18,9 +18,9 @@
 #include "machine.h"
 
 // Xefis:
-#include <xefis/app/xefis.h>
 #include <xefis/config/all.h>
 #include <xefis/core/machine_manager.h>
+#include <xefis/core/xefis.h>
 
 // Neutrino:
 #include <neutrino/si/lonlat_radius.h>
