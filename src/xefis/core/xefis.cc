@@ -20,10 +20,10 @@
 #include <xefis/core/executable.h>
 #include <xefis/core/machine.h>
 #include <xefis/core/machine_manager.h>
-#include <xefis/core/single_machine_manager.h>
 #include <xefis/core/system.h>
 #include <xefis/core/licenses.h>
 #include <xefis/support/airframe/airframe.h>
+#include <xefis/support/core/single_machine_manager.h>
 #include <xefis/support/ui/sound_manager.h>
 #include <xefis/xefis_machine.h>
 
