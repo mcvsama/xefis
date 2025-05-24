@@ -114,6 +114,7 @@ MIHAU.modules[xefis].products[xefis].sources				+= xefis/core/setting.h
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/core/single_machine_manager.cc
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/core/single_machine_manager.h
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/core/system.cc
+MIHAU.modules[xefis].products[xefis].sources				+= xefis/core/system.h
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/core/xefis.cc
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/core/xefis.h
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/modules/comm/flight_gear.cc
