@@ -43,7 +43,7 @@ TestInstrumentsMachine::TestInstrumentsMachine (xf::Xefis& xefis):
 
 	auto line_width = 0.3525_mm;
 	auto font_height = 3.15_mm;
-	xf::ScreenSpec spec { QRect { 0, 0, 1366, 768 }, 15_in, 30_Hz, line_width, font_height };
+	xf::ScreenSpec spec { QRect { 0, 0, 1366, 768 }, 15_in, 60_Hz, line_width, font_height };
 	spec.set_scale (1.25f);
 
 	auto& test_screen_1 = _test_screen_1.emplace (_test_loop, spec, xefis.graphics(), *_navaid_storage, *this, _logger.with_context ("test screen"));
