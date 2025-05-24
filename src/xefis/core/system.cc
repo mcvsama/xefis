@@ -15,8 +15,8 @@
 #include "system.h"
 
 // Xefis:
-#include <xefis/app/xefis.h>
 #include <xefis/config/all.h>
+#include <xefis/core/xefis.h>
 
 // System:
 #include <sys/types.h>

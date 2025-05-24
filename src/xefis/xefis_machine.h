@@ -19,9 +19,9 @@
 #include <memory>
 
 // Xefis:
-#include <xefis/app/xefis.h>
 #include <xefis/config/all.h>
 #include <xefis/core/machine.h>
+#include <xefis/core/xefis.h>
 
 
 extern std::unique_ptr<xf::Machine>

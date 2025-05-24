@@ -15,7 +15,7 @@
 #include "connectable_socket.h"
 
 // Xefis:
-#include <xefis/app/xefis.h>
+#include <xefis/core/xefis.h>
 
 // Standard:
 #include <cstddef>

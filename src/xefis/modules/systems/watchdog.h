@@ -15,9 +15,9 @@
 #define XEFIS__MODULES__SYSTEMS__WATCHDOG_H__INCLUDED
 
 // Xefis:
-#include <xefis/app/xefis.h>
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
+#include <xefis/core/xefis.h>
 
 // Neutrino:
 #include <neutrino/logger.h>

@@ -16,7 +16,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/app/xefis.h>
+#include <xefis/core/xefis.h>
 
 // Neutrino:
 #include <neutrino/noncopyable.h>

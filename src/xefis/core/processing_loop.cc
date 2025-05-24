@@ -15,10 +15,10 @@
 #include "processing_loop.h"
 
 // Xefis:
-#include <xefis/app/xefis.h>
 #include <xefis/config/all.h>
 #include <xefis/core/machine.h>
 #include <xefis/core/module.h>
+#include <xefis/core/xefis.h>
 
 // Neutrino:
 #include <neutrino/time_helper.h>
