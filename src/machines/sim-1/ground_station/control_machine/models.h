@@ -15,7 +15,7 @@
 #define XEFIS__MACHINES__SIM_1__GROUND_STATION__CONTROL_MACHINE__MODELS_H__INCLUDED
 
 // Xefis:
-#include <xefis/support/air/standard_atmosphere.h>
+#include <xefis/support/atmosphere/standard_atmosphere.h>
 
 // Standard:
 #include <cstddef>

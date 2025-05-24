@@ -16,7 +16,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/support/air/air.h>
+#include <xefis/support/atmosphere/air.h>
 #include <xefis/support/nature/various_inertia_tensors.h>
 #include <xefis/support/shapes/various_materials.h>
 #include <xefis/support/shapes/various_shapes.h>

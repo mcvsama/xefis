@@ -19,7 +19,7 @@
 #include <xefis/support/aerodynamics/airfoil_aerodynamic_forces.h>
 #include <xefis/support/aerodynamics/angle_of_attack.h>
 #include <xefis/support/aerodynamics/reynolds_number.h>
-#include <xefis/support/air/air.h>
+#include <xefis/support/atmosphere/air.h>
 
 // Standard:
 #include <cstddef>
