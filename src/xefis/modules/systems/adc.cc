@@ -17,8 +17,8 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/aerodynamics/reynolds_number.h>
-#include <xefis/support/air/standard_atmosphere.h>
 #include <xefis/support/airframe/airframe.h>
+#include <xefis/support/atmosphere/standard_atmosphere.h>
 #include <xefis/support/nature/constants.h>
 #include <xefis/utility/converger.h>
 

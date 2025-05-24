@@ -12,7 +12,7 @@
  */
 
 // Xefis:
-#include <xefis/support/air/standard_atmosphere.h>
+#include <xefis/support/atmosphere/standard_atmosphere.h>
 
 // Neutrino:
 #include <neutrino/test/auto_test.h>

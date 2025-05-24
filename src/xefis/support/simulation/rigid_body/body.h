@@ -16,7 +16,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/support/air/atmosphere.h>
+#include <xefis/support/atmosphere/atmosphere.h>
 #include <xefis/support/math/geometry.h>
 #include <xefis/support/math/placement.h>
 #include <xefis/support/nature/acceleration_moments.h>
