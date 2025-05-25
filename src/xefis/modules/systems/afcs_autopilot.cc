@@ -1,6 +1,6 @@
 /* vim:ts=4
  *
- * Copyleft 2012…2016  Michał Gawron
+ * Copyleft 2025  Michał Gawron
  * Marduk Unix Labs, http://mulabs.org/
  *
  * This program is free software: you can redistribute it and/or modify
@@ -12,7 +12,7 @@
  */
 
 // Local:
-#include "afcs_ap.h"
+#include "afcs_autopilot.h"
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -25,8 +25,8 @@
 #include <cstddef>
 
 
-AFCS_AP::AFCS_AP (xf::ProcessingLoop& loop, xf::Logger const& logger, std::string_view const& instance):
-	AFCS_AP_IO (loop, instance),
+AFCS_Autopilot::AFCS_Autopilot (xf::ProcessingLoop& loop, xf::Logger const& logger, std::string_view const& instance):
+	AFCS_Autopilot_IO (loop, instance),
 	_logger (logger.with_context (std::string (kLoggerScope) + "#" + instance))
 {
 	constexpr auto radian_second = 1.0_rad * 1.0_s;
@@ -38,7 +38,7 @@ AFCS_AP::AFCS_AP (xf::ProcessingLoop& loop, xf::Logger const& logger, std::strin
 	_ailerons_pid.set_winding (true);
 
 	_ap_computer.set_minimum_dt (5_ms);
-	_ap_computer.set_callback (std::bind (&AFCS_AP::compute_ap, this));
+	_ap_computer.set_callback (std::bind (&AFCS_Autopilot::compute_ap, this));
 	_ap_computer.add_depending_smoothers ({
 		&_elevator_smoother,
 		&_ailerons_smoother,
@@ -57,7 +57,7 @@ AFCS_AP::AFCS_AP (xf::ProcessingLoop& loop, xf::Logger const& logger, std::strin
 
 
 void
-AFCS_AP::initialize()
+AFCS_Autopilot::initialize()
 {
 	_elevator_pid.set_pid (*_io.pitch_pid_settings);
 	_elevator_pid.set_gain (*_io.overall_gain * *_io.pitch_gain);
@@ -68,14 +68,14 @@ AFCS_AP::initialize()
 
 
 void
-AFCS_AP::process (xf::Cycle const& cycle)
+AFCS_Autopilot::process (xf::Cycle const& cycle)
 {
 	_ap_computer.process (cycle.update_time());
 }
 
 
 void
-AFCS_AP::rescue (xf::Cycle const& cycle, std::exception_ptr eptr)
+AFCS_Autopilot::rescue (xf::Cycle const& cycle, std::exception_ptr eptr)
 {
 	using namespace xf::exception_ops;
 
@@ -88,7 +88,7 @@ AFCS_AP::rescue (xf::Cycle const& cycle, std::exception_ptr eptr)
 
 
 void
-AFCS_AP::compute_ap()
+AFCS_Autopilot::compute_ap()
 {
 	si::Time update_dt = _ap_computer.update_dt();
 
@@ -122,7 +122,7 @@ AFCS_AP::compute_ap()
 
 
 void
-AFCS_AP::diagnose()
+AFCS_Autopilot::diagnose()
 {
 	if (!_io.measured_pitch)
 		_logger << "Measured pitch is nil!" << std::endl;
