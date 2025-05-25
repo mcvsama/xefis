@@ -104,13 +104,6 @@ RigidBodyPainter::RigidBodyPainter (si::PixelDensity const pixel_density, WorkPe
 }
 
 
-RigidBodyPainter::~RigidBodyPainter()
-{
-	if (_texture_images.valid())
-		_texture_images.wait();
-}
-
-
 void
 RigidBodyPainter::set_time (si::Time const time)
 {
