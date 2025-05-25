@@ -12,7 +12,7 @@
  */
 
 // Local:
-#include "altacq.h"
+#include "altitude_acquired.h"
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -24,11 +24,11 @@
 #include <cstddef>
 
 
-AltAcq::AltAcq (xf::ProcessingLoop& loop, std::string_view const& instance):
-	AltAcqIO (loop, instance)
+AltitudeAcquired::AltitudeAcquired (xf::ProcessingLoop& loop, std::string_view const& instance):
+	AltitudeAcquiredIO (loop, instance)
 {
 	_output_computer.set_minimum_dt (100_ms);
-	_output_computer.set_callback (std::bind (&AltAcq::compute_altitude_acquire_distance, this));
+	_output_computer.set_callback (std::bind (&AltitudeAcquired::compute_altitude_acquire_distance, this));
 	_output_computer.add_depending_smoothers ({
 		&_output_smoother,
 	});
@@ -42,7 +42,7 @@ AltAcq::AltAcq (xf::ProcessingLoop& loop, std::string_view const& instance):
 
 
 void
-AltAcq::process (xf::Cycle const& cycle)
+AltitudeAcquired::process (xf::Cycle const& cycle)
 {
 	_output_computer.process (cycle.update_time());
 
@@ -72,7 +72,7 @@ AltAcq::process (xf::Cycle const& cycle)
 
 
 void
-AltAcq::compute_altitude_acquire_distance()
+AltitudeAcquired::compute_altitude_acquire_distance()
 {
 	si::Time update_dt = _output_computer.update_dt();
 
