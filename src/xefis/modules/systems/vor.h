@@ -68,7 +68,7 @@ class VOR: public VOR_IO
   public:
 	// Ctor
 	explicit
-	VOR (xf::ProcessingLoop&, std::string_view const& instance = {});
+	VOR (xf::ProcessingLoop&, std::string_view const instance = {});
 
 	// Module API
 	void

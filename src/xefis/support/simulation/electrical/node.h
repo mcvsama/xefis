@@ -44,7 +44,7 @@ class Node: public Noncopyable
 	 * Creates a free node.
 	 */
 	explicit
-	Node (std::string_view const& name);
+	Node (std::string_view const name);
 
 	/**
 	 * Creates an element-pin-type node.
@@ -99,7 +99,7 @@ class Node: public Noncopyable
 
 
 inline
-Node::Node (std::string_view const& name):
+Node::Node (std::string_view const name):
 	_name (name)
 { }
 

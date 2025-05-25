@@ -38,7 +38,7 @@ class Capacitor: public VoltageSource
 	 *			with the capacitor. Otherwise nan and inf values might happen.
 	 */
 	explicit
-	Capacitor (std::string_view const& name, si::Capacitance capacitance, si::Resistance internal_resistance);
+	Capacitor (std::string_view const name, si::Capacitance capacitance, si::Resistance internal_resistance);
 
 	/**
 	 * Return current capacitance.
@@ -80,7 +80,7 @@ class Capacitor: public VoltageSource
 
 
 inline
-Capacitor::Capacitor (std::string_view const& name, si::Capacitance const capacitance, si::Resistance const internal_resistance):
+Capacitor::Capacitor (std::string_view const name, si::Capacitance const capacitance, si::Resistance const internal_resistance):
 	VoltageSource (name, 0_V, internal_resistance),
 	_capacitance (capacitance)
 { }

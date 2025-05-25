@@ -59,7 +59,7 @@ class ProcessingLoop:
   public:
 	// Ctor
 	explicit
-	ProcessingLoop (std::string_view const& instance, si::Frequency loop_frequency, Logger const&);
+	ProcessingLoop (std::string_view const instance, si::Frequency loop_frequency, Logger const&);
 
 	explicit
 	ProcessingLoop (ProcessingLoop const&) = delete;

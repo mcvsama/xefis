@@ -66,7 +66,7 @@ class Gear:
   public:
 	// Ctor
 	explicit
-	Gear (xf::ProcessingLoop&, xf::Graphics const&, std::string_view const& instance = {});
+	Gear (xf::ProcessingLoop&, xf::Graphics const&, std::string_view const instance = {});
 
 	// Module API
 	void

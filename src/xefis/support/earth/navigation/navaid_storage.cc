@@ -51,7 +51,7 @@ class GzDataFileIterator
   public:
 	// Ctor
 	explicit
-	GzDataFileIterator (std::string_view const& path);
+	GzDataFileIterator (std::string_view const path);
 
 	/**
 	 * Return true if pointer doesn't point to the end of the line.
@@ -80,7 +80,7 @@ class GzDataFileIterator
 
 
 inline
-GzDataFileIterator::GzDataFileIterator (std::string_view const& path):
+GzDataFileIterator::GzDataFileIterator (std::string_view const path):
 	_file (QString::fromStdString (std::string (path)))
 {
 	using namespace std::string_literals;
@@ -129,9 +129,9 @@ GzDataFileIterator::operator*()
 
 
 NavaidStorage::NavaidStorage (Logger const& logger,
-							  std::string_view const& nav_file,
-							  std::string_view const& fix_file,
-							  std::string_view const& apt_file):
+							  std::string_view const nav_file,
+							  std::string_view const fix_file,
+							  std::string_view const apt_file):
 	_logger (logger.with_context ("<navaid storage>")),
 	_nav_dat_file (nav_file),
 	_fix_dat_file (fix_file),

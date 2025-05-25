@@ -62,7 +62,7 @@ InstrumentDetails::compute_position (QSize const canvas_size)
 }
 
 
-Screen::Screen (ScreenSpec const& spec, Graphics const& graphics, Machine& machine, std::string_view const& instance, Logger const& logger):
+Screen::Screen (ScreenSpec const& spec, Graphics const& graphics, Machine& machine, std::string_view const instance, Logger const& logger):
 	QWidget (nullptr),
 	NamedInstance (instance),
 	_machine (machine),

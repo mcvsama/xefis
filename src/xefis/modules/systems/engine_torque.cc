@@ -25,7 +25,7 @@
 #include <variant>
 
 
-EngineTorque::EngineTorque (xf::ProcessingLoop& loop, std::string_view const& instance):
+EngineTorque::EngineTorque (xf::ProcessingLoop& loop, std::string_view const instance):
 	EngineTorqueIO (loop, instance)
 { }
 

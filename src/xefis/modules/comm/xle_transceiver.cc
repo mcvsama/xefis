@@ -294,7 +294,7 @@ MasterTransceiver::Session::receiver()
 }
 
 
-MasterTransceiver::MasterTransceiver (xf::ProcessingLoop& loop, CryptoParams const& params, xf::Logger const& logger, std::string_view const& instance):
+MasterTransceiver::MasterTransceiver (xf::ProcessingLoop& loop, CryptoParams const& params, xf::Logger const& logger, std::string_view const instance):
 	Transceiver (Role::Master, Transport::ciphertext_expansion (params.hmac_size), logger.with_context (std::string (kLoggerScope) + "#" + instance)),
 	Module (loop, "MasterTransceiver"),
 	_crypto_params (params)
@@ -401,7 +401,7 @@ SlaveTransceiver::SlaveTransceiver (xf::ProcessingLoop& loop,
 									CryptoParams const& params,
 									HandshakeSlave::KeyCheckFunctions const key_check_functions,
 									xf::Logger const& logger,
-									std::string_view const& instance):
+									std::string_view const instance):
 	Transceiver (Role::Slave, Transport::ciphertext_expansion (params.hmac_size), logger.with_context (std::string (kLoggerScope) + "#" + instance)),
 	Module (loop, "SlaveTransceiver"),
 	_crypto_params (params),

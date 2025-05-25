@@ -31,7 +31,7 @@ class VoltageSource: public Element
   public:
 	// Ctor
 	explicit
-	VoltageSource (std::string_view const& name, si::Voltage, si::Resistance internal_resistance);
+	VoltageSource (std::string_view const name, si::Voltage, si::Resistance internal_resistance);
 
 	/**
 	 * Return ideal voltage source voltage.
@@ -72,7 +72,7 @@ class VoltageSource: public Element
 
 
 inline
-VoltageSource::VoltageSource (std::string_view const& name, si::Voltage const voltage, si::Resistance const internal_resistance):
+VoltageSource::VoltageSource (std::string_view const name, si::Voltage const voltage, si::Resistance const internal_resistance):
 	Element (Element::VoltageSource, name),
 	_source_voltage (voltage)
 {

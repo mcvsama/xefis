@@ -30,7 +30,7 @@ class Resistor: public Element
   public:
 	// Ctor
 	explicit
-	Resistor (std::string_view const& name, si::Resistance);
+	Resistor (std::string_view const name, si::Resistance);
 
 	/**
 	 * Return total energy dissipated by resistor.
@@ -60,7 +60,7 @@ class Resistor: public Element
 
 
 inline
-Resistor::Resistor (std::string_view const& name, si::Resistance const resistance):
+Resistor::Resistor (std::string_view const name, si::Resistance const resistance):
 	Element (Element::Load, name)
 {
 	set_resistance (resistance);

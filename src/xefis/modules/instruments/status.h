@@ -101,7 +101,7 @@ class Status:
 	  public:
 		// Ctor
 		explicit
-		Message (std::string_view const& text, Severity);
+		Message (std::string_view const text, Severity);
 
 		/**
 		 * Message to show on Status.
@@ -207,14 +207,14 @@ class Status:
   public:
 	// Ctor
 	explicit
-	Status (xf::ProcessingLoop&, xf::Graphics const&, std::string_view const& instance = {});
+	Status (xf::ProcessingLoop&, xf::Graphics const&, std::string_view const instance = {});
 
 	/**
 	 * Configure new message.
 	 * Use returned pointer to operate on the Message object and add observers.
 	 */
 	Message&
-	add_message (std::string_view const& text, Severity);
+	add_message (std::string_view const text, Severity);
 
 	// Module API
 	void

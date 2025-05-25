@@ -24,7 +24,7 @@
 #include <cstddef>
 
 
-AltitudeAcquired::AltitudeAcquired (xf::ProcessingLoop& loop, std::string_view const& instance):
+AltitudeAcquired::AltitudeAcquired (xf::ProcessingLoop& loop, std::string_view const instance):
 	AltitudeAcquiredIO (loop, instance)
 {
 	_output_computer.set_minimum_dt (100_ms);

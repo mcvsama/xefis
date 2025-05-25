@@ -173,7 +173,7 @@ JoystickInput::Axis::set_value (float value)
 }
 
 
-JoystickInput::JoystickInput (xf::ProcessingLoop& loop, QDomElement const& config, xf::Logger const& logger, std::string_view const& instance):
+JoystickInput::JoystickInput (xf::ProcessingLoop& loop, QDomElement const& config, xf::Logger const& logger, std::string_view const instance):
 	JoystickInputIO (loop, instance),
 	_logger (logger.with_context (std::string (kLoggerScope) + "#" + instance))
 {

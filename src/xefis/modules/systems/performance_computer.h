@@ -124,7 +124,7 @@ class PerformanceComputer: public PerformanceComputerIO
   public:
 	// Ctor
 	explicit
-	PerformanceComputer (xf::ProcessingLoop&, xf::Airframe*, std::string_view const& instance = {});
+	PerformanceComputer (xf::ProcessingLoop&, xf::Airframe*, std::string_view const instance = {});
 
   protected:
 	void

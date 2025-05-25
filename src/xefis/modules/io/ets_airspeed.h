@@ -90,7 +90,7 @@ class ETSAirspeed:
   public:
 	// Ctor
 	explicit
-	ETSAirspeed (xf::ProcessingLoop&, xf::i2c::Device&&, xf::Logger const&, std::string_view const& instance = {});
+	ETSAirspeed (xf::ProcessingLoop&, xf::i2c::Device&&, xf::Logger const&, std::string_view const instance = {});
 
 	// Module API
 	void

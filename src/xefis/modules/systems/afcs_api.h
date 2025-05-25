@@ -214,19 +214,19 @@ to_string (SpeedMode mode)
 
 
 void
-parse (std::string_view const&, ThrustMode&);
+parse (std::string_view const, ThrustMode&);
 
 
 void
-parse (std::string_view const&, RollMode&);
+parse (std::string_view const, RollMode&);
 
 
 void
-parse (std::string_view const&, PitchMode&);
+parse (std::string_view const, PitchMode&);
 
 
 void
-parse (std::string_view const&, SpeedMode&);
+parse (std::string_view const, SpeedMode&);
 
 } // namespace afcs
 

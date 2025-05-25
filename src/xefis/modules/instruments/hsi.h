@@ -138,7 +138,7 @@ to_string (NavType nav_type)
 
 
 inline void
-parse (std::string_view const& str, DisplayMode& display_mode)
+parse (std::string_view const str, DisplayMode& display_mode)
 {
 	if (str == kDisplayMode_Expanded)
 		display_mode = DisplayMode::Expanded;
@@ -150,7 +150,7 @@ parse (std::string_view const& str, DisplayMode& display_mode)
 
 
 inline void
-parse (std::string_view const& str, HeadingMode& heading_mode)
+parse (std::string_view const str, HeadingMode& heading_mode)
 {
 	if (str == kHeadingMode_Magnetic)
 		heading_mode = HeadingMode::Magnetic;
@@ -160,7 +160,7 @@ parse (std::string_view const& str, HeadingMode& heading_mode)
 
 
 inline void
-parse (std::string_view const& str, NavType& nav_type)
+parse (std::string_view const str, NavType& nav_type)
 {
 	if (str == kNavType_A)
 		nav_type = NavType::A;
@@ -583,7 +583,7 @@ class HSI: public HSI_IO
 
   public:
 	// Ctor
-	HSI (xf::ProcessingLoop&, xf::Graphics const&, xf::NavaidStorage const&, xf::Logger const&, std::string_view const& instance = {});
+	HSI (xf::ProcessingLoop&, xf::Graphics const&, xf::NavaidStorage const&, xf::Logger const&, std::string_view const instance = {});
 
 	// Module API
 	void

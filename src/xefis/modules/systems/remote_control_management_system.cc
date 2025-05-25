@@ -27,7 +27,7 @@
 #include <cstddef>
 
 
-RemoteControlManagementSystem::RemoteControlManagementSystem (xf::ProcessingLoop& loop, std::string_view const& instance):
+RemoteControlManagementSystem::RemoteControlManagementSystem (xf::ProcessingLoop& loop, std::string_view const instance):
 	RemoteControlManagementSystemIO (loop, instance)
 {
 	_distance_computer.set_callback (std::bind (&RemoteControlManagementSystem::compute_distances_to_home, this));

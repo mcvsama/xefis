@@ -25,7 +25,7 @@
 #include <format>
 
 
-VerticalTrim::VerticalTrim (xf::ProcessingLoop& loop, xf::Graphics const& graphics, std::string_view const& instance):
+VerticalTrim::VerticalTrim (xf::ProcessingLoop& loop, xf::Graphics const& graphics, std::string_view const instance):
 	VerticalTrimIO (loop, instance),
 	InstrumentSupport (graphics)
 {

@@ -28,7 +28,7 @@
 using namespace neutrino::si::literals;
 
 
-Flaps::Flaps (xf::ProcessingLoop& loop, xf::Graphics const& graphics, std::string_view const& instance):
+Flaps::Flaps (xf::ProcessingLoop& loop, xf::Graphics const& graphics, std::string_view const instance):
 	FlapsIO (loop, instance),
 	InstrumentSupport (graphics)
 {

@@ -29,7 +29,7 @@
 #include <cctype>
 
 
-KLogMonitor::KLogMonitor (xf::ProcessingLoop& loop, std::string_view const& instance):
+KLogMonitor::KLogMonitor (xf::ProcessingLoop& loop, std::string_view const instance):
 	KLogMonitorIO (loop, instance)
 {
 	_timer = new QTimer (this);

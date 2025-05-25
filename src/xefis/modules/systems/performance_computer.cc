@@ -33,7 +33,7 @@
 #include <limits>
 
 
-PerformanceComputer::PerformanceComputer (xf::ProcessingLoop& loop, xf::Airframe* airframe, std::string_view const& instance):
+PerformanceComputer::PerformanceComputer (xf::ProcessingLoop& loop, xf::Airframe* airframe, std::string_view const instance):
 	PerformanceComputerIO (loop, instance),
 	_airframe (airframe)
 {

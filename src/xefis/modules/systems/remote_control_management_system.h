@@ -70,7 +70,7 @@ class RemoteControlManagementSystem: public RemoteControlManagementSystemIO
   public:
 	// Ctor
 	explicit
-	RemoteControlManagementSystem (xf::ProcessingLoop&, std::string_view const& instance = {});
+	RemoteControlManagementSystem (xf::ProcessingLoop&, std::string_view const instance = {});
 
 	// Module API
 	void

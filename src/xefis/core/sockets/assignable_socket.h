@@ -72,7 +72,7 @@ template<class pValue>
 
 		// BasicAssignableSocket API
 		void
-		from_string (std::string_view const& str, SocketConversionSettings const& settings = {}) override;
+		from_string (std::string_view const str, SocketConversionSettings const& settings = {}) override;
 
 		// BasicAssignableSocket API
 		void
@@ -119,7 +119,7 @@ template<class V>
 
 template<class V>
 	inline void
-	AssignableSocket<V>::from_string (std::string_view const& str, SocketConversionSettings const& settings)
+	AssignableSocket<V>::from_string (std::string_view const str, SocketConversionSettings const& settings)
 	{
 		SocketTraits<Value>::from_string (*this, str, settings);
 	}

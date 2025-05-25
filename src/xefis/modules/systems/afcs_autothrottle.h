@@ -79,7 +79,7 @@ class AFCS_Autothrottle: public AFCS_Autothrottle_IO
   public:
 	// Ctor
 	explicit
-	AFCS_Autothrottle (xf::ProcessingLoop&, std::string_view const& instance = {});
+	AFCS_Autothrottle (xf::ProcessingLoop&, std::string_view const instance = {});
 
   protected:
 	// Module API

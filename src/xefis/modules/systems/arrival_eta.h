@@ -58,7 +58,7 @@ class ArrivalETA: public ArrivalETA_IO
   public:
 	// Ctor
 	explicit
-	ArrivalETA (xf::ProcessingLoop&, std::string_view const& instance = {});
+	ArrivalETA (xf::ProcessingLoop&, std::string_view const instance = {});
 
   protected:
 	// Module API

@@ -68,7 +68,7 @@ class AFCS_RollAutotrim: public AFCS_RollAutotrim_IO
   public:
 	// Ctor
 	explicit
-	AFCS_RollAutotrim (xf::ProcessingLoop&, std::string_view const& instance = {});
+	AFCS_RollAutotrim (xf::ProcessingLoop&, std::string_view const instance = {});
 
   protected:
 	// Module API

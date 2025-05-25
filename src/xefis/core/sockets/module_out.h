@@ -49,7 +49,7 @@ template<class pValue>
 		 * Create ModuleOut that's coupled to a Module and set the module as data source.
 		 */
 		explicit
-		ModuleOut (Module* owner_and_data_source, std::string_view const& path);
+		ModuleOut (Module* owner_and_data_source, std::string_view const path);
 
 		// Dtor
 		~ModuleOut();
@@ -77,7 +77,7 @@ template<class pValue>
 
 template<class V>
 	inline
-	ModuleOut<V>::ModuleOut (Module* owner_and_data_source, std::string_view const& path):
+	ModuleOut<V>::ModuleOut (Module* owner_and_data_source, std::string_view const path):
 		BasicModuleOut (owner_and_data_source, path)
 	{
 		if (!owner_and_data_source)

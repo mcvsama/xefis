@@ -29,7 +29,7 @@
 #include <cstddef>
 
 
-FlapsControl::FlapsControl (xf::ProcessingLoop& loop, xf::Airframe& airframe, std::string_view const& instance):
+FlapsControl::FlapsControl (xf::ProcessingLoop& loop, xf::Airframe& airframe, std::string_view const instance):
 	FlapsControlIO (loop, instance)
 {
 	for (auto s: airframe.flaps().settings())

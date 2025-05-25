@@ -211,7 +211,7 @@ class Module:
 		 * Print current exception information.
 		 */
 		void
-		handle_exception (Cycle const&, std::string_view const& context_info);
+		handle_exception (Cycle const&, std::string_view const context_info);
 
 	  private:
 		Module& _module;
@@ -294,7 +294,7 @@ class Module:
 	 *			Instance name for GUI identification and debugging purposes.
 	 */
 	explicit
-	Module (std::string_view const& instance = {});
+	Module (std::string_view const instance = {});
 
   public:
 	/**
@@ -304,7 +304,7 @@ class Module:
 	 *			Instance name for GUI identification and debugging purposes.
 	 */
 	explicit
-	Module (ProcessingLoop&, std::string_view const& instance = {});
+	Module (ProcessingLoop&, std::string_view const instance = {});
 
 	// Dtor
 	virtual

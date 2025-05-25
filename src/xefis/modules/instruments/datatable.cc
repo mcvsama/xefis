@@ -28,13 +28,13 @@
 #include <cstddef>
 
 
-Datatable::Line::Line (std::string_view const& label, xf::BasicSocket const& socket):
+Datatable::Line::Line (std::string_view const label, xf::BasicSocket const& socket):
 	label (label),
 	socket (socket)
 { }
 
 
-Datatable::Line::Line (std::string_view const& label, xf::BasicSocket const& socket,
+Datatable::Line::Line (std::string_view const label, xf::BasicSocket const& socket,
 					   QColor label_and_value_color):
 	label (label),
 	label_color (label_and_value_color),
@@ -43,7 +43,7 @@ Datatable::Line::Line (std::string_view const& label, xf::BasicSocket const& soc
 { }
 
 
-Datatable::Line::Line (std::string_view const& label, xf::BasicSocket const& socket,
+Datatable::Line::Line (std::string_view const label, xf::BasicSocket const& socket,
 					   std::optional<QColor> label_color,
 					   std::optional<QColor> value_color):
 	label (label),
@@ -67,7 +67,7 @@ Datatable::Line::stringified() const
 }
 
 
-Datatable::Datatable (xf::ProcessingLoop& loop, xf::Graphics const& graphics, std::string_view const& instance):
+Datatable::Datatable (xf::ProcessingLoop& loop, xf::Graphics const& graphics, std::string_view const instance):
 	Instrument (loop, instance),
 	InstrumentSupport (graphics)
 {

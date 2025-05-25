@@ -37,7 +37,7 @@ class Watchdog: public xf::Module
   public:
 	// Ctor
 	explicit
-	Watchdog (xf::ProcessingLoop& loop, xf::Xefis*, xf::Logger const&, std::string_view const& instance = {});
+	Watchdog (xf::ProcessingLoop& loop, xf::Xefis*, xf::Logger const&, std::string_view const instance = {});
 
   private:
 	/**

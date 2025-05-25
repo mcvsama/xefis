@@ -64,7 +64,7 @@ class VirtualTemperatureSensor: public VirtualTemperatureSensorIO
 							  xf::rigid_body::Body& mount_body,
 							  xf::SpaceVector<si::Length, xf::BodySpace> const& mount_location,
 							  xf::Logger const&,
-							  std::string_view const& instance = {});
+							  std::string_view const instance = {});
 
 	// Module API
 	void

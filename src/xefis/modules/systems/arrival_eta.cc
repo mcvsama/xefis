@@ -25,7 +25,7 @@
 #include <cstddef>
 
 
-ArrivalETA::ArrivalETA (xf::ProcessingLoop& loop, std::string_view const& instance):
+ArrivalETA::ArrivalETA (xf::ProcessingLoop& loop, std::string_view const instance):
 	ArrivalETA_IO (loop, instance)
 {
 	_eta_computer.set_minimum_dt (1_s);

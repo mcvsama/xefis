@@ -93,7 +93,7 @@ class TestGenerator: public xf::Module
   public:
 	// Ctor
 	explicit
-	TestGenerator (xf::ProcessingLoop&, std::string_view const& instance = {});
+	TestGenerator (xf::ProcessingLoop&, std::string_view const instance = {});
 
 	/**
 	 * Create and manage new output socket for sockets that can be used
@@ -101,7 +101,7 @@ class TestGenerator: public xf::Module
 	 */
 	template<UsefulWithRange Value>
 		xf::ModuleOut<Value>&
-		create_socket (std::string_view const& identifier,
+		create_socket (std::string_view const identifier,
 					   Value initial_value,
 					   xf::Range<Value> value_range,
 					   RateOfChange<Value> rate_of_change,
@@ -113,7 +113,7 @@ class TestGenerator: public xf::Module
 	 */
 	template<class Value>
 		xf::ModuleOut<Value>&
-		create_enum_socket (std::string_view const& identifier,
+		create_enum_socket (std::string_view const identifier,
 							std::vector<EnumTuple<Value>> const& values_and_intervals,
 							TestNilCondition const nil_condition = {});
 
@@ -157,7 +157,7 @@ TestGenerator::SocketGenerator::perhaps_set_to_nil (xf::BasicAssignableSocket& s
 
 template<UsefulWithRange Value>
 	inline xf::ModuleOut<Value>&
-	TestGenerator::create_socket (std::string_view const& identifier,
+	TestGenerator::create_socket (std::string_view const identifier,
 								  Value const initial_value,
 								  xf::Range<Value> const value_range,
 								  RateOfChange<Value> const rate_of_change,
@@ -172,7 +172,7 @@ template<UsefulWithRange Value>
 		  public:
 			// Ctor
 			RangeGenerator (TestGenerator* test_generator,
-							std::string_view const& identifier,
+							std::string_view const identifier,
 							Value const initial_value,
 							xf::Range<Value> const value_range,
 							RateOfChange<Value> const rate_of_change,
@@ -239,7 +239,7 @@ template<UsefulWithRange Value>
 
 template<class Value>
 	inline xf::ModuleOut<Value>&
-	TestGenerator::create_enum_socket (std::string_view const& identifier,
+	TestGenerator::create_enum_socket (std::string_view const identifier,
 									   std::vector<EnumTuple<Value>> const& values_and_intervals,
 									   TestNilCondition const nil_condition)
 	{
@@ -251,7 +251,7 @@ template<class Value>
 		  public:
 			// Ctor
 			EnumGenerator (TestGenerator* test_generator,
-						   std::string_view const& identifier,
+						   std::string_view const identifier,
 						   std::vector<EnumTuple<Value>> const& values_and_intervals,
 						   TestNilCondition const nil_condition):
 				SocketGenerator (nil_condition),

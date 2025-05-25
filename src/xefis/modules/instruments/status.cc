@@ -27,7 +27,7 @@
 #include <iterator>
 
 
-Status::Message::Message (std::string_view const& text, Severity severity):
+Status::Message::Message (std::string_view const text, Severity severity):
 	_text (text),
 	_severity (severity)
 { }
@@ -93,7 +93,7 @@ Status::Cache::solve_scroll_and_cursor (std::vector<Message*> const& visible_mes
 }
 
 
-Status::Status (xf::ProcessingLoop& loop, xf::Graphics const& graphics, std::string_view const& instance):
+Status::Status (xf::ProcessingLoop& loop, xf::Graphics const& graphics, std::string_view const instance):
 	StatusIO (loop, instance),
 	InstrumentSupport (graphics)
 {
@@ -132,7 +132,7 @@ Status::Status (xf::ProcessingLoop& loop, xf::Graphics const& graphics, std::str
 
 
 Status::Message&
-Status::add_message (std::string_view const& text, Severity severity)
+Status::add_message (std::string_view const text, Severity severity)
 {
 	Message& m = _messages.emplace_back (text, severity);
 	_hidden_messages.push_back (&m);

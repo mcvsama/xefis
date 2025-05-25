@@ -42,7 +42,7 @@ class Element: public Noncopyable
   protected:
 	// Ctor
 	explicit
-	Element (Type type, std::string_view const& name);
+	Element (Type type, std::string_view const name);
 
   public:
 	// Dtor
@@ -229,7 +229,7 @@ template<class T>
 
 
 inline
-Element::Element (Type const type, std::string_view const& name):
+Element::Element (Type const type, std::string_view const name):
 	_type (type),
 	_name (name),
 	_has_const_resistance (false)

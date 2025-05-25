@@ -25,7 +25,7 @@
 #include <cstddef>
 
 
-AFCS_Autopilot::AFCS_Autopilot (xf::ProcessingLoop& loop, xf::Logger const& logger, std::string_view const& instance):
+AFCS_Autopilot::AFCS_Autopilot (xf::ProcessingLoop& loop, xf::Logger const& logger, std::string_view const instance):
 	AFCS_Autopilot_IO (loop, instance),
 	_logger (logger.with_context (std::string (kLoggerScope) + "#" + instance))
 {
