@@ -12,7 +12,7 @@
  */
 
 // Local:
-#include "adc.h"
+#include "air_data_computer.h"
 
 // Xefis:
 #include <xefis/config/all.h>
