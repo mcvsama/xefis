@@ -12,7 +12,7 @@
  */
 
 // Local:
-#include "nc.h"
+#include "navigation_computer.h"
 
 // Xefis:
 #include <xefis/config/all.h>
