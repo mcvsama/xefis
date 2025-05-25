@@ -18,7 +18,7 @@
 using namespace neutrino::si::literals;
 
 
-InputLink::InputLink (xf::ProcessingLoop& loop, std::unique_ptr<LinkProtocol> protocol, InputLinkParams const& params, xf::Logger const& logger, std::string_view const& instance):
+InputLink::InputLink (xf::ProcessingLoop& loop, std::unique_ptr<LinkProtocol> protocol, InputLinkParams const& params, xf::Logger const& logger, std::string_view const instance):
 	Module (loop, instance),
 	_logger (logger.with_context (std::string (kLoggerScope) + "#" + instance)),
 	_protocol (std::move (protocol)),

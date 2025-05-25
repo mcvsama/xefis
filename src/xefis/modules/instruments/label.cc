@@ -24,7 +24,7 @@
 #include <cstddef>
 
 
-Label::Label (xf::ProcessingLoop& loop, xf::Graphics const& graphics, std::string_view const& instance):
+Label::Label (xf::ProcessingLoop& loop, xf::Graphics const& graphics, std::string_view const instance):
 	LabelIO (loop, instance),
 	InstrumentSupport (graphics)
 { }

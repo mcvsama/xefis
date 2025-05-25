@@ -25,7 +25,7 @@
 #include <cstddef>
 
 
-VOR::VOR (xf::ProcessingLoop& loop, std::string_view const& instance):
+VOR::VOR (xf::ProcessingLoop& loop, std::string_view const instance):
 	VOR_IO (loop, instance)
 {
 	_vor_computer.set_callback (std::bind (&VOR::compute, this));

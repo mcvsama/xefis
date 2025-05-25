@@ -38,7 +38,7 @@ class BasicAssignableSocket: virtual public BasicSocket
 	 * Unserialize socket's value from string.
 	 */
 	virtual void
-	from_string (std::string_view const&, SocketConversionSettings const& = {}) = 0;
+	from_string (std::string_view const, SocketConversionSettings const& = {}) = 0;
 
 	/**
 	 * Unserialize socket's value from Blob.

@@ -102,7 +102,7 @@ template<class Value, template<class> class AnySocket>
 
 template<class Value, template<class> class AnySocket>
 	inline void
-	apply_generic_string_parse (AnySocket<Value>& socket, std::string_view const& str, SocketConversionSettings const& settings)
+	apply_generic_string_parse (AnySocket<Value>& socket, std::string_view const str, SocketConversionSettings const& settings)
 	{
 		if (str == settings.nil_value)
 			assign (socket, xf::nil);
@@ -197,7 +197,7 @@ template<class Enum>
 		}
 
 		static inline void
-		from_string (AssignableSocket<Enum>& module_out, std::string_view const& str, SocketConversionSettings const& settings)
+		from_string (AssignableSocket<Enum>& module_out, std::string_view const str, SocketConversionSettings const& settings)
 		{
 			if (str == settings.nil_value)
 				detail::assign (module_out, xf::nil);
@@ -298,7 +298,7 @@ template<std::integral Integer>
 		}
 
 		static inline void
-		from_string (AssignableSocket<Integer>& module_out, std::string_view const& str, SocketConversionSettings const& settings)
+		from_string (AssignableSocket<Integer>& module_out, std::string_view const str, SocketConversionSettings const& settings)
 		{
 			detail::apply_generic_string_parse (module_out, str, settings);
 		}
@@ -357,7 +357,7 @@ template<std::floating_point FloatingPoint>
 		}
 
 		static inline void
-		from_string (AssignableSocket<FloatingPoint>& module_out, std::string_view const& str, SocketConversionSettings const& settings)
+		from_string (AssignableSocket<FloatingPoint>& module_out, std::string_view const str, SocketConversionSettings const& settings)
 		{
 			detail::apply_generic_string_parse (module_out, str, settings);
 		}
@@ -415,7 +415,7 @@ template<class Value, class Enabled = void>
 		to_string (Socket<Value> const&, SocketConversionSettings const&);
 
 		static inline void
-		from_string (AssignableSocket<Value>&, std::string_view const&, SocketConversionSettings const&);
+		from_string (AssignableSocket<Value>&, std::string_view const, SocketConversionSettings const&);
 
 		static inline std::optional<float128_t>
 		to_floating_point (Socket<Value> const&, SocketConversionSettings const&);
@@ -453,7 +453,7 @@ template<>
 		}
 
 		static inline void
-		from_string (AssignableSocket<bool>& module_out, std::string_view const& str, SocketConversionSettings const& settings)
+		from_string (AssignableSocket<bool>& module_out, std::string_view const str, SocketConversionSettings const& settings)
 		{
 			if (str == settings.true_value)
 				detail::assign (module_out, true);
@@ -579,7 +579,7 @@ template<>
 		}
 
 		static inline void
-		from_string (AssignableSocket<std::string>& module_out, std::string_view const& str, SocketConversionSettings const& settings)
+		from_string (AssignableSocket<std::string>& module_out, std::string_view const str, SocketConversionSettings const& settings)
 		{
 			if (str == settings.nil_value)
 				detail::assign (module_out, xf::nil);
@@ -659,7 +659,7 @@ template<class Unit>
 		}
 
 		static inline void
-		from_string (AssignableSocket<si::Quantity<Unit>>& module_out, std::string_view const& str, SocketConversionSettings const& settings)
+		from_string (AssignableSocket<si::Quantity<Unit>>& module_out, std::string_view const str, SocketConversionSettings const& settings)
 		{
 			if (str == settings.nil_value)
 				detail::assign (module_out, xf::nil);

@@ -41,7 +41,7 @@ class BasicModuleSocket: virtual public BasicSocket
 	 *			Owner object for this socket. May be nullptr.
 	 */
 	explicit
-	BasicModuleSocket (Module* owner, std::string_view const& path);
+	BasicModuleSocket (Module* owner, std::string_view const path);
 
   public:
 	// Dtor
@@ -84,7 +84,7 @@ class BasicModuleSocket: virtual public BasicSocket
 
 
 inline
-BasicModuleSocket::BasicModuleSocket (Module* owner, std::string_view const& path):
+BasicModuleSocket::BasicModuleSocket (Module* owner, std::string_view const path):
 	_module (owner),
 	_path (path)
 { }

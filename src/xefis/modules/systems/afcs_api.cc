@@ -24,7 +24,7 @@
 namespace afcs {
 
 void
-parse (std::string_view const& str, ThrustMode& thrust_mode)
+parse (std::string_view const str, ThrustMode& thrust_mode)
 {
 	if (str == kThrustMode_TO_GA)
 		thrust_mode = ThrustMode::TO_GA;
@@ -42,7 +42,7 @@ parse (std::string_view const& str, ThrustMode& thrust_mode)
 
 
 void
-parse (std::string_view const& str, RollMode& roll_mode)
+parse (std::string_view const str, RollMode& roll_mode)
 {
 	if (str == kRollMode_Heading)
 		roll_mode = RollMode::Heading;
@@ -60,7 +60,7 @@ parse (std::string_view const& str, RollMode& roll_mode)
 
 
 void
-parse (std::string_view const& str, PitchMode& pitch_mode)
+parse (std::string_view const str, PitchMode& pitch_mode)
 {
 	if (str == kPitchMode_TO_GA)
 		pitch_mode = PitchMode::TO_GA;
@@ -86,7 +86,7 @@ parse (std::string_view const& str, PitchMode& pitch_mode)
 
 
 void
-parse (std::string_view const& str, SpeedMode& speed_mode)
+parse (std::string_view const str, SpeedMode& speed_mode)
 {
 	if (str == kSpeedMode_Thrust)
 		speed_mode = SpeedMode::Thrust;

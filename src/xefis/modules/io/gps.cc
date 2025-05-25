@@ -145,7 +145,7 @@ GPS::Connection::alive_check_failed()
 
 
 void
-GPS::Connection::failure (std::string_view const& reason)
+GPS::Connection::failure (std::string_view const reason)
 {
 	auto log = _gps_module.logger() << "Failure detected";
 
@@ -510,7 +510,7 @@ GPS::PowerCycle::notify_connection_established()
 }
 
 
-GPS::GPS (xf::ProcessingLoop& loop, xf::System* system, xf::SerialPort::Configuration const& serial_port_config, xf::Logger const& logger, std::string_view const& instance):
+GPS::GPS (xf::ProcessingLoop& loop, xf::System* system, xf::SerialPort::Configuration const& serial_port_config, xf::Logger const& logger, std::string_view const instance):
 	GPS_IO (loop, instance),
 	_logger (logger.with_context (std::string (kLoggerScope) + "#" + instance)),
 	_system (system),

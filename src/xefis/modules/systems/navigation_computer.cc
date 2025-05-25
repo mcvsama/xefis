@@ -31,7 +31,7 @@
 #include <cstddef>
 
 
-NavigationComputer::NavigationComputer (xf::ProcessingLoop& loop, std::string_view const& instance):
+NavigationComputer::NavigationComputer (xf::ProcessingLoop& loop, std::string_view const instance):
 	NavigationComputerIO (loop, instance)
 {
 	// Initialize _positions* with invalid vals, to get them non-empty:

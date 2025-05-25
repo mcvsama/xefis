@@ -71,7 +71,7 @@ class FlapsBugs: public FlapsBugsIO
   public:
 	// Ctor
 	explicit
-	FlapsBugs (xf::ProcessingLoop&, xf::Flaps const& flaps, std::string_view const& instance = {});
+	FlapsBugs (xf::ProcessingLoop&, xf::Flaps const& flaps, std::string_view const instance = {});
 
   protected:
 	// Module API

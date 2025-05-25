@@ -26,7 +26,7 @@
 #include <cstddef>
 
 
-AFCS_Autothrottle::AFCS_Autothrottle (xf::ProcessingLoop& loop, std::string_view const& instance):
+AFCS_Autothrottle::AFCS_Autothrottle (xf::ProcessingLoop& loop, std::string_view const instance):
 	AFCS_Autothrottle_IO (loop, instance)
 {
 	_ias_pid.set_integral_limit ({ -5.0_m, +5.0_m });

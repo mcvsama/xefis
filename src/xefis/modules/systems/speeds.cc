@@ -22,7 +22,7 @@
 #include <cstddef>
 
 
-Speeds::Speeds (xf::ProcessingLoop& loop, xf::Airframe* airframe, std::string_view const& instance):
+Speeds::Speeds (xf::ProcessingLoop& loop, xf::Airframe* airframe, std::string_view const instance):
 	SpeedsIO (loop, instance),
 	_airframe (airframe)
 {

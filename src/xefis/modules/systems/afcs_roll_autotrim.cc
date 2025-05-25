@@ -21,7 +21,7 @@
 #include <cstddef>
 
 
-AFCS_RollAutotrim::AFCS_RollAutotrim (xf::ProcessingLoop& loop, std::string_view const& instance):
+AFCS_RollAutotrim::AFCS_RollAutotrim (xf::ProcessingLoop& loop, std::string_view const instance):
 	AFCS_RollAutotrim_IO (loop, instance)
 { }
 

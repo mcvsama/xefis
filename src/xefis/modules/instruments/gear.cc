@@ -25,7 +25,7 @@
 #include <cstddef>
 
 
-Gear::Gear (xf::ProcessingLoop& loop, xf::Graphics const& graphics, std::string_view const& instance):
+Gear::Gear (xf::ProcessingLoop& loop, xf::Graphics const& graphics, std::string_view const instance):
 	GearIO (loop, instance),
 	InstrumentSupport (graphics)
 {

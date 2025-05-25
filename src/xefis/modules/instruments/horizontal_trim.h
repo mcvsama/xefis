@@ -73,7 +73,7 @@ class HorizontalTrim:
   public:
 	// Ctor
 	explicit
-	HorizontalTrim (xf::ProcessingLoop&, xf::Graphics const&, std::string_view const& instance = {});
+	HorizontalTrim (xf::ProcessingLoop&, xf::Graphics const&, std::string_view const instance = {});
 
 	// Module API
 	void

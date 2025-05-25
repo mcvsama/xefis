@@ -84,7 +84,7 @@ class AFCS_Autopilot: public AFCS_Autopilot_IO
   public:
 	// Ctor
 	explicit
-	AFCS_Autopilot (xf::ProcessingLoop&, xf::Logger const&, std::string_view const& instance = {});
+	AFCS_Autopilot (xf::ProcessingLoop&, xf::Logger const&, std::string_view const instance = {});
 
   protected:
 	// Module API

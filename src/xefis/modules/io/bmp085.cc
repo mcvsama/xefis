@@ -31,7 +31,7 @@
 #include <iostream>
 
 
-BMP085::BMP085 (xf::ProcessingLoop& loop, xf::Logger const& logger, std::string_view const& instance):
+BMP085::BMP085 (xf::ProcessingLoop& loop, xf::Logger const& logger, std::string_view const instance):
 	BMP085_IO (loop, instance),
 	_logger (logger.with_context (std::string (kLoggerScope) + "#" + instance))
 {

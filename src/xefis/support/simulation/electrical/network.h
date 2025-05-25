@@ -43,7 +43,7 @@ class Network: public Noncopyable
 	 */
 	[[nodiscard]]
 	Node&
-	make_node (std::string_view const& name);
+	make_node (std::string_view const name);
 
 	/**
 	 * Add element to the network.
@@ -91,7 +91,7 @@ class Network: public Noncopyable
 
 
 inline Node&
-Network::make_node (std::string_view const& name)
+Network::make_node (std::string_view const name)
 {
 	_free_nodes.emplace_back (name);
 	return _free_nodes.back();

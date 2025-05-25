@@ -100,7 +100,7 @@ class AirDataComputer: public AirDataComputerIO
   public:
 	// Ctor
 	explicit
-	AirDataComputer (xf::ProcessingLoop&, xf::Airframe*, xf::Logger const&, std::string_view const& instance = {});
+	AirDataComputer (xf::ProcessingLoop&, xf::Airframe*, xf::Logger const&, std::string_view const instance = {});
 
   protected:
 	// Module API

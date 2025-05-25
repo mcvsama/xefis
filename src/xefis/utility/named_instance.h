@@ -29,7 +29,7 @@ class NamedInstance
   public:
 	// Ctor
 	explicit
-	NamedInstance (std::string_view const& instance):
+	NamedInstance (std::string_view const instance):
 		_instance (instance)
 	{ }
 

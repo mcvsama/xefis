@@ -123,7 +123,7 @@ class Screen:
   public:
 	// Ctor
 	explicit
-	Screen (ScreenSpec const&, Graphics const&, Machine&, std::string_view const& instance, Logger const&);
+	Screen (ScreenSpec const&, Graphics const&, Machine&, std::string_view const instance, Logger const&);
 
 	// Dtor
 	~Screen();

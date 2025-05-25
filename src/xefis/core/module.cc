@@ -179,7 +179,7 @@ Module::ProcessingLoopAPI::fetch_and_process (Cycle const& cycle)
 
 
 void
-Module::ProcessingLoopAPI::handle_exception (Cycle const& cycle, std::string_view const& context_info)
+Module::ProcessingLoopAPI::handle_exception (Cycle const& cycle, std::string_view const context_info)
 {
 	try {
 		_module.rescue (cycle, std::current_exception());
@@ -196,14 +196,14 @@ Module::ProcessingLoopAPI::handle_exception (Cycle const& cycle, std::string_vie
 }
 
 
-Module::Module (std::string_view const& instance):
+Module::Module (std::string_view const instance):
 	NamedInstance (instance)
 {
 	ModuleSocketAPI (*this).verify_settings();
 }
 
 
-Module::Module (ProcessingLoop& loop, std::string_view const& instance):
+Module::Module (ProcessingLoop& loop, std::string_view const instance):
 	NamedInstance (instance)
 {
 	ModuleSocketAPI (*this).verify_settings();

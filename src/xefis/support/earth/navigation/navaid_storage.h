@@ -85,9 +85,9 @@ class NavaidStorage
 	// Ctor
 	explicit
 	NavaidStorage (Logger const&,
-				   std::string_view const& nav_file,
-				   std::string_view const& fix_file,
-				   std::string_view const& apt_file);
+				   std::string_view const nav_file,
+				   std::string_view const fix_file,
+				   std::string_view const apt_file);
 
 	// Dtor
 	~NavaidStorage();

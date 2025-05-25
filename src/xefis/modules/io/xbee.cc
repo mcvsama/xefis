@@ -45,7 +45,7 @@
 #include <iomanip>
 
 
-XBee::XBee (xf::ProcessingLoop& loop, xf::Logger const& logger, std::string_view const& instance):
+XBee::XBee (xf::ProcessingLoop& loop, xf::Logger const& logger, std::string_view const instance):
 	XBeeIO (loop, instance),
 	_logger (logger.with_context (std::string (kLoggerScope) + "#" + instance))
 {
@@ -127,7 +127,7 @@ XBee::process (xf::Cycle const&)
 		std::string data = _output_buffer + *_io.send;
 		std::vector<std::string> packets = packetize (data, 100); // Max 100 bytes per packet according to XBee docs.
 
-		auto send_back_to_output_buffer = [&] (std::string_view const& front) -> void
+		auto send_back_to_output_buffer = [&] (std::string_view const front) -> void
 		{
 			// Add the rest of packets back to output buffer:
 			_output_buffer.clear();
@@ -269,7 +269,7 @@ XBee::open_device()
 
 
 void
-XBee::failure (std::string_view const& reason)
+XBee::failure (std::string_view const reason)
 {
 	auto log = _logger << "Failure detected";
 
@@ -437,7 +437,7 @@ XBee::set_device_options()
 
 
 void
-XBee::configure_modem (uint8_t frame_id, ATResponseStatus status, std::string_view const& response)
+XBee::configure_modem (uint8_t frame_id, ATResponseStatus status, std::string_view const response)
 {
 	auto request_at = [&] (ConfigurationStep next_step, std::string const& at, std::vector<uint8_t> data_bytes = {}) -> void
 	{
@@ -607,7 +607,7 @@ XBee::baud_rate_to_xbee_code (int baud_rate)
 
 
 std::string
-XBee::make_frame (std::string_view const& data) const
+XBee::make_frame (std::string_view const data) const
 {
 	if (data.size() > 0xffff)
 		throw xf::Exception ("max frame size is 0xffff");
@@ -635,7 +635,7 @@ XBee::make_frame (std::string_view const& data) const
 
 
 std::string
-XBee::make_tx64_command (uint64_t address, std::string_view const& data) const
+XBee::make_tx64_command (uint64_t address, std::string_view const data) const
 {
 	std::string result;
 
@@ -656,7 +656,7 @@ XBee::make_tx64_command (uint64_t address, std::string_view const& data) const
 
 
 std::string
-XBee::make_tx16_command (uint16_t address, std::string_view const& data) const
+XBee::make_tx16_command (uint16_t address, std::string_view const data) const
 {
 	std::string result;
 
@@ -677,7 +677,7 @@ XBee::make_tx16_command (uint16_t address, std::string_view const& data) const
 
 
 std::string
-XBee::make_at_command (std::string_view const& at_command, uint8_t frame_id)
+XBee::make_at_command (std::string_view const at_command, uint8_t frame_id)
 {
 	std::string result;
 
@@ -693,7 +693,7 @@ XBee::make_at_command (std::string_view const& at_command, uint8_t frame_id)
 
 
 XBee::SendResult
-XBee::send_frame (std::string_view const& frame, int& written)
+XBee::send_frame (std::string_view const frame, int& written)
 {
 	written = ::write (_device, frame.data(), frame.size());
 
@@ -731,7 +731,7 @@ XBee::send_failed_with_retry()
 
 
 std::vector<std::string>
-XBee::packetize (std::string_view const& data, std::size_t size) const
+XBee::packetize (std::string_view const data, std::size_t size) const
 {
 	if (data.size() <= size)
 		return { std::string (data) };
@@ -843,7 +843,7 @@ XBee::process_packet (std::string& input, ResponseAPI& api, std::string& data)
 
 
 void
-XBee::process_rx64_frame (std::string_view const& frame)
+XBee::process_rx64_frame (std::string_view const frame)
 {
 	if (*_io.debug)
 		debug() << ">> RX64 data: " << neutrino::to_hex_string (frame) << std::endl;
@@ -877,7 +877,7 @@ XBee::process_rx64_frame (std::string_view const& frame)
 
 
 void
-XBee::process_rx16_frame (std::string_view const& frame)
+XBee::process_rx16_frame (std::string_view const frame)
 {
 	if (*_io.debug)
 		debug() << ">> RX16 data: " << neutrino::to_hex_string (frame) << std::endl;
@@ -915,7 +915,7 @@ XBee::process_rx16_frame (std::string_view const& frame)
 
 
 void
-XBee::process_modem_status_frame (std::string_view const& data)
+XBee::process_modem_status_frame (std::string_view const data)
 {
 	if (*_io.debug)
 		debug() << ">> Modem status: " << neutrino::to_hex_string (data) << std::endl;
@@ -974,7 +974,7 @@ XBee::process_modem_status_frame (std::string_view const& data)
 
 
 void
-XBee::process_at_response_frame (std::string_view const& frame)
+XBee::process_at_response_frame (std::string_view const frame)
 {
 	if (*_io.debug)
 		debug() << ">> AT status: " << neutrino::to_hex_string (frame) << std::endl;
@@ -1022,7 +1022,7 @@ XBee::process_at_response_frame (std::string_view const& frame)
 
 
 void
-XBee::write_output_socket (std::string_view const& data)
+XBee::write_output_socket (std::string_view const data)
 {
 	if (configured())
 		_io.receive = std::string (data);
@@ -1060,7 +1060,7 @@ XBee::pong()
 
 
 void
-XBee::periodic_pong (ATResponseStatus status, std::string_view const& data)
+XBee::periodic_pong (ATResponseStatus status, std::string_view const data)
 {
 	if (status != ATResponseStatus::OK)
 		failure ("check-alive packet status non-OK");
@@ -1084,7 +1084,7 @@ XBee::stop_periodic_ping()
 
 
 void
-XBee::clear_channel_result (ATResponseStatus status, std::string_view const& result)
+XBee::clear_channel_result (ATResponseStatus status, std::string_view const result)
 {
 	if (status == ATResponseStatus::OK && result.size() >= 2)
 	{

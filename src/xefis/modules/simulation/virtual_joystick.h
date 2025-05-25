@@ -52,7 +52,7 @@ class VirtualJoystick: public VirtualJoystickIO
   public:
 	// Ctor
 	explicit
-	VirtualJoystick (xf::ProcessingLoop&, xf::Machine*, std::string_view const& instance = {});
+	VirtualJoystick (xf::ProcessingLoop&, xf::Machine*, std::string_view const instance = {});
 
 	QWidget*
 	widget() const noexcept;

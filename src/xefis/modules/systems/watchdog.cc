@@ -26,7 +26,7 @@
 #include <cstddef>
 
 
-Watchdog::Watchdog (xf::ProcessingLoop& loop, xf::Xefis* xefis, xf::Logger const& logger, std::string_view const& instance):
+Watchdog::Watchdog (xf::ProcessingLoop& loop, xf::Xefis* xefis, xf::Logger const& logger, std::string_view const instance):
 	Module (loop, instance),
 	_logger (logger.with_context (std::string (kLoggerScope) + "#" + instance))
 {

@@ -68,7 +68,7 @@ class AltitudeAcquired: public AltitudeAcquiredIO
   public:
 	// Ctor
 	explicit
-	AltitudeAcquired (xf::ProcessingLoop&, std::string_view const& instance = {});
+	AltitudeAcquired (xf::ProcessingLoop&, std::string_view const instance = {});
 
   protected:
 	// Module API

@@ -836,7 +836,7 @@ class ADI: public ADI_IO
   public:
 	// Ctor
 	explicit
-	ADI (xf::ProcessingLoop&, xf::Graphics const&, std::string_view const& instance = {});
+	ADI (xf::ProcessingLoop&, xf::Graphics const&, std::string_view const instance = {});
 
 	// Module API
 	void

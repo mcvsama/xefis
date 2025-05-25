@@ -43,13 +43,13 @@ template<class pValue>
 		 * Create a ModuleIn that's coupled to given owner, but doesn't have any data source yet.
 		 */
 		explicit
-		ModuleIn (Module* owner, std::string_view const& path);
+		ModuleIn (Module* owner, std::string_view const path);
 
 		/**
 		 * Same as ModuleIn (Module*, std::string_view), but additionally set up the fallback value.
 		 */
 		explicit
-		ModuleIn (Module* owner, std::string_view const& path, Value fallback_value);
+		ModuleIn (Module* owner, std::string_view const path, Value fallback_value);
 
 		// Dtor
 		~ModuleIn()
@@ -72,7 +72,7 @@ template<class pValue>
 
 template<class V>
 	inline
-	ModuleIn<V>::ModuleIn (Module* owner, std::string_view const& path):
+	ModuleIn<V>::ModuleIn (Module* owner, std::string_view const path):
 		BasicModuleIn (owner, path)
 	{
 		Module::ModuleSocketAPI (*_module).register_input_socket (*this);
@@ -81,7 +81,7 @@ template<class V>
 
 template<class V>
 	inline
-	ModuleIn<V>::ModuleIn (Module* owner, std::string_view const& path, Value fallback_value):
+	ModuleIn<V>::ModuleIn (Module* owner, std::string_view const path, Value fallback_value):
 		ModuleIn (owner, path)
 	{
 		if (!owner)

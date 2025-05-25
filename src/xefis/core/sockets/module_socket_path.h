@@ -42,7 +42,7 @@ class ModuleSocketPath
 
 	// Ctor
 	explicit
-	ModuleSocketPath (std::string_view const& path);
+	ModuleSocketPath (std::string_view const path);
 
 	// Ctor
 	explicit
@@ -81,7 +81,7 @@ ModuleSocketPath::ModuleSocketPath (const char* path):
 
 
 inline
-ModuleSocketPath::ModuleSocketPath (std::string_view const& path):
+ModuleSocketPath::ModuleSocketPath (std::string_view const path):
 	_path (path)
 { }
 

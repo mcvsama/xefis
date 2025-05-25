@@ -21,7 +21,7 @@
 #include <cstddef>
 
 
-DebugForces::DebugForces (xf::ProcessingLoop& loop, xf::Graphics const& graphics, std::string_view const& instance):
+DebugForces::DebugForces (xf::ProcessingLoop& loop, xf::Graphics const& graphics, std::string_view const instance):
 	DebugForcesIO (loop, instance),
 	InstrumentSupport (graphics)
 { }

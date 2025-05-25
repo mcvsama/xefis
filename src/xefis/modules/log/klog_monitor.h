@@ -54,7 +54,7 @@ class KLogMonitor:
   public:
 	// Ctor
 	explicit
-	KLogMonitor (xf::ProcessingLoop&, std::string_view const& instance = {});
+	KLogMonitor (xf::ProcessingLoop&, std::string_view const instance = {});
 
   private slots:
 	void

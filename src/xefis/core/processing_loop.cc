@@ -33,7 +33,7 @@
 
 namespace xf {
 
-ProcessingLoop::ProcessingLoop (std::string_view const& instance, si::Frequency loop_frequency, Logger const& logger):
+ProcessingLoop::ProcessingLoop (std::string_view const instance, si::Frequency loop_frequency, Logger const& logger):
 	Module (instance),
 	_loop_period (1.0 / loop_frequency),
 	_logger (logger)

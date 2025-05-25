@@ -29,7 +29,7 @@ VirtualPressureSensor::VirtualPressureSensor (xf::sim::FlightSimulation const& f
 											  Probe probe,
 											  xf::SpaceVector<si::Length, xf::AirframeFrame> const& mount_location,
 											  xf::Logger const& logger,
-											  std::string_view const& instance):
+											  std::string_view const instance):
 	VirtualPressureSensorIO (instance),
 	_logger (logger.with_context (std::string (kLoggerScope) + "#" + instance)),
 	_flight_simulation (flight_simulation),

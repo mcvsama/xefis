@@ -70,7 +70,7 @@ class VirtualPressureSensor: public VirtualPressureSensorIO
 						   Probe,
 						   xf::SpaceVector<si::Length, xf::AirframeFrame> const& mount_location,
 						   xf::Logger const&,
-						   std::string_view const& instance = {});
+						   std::string_view const instance = {});
 
 	// Module API
 	void

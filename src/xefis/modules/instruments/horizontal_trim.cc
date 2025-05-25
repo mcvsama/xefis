@@ -25,7 +25,7 @@
 #include <format>
 
 
-HorizontalTrim::HorizontalTrim (xf::ProcessingLoop& loop, xf::Graphics const& graphics, std::string_view const& instance):
+HorizontalTrim::HorizontalTrim (xf::ProcessingLoop& loop, xf::Graphics const& graphics, std::string_view const instance):
 	HorizontalTrimIO (loop, instance),
 	InstrumentSupport (graphics)
 {

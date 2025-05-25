@@ -37,7 +37,7 @@ class OutputLink: public xf::Module
   public:
 	// Ctor
 	explicit
-	OutputLink (xf::ProcessingLoop&, std::unique_ptr<LinkProtocol>, si::Frequency send_frequency, xf::Logger const&, std::string_view const& instance = {});
+	OutputLink (xf::ProcessingLoop&, std::unique_ptr<LinkProtocol>, si::Frequency send_frequency, xf::Logger const&, std::string_view const instance = {});
 
   protected:
 	// Module API
