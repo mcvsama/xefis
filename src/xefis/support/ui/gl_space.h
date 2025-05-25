@@ -362,7 +362,7 @@ template<math::CoordinateSystem TargetSpace, math::CoordinateSystem SourceSpace>
 		// but instead to convert the quaternion to a rotation matrix and
 		// use matrix multiplication. Since using glRotatef() indeed
 		// yields weird results, I'm fine with the matrix.
-		rotate (RotationMatrix (q));
+		rotate (RotationMatrix (~q));
 	}
 
 
@@ -387,7 +387,7 @@ template<math::CoordinateSystem BaseSpace, math::CoordinateSystem Space>
 	{
 		translate (placement.position());
 		// With OpenGL it's base→body, not body→space as one would normally expect:
-		rotate (placement.base_to_body_rotation());
+		rotate (placement.body_to_base_rotation());
 	}
 
 
