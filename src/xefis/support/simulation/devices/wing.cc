@@ -51,7 +51,7 @@ Wing::update_external_forces (Atmosphere const* atmosphere, si::Time const dt)
 		auto const ecef_to_world = RotationQuaternion<WorldSpace, ECEFSpace> (math::identity);
 		auto const body_to_airfoil_spline = RotationQuaternion<AirfoilSplineSpace, BodyCOM> (math::identity);
 		auto const airfoil_spline_to_body = RotationQuaternion<BodyCOM, AirfoilSplineSpace> (math::identity);
-		auto const world_to_body = placement().base_to_body_rotation();
+		auto const world_to_body = placement().base_rotation();
 		// ECEF → WorldSpace → BodyCOM → AirfoilSplineSpace:
 		RotationQuaternion<AirfoilSplineSpace, ECEFSpace> ecef_to_spline_transform = body_to_airfoil_spline * world_to_body * ecef_to_world;
 

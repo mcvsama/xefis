@@ -328,7 +328,7 @@ ImpulseSolver::normalize_rotations()
 	{
 		auto& body = _system.bodies()[_processed_frames % _system.bodies().size()];
 		auto pl = body->placement();
-		pl.set_body_to_base_rotation (pl.body_to_base_rotation().normalized());
+		pl.set_body_rotation (pl.body_rotation().normalized());
 		body->set_placement (pl);
 	}
 }

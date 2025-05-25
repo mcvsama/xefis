@@ -54,7 +54,7 @@ make_iss()
 	auto body = std::make_unique<rigid_body::Body> (iss_mass_moments);
 	auto pl = body->placement();
 	pl.set_position (math::coordinate_system_cast<WorldSpace, void> (iss_ecef_position));
-	pl.set_body_to_base_rotation (math::coordinate_system_cast<WorldSpace, BodyCOM> (iss_ecef_rotation));
+	pl.set_body_rotation (math::coordinate_system_cast<WorldSpace, BodyCOM> (iss_ecef_rotation));
 	body->set_placement (pl);
 	body->set_velocity_moments (VelocityMoments<WorldSpace> { iss_velocity, iss_angular_velocity });
 

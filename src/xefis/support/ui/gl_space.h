@@ -387,7 +387,7 @@ template<math::CoordinateSystem BaseSpace, math::CoordinateSystem Space>
 	{
 		translate (placement.position());
 		// With OpenGL it's base→body, not body→space as one would normally expect:
-		rotate (placement.body_to_base_rotation());
+		rotate (placement.body_rotation());
 	}
 
 

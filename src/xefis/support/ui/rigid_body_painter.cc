@@ -747,7 +747,7 @@ RigidBodyPainter::transform_gl_to_center_of_mass (rigid_body::Group const& group
 	// Transform so that center-of-mass is at the OpenGL space origin:
 	auto const* rotation_reference_body = group.rotation_reference_body();
 	auto const rotation = rotation_reference_body
-		? rotation_reference_body->placement().body_to_base_rotation()
+		? rotation_reference_body->placement().body_rotation()
 		: kNoRotation<WorldSpace, BodyCOM>;
 	_gl.transform (Placement<WorldSpace, BodyCOM> (get_center_of_mass (group), rotation) - _camera.position());
 }
@@ -1082,7 +1082,7 @@ RigidBodyPainter::paint_ecef_basis (QOpenGLPaintDevice& canvas)
 		// TODO Try to use set_camera instead of manually managing the matrix:
 		_gl.load_identity();
 		_gl.translate (0_m, 0_m, -1_m);
-		_gl.rotate (_camera.body_to_base_rotation());
+		_gl.rotate (_camera.body_rotation());
 		paint_basis (8_cm);
 	});
 }
@@ -1306,16 +1306,16 @@ RigidBodyPainter::calculate_camera_transform()
 
 			if (followed_body)
 			{
-				auto const body_rotation = math::coordinate_system_cast<WorldSpace, WorldSpace> (followed_body->placement().base_to_body_rotation());
+				auto const base_rotation = math::coordinate_system_cast<WorldSpace, WorldSpace> (followed_body->placement().base_rotation());
 				// Make an exception if we're following the planet body: we don't want to use aircraft coordinates
 				// for the planet, because it's unnatural:
 				if (followed_body == _planet_body)
-					rotation = _user_camera_rotation * kScreenToNullIslandRotation * body_rotation;
+					rotation = _user_camera_rotation * kScreenToNullIslandRotation * base_rotation;
 				else
-					rotation = _user_camera_rotation * kAircraftToBehindViewRotation * body_rotation;
+					rotation = _user_camera_rotation * kAircraftToBehindViewRotation * base_rotation;
 			}
 
-			_camera.set_body_to_base_rotation (rotation);
+			_camera.set_body_rotation (rotation);
 			_camera.set_position (_followed_position - planet_position() + ~rotation * _user_camera_translation);
 			_camera_polar_position = to_polar (_camera.position());
 		}
@@ -1324,7 +1324,7 @@ RigidBodyPainter::calculate_camera_transform()
 		case ChaseView:
 		{
 			auto const rotation = _user_camera_rotation * gravity_down_rotation (_followed_polar_position) * kScreenToNullIslandRotation;
-			_camera.set_body_to_base_rotation (rotation);
+			_camera.set_body_rotation (rotation);
 			_camera.set_position (_followed_position - planet_position() + ~rotation * _user_camera_translation);
 			_camera_polar_position = to_polar (_camera.position());
 		}

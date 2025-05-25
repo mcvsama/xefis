@@ -92,7 +92,7 @@ ecef_to_ned_rotation (SpaceVector<si::Length, ECEFSpace> const& position)
 inline RotationMatrix<NEDSpace, AirframeSpace>
 airframe_to_ned_rotation_matrix (Placement<ECEFSpace, AirframeSpace> const& pr)
 {
-	return ecef_to_ned_rotation_matrix (pr.position()) * RotationMatrix (pr.body_to_base_rotation());
+	return ecef_to_ned_rotation_matrix (pr.position()) * RotationMatrix (pr.body_rotation());
 }
 
 
@@ -100,7 +100,7 @@ airframe_to_ned_rotation_matrix (Placement<ECEFSpace, AirframeSpace> const& pr)
 inline RotationQuaternion<NEDSpace, AirframeSpace>
 airframe_to_ned_rotation (Placement<ECEFSpace, AirframeSpace> const& pr)
 {
-	return ecef_to_ned_rotation (pr.position()) * pr.body_to_base_rotation();
+	return ecef_to_ned_rotation (pr.position()) * pr.body_rotation();
 }
 
 } // namespace xf
