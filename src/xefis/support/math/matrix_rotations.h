@@ -222,7 +222,7 @@ template<math::CoordinateSystem TargetSpace = void, math::CoordinateSystem Sourc
 		if (abs (rotation_vector) > 0.0_rad)
 			return matrix_rotation_about (vector_normalized (rotation_vector) / 1_rad, abs (rotation_vector));
 		else
-			return math::unit;
+			return math::identity;
 	}
 
 

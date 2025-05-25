@@ -176,7 +176,7 @@ template<math::CoordinateSystem Space>
 	InertiaTensor<Space>
 	displacement_inertia_tensor (si::Mass const mass, SpaceLength<Space> const& R)
 	{
-		SpaceMatrix<double, Space> const E (math::unit);
+		SpaceMatrix<double, Space> const E (math::identity);
 		// m * [(R ⋅ R) E3 - R ⊗ R]
 		return mass * (dot_product (R, R) * E - outer_product (R, R));
 	}
