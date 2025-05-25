@@ -12,7 +12,7 @@
  */
 
 // Local:
-#include "pc.h"
+#include "performance_computer.h"
 
 // Xefis:
 #include <xefis/config/all.h>
