@@ -12,7 +12,7 @@
  */
 
 // Local:
-#include "afcs_at.h"
+#include "afcs_autothrottle.h"
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -26,13 +26,13 @@
 #include <cstddef>
 
 
-AFCS_AT::AFCS_AT (xf::ProcessingLoop& loop, std::string_view const& instance):
-	AFCS_AT_IO (loop, instance)
+AFCS_Autothrottle::AFCS_Autothrottle (xf::ProcessingLoop& loop, std::string_view const& instance):
+	AFCS_Autothrottle_IO (loop, instance)
 {
 	_ias_pid.set_integral_limit ({ -5.0_m, +5.0_m });
 
 	_thrust_computer.set_minimum_dt (5_ms);
-	_thrust_computer.set_callback (std::bind (&AFCS_AT::compute_thrust, this));
+	_thrust_computer.set_callback (std::bind (&AFCS_Autothrottle::compute_thrust, this));
 	_thrust_computer.add_depending_smoothers ({
 		&_ias_pid_smoother,
 	});
@@ -46,7 +46,7 @@ AFCS_AT::AFCS_AT (xf::ProcessingLoop& loop, std::string_view const& instance):
 
 
 void
-AFCS_AT::initialize()
+AFCS_Autothrottle::initialize()
 {
 	_ias_pid.set_pid (*_io.ias_pid_settings);
 	_ias_pid.set_gain (*_io.ias_pid_gain);
@@ -54,14 +54,14 @@ AFCS_AT::initialize()
 
 
 void
-AFCS_AT::process (xf::Cycle const& cycle)
+AFCS_Autothrottle::process (xf::Cycle const& cycle)
 {
 	_thrust_computer.process (cycle.update_time());
 }
 
 
 void
-AFCS_AT::compute_thrust()
+AFCS_Autothrottle::compute_thrust()
 {
 	bool disengage = false;
 	si::Force computed_thrust = 0.0_N;
