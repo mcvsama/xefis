@@ -12,7 +12,7 @@
  */
 
 // Local:
-#include "afcs_eac_yd.h"
+#include "afcs_yaw_damper.h"
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -21,13 +21,13 @@
 #include <cstddef>
 
 
-AFCS_EAC_YD::AFCS_EAC_YD (std::string_view const& instance):
-	AFCS_EAC_YD_IO (instance)
+AFCS_YawDamper::AFCS_YawDamper (xf::ProcessingLoop& loop, std::string_view const instance):
+	AFCS_YawDamper_IO (loop, instance)
 {
 	_rudder_pid.set_integral_limit ({ -0.1_Ns, +0.1_Ns });
 	_rudder_pid.set_output_limit ({ -*_io.deflection_limit, *_io.deflection_limit });
 
-	_rudder_computer.set_callback (std::bind (&AFCS_EAC_YD::compute, this));
+	_rudder_computer.set_callback (std::bind (&AFCS_YawDamper::compute, this));
 	_rudder_computer.observe ({
 		&_io.enabled,
 		&_io.slip_skid,
@@ -36,7 +36,7 @@ AFCS_EAC_YD::AFCS_EAC_YD (std::string_view const& instance):
 
 
 void
-AFCS_EAC_YD::initialize()
+AFCS_YawDamper::initialize()
 {
 	_rudder_pid.set_pid (*_io.rudder_pid_settings);
 	_rudder_pid.set_gain (*_io.rudder_pid_gain);
@@ -44,14 +44,14 @@ AFCS_EAC_YD::initialize()
 
 
 void
-AFCS_EAC_YD::process (xf::Cycle const& cycle)
+AFCS_YawDamper::process (xf::Cycle const& cycle)
 {
 	_rudder_computer.process (cycle.update_time());
 }
 
 
 void
-AFCS_EAC_YD::compute()
+AFCS_YawDamper::compute()
 {
 	si::Time dt = _rudder_computer.update_dt();
 

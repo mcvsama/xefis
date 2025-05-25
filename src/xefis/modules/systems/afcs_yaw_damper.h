@@ -11,23 +11,30 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__MODULES__SYSTEMS__AFCS_EAC_YD_H__INCLUDED
-#define XEFIS__MODULES__SYSTEMS__AFCS_EAC_YD_H__INCLUDED
+#ifndef XEFIS__MODULES__SYSTEMS__AFCS_YAW_DAMPER_H__INCLUDED
+#define XEFIS__MODULES__SYSTEMS__AFCS_YAW_DAMPER_H__INCLUDED
 
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
-#include <xefis/core/module_socket.h>
 #include <xefis/core/setting.h>
+#include <xefis/core/sockets/module_socket.h>
 #include <xefis/support/control/pid_controller.h>
 #include <xefis/support/sockets/socket_observer.h>
+
+// Neutrino:
+#include <neutrino/si/si.h>
 
 // Standard:
 #include <cstddef>
 #include <string>
 
 
-class AFCS_EAC_YD_IO: public xf::Module
+namespace si = neutrino::si;
+using namespace neutrino::si::literals;
+
+
+class AFCS_YawDamper_IO: public xf::Module
 {
   public:
 	/*
@@ -59,12 +66,12 @@ class AFCS_EAC_YD_IO: public xf::Module
 /**
  * Controls rudder to obtain zero slip-skid value.
  */
-class AFCS_EAC_YD: public AFCS_EAC_YD_IO
+class AFCS_YawDamper: public AFCS_YawDamper_IO
 {
   public:
 	// Ctor
 	explicit
-	AFCS_EAC_YD (std::string_view const& instance = {});
+	AFCS_YawDamper (xf::ProcessingLoop& loop, std::string_view const instance = {});
 
   private:
 	// Module API
@@ -82,7 +89,7 @@ class AFCS_EAC_YD: public AFCS_EAC_YD_IO
 	compute();
 
   private:
-	AFCS_EAC_YD_IO&							_io { *this };
+	AFCS_YawDamper_IO&						_io { *this };
 	xf::PIDController<si::Force, si::Angle>	_rudder_pid;
 	xf::SocketObserver						_rudder_computer;
 };
