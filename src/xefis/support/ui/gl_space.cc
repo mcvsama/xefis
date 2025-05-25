@@ -55,7 +55,7 @@ GLSpace::set_camera (std::optional<Placement<WorldSpace, WorldSpace>> const& cam
 
 	// Apply camera rotation (inverse, that is base→body, since OpenGL rotates the world, not the objects):
 	if (_camera)
-		rotate (_camera->base_to_body_rotation());
+		rotate (_camera->body_to_base_rotation());
 
 	// Don't translate now. The GL matrix has 32-bit floats, we need to apply translation when applying verices using 64-bit floats (si::Length).
 }

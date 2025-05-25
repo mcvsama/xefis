@@ -478,7 +478,7 @@ RigidBodyPainter::make_z_towards_the_sun()
 void
 RigidBodyPainter::make_z_sky_top_x_south()
 {
-	_gl.rotate (~(z_rotation<WorldSpace> (_camera_polar_position.lon()) * y_rotation<WorldSpace> (-_camera_polar_position.lat() + 90_deg)));
+	_gl.rotate (z_rotation<WorldSpace> (_camera_polar_position.lon()) * y_rotation<WorldSpace> (-_camera_polar_position.lat() + 90_deg));
 	// Z is now sky top, X is towards azimuth 180° (true south).
 }
 
@@ -532,7 +532,7 @@ RigidBodyPainter::paint_universe()
 			glEnable (GL_TEXTURE_2D);
 			glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 			_gl.set_camera_rotation_only (_camera);
-			_gl.rotate (kScreenToNullIslandRotation * _ecef_to_celestial_rotation);
+			_gl.rotate (~(kScreenToNullIslandRotation * _ecef_to_celestial_rotation));
 			_gl.draw (*_sky_box_shape);
 			_gl.clear_z_buffer();
 			glDisable (GL_TEXTURE_2D);
@@ -1082,7 +1082,7 @@ RigidBodyPainter::paint_ecef_basis (QOpenGLPaintDevice& canvas)
 		// TODO Try to use set_camera instead of manually managing the matrix:
 		_gl.load_identity();
 		_gl.translate (0_m, 0_m, -1_m);
-		_gl.rotate (_camera.base_to_body_rotation());
+		_gl.rotate (_camera.body_to_base_rotation());
 		paint_basis (8_cm);
 	});
 }
