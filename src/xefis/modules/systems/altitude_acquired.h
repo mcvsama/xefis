@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__MODULES__SYSTEMS__ALTACQ_H__INCLUDED
-#define XEFIS__MODULES__SYSTEMS__ALTACQ_H__INCLUDED
+#ifndef XEFIS__MODULES__SYSTEMS__ALTITUDE_ACQUIRED_H__INCLUDED
+#define XEFIS__MODULES__SYSTEMS__ALTITUDE_ACQUIRED_H__INCLUDED
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -31,7 +31,7 @@ namespace si = neutrino::si;
 using namespace neutrino::si::literals;
 
 
-class AltAcqIO: public xf::Module
+class AltitudeAcquiredIO: public xf::Module
 {
   public:
 	/*
@@ -63,12 +63,12 @@ class AltAcqIO: public xf::Module
 };
 
 
-class AltAcq: public AltAcqIO
+class AltitudeAcquired: public AltitudeAcquiredIO
 {
   public:
 	// Ctor
 	explicit
-	AltAcq (xf::ProcessingLoop&, std::string_view const& instance = {});
+	AltitudeAcquired (xf::ProcessingLoop&, std::string_view const& instance = {});
 
   protected:
 	// Module API
@@ -79,7 +79,7 @@ class AltAcq: public AltAcqIO
 	compute_altitude_acquire_distance();
 
   private:
-	AltAcqIO&							_io									{ *this };
+	AltitudeAcquiredIO&					_io									{ *this };
 	bool								_flag_armed							{ false };
 	// Note: SocketObservers depend on Smoothers, so first Smoothers must be defined,
 	// then SocketObservers, to ensure correct order of destruction.
