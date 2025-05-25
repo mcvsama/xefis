@@ -275,8 +275,8 @@ AutoTest t6 ("Math: fixed orientation helper rotations", []{
 			RotationMatrix<BodyCOM, BodyCOM> const m_body_error = ~m_initial_relative_rotation * m_current_relative_rotation;
 			RotationQuaternion<BodyCOM, BodyCOM> const q_body_error = ~q_initial_relative_rotation * q_current_relative_rotation;
 
-			SpaceVector<si::Angle, WorldSpace> const m_world_error = placement_2.body_to_base_rotation() * to_rotation_vector (m_body_error);
-			SpaceVector<si::Angle, WorldSpace> const q_world_error = placement_2.body_to_base_rotation() * to_rotation_vector (q_body_error);
+			SpaceVector<si::Angle, WorldSpace> const m_world_error = placement_2.body_rotation() * to_rotation_vector (m_body_error);
+			SpaceVector<si::Angle, WorldSpace> const q_world_error = placement_2.body_rotation() * to_rotation_vector (q_body_error);
 
 			test_asserts::verify_equal_with_epsilon ("Matrix relative rotations == Quaternion relative rotations",
 													 m_world_error, q_world_error, 1e-9_rad);

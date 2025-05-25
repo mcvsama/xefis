@@ -116,7 +116,7 @@ tait_bryan_angles (RotationQuaternion<ECEFSpace, AirframeSpace> const& body_rota
 inline TaitBryanAngles
 tait_bryan_angles (Placement<ECEFSpace, AirframeSpace> const& placement)
 {
-	return tait_bryan_angles (placement.body_to_base_rotation(), to_polar (placement.position()));
+	return tait_bryan_angles (placement.body_rotation(), to_polar (placement.position()));
 }
 
 } // namespace xf

@@ -30,7 +30,6 @@ namespace xf {
  * inv (R) == ~R
  */
 
-// TODO Perhaps rename *_to_base() to *_to_world(), and maybe *_to_body() to *_to_local()?
 template<math::CoordinateSystem pBaseSpace = void, math::CoordinateSystem pSpace = pBaseSpace>
 	class Placement
 	{
@@ -39,21 +38,21 @@ template<math::CoordinateSystem pBaseSpace = void, math::CoordinateSystem pSpace
 		using Space					= pSpace;
 
 		using Position				= SpaceVector<si::Length, BaseSpace>;
-		using RotationToBase		= RotationQuaternion<BaseSpace, Space>;
-		using RotationToBody		= RotationQuaternion<Space, BaseSpace>;
-		using RotationToBaseMatrix	= RotationMatrix<BaseSpace, Space>;
-		using RotationToBodyMatrix	= RotationMatrix<Space, BaseSpace>;
+		using BodyRotation			= RotationQuaternion<BaseSpace, Space>;
+		using BaseRotation			= RotationQuaternion<Space, BaseSpace>;
+		using BodyRotationMatrix	= RotationMatrix<BaseSpace, Space>;
+		using BaseRotationMatrix	= RotationMatrix<Space, BaseSpace>;
 
 	  public:
 		// Ctor
 		Placement() = default;
 
 		// Ctor
-		Placement (Position const&, RotationToBody const&)
+		Placement (Position const&, BaseRotation const&)
 			requires (!std::is_same<BaseSpace, Space>());
 
 		// Ctor
-		Placement (Position const&, RotationToBase const&);
+		Placement (Position const&, BodyRotation const&);
 
 		/**
 		 * Body position viewed from the BaseSpace coordinate system.
@@ -74,46 +73,46 @@ template<math::CoordinateSystem pBaseSpace = void, math::CoordinateSystem pSpace
 		 * Body rotation matrix transforming from BaseSpace to Space.
 		 */
 		[[nodiscard]]
-		RotationToBody const&
-		base_to_body_rotation() const noexcept
-			{ return _base_to_body_rotation; }
+		BaseRotation const&
+		base_rotation() const noexcept
+			{ return _base_rotation; }
 
 		/**
 		 * Return base's X, Y, Z axes viewed in BodySpace coordinates.
-		 * Same as base_to_body_rotation().
+		 * Same as base_rotation().
 		 */
 		[[nodiscard]]
-		RotationToBodyMatrix
+		BaseRotationMatrix
 		base_coordinates() const noexcept
-			{ return RotationToBodyMatrix (_base_to_body_rotation); }
+			{ return BaseRotationMatrix (_base_rotation); }
 
 		/**
 		 * Set body's rotation matrix.
 		 */
 		void
-		set_base_to_body_rotation (RotationToBody const&);
+		set_base_rotation (BaseRotation const&);
 
 		/**
 		 * Body rotation matrix transforming from Space to BaseSpace.
 		 */
 		[[nodiscard]]
-		RotationToBase const&
-		body_to_base_rotation() const noexcept
-			{ return _body_to_base_rotation; }
+		BodyRotation const&
+		body_rotation() const noexcept
+			{ return _body_rotation; }
 
 		/**
 		 * Return body's X, Y, Z axes viewed in BaseSpace coordinates.
 		 */
 		[[nodiscard]]
-		RotationToBaseMatrix
+		BodyRotationMatrix
 		body_coordinates() const noexcept
-			{ return RotationToBaseMatrix (_body_to_base_rotation); }
+			{ return BodyRotationMatrix (_body_rotation); }
 
 		/**
 		 * Set body's rotation matrix.
 		 */
 		void
-		set_body_to_base_rotation (RotationToBase const&);
+		set_body_rotation (BodyRotation const&);
 
 		/**
 		 * Translate in-place the body by a relative vector in BaseSpace.
@@ -128,7 +127,7 @@ template<math::CoordinateSystem pBaseSpace = void, math::CoordinateSystem pSpace
 		void
 		translate_frame (SpaceVector<si::Length, Space> const& vector)
 			requires (!std::is_same<BaseSpace, Space>())
-		{ translate (_body_to_base_rotation * vector); }
+		{ translate (_body_rotation * vector); }
 
 		/**
 		 * Rotate in-place the body.
@@ -158,7 +157,7 @@ template<math::CoordinateSystem pBaseSpace = void, math::CoordinateSystem pSpace
 			[[nodiscard]]
 			auto
 			bound_transform_to_body (InputObject const& input) const
-				{ return _base_to_body_rotation * (input - _position); }
+				{ return _base_rotation * (input - _position); }
 
 		/**
 		 * Transform unbound geometrical object from base to body space.
@@ -167,7 +166,7 @@ template<math::CoordinateSystem pBaseSpace = void, math::CoordinateSystem pSpace
 			[[nodiscard]]
 			auto
 			unbound_transform_to_body (InputObject const& input) const
-				{ return _base_to_body_rotation * input; }
+				{ return _base_rotation * input; }
 
 		/**
 		 * Transform bound geometrical object from body to base space.
@@ -176,7 +175,7 @@ template<math::CoordinateSystem pBaseSpace = void, math::CoordinateSystem pSpace
 			[[nodiscard]]
 			auto
 			bound_transform_to_base (InputObject const& input) const
-				{ return _body_to_base_rotation * input + _position; }
+				{ return _body_rotation * input + _position; }
 
 		/**
 		 * Transform unbound geometrical object from body to base space.
@@ -185,12 +184,12 @@ template<math::CoordinateSystem pBaseSpace = void, math::CoordinateSystem pSpace
 			[[nodiscard]]
 			auto
 			unbound_transform_to_base (InputObject const& input) const
-				{ return _body_to_base_rotation * input; }
+				{ return _body_rotation * input; }
 
 	  private:
-		SpaceVector<si::Length, BaseSpace>	_position				{ math::zero };
-		RotationToBody						_base_to_body_rotation	{ math::identity };
-		RotationToBase						_body_to_base_rotation	{ math::identity };
+		SpaceVector<si::Length, BaseSpace>	_position		{ math::zero };
+		BaseRotation						_base_rotation	{ math::identity };
+		BodyRotation						_body_rotation	{ math::identity };
 	};
 
 
@@ -230,38 +229,38 @@ template<math::CoordinateSystem NewBaseSpace, math::CoordinateSystem NewSpace, m
 
 template<math::CoordinateSystem BaseSpace, math::CoordinateSystem Space>
 	inline
-	Placement<BaseSpace, Space>::Placement (Position const& position, RotationToBody const& rotation)
+	Placement<BaseSpace, Space>::Placement (Position const& position, BaseRotation const& rotation)
 		requires (!std::is_same<BaseSpace, Space>()):
 		_position (position),
-		_base_to_body_rotation (rotation),
-		_body_to_base_rotation (~rotation)
+		_base_rotation (rotation),
+		_body_rotation (~rotation)
 	{ }
 
 
 template<math::CoordinateSystem BaseSpace, math::CoordinateSystem Space>
 	inline
-	Placement<BaseSpace, Space>::Placement (Position const& position, RotationToBase const& rotation):
+	Placement<BaseSpace, Space>::Placement (Position const& position, BodyRotation const& rotation):
 		_position (position),
-		_base_to_body_rotation (~rotation),
-		_body_to_base_rotation (rotation)
+		_base_rotation (~rotation),
+		_body_rotation (rotation)
 	{ }
 
 
 template<math::CoordinateSystem BaseSpace, math::CoordinateSystem Space>
 	inline void
-	Placement<BaseSpace, Space>::set_base_to_body_rotation (RotationToBody const& rotation)
+	Placement<BaseSpace, Space>::set_base_rotation (BaseRotation const& rotation)
 	{
-		_base_to_body_rotation = rotation;
-		_body_to_base_rotation = ~rotation;
+		_base_rotation = rotation;
+		_body_rotation = ~rotation;
 	}
 
 
 template<math::CoordinateSystem BaseSpace, math::CoordinateSystem Space>
 	inline void
-	Placement<BaseSpace, Space>::set_body_to_base_rotation (RotationToBase const& rotation)
+	Placement<BaseSpace, Space>::set_body_rotation (BodyRotation const& rotation)
 	{
-		_body_to_base_rotation = rotation;
-		_base_to_body_rotation = ~rotation;
+		_body_rotation = rotation;
+		_base_rotation = ~rotation;
 	}
 
 
@@ -269,8 +268,8 @@ template<math::CoordinateSystem BaseSpace, math::CoordinateSystem Space>
 	inline void
 	Placement<BaseSpace, Space>::rotate_body_frame (RotationQuaternion<BaseSpace> const& rotation)
 	{
-		_body_to_base_rotation = rotation * _body_to_base_rotation;
-		_base_to_body_rotation = ~_body_to_base_rotation;
+		_body_rotation = rotation * _body_rotation;
+		_base_rotation = ~_body_rotation;
 	}
 
 
@@ -299,7 +298,7 @@ template<math::CoordinateSystem BaseSpace, math::CoordinateSystem Space1, math::
 	relative_rotation (Placement<BaseSpace, Space1> const& from, Placement<BaseSpace, Space2> const& to)
 	{
 		// Divide the "from" rotation matrix by the "to" rotation matrix (mutiply by inversion):
-		return from.base_to_body_rotation() * to.body_to_base_rotation();
+		return from.base_rotation() * to.body_rotation();
 	}
 
 

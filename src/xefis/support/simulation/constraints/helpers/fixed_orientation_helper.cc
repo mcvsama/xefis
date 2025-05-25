@@ -33,9 +33,9 @@ SpaceLength<WorldSpace>
 FixedOrientationHelper::rotation_constraint_value (Placement<WorldSpace, BodyCOM> const& location_1,
 												   Placement<WorldSpace, BodyCOM> const& location_2) const
 {
-	RotationQuaternion<BodyCOM, BodyCOM> const q_current_relative_rotation = relative_rotation (location_1.base_to_body_rotation(), location_2.base_to_body_rotation());
+	RotationQuaternion<BodyCOM, BodyCOM> const q_current_relative_rotation = relative_rotation (location_1.base_rotation(), location_2.base_rotation());
 	RotationQuaternion<BodyCOM, BodyCOM> const q_body_error = ~_initial_relative_rotation * q_current_relative_rotation;
-	SpaceVector<si::Angle, WorldSpace> const world_error = location_2.body_to_base_rotation() * to_rotation_vector (q_body_error);
+	SpaceVector<si::Angle, WorldSpace> const world_error = location_2.body_rotation() * to_rotation_vector (q_body_error);
 	constexpr auto rad_to_meter = 1_m / 1_rad;
 	return world_error * rad_to_meter;
 }

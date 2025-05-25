@@ -629,7 +629,7 @@ template<CoordinateSystemConcept Space>
 		if constexpr (std::is_same_v<Space, WorldSpace>)
 			_placement.translate_frame (translation);
 		else if constexpr (std::is_same_v<Space, BodyCOM>)
-			_placement.translate_frame (placement().body_to_base_rotation() * translation);
+			_placement.translate_frame (placement().body_rotation() * translation);
 		else
 			static_assert (false, "unsupported coordinate system");
 	}
