@@ -52,6 +52,16 @@ RigidBodyViewer::RigidBodyViewer (QWidget* parent, RefreshRate const refresh_rat
 
 
 void
+RigidBodyViewer::reset_camera_position()
+{
+	_camera_translation = kDefaultCameraTranslation;
+	forward_camera_translation();
+	_camera_rotation = kDefaultCameraRotation;
+	forward_camera_rotation();
+}
+
+
+void
 RigidBodyViewer::toggle_pause()
 {
 	switch (_playback)
@@ -93,10 +103,7 @@ RigidBodyViewer::mousePressEvent (QMouseEvent* event)
 
 		case kResetViewButton:
 			event->accept();
-			_camera_translation = kDefaultCameraTranslation;
-			forward_camera_translation();
-			_camera_rotation = kDefaultCameraRotation;
-			forward_camera_rotation();
+			reset_camera_position();
 			break;
 
 		default:
