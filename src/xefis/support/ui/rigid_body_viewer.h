@@ -48,7 +48,7 @@ class RigidBodyViewer: public GLAnimationWidget
 {
   public:
 	// Evolution function called before each display frame:
-	using OnRedraw = std::function<void (std::optional<si::Time> frame_duration)>;
+	using RedrawCallback = std::function<void (std::optional<si::Time> frame_duration)>;
 	using FPSMode = GLAnimationWidget::FPSMode;
 	using GroupRenderingConfig = RigidBodyPainter::GroupRenderingConfig;
 	using BodyRenderingConfig = RigidBodyPainter::BodyRenderingConfig;
@@ -127,8 +127,8 @@ class RigidBodyViewer: public GLAnimationWidget
 	 * Pass nullptr to unset.
 	 */
 	void
-	set_redraw_callback (OnRedraw const on_redraw = {})
-		{ _on_redraw = on_redraw; }
+	set_redraw_callback (RedrawCallback const callback = {})
+		{ _redraw_callback = callback; }
 
 	/**
 	 * Set related machine. Used to show configurator widget when pressing Esc.
@@ -336,7 +336,7 @@ class RigidBodyViewer: public GLAnimationWidget
 	Machine*					_machine						{ nullptr };
 	rigid_body::System const*	_rigid_body_system				{ nullptr };
 	RigidBodyPainter			_rigid_body_painter;
-	OnRedraw					_on_redraw;
+	RedrawCallback				_redraw_callback;
 	QPoint						_last_pos;
 	bool						_changing_rotation: 1			{ false };
 	bool						_changing_translation: 1		{ false };

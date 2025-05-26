@@ -202,7 +202,7 @@ RigidBodyViewer::keyPressEvent (QKeyEvent* event)
 void
 RigidBodyViewer::draw (QOpenGLPaintDevice& canvas)
 {
-	if (_on_redraw)
+	if (_redraw_callback)
 	{
 		switch (_playback)
 		{
@@ -213,12 +213,12 @@ RigidBodyViewer::draw (QOpenGLPaintDevice& canvas)
 				if (_steps_to_do > 0)
 				{
 					_steps_to_do -= 1;
-					_on_redraw (std::nullopt);
+					_redraw_callback (std::nullopt);
 				}
 				break;
 
 			case Playback::Running:
-				_on_redraw (1 / refresh_rate());
+				_redraw_callback (1 / refresh_rate());
 				break;
 		}
 	}
