@@ -29,6 +29,7 @@
 #include <QGridLayout>
 #include <QGroupBox>
 #include <QRadioButton>
+#include <QPushButton>
 
 // Standard:
 #include <cstddef>
@@ -91,49 +92,72 @@ CameraControls::CameraControls (RigidBodyViewer& viewer, QWidget* parent):
 	auto* const chase_view = new QRadioButton ("Chase view", this);
 	auto* const rc_pilot_view = new QRadioButton ("RC pilot view", this);
 	auto* const fixed_view = new QRadioButton ("Manual view", this);
-	auto* const view_group_box = new QGroupBox (this);
 
-	auto* const mode_layout = new QVBoxLayout();
+	auto* const mode_group_box = new QGroupBox (this);
+	auto* const mode_layout = new QVBoxLayout (mode_group_box);
 	mode_layout->setContentsMargins (ph.group_box_margins());
 	mode_layout->addWidget (cockpit_view);
 	mode_layout->addWidget (chase_view);
 	mode_layout->addWidget (rc_pilot_view);
 	mode_layout->addWidget (fixed_view);
-	view_group_box->setLayout (mode_layout);
 
-	auto* const layout = new QGridLayout (this);
-	auto column = 0;
-	layout->addWidget (view_group_box, 0, column, 3, 1);
-	++column;
-	layout->addItem (ph.new_fixed_horizontal_spacer (1.0), 0, column);
-	++column;
-	layout->addWidget (new QLabel ("ECEF position:"), 0, column);
-	++column;
-	layout->addItem (ph.new_fixed_horizontal_spacer (1.0), 0, column);
-	++column;
-	layout->addWidget (align_right (new QLabel ("X")), 0, column);
-	layout->addWidget (align_right (new QLabel ("Y")), 1, column);
-	layout->addWidget (align_right (new QLabel ("Z")), 2, column);
-	++column;
-	layout->addWidget (_ecef_x, 0, column);
-	layout->addWidget (_ecef_y, 1, column);
-	layout->addWidget (_ecef_z, 2, column);
-	++column;
-	layout->addItem (ph.new_fixed_horizontal_spacer (2.0), 0, column);
-	++column;
-	layout->addWidget (new QLabel ("Polar position:"), 0, column);
-	++column;
-	layout->addItem (ph.new_fixed_horizontal_spacer (1.0), 0, column);
-	++column;
-	layout->addWidget (align_right (new QLabel ("Latitude")), 0, column);
-	layout->addWidget (align_right (new QLabel ("Longitude")), 1, column);
-	layout->addWidget (align_right (new QLabel ("Radius")), 2, column);
-	++column;
-	layout->addWidget (_polar_lat, 0, column);
-	layout->addWidget (_polar_lon, 1, column);
-	layout->addWidget (_polar_radius, 2, column);
-	++column;
-	layout->addItem (ph.new_expanding_horizontal_spacer(), 0, column);
+	auto* const reset_position = new QPushButton ("↺", this);
+	reset_position->setToolTip ("Reset postion and rotation to default");
+	QObject::connect (reset_position, &QPushButton::clicked, [this] {
+		_rigid_body_viewer.reset_camera_position();
+	});
+
+	auto* const fov = new QSpinBox (this);
+	fov->setRange (30, 90);
+	fov->setSuffix ("°");
+	QObject::connect (fov, &QSpinBox::valueChanged, [this] (int value) {
+		_rigid_body_viewer.set_fov (1_deg * value);
+	});
+	fov->setValue (40);
+
+	auto* const fov_group_box = new QGroupBox (this);
+	auto* const fov_layout = new QVBoxLayout (fov_group_box);
+	fov_layout->addWidget (new QLabel ("View FOV:"));
+	fov_layout->addWidget (fov);
+	fov_layout->addItem (ph.new_expanding_vertical_spacer());
+
+	auto* const position_group_box = new QGroupBox (this);
+	auto* const position_layout = new QGridLayout (position_group_box);
+	{
+		auto column = 0;
+		position_layout->addWidget (new QLabel ("ECEF position:"), 0, column);
+		position_layout->addWidget (reset_position, 2, column);
+		++column;
+		position_layout->addItem (ph.new_fixed_horizontal_spacer (0.5), 0, column);
+		++column;
+		position_layout->addWidget (align_right (new QLabel ("X")), 0, column);
+		position_layout->addWidget (align_right (new QLabel ("Y")), 1, column);
+		position_layout->addWidget (align_right (new QLabel ("Z")), 2, column);
+		++column;
+		position_layout->addWidget (_ecef_x, 0, column);
+		position_layout->addWidget (_ecef_y, 1, column);
+		position_layout->addWidget (_ecef_z, 2, column);
+		++column;
+		position_layout->addItem (ph.new_fixed_horizontal_spacer (1.0), 0, column);
+		++column;
+		position_layout->addWidget (new QLabel ("Polar position:"), 0, column);
+		++column;
+		position_layout->addItem (ph.new_fixed_horizontal_spacer (0.5), 0, column);
+		++column;
+		position_layout->addWidget (align_right (new QLabel ("Latitude")), 0, column);
+		position_layout->addWidget (align_right (new QLabel ("Longitude")), 1, column);
+		position_layout->addWidget (align_right (new QLabel ("Radius")), 2, column);
+		++column;
+		position_layout->addWidget (_polar_lat, 0, column);
+		position_layout->addWidget (_polar_lon, 1, column);
+		position_layout->addWidget (_polar_radius, 2, column);
+	}
+
+	auto* const layout = new QHBoxLayout (this);
+	layout->addWidget (mode_group_box);
+	layout->addWidget (fov_group_box);
+	layout->addWidget (position_group_box);
+	layout->addItem (ph.new_expanding_horizontal_spacer());
 
 	// -- Behavior --
 

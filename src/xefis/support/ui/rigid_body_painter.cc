@@ -260,7 +260,7 @@ RigidBodyPainter::setup_camera_projection (QSize const size)
 	glMatrixMode (GL_PROJECTION);
 	_gl.load_identity();
 	_gl.translate (0.0, 0.0, -1.0);
-	_gl.set_hfov_perspective (size, 40_deg, _gl.to_opengl (1_m), _gl.to_opengl (100_km));
+	_gl.set_hfov_perspective (size, _fov, _gl.to_opengl (1_m), _gl.to_opengl (100_km));
 }
 
 

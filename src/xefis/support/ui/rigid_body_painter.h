@@ -170,6 +170,13 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	set_time (si::Time const time);
 
 	/**
+	 * Set field of view.
+	 */
+	void
+	set_fov (si::Angle const fov)
+		{ _fov = fov; }
+
+	/**
 	 * Assign a thread pool to use, notably when calculating sky colors.
 	 * Pass nullptr to disable.
 	 */
@@ -623,6 +630,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 
   private:
 	si::PixelDensity			_pixel_density;
+	si::Angle					_fov						{ 40_deg };
 	neutrino::ValueOrPtr<neutrino::WorkPerformer, std::size_t, xf::Logger const&>
 								_work_performer;
 	si::Time					_time;

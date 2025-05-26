@@ -90,6 +90,13 @@ class RigidBodyViewer: public GLAnimationWidget
 		{ _rigid_body_painter.set_time (time); }
 
 	/**
+	 * Set field of view.
+	 */
+	void
+	set_fov (si::Angle const fov)
+		{ _rigid_body_painter.set_fov (fov); }
+
+	/**
 	 * Assign a thread pool for RigidBodyPainter.
 	 */
 	void
@@ -218,6 +225,12 @@ class RigidBodyViewer: public GLAnimationWidget
 	void
 	set_camera_mode (RigidBodyPainter::CameraMode const mode)
 		{ _rigid_body_painter.set_camera_mode (mode); }
+
+	/**
+	 * Reset camera position to default.
+	 */
+	void
+	reset_camera_position();
 
 	/**
 	 * Return current camera position.
