@@ -187,7 +187,7 @@ ObservationWidget::add_basic_observables()
 void
 ObservationWidget::add_position_observables()
 {
-	auto group = add_group (u8"Position");
+	auto group = add_group();
 	group.add_observable ("Latitude", [this]() {
 		return _planet_body ? std::format ("{:.6f}", _polar_location.lat().to<si::Degree>()) : "";
 	});
@@ -203,7 +203,7 @@ ObservationWidget::add_position_observables()
 void
 ObservationWidget::add_velocity_observables()
 {
-	auto group = add_group (u8"Velocities");
+	auto group = add_group();
 	group.add_observable ("Velocity", [this]() {
 		return std::format ("{:.3f}", abs (_velocity_moments.velocity()));
 	});
