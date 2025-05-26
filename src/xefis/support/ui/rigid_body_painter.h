@@ -130,6 +130,8 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	};
 
   public:
+	using CameraPositionCallback = std::function<void (SpaceLength<WorldSpace>)>;
+
 	enum CameraMode
 	{
 		CockpitView,
@@ -256,6 +258,14 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	[[nodiscard]]
 	si::Length
 	camera_distance_to_followed() const;
+
+	/**
+	 * Set a callback to be called when camera position changes.
+	 * Can be nullptr to unset.
+	 */
+	void
+	set_camera_position_callback (RigidBodyPainter::CameraPositionCallback const callback)
+		{ _camera_position_callback = callback; }
 
 	/**
 	 * Draw given object as focused (painted differently).
@@ -641,6 +651,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	SpaceLength<WorldSpace>		_user_camera_translation;
 	// Final computed camera position (from requested camera position and user camera translation):
 	si::LonLatRadius<>			_camera_polar_position;
+	CameraPositionCallback		_camera_position_callback;
 	// Requested camera rotation in screen coordinates:
 	SpaceVector<si::Angle>		_user_camera_angles;
 	RotationQuaternion<WorldSpace>

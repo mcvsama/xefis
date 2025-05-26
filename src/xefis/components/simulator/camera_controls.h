@@ -33,6 +33,9 @@ class CameraControls: public QWidget
 	// Ctor
 	CameraControls (RigidBodyViewer&, QWidget* parent = nullptr);
 
+	void
+	set_camera_position (SpaceLength<WorldSpace> const position);
+
   private:
 	RigidBodyViewer&	_rigid_body_viewer;
 	QDoubleSpinBox*		_ecef_x;

@@ -1341,6 +1341,9 @@ RigidBodyPainter::calculate_camera_transform()
 
 	if (_textures)
 		_ground_shape = calculate_ground_shape (_camera_polar_position, kEarthMeanRadius, _textures->earth);
+
+	if (_camera_position_callback)
+		_camera_position_callback (_camera.position());
 }
 
 
