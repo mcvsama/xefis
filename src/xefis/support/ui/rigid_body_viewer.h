@@ -249,6 +249,17 @@ class RigidBodyViewer: public GLAnimationWidget
 		{ return _camera_rotation; }
 
 	/**
+	 * Set a callback to be called when camera position changes.
+	 * Can be nullptr to unset.
+	 *
+	 * This isn't the same as translation; translation is relative
+	 * to the body, position is absolute and calculated by the RigidBodyPainter.
+	 */
+	void
+	set_camera_position_callback (RigidBodyPainter::CameraPositionCallback const callback)
+		{ _rigid_body_painter.set_camera_position_callback (callback); }
+
+	/**
 	 * Return playback mode.
 	 */
 	[[nodiscard]]

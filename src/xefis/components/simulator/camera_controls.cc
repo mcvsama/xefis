@@ -202,6 +202,19 @@ CameraControls::CameraControls (RigidBodyViewer& viewer, QWidget* parent):
 	});
 
 	cockpit_view->setChecked (true);
+
+	_rigid_body_viewer.set_camera_position_callback ([this] (SpaceLength<WorldSpace> const camera_position) {
+		set_camera_position (camera_position);
+	});
+}
+
+
+void
+CameraControls::set_camera_position (SpaceLength<WorldSpace> const position)
+{
+	_ecef_x->setValue (position.x().in<si::Meter>());
+	_ecef_y->setValue (position.y().in<si::Meter>());
+	_ecef_z->setValue (position.z().in<si::Meter>());
 }
 
 } // namespace xf
