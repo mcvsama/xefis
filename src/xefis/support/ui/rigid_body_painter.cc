@@ -198,6 +198,9 @@ RigidBodyPainter::paint (rigid_body::System const& system, QOpenGLPaintDevice& c
 	_group_centers_of_mass_cache.clear();
 	initializeOpenGLFunctions();
 
+	// Paint black background, reset z-buffer and stencil buffer:
+	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
 	auto const ph = PaintHelper (canvas);
 	auto painter = QPainter (&canvas);
 	ph.setup_painter (painter);
