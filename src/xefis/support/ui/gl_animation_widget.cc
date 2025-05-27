@@ -88,9 +88,6 @@ GLAnimationWidget::paintGL()
 	_open_gl_device->setSize (size() * devicePixelRatio());
 	_open_gl_device->setDevicePixelRatio (devicePixelRatio());
 
-	// Paint black background, reset z-buffer and stencil buffer:
-	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
 	_display_function (*_open_gl_device);
 }
 
