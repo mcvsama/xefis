@@ -87,6 +87,9 @@ ItemsTree::refresh()
 	// Select first element by default:
 	if (selectedItems().empty() && topLevelItemCount() > 0)
 		setCurrentItem (topLevelItem (0));
+
+	// Make sure to redraw the viewer after potential changes in the config or system:
+	_rigid_body_viewer.update();
 }
 
 
@@ -369,6 +372,7 @@ ItemsTree::contextMenuEvent (QContextMenuEvent* event)
 		{
 			auto* action = menu.addAction ("Center of mass always visible", [this, group_item, &rendering] {
 				rendering.center_of_mass_visible = !rendering.center_of_mass_visible;
+				_rigid_body_viewer.update();
 			});
 			action->setCheckable (true);
 			action->setChecked (rendering.center_of_mass_visible);
@@ -393,6 +397,7 @@ ItemsTree::contextMenuEvent (QContextMenuEvent* event)
 		{
 			auto* action = menu.addAction ("Break this body", [this, body_item] {
 				body_item->body().set_broken();
+				_rigid_body_viewer.update();
 				refresh();
 			});
 
@@ -405,6 +410,7 @@ ItemsTree::contextMenuEvent (QContextMenuEvent* event)
 		{
 			auto* action = menu.addAction ("Body visible", [this, body_item, &rendering] {
 				rendering.body_visible = !rendering.body_visible;
+				_rigid_body_viewer.update();
 			});
 			action->setCheckable (true);
 			action->setChecked (rendering.body_visible);
@@ -413,6 +419,7 @@ ItemsTree::contextMenuEvent (QContextMenuEvent* event)
 		{
 			auto* action = menu.addAction ("Origin always visible", [this, body_item, &rendering] {
 				rendering.origin_visible = !rendering.origin_visible;
+				_rigid_body_viewer.update();
 			});
 			action->setCheckable (true);
 			action->setChecked (rendering.origin_visible);
@@ -421,6 +428,7 @@ ItemsTree::contextMenuEvent (QContextMenuEvent* event)
 		{
 			auto* action = menu.addAction ("Center of mass always visible", [this, body_item, &rendering] {
 				rendering.center_of_mass_visible = !rendering.center_of_mass_visible;
+				_rigid_body_viewer.update();
 			});
 			action->setCheckable (true);
 			action->setChecked (rendering.center_of_mass_visible);
@@ -429,6 +437,7 @@ ItemsTree::contextMenuEvent (QContextMenuEvent* event)
 		{
 			auto* action = menu.addAction ("Moments of inertia cuboid visible", [this, body_item, &rendering] {
 				rendering.moments_of_inertia_visible = !rendering.moments_of_inertia_visible;
+				_rigid_body_viewer.update();
 			});
 			action->setCheckable (true);
 			action->setChecked (rendering.moments_of_inertia_visible);
@@ -444,6 +453,7 @@ ItemsTree::contextMenuEvent (QContextMenuEvent* event)
 
 		menu.addAction ("Break this constraint", [this, constraint_item] {
 			constraint_item->constraint().set_broken();
+			_rigid_body_viewer.update();
 			refresh();
 		});
 	}

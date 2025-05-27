@@ -87,14 +87,20 @@ class RigidBodyViewer: public GLAnimationWidget
 	 */
 	void
 	set_time (si::Time const time)
-		{ _rigid_body_painter.set_time (time); }
+	{
+		_rigid_body_painter.set_time (time);
+		mark_dirty();
+	}
 
 	/**
 	 * Set field of view.
 	 */
 	void
 	set_fov (si::Angle const fov)
-		{ _rigid_body_painter.set_fov (fov); }
+	{
+		_rigid_body_painter.set_fov (fov);
+		mark_dirty();
+	}
 
 	/**
 	 * Assign a thread pool for RigidBodyPainter.
@@ -119,7 +125,10 @@ class RigidBodyViewer: public GLAnimationWidget
 	 */
 	void
 	set_rigid_body_system (rigid_body::System const* system)
-		{ _rigid_body_system = system; }
+	{
+		_rigid_body_system = system;
+		mark_dirty();
+	}
 
 	/**
 	 * Set the callback to be called on each UI frame.
@@ -143,14 +152,20 @@ class RigidBodyViewer: public GLAnimationWidget
 	 */
 	void
 	set_followed (auto const& object) noexcept
-		{ _rigid_body_painter.set_followed (object); }
+	{
+		_rigid_body_painter.set_followed (object);
+		mark_dirty();
+	}
 
 	/**
 	 * Calls set_followed_to_none() on internal RigidBodyPainter.
 	 */
 	void
 	set_followed_to_none() noexcept
-		{ _rigid_body_painter.set_followed_to_none(); }
+	{
+		_rigid_body_painter.set_followed_to_none();
+		mark_dirty();
+	}
 
 	/**
 	 * Return followed_group() from internal RigidBodyPainter.
@@ -181,28 +196,40 @@ class RigidBodyViewer: public GLAnimationWidget
 	 */
 	void
 	set_focused (auto const& object) noexcept
-		{ _rigid_body_painter.set_focused (object); }
+	{
+		_rigid_body_painter.set_focused (object);
+		mark_dirty();
+	}
 
 	/**
 	 * Calls set_focused_to_none() on internal RigidBodyPainter.
 	 */
 	void
 	set_focused_to_none() noexcept
-		{ _rigid_body_painter.set_focused_to_none(); }
+	{
+		_rigid_body_painter.set_focused_to_none();
+		mark_dirty();
+	}
 
 	/**
 	 * Calls set_hovered() on internal RigidBodyPainter.
 	 */
 	void
 	set_hovered (auto const& object) noexcept
-		{ _rigid_body_painter.set_hovered (object); }
+	{
+		_rigid_body_painter.set_hovered (object);
+		mark_dirty();
+	}
 
 	/**
 	 * Calls set_hovered_to_none() on internal RigidBodyPainter.
 	 */
 	void
 	set_hovered_to_none() noexcept
-		{ _rigid_body_painter.set_hovered_to_none(); }
+	{
+		_rigid_body_painter.set_hovered_to_none();
+		mark_dirty();
+	}
 
 	/**
 	 * Return the planet body.
@@ -217,14 +244,20 @@ class RigidBodyViewer: public GLAnimationWidget
 	 */
 	void
 	set_planet (rigid_body::Body const* planet_body) noexcept
-		{ _rigid_body_painter.set_planet (planet_body); }
+	{
+		_rigid_body_painter.set_planet (planet_body);
+		mark_dirty();
+	}
 
 	/**
 	 * Forward the mode to RigidBodyPainter.
 	 */
 	void
 	set_camera_mode (RigidBodyPainter::CameraMode const mode)
-		{ _rigid_body_painter.set_camera_mode (mode); }
+	{
+		_rigid_body_painter.set_camera_mode (mode);
+		mark_dirty();
+	}
 
 	/**
 	 * Reset camera position to default.
@@ -290,6 +323,12 @@ class RigidBodyViewer: public GLAnimationWidget
 	get_rendering_config (rigid_body::Body const& body)
 		{ return _rigid_body_painter.get_rendering_config (body); }
 
+	/**
+	 * Force redrawing of the stuff, after eg. rendering config was modified.
+	 */
+	void
+	update();
+
   protected:
 	// QWidget API
 	void
@@ -311,7 +350,15 @@ class RigidBodyViewer: public GLAnimationWidget
 	void
 	keyPressEvent (QKeyEvent*) override;
 
+	// QWidget API
+	void
+	resizeEvent (QResizeEvent*) override;
+
   private:
+	void
+	mark_dirty() noexcept
+		{ _dirty = true; }
+
 	void
 	draw (QOpenGLPaintDevice&);
 
@@ -334,20 +381,27 @@ class RigidBodyViewer: public GLAnimationWidget
 	 */
 	void
 	forward_camera_translation()
-		{ _rigid_body_painter.set_user_camera_translation (_camera_translation); }
+	{
+		_rigid_body_painter.set_user_camera_translation (_camera_translation);
+		mark_dirty();
+	}
 
 	/**
 	 * Forward current camera angles to the RigidBodyPainter.
 	 */
 	void
 	forward_camera_rotation()
-		{ _rigid_body_painter.set_user_camera_rotation (_camera_rotation); }
+	{
+		_rigid_body_painter.set_user_camera_rotation (_camera_rotation);
+		mark_dirty();
+	}
 
   private:
 	Machine*					_machine						{ nullptr };
 	rigid_body::System const*	_rigid_body_system				{ nullptr };
 	RigidBodyPainter			_rigid_body_painter;
 	RedrawCallback				_redraw_callback;
+	bool						_dirty							{ true };
 	QPoint						_last_pos;
 	bool						_changing_rotation: 1			{ false };
 	bool						_changing_translation: 1		{ false };

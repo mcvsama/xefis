@@ -87,6 +87,14 @@ RigidBodyViewer::step()
 
 
 void
+RigidBodyViewer::update()
+{
+	mark_dirty();
+	GLAnimationWidget::update();
+}
+
+
+void
 RigidBodyViewer::mousePressEvent (QMouseEvent* event)
 {
 	switch (event->button())
@@ -200,6 +208,14 @@ RigidBodyViewer::keyPressEvent (QKeyEvent* event)
 
 
 void
+RigidBodyViewer::resizeEvent (QResizeEvent* event)
+{
+	mark_dirty();
+	GLAnimationWidget::resizeEvent (event);
+}
+
+
+void
 RigidBodyViewer::draw (QOpenGLPaintDevice& canvas)
 {
 	if (_redraw_callback)
@@ -214,17 +230,22 @@ RigidBodyViewer::draw (QOpenGLPaintDevice& canvas)
 				{
 					_steps_to_do -= 1;
 					_redraw_callback (std::nullopt);
+					mark_dirty();
 				}
 				break;
 
 			case Playback::Running:
 				_redraw_callback (1 / refresh_rate());
+				mark_dirty();
 				break;
 		}
 	}
 
-	if (_rigid_body_system)
+	if (_rigid_body_system && _dirty)
+	{
 		_rigid_body_painter.paint (*_rigid_body_system, canvas);
+		_dirty = false;
+	}
 }
 
 
@@ -239,6 +260,7 @@ RigidBodyViewer::display_menu()
 		auto* action = menu.addAction ("Show &constraints", [this] {
 			auto& conf = _rigid_body_painter.features_config();
 			conf.constraints_visible = !conf.constraints_visible;
+			update();
 		});
 		action->setCheckable (true);
 		action->setChecked (_rigid_body_painter.features_config().constraints_visible);
@@ -249,6 +271,7 @@ RigidBodyViewer::display_menu()
 		auto* action = menu.addAction ("Show &gravity", [this] {
 			auto& conf = _rigid_body_painter.features_config();
 			conf.gravity_visible = !conf.gravity_visible;
+			update();
 		});
 		action->setCheckable (true);
 		action->setChecked (_rigid_body_painter.features_config().gravity_visible);
@@ -259,6 +282,7 @@ RigidBodyViewer::display_menu()
 		auto* action = menu.addAction ("Show &aerodynamic forces", [this] {
 			auto& conf = _rigid_body_painter.features_config();
 			conf.aerodynamic_forces_visible = !conf.aerodynamic_forces_visible;
+			update();
 		});
 		action->setCheckable (true);
 		action->setChecked (_rigid_body_painter.features_config().aerodynamic_forces_visible);
@@ -269,6 +293,7 @@ RigidBodyViewer::display_menu()
 		auto* action = menu.addAction ("Show &external forces", [this] {
 			auto& conf = _rigid_body_painter.features_config();
 			conf.external_forces_visible = !conf.external_forces_visible;
+			update();
 		});
 		action->setCheckable (true);
 		action->setChecked (_rigid_body_painter.features_config().external_forces_visible);
@@ -279,6 +304,7 @@ RigidBodyViewer::display_menu()
 		auto* action = menu.addAction ("Show angula&r velocities", [this] {
 			auto& conf = _rigid_body_painter.features_config();
 			conf.angular_velocities_visible = !conf.angular_velocities_visible;
+			update();
 		});
 		action->setCheckable (true);
 		action->setChecked (_rigid_body_painter.features_config().angular_velocities_visible);
@@ -289,6 +315,7 @@ RigidBodyViewer::display_menu()
 		auto* action = menu.addAction ("Show angular &momenta", [this] {
 			auto& conf = _rigid_body_painter.features_config();
 			conf.angular_momenta_visible = !conf.angular_momenta_visible;
+			update();
 		});
 		action->setCheckable (true);
 		action->setChecked (_rigid_body_painter.features_config().angular_momenta_visible);
