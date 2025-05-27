@@ -40,53 +40,51 @@
 
 namespace xf {
 
+template<class Value>
+	void
+	load_to_spinbox (QDoubleSpinBox* const spinbox, Value const value)
+	{
+		auto const signals_blocker = QSignalBlocker (spinbox);
+		spinbox->setValue (value / Value (1));
+	}
+
+
 CameraControls::CameraControls (RigidBodyViewer& viewer, QWidget* parent):
 	QWidget (parent),
 	_rigid_body_viewer (viewer)
 {
-	struct EarthCoordinates
-	{
-		SpaceLength<ECEFSpace>	ecef	{ 0_m, 0_m, 0_m };
-		si::LonLatRadius<>		polar	{ 0_deg, 0_deg, 0_m };
-	};
 
 	auto const ph = PaintHelper (*this);
-	auto coordinates = std::make_shared<EarthCoordinates>();
+	_coordinates = std::make_shared<EarthCoordinates>();
 
-	auto const new_spinbox = [this, coordinates]<class Value, class ControlledValue> (neutrino::Range<Value> const range, Value const step, uint8_t const decimals, ControlledValue& controlled_value) {
+	auto const new_spinbox = [this]<class Value, class ControlledValue> (neutrino::Range<Value> const range, Value const step, uint8_t const decimals, ControlledValue& controlled_value) {
 		auto const one = Value (1);
 		auto* spinbox = new QDoubleSpinBox (this);
 		spinbox->setRange (range.min() / one, range.max() / one);
 		spinbox->setDecimals (decimals);
 		spinbox->setSuffix (QString::fromStdString (si::unit_suffix<Value>()));
 		spinbox->setSingleStep (step / one);
-		QObject::connect (spinbox, static_cast<void (QDoubleSpinBox::*)(double)> (&QDoubleSpinBox::valueChanged), [&controlled_value, one, coordinates] (double const double_value) {
+		QObject::connect (spinbox, static_cast<void (QDoubleSpinBox::*)(double)> (&QDoubleSpinBox::valueChanged), [&controlled_value, one] (double const double_value) {
 			controlled_value = one * double_value;
 		});
 		return spinbox;
 	};
 
-	auto const on_value_change = []<class Function> (QDoubleSpinBox* spinbox, Function const callback) {
-		QObject::connect (spinbox, static_cast<void (QDoubleSpinBox::*)(double)> (&QDoubleSpinBox::valueChanged), [callback] ([[maybe_unused]] double value) {
-			callback();
-		});
-	};
-
-	auto const ecef_range = Range { -2000_km, 2000_km };
+	auto const ecef_range = Range { -20'000_km, 20'000_km };
 	auto const ecef_step = 1_m;
 	auto const ecef_decimals = 3;
 
-	_ecef_x = new_spinbox.operator()<si::Length> (ecef_range, ecef_step, ecef_decimals, coordinates->ecef.x());
-	_ecef_y = new_spinbox.operator()<si::Length> (ecef_range, ecef_step, ecef_decimals, coordinates->ecef.y());
-	_ecef_z = new_spinbox.operator()<si::Length> (ecef_range, ecef_step, ecef_decimals, coordinates->ecef.z());
+	_ecef_x = new_spinbox.operator()<si::Length> (ecef_range, ecef_step, ecef_decimals, _coordinates->ecef.x());
+	_ecef_y = new_spinbox.operator()<si::Length> (ecef_range, ecef_step, ecef_decimals, _coordinates->ecef.y());
+	_ecef_z = new_spinbox.operator()<si::Length> (ecef_range, ecef_step, ecef_decimals, _coordinates->ecef.z());
 
 	auto const polar_step = 1e-3_deg;
 	auto const polar_decimals = 6;
 
 	// Note: order of creation is important for tab-order:
-	_polar_lat = new_spinbox.operator()<si::Quantity<si::Degree>> ({ -90_deg, +90_deg }, polar_step, polar_decimals, coordinates->polar.lat());
-	_polar_lon = new_spinbox.operator()<si::Quantity<si::Degree>> ({ -180_deg, +180_deg }, polar_step, polar_decimals, coordinates->polar.lon());
-	_polar_radius = new_spinbox.operator()<si::Length> (ecef_range, ecef_step, ecef_decimals, coordinates->polar.radius());
+	_polar_lat = new_spinbox.operator()<si::Quantity<si::Degree>> ({ -90_deg, +90_deg }, polar_step, polar_decimals, _coordinates->polar.lat());
+	_polar_lon = new_spinbox.operator()<si::Quantity<si::Degree>> ({ -180_deg, +180_deg }, polar_step, polar_decimals, _coordinates->polar.lon());
+	_polar_radius = new_spinbox.operator()<si::Length> (ecef_range, ecef_step, ecef_decimals, _coordinates->polar.radius());
 
 	auto* const cockpit_view = new QRadioButton ("Cockpit view", this);
 	auto* const chase_view = new QRadioButton ("Chase view", this);
@@ -161,32 +159,19 @@ CameraControls::CameraControls (RigidBodyViewer& viewer, QWidget* parent):
 
 	// -- Behavior --
 
-	auto const load_to_spinbox = []<class Value> (QDoubleSpinBox* const spinbox, Value const value) {
-		auto const signals_blocker = QSignalBlocker (spinbox);
-		spinbox->setValue (value / Value (1));
+	auto const on_value_change = []<class Function> (QDoubleSpinBox* spinbox, Function const callback) {
+		QObject::connect (spinbox, static_cast<void (QDoubleSpinBox::*)(double)> (&QDoubleSpinBox::valueChanged), [callback] ([[maybe_unused]] double value) {
+			callback();
+		});
 	};
 
-	auto const update_polar_from_ecef = [=, this] {
-		coordinates->polar = to_polar (coordinates->ecef);
-		load_to_spinbox (_polar_lon, coordinates->polar.lon().to<si::Degree>());
-		load_to_spinbox (_polar_lat, coordinates->polar.lat().to<si::Degree>());
-		load_to_spinbox (_polar_radius, coordinates->polar.radius());
-	};
+	on_value_change (_ecef_x, [this] { update_polar_from_ecef(); });
+	on_value_change (_ecef_y, [this] { update_polar_from_ecef(); });
+	on_value_change (_ecef_z, [this] { update_polar_from_ecef(); });
 
-	auto const update_ecef_from_polar = [=, this] {
-		coordinates->ecef = to_cartesian (coordinates->polar);
-		load_to_spinbox (_ecef_x, coordinates->ecef.x());
-		load_to_spinbox (_ecef_y, coordinates->ecef.y());
-		load_to_spinbox (_ecef_z, coordinates->ecef.z());
-	};
-
-	on_value_change (_ecef_x, update_polar_from_ecef);
-	on_value_change (_ecef_y, update_polar_from_ecef);
-	on_value_change (_ecef_z, update_polar_from_ecef);
-
-	on_value_change (_polar_lat, update_ecef_from_polar);
-	on_value_change (_polar_lon, update_ecef_from_polar);
-	on_value_change (_polar_radius, update_ecef_from_polar);
+	on_value_change (_polar_lat, [this] { update_ecef_from_polar(); });
+	on_value_change (_polar_lon, [this] { update_ecef_from_polar(); });
+	on_value_change (_polar_radius, [this] { update_ecef_from_polar(); });
 
 	QObject::connect (cockpit_view, &QRadioButton::clicked, [this](bool) {
 		_rigid_body_viewer.set_camera_mode (RigidBodyPainter::CockpitView);
@@ -212,9 +197,45 @@ CameraControls::CameraControls (RigidBodyViewer& viewer, QWidget* parent):
 void
 CameraControls::set_camera_position (SpaceLength<WorldSpace> const position)
 {
+	auto const signals_blocker_x = QSignalBlocker (_ecef_x);
+	auto const signals_blocker_y = QSignalBlocker (_ecef_y);
+	auto const signals_blocker_z = QSignalBlocker (_ecef_z);
+
 	_ecef_x->setValue (position.x().in<si::Meter>());
 	_ecef_y->setValue (position.y().in<si::Meter>());
 	_ecef_z->setValue (position.z().in<si::Meter>());
+
+	update_coordinates_from_ecef();
+	update_polar_from_ecef();
+}
+
+
+void
+CameraControls::update_polar_from_ecef()
+{
+	_coordinates->polar = to_polar (_coordinates->ecef);
+	load_to_spinbox (_polar_lon, _coordinates->polar.lon().to<si::Degree>());
+	load_to_spinbox (_polar_lat, _coordinates->polar.lat().to<si::Degree>());
+	load_to_spinbox (_polar_radius, _coordinates->polar.radius());
+};
+
+
+void
+CameraControls::update_ecef_from_polar()
+{
+	_coordinates->ecef = to_cartesian (_coordinates->polar);
+	load_to_spinbox (_ecef_x, _coordinates->ecef.x());
+	load_to_spinbox (_ecef_y, _coordinates->ecef.y());
+	load_to_spinbox (_ecef_z, _coordinates->ecef.z());
+};
+
+
+void
+CameraControls::update_coordinates_from_ecef()
+{
+	_coordinates->ecef.x() = 1_m * _ecef_x->value();
+	_coordinates->ecef.y() = 1_m * _ecef_y->value();
+	_coordinates->ecef.z() = 1_m * _ecef_z->value();
 }
 
 } // namespace xf

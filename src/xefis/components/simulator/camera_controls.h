@@ -29,6 +29,13 @@ namespace xf {
 
 class CameraControls: public QWidget
 {
+  private:
+	struct EarthCoordinates
+	{
+		SpaceLength<ECEFSpace>	ecef	{ 0_m, 0_m, 0_m };
+		si::LonLatRadius<>		polar	{ 0_deg, 0_deg, 0_m };
+	};
+
   public:
 	// Ctor
 	CameraControls (RigidBodyViewer&, QWidget* parent = nullptr);
@@ -37,13 +44,24 @@ class CameraControls: public QWidget
 	set_camera_position (SpaceLength<WorldSpace> const position);
 
   private:
-	RigidBodyViewer&	_rigid_body_viewer;
-	QDoubleSpinBox*		_ecef_x;
-	QDoubleSpinBox*		_ecef_y;
-	QDoubleSpinBox*		_ecef_z;
-	QDoubleSpinBox*		_polar_lat;
-	QDoubleSpinBox*		_polar_lon;
-	QDoubleSpinBox*		_polar_radius;
+	void
+	update_polar_from_ecef();
+
+	void
+	update_ecef_from_polar();
+
+	void
+	update_coordinates_from_ecef();
+
+  private:
+	RigidBodyViewer&					_rigid_body_viewer;
+	std::shared_ptr<EarthCoordinates>	_coordinates;
+	QDoubleSpinBox*						_ecef_x;
+	QDoubleSpinBox*						_ecef_y;
+	QDoubleSpinBox*						_ecef_z;
+	QDoubleSpinBox*						_polar_lat;
+	QDoubleSpinBox*						_polar_lon;
+	QDoubleSpinBox*						_polar_radius;
 };
 
 } // namespace xf
