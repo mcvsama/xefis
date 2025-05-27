@@ -64,9 +64,11 @@ CameraControls::CameraControls (RigidBodyViewer& viewer, QWidget* parent):
 		spinbox->setDecimals (decimals);
 		spinbox->setSuffix (QString::fromStdString (si::unit_suffix<Value>()));
 		spinbox->setSingleStep (step / one);
+
 		QObject::connect (spinbox, static_cast<void (QDoubleSpinBox::*)(double)> (&QDoubleSpinBox::valueChanged), [&controlled_value, one] (double const double_value) {
 			controlled_value = one * double_value;
 		});
+
 		return spinbox;
 	};
 
