@@ -132,9 +132,9 @@ CameraControls::CameraControls (RigidBodyViewer& viewer, QWidget* parent):
 		++column;
 		position_layout->addItem (ph.new_fixed_horizontal_spacer (0.5), 0, column);
 		++column;
-		position_layout->addWidget (align_right (new QLabel ("X")), 0, column);
-		position_layout->addWidget (align_right (new QLabel ("Y")), 1, column);
-		position_layout->addWidget (align_right (new QLabel ("Z")), 2, column);
+		position_layout->addWidget (align_right (new QLabel ("X:")), 0, column);
+		position_layout->addWidget (align_right (new QLabel ("Y:")), 1, column);
+		position_layout->addWidget (align_right (new QLabel ("Z:")), 2, column);
 		++column;
 		position_layout->addWidget (_ecef_x, 0, column);
 		position_layout->addWidget (_ecef_y, 1, column);
@@ -146,9 +146,9 @@ CameraControls::CameraControls (RigidBodyViewer& viewer, QWidget* parent):
 		++column;
 		position_layout->addItem (ph.new_fixed_horizontal_spacer (0.5), 0, column);
 		++column;
-		position_layout->addWidget (align_right (new QLabel ("Latitude")), 0, column);
-		position_layout->addWidget (align_right (new QLabel ("Longitude")), 1, column);
-		position_layout->addWidget (align_right (new QLabel ("Radius")), 2, column);
+		position_layout->addWidget (align_right (new QLabel ("Latitude:")), 0, column);
+		position_layout->addWidget (align_right (new QLabel ("Longitude:")), 1, column);
+		position_layout->addWidget (align_right (new QLabel ("Radius:")), 2, column);
 		++column;
 		position_layout->addWidget (_polar_lat, 0, column);
 		position_layout->addWidget (_polar_lon, 1, column);
