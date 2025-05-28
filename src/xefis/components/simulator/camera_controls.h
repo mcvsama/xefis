@@ -53,6 +53,12 @@ class CameraControls: public QWidget
 	void
 	update_coordinates_from_ecef();
 
+	/**
+	 * Forward new camera coordinates to the RigidBodyViewer.
+	 */
+	void
+	update_rigid_body_viewer_camera_position();
+
   private:
 	RigidBodyViewer&					_rigid_body_viewer;
 	std::shared_ptr<EarthCoordinates>	_coordinates;

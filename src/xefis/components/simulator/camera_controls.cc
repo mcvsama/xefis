@@ -64,6 +64,8 @@ CameraControls::CameraControls (RigidBodyViewer& viewer, QWidget* parent):
 		spinbox->setDecimals (decimals);
 		spinbox->setSuffix (QString::fromStdString (si::unit_suffix<Value>()));
 		spinbox->setSingleStep (step / one);
+		// For now they're read only. See comment in update_rigid_body_viewer_camera_position().
+		spinbox->setEnabled (false);
 
 		QObject::connect (spinbox, static_cast<void (QDoubleSpinBox::*)(double)> (&QDoubleSpinBox::valueChanged), [&controlled_value, one] (double const double_value) {
 			controlled_value = one * double_value;
@@ -167,13 +169,23 @@ CameraControls::CameraControls (RigidBodyViewer& viewer, QWidget* parent):
 		});
 	};
 
-	on_value_change (_ecef_x, [this] { update_polar_from_ecef(); });
-	on_value_change (_ecef_y, [this] { update_polar_from_ecef(); });
-	on_value_change (_ecef_z, [this] { update_polar_from_ecef(); });
+	auto const ecef_changed = [this] {
+		update_polar_from_ecef();
+		update_rigid_body_viewer_camera_position();
+	};
 
-	on_value_change (_polar_lat, [this] { update_ecef_from_polar(); });
-	on_value_change (_polar_lon, [this] { update_ecef_from_polar(); });
-	on_value_change (_polar_radius, [this] { update_ecef_from_polar(); });
+	on_value_change (_ecef_x, ecef_changed);
+	on_value_change (_ecef_y, ecef_changed);
+	on_value_change (_ecef_z, ecef_changed);
+
+	auto const polar_changed = [this] {
+		update_ecef_from_polar();
+		update_rigid_body_viewer_camera_position();
+	};
+
+	on_value_change (_polar_lat, polar_changed);
+	on_value_change (_polar_lon, polar_changed);
+	on_value_change (_polar_radius, polar_changed);
 
 	QObject::connect (cockpit_view, &QRadioButton::clicked, [this](bool) {
 		_rigid_body_viewer.set_camera_mode (RigidBodyPainter::CockpitView);
@@ -238,6 +250,16 @@ CameraControls::update_coordinates_from_ecef()
 	_coordinates->ecef.x() = 1_m * _ecef_x->value();
 	_coordinates->ecef.y() = 1_m * _ecef_y->value();
 	_coordinates->ecef.z() = 1_m * _ecef_z->value();
+}
+
+
+void
+CameraControls::update_rigid_body_viewer_camera_position()
+{
+	// TODO This is not so easy, and may be not implemented at all.
+	// What needs to be done is the inverse of RigidBodyPainter::calculate_camera_transform()
+	// to get offset/rotation used in RigidBodyViewer.
+	// For now the camera position widgets are set to read-only.
 }
 
 } // namespace xf
