@@ -239,7 +239,7 @@ RigidBodyPainter::precalculate()
 	_followed_position = calculate_followed_position();
 	_followed_polar_position = to_polar (math::coordinate_system_cast<ECEFSpace, void> (_followed_position - planet_position()));
 
-	_sun_position = calculate_sun_position (_camera_polar_position, _time); // TODO maybe _followed_position?
+	_sun_position = calculate_sun_position (_camera_polar_position, _time);
 	_corrected_sun_position_horizontal_coordinates = corrected_sun_position_near_horizon (_sun_position.horizontal_coordinates);
 	_corrected_sun_position_cartesian_horizontal_coordinates = calculate_cartesian_horizontal_coordinates (_corrected_sun_position_horizontal_coordinates);
 	_sun_color_on_followed = to_gl_color (calculate_sun_light_color (_camera_polar_position, _corrected_sun_position_cartesian_horizontal_coordinates, _atmospheric_scattering));
