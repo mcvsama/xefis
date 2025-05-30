@@ -25,6 +25,7 @@
 #include <QShortcut>
 
 // Standard:
+#include <chrono>
 #include <cstddef>
 #include <functional>
 
@@ -48,6 +49,18 @@ RigidBodyViewer::RigidBodyViewer (QWidget* parent, RefreshRate const refresh_rat
 
 	forward_camera_translation();
 	forward_camera_rotation();
+
+	{
+		using namespace std::literals::chrono_literals;
+		_painter_ready_check_timer->callOnTimeout ([this] {
+			if (_rigid_body_painter.ready())
+			{
+				update();
+				_painter_ready_check_timer->deleteLater();
+			}
+		});
+		_painter_ready_check_timer->start (100ms);
+	}
 }
 
 

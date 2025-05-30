@@ -27,6 +27,7 @@
 // Qt:
 #include <QKeyEvent>
 #include <QMouseEvent>
+#include <QTimer>
 #include <QWheelEvent>
 #include <QWidget>
 
@@ -414,6 +415,8 @@ class RigidBodyViewer: public GLAnimationWidget
 	// Camera position relative to the followed body:
 	SpaceLength<WorldSpace>		_camera_translation				{ kDefaultCameraTranslation };
 	SpaceVector<si::Angle>		_camera_rotation				{ kDefaultCameraRotation };
+	// Self-deletes after a while and becomes a dangling pointer:
+	QTimer*						_painter_ready_check_timer		{ new QTimer (this) };
 };
 
 } // namespace xf

@@ -166,6 +166,14 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	RigidBodyPainter (si::PixelDensity, WorkPerformer* = nullptr);
 
 	/**
+	 * Return true when the painter is finally ready and loaded all
+	 * textures and images needed. It could be used before, too, but
+	 * it would miss eg. Earth textures.
+	 */
+	bool
+	ready() const;
+
+	/**
 	 * Set simulation time. It makes Sun rendered in different positions.
 	 */
 	void
