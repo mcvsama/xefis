@@ -1170,8 +1170,6 @@ RigidBodyPainter::check_texture_images()
 	{
 		// Start loading texture images if not yet loaded by another RigidBodyPainter:
 		*texture_images = _work_performer->submit ([]{
-			using namespace std::chrono_literals;
-
 			return TextureImages {
 				.earth			= QImage ("share/images/textures/earth/earth-day-2004-07.jpg"),
 				.universe_neg_x	= QImage ("share/images/textures/universe/nx.jpg"),
