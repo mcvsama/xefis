@@ -656,6 +656,7 @@ RigidBodyPainter::paint_air_particles()
 		_gl.translate (_followed_position - _camera.position());
 
 		// Air 'particles' only appear if we have a planet:
+		// TODO both dust size and grid size should depend on the airplane size (max bounds?)
 		auto const dust_size = 2_cm;
 		auto const grid_size = 5_m;
 		auto dust_material = kWhiteMatte;
