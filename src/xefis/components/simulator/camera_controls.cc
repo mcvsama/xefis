@@ -102,6 +102,11 @@ CameraControls::CameraControls (RigidBodyViewer& viewer, QWidget* parent):
 	mode_layout->addWidget (chase_view);
 	mode_layout->addWidget (rc_pilot_view);
 	mode_layout->addWidget (fixed_view);
+	mode_layout->addItem (ph.new_expanding_vertical_spacer());
+
+	// TODO Hide for now, unhide when support is ready:
+	rc_pilot_view->hide();
+	fixed_view->hide();
 
 	auto* const reset_position = new QPushButton ("↺", this);
 	reset_position->setToolTip ("Reset postion and rotation to default");
