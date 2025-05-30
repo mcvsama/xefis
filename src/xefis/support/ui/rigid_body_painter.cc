@@ -79,26 +79,28 @@ RigidBodyPainter::RigidBodyPainter (si::PixelDensity const pixel_density, WorkPe
 	use_work_performer (work_performer);
 
 	// Initialize sky lights:
-	_sky_lights[0] = SkyLight {
-		.gl_number	= kGLSkyLight0,
-		.position	= { 0_deg, 0_deg },
-	};
-	_sky_lights[1] = SkyLight {
-		.gl_number	= kGLSkyLight1,
-		.position	= { 90_deg, 5_deg },
-	};
-	_sky_lights[2] = SkyLight {
-		.gl_number	= kGLSkyLight2,
-		.position	= { 180_deg, 5_deg },
-	};
-	_sky_lights[3] = SkyLight {
-		.gl_number	= kGLSkyLight3,
-		.position	= { 270_deg, 5_deg },
-	};
-	_sky_lights[4] = {
-		.gl_number	= kGLSkyLight4,
-		.position	= { 0_deg, 90_deg },
-	};
+	{
+		_sky_lights[0] = SkyLight {
+			.gl_number	= kGLSkyLight0,
+			.position	= { 0_deg, 0_deg },
+		};
+		_sky_lights[1] = SkyLight {
+			.gl_number	= kGLSkyLight1,
+			.position	= { 90_deg, 5_deg },
+		};
+		_sky_lights[2] = SkyLight {
+			.gl_number	= kGLSkyLight2,
+			.position	= { 180_deg, 5_deg },
+		};
+		_sky_lights[3] = SkyLight {
+			.gl_number	= kGLSkyLight3,
+			.position	= { 270_deg, 5_deg },
+		};
+		_sky_lights[4] = {
+			.gl_number	= kGLSkyLight4,
+			.position	= { 0_deg, 90_deg },
+		};
+	}
 
 	calculate_camera_transform();
 }
