@@ -1333,8 +1333,6 @@ RigidBodyPainter::calculate_camera_transform()
 			}
 
 			_camera.set_body_rotation (rotation);
-			_camera.set_position (_followed_position - planet_position() + ~rotation * _user_camera_translation);
-			_camera_polar_position = to_polar (_camera.position());
 		}
 		break;
 
@@ -1342,8 +1340,6 @@ RigidBodyPainter::calculate_camera_transform()
 		{
 			auto const rotation = _user_camera_rotation * gravity_down_rotation (_followed_polar_position) * kScreenToNullIslandRotation;
 			_camera.set_body_rotation (rotation);
-			_camera.set_position (_followed_position - planet_position() + ~rotation * _user_camera_translation);
-			_camera_polar_position = to_polar (_camera.position());
 		}
 		break;
 
@@ -1357,6 +1353,9 @@ RigidBodyPainter::calculate_camera_transform()
 			// TODO use _requested_camera_polar_position
 			break;
 	}
+
+	_camera.set_position (_followed_position - planet_position() + _camera.base_rotation() * _user_camera_translation);
+	_camera_polar_position = to_polar (_camera.position());
 
 	fix_camera_position();
 
