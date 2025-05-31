@@ -1302,8 +1302,13 @@ RigidBodyPainter::calculate_camera_transform()
 {
 	auto const* followed_group = this->followed_group();
 	auto const* followed_body = this->followed_body();
+	auto camera_mode = _camera_mode;
 
-	switch (_camera_mode)
+	// When CockpitView is requested but nothing is set to follow, fall back to ChaseView:
+	if (_camera_mode == CockpitView && std::holds_alternative<std::monostate> (_followed))
+		camera_mode = ChaseView;
+
+	switch (camera_mode)
 	{
 		case CockpitView:
 		{

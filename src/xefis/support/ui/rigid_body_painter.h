@@ -134,6 +134,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 
 	enum CameraMode
 	{
+		// If there's no followed body set, CockpitView behaves the same as ChaseView.
 		CockpitView,
 		ChaseView,
 		RCPilotView,
