@@ -116,6 +116,7 @@ run (rigid_body::System& system, rigid_body::Body* followed_body, std::function<
 	if (followed_body)
 		viewer.set_followed (*followed_body);
 
+	viewer.set_camera_mode (RigidBodyPainter::FixedView);
 	viewer.show();
 
 	app->exec();
