@@ -652,7 +652,11 @@ void
 RigidBodyPainter::paint_air_particles()
 {
 	_gl.save_context ([&] {
-		enable_only_lights (kAtmosphericSunLight | kSkyLight);
+		if (_planet_body)
+			enable_only_lights (kAtmosphericSunLight | kSkyLight);
+		else
+			enable_only_lights (kFeatureLight);
+
 		_gl.set_camera_rotation_only (_camera);
 		// Trick with rotating camera and then subtracting camera position from the object is to avoid problems with low precision OpenGL floats:
 		// _followed_position - _camera.position() uses doubles; but _gl.translate() internally reduces them to floats:
@@ -710,7 +714,11 @@ void
 RigidBodyPainter::paint (rigid_body::System const& system)
 {
 	_gl.save_context ([&] {
-		enable_only_lights (kAtmosphericSunLight | kSkyLight);
+		if (_planet_body)
+			enable_only_lights (kAtmosphericSunLight | kSkyLight);
+		else
+			enable_only_lights (kFeatureLight);
+
 		_gl.set_camera_rotation_only (_camera);
 
 		for (auto const& body: system.bodies())
