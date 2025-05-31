@@ -1346,11 +1346,13 @@ RigidBodyPainter::calculate_camera_transform()
 		case RCPilotView:
 			// TODO unimplemented yet
 			// TODO use _requested_camera_polar_position
+			_camera.set_body_rotation (_user_camera_rotation);
 			break;
 
 		case FixedView:
 			// TODO unimplemented yet
 			// TODO use _requested_camera_polar_position
+			_camera.set_body_rotation (_user_camera_rotation);
 			break;
 	}
 
