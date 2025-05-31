@@ -546,51 +546,54 @@ RigidBodyPainter::paint_universe()
 		});
 	}
 
-	// Sun:
-	_gl.save_context ([&] {
-		auto const magnification_at_0_amsl = neutrino::renormalize (sun_altitude_above_horizon, Range { 0_deg, 90_deg }, Range { kSunSunsetMagnification, kSunNoonMagnification });
-		// Correct for the fact that the magnification only happens inside atmosphere:
-		_sun_magnification = 1 + (magnification_at_0_amsl - 1) * (1.0 - _camera_clamped_normalized_amsl_height);
-		auto sun_face_material = kWhiteMatte;
-		sun_face_material.gl_emission_color = GLColor (1.0, 1.0, 1.0);
-		auto sun_face = make_solid_circle (_sun_magnification * kSunRadius, { 0_deg, 360_deg }, 19, sun_face_material);
-		auto const sun_visibility = 1.0f - square (1.0f - calculate_sun_visible_surface_factor (sun_altitude_above_horizon));
+	if (_planet_body)
+	{
+		// Sun:
+		_gl.save_context ([&] {
+			auto const magnification_at_0_amsl = neutrino::renormalize (sun_altitude_above_horizon, Range { 0_deg, 90_deg }, Range { kSunSunsetMagnification, kSunNoonMagnification });
+			// Correct for the fact that the magnification only happens inside atmosphere:
+			_sun_magnification = 1 + (magnification_at_0_amsl - 1) * (1.0 - _camera_clamped_normalized_amsl_height);
+			auto sun_face_material = kWhiteMatte;
+			sun_face_material.gl_emission_color = GLColor (1.0, 1.0, 1.0);
+			auto sun_face = make_solid_circle (_sun_magnification * kSunRadius, { 0_deg, 360_deg }, 19, sun_face_material);
+			auto const sun_visibility = 1.0f - square (1.0f - calculate_sun_visible_surface_factor (sun_altitude_above_horizon));
 
-		auto sun_shines = make_centered_sphere_shape ({
-			.radius = kSunDistance,
-			.n_slices = 9,
-			.n_stacks = 36,
-			.v_range = { 0_deg, 90_deg },
-			.material = kWhiteMatte,
-			.setup_material = [&] (ShapeMaterial& material, si::LonLat const position) {
-				float const actual_radius = 0.02f;
-				float const norm = renormalize<si::Angle> (position.lat(), Range { 0_deg, 90_deg }, Range { 0.0f, 1.0f });
-				float const alpha = std::clamp<float> (sun_visibility * std::pow (norm + actual_radius, 6.0f), 0.0f, 1.0f);
-				material.gl_emission_color = { 1.0f, 1.0f, 1.0f, alpha * _camera_clamped_normalized_amsl_height };
-			},
+			auto sun_shines = make_centered_sphere_shape ({
+				.radius = kSunDistance,
+				.n_slices = 9,
+				.n_stacks = 36,
+				.v_range = { 0_deg, 90_deg },
+				.material = kWhiteMatte,
+				.setup_material = [&] (ShapeMaterial& material, si::LonLat const position) {
+					float const actual_radius = 0.02f;
+					float const norm = renormalize<si::Angle> (position.lat(), Range { 0_deg, 90_deg }, Range { 0.0f, 1.0f });
+					float const alpha = std::clamp<float> (sun_visibility * std::pow (norm + actual_radius, 6.0f), 0.0f, 1.0f);
+					material.gl_emission_color = { 1.0f, 1.0f, 1.0f, alpha * _camera_clamped_normalized_amsl_height };
+				},
+			});
+			negate_normals (sun_shines);
+
+			glEnable (GL_BLEND);
+			// Disable Z-testing so that the sun gets rendered even if it's far behind the sky dome sphere:
+			glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			glDisable (GL_ALPHA_TEST);
+
+			// Enable blending, to blend well the Sun with the sky:
+			glDisable (GL_DEPTH_TEST);
+			glDisable (GL_LIGHTING);
+			// We drawing the 'inside' of the sphere with sun_shines:
+			glFrontFace (GL_CW);
+
+			_gl.set_camera (_camera);
+			make_z_towards_the_sun();
+			// Z is now direction towards the Sun:
+			_gl.translate (0_m, 0_m, kSunDistance);
+			_gl.draw (sun_face);
+			// Rotate sun shines when camera angle changes:
+			_gl.rotate (_user_camera_angles[0] - 2 * _user_camera_angles[1], 0, 0, 1);
+			_gl.draw (sun_shines);
 		});
-		negate_normals (sun_shines);
-
-		glEnable (GL_BLEND);
-		// Disable Z-testing so that the sun gets rendered even if it's far behind the sky dome sphere:
-		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glDisable (GL_ALPHA_TEST);
-
-		// Enable blending, to blend well the Sun with the sky:
-		glDisable (GL_DEPTH_TEST);
-		glDisable (GL_LIGHTING);
-		// We drawing the 'inside' of the sphere with sun_shines:
-		glFrontFace (GL_CW);
-
-		_gl.set_camera (_camera);
-		make_z_towards_the_sun();
-		// Z is now direction towards the Sun:
-		_gl.translate (0_m, 0_m, kSunDistance);
-		_gl.draw (sun_face);
-		// Rotate sun shines when camera angle changes:
-		_gl.rotate (_user_camera_angles[0] - 2 * _user_camera_angles[1], 0, 0, 1);
-		_gl.draw (sun_shines);
-	});
+	}
 }
 
 
