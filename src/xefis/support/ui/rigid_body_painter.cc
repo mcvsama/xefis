@@ -1366,7 +1366,7 @@ RigidBodyPainter::calculate_camera_transform()
 void
 RigidBodyPainter::fix_camera_position()
 {
-	if (followed_body() != _planet_body && _camera_polar_position.radius() < kEarthMeanRadius)
+	if (_planet_body && followed_body() != _planet_body && _camera_polar_position.radius() < kEarthMeanRadius)
 	{
 		// Just a bit above the ground to ensure the earth surface is properly drawn:
 		_camera_polar_position.radius() = kEarthMeanRadius + 10_m;
