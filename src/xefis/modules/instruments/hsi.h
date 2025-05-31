@@ -20,10 +20,10 @@
 #include <xefis/core/instrument.h>
 #include <xefis/core/setting.h>
 #include <xefis/core/sockets/socket.h>
-#include <xefis/support/earth/navigation/navaid_storage.h>
 #include <xefis/support/instrument/instrument_support.h>
 #include <xefis/utility/event_timestamper.h>
 #include <xefis/utility/temporal.h>
+#include <xefis/support/universe/earth/navaid_storage.h>
 
 // Qt:
 #include <QPainterPath>

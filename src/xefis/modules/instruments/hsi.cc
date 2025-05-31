@@ -16,9 +16,9 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/support/earth/earth.h>
-#include <xefis/support/earth/navigation/wind_triangle.h>
 #include <xefis/support/instrument/text_layout.h>
+#include <xefis/support/universe/earth/utility.h>
+#include <xefis/support/universe/earth/wind_triangle.h>
 
 // Neutrino:
 #include <neutrino/numeric.h>

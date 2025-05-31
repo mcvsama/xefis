@@ -12,7 +12,7 @@
  */
 
 // Local:
-#include "earth.h"
+#include "utility.h"
 
 // Xefis:
 #include <xefis/config/all.h>

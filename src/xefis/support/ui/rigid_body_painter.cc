@@ -19,7 +19,6 @@
 #include <xefis/support/atmosphere/atmospheric_scattering.h>
 #include <xefis/support/color/hsl.h>
 #include <xefis/support/color/spaces.h>
-#include <xefis/support/earth/earth.h>
 #include <xefis/support/math/rotations.h>
 #include <xefis/support/nature/constants.h>
 #include <xefis/support/shapes/various_materials.h>
@@ -30,6 +29,7 @@
 #include <xefis/support/simulation/devices/wing.h>
 #include <xefis/support/ui/gl_space.h>
 #include <xefis/support/ui/paint_helper.h>
+#include <xefis/support/universe/earth/utility.h>
 #include <xefis/support/universe/julian_calendar.h>
 
 // Neutrino:

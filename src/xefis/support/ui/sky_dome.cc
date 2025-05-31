@@ -16,10 +16,10 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/support/earth/earth.h>
 #include <xefis/support/math/geometry.h>
 #include <xefis/support/shapes/various_shapes.h>
 #include <xefis/support/ui/gl_color.h>
+#include <xefis/support/universe/earth/utility.h>
 #include <xefis/support/universe/julian_calendar.h>
 
 // Standard:

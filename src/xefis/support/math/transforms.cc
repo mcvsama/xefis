@@ -13,10 +13,10 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/support/earth/earth.h>
 #include <xefis/support/math/geometry.h>
 #include <xefis/support/math/north_east_down.h>
 #include <xefis/support/math/tait_bryan_angles.h>
+#include <xefis/support/universe/earth/utility.h>
 
 // Standard:
 #include <cstddef>
