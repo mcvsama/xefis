@@ -16,8 +16,8 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/support/earth/earth.h>
-#include <xefis/support/earth/navigation/magnetic_variation.h>
+#include <xefis/support/universe/earth/magnetic_variation.h>
+#include <xefis/support/universe/earth/utility.h>
 
 // Neutrino:
 #include <neutrino/exception.h>

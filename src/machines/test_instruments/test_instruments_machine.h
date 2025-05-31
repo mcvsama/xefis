@@ -24,7 +24,7 @@
 #include <xefis/core/processing_loop.h>
 #include <xefis/core/xefis.h>
 #include <xefis/modules/test/test_generator.h>
-#include <xefis/support/earth/navigation/navaid_storage.h>
+#include <xefis/support/universe/earth/navaid_storage.h>
 
 // Neutrino:
 #include <neutrino/logger.h>

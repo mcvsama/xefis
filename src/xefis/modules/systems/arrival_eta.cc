@@ -16,7 +16,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/support/earth/earth.h>
+#include <xefis/support/universe/earth/utility.h>
 
 // Neutrino:
 #include <neutrino/numeric.h>

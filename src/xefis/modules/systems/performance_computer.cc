@@ -19,8 +19,8 @@
 #include <xefis/support/airframe/airframe.h>
 #include <xefis/support/airframe/types.h>
 #include <xefis/support/atmosphere/air.h>
-#include <xefis/support/earth/navigation/wind_triangle.h>
 #include <xefis/support/nature/constants.h>
+#include <xefis/support/universe/earth/wind_triangle.h>
 
 // Neutrino:
 #include <neutrino/exception.h>
