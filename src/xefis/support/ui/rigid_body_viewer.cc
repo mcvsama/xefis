@@ -231,7 +231,7 @@ RigidBodyViewer::resizeEvent (QResizeEvent* event)
 void
 RigidBodyViewer::draw (QOpenGLPaintDevice& canvas)
 {
-	if (_redraw_callback)
+	if (_before_paint_callback)
 	{
 		switch (_playback)
 		{
@@ -242,13 +242,13 @@ RigidBodyViewer::draw (QOpenGLPaintDevice& canvas)
 				if (_steps_to_do > 0)
 				{
 					_steps_to_do -= 1;
-					_redraw_callback (std::nullopt);
+					_before_paint_callback (std::nullopt);
 					mark_dirty();
 				}
 				break;
 
 			case Playback::Running:
-				_redraw_callback (1 / refresh_rate());
+				_before_paint_callback (1 / refresh_rate());
 				mark_dirty();
 				break;
 		}
