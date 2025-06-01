@@ -104,7 +104,7 @@ class RigidBodyViewer: public GLAnimationWidget
 	set_time (si::Time const time)
 	{
 		_rigid_body_painter.set_time (time);
-		mark_dirty();
+		update();
 	}
 
 	/**
@@ -114,7 +114,7 @@ class RigidBodyViewer: public GLAnimationWidget
 	set_fov (si::Angle const fov)
 	{
 		_rigid_body_painter.set_fov (fov);
-		mark_dirty();
+		update();
 	}
 
 	/**
@@ -124,7 +124,7 @@ class RigidBodyViewer: public GLAnimationWidget
 	set_rigid_body_system (rigid_body::System const* system)
 	{
 		_rigid_body_system = system;
-		mark_dirty();
+		update();
 	}
 
 	/**
@@ -151,7 +151,7 @@ class RigidBodyViewer: public GLAnimationWidget
 	set_followed (auto const& object) noexcept
 	{
 		_rigid_body_painter.set_followed (object);
-		mark_dirty();
+		update();
 	}
 
 	/**
@@ -161,7 +161,7 @@ class RigidBodyViewer: public GLAnimationWidget
 	set_followed_to_none() noexcept
 	{
 		_rigid_body_painter.set_followed_to_none();
-		mark_dirty();
+		update();
 	}
 
 	/**
@@ -195,7 +195,7 @@ class RigidBodyViewer: public GLAnimationWidget
 	set_focused (auto const& object) noexcept
 	{
 		_rigid_body_painter.set_focused (object);
-		mark_dirty();
+		update();
 	}
 
 	/**
@@ -205,7 +205,7 @@ class RigidBodyViewer: public GLAnimationWidget
 	set_focused_to_none() noexcept
 	{
 		_rigid_body_painter.set_focused_to_none();
-		mark_dirty();
+		update();
 	}
 
 	/**
@@ -215,7 +215,7 @@ class RigidBodyViewer: public GLAnimationWidget
 	set_hovered (auto const& object) noexcept
 	{
 		_rigid_body_painter.set_hovered (object);
-		mark_dirty();
+		update();
 	}
 
 	/**
@@ -225,7 +225,7 @@ class RigidBodyViewer: public GLAnimationWidget
 	set_hovered_to_none() noexcept
 	{
 		_rigid_body_painter.set_hovered_to_none();
-		mark_dirty();
+		update();
 	}
 
 	/**
@@ -243,7 +243,7 @@ class RigidBodyViewer: public GLAnimationWidget
 	set_planet (rigid_body::Body const* planet_body) noexcept
 	{
 		_rigid_body_painter.set_planet (planet_body);
-		mark_dirty();
+		update();
 	}
 
 	/**
@@ -253,7 +253,7 @@ class RigidBodyViewer: public GLAnimationWidget
 	set_camera_mode (RigidBodyPainter::CameraMode const mode)
 	{
 		_rigid_body_painter.set_camera_mode (mode);
-		mark_dirty();
+		update();
 	}
 
 	/**
@@ -380,7 +380,7 @@ class RigidBodyViewer: public GLAnimationWidget
 	forward_camera_translation()
 	{
 		_rigid_body_painter.set_user_camera_translation (_camera_translation);
-		mark_dirty();
+		update();
 	}
 
 	/**
@@ -390,7 +390,7 @@ class RigidBodyViewer: public GLAnimationWidget
 	forward_camera_rotation()
 	{
 		_rigid_body_painter.set_user_camera_rotation (_camera_rotation);
-		mark_dirty();
+		update();
 	}
 
   private:
