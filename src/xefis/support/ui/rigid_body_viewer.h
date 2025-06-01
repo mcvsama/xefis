@@ -84,6 +84,20 @@ class RigidBodyViewer: public GLAnimationWidget
 	RigidBodyViewer (QWidget* parent, RefreshRate, neutrino::WorkPerformer* work_performer = nullptr);
 
 	/**
+	 * Assign a thread pool for RigidBodyPainter.
+	 */
+	void
+	use_work_performer (neutrino::WorkPerformer* work_performer)
+		{ _rigid_body_painter.use_work_performer (work_performer); }
+
+	/**
+	 * Return used rigid body system. Might be nullptr.
+	 */
+	rigid_body::System const*
+	rigid_body_system() const noexcept
+		{ return _rigid_body_system; }
+
+	/**
 	 * Set time for RigidBodyPainter.
 	 */
 	void
@@ -102,20 +116,6 @@ class RigidBodyViewer: public GLAnimationWidget
 		_rigid_body_painter.set_fov (fov);
 		mark_dirty();
 	}
-
-	/**
-	 * Assign a thread pool for RigidBodyPainter.
-	 */
-	void
-	use_work_performer (neutrino::WorkPerformer* work_performer)
-		{ _rigid_body_painter.use_work_performer (work_performer); }
-
-	/**
-	 * Return used rigid body system. Might be nullptr.
-	 */
-	rigid_body::System const*
-	rigid_body_system() const noexcept
-		{ return _rigid_body_system; }
 
 	/**
 	 * Assign a rigid body system. Pass nullptr to unassign.
