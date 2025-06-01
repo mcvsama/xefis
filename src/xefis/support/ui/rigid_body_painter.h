@@ -175,6 +175,14 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	ready() const;
 
 	/**
+	 * Assign a thread pool to use, notably when calculating sky colors.
+	 * Pass nullptr to disable.
+	 */
+	void
+	use_work_performer (neutrino::WorkPerformer* work_performer)
+		{ _work_performer = work_performer; }
+
+	/**
 	 * Set simulation time. It makes Sun rendered in different positions.
 	 */
 	void
@@ -186,14 +194,6 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	void
 	set_fov (si::Angle const fov)
 		{ _fov = fov; }
-
-	/**
-	 * Assign a thread pool to use, notably when calculating sky colors.
-	 * Pass nullptr to disable.
-	 */
-	void
-	use_work_performer (neutrino::WorkPerformer* work_performer)
-		{ _work_performer = work_performer; }
 
 	/**
 	 * Follow the selected object to keep it centered on the screen.
