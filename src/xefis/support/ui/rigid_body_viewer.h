@@ -119,10 +119,6 @@ class RigidBodyViewer: public GLAnimationWidget
 
 	/**
 	 * Assign a rigid body system. Pass nullptr to unassign.
-	 *
-	 * \param	evolve
-	 *			Evolution function called before each redraw.
-	 *			May be nullptr.
 	 */
 	void
 	set_rigid_body_system (rigid_body::System const* system)
