@@ -105,7 +105,7 @@ run (rigid_body::System& system, rigid_body::Body* followed_body, std::function<
 
 	RigidBodyViewer viewer (nullptr, 60_Hz);
 	viewer.set_rigid_body_system (&system);
-	viewer.set_redraw_callback ([&evolver] (std::optional<si::Time> const frame_duration) {
+	viewer.set_before_paint_callback ([&evolver] (std::optional<si::Time> const frame_duration) {
 		if (frame_duration)
 			evolver.evolve (*frame_duration);
 		else

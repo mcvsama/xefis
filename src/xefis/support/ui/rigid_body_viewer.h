@@ -137,7 +137,7 @@ class RigidBodyViewer: public GLAnimationWidget
 	 * Pass nullptr to unset.
 	 */
 	void
-	set_redraw_callback (BeforePaintCallback const callback = {})
+	set_before_paint_callback (BeforePaintCallback const callback = {})
 		{ _before_paint_callback = callback; }
 
 	/**
