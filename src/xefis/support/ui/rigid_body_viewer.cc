@@ -33,7 +33,7 @@
 namespace xf {
 
 RigidBodyViewer::RigidBodyViewer (QWidget* parent, RefreshRate const refresh_rate, neutrino::WorkPerformer* work_performer):
-	GLAnimationWidget (parent, refresh_rate, std::bind (&RigidBodyViewer::draw, this, std::placeholders::_1)),
+	GLAnimationWidget (parent, refresh_rate, std::bind (&RigidBodyViewer::paint, this, std::placeholders::_1)),
 	_rigid_body_painter (si::PixelDensity (screen()->physicalDotsPerInch()), work_performer)
 {
 	setWindowTitle("Xefis rigid body viewer");
@@ -229,7 +229,7 @@ RigidBodyViewer::resizeEvent (QResizeEvent* event)
 
 
 void
-RigidBodyViewer::draw (QOpenGLPaintDevice& canvas)
+RigidBodyViewer::paint (QOpenGLPaintDevice& canvas)
 {
 	if (_before_paint_callback)
 	{

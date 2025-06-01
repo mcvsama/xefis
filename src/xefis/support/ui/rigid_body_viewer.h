@@ -361,7 +361,7 @@ class RigidBodyViewer: public GLAnimationWidget
 		{ _dirty = true; }
 
 	void
-	draw (QOpenGLPaintDevice&);
+	paint (QOpenGLPaintDevice&);
 
 	/**
 	 * Return 1.0 normally or kHighPrecisionFactor value when Shift is pressed on the keyboard.
