@@ -23,6 +23,7 @@
 
 // Standard:
 #include <cstddef>
+#include <chrono>
 
 
 namespace xf {
@@ -50,11 +51,11 @@ Panel::Panel (QWidget* parent, Graphics const& graphics):
 	setBackgroundRole (QPalette::Window);
 	setAutoFillBackground (true);
 
+	using namespace std::literals::chrono_literals;
 	_timer = new QTimer (this);
-	_timer->setInterval (100);
 	_timer->setSingleShot (false);
-	QObject::connect (_timer, &QTimer::timeout, [this] { read(); });
-	_timer->start();
+	_timer->callOnTimeout ([this] { read(); });
+	_timer->start (100ms);
 }
 
 
