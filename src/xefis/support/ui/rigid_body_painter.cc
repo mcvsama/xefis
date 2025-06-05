@@ -1287,15 +1287,22 @@ RigidBodyPainter::check_universe_texture_images()
 
 		if (!images->valid())
 		{
-			// Start loading texture images if not yet loaded by another RigidBodyPainter:
-			*images = _work_performer->submit ([]{
+			// Start loading texture images if not yet loaded by another RigidBodyPainter.
+			*images = std::async (std::launch::async, [this] {
+				auto neg_x_future = _work_performer->submit ([]{ return QImage ("share/images/textures/universe/nx.jpg"); });
+				auto neg_y_future = _work_performer->submit ([]{ return QImage ("share/images/textures/universe/ny.jpg"); });
+				auto neg_z_future = _work_performer->submit ([]{ return QImage ("share/images/textures/universe/nz.jpg"); });
+				auto pos_x_future = _work_performer->submit ([]{ return QImage ("share/images/textures/universe/px.jpg"); });
+				auto pos_y_future = _work_performer->submit ([]{ return QImage ("share/images/textures/universe/py.jpg"); });
+				auto pos_z_future = _work_performer->submit ([]{ return QImage ("share/images/textures/universe/pz.jpg"); });
+
 				return UniverseTextureImages {
-					.universe_neg_x	= QImage ("share/images/textures/universe/nx.jpg"),
-					.universe_neg_y	= QImage ("share/images/textures/universe/ny.jpg"),
-					.universe_neg_z	= QImage ("share/images/textures/universe/nz.jpg"),
-					.universe_pos_x	= QImage ("share/images/textures/universe/px.jpg"),
-					.universe_pos_y	= QImage ("share/images/textures/universe/py.jpg"),
-					.universe_pos_z	= QImage ("share/images/textures/universe/pz.jpg"),
+					.universe_neg_x	= neg_x_future.get(),
+					.universe_neg_y	= neg_y_future.get(),
+					.universe_neg_z	= neg_z_future.get(),
+					.universe_pos_x	= pos_x_future.get(),
+					.universe_pos_y	= pos_y_future.get(),
+					.universe_pos_z	= pos_z_future.get(),
 				};
 			});
 		}
