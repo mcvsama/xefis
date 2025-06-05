@@ -61,7 +61,8 @@ constexpr auto kGLSkyLight2				= GL_LIGHT5;
 constexpr auto kGLSkyLight3				= GL_LIGHT6;
 constexpr auto kGLSkyLight4				= GL_LIGHT7;
 
-Synchronized<std::shared_future<RigidBodyPainter::TextureImages>> RigidBodyPainter::_texture_images;
+Synchronized<std::shared_future<RigidBodyPainter::PlanetTextureImages>>		RigidBodyPainter::_planet_texture_images;
+Synchronized<std::shared_future<RigidBodyPainter::UniverseTextureImages>>	RigidBodyPainter::_universe_texture_images;
 
 std::array<RigidBodyPainter::SkyLight, 5> const RigidBodyPainter::Planet::sky_lights = {{
 	{
@@ -106,7 +107,7 @@ RigidBodyPainter::RigidBodyPainter (si::PixelDensity const pixel_density, WorkPe
 bool
 RigidBodyPainter::ready() const
 {
-	return valid_and_ready (*_texture_images.lock());
+	return valid_and_ready (*_planet_texture_images.lock()) && valid_and_ready (*_universe_texture_images.lock());
 }
 
 
@@ -189,8 +190,7 @@ RigidBodyPainter::set_planet (rigid_body::Body const* planet_body)
 	{
 		_planet.emplace();
 		_planet->body = planet_body;
-
-		check_texture_images();
+		check_planet_texture_images();
 	}
 	else
 		_planet.reset();
@@ -218,6 +218,7 @@ RigidBodyPainter::set_universe_enabled (bool enabled)
 	if (enabled)
 	{
 		_universe.emplace();
+		check_universe_texture_images();
 		check_sky_box();
 	}
 	else
@@ -255,7 +256,8 @@ RigidBodyPainter::paint (rigid_body::System const& system, QOpenGLPaintDevice& c
 void
 RigidBodyPainter::drop_resources()
 {
-	*_texture_images.lock() = {};
+	*_planet_texture_images.lock() = {};
+	*_universe_texture_images.lock() = {};
 }
 
 
@@ -1251,22 +1253,52 @@ RigidBodyPainter::get_center_of_mass (rigid_body::Group const& group)
 void
 RigidBodyPainter::check_texture_images()
 {
-	auto texture_images = _texture_images.lock();
+	check_planet_texture_images();
+	check_universe_texture_images();
+}
 
-	if (!texture_images->valid())
+
+void
+RigidBodyPainter::check_planet_texture_images()
+{
+	if (_planet)
 	{
-		// Start loading texture images if not yet loaded by another RigidBodyPainter:
-		*texture_images = _work_performer->submit ([]{
-			return TextureImages {
-				.earth			= QImage ("share/images/textures/earth/earth-day-2004-07.jpg"),
-				.universe_neg_x	= QImage ("share/images/textures/universe/nx.jpg"),
-				.universe_neg_y	= QImage ("share/images/textures/universe/ny.jpg"),
-				.universe_neg_z	= QImage ("share/images/textures/universe/nz.jpg"),
-				.universe_pos_x	= QImage ("share/images/textures/universe/px.jpg"),
-				.universe_pos_y	= QImage ("share/images/textures/universe/py.jpg"),
-				.universe_pos_z	= QImage ("share/images/textures/universe/pz.jpg"),
-			};
-		});
+		auto images = _planet_texture_images.lock();
+
+		if (!images->valid())
+		{
+			// Start loading texture images if not yet loaded by another RigidBodyPainter:
+			*images = _work_performer->submit ([]{
+				return PlanetTextureImages {
+					.earth = QImage ("share/images/textures/earth/earth-day-2004-07.jpg"),
+				};
+			});
+		}
+	}
+}
+
+
+void
+RigidBodyPainter::check_universe_texture_images()
+{
+	if (_universe)
+	{
+		auto images = _universe_texture_images.lock();
+
+		if (!images->valid())
+		{
+			// Start loading texture images if not yet loaded by another RigidBodyPainter:
+			*images = _work_performer->submit ([]{
+				return UniverseTextureImages {
+					.universe_neg_x	= QImage ("share/images/textures/universe/nx.jpg"),
+					.universe_neg_y	= QImage ("share/images/textures/universe/ny.jpg"),
+					.universe_neg_z	= QImage ("share/images/textures/universe/nz.jpg"),
+					.universe_pos_x	= QImage ("share/images/textures/universe/px.jpg"),
+					.universe_pos_y	= QImage ("share/images/textures/universe/py.jpg"),
+					.universe_pos_z	= QImage ("share/images/textures/universe/pz.jpg"),
+				};
+			});
+		}
 	}
 }
 
@@ -1274,26 +1306,45 @@ RigidBodyPainter::check_texture_images()
 void
 RigidBodyPainter::check_textures()
 {
-	if (_planet && !_textures)
-	{
-		auto texture_images = _texture_images.lock();
+	check_planet_textures();
+	check_universe_textures();
+}
 
-		if (valid_and_ready (*texture_images))
+
+void
+RigidBodyPainter::check_planet_textures()
+{
+	if (_planet && !_planet_textures)
+	{
+		auto images_accessor = _planet_texture_images.lock();
+
+		if (valid_and_ready (*images_accessor))
 		{
-			auto const make_texture = [](QImage const& image) {
-				auto texture = std::make_shared<QOpenGLTexture> (QOpenGLTexture::Target2D);
-				texture->setData (image);
-				texture->setWrapMode (QOpenGLTexture::DirectionS, QOpenGLTexture::Repeat);
-				texture->setWrapMode (QOpenGLTexture::DirectionT, QOpenGLTexture::MirroredRepeat);
-				texture->setMinificationFilter (QOpenGLTexture::LinearMipMapLinear);
-				texture->setMagnificationFilter (QOpenGLTexture::Nearest);
-				return texture;
+			auto const& images = images_accessor->get();
+
+			_planet_textures = PlanetTextures {
+				.earth = make_texture (images.earth),
 			};
 
-			auto const& images = texture_images->get();
+			// Reload SkyDome to include the Earth texture:
+			_planet->need_new_sky_dome = true;
+		}
+	}
+}
 
-			_textures = Textures {
-				.earth = make_texture (images.earth),
+
+void
+RigidBodyPainter::check_universe_textures()
+{
+	if (_universe && !_universe_textures)
+	{
+		auto images_accessor = _universe_texture_images.lock();
+
+		if (valid_and_ready (*images_accessor))
+		{
+			auto const& images = images_accessor->get();
+
+			_universe_textures = UniverseTextures {
 				.universe_neg_x = make_texture (images.universe_neg_x),
 				.universe_neg_y = make_texture (images.universe_neg_y),
 				.universe_neg_z = make_texture (images.universe_neg_z),
@@ -1301,9 +1352,6 @@ RigidBodyPainter::check_textures()
 				.universe_pos_y = make_texture (images.universe_pos_y),
 				.universe_pos_z = make_texture (images.universe_pos_z),
 			};
-
-			// Reload SkyDome to include the Earth texture:
-			_planet->need_new_sky_dome = true;
 		}
 	}
 }
@@ -1334,7 +1382,7 @@ RigidBodyPainter::calculate_sky_dome_shape()
 			.observer_position = _camera_polar_position,
 			.sun_position = _sun->corrected_position_horizontal_coordinates,
 			.earth_radius = kEarthMeanRadius,
-			.earth_texture = _textures ? _textures->earth : nullptr,
+			.earth_texture = _planet_textures ? _planet_textures->earth : nullptr,
 			.sky_alpha = sky_alpha,
 		}, &*_work_performer);
 		// TODO apply sky_correction to vertices' materials
@@ -1347,18 +1395,18 @@ RigidBodyPainter::calculate_sky_dome_shape()
 void
 RigidBodyPainter::check_sky_box()
 {
-	if (_universe && !_universe->sky_box_shape && _textures)
+	if (_universe && !_universe->sky_box_shape && _universe_textures)
 	{
 		auto material = kWhiteMatte;
 		_universe->sky_box_shape = make_sky_box ({
 			.edge_length = 1000_m,
 			.material = material,
-			.texture_neg_x = _textures->universe_neg_x,
-			.texture_neg_y = _textures->universe_neg_y,
-			.texture_neg_z = _textures->universe_neg_z,
-			.texture_pos_x = _textures->universe_pos_x,
-			.texture_pos_y = _textures->universe_pos_y,
-			.texture_pos_z = _textures->universe_pos_z,
+			.texture_neg_x = _universe_textures->universe_neg_x,
+			.texture_neg_y = _universe_textures->universe_neg_y,
+			.texture_neg_z = _universe_textures->universe_neg_z,
+			.texture_pos_x = _universe_textures->universe_pos_x,
+			.texture_pos_y = _universe_textures->universe_pos_y,
+			.texture_pos_z = _universe_textures->universe_pos_z,
 		});
 	}
 
@@ -1449,8 +1497,8 @@ RigidBodyPainter::calculate_camera_transform()
 		if (abs (_camera_position_for_sky_dome - _camera.position()) > 10_m)
 			_planet->need_new_sky_dome = true;
 
-		if (_textures)
-			_planet->ground_shape = calculate_ground_shape (_camera_polar_position, kEarthMeanRadius, _textures->earth);
+		if (_planet_textures)
+			_planet->ground_shape = calculate_ground_shape (_camera_polar_position, kEarthMeanRadius, _planet_textures->earth);
 	}
 
 	if (_camera_position_callback)
@@ -1485,6 +1533,19 @@ RigidBodyPainter::corrected_sun_position_near_horizon (HorizontalCoordinates ori
 	}
 
 	return orig;
+}
+
+
+std::shared_ptr<QOpenGLTexture>
+RigidBodyPainter::make_texture (QImage const& image)
+{
+	auto texture = std::make_shared<QOpenGLTexture> (QOpenGLTexture::Target2D);
+	texture->setData (image);
+	texture->setWrapMode (QOpenGLTexture::DirectionS, QOpenGLTexture::Repeat);
+	texture->setWrapMode (QOpenGLTexture::DirectionT, QOpenGLTexture::MirroredRepeat);
+	texture->setMinificationFilter (QOpenGLTexture::LinearMipMapLinear);
+	texture->setMagnificationFilter (QOpenGLTexture::Nearest);
+	return texture;
 }
 
 } // namespace xf
