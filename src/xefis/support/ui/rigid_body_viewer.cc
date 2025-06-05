@@ -334,6 +334,24 @@ RigidBodyViewer::display_menu()
 		action->setChecked (_rigid_body_painter.features_config().angular_momenta_visible);
 	}
 
+	menu.addSeparator();
+
+	{
+		auto* action = menu.addAction ("Sun enabled", [this] {
+			set_sun_enabled (!sun_enabled());
+		});
+		action->setCheckable (true);
+		action->setChecked (_rigid_body_painter.sun_enabled());
+	}
+
+	{
+		auto* action = menu.addAction ("Universe enabled", [this] {
+			set_universe_enabled (!universe_enabled());
+		});
+		action->setCheckable (true);
+		action->setChecked (_rigid_body_painter.universe_enabled());
+	}
+
 	return !!menu.exec (QCursor::pos());
 }
 
