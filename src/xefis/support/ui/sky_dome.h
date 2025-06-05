@@ -49,7 +49,7 @@ struct SkyDomeParameters
 	si::Length						earth_radius;
 	std::shared_ptr<QOpenGLTexture>	earth_texture;
 	float							sky_alpha			{ 1.0f };
-	float							ground_haze_alpha	{ 0.5f };
+	float							ground_haze_alpha	{ 0.7f };
 };
 
 
