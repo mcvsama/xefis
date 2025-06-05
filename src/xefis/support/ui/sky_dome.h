@@ -47,8 +47,9 @@ struct SkyDomeParameters
 	si::LonLatRadius<>				observer_position;
 	HorizontalCoordinates			sun_position;
 	si::Length						earth_radius;
-	float							ground_haze_alpha { 0.5f };
 	std::shared_ptr<QOpenGLTexture>	earth_texture;
+	float							sky_alpha			{ 1.0f };
+	float							ground_haze_alpha	{ 0.5f };
 };
 
 
