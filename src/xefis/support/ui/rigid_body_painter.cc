@@ -869,6 +869,8 @@ RigidBodyPainter::paint (rigid_body::Body const& body, BodyRenderingConfig const
 				else if (hovered<rigid_body::Body>() == &body)
 					_gl.additional_parameters().color_override = GLColor::from_rgb (0x00, 0xaa, 0x7f).lighter (0.5);
 
+				glFrontFace (GL_CCW);
+
 				if (auto const& shape = body.shape())
 					_gl.draw (*shape);
 				else
@@ -1014,6 +1016,7 @@ RigidBodyPainter::paint_moments_of_inertia_cuboid (MassMoments<BodyCOM> const& m
 {
 	auto const com_material = make_material ({ 0x00, 0x44, 0x99 });
 	auto const com_shape = make_centered_cube_shape (mass_moments, com_material);
+	glFrontFace (GL_CCW);
 	_gl.draw (com_shape);
 }
 
@@ -1105,6 +1108,7 @@ RigidBodyPainter::draw_arrow (SpaceLength<WorldSpace> const& origin, SpaceLength
 			auto constexpr radius = 5_mm * scale;
 			auto const alpha_beta = alpha_beta_from_x_to (vector);
 
+			glFrontFace (GL_CCW);
 			_gl.translate (origin);
 			_gl.rotate_z (alpha_beta[0]);
 			_gl.rotate_y (alpha_beta[1] + 90_deg);
@@ -1181,6 +1185,7 @@ RigidBodyPainter::paint_basis (si::Length const length)
 
 	setup_feature_light();
 
+	glFrontFace (GL_CCW);
 	// Root ball:
 	_gl.draw (make_centered_sphere_shape ({ .radius = 2 * radius, .n_slices = 8, .n_stacks = 4 }));
 	// X axis:
