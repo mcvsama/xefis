@@ -80,6 +80,8 @@ SimulatorWidget::make_viewer_widget()
 	_rigid_body_viewer.emplace (this, RigidBodyViewer::AutoFPS, &_graphics_work_performer);
 	_rigid_body_viewer->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Expanding);
 	_rigid_body_viewer->use_work_performer (&_graphics_work_performer);
+	_rigid_body_viewer->set_sun_enabled (true);
+	_rigid_body_viewer->set_universe_enabled (true);
 	_rigid_body_viewer->set_rigid_body_system (&_simulator.rigid_body_system());
 	_rigid_body_viewer->set_before_paint_callback ([this, prev_sim_time = 0_s] (std::optional<si::Time> const frame_duration) mutable {
 		if (frame_duration)

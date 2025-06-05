@@ -16,7 +16,6 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/support/atmosphere/atmospheric_scattering.h>
 #include <xefis/support/color/hsl.h>
 #include <xefis/support/color/spaces.h>
 #include <xefis/support/math/rotations.h>
@@ -64,6 +63,29 @@ constexpr auto kGLSkyLight4				= GL_LIGHT7;
 
 Synchronized<std::shared_future<RigidBodyPainter::TextureImages>> RigidBodyPainter::_texture_images;
 
+std::array<RigidBodyPainter::SkyLight, 5> const RigidBodyPainter::Planet::sky_lights = {{
+	{
+		.gl_number	= kGLSkyLight0,
+		.position	= { 0_deg, 0_deg },
+	},
+	{
+		.gl_number	= kGLSkyLight1,
+		.position	= { 90_deg, 5_deg },
+	},
+	{
+		.gl_number	= kGLSkyLight2,
+		.position	= { 180_deg, 5_deg },
+	},
+	{
+		.gl_number	= kGLSkyLight3,
+		.position	= { 270_deg, 5_deg },
+	},
+	{
+		.gl_number	= kGLSkyLight4,
+		.position	= { 0_deg, 90_deg },
+	},
+}};
+
 
 RigidBodyPainter::RigidBodyPainter (si::PixelDensity const pixel_density, WorkPerformer* work_performer):
 	_pixel_density (pixel_density),
@@ -77,31 +99,6 @@ RigidBodyPainter::RigidBodyPainter (si::PixelDensity const pixel_density, WorkPe
 		throw InvalidArgument ("provided WorkPerformer must have at least 2 threads");
 
 	use_work_performer (work_performer);
-
-	// Initialize sky lights:
-	{
-		_sky_lights[0] = SkyLight {
-			.gl_number	= kGLSkyLight0,
-			.position	= { 0_deg, 0_deg },
-		};
-		_sky_lights[1] = SkyLight {
-			.gl_number	= kGLSkyLight1,
-			.position	= { 90_deg, 5_deg },
-		};
-		_sky_lights[2] = SkyLight {
-			.gl_number	= kGLSkyLight2,
-			.position	= { 180_deg, 5_deg },
-		};
-		_sky_lights[3] = SkyLight {
-			.gl_number	= kGLSkyLight3,
-			.position	= { 270_deg, 5_deg },
-		};
-		_sky_lights[4] = {
-			.gl_number	= kGLSkyLight4,
-			.position	= { 0_deg, 90_deg },
-		};
-	}
-
 	calculate_camera_transform();
 }
 
@@ -109,24 +106,25 @@ RigidBodyPainter::RigidBodyPainter (si::PixelDensity const pixel_density, WorkPe
 bool
 RigidBodyPainter::ready() const
 {
-	return valid_and_ready (*_texture_images.lock()) && _sky_dome_shape.has_value();
+	return valid_and_ready (*_texture_images.lock());
 }
 
 
 void
-RigidBodyPainter::set_time (si::Time const time)
+RigidBodyPainter::set_time (si::Time const new_time)
 {
-	if (abs (time - _sky_dome_update_time) > 5_s)
+	_time = new_time;
+
+	if (abs (_time - _prev_saved_time) > 5_s)
 	{
-		_need_new_sky_dome = true;
-		_sky_dome_update_time = time;
+		if (_planet)
+			_planet->need_new_sky_dome = true;
 
-		// Universe sky box rotation:
-		auto const julian_date = unix_time_to_julian_date (time);
-		_ecef_to_celestial_rotation = calculate_ecef_to_celestial_rotation (julian_date);
+		if (_universe)
+			check_sky_box();
+
+		_prev_saved_time = _time;
 	}
-
-	_time = time;
 }
 
 
@@ -187,18 +185,43 @@ RigidBodyPainter::camera_distance_to_followed() const
 void
 RigidBodyPainter::set_planet (rigid_body::Body const* planet_body)
 {
-	_planet_body = planet_body;
-	calculate_camera_transform();
-
-	if (_planet_body)
+	if (planet_body)
 	{
-		check_texture_images();
+		_planet.emplace();
+		_planet->body = planet_body;
 
-		if (!_sky_dome_shape)
-			_sky_dome_shape = this->calculate_sky_dome_shape();
+		check_texture_images();
 	}
 	else
-		_sky_dome_shape.reset();
+		_planet.reset();
+
+	calculate_camera_transform();
+}
+
+
+void
+RigidBodyPainter::set_sun_enabled (bool enabled)
+{
+	if (enabled)
+		_sun.emplace();
+	else
+		_sun.reset();
+
+	if (_planet)
+		_planet->need_new_sky_dome = true;
+}
+
+
+void
+RigidBodyPainter::set_universe_enabled (bool enabled)
+{
+	if (enabled)
+	{
+		_universe.emplace();
+		check_sky_box();
+	}
+	else
+		_universe.reset();
 }
 
 
@@ -239,19 +262,23 @@ RigidBodyPainter::drop_resources()
 void
 RigidBodyPainter::precalculate()
 {
-	auto const followed_body_normalized_height = neutrino::renormalize (_followed_polar_position.radius(), Range { kEarthMeanRadius, kAtmosphereRadius }, Range { 0.0f, 1.0f });
-	_followed_body_normalized_amsl_height = std::clamp<float> (followed_body_normalized_height, 0.0f, 1.0f);
+	if (_planet)
+	{
+		auto const followed_body_normalized_height = neutrino::renormalize (_followed_polar_position.radius(), Range { kEarthMeanRadius, kAtmosphereRadius }, Range { 0.0f, 1.0f });
+		_planet->followed_body_normalized_amsl_height = std::clamp<float> (followed_body_normalized_height, 0.0f, 1.0f);
+		_planet->camera_normalized_amsl_height = neutrino::renormalize (_camera_polar_position.radius(), Range { kEarthMeanRadius, kAtmosphereRadius }, Range { 0.0f, 1.0f });
+		_planet->camera_clamped_normalized_amsl_height = std::clamp<float> (_planet->camera_normalized_amsl_height, 0.0f, 1.0f);
+	}
 
-	_camera_normalized_amsl_height = neutrino::renormalize (_camera_polar_position.radius(), Range { kEarthMeanRadius, kAtmosphereRadius }, Range { 0.0f, 1.0f });
-	_camera_clamped_normalized_amsl_height = std::clamp<float> (_camera_normalized_amsl_height, 0.0f, 1.0f);
+	calculate_followed_position();
 
-	_followed_position = calculate_followed_position();
-	_followed_polar_position = to_polar (math::coordinate_system_cast<ECEFSpace, void> (_followed_position - planet_position()));
-
-	_sun_position = calculate_sun_position (_camera_polar_position, _time);
-	_corrected_sun_position_horizontal_coordinates = corrected_sun_position_near_horizon (_sun_position.horizontal_coordinates);
-	_corrected_sun_position_cartesian_horizontal_coordinates = calculate_cartesian_horizontal_coordinates (_corrected_sun_position_horizontal_coordinates);
-	_sun_color_on_followed = to_gl_color (calculate_sun_light_color (_camera_polar_position, _corrected_sun_position_cartesian_horizontal_coordinates, _atmospheric_scattering));
+	if (_sun)
+	{
+		_sun->position = calculate_sun_position (_camera_polar_position, _time);
+		_sun->corrected_position_horizontal_coordinates = corrected_sun_position_near_horizon (_sun->position.horizontal_coordinates);
+		_sun->corrected_position_cartesian_horizontal_coordinates = calculate_cartesian_horizontal_coordinates (_sun->corrected_position_horizontal_coordinates);
+		_sun->color_on_body = to_gl_color (calculate_sun_light_color (_camera_polar_position, _sun->corrected_position_cartesian_horizontal_coordinates, _sun->atmospheric_scattering));
+	}
 
 	check_textures();
 	check_sky_dome();
@@ -313,44 +340,48 @@ RigidBodyPainter::setup_lights()
 void
 RigidBodyPainter::setup_sun_light()
 {
-	// Blend the original sun color with color as seen through the atmosphere:
-	auto const qcolor = QColor::fromRgbF (_sun_color_on_followed[0], _sun_color_on_followed[1], _sun_color_on_followed[2]);
-	auto const atmospheric_sun_color = to_gl_color (hsl_interpolation (_followed_body_normalized_amsl_height, qcolor, kSunQColorInSpace));
+	if (_sun)
+	{
+		// Blend the original sun color with color as seen through the atmosphere:
+		auto const qcolor = QColor::fromRgbF (_sun->color_on_body[0], _sun->color_on_body[1], _sun->color_on_body[2]);
+		auto const height_factor = _planet ? _planet->camera_clamped_normalized_amsl_height : 1.0f;
+		auto const atmospheric_sun_color = to_gl_color (hsl_interpolation (height_factor, qcolor, kSunQColorInSpace));
 
-	glLightfv (kGLAtmosphericSunLight, GL_AMBIENT, atmospheric_sun_color.scaled (0.0f));
-	glLightfv (kGLAtmosphericSunLight, GL_DIFFUSE, atmospheric_sun_color.scaled (0.4f));
-	glLightfv (kGLAtmosphericSunLight, GL_SPECULAR, atmospheric_sun_color.scaled (0.1f));
+		glLightfv (kGLAtmosphericSunLight, GL_AMBIENT, atmospheric_sun_color.scaled (0.0f));
+		glLightfv (kGLAtmosphericSunLight, GL_DIFFUSE, atmospheric_sun_color.scaled (0.4f));
+		glLightfv (kGLAtmosphericSunLight, GL_SPECULAR, atmospheric_sun_color.scaled (0.1f));
 
-	glLightfv (kGLCosmicSunLight, GL_AMBIENT, kSunColorInSpace.scaled (0.0f));
-	glLightfv (kGLCosmicSunLight, GL_DIFFUSE, kSunColorInSpace.scaled (0.4f));
-	glLightfv (kGLCosmicSunLight, GL_SPECULAR, kSunColorInSpace.scaled (0.1f));
+		glLightfv (kGLCosmicSunLight, GL_AMBIENT, kSunColorInSpace.scaled (0.0f));
+		glLightfv (kGLCosmicSunLight, GL_DIFFUSE, kSunColorInSpace.scaled (0.4f));
+		glLightfv (kGLCosmicSunLight, GL_SPECULAR, kSunColorInSpace.scaled (0.1f));
 
-	_gl.save_context ([&] {
-		_gl.set_camera (_camera);
+		_gl.save_context ([&] {
+			_gl.set_camera (_camera);
 
-		if (_planet_body)
-		{
-			_gl.save_context ([&] {
-				_gl.load_identity();
-				_gl.set_camera_rotation_only (_camera);
-				make_z_towards_the_sun();
-				// Direct atmospheric sunlight:
-				glLightfv (kGLAtmosphericSunLight, GL_POSITION, GLArray { 0.0f, 0.0f, _gl.to_opengl (kSunDistance), 1.0f });
-				// Direct cosmic sunlight:
-				glLightfv (kGLCosmicSunLight, GL_POSITION, GLArray { 0.0f, 0.0f, _gl.to_opengl (kSunDistance), 1.0f });
-			});
-		}
-		else
-		{
-			// Otherwise let the observer cast the light:
-			glLightfv (kGLAtmosphericSunLight, GL_POSITION, GLArray { 0.0f, 0.0f, 1.0f, 0.0f });
-			glLightfv (kGLCosmicSunLight, GL_POSITION, GLArray { 0.0f, 0.0f, 1.0f, 0.0f });
-		}
-	});
+			if (_sun)
+			{
+				_gl.save_context ([&] {
+					_gl.load_identity();
+					_gl.set_camera_rotation_only (_camera);
+					make_z_towards_the_sun (_sun->position);
+					// Direct atmospheric sunlight:
+					glLightfv (kGLAtmosphericSunLight, GL_POSITION, GLArray { 0.0f, 0.0f, _gl.to_opengl (kSunDistance), 1.0f });
+					// Direct cosmic sunlight:
+					glLightfv (kGLCosmicSunLight, GL_POSITION, GLArray { 0.0f, 0.0f, _gl.to_opengl (kSunDistance), 1.0f });
+				});
+			}
+			else
+			{
+				// Otherwise let the observer cast the light:
+				glLightfv (kGLAtmosphericSunLight, GL_POSITION, GLArray { 0.0f, 0.0f, 1.0f, 0.0f });
+				glLightfv (kGLCosmicSunLight, GL_POSITION, GLArray { 0.0f, 0.0f, 1.0f, 0.0f });
+			}
+		});
 
-	// TODO GL_SPOT_DIRECTION
-	// TODO GL_SPOT_EXPONENT
-	// TODO GL_SPOT_CUTOFF
+		// TODO GL_SPOT_DIRECTION
+		// TODO GL_SPOT_EXPONENT
+		// TODO GL_SPOT_CUTOFF
+	}
 }
 
 
@@ -377,32 +408,35 @@ RigidBodyPainter::set_cosmic_sun_light_enabled (bool enabled)
 void
 RigidBodyPainter::setup_sky_light()
 {
-	// Sky lights:
-	for (auto& sky_light: _sky_lights)
+	if (_planet && _sun)
 	{
-		_gl.save_context ([&] {
-			make_z_sky_top_x_sun_azimuth();
-			_gl.rotate_z (+sky_light.position.lon());
-			_gl.rotate_y (-sky_light.position.lat());
+		// Sky lights:
+		for (auto& sky_light: _planet->sky_lights)
+		{
+			_gl.save_context ([&] {
+				make_z_sky_top_x_sun_azimuth (_sun->position);
+				_gl.rotate_z (+sky_light.position.lon());
+				_gl.rotate_y (-sky_light.position.lat());
 
-			auto const number = sky_light.gl_number;
-			auto const light_direction = to_cartesian<void> (sky_light.position); // Azimuth (lon()) should possible be negated, but the sky dome is symmetric, so this is okay.
-			auto const color = _atmospheric_scattering.calculate_incident_light (
-				{ 0_m, 0_m, _followed_polar_position.radius() },
-				light_direction,
-				_sun_position.cartesian_horizontal_coordinates
-			);
-			auto const corrected_color = sky_correction (color);
-			auto const gl_color = to_gl_color (corrected_color);
-			auto const sky_height = kAtmosphereRadius - kEarthMeanRadius;
-			auto const black = GLColor (0.0f, 0.0f, 0.0f);
+				auto const number = sky_light.gl_number;
+				auto const light_direction = to_cartesian<void> (sky_light.position); // Azimuth (lon()) should possible be negated, but the sky dome is symmetric, so this is okay.
+				auto const color = _sun->atmospheric_scattering.calculate_incident_light (
+					{ 0_m, 0_m, _followed_polar_position.radius() },
+					light_direction,
+					_sun->position.cartesian_horizontal_coordinates
+				);
+				auto const corrected_color = sky_correction (color, _sun->position);
+				auto const gl_color = to_gl_color (corrected_color);
+				auto const sky_height = kAtmosphereRadius - kEarthMeanRadius;
+				auto const black = GLColor (0.0f, 0.0f, 0.0f);
 
-			glEnable (number);
-			glLightfv (number, GL_AMBIENT, black);
-			glLightfv (number, GL_DIFFUSE, gl_color.scaled (0.2f));
-			glLightfv (number, GL_SPECULAR, black);
-			glLightfv (number, GL_POSITION, GLArray { _gl.to_opengl (sky_height), 0.0f, 0.0f, 0.0f });
-		});
+				glEnable (number);
+				glLightfv (number, GL_AMBIENT, black);
+				glLightfv (number, GL_DIFFUSE, gl_color.scaled (0.2f));
+				glLightfv (number, GL_SPECULAR, black);
+				glLightfv (number, GL_POSITION, GLArray { _gl.to_opengl (sky_height), 0.0f, 0.0f, 0.0f });
+			});
+		}
 	}
 }
 
@@ -410,12 +444,13 @@ RigidBodyPainter::setup_sky_light()
 void
 RigidBodyPainter::set_sky_light_enabled (bool enabled)
 {
-	for (auto& sky_light: _sky_lights)
+	if (_planet)
 	{
-		if (enabled)
-			glEnable (sky_light.gl_number);
-		else
-			glDisable (sky_light.gl_number);
+		for (auto& sky_light: _planet->sky_lights)
+		{
+			auto func = enabled ? &::glEnable : &::glDisable;
+			func (sky_light.gl_number);
+		}
 	}
 }
 
@@ -464,16 +499,31 @@ RigidBodyPainter::enable_only_lights (uint32_t lights)
 
 
 void
-RigidBodyPainter::make_z_towards_the_sun()
+RigidBodyPainter::enable_appropriate_lights()
+{
+	if (_sun)
+	{
+		if (_planet)
+			enable_only_lights (kAtmosphericSunLight | kSkyLight);
+		else
+			enable_only_lights (kCosmicSunLight);
+	}
+	else
+		enable_only_lights (kFeatureLight);
+}
+
+
+void
+RigidBodyPainter::make_z_towards_the_sun (SunPosition const& sun_position)
 {
 	// Assuming we have identity rotations + camera rotations applied.
 
 	// Rotate sun depending on UTC time:
-	auto const greenwich_hour_angle = _sun_position.hour_angle - _camera_polar_position.lon();
+	auto const greenwich_hour_angle = sun_position.hour_angle - _camera_polar_position.lon();
 	_gl.rotate_z (-greenwich_hour_angle);
 
 	// Rotate sun depending on time of the year:
-	_gl.rotate_y (-_sun_position.declination);
+	_gl.rotate_y (-sun_position.declination);
 
 	// Our sun is located over the North Pole (+Z in ECEF). Rotate it to be straight over Null Island
 	// that is lon/lat 0°/0° (+X in ECEF):
@@ -490,10 +540,10 @@ RigidBodyPainter::make_z_sky_top_x_south()
 
 
 void
-RigidBodyPainter::make_z_sky_top_x_sun_azimuth()
+RigidBodyPainter::make_z_sky_top_x_sun_azimuth (SunPosition const& sun_position)
 {
 	make_z_sky_top_x_south();
-	_gl.rotate_z (-_sun_position.horizontal_coordinates.azimuth + 180_deg);
+	_gl.rotate_z (-sun_position.horizontal_coordinates.azimuth + 180_deg);
 }
 
 
@@ -501,7 +551,7 @@ void
 RigidBodyPainter::paint_world (rigid_body::System const& system)
 {
 	_gl.save_context ([&] {
-		paint_universe();
+		paint_universe_and_sun();
 		paint_planet();
 		paint_air_particles();
 		paint (system);
@@ -510,20 +560,28 @@ RigidBodyPainter::paint_world (rigid_body::System const& system)
 
 
 void
-RigidBodyPainter::paint_universe()
+RigidBodyPainter::paint_universe_and_sun()
 {
-	_horizon_angle = calculate_horizon_angle (kEarthMeanRadius, _camera_polar_position.radius());
-	auto const sun_altitude = _sun_position.horizontal_coordinates.altitude;
-	auto const sun_altitude_above_horizon = sun_altitude - _horizon_angle;
+	auto sun_altitude_above_horizon = std::optional<si::Angle>();
+
+	if (_planet && _sun)
+	{
+		_planet->horizon_angle = calculate_horizon_angle (kEarthMeanRadius, _camera_polar_position.radius());
+		auto const sun_altitude = _sun->position.horizontal_coordinates.altitude;
+		sun_altitude_above_horizon = sun_altitude - _planet->horizon_angle;
+	}
 
 	check_sky_box();
 
-	if (_sky_box_shape)
+	if (_universe && _universe->sky_box_shape)
 	{
 		_gl.save_context ([&] {
-			auto const color = GLColor (1.0f, 1.0f, 1.0f, compute_sky_box_visibility (sun_altitude_above_horizon));
+			auto const alpha = sun_altitude_above_horizon
+				? compute_sky_box_visibility (*sun_altitude_above_horizon)
+				: 1.0f;
+			auto const color = GLColor (1.0f, 1.0f, 1.0f, alpha);
 
-			_sky_box_shape->for_all_vertices ([color] (ShapeVertex& vertex) {
+			_universe->sky_box_shape->for_all_vertices ([color] (ShapeVertex& vertex) {
 				vertex.material().gl_texture_color = color;
 			});
 
@@ -538,37 +596,44 @@ RigidBodyPainter::paint_universe()
 			glEnable (GL_TEXTURE_2D);
 			glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 			_gl.set_camera_rotation_only (_camera);
-			_gl.rotate (~(kScreenToNullIslandRotation * _ecef_to_celestial_rotation));
-			_gl.draw (*_sky_box_shape);
+			_gl.rotate (~(kScreenToNullIslandRotation * _universe->ecef_to_celestial_rotation));
+			_gl.draw (*_universe->sky_box_shape);
 			_gl.clear_z_buffer();
 			glDisable (GL_TEXTURE_2D);
 			glDisable (GL_BLEND);
 		});
 	}
 
-	if (_planet_body)
+	if (_sun)
 	{
 		// Sun:
 		_gl.save_context ([&] {
-			auto const magnification_at_0_amsl = neutrino::renormalize (sun_altitude_above_horizon, Range { 0_deg, 90_deg }, Range { kSunSunsetMagnification, kSunNoonMagnification });
+			auto const magnification_at_0_amsl = sun_altitude_above_horizon
+				? neutrino::renormalize (*sun_altitude_above_horizon, Range { 0_deg, 90_deg }, Range { kSunSunsetMagnification, kSunNoonMagnification })
+				: 1.0f;
 			// Correct for the fact that the magnification only happens inside atmosphere:
-			_sun_magnification = 1 + (magnification_at_0_amsl - 1) * (1.0 - _camera_clamped_normalized_amsl_height);
+			_sun->magnification = _planet
+				? 1.0f + (magnification_at_0_amsl - 1.0f) * (1.0f - _planet->camera_clamped_normalized_amsl_height)
+				: 1.0f;
 			auto sun_face_material = kWhiteMatte;
 			sun_face_material.gl_emission_color = GLColor (1.0, 1.0, 1.0);
-			auto sun_face = make_solid_circle (_sun_magnification * kSunRadius, { 0_deg, 360_deg }, 19, sun_face_material);
-			auto const sun_visibility = 1.0f - square (1.0f - calculate_sun_visible_surface_factor (sun_altitude_above_horizon));
+			auto sun_face = make_solid_circle (_sun->magnification * kSunRadius, { 0_deg, 360_deg }, 19, sun_face_material);
+			auto const sun_visibility = sun_altitude_above_horizon
+				? 1.0f - square (1.0f - calculate_sun_visible_surface_factor (*sun_altitude_above_horizon))
+				: 1.0f;
 
+			auto const height_factor = _planet ? _planet->camera_clamped_normalized_amsl_height : 1.0f;
+			auto const actual_radius = 0.02f;
 			auto sun_shines = make_centered_sphere_shape ({
 				.radius = kSunDistance,
 				.n_slices = 9,
 				.n_stacks = 36,
 				.v_range = { 0_deg, 90_deg },
 				.material = kWhiteMatte,
-				.setup_material = [&] (ShapeMaterial& material, si::LonLat const position) {
-					float const actual_radius = 0.02f;
+				.setup_material = [=] (ShapeMaterial& material, si::LonLat const position) {
 					float const norm = renormalize<si::Angle> (position.lat(), Range { 0_deg, 90_deg }, Range { 0.0f, 1.0f });
 					float const alpha = std::clamp<float> (sun_visibility * std::pow (norm + actual_radius, 6.0f), 0.0f, 1.0f);
-					material.gl_emission_color = { 1.0f, 1.0f, 1.0f, alpha * _camera_clamped_normalized_amsl_height };
+					material.gl_emission_color = { 1.0f, 1.0f, 1.0f, alpha * height_factor };
 				},
 			});
 			negate_normals (sun_shines);
@@ -585,7 +650,7 @@ RigidBodyPainter::paint_universe()
 			glFrontFace (GL_CW);
 
 			_gl.set_camera (_camera);
-			make_z_towards_the_sun();
+			make_z_towards_the_sun (_sun->position);
 			// Z is now direction towards the Sun:
 			_gl.translate (0_m, 0_m, kSunDistance);
 			_gl.draw (sun_face);
@@ -600,7 +665,7 @@ RigidBodyPainter::paint_universe()
 void
 RigidBodyPainter::paint_planet()
 {
-	if (!_planet_body)
+	if (!_planet)
 		return;
 
 	_gl.save_context ([&] {
@@ -616,11 +681,11 @@ RigidBodyPainter::paint_planet()
 			glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 			_gl.translate (planet_position());
 			enable_only_lights (kCosmicSunLight);
-			_gl.draw (_ground_shape);
+			_gl.draw (_planet->ground_shape);
 			glDisable (GL_TEXTURE_2D);
 		});
 
-		if (_sky_dome_shape)
+		if (_planet)
 		{
 			// Sky and ground dome around the observer:
 			_gl.save_context ([&] {
@@ -637,7 +702,7 @@ RigidBodyPainter::paint_planet()
 				// Blend with the universe: final_color = (1 - transmittance) * atmosphere_color + universe_color
 				glBlendFunc (GL_SRC_ALPHA, GL_ONE);
 				glEnable (GL_BLEND);
-				_gl.draw (*_sky_dome_shape);
+				_gl.draw (_planet->sky_dome_shape);
 				glDisable (GL_BLEND);
 				glEnable (GL_LIGHTING);
 				glEnable (GL_DEPTH_TEST);
@@ -652,11 +717,7 @@ void
 RigidBodyPainter::paint_air_particles()
 {
 	_gl.save_context ([&] {
-		if (_planet_body)
-			enable_only_lights (kAtmosphericSunLight | kSkyLight);
-		else
-			enable_only_lights (kFeatureLight);
-
+		enable_appropriate_lights();
 		_gl.set_camera_rotation_only (_camera);
 		// Trick with rotating camera and then subtracting camera position from the object is to avoid problems with low precision OpenGL floats:
 		// _followed_position - _camera.position() uses doubles; but _gl.translate() internally reduces them to floats:
@@ -714,11 +775,7 @@ void
 RigidBodyPainter::paint (rigid_body::System const& system)
 {
 	_gl.save_context ([&] {
-		if (_planet_body)
-			enable_only_lights (kAtmosphericSunLight | kSkyLight);
-		else
-			enable_only_lights (kFeatureLight);
-
+		enable_appropriate_lights();
 		_gl.set_camera_rotation_only (_camera);
 
 		for (auto const& body: system.bodies())
@@ -1060,21 +1117,21 @@ RigidBodyPainter::draw_arrow (SpaceLength<WorldSpace> const& origin, SpaceLength
 
 
 SpaceVector<float, RGBSpace>
-RigidBodyPainter::sky_correction (SpaceVector<float, RGBSpace> rgb) const
+RigidBodyPainter::sky_correction (SpaceVector<float, RGBSpace> rgb, SunPosition const& sun_position) const
 {
 	auto constexpr altitude_threshold = 4_deg;
 	auto constexpr reduce_green_to = 0.8;
 	auto constexpr reduce_green_to_sqrt = std::sqrt (reduce_green_to);
 
-	if (_sun_position.hour_angle > 0_deg && _sun_position.hour_angle < 180_deg)
+	if (sun_position.hour_angle > 0_deg && sun_position.hour_angle < 180_deg)
 	{
-		auto const abs_altitude = abs (_sun_position.horizontal_coordinates.altitude);
+		auto const abs_altitude = abs (sun_position.horizontal_coordinates.altitude);
 
 		if (abs_altitude < altitude_threshold)
 		{
 			auto const from = Range { altitude_threshold, 0_deg };
 			auto const to = Range { 1.0, reduce_green_to_sqrt };
-			auto const factor = neutrino::renormalize (_sun_position.horizontal_coordinates.altitude, from, to);
+			auto const factor = neutrino::renormalize (sun_position.horizontal_coordinates.altitude, from, to);
 			rgb[1] *= square (factor);
 		}
 	}
@@ -1149,23 +1206,25 @@ RigidBodyPainter::paint_basis (si::Length const length)
 }
 
 
-SpaceLength<WorldSpace>
+void
 RigidBodyPainter::calculate_followed_position()
 {
 	if (auto const* followed_body = this->followed_body())
-		return followed_body->placement().position();
+		_followed_position = followed_body->placement().position();
 	else if (auto const* followed_group = this->followed_group())
-		return get_center_of_mass (*followed_group);
+		_followed_position = get_center_of_mass (*followed_group);
 	else
-		return { 0_m, 0_m, 0_m };
+		_followed_position = { 0_m, 0_m, 0_m };
+
+	_followed_polar_position = to_polar (math::coordinate_system_cast<ECEFSpace, void> (_followed_position - planet_position()));
 }
 
 
 SpaceLength<WorldSpace>
 RigidBodyPainter::planet_position() const
 {
-	if (_planet_body)
-		return _planet_body->placement().position();
+	if (_planet)
+		return _planet->body->placement().position();
 	else
 		return SpaceLength<WorldSpace> (math::zero);
 }
@@ -1210,7 +1269,7 @@ RigidBodyPainter::check_texture_images()
 void
 RigidBodyPainter::check_textures()
 {
-	if (_planet_body && !_textures)
+	if (_planet && !_textures)
 	{
 		auto texture_images = _texture_images.lock();
 
@@ -1239,7 +1298,7 @@ RigidBodyPainter::check_textures()
 			};
 
 			// Reload SkyDome to include the Earth texture:
-			_need_new_sky_dome = true;
+			_planet->need_new_sky_dome = true;
 		}
 	}
 }
@@ -1248,9 +1307,9 @@ RigidBodyPainter::check_textures()
 void
 RigidBodyPainter::check_sky_dome()
 {
-	if (std::exchange (_need_new_sky_dome, false))
-		if (_planet_body)
-			_sky_dome_shape = calculate_sky_dome_shape();
+	if (_planet)
+		if (std::exchange (_planet->need_new_sky_dome, false))
+			_planet->sky_dome_shape = calculate_sky_dome_shape();
 }
 
 
@@ -1259,24 +1318,29 @@ RigidBodyPainter::calculate_sky_dome_shape()
 {
 	_camera_position_for_sky_dome = _camera.position();
 
-	return xf::calculate_sky_dome_shape ({
-		.atmospheric_scattering = _atmospheric_scattering,
-		.observer_position = _camera_polar_position,
-		.sun_position = _corrected_sun_position_horizontal_coordinates,
-		.earth_radius = kEarthMeanRadius,
-		.earth_texture = _textures ? _textures->earth : nullptr,
-	}, &*_work_performer);
-	// TODO apply sky_correction to vertices' materials
+	if (_planet && _sun)
+	{
+		return xf::calculate_sky_dome_shape ({
+			.atmospheric_scattering = _sun->atmospheric_scattering,
+			.observer_position = _camera_polar_position,
+			.sun_position = _sun->corrected_position_horizontal_coordinates,
+			.earth_radius = kEarthMeanRadius,
+			.earth_texture = _textures ? _textures->earth : nullptr,
+		}, &*_work_performer);
+		// TODO apply sky_correction to vertices' materials
+	}
+	else
+		return {};
 }
 
 
 void
 RigidBodyPainter::check_sky_box()
 {
-	if (_textures && !_sky_box_shape)
+	if (_universe && !_universe->sky_box_shape && _textures)
 	{
 		auto material = kWhiteMatte;
-		_sky_box_shape = make_sky_box ({
+		_universe->sky_box_shape = make_sky_box ({
 			.edge_length = 1000_m,
 			.material = material,
 			.texture_neg_x = _textures->universe_neg_x,
@@ -1287,24 +1351,25 @@ RigidBodyPainter::check_sky_box()
 			.texture_pos_z = _textures->universe_pos_z,
 		});
 	}
+
+	// Universe sky box rotation:
+	auto const julian_date = unix_time_to_julian_date (_time);
+	_universe->ecef_to_celestial_rotation = calculate_ecef_to_celestial_rotation (julian_date);
 }
 
 
 float
 RigidBodyPainter::compute_sky_box_visibility (si::Angle const sun_altitude_above_horizon) const
 {
-	// Update sky box visibility (none near the ground, except at night):
-	auto universe_visibility = 1.0f;
-
-	if (_planet_body)
+	if (_planet)
 	{
 		// Make the universe sky box visible when high above the surface, but also at night:
 		auto const night_time_visibility = neutrino::renormalize (sun_altitude_above_horizon, Range { -3_deg, -8_deg }, Range { 0.0f, 0.5f });
-		auto const altitude_visibility = neutrino::renormalize (_camera_normalized_amsl_height, Range { 0.8f, 1.5f }, Range { 0.0f, 1.0f });
-		universe_visibility = std::max (altitude_visibility, night_time_visibility);
+		auto const altitude_visibility = neutrino::renormalize (_planet->camera_normalized_amsl_height, Range { 0.8f, 1.5f }, Range { 0.0f, 1.0f });
+		return std::max (altitude_visibility, night_time_visibility);
 	}
-
-	return universe_visibility;
+	else
+		return 1.0f;
 }
 
 
@@ -1334,7 +1399,7 @@ RigidBodyPainter::calculate_camera_transform()
 				auto const base_rotation = math::coordinate_system_cast<WorldSpace, WorldSpace> (followed_body->placement().base_rotation());
 				// Make an exception if we're following the planet body: we don't want to use aircraft coordinates
 				// for the planet, because it's unnatural:
-				if (followed_body == _planet_body)
+				if (_planet && _planet->body == followed_body)
 					rotation = _user_camera_rotation * kScreenToNullIslandRotation * base_rotation;
 				else
 					rotation = _user_camera_rotation * kAircraftToBehindViewRotation * base_rotation;
@@ -1369,11 +1434,14 @@ RigidBodyPainter::calculate_camera_transform()
 
 	fix_camera_position();
 
-	if (abs (_camera_position_for_sky_dome - _camera.position()) > 10_m)
-		_need_new_sky_dome = true;
+	if (_planet)
+	{
+		if (abs (_camera_position_for_sky_dome - _camera.position()) > 10_m)
+			_planet->need_new_sky_dome = true;
 
-	if (_textures)
-		_ground_shape = calculate_ground_shape (_camera_polar_position, kEarthMeanRadius, _textures->earth);
+		if (_textures)
+			_planet->ground_shape = calculate_ground_shape (_camera_polar_position, kEarthMeanRadius, _textures->earth);
+	}
 
 	if (_camera_position_callback)
 		_camera_position_callback (_camera.position());
@@ -1383,7 +1451,7 @@ RigidBodyPainter::calculate_camera_transform()
 void
 RigidBodyPainter::fix_camera_position()
 {
-	if (_planet_body && followed_body() != _planet_body && _camera_polar_position.radius() < kEarthMeanRadius)
+	if (_planet && _planet->body != followed_body() && _camera_polar_position.radius() < kEarthMeanRadius)
 	{
 		// Just a bit above the ground to ensure the earth surface is properly drawn:
 		_camera_polar_position.radius() = kEarthMeanRadius + 10_m;
@@ -1395,13 +1463,17 @@ RigidBodyPainter::fix_camera_position()
 HorizontalCoordinates
 RigidBodyPainter::corrected_sun_position_near_horizon (HorizontalCoordinates orig) const
 {
-	auto const R = _sun_magnification * kSunFaceAngularRadius;
-	auto alt = orig.altitude - _horizon_angle;
+	if (_planet && _sun)
+	{
+		auto const R = _sun->magnification * kSunFaceAngularRadius;
+		auto alt = orig.altitude - _planet->horizon_angle;
 
-	if (alt < R)
-		alt = 0.5 * (alt + R);
+		if (alt < R)
+			alt = 0.5 * (alt + R);
 
-	orig.altitude = alt + _horizon_angle;
+		orig.altitude = alt + _planet->horizon_angle;
+	}
+
 	return orig;
 }
 
