@@ -129,6 +129,45 @@ class RigidBodyPainter: protected QOpenGLFunctions
 		bool	angular_momenta_visible:1		{ false };
 	};
 
+	struct Planet
+	{
+		rigid_body::Body const*	body				{ nullptr };
+		// If set to true, sky_dome_shape will be recalculated:
+		bool					need_new_sky_dome	{ true };
+		Shape					sky_dome_shape;
+		Shape					ground_shape;
+		// Angle of horizon (always below 0°) as viewed from the camera position:
+		si::Angle				horizon_angle		{ 0_deg };
+		float					camera_normalized_amsl_height			{ 0.0f };
+		float					camera_clamped_normalized_amsl_height	{ 0.0f }; // Range: 0…1
+		float					followed_body_normalized_amsl_height	{ 0.0f }; // Range: 0…1
+		static std::array<SkyLight, 5> const
+								sky_lights;
+	};
+
+	struct Sun
+	{
+		SunPosition					position;
+		// Corrected position is for the case when sun sets or rises and the face is partially covered by earth;
+		// In such case the corrected position is the center of the visible part of sun's face, not the center of the circle:
+		HorizontalCoordinates		corrected_position_horizontal_coordinates;
+		SpaceVector<double>			corrected_position_cartesian_horizontal_coordinates;
+		// Color to use when setting up OpenGL light:
+		GLColor						color_on_body;
+		float						magnification			{ 1.0f };
+		AtmosphericScattering const	atmospheric_scattering	{{
+			.earth_radius = kEarthMeanRadius,
+			.atmosphere_radius = kAtmosphereRadius,
+			.enable_tonemapping = true,
+		}};
+	};
+
+	struct Universe
+	{
+		std::optional<Shape>			sky_box_shape;
+		RotationQuaternion<WorldSpace>	ecef_to_celestial_rotation;
+	};
+
   public:
 	using CameraPositionCallback = std::function<void (SpaceLength<WorldSpace>)>;
 
@@ -205,6 +244,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 		set_followed (Object const& object) noexcept
 		{
 			_followed = &object;
+			calculate_followed_position();
 			calculate_camera_transform();
 		}
 
@@ -366,7 +406,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	[[nodiscard]]
 	rigid_body::Body const*
 	planet() const noexcept
-		{ return _planet_body; }
+		{ return _planet ? _planet->body : nullptr; }
 
 	/**
 	 * Set planet body.
@@ -379,6 +419,32 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	 */
 	void
 	set_planet (rigid_body::Body const* planet_body);
+
+	/**
+	 * Return true if rendering of sun is enabled.
+	 */
+	bool
+	sun_enabled() const
+		{ return _sun.has_value(); }
+
+	/**
+	 * Enable/disable rendering of sun.
+	 */
+	void
+	set_sun_enabled (bool);
+
+	/**
+	 * Return true if rendering of universe is enabled.
+	 */
+	bool
+	universe_enabled() const
+		{ return _universe.has_value(); }
+
+	/**
+	 * Enable/disable rendering of the universe (stars, Milky Way, etc).
+	 */
+	void
+	set_universe_enabled (bool);
 
 	/**
 	 * Return FeaturesConfig structure. It can be modified.
@@ -458,13 +524,20 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	enable_only_lights (uint32_t light_flags);
 
 	/**
+	 * Enable sun light/sky light, cosmic light or feature lights
+	 * depending of presence of sun and planet.
+	 */
+	void
+	enable_appropriate_lights();
+
+	/**
 	 * Rotates OpenGL world so that Z direction is towards the Sun.
 	 * Preconditions:
 	 *  • _sun_local_hour_angle and _sun_declination are calculated first.
 	 *  • current OpenGL rotation is identity.
 	 */
 	void
-	make_z_towards_the_sun();
+	make_z_towards_the_sun (SunPosition const&);
 
 	/**
 	 * Rotates OpenGL world so that Z direction is towards the center of Earth and X is towards south (azimuth 180°).
@@ -477,7 +550,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	 * Like make_z_towards_the_sun(), but make the Z touch the horizon.
 	 */
 	void
-	make_z_sky_top_x_sun_azimuth();
+	make_z_sky_top_x_sun_azimuth (SunPosition const&);
 
 	void
 	paint_world (rigid_body::System const&);
@@ -493,7 +566,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	paint_basis (si::Length arrow_length);
 
 	void
-	paint_universe();
+	paint_universe_and_sun();
 
 	void
 	paint_planet();
@@ -567,10 +640,9 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	 */
 	[[nodiscard]]
 	SpaceVector<float, RGBSpace>
-	sky_correction (SpaceVector<float, RGBSpace> rgb) const;
+	sky_correction (SpaceVector<float, RGBSpace> rgb, SunPosition const&) const;
 
-	[[nodiscard]]
-	SpaceLength<WorldSpace>
+	void
 	calculate_followed_position();
 
 	[[nodiscard]]
@@ -602,7 +674,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	check_sky_dome();
 
 	/**
-	 * \threadsafe	As long as _atmospheric_scattering is unmodified.
+	 * \threadsafe	As long as atmospheric_scattering is unmodified.
 	 */
 	[[nodiscard]]
 	Shape
@@ -653,6 +725,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	neutrino::ValueOrPtr<neutrino::WorkPerformer, std::size_t, xf::Logger const&>
 								_work_performer;
 	si::Time					_time;
+	si::Time					_prev_saved_time;
 	CameraMode					_camera_mode				{ CockpitView };
 	// Requested camera position:
 	si::LonLatRadius<>			_requested_camera_polar_position;
@@ -680,7 +753,6 @@ class RigidBodyPainter: protected QOpenGLFunctions
 								_focused;
 	std::variant<std::monostate, rigid_body::Body const*, rigid_body::Constraint const*>
 								_hovered;
-	rigid_body::Body const*		_planet_body				{ nullptr };
 	FeaturesConfig				_features_config;
 	std::map<rigid_body::Group const*, GroupRenderingConfig>
 								_group_rendering_config;
@@ -689,35 +761,11 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	std::minstd_rand0			_air_particles_prng;
 	std::map<rigid_body::Group const*, SpaceLength<WorldSpace>>
 								_group_centers_of_mass_cache;
-	AtmosphericScattering const	_atmospheric_scattering		{{ .earth_radius = kEarthMeanRadius, .atmosphere_radius = kAtmosphereRadius, .enable_tonemapping = true }};
 
-	// Sky and ground:
-	std::optional<Shape>		_sky_dome_shape;
-	// If set to true, _sky_dome_shape will be recalculated:
-	bool						_need_new_sky_dome			{ false };
-	si::Time					_sky_dome_update_time;
-	Shape						_ground_shape;
-	std::optional<Shape>		_sky_box_shape;
-	si::Angle					_horizon_angle;
-	// Recalculated from time to time:
-	RotationQuaternion<WorldSpace>
-								_ecef_to_celestial_rotation;
+	std::optional<Planet>		_planet;
+	std::optional<Sun>			_sun;
+	std::optional<Universe>		_universe;
 
-	// Sun:
-	SunPosition					_sun_position;
-	// Corrected position is for the case when sun sets or rises and the face is partially covered by earth;
-	// In such case the corrected position is the center of the visible part of sun's face, not the center of the circle:
-	HorizontalCoordinates		_corrected_sun_position_horizontal_coordinates;
-	SpaceVector<double>			_corrected_sun_position_cartesian_horizontal_coordinates;
-	float						_sun_magnification						{ 1.0f };
-	// Color to use when setting up OpenGL light:
-	GLColor						_sun_color_on_followed;
-
-	float						_camera_normalized_amsl_height			{ 0.0f };
-	float						_camera_clamped_normalized_amsl_height	{ 0.0f }; // Range: 0…1
-	float						_followed_body_normalized_amsl_height	{ 0.0f }; // Range: 0…1
-
-	std::array<SkyLight, 5>		_sky_lights;
 	static Synchronized<std::shared_future<TextureImages>>
 								_texture_images;
 	std::optional<Textures>		_textures;

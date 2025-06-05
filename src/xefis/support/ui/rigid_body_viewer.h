@@ -247,6 +247,40 @@ class RigidBodyViewer: public GLAnimationWidget
 	}
 
 	/**
+	 * Return true if rendering of sun is enabled.
+	 */
+	bool
+	sun_enabled() const
+		{ return _rigid_body_painter.sun_enabled(); }
+
+	/**
+	 * Enable/disable rendering of sun.
+	 */
+	void
+	set_sun_enabled (bool enabled)
+	{
+		_rigid_body_painter.set_sun_enabled (enabled);
+		update();
+	}
+
+	/**
+	 * Return true if rendering of universe is enabled.
+	 */
+	bool
+	universe_enabled() const
+		{ return _rigid_body_painter.universe_enabled(); }
+
+	/**
+	 * Enable/disable rendering of the universe (stars, Milky Way, etc).
+	 */
+	void
+	set_universe_enabled (bool enabled)
+	{
+		_rigid_body_painter.set_universe_enabled (enabled);
+		update();
+	}
+
+	/**
 	 * Forward the mode to RigidBodyPainter.
 	 */
 	void
