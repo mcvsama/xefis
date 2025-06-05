@@ -112,6 +112,7 @@ run (rigid_body::System& system, rigid_body::Body* followed_body, std::function<
 			evolver.evolve (1);
 	});
 	viewer.resize (QSize (50 * lh, 50 * lh));
+	viewer.set_universe_enabled (true);
 
 	if (followed_body)
 		viewer.set_followed (*followed_body);

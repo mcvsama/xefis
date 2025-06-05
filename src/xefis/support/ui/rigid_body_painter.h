@@ -97,9 +97,13 @@ class RigidBodyPainter: protected QOpenGLFunctions
 		si::LonLat			position;
 	};
 
-	struct TextureImages
+	struct PlanetTextureImages
 	{
 		QImage	earth;
+	};
+
+	struct UniverseTextureImages
+	{
 		QImage	universe_neg_x;
 		QImage	universe_neg_y;
 		QImage	universe_neg_z;
@@ -108,9 +112,13 @@ class RigidBodyPainter: protected QOpenGLFunctions
 		QImage	universe_pos_z;
 	};
 
-	struct Textures
+	struct PlanetTextures
 	{
 		std::shared_ptr<QOpenGLTexture>	earth;
+	};
+
+	struct UniverseTextures
+	{
 		std::shared_ptr<QOpenGLTexture>	universe_neg_x;
 		std::shared_ptr<QOpenGLTexture>	universe_neg_y;
 		std::shared_ptr<QOpenGLTexture>	universe_neg_z;
@@ -659,12 +667,24 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	void
 	check_texture_images();
 
+	void
+	check_planet_texture_images();
+
+	void
+	check_universe_texture_images();
+
 	/**
 	 * Check if loading of textures is needed. First the check_texture_images()
 	 * should be called to load images that will be needed by the textures.
 	 */
 	void
 	check_textures();
+
+	void
+	check_planet_textures();
+
+	void
+	check_universe_textures();
 
 	/**
 	 * Check if calculation of new SkyDome was requested.
@@ -719,6 +739,10 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	HorizontalCoordinates
 	corrected_sun_position_near_horizon (HorizontalCoordinates) const;
 
+	[[nodiscard]]
+	static std::shared_ptr<QOpenGLTexture>
+	make_texture (QImage const& image);
+
   private:
 	si::PixelDensity			_pixel_density;
 	si::Angle					_fov						{ 40_deg };
@@ -766,9 +790,14 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	std::optional<Sun>			_sun;
 	std::optional<Universe>		_universe;
 
-	static Synchronized<std::shared_future<TextureImages>>
-								_texture_images;
-	std::optional<Textures>		_textures;
+	static Synchronized<std::shared_future<PlanetTextureImages>>
+								_planet_texture_images;
+	static Synchronized<std::shared_future<UniverseTextureImages>>
+								_universe_texture_images;
+	std::optional<PlanetTextures>
+								_planet_textures;
+	std::optional<UniverseTextures>
+								_universe_textures;
 };
 
 
