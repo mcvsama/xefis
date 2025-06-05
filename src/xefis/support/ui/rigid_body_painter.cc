@@ -1325,12 +1325,17 @@ RigidBodyPainter::calculate_sky_dome_shape()
 
 	if (_planet && _sun)
 	{
+		// With alpha 1.0 and being in space, the sky is a bit too bright.
+		// Tone it down a bit.
+		auto const sky_alpha = 1.0f - 0.1f * _planet->camera_clamped_normalized_amsl_height;
+
 		return xf::calculate_sky_dome_shape ({
 			.atmospheric_scattering = _sun->atmospheric_scattering,
 			.observer_position = _camera_polar_position,
 			.sun_position = _sun->corrected_position_horizontal_coordinates,
 			.earth_radius = kEarthMeanRadius,
 			.earth_texture = _textures ? _textures->earth : nullptr,
+			.sky_alpha = sky_alpha,
 		}, &*_work_performer);
 		// TODO apply sky_correction to vertices' materials
 	}
