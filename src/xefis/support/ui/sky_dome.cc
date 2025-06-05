@@ -317,6 +317,7 @@ calculate_sky_dome_shape (SkyDomeParameters const& p, neutrino::WorkPerformer* c
 						cartesian_sun_position
 					);
 					material.gl_emission_color = to_gl_color (color);
+					material.gl_emission_color[3] = p.sky_alpha;
 				}
 				else
 				{
