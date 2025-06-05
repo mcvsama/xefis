@@ -744,60 +744,58 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	make_texture (QImage const& image);
 
   private:
-	si::PixelDensity			_pixel_density;
-	si::Angle					_fov						{ 40_deg };
+	si::PixelDensity				_pixel_density;
+	si::Angle						_fov						{ 40_deg };
 	neutrino::ValueOrPtr<neutrino::WorkPerformer, std::size_t, xf::Logger const&>
-								_work_performer;
-	si::Time					_time;
-	si::Time					_prev_saved_time;
-	CameraMode					_camera_mode				{ CockpitView };
+									_work_performer;
+	si::Time						_time;
+	si::Time						_prev_saved_time;
+	CameraMode						_camera_mode				{ CockpitView };
 	// Requested camera position:
-	si::LonLatRadius<>			_requested_camera_polar_position;
+	si::LonLatRadius<>				_requested_camera_polar_position;
 	// User offset (it's actually in camera space):
-	SpaceLength<WorldSpace>		_user_camera_translation;
+	SpaceLength<WorldSpace>			_user_camera_translation;
 	// Final computed camera position (from requested camera position and user camera translation):
-	si::LonLatRadius<>			_camera_polar_position;
-	CameraPositionCallback		_camera_position_callback;
+	si::LonLatRadius<>				_camera_polar_position;
+	CameraPositionCallback			_camera_position_callback;
 	// Requested camera rotation in screen coordinates:
-	SpaceVector<si::Angle>		_user_camera_angles;
+	SpaceVector<si::Angle>			_user_camera_angles;
 	RotationQuaternion<WorldSpace>
-								_user_camera_rotation		{ math::identity };
+									_user_camera_rotation		{ math::identity };
 	// Final computed camera rotation:
 	Placement<WorldSpace, WorldSpace>
-								_camera;
-	SpaceLength<WorldSpace>		_camera_position_for_sky_dome;
+									_camera;
+	SpaceLength<WorldSpace>			_camera_position_for_sky_dome;
 	// Position of the followed body:
-	SpaceLength<WorldSpace>		_followed_position;
-	si::LonLatRadius<>			_followed_polar_position;
+	SpaceLength<WorldSpace>			_followed_position;
+	si::LonLatRadius<>				_followed_polar_position;
 
-	GLSpace						_gl							{ 1.0 / 1_m };
+	GLSpace							_gl							{ 1.0 / 1_m };
 	std::variant<std::monostate, rigid_body::Group const*, rigid_body::Body const*>
-								_followed;
+									_followed;
 	std::variant<std::monostate, rigid_body::Group const*, rigid_body::Body const*, rigid_body::Constraint const*>
-								_focused;
+									_focused;
 	std::variant<std::monostate, rigid_body::Body const*, rigid_body::Constraint const*>
-								_hovered;
-	FeaturesConfig				_features_config;
+									_hovered;
+	FeaturesConfig					_features_config;
 	std::map<rigid_body::Group const*, GroupRenderingConfig>
-								_group_rendering_config;
+									_group_rendering_config;
 	std::map<rigid_body::Body const*, BodyRenderingConfig>
-								_body_rendering_config;
-	std::minstd_rand0			_air_particles_prng;
+									_body_rendering_config;
+	std::minstd_rand0				_air_particles_prng;
 	std::map<rigid_body::Group const*, SpaceLength<WorldSpace>>
-								_group_centers_of_mass_cache;
+									_group_centers_of_mass_cache;
 
-	std::optional<Planet>		_planet;
-	std::optional<Sun>			_sun;
-	std::optional<Universe>		_universe;
+	std::optional<Planet>			_planet;
+	std::optional<Sun>				_sun;
+	std::optional<Universe>			_universe;
 
 	static Synchronized<std::shared_future<PlanetTextureImages>>
-								_planet_texture_images;
+									_planet_texture_images;
 	static Synchronized<std::shared_future<UniverseTextureImages>>
-								_universe_texture_images;
-	std::optional<PlanetTextures>
-								_planet_textures;
-	std::optional<UniverseTextures>
-								_universe_textures;
+									_universe_texture_images;
+	std::optional<PlanetTextures>	_planet_textures;
+	std::optional<UniverseTextures>	_universe_textures;
 };
 
 
