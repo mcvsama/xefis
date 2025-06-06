@@ -1405,10 +1405,9 @@ RigidBodyPainter::check_sky_box()
 {
 	if (_universe && !_universe->sky_box_shape && _universe_textures)
 	{
-		auto material = kWhiteMatte;
 		_universe->sky_box_shape = make_sky_box ({
 			.edge_length = 1000_m,
-			.material = material,
+			.material = kWhiteMatte,
 			.texture_neg_x = _universe_textures->universe_neg_x,
 			.texture_neg_y = _universe_textures->universe_neg_y,
 			.texture_neg_z = _universe_textures->universe_neg_z,
