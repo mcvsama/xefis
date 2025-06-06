@@ -581,7 +581,8 @@ RigidBodyPainter::paint_universe_and_sun()
 			auto const alpha = sun_altitude_above_horizon
 				? compute_sky_box_visibility (*sun_altitude_above_horizon)
 				: 1.0f;
-			auto const color = GLColor (1.0f, 1.0f, 1.0f, alpha);
+			auto const x = 0.7f; // Darken the universe a bit.
+			auto const color = GLColor (x, x, x, alpha);
 
 			_universe->sky_box_shape->for_all_vertices ([color] (ShapeVertex& vertex) {
 				vertex.material().gl_texture_color = color;
