@@ -107,7 +107,8 @@ RigidBodyPainter::RigidBodyPainter (si::PixelDensity const pixel_density, WorkPe
 bool
 RigidBodyPainter::ready() const
 {
-	return valid_and_ready (*_planet_texture_images.lock()) && valid_and_ready (*_universe_texture_images.lock());
+	return (!_planet || valid_and_ready (*_planet_texture_images.lock()))
+		&& (!_universe || valid_and_ready (*_universe_texture_images.lock()));
 }
 
 
