@@ -657,8 +657,9 @@ RigidBodyPainter::paint_universe_and_sun()
 			// Z is now direction towards the Sun:
 			_gl.translate (0_m, 0_m, kSunDistance);
 			_gl.draw (sun_face);
-			// Rotate sun shines when camera angle changes:
-			_gl.rotate (_user_camera_angles[0] - 2 * _user_camera_angles[1], 0, 0, 1);
+			auto const time_dependent_angle = 360_deg * _time.in<si::Hour>() / 24.0;
+			// Rotate sun shines when camera angle and simulation time changes:
+			_gl.rotate (_user_camera_angles[0] - 2 * _user_camera_angles[1] + time_dependent_angle, 0, 0, 1);
 			_gl.draw (sun_shines);
 		});
 	}
