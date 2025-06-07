@@ -50,17 +50,15 @@ RigidBodyViewer::RigidBodyViewer (QWidget* parent, RefreshRate const refresh_rat
 	forward_camera_translation();
 	forward_camera_rotation();
 
-	{
-		using namespace std::literals::chrono_literals;
-		_painter_ready_check_timer->callOnTimeout ([this] {
-			if (_rigid_body_painter.ready())
-			{
-				update();
-				_painter_ready_check_timer->deleteLater();
-			}
-		});
-		_painter_ready_check_timer->start (100ms);
-	}
+	_painter_ready_check_timer->callOnTimeout ([this] {
+		if (_rigid_body_painter.ready())
+		{
+			update();
+			_painter_ready_check_timer->stop();
+		}
+	});
+
+	start_waiting_for_resources();
 }
 
 
@@ -229,6 +227,14 @@ RigidBodyViewer::resizeEvent (QResizeEvent* event)
 
 
 void
+RigidBodyViewer::start_waiting_for_resources()
+{
+	using namespace std::literals::chrono_literals;
+	_painter_ready_check_timer->start (20ms);
+}
+
+
+void
 RigidBodyViewer::paint (QOpenGLPaintDevice& canvas)
 {
 	if (_before_paint_callback)
@@ -339,6 +345,7 @@ RigidBodyViewer::display_menu()
 	{
 		auto* action = menu.addAction ("Sun enabled", [this] {
 			set_sun_enabled (!sun_enabled());
+			start_waiting_for_resources();
 		});
 		action->setCheckable (true);
 		action->setChecked (_rigid_body_painter.sun_enabled());
@@ -347,6 +354,7 @@ RigidBodyViewer::display_menu()
 	{
 		auto* action = menu.addAction ("Universe enabled", [this] {
 			set_universe_enabled (!universe_enabled());
+			start_waiting_for_resources();
 		});
 		action->setCheckable (true);
 		action->setChecked (_rigid_body_painter.universe_enabled());

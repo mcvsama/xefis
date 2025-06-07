@@ -386,6 +386,14 @@ class RigidBodyViewer: public GLAnimationWidget
 	resizeEvent (QResizeEvent*) override;
 
   private:
+	/**
+	 * Make sure that when not-previously loaded resources (textures) are needed now
+	 * (eg. when user enabled the Universe), we will know about it and run the update()
+	 * when they're ready.
+	 */
+	void
+	start_waiting_for_resources();
+
 	void
 	mark_dirty() noexcept
 		{ _dirty = true; }
