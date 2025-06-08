@@ -723,10 +723,8 @@ RigidBodyPainter::paint_air_particles()
 		// TODO both dust size and grid size should depend on the airplane size (max bounds?)
 		auto const dust_size = 2_cm;
 		auto const grid_size = 5_m;
-		auto dust_material = kWhiteMatte;
-		dust_material.set_emission_color (Qt::white);
-		auto const dust = make_centered_sphere_shape ({ .radius = dust_size, .n_slices = 3, .n_stacks = 3, .material = dust_material });
-		auto const range = 3 * grid_size;
+		static auto const range = 3 * grid_size;
+		static auto const dust = make_centered_sphere_shape ({ .radius = dust_size, .n_slices = 3, .n_stacks = 3, .material = kWhiteMatte });
 
 		// Figure out nearest 3D grid points.
 		// Then wiggle each one pseudo-randomly.
