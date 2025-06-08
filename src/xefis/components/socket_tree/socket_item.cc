@@ -20,8 +20,12 @@
 #include <xefis/base/icons.h>
 #include <xefis/core/sockets/socket_converter.h>
 
+// Neutrino:
+#include <neutrino/qt/qstring.h>
+
 // Qt:
 #include <QtWidgets/QTreeWidgetItem>
+#include <QFontDatabase>
 
 // Standard:
 #include <cstddef>
@@ -36,6 +40,11 @@ SocketItem::SocketItem (BasicSocket* socket, QTreeWidgetItem& parent):
 {
 	if (_socket)
 		setText (SocketTree::UseCountColumn, QString::number (_socket->readers_count()));
+
+	QFont const monospace_font = QFontDatabase::systemFont (QFontDatabase::FixedFont);
+
+	for (auto const column: { 2, 3, 4 })
+		setFont (column, monospace_font);
 }
 
 
@@ -60,17 +69,22 @@ SocketItem::read()
 			si::Degree::dynamic_unit(),
 		};
 
-		std::string const actual_value = _socket->to_string (conv_settings);
-		std::string const set_value = _socket->to_string (conv_settings);
+		using neutrino::to_qstring;
+
+		QString actual_value = to_qstring (_socket->to_string (conv_settings));
+		neutrino::filter_printable_string (actual_value);
+
+		QString set_value = to_qstring (_socket->to_string (conv_settings));
+		neutrino::filter_printable_string (set_value);
 
 		setTextAlignment (SocketTree::ActualValueColumn, Qt::AlignRight);
-		setText (SocketTree::ActualValueColumn, QString::fromStdString (actual_value));
+		setText (SocketTree::ActualValueColumn, actual_value);
 
 		setTextAlignment (SocketTree::SetValueColumn, Qt::AlignRight);
-		setText (SocketTree::SetValueColumn, QString::fromStdString (set_value));
+		setText (SocketTree::SetValueColumn, set_value);
 
 		setTextAlignment (SocketTree::FallbackValueColumn, Qt::AlignRight);
-		setText (SocketTree::FallbackValueColumn, "x");
+		setText (SocketTree::FallbackValueColumn, "x"); // TODO get the actual fallback value
 	}
 }
 
