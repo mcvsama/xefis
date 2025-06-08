@@ -61,7 +61,7 @@ calculate_sun_equatorial_position (si::Angle const& ecliptic_longitude, double c
 	// Convert to equatorial coordinates:
 	return {
 		.right_ascension = 1_rad * atan2 (cos (ecliptic_obliquity) * sin_lambda, cos (lambda)),
-		.declination = 1_rad * asin (sin (ecliptic_obliquity) * sin_lambda),
+		.declination = 1_rad * asin (std::clamp (sin (ecliptic_obliquity) * sin_lambda, -1.0, +1.0)),
 	};
 }
 
@@ -80,7 +80,8 @@ calculate_sun_horizontal_position (si::Angle const sun_declination, si::Angle co
 si::Angle
 calculate_sun_altitude (si::Angle const sun_declination, si::Angle const observer_latitude, si::Angle const hour_angle)
 {
-	return 1_rad * asin (sin (observer_latitude) * sin (sun_declination) + cos (observer_latitude) * cos (sun_declination) * cos (hour_angle));
+	auto const arg = sin (observer_latitude) * sin (sun_declination) + cos (observer_latitude) * cos (sun_declination) * cos (hour_angle);
+	return 1_rad * asin (std::clamp (arg, -1.0, +1.0));
 }
 
 
@@ -89,7 +90,8 @@ calculate_sun_azimuth (si::Angle const sun_declination, si::Angle const observer
 {
 	// Formulas returned by ChatGPT:
 
-	auto const azimuth = 1_rad * acos ((sin (sun_declination) - sin (sun_altitude) * sin (observer_latitude)) / (cos (sun_altitude) * cos (observer_latitude)));
+	auto const arg = (sin (sun_declination) - sin (sun_altitude) * sin (observer_latitude)) / (cos (sun_altitude) * cos (observer_latitude));
+	auto const azimuth = 1_rad * acos (std::clamp (arg, -1.0, +1.0));
 
 	// The inverse cosine function only returns values in the range 0∘0∘ to 180∘180∘, so use the following rule to determine the correct quadrant:
 	if (sin (hour_angle) >= 0)

@@ -90,7 +90,7 @@ tait_bryan_angles (RotationQuaternion<ECEFSpace, AirframeSpace> const& body_rota
 
 	return TaitBryanAngles ({
 		.roll = 1_rad * std::atan2 (2.0 * (w * x + y * z), 1.0 - 2.0 * (x * x + yy)),
-		.pitch = 1_rad * std::asin (2.0 * (w * y - z * x)),
+		.pitch = 1_rad * std::asin (std::clamp (2.0 * (w * y - z * x), -1.0, +1.0)),
 		.yaw = 1_rad * std::atan2 (2.0 * (w * z + x * y), 1.0 - 2.0 * (yy + z * z)),
 	});
 }
