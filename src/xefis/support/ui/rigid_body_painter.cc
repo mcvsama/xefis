@@ -619,28 +619,6 @@ RigidBodyPainter::paint_universe_and_sun()
 			_sun->magnification = _planet
 				? 1.0f + (magnification_at_0_amsl - 1.0f) * (1.0f - _planet->camera_clamped_normalized_amsl_height)
 				: 1.0f;
-			auto sun_face_material = kWhiteMatte;
-			sun_face_material.gl_emission_color = GLColor (1.0, 1.0, 1.0);
-			auto sun_face = make_solid_circle (_sun->magnification * kSunRadius, { 0_deg, 360_deg }, 19, sun_face_material);
-			auto const sun_visibility = sun_altitude_above_horizon
-				? 1.0f - square (1.0f - calculate_sun_visible_surface_factor (*sun_altitude_above_horizon))
-				: 1.0f;
-
-			auto const height_factor = _planet ? _planet->camera_clamped_normalized_amsl_height : 1.0f;
-			auto const actual_radius = 0.02f;
-			auto sun_shines = make_centered_sphere_shape ({
-				.radius = kSunDistance,
-				.n_slices = 9,
-				.n_stacks = 36,
-				.v_range = { 0_deg, 90_deg },
-				.material = kWhiteMatte,
-				.setup_material = [=] (ShapeMaterial& material, si::LonLat const position) {
-					float const norm = renormalize<si::Angle> (position.lat(), Range { 0_deg, 90_deg }, Range { 0.0f, 1.0f });
-					float const alpha = std::clamp<float> (sun_visibility * std::pow (norm + actual_radius, 6.0f), 0.0f, 1.0f);
-					material.gl_emission_color = { 1.0f, 1.0f, 1.0f, alpha * height_factor };
-				},
-			});
-			negate_normals (sun_shines);
 
 			glEnable (GL_BLEND);
 			// Disable Z-testing so that the sun gets rendered even if it's far behind the sky dome sphere:
@@ -657,11 +635,24 @@ RigidBodyPainter::paint_universe_and_sun()
 			make_z_towards_the_sun (_sun->position);
 			// Z is now direction towards the Sun:
 			_gl.translate (0_m, 0_m, kSunDistance);
-			_gl.draw (sun_face);
+			_gl.save_context ([&] {
+				auto const scale = _sun->magnification;
+				glScalef (scale, scale, scale);
+				_gl.draw (_sun->face_shape);
+			});
 			auto const time_dependent_angle = 360_deg * _time.in<si::Hour>() / 24.0;
 			// Rotate sun shines when camera angle and simulation time changes:
 			_gl.rotate (_user_camera_angles[0] - 2 * _user_camera_angles[1] + time_dependent_angle, 0, 0, 1);
-			_gl.draw (sun_shines);
+
+			auto const sun_visibility = sun_altitude_above_horizon
+				? 1.0f - square (1.0f - calculate_sun_visible_surface_factor (*sun_altitude_above_horizon))
+				: 1.0f;
+			auto const alpha_height_factor = _planet ? _planet->camera_clamped_normalized_amsl_height : 1.0f;
+
+			_gl.save_context ([&] {
+				_gl.additional_parameters().alpha_factor = std::clamp<float> (alpha_height_factor * sun_visibility, 0.0f, 1.0f);
+				_gl.draw (_sun->shines_shape);
+			});
 		});
 	}
 }
@@ -1555,6 +1546,27 @@ RigidBodyPainter::make_texture (QImage const& image)
 	texture->setMinificationFilter (QOpenGLTexture::LinearMipMapLinear);
 	texture->setMagnificationFilter (QOpenGLTexture::Nearest);
 	return texture;
+}
+
+
+Shape
+RigidBodyPainter::make_sun_shines_shape()
+{
+	auto sun_shines = make_centered_sphere_shape ({
+		.radius = kSunDistance,
+		.n_slices = 9,
+		.n_stacks = 36,
+		.v_range = { 0_deg, 90_deg },
+		.material = kWhiteMatte,
+		.setup_material = [=] (ShapeMaterial& material, si::LonLat const position) {
+			auto const actual_radius = 0.02f;
+			float const norm = renormalize<si::Angle> (position.lat(), Range { 0_deg, 90_deg }, Range { 0.0f, 1.0f });
+			float const alpha = std::pow (norm + actual_radius, 6.0f);
+			material.gl_emission_color = { 1.0f, 1.0f, 1.0f, alpha };
+		},
+	});
+	negate_normals (sun_shines);
+	return sun_shines;
 }
 
 } // namespace xf

@@ -20,6 +20,8 @@
 #include <xefis/support/color/blackbody.h>
 #include <xefis/support/color/spaces.h>
 #include <xefis/support/math/rotations.h>
+#include <xefis/support/shapes/various_materials.h>
+#include <xefis/support/shapes/various_shapes.h>
 #include <xefis/support/simulation/rigid_body/system.h>
 #include <xefis/support/ui/gl_space.h>
 #include <xefis/support/ui/sky_dome.h>
@@ -168,6 +170,8 @@ class RigidBodyPainter: protected QOpenGLFunctions
 			.atmosphere_radius = kAtmosphereRadius,
 			.enable_tonemapping = true,
 		}};
+		Shape						face_shape				{ make_solid_circle (kSunRadius, { 0_deg, 360_deg }, 19, kWhiteMatte) };
+		Shape						shines_shape			{ make_sun_shines_shape() };
 	};
 
 	struct Universe
@@ -742,6 +746,10 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	[[nodiscard]]
 	static std::shared_ptr<QOpenGLTexture>
 	make_texture (QImage const& image);
+
+	[[nodiscard]]
+	static Shape
+	make_sun_shines_shape();
 
   private:
 	si::PixelDensity				_pixel_density;
