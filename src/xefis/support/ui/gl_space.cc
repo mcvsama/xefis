@@ -89,17 +89,35 @@ void
 GLSpace::set_material (ShapeMaterial const& material)
 {
 	auto const& params = additional_parameters();
+	auto emission_color = material.gl_emission_color;
+	emission_color[3] *= params.alpha_factor;
 
 	glFogCoordf (material.gl_fog_distance);
 	glMaterialf (GL_FRONT, GL_SHININESS, 128.0 * material.gl_shininess);
-	glColor4fv (material.gl_emission_color);
-	glMaterialfv (GL_FRONT, GL_EMISSION, material.gl_emission_color);
+	glColor4fv (emission_color);
+	glMaterialfv (GL_FRONT, GL_EMISSION, emission_color);
 
 	if (params.color_override)
 	{
+		auto color = *params.color_override;
+		color[3] *= params.alpha_factor;
 		glMaterialfv (GL_FRONT, GL_AMBIENT, *params.color_override);
 		glMaterialfv (GL_FRONT, GL_DIFFUSE, *params.color_override);
 		glMaterialfv (GL_FRONT, GL_SPECULAR, *params.color_override);
+	}
+	else if (params.alpha_factor != 1.0f)
+	{
+		auto ambient_color = material.gl_ambient_color;
+		auto diffuse_color = material.gl_diffuse_color;
+		auto specular_color = material.gl_specular_color;
+
+		ambient_color[3] *= params.alpha_factor;
+		diffuse_color[3] *= params.alpha_factor;
+		specular_color[3] *= params.alpha_factor;
+
+		glMaterialfv (GL_FRONT, GL_AMBIENT, ambient_color);
+		glMaterialfv (GL_FRONT, GL_DIFFUSE, diffuse_color);
+		glMaterialfv (GL_FRONT, GL_SPECULAR, specular_color);
 	}
 	else
 	{
@@ -113,9 +131,13 @@ GLSpace::set_material (ShapeMaterial const& material)
 void
 GLSpace::set_texture (ShapeMaterial const& material)
 {
+	auto const& params = additional_parameters();
+	auto color = material.gl_texture_color;
+	color[3] *= params.alpha_factor;
+
 	glFogCoordf (material.gl_fog_distance);
-	glColor4fv (material.gl_texture_color);
-	glMaterialfv (GL_FRONT, GL_DIFFUSE, material.gl_texture_color);
+	glColor4fv (color);
+	glMaterialfv (GL_FRONT, GL_DIFFUSE, color);
 	glTexCoord2f (material.texture_position.x(), material.texture_position.y());
 }
 

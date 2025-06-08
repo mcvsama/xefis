@@ -86,7 +86,10 @@ class GLSpace
   public:
 	struct AdditionalParameters
 	{
+		// Overrides ambient, diffuse and specular colors if set (but not emission color):
 		std::optional<GLColor>	color_override;
+		// Use this to modulate alpha for an entire shape:
+		float					alpha_factor	{ 1.0f };
 	};
 
   public:
