@@ -64,7 +64,8 @@ calculate_sun_azimuth (si::Angle sun_declination, si::Angle observer_latitude, s
 constexpr std::tuple<si::Angle, si::Angle>
 calculate_sunrise_and_sunset_hour_angles (si::Angle const sun_declination, si::Angle const observer_latitude)
 {
-	auto const ha = 1_rad * acos (-tan (observer_latitude) * tan (sun_declination));
+	auto const arg = -tan (observer_latitude) * tan (sun_declination);
+	auto const ha = 1_rad * acos (std::clamp (arg, -1.0, +1.0));
 	return { -ha, +ha };
 }
 
