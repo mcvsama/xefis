@@ -77,7 +77,7 @@ AirfoilSplineWidget::resizeEvent (QResizeEvent* event)
 {
 	CanvasWidget::resizeEvent (event);
 	setup_painting_transform();
-	_pens_computed = false;
+	_pens.reset();
 }
 
 
@@ -183,7 +183,7 @@ AirfoilSplineWidget::update_canvas()
 
 		painter.translate (_center_of_mass_position);
 		painter.rotate (angle.in<si::Degree>());
-		painter.setPen (_wind_line_pen);
+		painter.setPen (_pens->wind_line_pen);
 
 		// Calculate the number of vertical rows for arrows based on the total length and vertical step:
 		auto const num_y = length / ystep.y();
@@ -203,14 +203,14 @@ AirfoilSplineWidget::update_canvas()
 
 	// Airfoil:
 	{
-		painter.setPen (_airfoil_pen);
-		painter.setBrush (_airfoil_brush);
+		painter.setPen (_pens->airfoil_pen);
+		painter.setBrush (_pens->airfoil_brush);
 		painter.drawPolygon (_airfoil_polygon);
 	}
 
 	// Coordinate lines:
 	{
-		painter.setPen (_coordinate_lines_pen);
+		painter.setPen (_pens->coordinate_lines_pen);
 		painter.drawLine (QPoint (-2, 0), QPoint (+2, 0));
 		painter.drawLine (QPoint (0, -2), QPoint (0, +2));
 	}
@@ -222,7 +222,7 @@ AirfoilSplineWidget::update_canvas()
 		auto const r = ph.em_pixels (0.5) / _scale;
 		painter.save();
 		painter.translate (_center_of_mass_position);
-		painter.setPen (_center_of_mass_black_pen);
+		painter.setPen (_pens->center_of_mass_black_pen);
 		painter.setBrush (Qt::black);
 		painter.drawPie (QRectF (QPointF (-r, +r), QPointF (+r, -r)), 0_qarcdeg, -90_qarcdeg);
 		painter.drawPie (QRectF (QPointF (-r, +r), QPointF (+r, -r)), -180_qarcdeg, -90_qarcdeg);
@@ -241,7 +241,7 @@ AirfoilSplineWidget::update_canvas()
 			painter.translate (_center_of_mass_position);
 
 		painter.translate (*_center_of_pressure_position);
-		painter.setPen (_lift_force_pen);
+		painter.setPen (_pens->lift_force_pen);
 		painter.setBrush (Qt::green);
 		auto const lift_force_unitless = *_lift_force / _force_per_spline_space_unit;
 		draw_arrow (painter, QPointF (0.0f, 0.0f), QPointF (lift_force_unitless.x(), lift_force_unitless.y()));
@@ -257,7 +257,7 @@ AirfoilSplineWidget::update_canvas()
 			painter.translate (_center_of_mass_position);
 
 		painter.translate (*_center_of_pressure_position);
-		painter.setPen (_drag_force_pen);
+		painter.setPen (_pens->drag_force_pen);
 		painter.setBrush (Qt::red);
 		auto const drag_force_unitless = *_drag_force / _force_per_spline_space_unit;
 		draw_arrow (painter, QPointF (0.0f, 0.0f), QPointF (drag_force_unitless.x(), drag_force_unitless.y()));
@@ -274,7 +274,7 @@ AirfoilSplineWidget::update_canvas()
 			painter.translate (_center_of_mass_position);
 
 		painter.translate (*_center_of_pressure_position);
-		painter.setPen (_center_of_pressure_pen);
+		painter.setPen (_pens->center_of_pressure_pen);
 		painter.setBrush (Qt::white);
 		painter.drawEllipse (QRectF (QPointF (-r, +r), QPointF (+r, -r)));
 		painter.restore();
@@ -288,20 +288,21 @@ AirfoilSplineWidget::update_canvas()
 void
 AirfoilSplineWidget::update_pens()
 {
-	if (!_pens_computed)
+	if (!_pens)
 	{
 		auto const ph = PaintHelper (this->canvas(), palette(), font());
 		auto const airfoil_color = QColor (0xd2, 0xc3, 0xb1, 0xff);
 
-		_coordinate_lines_pen = QPen (Qt::black, ph.em_pixels (0.05f) / _scale, Qt::SolidLine, Qt::RoundCap);
-		_airfoil_pen = QPen (airfoil_color.darker (150), ph.em_pixels (0.05f) / _scale, Qt::SolidLine, Qt::RoundCap);
-		_airfoil_brush = QBrush (airfoil_color);
-		_center_of_mass_black_pen = QPen (Qt::black, ph.em_pixels (0.1f) / _scale, Qt::SolidLine, Qt::FlatCap);
-		_lift_force_pen = QPen (Qt::green, ph.em_pixels (0.1f) / _scale, Qt::SolidLine, Qt::RoundCap);
-		_drag_force_pen = QPen (Qt::red, ph.em_pixels (0.1f) / _scale, Qt::SolidLine, Qt::RoundCap);
-		_center_of_pressure_pen = QPen (Qt::blue, ph.em_pixels (0.1f) / _scale, Qt::SolidLine, Qt::FlatCap);
-		_wind_line_pen = QPen (Qt::gray, ph.em_pixels (0.05f) / _scale, Qt::SolidLine, Qt::FlatCap);
-		_pens_computed = true;
+		_pens = {
+			.coordinate_lines_pen		= QPen (Qt::black, ph.em_pixels (0.05f) / _scale, Qt::SolidLine, Qt::RoundCap),
+			.airfoil_pen				= QPen (airfoil_color.darker (150), ph.em_pixels (0.05f) / _scale, Qt::SolidLine, Qt::RoundCap),
+			.airfoil_brush				= QBrush (airfoil_color),
+			.center_of_mass_black_pen	= QPen (Qt::black, ph.em_pixels (0.1f) / _scale, Qt::SolidLine, Qt::FlatCap),
+			.lift_force_pen				= QPen (Qt::green, ph.em_pixels (0.1f) / _scale, Qt::SolidLine, Qt::RoundCap),
+			.drag_force_pen				= QPen (Qt::red, ph.em_pixels (0.1f) / _scale, Qt::SolidLine, Qt::RoundCap),
+			.center_of_pressure_pen		= QPen (Qt::blue, ph.em_pixels (0.1f) / _scale, Qt::SolidLine, Qt::FlatCap),
+			.wind_line_pen				= QPen (Qt::gray, ph.em_pixels (0.05f) / _scale, Qt::SolidLine, Qt::FlatCap),
+		};
 	}
 }
 

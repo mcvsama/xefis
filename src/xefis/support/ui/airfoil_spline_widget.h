@@ -34,6 +34,19 @@ namespace xf {
 
 class AirfoilSplineWidget: public CanvasWidget
 {
+  private:
+	struct Pens
+	{
+		QPen	coordinate_lines_pen;
+		QPen	airfoil_pen;
+		QBrush	airfoil_brush;
+		QPen	center_of_mass_black_pen;
+		QPen	lift_force_pen;
+		QPen	drag_force_pen;
+		QPen	center_of_pressure_pen;
+		QPen	wind_line_pen;
+	};
+
   public:
 	// Ctor
 	explicit
@@ -148,15 +161,7 @@ class AirfoilSplineWidget: public CanvasWidget
 	// If not relative to COM, then it's relative to space origin in AirfoilSplineSpace:
 	bool						_center_of_pressure_position_relative_to_com { false };
 	si::Force					_force_per_spline_space_unit { 500_N };
-	bool						_pens_computed { false };
-	QPen						_coordinate_lines_pen;
-	QPen						_airfoil_pen;
-	QBrush						_airfoil_brush;
-	QPen						_center_of_mass_black_pen;
-	QPen						_lift_force_pen;
-	QPen						_drag_force_pen;
-	QPen						_center_of_pressure_pen;
-	QPen						_wind_line_pen;
+	std::optional<Pens>			_pens;
 	// Values computed by prepare_for_painting():
 	QPolygonF					_airfoil_polygon;
 	// Range of airfoil spline points in AirfoilSplineSpace:
