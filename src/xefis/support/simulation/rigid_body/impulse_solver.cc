@@ -51,8 +51,8 @@ ImpulseSolver::evolve (si::Time const dt)
 	for (auto& body: _system.bodies())
 		body->iteration().reset (body->velocity_moments<WorldSpace>());
 
-	for (auto& frame_precalculation: _system.frame_precalculations())
-		frame_precalculation->reset();
+	for (auto& frame_precomputation: _system.frame_precomputations())
+		frame_precomputation->reset();
 
 	update_mass_moments();
 	update_forces (dt);

@@ -26,7 +26,7 @@
 namespace xf::rigid_body {
 
 HingePrecalculation::HingePrecalculation (Body& body_1, Body& body_2):
-	FramePrecalculation (body_1, body_2),
+	FramePrecomputation (body_1, body_2),
 	_fixed_orientation (body_1.placement(), body_2.placement())
 { }
 

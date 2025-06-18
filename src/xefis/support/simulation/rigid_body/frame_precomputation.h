@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__SUPPORT__SIMULATION__RIGID_BODY__FRAME_PRECALCULATION_H__INCLUDED
-#define XEFIS__SUPPORT__SIMULATION__RIGID_BODY__FRAME_PRECALCULATION_H__INCLUDED
+#ifndef XEFIS__SUPPORT__SIMULATION__RIGID_BODY__FRAME_PRECOMPUTATION_H__INCLUDED
+#define XEFIS__SUPPORT__SIMULATION__RIGID_BODY__FRAME_PRECOMPUTATION_H__INCLUDED
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -29,19 +29,19 @@ namespace xf::rigid_body {
  * Instead of having each constraint recompute commonly required values, compute them
  * on demand here and let constraints use them.
  *
- * The solver is supposed to reset the data of all registered FramePrecalculations just before
+ * The solver is supposed to reset the data of all registered FramePrecomputations just before
  * calculating constraint forces in each frame.
  */
-class BasicFramePrecalculation: public ConnectedBodies
+class BasicFramePrecomputation: public ConnectedBodies
 {
   public:
 	// Ctor
 	explicit
-	BasicFramePrecalculation (Body& body_1, Body& body_2);
+	BasicFramePrecomputation (Body& body_1, Body& body_2);
 
 	// Dtor
 	virtual
-	~BasicFramePrecalculation() = default;
+	~BasicFramePrecomputation() = default;
 
 	/**
 	 * Forget the computed data.
@@ -52,14 +52,14 @@ class BasicFramePrecalculation: public ConnectedBodies
 
 
 template<class pData>
-	class FramePrecalculation: public BasicFramePrecalculation
+	class FramePrecomputation: public BasicFramePrecomputation
 	{
 	  public:
 		using Data = pData;
 
 	  public:
 		// Ctor
-		using BasicFramePrecalculation::BasicFramePrecalculation;
+		using BasicFramePrecomputation::BasicFramePrecomputation;
 
 		/**
 		 * Access computed data.
@@ -76,7 +76,7 @@ template<class pData>
 		data() const
 			{ return _data; }
 
-		// BasicFramePrecalculation API
+		// BasicFramePrecomputation API
 		void
 		reset() override
 			{ _data.reset(); }
@@ -94,14 +94,14 @@ template<class pData>
 
 
 inline
-BasicFramePrecalculation::BasicFramePrecalculation (Body& body_1, Body& body_2):
+BasicFramePrecomputation::BasicFramePrecomputation (Body& body_1, Body& body_2):
 	ConnectedBodies (body_1, body_2)
 { }
 
 
 template<class D>
 	inline auto
-	FramePrecalculation<D>::data() -> Data const&
+	FramePrecomputation<D>::data() -> Data const&
 	{
 		if (!_data)
 		{
