@@ -17,7 +17,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/nature/force_moments.h>
-#include <xefis/support/simulation/constraints/slider_precalculation.h>
+#include <xefis/support/simulation/constraints/slider_precomputation.h>
 #include <xefis/support/simulation/rigid_body/constraint.h>
 
 // Standard:
@@ -35,11 +35,11 @@ class LinearLimitsConstraint: public Constraint
   public:
 	// Ctor
 	explicit
-	LinearLimitsConstraint (SliderPrecalculation&, std::optional<si::Length> min_distance, std::optional<si::Length> max_distance);
+	LinearLimitsConstraint (SliderPrecomputation&, std::optional<si::Length> min_distance, std::optional<si::Length> max_distance);
 
 	// Ctor
 	explicit
-	LinearLimitsConstraint (SliderPrecalculation&, Range<si::Length>);
+	LinearLimitsConstraint (SliderPrecomputation&, Range<si::Length>);
 
 	/**
 	 * Set minimum distance between objects.
@@ -84,7 +84,7 @@ class LinearLimitsConstraint: public Constraint
 	min_distance_corrections (VelocityMoments<WorldSpace> const& vm_1,
 							  VelocityMoments<WorldSpace> const& vm_2,
 							  si::Time dt,
-							  SliderPrecalculationData const&) const;
+							  SliderPrecomputationData const&) const;
 
 	/**
 	 * Return corrective forces for slider limits: maximum distance.
@@ -93,10 +93,10 @@ class LinearLimitsConstraint: public Constraint
 	max_distance_corrections (VelocityMoments<WorldSpace> const& vm_1,
 							  VelocityMoments<WorldSpace> const& vm_2,
 							  si::Time dt,
-							  SliderPrecalculationData const&) const;
+							  SliderPrecomputationData const&) const;
 
   private:
-	SliderPrecalculation&		_slider_precalculation;
+	SliderPrecomputation&		_slider_precomputation;
 	std::optional<si::Length>	_min_distance;
 	std::optional<si::Length>	_max_distance;
 	JacobianV<1>				_min_Jv1;

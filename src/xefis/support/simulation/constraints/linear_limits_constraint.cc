@@ -23,9 +23,9 @@
 
 namespace xf::rigid_body {
 
-LinearLimitsConstraint::LinearLimitsConstraint (SliderPrecalculation& slider_precalculation, std::optional<si::Length> const min_distance, std::optional<si::Length> const max_distance):
-	Constraint (slider_precalculation),
-	_slider_precalculation (slider_precalculation),
+LinearLimitsConstraint::LinearLimitsConstraint (SliderPrecomputation& slider_precomputation, std::optional<si::Length> const min_distance, std::optional<si::Length> const max_distance):
+	Constraint (slider_precomputation),
+	_slider_precomputation (slider_precomputation),
 	_min_distance (min_distance),
 	_max_distance (max_distance)
 {
@@ -33,15 +33,15 @@ LinearLimitsConstraint::LinearLimitsConstraint (SliderPrecalculation& slider_pre
 }
 
 
-LinearLimitsConstraint::LinearLimitsConstraint (SliderPrecalculation& slider_precalculation, Range<si::Length> const range):
-	LinearLimitsConstraint (slider_precalculation, range.min(), range.max())
+LinearLimitsConstraint::LinearLimitsConstraint (SliderPrecomputation& slider_precomputation, Range<si::Length> const range):
+	LinearLimitsConstraint (slider_precomputation, range.min(), range.max())
 { }
 
 
 void
 LinearLimitsConstraint::initialize_step (si::Time const dt)
 {
-	auto const& slider_data = _slider_precalculation.data();
+	auto const& slider_data = _slider_precomputation.data();
 
 	_min_Jv1.put (-~slider_data.a, 0, 0);
 	_min_Jw1.put (-slider_data.r1uxa, 0, 0);
@@ -65,7 +65,7 @@ ConstraintForces
 LinearLimitsConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, VelocityMoments<WorldSpace> const& vm_2, si::Time dt)
 {
 	ConstraintForces fc;
-	auto const& slider_data = _slider_precalculation.data();
+	auto const& slider_data = _slider_precomputation.data();
 
 	if (auto fc_min = min_distance_corrections (vm_1, vm_2, dt, slider_data))
 		fc = fc + *fc_min;
@@ -81,7 +81,7 @@ std::optional<ConstraintForces>
 LinearLimitsConstraint::min_distance_corrections (VelocityMoments<WorldSpace> const& vm_1,
 												  VelocityMoments<WorldSpace> const& vm_2,
 												  si::Time dt,
-												  SliderPrecalculationData const& slider_data) const
+												  SliderPrecomputationData const& slider_data) const
 {
 	if (_min_distance && slider_data.distance < *_min_distance)
 	{
@@ -99,7 +99,7 @@ std::optional<ConstraintForces>
 LinearLimitsConstraint::max_distance_corrections (VelocityMoments<WorldSpace> const& vm_1,
 												  VelocityMoments<WorldSpace> const& vm_2,
 												  si::Time dt,
-												  SliderPrecalculationData const& slider_data) const
+												  SliderPrecomputationData const& slider_data) const
 {
 	if (_max_distance && slider_data.distance > *_max_distance)
 	{
