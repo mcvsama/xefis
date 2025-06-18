@@ -17,7 +17,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/nature/force_moments.h>
-#include <xefis/support/simulation/constraints/slider_precalculation.h>
+#include <xefis/support/simulation/constraints/slider_precomputation.h>
 #include <xefis/support/simulation/rigid_body/constraint.h>
 
 // Standard:
@@ -31,7 +31,7 @@ class SliderConstraint: public Constraint
   public:
 	// Ctor
 	explicit
-	SliderConstraint (SliderPrecalculation&);
+	SliderConstraint (SliderPrecomputation&);
 
 	// Constraint API
 	void
@@ -43,7 +43,7 @@ class SliderConstraint: public Constraint
 	do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, VelocityMoments<WorldSpace> const& vm_2, si::Time dt) override;
 
   private:
-	SliderPrecalculation&	_slider_precalculation;
+	SliderPrecomputation&	_slider_precomputation;
 	JacobianV<5>			_Jv1;
 	JacobianW<5>			_Jw1;
 	JacobianV<5>			_Jv2;

@@ -12,7 +12,7 @@
  */
 
 // Local:
-#include "slider_precalculation.h"
+#include "slider_precomputation.h"
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -23,7 +23,7 @@
 
 namespace xf::rigid_body {
 
-SliderPrecalculation::SliderPrecalculation (Body& body_1,
+SliderPrecomputation::SliderPrecomputation (Body& body_1,
 											Body& body_2,
 											SpaceVector<double, WorldSpace> const& axis):
 	FramePrecomputation (body_1, body_2),
@@ -42,7 +42,7 @@ SliderPrecalculation::SliderPrecalculation (Body& body_1,
 
 
 void
-SliderPrecalculation::compute (SliderPrecalculationData& data)
+SliderPrecomputation::compute (SliderPrecomputationData& data)
 {
 	auto const pl_1 = body_1().placement();
 	auto const pl_2 = body_2().placement();

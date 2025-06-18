@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__SUPPORT__SIMULATION__CONSTRAINTS__SLIDER_PRECALCULATION_H__INCLUDED
-#define XEFIS__SUPPORT__SIMULATION__CONSTRAINTS__SLIDER_PRECALCULATION_H__INCLUDED
+#ifndef XEFIS__SUPPORT__SIMULATION__CONSTRAINTS__SLIDER_PRECOMPUTATION_H__INCLUDED
+#define XEFIS__SUPPORT__SIMULATION__CONSTRAINTS__SLIDER_PRECOMPUTATION_H__INCLUDED
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -26,7 +26,7 @@
 
 namespace xf::rigid_body {
 
-class SliderPrecalculationData
+class SliderPrecomputationData
 {
   public:
 	// Body 1 and 2 positions:
@@ -52,18 +52,18 @@ class SliderPrecalculationData
 };
 
 
-class SliderPrecalculation: public FramePrecomputation<SliderPrecalculationData>
+class SliderPrecomputation: public FramePrecomputation<SliderPrecomputationData>
 {
   public:
 	// Ctor
 	explicit
-	SliderPrecalculation (Body& body_1,
+	SliderPrecomputation (Body& body_1,
 						  Body& body_2,
 						  SpaceVector<double, WorldSpace> const& axis);
 
 	// Ctor
 	explicit
-	SliderPrecalculation (SliderPrecalculation const&) = default;
+	SliderPrecomputation (SliderPrecomputation const&) = default;
 
 	/**
 	 * Return anchor as visible from the first body.
@@ -96,7 +96,7 @@ class SliderPrecalculation: public FramePrecomputation<SliderPrecalculationData>
   protected:
 	// FramePrecomputation API
 	void
-	compute (SliderPrecalculationData&) override;
+	compute (SliderPrecomputationData&) override;
 
   private:
 	SpaceLength<BodyCOM>			_anchor_1;

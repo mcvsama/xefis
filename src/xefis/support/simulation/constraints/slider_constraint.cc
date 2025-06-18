@@ -24,9 +24,9 @@
 
 namespace xf::rigid_body {
 
-SliderConstraint::SliderConstraint (SliderPrecalculation& slider_precalculation):
-	Constraint (slider_precalculation),
-	_slider_precalculation (slider_precalculation)
+SliderConstraint::SliderConstraint (SliderPrecomputation& slider_precomputation):
+	Constraint (slider_precomputation),
+	_slider_precomputation (slider_precomputation)
 {
 	set_label ("slider");
 
@@ -75,7 +75,7 @@ SliderConstraint::SliderConstraint (SliderPrecalculation& slider_precalculation)
 void
 SliderConstraint::initialize_step (si::Time const dt)
 {
-	auto const& slider_data = _slider_precalculation.data();
+	auto const& slider_data = _slider_precomputation.data();
 
 	_Jv1.put (-~slider_data.t1, 0, 0);
 	_Jv1.put (-~slider_data.t2, 0, 1);

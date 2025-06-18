@@ -301,7 +301,7 @@ ManualTest t_4 ("rigid_body::System: multiple constraints", []{
 	servo.set_voltage (6_V);
 	servo.set_setpoint (45_deg);
 
-	auto& s1 = system.add<rigid_body::SliderPrecalculation> (body3, body4, SpaceVector<double, WorldSpace> { 1.0, 0.0, 0.0 });
+	auto& s1 = system.add<rigid_body::SliderPrecomputation> (body3, body4, SpaceVector<double, WorldSpace> { 1.0, 0.0, 0.0 });
 	system.add<rigid_body::SliderConstraint> (s1);
 	system.add<rigid_body::LinearLimitsConstraint> (s1, -0.5_m, +0.5_m);
 
