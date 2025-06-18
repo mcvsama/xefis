@@ -250,13 +250,13 @@ ManualTest t_3 ("rigid_body::System: hinge constraints", []{
 	auto& body4 = system.add<rigid_body::Body> (make_body_mass_moments (0.1_kg));
 	body4.set_placement (kPlacement4);
 
-	auto& h1 = system.add<rigid_body::HingePrecalculation> (hinge1, hinge1 + SpaceLength<BodyCOM> { 0_m, 0_m, +1_m }, body1, body2);
+	auto& h1 = system.add<rigid_body::HingePrecomputation> (hinge1, hinge1 + SpaceLength<BodyCOM> { 0_m, 0_m, +1_m }, body1, body2);
 	system.add<rigid_body::HingeConstraint> (h1);
 
-	auto& h2 = system.add<rigid_body::HingePrecalculation> (hinge2, hinge2 + SpaceLength<BodyCOM> { 0_m, 0_m, +1_m }, body2, body3);
+	auto& h2 = system.add<rigid_body::HingePrecomputation> (hinge2, hinge2 + SpaceLength<BodyCOM> { 0_m, 0_m, +1_m }, body2, body3);
 	system.add<rigid_body::HingeConstraint> (h2);
 
-	auto& h3 = system.add<rigid_body::HingePrecalculation> (hinge3, hinge3 + SpaceLength<BodyCOM> { 0_m, 0_m, +1_m }, body3, body4);
+	auto& h3 = system.add<rigid_body::HingePrecomputation> (hinge3, hinge3 + SpaceLength<BodyCOM> { 0_m, 0_m, +1_m }, body3, body4);
 	system.add<rigid_body::HingeConstraint> (h3);
 
 	run (system, &body1, [&] (si::Time const) {
@@ -289,11 +289,11 @@ ManualTest t_4 ("rigid_body::System: multiple constraints", []{
 	auto& body6 = system.add<rigid_body::Body> (make_body_mass_moments (0.1_kg));
 	body6.set_placement (kPlacement6);
 
-	auto& h1 = system.add<rigid_body::HingePrecalculation> (hinge1, hinge1 + SpaceLength<BodyCOM> { 0_m, 0_m, +1_m }, body1, body2);
+	auto& h1 = system.add<rigid_body::HingePrecomputation> (hinge1, hinge1 + SpaceLength<BodyCOM> { 0_m, 0_m, +1_m }, body1, body2);
 	system.add<rigid_body::HingeConstraint> (h1);
 	system.add<rigid_body::AngularLimitsConstraint> (h1, -90_deg, +90_deg);
 
-	auto& h2 = system.add<rigid_body::HingePrecalculation> (hinge2, hinge2 + SpaceLength<BodyCOM> { 0_m, 0_m, +1_m }, body2, body3);
+	auto& h2 = system.add<rigid_body::HingePrecomputation> (hinge2, hinge2 + SpaceLength<BodyCOM> { 0_m, 0_m, +1_m }, body2, body3);
 	system.add<rigid_body::HingeConstraint> (h2);
 	system.add<rigid_body::AngularLimitsConstraint> (h2, -90_deg, +90_deg);
 	auto& servo = system.add (make_standard_9gram_servo_constraint (h2, 10.0f));

@@ -16,7 +16,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/support/simulation/constraints/hinge_precalculation.h>
+#include <xefis/support/simulation/constraints/hinge_precomputation.h>
 #include <xefis/support/simulation/constraints/angular_servo_constraint.h>
 #include <xefis/support/simulation/devices/interfaces/angular_servo.h>
 #include <xefis/support/simulation/rigid_body/body.h>

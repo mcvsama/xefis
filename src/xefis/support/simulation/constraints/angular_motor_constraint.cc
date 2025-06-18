@@ -20,9 +20,9 @@
 
 namespace xf::rigid_body {
 
-AngularMotorConstraint::AngularMotorConstraint (HingePrecalculation& hinge_precalculation, si::AngularVelocity const max_angular_velocity, si::Torque const torque):
-	Constraint (hinge_precalculation),
-	_hinge_precalculation (hinge_precalculation),
+AngularMotorConstraint::AngularMotorConstraint (HingePrecomputation& hinge_precomputation, si::AngularVelocity const max_angular_velocity, si::Torque const torque):
+	Constraint (hinge_precomputation),
+	_hinge_precomputation (hinge_precomputation),
 	_max_angular_velocity (max_angular_velocity),
 	_force (abs (torque / 1_m))
 {
@@ -33,7 +33,7 @@ AngularMotorConstraint::AngularMotorConstraint (HingePrecalculation& hinge_preca
 void
 AngularMotorConstraint::initialize_step (si::Time const dt)
 {
-	auto const& hinge = _hinge_precalculation.data();
+	auto const& hinge = _hinge_precomputation.data();
 
 	_Jw1.put (1_m * ~hinge.a1, 0, 0);
 	_Jw2.put (1_m * -~hinge.a1, 0, 0);

@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__SUPPORT__SIMULATION__CONSTRAINTS__HINGE_PRECALCULATION_H__INCLUDED
-#define XEFIS__SUPPORT__SIMULATION__CONSTRAINTS__HINGE_PRECALCULATION_H__INCLUDED
+#ifndef XEFIS__SUPPORT__SIMULATION__CONSTRAINTS__HINGE_PRECOMPUTATION_H__INCLUDED
+#define XEFIS__SUPPORT__SIMULATION__CONSTRAINTS__HINGE_PRECOMPUTATION_H__INCLUDED
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -26,7 +26,7 @@
 
 namespace xf::rigid_body {
 
-class HingePrecalculationData
+class HingePrecomputationData
 {
   public:
 	// Body 1 and 2 positions:
@@ -48,14 +48,14 @@ class HingePrecalculationData
 };
 
 
-class HingePrecalculation: public FramePrecomputation<HingePrecalculationData>
+class HingePrecomputation: public FramePrecomputation<HingePrecomputationData>
 {
   private:
 	/**
 	 * Common initializer for all other ctors.
 	 */
 	explicit
-	HingePrecalculation (Body& body_1, Body& body_2);
+	HingePrecomputation (Body& body_1, Body& body_2);
 
   public:
 	/**
@@ -63,7 +63,7 @@ class HingePrecalculation: public FramePrecomputation<HingePrecalculationData>
 	 * Hinge vector/axis is given relative to the first body.
 	 */
 	explicit
-	HingePrecalculation (SpaceLength<BodyCOM> const& anchor_point_1,
+	HingePrecomputation (SpaceLength<BodyCOM> const& anchor_point_1,
 						 SpaceLength<BodyCOM> const& anchor_point_2,
 						 Body& body_1,
 						 Body& body_2);
@@ -73,7 +73,7 @@ class HingePrecalculation: public FramePrecomputation<HingePrecalculationData>
 	 * Hinge vector/axis is given relative to the second body.
 	 */
 	explicit
-	HingePrecalculation (Body& body_1,
+	HingePrecomputation (Body& body_1,
 						 Body& body_2,
 						 SpaceLength<BodyCOM> const& anchor_point_1,
 						 SpaceLength<BodyCOM> const& anchor_point_2);
@@ -83,14 +83,14 @@ class HingePrecalculation: public FramePrecomputation<HingePrecalculationData>
 	 * Hinge vector/axis is given in world space coordinates.
 	 */
 	explicit
-	HingePrecalculation (Body& body_1,
+	HingePrecomputation (Body& body_1,
 						 SpaceLength<WorldSpace> const& anchor_point_1,
 						 SpaceLength<WorldSpace> const& anchor_point_2,
 						 Body& body_2);
 
 	// Ctor
 	explicit
-	HingePrecalculation (HingePrecalculation const&) = default;
+	HingePrecomputation (HingePrecomputation const&) = default;
 
 	/**
 	 * Return anchor as visible from the first body.
@@ -137,7 +137,7 @@ class HingePrecalculation: public FramePrecomputation<HingePrecalculationData>
   protected:
 	// FramePrecomputation API
 	void
-	compute (HingePrecalculationData&) override;
+	compute (HingePrecomputationData&) override;
 
   private:
 	// Anchor as visible from each body:

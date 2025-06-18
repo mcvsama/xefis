@@ -17,7 +17,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/math/geometry.h>
-#include <xefis/support/simulation/constraints/hinge_precalculation.h>
+#include <xefis/support/simulation/constraints/hinge_precomputation.h>
 
 // Neutrino:
 #include <neutrino/numeric.h>
@@ -28,7 +28,7 @@
 
 namespace xf::rigid_body {
 
-AngularSpringConstraint::AngularSpringConstraint (HingePrecalculation& hinge, SpringTorqueFunction const spring_torque):
+AngularSpringConstraint::AngularSpringConstraint (HingePrecomputation& hinge, SpringTorqueFunction const spring_torque):
 	Constraint (hinge),
 	_hinge (hinge),
 	_spring_torque (spring_torque)

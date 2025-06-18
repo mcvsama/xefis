@@ -16,7 +16,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/support/simulation/constraints/hinge_precalculation.h>
+#include <xefis/support/simulation/constraints/hinge_precomputation.h>
 #include <xefis/support/simulation/rigid_body/body.h>
 #include <xefis/support/simulation/rigid_body/constraint.h>
 
@@ -50,7 +50,7 @@ class AngularSpringConstraint: public Constraint
   public:
 	// Ctor
 	explicit
-	AngularSpringConstraint (HingePrecalculation&, SpringTorqueFunction);
+	AngularSpringConstraint (HingePrecomputation&, SpringTorqueFunction);
 
 	// Constraint API
 	void
@@ -62,7 +62,7 @@ class AngularSpringConstraint: public Constraint
 	do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, VelocityMoments<WorldSpace> const& vm_2, si::Time dt) override;
 
   private:
-	HingePrecalculation&			_hinge;
+	HingePrecomputation&			_hinge;
 	SpringTorqueFunction			_spring_torque;
 	SpaceVector<double, WorldSpace>	_hinge_axis;
 };

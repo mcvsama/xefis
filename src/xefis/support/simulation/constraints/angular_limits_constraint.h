@@ -17,7 +17,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/nature/force_moments.h>
-#include <xefis/support/simulation/constraints/hinge_precalculation.h>
+#include <xefis/support/simulation/constraints/hinge_precomputation.h>
 #include <xefis/support/simulation/rigid_body/constraint.h>
 
 // Standard:
@@ -29,18 +29,18 @@ namespace xf::rigid_body {
 
 /**
  * Angular limits, constraints angle between two bodies.
- * Uses HingePrecalculation to define the two bodies and the hinge about which angle will be measured.
+ * Uses HingePrecomputation to define the two bodies and the hinge about which angle will be measured.
  */
 class AngularLimitsConstraint: public Constraint
 {
   public:
 	// Ctor
 	explicit
-	AngularLimitsConstraint (HingePrecalculation&, std::optional<si::Angle> min_angle, std::optional<si::Angle> max_angle);
+	AngularLimitsConstraint (HingePrecomputation&, std::optional<si::Angle> min_angle, std::optional<si::Angle> max_angle);
 
 	// Ctor
 	explicit
-	AngularLimitsConstraint (HingePrecalculation&, Range<si::Angle>);
+	AngularLimitsConstraint (HingePrecomputation&, Range<si::Angle>);
 
 	/**
 	 * Set minimum hinge angle.
@@ -85,7 +85,7 @@ class AngularLimitsConstraint: public Constraint
 	min_angle_corrections (VelocityMoments<WorldSpace> const& vm_1,
 						   VelocityMoments<WorldSpace> const& vm_2,
 						   si::Time dt,
-						   HingePrecalculationData const& hinge_data) const;
+						   HingePrecomputationData const& hinge_data) const;
 
 	/**
 	 * Return corrective forces for hinge limits: maximum angle.
@@ -94,10 +94,10 @@ class AngularLimitsConstraint: public Constraint
 	max_angle_corrections (VelocityMoments<WorldSpace> const& vm_1,
 						   VelocityMoments<WorldSpace> const& vm_2,
 						   si::Time dt,
-						   HingePrecalculationData const& hinge_data) const;
+						   HingePrecomputationData const& hinge_data) const;
 
   private:
-	HingePrecalculation&		_hinge_precalculation;
+	HingePrecomputation&		_hinge_precomputation;
 	std::optional<si::Angle>	_min_angle;
 	std::optional<si::Angle>	_max_angle;
 	JacobianV<1>				_Jv { math::zero };

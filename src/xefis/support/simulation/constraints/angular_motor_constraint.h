@@ -17,7 +17,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/nature/force_moments.h>
-#include <xefis/support/simulation/constraints/hinge_precalculation.h>
+#include <xefis/support/simulation/constraints/hinge_precomputation.h>
 #include <xefis/support/simulation/rigid_body/constraint.h>
 
 // Standard:
@@ -31,7 +31,7 @@ class AngularMotorConstraint: public Constraint
   public:
 	// Ctor
 	explicit
-	AngularMotorConstraint (HingePrecalculation&, si::AngularVelocity max_angular_velocity = 0_radps, si::Torque const torque = 0_Nm);
+	AngularMotorConstraint (HingePrecomputation&, si::AngularVelocity max_angular_velocity = 0_radps, si::Torque const torque = 0_Nm);
 
 	/**
 	 * Torque used to move the motor. Always positive.
@@ -74,7 +74,7 @@ class AngularMotorConstraint: public Constraint
 	do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, VelocityMoments<WorldSpace> const& vm_2, si::Time dt) override;
 
   private:
-	HingePrecalculation&	_hinge_precalculation;
+	HingePrecomputation&	_hinge_precomputation;
 	si::AngularVelocity		_max_angular_velocity;
 	JacobianV<1>			_Jv { math::zero };
 	JacobianW<1>			_Jw1;

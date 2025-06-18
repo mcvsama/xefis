@@ -23,9 +23,9 @@
 
 namespace xf::rigid_body {
 
-AngularLimitsConstraint::AngularLimitsConstraint (HingePrecalculation& hinge_precalculation, std::optional<si::Angle> const min_angle, std::optional<si::Angle> const max_angle):
-	Constraint (hinge_precalculation),
-	_hinge_precalculation (hinge_precalculation),
+AngularLimitsConstraint::AngularLimitsConstraint (HingePrecomputation& hinge_precomputation, std::optional<si::Angle> const min_angle, std::optional<si::Angle> const max_angle):
+	Constraint (hinge_precomputation),
+	_hinge_precomputation (hinge_precomputation),
 	_min_angle (min_angle),
 	_max_angle (max_angle)
 {
@@ -33,15 +33,15 @@ AngularLimitsConstraint::AngularLimitsConstraint (HingePrecalculation& hinge_pre
 }
 
 
-AngularLimitsConstraint::AngularLimitsConstraint (HingePrecalculation& hinge_precalculation, Range<si::Angle> const range):
-	AngularLimitsConstraint (hinge_precalculation, range.min(), range.max())
+AngularLimitsConstraint::AngularLimitsConstraint (HingePrecomputation& hinge_precomputation, Range<si::Angle> const range):
+	AngularLimitsConstraint (hinge_precomputation, range.min(), range.max())
 { }
 
 
 void
 AngularLimitsConstraint::initialize_step (si::Time const dt)
 {
-	auto const& hinge = _hinge_precalculation.data();
+	auto const& hinge = _hinge_precomputation.data();
 
 	_min_Jw1.put (1_m * -~hinge.a1, 0, 0);
 	_min_Jw2.put (1_m * ~hinge.a1, 0, 0);
@@ -57,7 +57,7 @@ ConstraintForces
 AngularLimitsConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, VelocityMoments<WorldSpace> const& vm_2, si::Time dt)
 {
 	ConstraintForces fc;
-	auto const& hinge_data = _hinge_precalculation.data();
+	auto const& hinge_data = _hinge_precomputation.data();
 
 	if (auto fc_min = min_angle_corrections (vm_1, vm_2, dt, hinge_data))
 		fc = fc + *fc_min;
@@ -73,7 +73,7 @@ std::optional<ConstraintForces>
 AngularLimitsConstraint::min_angle_corrections (VelocityMoments<WorldSpace> const& vm_1,
 												VelocityMoments<WorldSpace> const& vm_2,
 												si::Time dt,
-												HingePrecalculationData const& hinge_data) const
+												HingePrecomputationData const& hinge_data) const
 {
 	if (_min_angle && hinge_data.angle < *_min_angle)
 	{
@@ -91,7 +91,7 @@ std::optional<ConstraintForces>
 AngularLimitsConstraint::max_angle_corrections (VelocityMoments<WorldSpace> const& vm_1,
 												VelocityMoments<WorldSpace> const& vm_2,
 												si::Time dt,
-												HingePrecalculationData const& hinge_data) const
+												HingePrecomputationData const& hinge_data) const
 {
 	if (_max_angle && hinge_data.angle > *_max_angle)
 	{

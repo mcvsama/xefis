@@ -19,7 +19,7 @@
 #include <xefis/support/control/pid_controller.h>
 #include <xefis/support/simulation/components/resistor.h>
 #include <xefis/support/simulation/constraints/angular_motor_constraint.h>
-#include <xefis/support/simulation/constraints/hinge_precalculation.h>
+#include <xefis/support/simulation/constraints/hinge_precomputation.h>
 #include <xefis/support/simulation/devices/interfaces/angular_servo.h>
 #include <xefis/support/simulation/failure/sigmoidal_temperature_failure.h>
 #include <xefis/support/simulation/rigid_body/body.h>
@@ -79,7 +79,7 @@ class AngularServoConstraint:
 	 *			Otherwise, the servo will not act at all.
 	 */
 	explicit
-	AngularServoConstraint (HingePrecalculation&, Range<si::Angle> angle_range, si::Angle backlash, AngularVelocityPotential, TorquePotential);
+	AngularServoConstraint (HingePrecomputation&, Range<si::Angle> angle_range, si::Angle backlash, AngularVelocityPotential, TorquePotential);
 
 	[[nodiscard]]
 	xf::sim::ServoOrientation
@@ -176,7 +176,7 @@ class AngularServoConstraint:
 	update_pid_controller (si::Time const dt);
 
   private:
-	HingePrecalculation&									_hinge;
+	HingePrecomputation&									_hinge;
 	xf::sim::ServoOrientation								_orientation			{ xf::sim::ServoOrientation::Normal };
 	xf::PIDController<si::Angle, double>					_pid_controller;
 	Range<si::Angle>										_angle_range;
@@ -205,7 +205,7 @@ class AngularServoConstraint:
  *			Scales up the torque, and scales down the speed.
  */
 std::unique_ptr<AngularServoConstraint>
-make_standard_servo_constraint (HingePrecalculation&, float scale = 1.0);
+make_standard_servo_constraint (HingePrecomputation&, float scale = 1.0);
 
 /**
  * Return typical 9-gram servo constraint.
@@ -214,7 +214,7 @@ make_standard_servo_constraint (HingePrecalculation&, float scale = 1.0);
  *			Scales up the torque, and scales down the speed.
  */
 std::unique_ptr<AngularServoConstraint>
-make_standard_9gram_servo_constraint (HingePrecalculation&, float scale = 1.0);
+make_standard_9gram_servo_constraint (HingePrecomputation&, float scale = 1.0);
 
 } // namespace xf::rigid_body
 
