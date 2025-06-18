@@ -342,7 +342,7 @@ class Body: public Noncopyable
 		{ return _broken; }
 
 	/**
-	 * Mark body as broken to remove it from calculations (but not from the
+	 * Mark body as broken to remove it from computations (but not from the
 	 * system, it should simply be skipped when evolving the system, etc).
 	 */
 	void

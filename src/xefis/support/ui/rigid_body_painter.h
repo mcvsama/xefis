@@ -226,7 +226,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	ready() const;
 
 	/**
-	 * Assign a thread pool to use, notably when calculating sky colors.
+	 * Assign a thread pool to use, notably when computing sky colors.
 	 * Pass nullptr to disable.
 	 */
 	void
@@ -691,7 +691,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	check_universe_textures();
 
 	/**
-	 * Check if calculation of new SkyDome was requested.
+	 * Check if computation of new SkyDome was requested.
 	 * Also if it has been finished, start using it.
 	 */
 	void
