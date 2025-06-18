@@ -173,7 +173,7 @@ ImpulseSolver::update_constraint_forces (si::Time const dt)
 
 	if (!_warm_starting)
 		for (auto const& constraint: _system.constraints())
-			constraint->previous_calculation_force_moments().reset();
+			constraint->previous_computation_force_moments().reset();
 
 	for (auto const& constraint: _system.constraints())
 		constraint->initialize_step (dt);
@@ -229,7 +229,7 @@ ImpulseSolver::update_single_constraint_forces (Constraint* constraint, si::Time
 
 			if (_required_force_torque_precision)
 			{
-				if (auto prev = constraint->previous_calculation_force_moments())
+				if (auto prev = constraint->previous_computation_force_moments())
 				{
 					auto const dF = abs (constraint_forces[0].force() - prev->force());
 					auto const dT = abs (constraint_forces[0].torque() - prev->torque());
@@ -244,7 +244,7 @@ ImpulseSolver::update_single_constraint_forces (Constraint* constraint, si::Time
 					precise_enough = false;
 			}
 
-			constraint->previous_calculation_force_moments() = constraint_forces[0];
+			constraint->previous_computation_force_moments() = constraint_forces[0];
 
 			iter1.all_constraints_force_moments += constraint_forces[0];
 			iter2.all_constraints_force_moments += constraint_forces[1];

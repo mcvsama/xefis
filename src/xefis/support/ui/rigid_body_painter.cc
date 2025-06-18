@@ -91,7 +91,7 @@ std::array<RigidBodyPainter::SkyLight, 5> const RigidBodyPainter::Planet::sky_li
 RigidBodyPainter::RigidBodyPainter (si::PixelDensity const pixel_density, WorkPerformer* work_performer):
 	_pixel_density (pixel_density),
 	// Work performer needs at least two threads: compute_sky_dome_shape() will be placed as a task, but it will
-	// also create its own subtasks. If it would only have 1 thread, the calculation subtasks would
+	// also create its own subtasks. If it would only have 1 thread, the computation subtasks would
 	// infinitely wait for the first task to end (deadlock).
 	_work_performer (work_performer, std::in_place, 2, Logger()),
 	_gl (pixel_density * kDefaultPositionScale)

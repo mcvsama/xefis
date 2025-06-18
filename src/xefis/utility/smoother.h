@@ -106,7 +106,7 @@ template<class pValue>
 		 *			This Smoother uses Hann window, it means that at least 3 samples are needed for the Smoother
 		 *			to work properly.
 		 * \param	precision
-		 *			Internal precision of calculations. If the dt provided in process() varies from call to call,
+		 *			Internal precision of computations. If the dt provided in process() varies from call to call,
 		 *			the Smoother internally uses more steps to get more correct output. The duration of each internal steps is
 		 *			controlled by this [precision] parameter.
 		 *			Must be > 0_ms and finite.

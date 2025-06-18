@@ -176,7 +176,7 @@ class System: private Noncopyable
 		{ return _constraints; }
 
 	/**
-	 * Return sequence of frame precalculation objects.
+	 * Return sequence of frame precomputation objects.
 	 */
 	[[nodiscard]]
 	FramePrecomputations const&

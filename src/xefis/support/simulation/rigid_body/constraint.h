@@ -249,13 +249,13 @@ class Constraint: public ConnectedBodies
 	}
 
 	/**
-	 * Access the previous calculation ForceMoments used by the solver
+	 * Access the previous computation ForceMoments used by the solver
 	 * to figure out if required simulation precision has been acquired
 	 * for this constraint.
 	 */
 	std::optional<ForceMoments<WorldSpace>>&
-	previous_calculation_force_moments()
-		{ return _previous_calculation_force_moments; }
+	previous_computation_force_moments()
+		{ return _previous_computation_force_moments; }
 
   protected:
 	/**
@@ -388,7 +388,7 @@ class Constraint: public ConnectedBodies
 	ConstraintMassMatrix<0>::Scalar	_constraint_force_mixing_factor { 0.0 };
 	double							_friction_factor				{ 0.0 }; // TODO implement
 	std::optional<ForceMoments<WorldSpace>>
-									_previous_calculation_force_moments;
+									_previous_computation_force_moments;
 };
 
 
