@@ -59,7 +59,7 @@ class AtmosphericScattering
 		uint32_t			num_light_direction_samples		{ 8 };
 	};
 
-	// Used for scaling output of AtmosphericScattering::calculate_incident_light(); chosen experimentally:
+	// Used for scaling output of AtmosphericScattering::compute_incident_light(); chosen experimentally:
 	static constexpr auto kIncidentLightScale = 100.0;
 
   public:
@@ -87,13 +87,11 @@ class AtmosphericScattering
 	 */
 	[[nodiscard]]
     SpaceVector<float, RGBSpace>
-	calculate_incident_light (
-		SpaceLength<> const& observer_position,
-		SpaceVector<double> const& ray_direction,
-		SpaceVector<double> const& sun_direction,
-		si::Length min_distance = 0_m,
-		si::Length max_distance = std::numeric_limits<si::Length>::infinity()
-	) const;
+	compute_incident_light (SpaceLength<> const& observer_position,
+							SpaceVector<double> const& ray_direction,
+							SpaceVector<double> const& sun_direction,
+							si::Length min_distance = 0_m,
+							si::Length max_distance = std::numeric_limits<si::Length>::infinity()) const;
 
 	[[nodiscard]]
 	static constexpr float

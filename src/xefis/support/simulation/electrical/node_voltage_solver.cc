@@ -126,7 +126,7 @@ NodeVoltageSolver::solve (SNetwork& network, double const accuracy, uint32_t max
 
 	bool converged = !!accuracy_satisfied;
 
-	// Transfer calculated values of voltage and current to elements:
+	// Transfer computed values of voltage and current to elements:
 	for (auto const* dir_edge: network.a_k_dir_edges)
 	{
 		Element& element = *dir_edge->edge->element;

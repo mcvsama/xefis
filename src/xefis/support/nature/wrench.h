@@ -100,7 +100,7 @@ template<math::CoordinateSystem Space>
 
 
 /**
- * This changes the application position of the force/torque. Doesn't recalculate anything.
+ * This changes the application position of the force/torque. Doesn't recompute anything.
  */
 template<math::CoordinateSystem Space>
 	inline Wrench<Space>
@@ -112,7 +112,7 @@ template<math::CoordinateSystem Space>
 
 
 /**
- * This changes the application position of the force/torque. Doesn't recalculate anything.
+ * This changes the application position of the force/torque. Doesn't recompute anything.
  */
 template<math::CoordinateSystem Space>
 	inline Wrench<Space>

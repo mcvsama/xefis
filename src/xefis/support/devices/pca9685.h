@@ -148,7 +148,7 @@ class PCA9685: public QObject
 	 * Compute value to be put to the pre-scale register of the chip.
 	 */
 	static uint8_t
-	calculate_prescale_register (si::Frequency frequency);
+	compute_prescale_register (si::Frequency frequency);
 
 	/**
 	 * Guard and reinitialize on I2C error.

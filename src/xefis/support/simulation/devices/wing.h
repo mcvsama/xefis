@@ -62,7 +62,7 @@ class Wing:
 		{ return std::make_unique<WingWidget> (*this); }
 
 	/**
-	 * Enable/disable smoothing of calculated aerodynamic forces.
+	 * Enable/disable smoothing of computed aerodynamic forces.
 	 * This helps with damping oscillations that may arise in some circumstances.
 	 */
 	void
@@ -85,7 +85,7 @@ class Wing:
   private:
 	[[nodiscard]]
 	static MassMomentsAtArm<BodyCOM>
-	calculate_body_com_mass_moments (Airfoil const&, si::Density material_density);
+	compute_body_com_mass_moments (Airfoil const&, si::Density material_density);
 
   private:
 	Airfoil													_airfoil;

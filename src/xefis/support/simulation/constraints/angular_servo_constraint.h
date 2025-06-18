@@ -162,7 +162,7 @@ class AngularServoConstraint:
 
 	// Constraint API
 	void
-	calculated_constraint_forces (ConstraintForces const&, si::Time dt) override;
+	computed_constraint_forces (ConstraintForces const&, si::Time dt) override;
 
 	// Element API
 	void

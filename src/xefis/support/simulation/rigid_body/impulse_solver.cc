@@ -195,12 +195,12 @@ ImpulseSolver::update_constraint_forces (si::Time const dt)
 	for (auto& body: _system.bodies())
 		body->set_acceleration_moments_except_gravity (body->iteration().force_moments_except_gravity() / body->mass_moments<WorldSpace>());
 
-	// Tell each constraint that we finally calculated its forces:
+	// Tell each constraint that we finally computed its forces:
 	for (auto& constraint: _system.constraints())
 	{
 		// TODO What, these are summed-up all_constraints_force_moments, not individual ones, should be individual though:
-		constraint->calculated_constraint_forces ({ constraint->body_1().iteration().all_constraints_force_moments,
-													constraint->body_2().iteration().all_constraints_force_moments }, dt);
+		constraint->computed_constraint_forces ({ constraint->body_1().iteration().all_constraints_force_moments,
+												  constraint->body_2().iteration().all_constraints_force_moments }, dt);
 	}
 
     return {
@@ -249,11 +249,11 @@ ImpulseSolver::update_single_constraint_forces (Constraint* constraint, si::Time
 			iter1.all_constraints_force_moments += constraint_forces[0];
 			iter2.all_constraints_force_moments += constraint_forces[1];
 
-			// Recalculate accelerations:
+			// Recompute accelerations:
 			iter1.acceleration_moments = iter1.all_force_moments() / b1.mass_moments<WorldSpace>();
 			iter2.acceleration_moments = iter2.all_force_moments() / b2.mass_moments<WorldSpace>();
 
-			// Recalculate velocity moments:
+			// Recompute velocity moments:
 			iter1.velocity_moments = b1.velocity_moments<WorldSpace>() + *iter1.acceleration_moments * dt;
 			iter2.velocity_moments = b2.velocity_moments<WorldSpace>() + *iter2.acceleration_moments * dt;
 		}
@@ -300,7 +300,7 @@ ImpulseSolver::update_velocity_moments (si::Time const dt)
 
 
 Placement<WorldSpace, BodyCOM>
-ImpulseSolver::calculate_placement (Placement<WorldSpace, BodyCOM> placement, VelocityMoments<WorldSpace> const& vm, si::Time const dt)
+ImpulseSolver::compute_placement (Placement<WorldSpace, BodyCOM> placement, VelocityMoments<WorldSpace> const& vm, si::Time const dt)
 {
 	auto const ds = vm.velocity() * dt;
 	auto const dr = to_rotation_quaternion (vm.angular_velocity() * dt);
@@ -316,7 +316,7 @@ void
 ImpulseSolver::update_placements (si::Time dt)
 {
 	for (auto& body: _system.bodies())
-		body->set_placement (calculate_placement (body->placement(), body->velocity_moments<WorldSpace>(), dt));
+		body->set_placement (compute_placement (body->placement(), body->velocity_moments<WorldSpace>(), dt));
 }
 
 

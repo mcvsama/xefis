@@ -66,7 +66,7 @@ class ItemsTree: public QTreeWidget
 					std::map<rigid_body::Body*, BodyItem*>& body_to_item);
 
 	void
-	recalculate_gravitating_bodies();
+	recompute_gravitating_bodies();
 
 	void
 	insert_new (std::set<rigid_body::Group*> const& new_groups,

@@ -50,7 +50,7 @@ blackbody_spectral_radiance (si::Length const wavelength, si::Temperature const 
 
 [[nodiscard]]
 math::Vector<float, 2>
-calculate_cie_xy_blackbody_color (si::Temperature const temperature, std::function<float (float)> const attenuator = nullptr);
+compute_cie_xy_blackbody_color (si::Temperature const temperature, std::function<float (float)> const attenuator = nullptr);
 
 
 /**

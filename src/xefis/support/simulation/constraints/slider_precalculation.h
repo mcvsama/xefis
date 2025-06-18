@@ -96,7 +96,7 @@ class SliderPrecalculation: public FramePrecalculation<SliderPrecalculationData>
   protected:
 	// FramePrecalculation API
 	void
-	calculate (SliderPrecalculationData&) override;
+	compute (SliderPrecalculationData&) override;
 
   private:
 	SpaceLength<BodyCOM>			_anchor_1;

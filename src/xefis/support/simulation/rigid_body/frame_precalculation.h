@@ -25,8 +25,8 @@
 namespace xf::rigid_body {
 
 /**
- * A struct of data calculated on each simulation frame for certain types of constraints.
- * Instead of having each constraint recalculate commonly required values, calculate them
+ * A struct of data computed on each simulation frame for certain types of constraints.
+ * Instead of having each constraint recompute commonly required values, compute them
  * on demand here and let constraints use them.
  *
  * The solver is supposed to reset the data of all registered FramePrecalculations just before
@@ -44,7 +44,7 @@ class BasicFramePrecalculation: public ConnectedBodies
 	~BasicFramePrecalculation() = default;
 
 	/**
-	 * Forget the calculated data.
+	 * Forget the computed data.
 	 */
 	virtual void
 	reset() = 0;
@@ -62,14 +62,14 @@ template<class pData>
 		using BasicFramePrecalculation::BasicFramePrecalculation;
 
 		/**
-		 * Access calculated data.
-		 * If it's not calculated, calls calculate() first.
+		 * Access computed data.
+		 * If it's not computed, calls compute() first.
 		 */
 		Data const&
 		data();
 
 		/**
-		 * Access calculated data.
+		 * Access computed data.
 		 * If it doesn't exist, return nullopt.
 		 */
 		std::optional<Data> const&
@@ -86,7 +86,7 @@ template<class pData>
 		 * Calculate the required data.
 		 */
 		virtual void
-		calculate (Data&) = 0;
+		compute (Data&) = 0;
 
 	  private:
 		std::optional<Data>	_data;
@@ -106,7 +106,7 @@ template<class D>
 		if (!_data)
 		{
 			_data = Data();
-			calculate (*_data);
+			compute (*_data);
 		}
 
 		return *_data;

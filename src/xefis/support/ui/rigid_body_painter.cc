@@ -90,7 +90,7 @@ std::array<RigidBodyPainter::SkyLight, 5> const RigidBodyPainter::Planet::sky_li
 
 RigidBodyPainter::RigidBodyPainter (si::PixelDensity const pixel_density, WorkPerformer* work_performer):
 	_pixel_density (pixel_density),
-	// Work performer needs at least two threads: calculate_sky_dome_shape() will be placed as a task, but it will
+	// Work performer needs at least two threads: compute_sky_dome_shape() will be placed as a task, but it will
 	// also create its own subtasks. If it would only have 1 thread, the calculation subtasks would
 	// infinitely wait for the first task to end (deadlock).
 	_work_performer (work_performer, std::in_place, 2, Logger()),
@@ -100,7 +100,7 @@ RigidBodyPainter::RigidBodyPainter (si::PixelDensity const pixel_density, WorkPe
 		throw InvalidArgument ("provided WorkPerformer must have at least 2 threads");
 
 	use_work_performer (work_performer);
-	calculate_camera_transform();
+	compute_camera_transform();
 }
 
 
@@ -134,7 +134,7 @@ void
 RigidBodyPainter::set_followed_to_none()
 {
 	_followed = std::monostate();
-	calculate_camera_transform();
+	compute_camera_transform();
 }
 
 
@@ -142,7 +142,7 @@ void
 RigidBodyPainter::set_camera_mode (CameraMode const mode)
 {
 	_camera_mode = mode;
-	calculate_camera_transform();
+	compute_camera_transform();
 }
 
 
@@ -150,7 +150,7 @@ void
 RigidBodyPainter::set_camera_position (si::LonLatRadius<> const position)
 {
 	_requested_camera_polar_position = position;
-	calculate_camera_transform();
+	compute_camera_transform();
 }
 
 
@@ -158,7 +158,7 @@ void
 RigidBodyPainter::set_user_camera_translation (SpaceLength<WorldSpace> const& translation)
 {
 	_user_camera_translation = translation;
-	calculate_camera_transform();
+	compute_camera_transform();
 }
 
 
@@ -172,7 +172,7 @@ RigidBodyPainter::set_user_camera_rotation (SpaceVector<si::Angle> const& angles
 		auto const y = y_rotation<WorldSpace> (angles.y());
 		auto const z = z_rotation<WorldSpace> (angles.z());
 		_user_camera_rotation = x * y * z;
-		calculate_camera_transform();
+		compute_camera_transform();
 	}
 }
 
@@ -196,7 +196,7 @@ RigidBodyPainter::set_planet (rigid_body::Body const* planet_body)
 	else
 		_planet.reset();
 
-	calculate_camera_transform();
+	compute_camera_transform();
 }
 
 
@@ -245,7 +245,7 @@ RigidBodyPainter::paint (rigid_body::System const& system, QOpenGLPaintDevice& c
 
 	painter.translate (center);
 	painter.beginNativePainting();
-	precalculate();
+	precompute();
 	setup_camera (canvas);
 	setup_lights();
 	paint_world (system);
@@ -263,7 +263,7 @@ RigidBodyPainter::drop_resources()
 
 
 void
-RigidBodyPainter::precalculate()
+RigidBodyPainter::precompute()
 {
 	if (_planet)
 	{
@@ -273,14 +273,14 @@ RigidBodyPainter::precalculate()
 		_planet->camera_clamped_normalized_amsl_height = std::clamp<float> (_planet->camera_normalized_amsl_height, 0.0f, 1.0f);
 	}
 
-	calculate_followed_position();
+	compute_followed_position();
 
 	if (_sun)
 	{
-		_sun->position = calculate_sun_position (_camera_polar_position, _time);
+		_sun->position = compute_sun_position (_camera_polar_position, _time);
 		_sun->corrected_position_horizontal_coordinates = corrected_sun_position_near_horizon (_sun->position.horizontal_coordinates);
-		_sun->corrected_position_cartesian_horizontal_coordinates = calculate_cartesian_horizontal_coordinates (_sun->corrected_position_horizontal_coordinates);
-		_sun->color_on_body = to_gl_color (calculate_sun_light_color (_camera_polar_position, _sun->corrected_position_cartesian_horizontal_coordinates, _sun->atmospheric_scattering));
+		_sun->corrected_position_cartesian_horizontal_coordinates = compute_cartesian_horizontal_coordinates (_sun->corrected_position_horizontal_coordinates);
+		_sun->color_on_body = to_gl_color (compute_sun_light_color (_camera_polar_position, _sun->corrected_position_cartesian_horizontal_coordinates, _sun->atmospheric_scattering));
 	}
 
 	check_textures();
@@ -293,7 +293,7 @@ RigidBodyPainter::setup_camera (QOpenGLPaintDevice& canvas)
 {
 	setup_camera_projection (canvas.size());
 	setup_modelview();
-	calculate_camera_transform();
+	compute_camera_transform();
 }
 
 
@@ -423,7 +423,7 @@ RigidBodyPainter::setup_sky_light()
 
 				auto const number = sky_light.gl_number;
 				auto const light_direction = to_cartesian<void> (sky_light.position); // Azimuth (lon()) should possible be negated, but the sky dome is symmetric, so this is okay.
-				auto const color = _sun->atmospheric_scattering.calculate_incident_light (
+				auto const color = _sun->atmospheric_scattering.compute_incident_light (
 					{ 0_m, 0_m, _followed_polar_position.radius() },
 					light_direction,
 					_sun->position.cartesian_horizontal_coordinates
@@ -569,7 +569,7 @@ RigidBodyPainter::paint_universe_and_sun()
 
 	if (_planet && _sun)
 	{
-		_planet->horizon_angle = calculate_horizon_angle (kEarthMeanRadius, _camera_polar_position.radius());
+		_planet->horizon_angle = compute_horizon_angle (kEarthMeanRadius, _camera_polar_position.radius());
 		auto const sun_altitude = _sun->position.horizontal_coordinates.altitude;
 		sun_altitude_above_horizon = sun_altitude - _planet->horizon_angle;
 	}
@@ -645,7 +645,7 @@ RigidBodyPainter::paint_universe_and_sun()
 			_gl.rotate (_user_camera_angles[0] - 2 * _user_camera_angles[1] + time_dependent_angle, 0, 0, 1);
 
 			auto const sun_visibility = sun_altitude_above_horizon
-				? 1.0f - square (1.0f - calculate_sun_visible_surface_factor (*sun_altitude_above_horizon))
+				? 1.0f - square (1.0f - compute_sun_visible_surface_factor (*sun_altitude_above_horizon))
 				: 1.0f;
 			auto const alpha_height_factor = _planet ? _planet->camera_clamped_normalized_amsl_height : 1.0f;
 
@@ -1206,7 +1206,7 @@ RigidBodyPainter::paint_basis (si::Length const length)
 
 
 void
-RigidBodyPainter::calculate_followed_position()
+RigidBodyPainter::compute_followed_position()
 {
 	if (auto const* followed_body = this->followed_body())
 		_followed_position = followed_body->placement().position();
@@ -1361,12 +1361,12 @@ RigidBodyPainter::check_sky_dome()
 {
 	if (_planet)
 		if (std::exchange (_planet->need_new_sky_dome, false))
-			_planet->sky_dome_shape = calculate_sky_dome_shape();
+			_planet->sky_dome_shape = compute_sky_dome_shape();
 }
 
 
 Shape
-RigidBodyPainter::calculate_sky_dome_shape()
+RigidBodyPainter::compute_sky_dome_shape()
 {
 	_camera_position_for_sky_dome = _camera.position();
 
@@ -1376,7 +1376,7 @@ RigidBodyPainter::calculate_sky_dome_shape()
 		// Tone it down a bit.
 		auto const sky_alpha = 1.0f - 0.1f * _planet->camera_clamped_normalized_amsl_height;
 
-		return xf::calculate_sky_dome_shape ({
+		return xf::compute_sky_dome_shape ({
 			.atmospheric_scattering = _sun->atmospheric_scattering,
 			.observer_position = _camera_polar_position,
 			.sun_position = _sun->corrected_position_horizontal_coordinates,
@@ -1410,7 +1410,7 @@ RigidBodyPainter::check_sky_box()
 
 	// Universe sky box rotation:
 	auto const julian_date = unix_time_to_julian_date (_time);
-	_universe->ecef_to_celestial_rotation = calculate_ecef_to_celestial_rotation (julian_date);
+	_universe->ecef_to_celestial_rotation = compute_ecef_to_celestial_rotation (julian_date);
 }
 
 
@@ -1430,7 +1430,7 @@ RigidBodyPainter::compute_sky_box_visibility (si::Angle const sun_altitude_above
 
 
 void
-RigidBodyPainter::calculate_camera_transform()
+RigidBodyPainter::compute_camera_transform()
 {
 	auto const* followed_group = this->followed_group();
 	auto const* followed_body = this->followed_body();
@@ -1496,7 +1496,7 @@ RigidBodyPainter::calculate_camera_transform()
 			_planet->need_new_sky_dome = true;
 
 		if (_planet_textures)
-			_planet->ground_shape = calculate_ground_shape (_camera_polar_position, kEarthMeanRadius, _planet_textures->earth);
+			_planet->ground_shape = compute_ground_shape (_camera_polar_position, kEarthMeanRadius, _planet_textures->earth);
 	}
 
 	if (_camera_position_callback)

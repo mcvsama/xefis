@@ -96,7 +96,7 @@ mean (si::Angle a, si::Angle b);
  */
 [[nodiscard]]
 constexpr si::Angle
-calculate_greenwich_mean_sidereal_time_at_0h_ut (double const julian_date)
+compute_greenwich_mean_sidereal_time_at_0h_ut (double const julian_date)
 {
 	auto const midnight = std::floor (julian_date) + 0.5;
 	auto const days_since_midnight = julian_date - midnight;
@@ -122,7 +122,7 @@ constexpr si::Angle
 unix_time_to_greenwich_mean_sidereal_time_at_0h_ut (si::Time const unix_time)
 {
 	auto const jd = unix_time_to_julian_date (unix_time);
-	return calculate_greenwich_mean_sidereal_time_at_0h_ut (jd);
+	return compute_greenwich_mean_sidereal_time_at_0h_ut (jd);
 }
 
 
@@ -142,7 +142,7 @@ unix_time_to_local_sidereal_time (si::Time const unix_time, si::Angle const obse
  */
 [[nodiscard]]
 RotationQuaternion<WorldSpace>
-calculate_ecef_to_celestial_rotation (double const julian_date);
+compute_ecef_to_celestial_rotation (double const julian_date);
 
 } // namespace xf
 

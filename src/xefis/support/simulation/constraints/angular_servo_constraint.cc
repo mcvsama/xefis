@@ -66,9 +66,9 @@ AngularServoConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const&
 
 
 void
-AngularServoConstraint::calculated_constraint_forces (ConstraintForces const& result, si::Time const dt)
+AngularServoConstraint::computed_constraint_forces (ConstraintForces const& result, si::Time const dt)
 {
-	Constraint::calculated_constraint_forces (result, dt);
+	Constraint::computed_constraint_forces (result, dt);
 
 	update_velocity_and_torque();
 	update_pid_controller (dt);

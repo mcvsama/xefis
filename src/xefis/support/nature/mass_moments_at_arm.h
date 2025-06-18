@@ -227,7 +227,7 @@ template<math::CoordinateSystem Space>
 
 template<math::CoordinateSystem Space, std::forward_iterator MassMomentsIterator>
 	inline MassMomentsAtArm<Space>
-	calculate_mass_moments_at_arm (MassMomentsIterator const begin, MassMomentsIterator const end)
+	compute_mass_moments_at_arm (MassMomentsIterator const begin, MassMomentsIterator const end)
 		requires std::is_same_v<std::remove_cvref_t<decltype (*std::declval<MassMomentsIterator>())>, MassMomentsAtArm<Space>>
 	{
 		MassMomentsAtArm<Space> result;
@@ -241,26 +241,26 @@ template<math::CoordinateSystem Space, std::forward_iterator MassMomentsIterator
 
 template<math::CoordinateSystem Space>
 	inline MassMomentsAtArm<Space>
-	calculate_mass_moments_at_arm (std::initializer_list<MassMomentsAtArm<Space>> const elements)
+	compute_mass_moments_at_arm (std::initializer_list<MassMomentsAtArm<Space>> const elements)
 	{
-		return calculate_mass_moments_at_arm<Space> (elements.begin(), elements.end());
+		return compute_mass_moments_at_arm<Space> (elements.begin(), elements.end());
 	}
 
 
 template<math::CoordinateSystem Space>
 	inline MassMomentsAtArm<Space>
-	calculate_mass_moments_at_arm (std::span<MassMomentsAtArm<Space>> const elements)
+	compute_mass_moments_at_arm (std::span<MassMomentsAtArm<Space>> const elements)
 	{
-		return calculate_mass_moments_at_arm<Space> (elements.begin(), elements.end());
+		return compute_mass_moments_at_arm<Space> (elements.begin(), elements.end());
 	}
 
 
 template<math::CoordinateSystem Space>
 	inline MassMomentsAtArm<Space>
-	calculate_mass_moments_at_arm (std::ranges::view auto const& elements)
+	compute_mass_moments_at_arm (std::ranges::view auto const& elements)
 		requires std::same_as<std::ranges::range_value_t<decltype (elements)>, MassMomentsAtArm<Space>>
 	{
-		return calculate_mass_moments_at_arm<Space> (elements.begin(), elements.end());
+		return compute_mass_moments_at_arm<Space> (elements.begin(), elements.end());
 	}
 
 
@@ -270,7 +270,7 @@ template<math::CoordinateSystem Space>
  */
 template<math::Scalar S, math::CoordinateSystem Space>
 	inline MassMomentsAtArm<Space>
-	calculate_mass_moments_at_arm (std::vector<PlaneTriangle<S, Space>> const& polygon_triangulation, si::Length const chord_length, si::Length const wing_length, si::Density const material_density)
+	compute_mass_moments_at_arm (std::vector<PlaneTriangle<S, Space>> const& polygon_triangulation, si::Length const chord_length, si::Length const wing_length, si::Density const material_density)
 	{
 		// Have 2D triangulation points, make two sets of them, split the virtual wing into two identical-length parts,
 		// make the points at the center of each wing part. This way we'll get correct MOI for all 3D axes.
@@ -294,7 +294,7 @@ template<math::Scalar S, math::CoordinateSystem Space>
 			point_masses.push_back (MassMomentsAtArm<Space> { point_mass, position_2, inertia_tensor_2 });
 		}
 
-		return calculate_mass_moments_at_arm<Space> (begin (point_masses), end (point_masses));
+		return compute_mass_moments_at_arm<Space> (begin (point_masses), end (point_masses));
 	}
 
 

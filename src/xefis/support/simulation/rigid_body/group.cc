@@ -80,7 +80,7 @@ Group::mass_moments() const
 		return MassMomentsAtArm<WorldSpace> (mm_at_com.mass(), body_ptr->placement().position(), mm_at_com.inertia_tensor());
 	};
 
-	return calculate_mass_moments_at_arm<WorldSpace> (_bodies | std::views::transform (get_mass_moments_from_body));
+	return compute_mass_moments_at_arm<WorldSpace> (_bodies | std::views::transform (get_mass_moments_from_body));
 }
 
 } // namespace xf::rigid_body

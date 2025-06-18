@@ -80,7 +80,7 @@ ItemsTree::refresh()
 					bodies, body_items_to_update,
 					constraints, constraint_items_to_update,
 					body_to_item);
-	recalculate_gravitating_bodies();
+	recompute_gravitating_bodies();
 	insert_new (groups, bodies, constraints, body_to_item);
 	update_existing (group_items_to_update, body_items_to_update, constraint_items_to_update);
 
@@ -179,7 +179,7 @@ ItemsTree::remove_deleted (std::set<rigid_body::Group*>& existing_groups,
 
 
 void
-ItemsTree::recalculate_gravitating_bodies()
+ItemsTree::recompute_gravitating_bodies()
 {
 	_gravitating_bodies.clear();
 

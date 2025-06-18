@@ -262,7 +262,7 @@ void
 CameraControls::update_rigid_body_viewer_camera_position()
 {
 	// TODO This is not so easy, and may be not implemented at all.
-	// What needs to be done is the inverse of RigidBodyPainter::calculate_camera_transform()
+	// What needs to be done is the inverse of RigidBodyPainter::compute_camera_transform()
 	// to get offset/rotation used in RigidBodyViewer.
 	// For now the camera position widgets are set to read-only.
 }

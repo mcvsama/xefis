@@ -30,27 +30,27 @@ namespace xf {
 
 [[nodiscard]]
 EclipticCoordinates
-calculate_sun_ecliptic_position (double days_since_J2000);
+compute_sun_ecliptic_position (double days_since_J2000);
 
 
 [[nodiscard]]
 EquatorialCoordinates
-calculate_sun_equatorial_position (si::Angle const& ecliptic_longitude, double days_since_J2000);
+compute_sun_equatorial_position (si::Angle const& ecliptic_longitude, double days_since_J2000);
 
 
 [[nodiscard]]
 HorizontalCoordinates
-calculate_sun_horizontal_position (si::Angle sun_declination, si::Angle observer_latitude, si::Angle hour_angle);
+compute_sun_horizontal_position (si::Angle sun_declination, si::Angle observer_latitude, si::Angle hour_angle);
 
 
 [[nodiscard]]
 si::Angle
-calculate_sun_altitude (si::Angle sun_declination, si::Angle observer_latitude, si::Angle hour_angle);
+compute_sun_altitude (si::Angle sun_declination, si::Angle observer_latitude, si::Angle hour_angle);
 
 
 [[nodiscard]]
 si::Angle
-calculate_sun_azimuth (si::Angle sun_declination, si::Angle observer_latitude, si::Angle hour_angle, si::Angle sun_altitude);
+compute_sun_azimuth (si::Angle sun_declination, si::Angle observer_latitude, si::Angle hour_angle, si::Angle sun_altitude);
 
 
 /**
@@ -62,7 +62,7 @@ calculate_sun_azimuth (si::Angle sun_declination, si::Angle observer_latitude, s
  */
 [[nodiscard]]
 constexpr std::tuple<si::Angle, si::Angle>
-calculate_sunrise_and_sunset_hour_angles (si::Angle const sun_declination, si::Angle const observer_latitude)
+compute_sunrise_and_sunset_hour_angles (si::Angle const sun_declination, si::Angle const observer_latitude)
 {
 	auto const arg = -tan (observer_latitude) * tan (sun_declination);
 	auto const ha = 1_rad * acos (std::clamp (arg, -1.0, +1.0));
@@ -75,7 +75,7 @@ calculate_sunrise_and_sunset_hour_angles (si::Angle const sun_declination, si::A
  */
 [[nodiscard]]
 constexpr si::Angle
-calculate_solar_noon_altitude (si::Angle const sun_declination, si::Angle const observer_latitude)
+compute_solar_noon_altitude (si::Angle const sun_declination, si::Angle const observer_latitude)
 {
 	return 90_deg - abs (observer_latitude - sun_declination);
 }
@@ -86,7 +86,7 @@ calculate_solar_noon_altitude (si::Angle const sun_declination, si::Angle const 
  */
 [[nodiscard]]
 constexpr si::Angle
-calculate_hour_angle (si::Angle const local_sidereal_time, si::Angle const sun_right_ascension)
+compute_hour_angle (si::Angle const local_sidereal_time, si::Angle const sun_right_ascension)
 {
 	return floored_mod (local_sidereal_time - sun_right_ascension, 360_deg);
 }
