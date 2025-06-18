@@ -19,7 +19,7 @@
 #include <xefis/support/simulation/rigid_body/body.h>
 #include <xefis/support/simulation/rigid_body/concepts.h>
 #include <xefis/support/simulation/rigid_body/constraint.h>
-#include <xefis/support/simulation/rigid_body/frame_precalculation.h>
+#include <xefis/support/simulation/rigid_body/frame_precomputation.h>
 
 // Neutrino:
 #include <neutrino/noncopyable.h>
@@ -44,7 +44,7 @@ class Group;
 class System: private Noncopyable
 {
   public:
-	using FramePrecalculations	= std::vector<std::unique_ptr<BasicFramePrecalculation>>;
+	using FramePrecomputations	= std::vector<std::unique_ptr<BasicFramePrecomputation>>;
 	using Groups				= std::set<std::unique_ptr<Group>>;
 	using Bodies				= std::vector<std::unique_ptr<Body>>;
 	using Constraints			= std::vector<std::unique_ptr<Constraint>>;
@@ -100,18 +100,18 @@ class System: private Noncopyable
 		add (std::unique_ptr<SpecificConstraint>&&);
 
 	/**
-	 * Add new BasicFramePrecalculation to the system.
+	 * Add new BasicFramePrecomputation to the system.
 	 */
-	template<BasicFramePrecalculationConcept SpecificFramePrecalculation, class ...Args>
-		SpecificFramePrecalculation&
+	template<BasicFramePrecomputationConcept SpecificFramePrecomputation, class ...Args>
+		SpecificFramePrecomputation&
 		add (Args&&...);
 
 	/**
-	 * Add new BasicFramePrecalculation to the system.
+	 * Add new BasicFramePrecomputation to the system.
 	 */
-	template<BasicFramePrecalculationConcept SpecificFramePrecalculation>
-		SpecificFramePrecalculation&
-		add (std::unique_ptr<SpecificFramePrecalculation>&&);
+	template<BasicFramePrecomputationConcept SpecificFramePrecomputation>
+		SpecificFramePrecomputation&
+		add (std::unique_ptr<SpecificFramePrecomputation>&&);
 
 	/**
 	 * Return atmosphere model to use by bodies or nullptr if it wasn't set.
@@ -179,9 +179,9 @@ class System: private Noncopyable
 	 * Return sequence of frame precalculation objects.
 	 */
 	[[nodiscard]]
-	FramePrecalculations const&
-	frame_precalculations() const noexcept
-		{ return _frame_precalculations; }
+	FramePrecomputations const&
+	frame_precomputations() const noexcept
+		{ return _frame_precomputations; }
 
 	/**
 	 * Calculate total translational energy of all bodies in the system.
@@ -228,7 +228,7 @@ class System: private Noncopyable
 	set_friction_factor (double factor) noexcept;
 
   private:
-	FramePrecalculations	_frame_precalculations;
+	FramePrecomputations	_frame_precomputations;
 	Groups					_groups;
 	Bodies					_bodies;
 	Constraints				_constraints;
@@ -305,20 +305,20 @@ template<ConstraintConcept SpecificConstraint>
 	}
 
 
-template<BasicFramePrecalculationConcept SpecificFramePrecalculation, class ...Args>
-	inline SpecificFramePrecalculation&
+template<BasicFramePrecomputationConcept SpecificFramePrecomputation, class ...Args>
+	inline SpecificFramePrecomputation&
 	System::add (Args&& ...args)
 	{
-		return add (std::make_unique<SpecificFramePrecalculation> (std::forward<Args> (args)...));
+		return add (std::make_unique<SpecificFramePrecomputation> (std::forward<Args> (args)...));
 	}
 
 
-template<BasicFramePrecalculationConcept SpecificFramePrecalculation>
-	inline SpecificFramePrecalculation&
-	System::add (std::unique_ptr<SpecificFramePrecalculation>&& frame_cache)
+template<BasicFramePrecomputationConcept SpecificFramePrecomputation>
+	inline SpecificFramePrecomputation&
+	System::add (std::unique_ptr<SpecificFramePrecomputation>&& frame_cache)
 	{
-		_frame_precalculations.push_back (std::move (frame_cache));
-		return static_cast<SpecificFramePrecalculation&> (*_frame_precalculations.back());
+		_frame_precomputations.push_back (std::move (frame_cache));
+		return static_cast<SpecificFramePrecomputation&> (*_frame_precomputations.back());
 	}
 
 } // namespace xf::rigid_body

@@ -29,7 +29,7 @@ namespace xf::rigid_body {
 
 class Body;
 class Constraint;
-class BasicFramePrecalculation;
+class BasicFramePrecomputation;
 
 
 template<class T>
@@ -41,7 +41,7 @@ template<class T>
 
 
 template<class T>
-	concept BasicFramePrecalculationConcept = std::derived_from<T, BasicFramePrecalculation>;
+	concept BasicFramePrecomputationConcept = std::derived_from<T, BasicFramePrecomputation>;
 
 
 template<class T>

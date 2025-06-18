@@ -17,7 +17,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/simulation/constraints/helpers/fixed_orientation_helper.h>
-#include <xefis/support/simulation/rigid_body/frame_precalculation.h>
+#include <xefis/support/simulation/rigid_body/frame_precomputation.h>
 #include <xefis/support/nature/force_moments.h>
 
 // Standard:
@@ -48,7 +48,7 @@ class HingePrecalculationData
 };
 
 
-class HingePrecalculation: public FramePrecalculation<HingePrecalculationData>
+class HingePrecalculation: public FramePrecomputation<HingePrecalculationData>
 {
   private:
 	/**
@@ -135,7 +135,7 @@ class HingePrecalculation: public FramePrecalculation<HingePrecalculationData>
 		{ return _normalized_hinge_2; }
 
   protected:
-	// FramePrecalculation API
+	// FramePrecomputation API
 	void
 	compute (HingePrecalculationData&) override;
 

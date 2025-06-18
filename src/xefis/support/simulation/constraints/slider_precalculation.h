@@ -17,7 +17,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/simulation/constraints/helpers/fixed_orientation_helper.h>
-#include <xefis/support/simulation/rigid_body/frame_precalculation.h>
+#include <xefis/support/simulation/rigid_body/frame_precomputation.h>
 #include <xefis/support/nature/force_moments.h>
 
 // Standard:
@@ -52,7 +52,7 @@ class SliderPrecalculationData
 };
 
 
-class SliderPrecalculation: public FramePrecalculation<SliderPrecalculationData>
+class SliderPrecalculation: public FramePrecomputation<SliderPrecalculationData>
 {
   public:
 	// Ctor
@@ -94,7 +94,7 @@ class SliderPrecalculation: public FramePrecalculation<SliderPrecalculationData>
 		{ return _axis_2; }
 
   protected:
-	// FramePrecalculation API
+	// FramePrecomputation API
 	void
 	compute (SliderPrecalculationData&) override;
 
