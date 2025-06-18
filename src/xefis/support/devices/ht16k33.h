@@ -343,23 +343,23 @@ class HT16K33: public QObject
 	/**
 	 * Add a switch handler.
 	 */
-	template<class ...Arg>
+	template<class ...Args>
 		void
-		add_single_switch (Arg&& ...args);
+		add_single_switch (Args&& ...args);
 
 	/**
 	 * Add a single LED handler.
 	 */
-	template<class ...Arg>
+	template<class ...Args>
 		void
-		add_single_led (Arg&& ...args);
+		add_single_led (Args&& ...args);
 
 	/**
 	 * Add a 7-segment LED display handler.
 	 */
-	template<class Value, class Unit, class ...Arg>
+	template<class Value, class Unit, class ...Args>
 		void
-		add_numeric_display (Arg&& ...args);
+		add_numeric_display (Args&& ...args);
 
 	// TODO options for API user: manual synchronization or automatic synchronization
 	/**
@@ -576,27 +576,27 @@ HT16K33::set_reliable_mode (bool enabled)
 }
 
 
-template<class ...Arg>
+template<class ...Args>
 	inline void
-	HT16K33::add_single_switch (Arg&& ...args)
+	HT16K33::add_single_switch (Args&& ...args)
 	{
-		_switches.push_back (std::move (std::make_unique<SingleSwitch> (std::forward<Arg> (args)...)));
+		_switches.push_back (std::move (std::make_unique<SingleSwitch> (std::forward<Args> (args)...)));
 	}
 
 
-template<class ...Arg>
+template<class ...Args>
 	inline void
-	HT16K33::add_single_led (Arg&& ...args)
+	HT16K33::add_single_led (Args&& ...args)
 	{
-		_displays.push_back (std::move (std::make_unique<SingleLED> (std::forward<Arg> (args)...)));
+		_displays.push_back (std::move (std::make_unique<SingleLED> (std::forward<Args> (args)...)));
 	}
 
 
-template<class Value, class Unit, class ...Arg>
+template<class Value, class Unit, class ...Args>
 	inline void
-	HT16K33::add_numeric_display (Arg&& ...args)
+	HT16K33::add_numeric_display (Args&& ...args)
 	{
-		_displays.push_back (std::move (std::make_unique<NumericDisplay<Value, Unit>> (std::forward<Arg> (args)...)));
+		_displays.push_back (std::move (std::make_unique<NumericDisplay<Value, Unit>> (std::forward<Args> (args)...)));
 	}
 
 } // namespace xf
