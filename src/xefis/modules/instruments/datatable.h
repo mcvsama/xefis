@@ -109,9 +109,9 @@ class Datatable:
 	 * Add text line to the table.
 	 * Forwards arguments to the Line constructor.
 	 */
-	template<class ...Arg>
+	template<class ...Args>
 		void
-		add_line (Arg&& ...args);
+		add_line (Args&& ...args);
 
 	// Module API
 	void
@@ -134,11 +134,11 @@ class Datatable:
 };
 
 
-template<class ...Arg>
+template<class ...Args>
 	void
-	Datatable::add_line (Arg&& ...args)
+	Datatable::add_line (Args&& ...args)
 	{
-		_list.emplace_back (std::forward<Arg> (args)...);
+		_list.emplace_back (std::forward<Args> (args)...);
 	}
 
 #endif

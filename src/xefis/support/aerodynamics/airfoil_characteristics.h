@@ -131,38 +131,38 @@ class AirfoilCharacteristics
 	/**
 	 * Return value of lift coefficient field.
 	 */
-	template<class ...Arg>
+	template<class ...Args>
 		[[nodiscard]]
 		auto
-		lift_coefficient (Arg&& ...args) const
-			{ return _lift_coefficient (std::forward<Arg> (args)...); }
+		lift_coefficient (Args&& ...args) const
+			{ return _lift_coefficient (std::forward<Args> (args)...); }
 
 	/**
 	 * Return value of drag coefficient field.
 	 */
-	template<class ...Arg>
+	template<class ...Args>
 		[[nodiscard]]
 		auto
-		drag_coefficient (Arg&& ...args) const
-			{ return _drag_coefficient (std::forward<Arg> (args)...); }
+		drag_coefficient (Args&& ...args) const
+			{ return _drag_coefficient (std::forward<Args> (args)...); }
 
 	/**
 	 * Return value of pitching moment coefficient field.
 	 */
-	template<class ...Arg>
+	template<class ...Args>
 		[[nodiscard]]
 		auto
-		pitching_moment_coefficient (Arg&& ...args) const
-			{ return _pitching_moment_coefficient (std::forward<Arg> (args)...); }
+		pitching_moment_coefficient (Args&& ...args) const
+			{ return _pitching_moment_coefficient (std::forward<Args> (args)...); }
 
 	/**
 	 * Return value of center of pressure field.
 	 */
-	template<class ...Arg>
+	template<class ...Args>
 		[[nodiscard]]
 		auto
-		center_of_pressure_position (Arg&& ...args) const
-			{ return _center_of_pressure_position (std::forward<Arg> (args)...); }
+		center_of_pressure_position (Args&& ...args) const
+			{ return _center_of_pressure_position (std::forward<Args> (args)...); }
 
   private:
 	AirfoilSpline					_spline;
