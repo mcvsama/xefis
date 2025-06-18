@@ -234,7 +234,7 @@ MasterTransceiver::Session::set_handshake_response (Blob const& handshake_respon
 {
 	if (auto* hr = std::get_if<HandshakeRequested> (&_state))
 	{
-		auto const ephemeral_key = Secure (hr->handshake_master.calculate_key (handshake_response));
+		auto const ephemeral_key = Secure (hr->handshake_master.compute_key (handshake_response));
 		_state.emplace<Connected> (ephemeral_key, _crypto_params);
 		_session_prepared_promise.set_value();
 	}

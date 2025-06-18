@@ -56,7 +56,7 @@ AutoTest t1 ("Xefis Lossy Encryption/Handshake: correct handshake", []{
 
 	Blob const master_handshake = master.generate_handshake_blob (neutrino::TimeHelper::utc_now());
 	auto const slave_handshake_and_key = slave.generate_handshake_blob_and_key (master_handshake, neutrino::TimeHelper::utc_now());
-	Blob const master_key = master.calculate_key (*slave_handshake_and_key.handshake_response);
+	Blob const master_key = master.compute_key (*slave_handshake_and_key.handshake_response);
 	Blob const slave_key = *slave_handshake_and_key.ephemeral_key;
 
 	test_asserts::verify ("keys match", master_key == slave_key);
@@ -112,7 +112,7 @@ AutoTest t2 ("Xefis Lossy Encryption/Handshake: handshake with wrong signature",
 		bool thrown_wrong_signature = false;
 
 		try {
-			Blob const master_key [[maybe_unused]] = master_2.calculate_key (*slave_handshake_and_key.handshake_response);
+			Blob const master_key [[maybe_unused]] = master_2.compute_key (*slave_handshake_and_key.handshake_response);
 		}
 		catch (HandshakeMaster::Exception const& exception)
 		{
@@ -191,7 +191,7 @@ AutoTest t5 ("Xefis Lossy Encryption/Handshake: wrong timestamp on slave side", 
 	bool thrown_delta_time_too_high = false;
 
 	try {
-		auto const encryption_key [[maybe_unused]] = master.calculate_key (*slave_handshake_and_key.handshake_response);
+		auto const encryption_key [[maybe_unused]] = master.compute_key (*slave_handshake_and_key.handshake_response);
 	}
 	catch (xf::crypto::xle::HandshakeMaster::Exception const& exception)
 	{
@@ -224,7 +224,7 @@ AutoTest t6 ("Xefis Lossy Encryption/Handshake: mismatched handshake IDs", []{
 	bool thrown_invalid_handshake_id = false;
 
 	try {
-		Blob const key = master_2.calculate_key (*slave_handshake_and_key.handshake_response);
+		Blob const key = master_2.compute_key (*slave_handshake_and_key.handshake_response);
 	}
 	catch (xf::crypto::xle::HandshakeMaster::Exception const& exception)
 	{

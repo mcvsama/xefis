@@ -31,21 +31,21 @@ namespace xf::crypto::xle {
 Transport::Transport (Params const& params):
 	_hmac_size (params.hmac_size)
 {
-	_hmac_key = calculate_hkdf<kSignatureHMACHashAlgorithm> ({
+	_hmac_key = compute_hkdf<kSignatureHMACHashAlgorithm> ({
 		.salt = params.authentication_secret,
 		.key_material = params.ephemeral_session_key,
 		.info = params.hkdf_user_info + to_blob ("hmac_key"),
 		.result_length = 32,
 	});
 
-	_data_encryption_key = calculate_hkdf<kDataEncryptionKeyHKDFHashAlgorithm> ({
+	_data_encryption_key = compute_hkdf<kDataEncryptionKeyHKDFHashAlgorithm> ({
 		.salt = params.data_encryption_secret,
 		.key_material = params.ephemeral_session_key,
 		.info = params.hkdf_user_info + to_blob ("data_encryption_key"),
 		.result_length = 32,
 	});
 
-	_seq_num_encryption_key = calculate_hkdf<kSeqNumEncryptionKeyHKDFHashAlgorithm> ({
+	_seq_num_encryption_key = compute_hkdf<kSeqNumEncryptionKeyHKDFHashAlgorithm> ({
 		.salt = params.seq_num_encryption_secret,
 		.key_material = params.ephemeral_session_key,
 		.info = params.hkdf_user_info + to_blob ("seq_num_encryption_key"),
@@ -82,7 +82,7 @@ Transmitter::encrypt_packet (BlobView const data)
 	// It's required that to_blob() gives little-endian encoding:
 	auto const binary_sequence_number = to_blob (_sequence_number);
 	auto const salt = random_blob (kDataSaltSize, _random_device);
-	auto const full_hmac = calculate_hmac<kSignatureHMACHashAlgorithm> ({
+	auto const full_hmac = compute_hmac<kSignatureHMACHashAlgorithm> ({
 		.data = data + salt + binary_sequence_number,
 		.key = *_hmac_key,
 	});
@@ -94,14 +94,14 @@ Transmitter::encrypt_packet (BlobView const data)
 	auto const encrypted_data = aes_ctr_xor ({
 		.data = data + salt + hmac,
 		.key = *_data_encryption_key,
-		.nonce = calculate_hash<kDataNonceHashAlgorithm> (binary_sequence_number).substr (0, 8),
+		.nonce = compute_hash<kDataNonceHashAlgorithm> (binary_sequence_number).substr (0, 8),
 	});
 	auto const encrypted_sequence_number = aes_ctr_xor ({
 		.data = binary_sequence_number,
 		.key = *_seq_num_encryption_key,
 		// Encrypted data must be at least 8 bytes, but longer is better for better entropy to avoid
 		// repeating nonce ever. That's why data salt is added before encryption.
-		.nonce = calculate_hash<kSeqNumNonceHashAlgorithm> (encrypted_data).substr (0, 8),
+		.nonce = compute_hash<kSeqNumNonceHashAlgorithm> (encrypted_data).substr (0, 8),
 	});
 	auto const encrypted_packet = encrypted_sequence_number + encrypted_data;
 
@@ -117,12 +117,12 @@ Receiver::decrypt_packet (BlobView const encrypted_packet, std::optional<Sequenc
 	auto const binary_sequence_number = aes_ctr_xor ({
 		.data = encrypted_sequence_number,
 		.key = *_seq_num_encryption_key,
-		.nonce = calculate_hash<kSeqNumNonceHashAlgorithm> (encrypted_data).substr (0, 8),
+		.nonce = compute_hash<kSeqNumNonceHashAlgorithm> (encrypted_data).substr (0, 8),
 	});
 	auto const data_with_hmac = aes_ctr_xor ({
 		.data = encrypted_data,
 		.key = *_data_encryption_key,
-		.nonce = calculate_hash<kDataNonceHashAlgorithm> (binary_sequence_number).substr (0, 8),
+		.nonce = compute_hash<kDataNonceHashAlgorithm> (binary_sequence_number).substr (0, 8),
 	});
 
 	if (data_with_hmac.size() >= kDataSaltSize + _hmac_size)
@@ -135,13 +135,13 @@ Receiver::decrypt_packet (BlobView const encrypted_packet, std::optional<Sequenc
 		salt.remove_suffix (_hmac_size);
 		hmac.remove_prefix (data.size() + kDataSaltSize);
 
-		auto const calculated_full_hmac = calculate_hmac<kSignatureHMACHashAlgorithm> ({
+		auto const computed_full_hmac = compute_hmac<kSignatureHMACHashAlgorithm> ({
 			.data = Blob (data) + salt + binary_sequence_number,
 			.key = *_hmac_key,
 		});
-		auto calculated_hmac = BlobView (calculated_full_hmac).substr (0, _hmac_size);
+		auto computed_hmac = BlobView (computed_full_hmac).substr (0, _hmac_size);
 
-		if (calculated_hmac == hmac)
+		if (computed_hmac == hmac)
 		{
 			auto const sequence_number = parse<SequenceNumber> (binary_sequence_number);
 

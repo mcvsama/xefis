@@ -173,7 +173,7 @@ class Transceiver
 	/**
 	 * Encrypt packet.
 	 *
-	 * \throws std::logic_error when calculated HMAC size doesn't fit
+	 * \throws std::logic_error when computed HMAC size doesn't fit
 	 *		   requirements.
 	 * \throws Exception when transceiver is not connected.
 	 */
@@ -338,7 +338,7 @@ class MasterTransceiver:
 		 * HandshakeRequested state.
 		 * Handshake has been requested to be sent, and it will be requested periodically
 		 * until connection is finalized, that is handshake response is received and encryption
-		 * key gets calculated.
+		 * key gets computed.
 		 */
 		struct HandshakeRequested
 		{
