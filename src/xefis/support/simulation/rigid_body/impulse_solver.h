@@ -97,7 +97,7 @@ class ImpulseSolver: private Noncopyable
 		{ _max_iterations = max_iterations; }
 
 	/**
-	 * Set required precision for calculated force moments of constraints.
+	 * Set required precision for computed force moments of constraints.
 	 */
 	void
 	set_required_precision (si::Force, si::Torque);
@@ -134,7 +134,7 @@ class ImpulseSolver: private Noncopyable
 	update_forces (si::Time dt);
 
 	void
-	calculate_constants_for_step (si::Time dt);
+	compute_constants_for_step (si::Time dt);
 
 	EvolutionDetails
 	update_constraint_forces (si::Time dt);
@@ -154,7 +154,7 @@ class ImpulseSolver: private Noncopyable
 
 	[[nodiscard]]
 	static Placement<WorldSpace, BodyCOM>
-	calculate_placement (Placement<WorldSpace, BodyCOM>, VelocityMoments<WorldSpace> const&, si::Time const dt);
+	compute_placement (Placement<WorldSpace, BodyCOM>, VelocityMoments<WorldSpace> const&, si::Time const dt);
 
 	void
 	update_placements (si::Time dt);

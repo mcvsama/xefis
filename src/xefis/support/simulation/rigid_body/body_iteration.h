@@ -38,7 +38,7 @@ class BodyIteration
 	using AngularImpulseOverInertia = decltype (si::AngularImpulse (1) / si::MomentOfInertia (1));
 
   public:
-	// Those are recalculated on each simulation step, but stay the same on all
+	// Those are recomputed on each simulation step, but stay the same on all
 	// impulse solver iterations:
 	SpaceMatrix<si::Mass, WorldSpace>::InverseMatrix			inv_M;
 	SpaceMatrix<si::MomentOfInertia, WorldSpace>::InverseMatrix	inv_I;

@@ -87,7 +87,7 @@ HingePrecalculation::HingePrecalculation (Body& body_1,
 
 
 void
-HingePrecalculation::calculate (HingePrecalculationData& data)
+HingePrecalculation::compute (HingePrecalculationData& data)
 {
 	auto const pl_1 = body_1().placement();
 	auto const pl_2 = body_2().placement();

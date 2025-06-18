@@ -61,7 +61,7 @@ AirfoilSplineWidget::set_airfoil_spline (AirfoilSpline const& airfoil_spline, st
 		auto const assumed_chord_length = _chord_length.value_or (1_m);
 		auto const assumed_wing_length = 1_m;
 		auto const assumed_material_density = 1_kg / 1_m3;
-		auto const mass_moments = calculate_mass_moments_at_arm<AirfoilSplineSpace> (_airfoil_spline, assumed_chord_length, assumed_wing_length, assumed_material_density);
+		auto const mass_moments = compute_mass_moments_at_arm<AirfoilSplineSpace> (_airfoil_spline, assumed_chord_length, assumed_wing_length, assumed_material_density);
 		auto const center_of_mass_3d = mass_moments.center_of_mass_position();
 		_center_of_mass_position = { center_of_mass_3d.x() / assumed_chord_length, center_of_mass_3d.y() / assumed_chord_length };
 	}
@@ -77,7 +77,7 @@ AirfoilSplineWidget::resizeEvent (QResizeEvent* event)
 {
 	CanvasWidget::resizeEvent (event);
 	setup_painting_transform();
-	_pens_calculated = false;
+	_pens_computed = false;
 }
 
 
@@ -288,7 +288,7 @@ AirfoilSplineWidget::update_canvas()
 void
 AirfoilSplineWidget::update_pens()
 {
-	if (!_pens_calculated)
+	if (!_pens_computed)
 	{
 		auto const ph = PaintHelper (this->canvas(), palette(), font());
 		auto const airfoil_color = QColor (0xd2, 0xc3, 0xb1, 0xff);
@@ -301,7 +301,7 @@ AirfoilSplineWidget::update_pens()
 		_drag_force_pen = QPen (Qt::red, ph.em_pixels (0.1f) / _scale, Qt::SolidLine, Qt::RoundCap);
 		_center_of_pressure_pen = QPen (Qt::blue, ph.em_pixels (0.1f) / _scale, Qt::SolidLine, Qt::FlatCap);
 		_wind_line_pen = QPen (Qt::gray, ph.em_pixels (0.05f) / _scale, Qt::SolidLine, Qt::FlatCap);
-		_pens_calculated = true;
+		_pens_computed = true;
 	}
 }
 

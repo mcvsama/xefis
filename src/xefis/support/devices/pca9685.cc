@@ -79,7 +79,7 @@ PCA9685::initialize()
 		// Need to go to sleep to change prescale value.
 		uint8_t mode1_orig = _i2c_device.read_register (Register_Mode1) & static_cast<uint8_t> (~Mode1_RestartEnabled);
 		_i2c_device.write_register (Register_Mode1, mode1_orig | Mode1_Sleep);
-		_i2c_device.write_register (Register_Prescale, calculate_prescale_register (1.0 / _output_period));
+		_i2c_device.write_register (Register_Prescale, compute_prescale_register (1.0 / _output_period));
 		_i2c_device.write_register (Register_Mode1, mode1_orig & ~Mode1_Sleep);
 		// Need to sleep for max 500 µs while waiting for osc to restart.
 		usleep (500);
@@ -148,7 +148,7 @@ PCA9685::get_config_for_pwm (si::Time duty_cycle)
 
 
 uint8_t
-PCA9685::calculate_prescale_register (si::Frequency frequency)
+PCA9685::compute_prescale_register (si::Frequency frequency)
 {
 	// Spec says: refresh_rate = EXTCLK / (4096 * (prescale + 1))
 	return std::round (kInternalFrequency / (4096.0 * frequency) - 1);

@@ -98,18 +98,18 @@ FixedConstraint::initialize_step (si::Time const dt)
 	_location_constraint_value.put (x2 + r2 - x1 - r1, 0, 0);
 	_location_constraint_value.put (_fixed_orientation.rotation_constraint_value (placement_1, placement_2), 0, 3);
 
-	_Z = calculate_Z (_Jv1, _Jw1, _Jv2, _Jw2, dt);
+	_Z = compute_Z (_Jv1, _Jw1, _Jv2, _Jw2, dt);
 }
 
 
 ConstraintForces
 FixedConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, VelocityMoments<WorldSpace> const& vm_2, si::Time dt)
 {
-	auto const J = calculate_jacobian (vm_1, _Jv1, _Jw1, vm_2, _Jv2, _Jw2);
-	auto const lambda = calculate_lambda (_location_constraint_value, J, _Z, dt);
+	auto const J = compute_jacobian (vm_1, _Jv1, _Jw1, vm_2, _Jv2, _Jw2);
+	auto const lambda = compute_lambda (_location_constraint_value, J, _Z, dt);
 
 	// TODO this internally transposes jacobians, so store here the transposed ones and reuse them
-	return calculate_constraint_forces (_Jv1, _Jw1, _Jv2, _Jw2, lambda);
+	return compute_constraint_forces (_Jv1, _Jw1, _Jv2, _Jw2, lambda);
 }
 
 } // namespace xf::rigid_body

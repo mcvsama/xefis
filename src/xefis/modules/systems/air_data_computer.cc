@@ -433,7 +433,7 @@ void
 AirDataComputer::compute_mach()
 {
 	// The approximate speed of sound in dry (0% humidity) air is TAS / sound-of-speed.
-	// We don't want to use either, because they depend on SAT, and SAT is calculated
+	// We don't want to use either, because they depend on SAT, and SAT is computed
 	// using Mach number, so we'd have a cycle.
 	//
 	// Instead use algorithm described here:

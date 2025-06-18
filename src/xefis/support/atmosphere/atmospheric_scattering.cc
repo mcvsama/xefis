@@ -30,7 +30,7 @@
 namespace xf {
 
 /**
- * Helper struct used in AtmosphericScattering::calculate_incident_light().
+ * Helper struct used in AtmosphericScattering::compute_incident_light().
  */
 template<class Value>
 	struct RayleighMie
@@ -47,11 +47,11 @@ AtmosphericScattering::AtmosphericScattering (Parameters const& parameters):
 
 [[nodiscard]]
 SpaceVector<float, RGBSpace>
-AtmosphericScattering::calculate_incident_light (SpaceLength<> const& observer_position,
-												 SpaceVector<double> const& ray_direction,
-												 SpaceVector<double> const& sun_direction,
-												 si::Length min_distance,
-												 si::Length max_distance) const
+AtmosphericScattering::compute_incident_light (SpaceLength<> const& observer_position,
+											   SpaceVector<double> const& ray_direction,
+											   SpaceVector<double> const& sun_direction,
+											   si::Length min_distance,
+											   si::Length max_distance) const
 {
 	// Precomputed values that correspond to the scattering coefficients of the sky at sea level, for wavelengths 680, 550 and 440 respectively:
     static constexpr SpaceVector<double> kRayleighBeta	= { 5.8e-6f, 13.5e-6f, 33.1e-6f };

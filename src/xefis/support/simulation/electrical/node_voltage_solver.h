@@ -158,7 +158,7 @@ class NodeVoltageSolver: public Noncopyable
 	solve_throwing();
 
 	/**
-	 * Evolve the state of the network (flow current and recalculate voltages).
+	 * Evolve the state of the network (flow current and recompute voltages).
 	 * Ignores convergence errors.
 	 */
 	void

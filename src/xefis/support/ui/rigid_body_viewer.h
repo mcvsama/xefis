@@ -317,7 +317,7 @@ class RigidBodyViewer: public GLAnimationWidget
 	 * Can be nullptr to unset.
 	 *
 	 * This isn't the same as translation; translation is relative
-	 * to the body, position is absolute and calculated by the RigidBodyPainter.
+	 * to the body, position is absolute and computed by the RigidBodyPainter.
 	 */
 	void
 	set_camera_position_callback (RigidBodyPainter::CameraPositionCallback const callback)

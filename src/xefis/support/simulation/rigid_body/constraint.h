@@ -74,7 +74,7 @@ class Constraint: public ConnectedBodies
 	template<std::size_t N>
 		using ConstraintMassMatrix = math::SquareMatrix<decltype (1 / 1_kg), N, WorldSpace, WorldSpace>;
 
-	// Z matrix is a result of -inv (K) * dt, where K is result of calculate_K():
+	// Z matrix is a result of -inv (K) * dt, where K is result of compute_K():
 	template<std::size_t N>
 		using ConstraintZMatrix = math::SquareMatrix<decltype (1_kg / 1_s), N, WorldSpace, WorldSpace>;
 
@@ -237,7 +237,7 @@ class Constraint: public ConnectedBodies
 	 * Called when final constraint forces are obtained for current frame of simulation.
 	 */
 	virtual void
-	calculated_constraint_forces (ConstraintForces const& result, [[maybe_unused]] si::Time const dt)
+	computed_constraint_forces (ConstraintForces const& result, [[maybe_unused]] si::Time const dt)
 	{
 		if (_breaking_force)
 			if (abs (result[0].force()) > *_breaking_force || abs (result[1].force()) > *_breaking_force)
@@ -259,14 +259,14 @@ class Constraint: public ConnectedBodies
 
   protected:
 	/**
-	 * Should return calculated constraint forces.
+	 * Should return computed constraint forces.
 	 */
 	[[nodiscard]]
 	virtual ConstraintForces
 	do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, VelocityMoments<WorldSpace> const& vm_2, si::Time dt) = 0;
 
 	/**
-	 * Helper function that calculates actual corrective forces for given Jacobians and location constraints.
+	 * Helper function that computes actual corrective forces for given Jacobians and location constraints.
 	 *
 	 * \param	ext_forces_1, ext_forces_2
 	 *			External force-moments acting on bodies 1, 2.
@@ -274,11 +274,11 @@ class Constraint: public ConnectedBodies
 	template<std::size_t N>
 		[[nodiscard]]
 		ConstraintForces
-		calculate_constraint_forces (JacobianV<N> const& Jv1,
-									 JacobianW<N> const& Jw1,
-									 JacobianV<N> const& Jv2,
-									 JacobianW<N> const& Jw2,
-									 Lambda<N> const& lambda) const;
+		compute_constraint_forces (JacobianV<N> const& Jv1,
+								   JacobianW<N> const& Jw1,
+								   JacobianV<N> const& Jv2,
+								   JacobianW<N> const& Jw2,
+								   Lambda<N> const& lambda) const;
 
 	/**
 	 * Calculates total jacobian (J[i]) for current simulation frame.
@@ -286,12 +286,12 @@ class Constraint: public ConnectedBodies
 	template<std::size_t N>
 		[[nodiscard]]
 		Jacobian<N>
-		calculate_jacobian (VelocityMoments<WorldSpace> const& vm_1,
-							JacobianV<N> const& Jv1,
-							JacobianW<N> const& Jw1,
-							VelocityMoments<WorldSpace> const& vm_2,
-							JacobianV<N> const& Jv2,
-							JacobianW<N> const& Jw2) const;
+		compute_jacobian (VelocityMoments<WorldSpace> const& vm_1,
+						  JacobianV<N> const& Jv1,
+						  JacobianW<N> const& Jw1,
+						  VelocityMoments<WorldSpace> const& vm_2,
+						  JacobianV<N> const& Jv2,
+						  JacobianW<N> const& Jw2) const;
 
 	/**
 	 * Calculate lambda (a vector of si::Force).
@@ -299,10 +299,10 @@ class Constraint: public ConnectedBodies
 	template<std::size_t N>
 		[[nodiscard]]
 		Lambda<N>
-		calculate_lambda (LocationConstraint<N> const& location_constraint,
-						  Jacobian<N> const& J,
-						  ConstraintMassMatrix<N> const& K,
-						  si::Time dt) const;
+		compute_lambda (LocationConstraint<N> const& location_constraint,
+						Jacobian<N> const& J,
+						ConstraintMassMatrix<N> const& K,
+						si::Time dt) const;
 
 	/**
 	 * Calculate lambda (a vector of si::Force).
@@ -310,10 +310,10 @@ class Constraint: public ConnectedBodies
 	template<std::size_t N>
 		[[nodiscard]]
 		Lambda<N>
-		calculate_lambda (LocationConstraint<N> const& location_constraint,
-						  Jacobian<N> const& J,
-						  ConstraintZMatrix<N> const& Z,
-						  si::Time dt) const;
+		compute_lambda (LocationConstraint<N> const& location_constraint,
+						Jacobian<N> const& J,
+						ConstraintZMatrix<N> const& Z,
+						si::Time dt) const;
 
 	/**
 	 * Calculate mass matrix K in a generic way.
@@ -322,10 +322,10 @@ class Constraint: public ConnectedBodies
 	template<std::size_t N>
 		[[nodiscard]]
 		ConstraintMassMatrix<N>
-		calculate_K (JacobianV<N> const& Jv1,
-					 JacobianW<N> const& Jw1,
-					 JacobianV<N> const& Jv2,
-					 JacobianW<N> const& Jw2) const;
+		compute_K (JacobianV<N> const& Jv1,
+				   JacobianW<N> const& Jw1,
+				   JacobianV<N> const& Jv2,
+				   JacobianW<N> const& Jw2) const;
 
 	/**
 	 * Calculate mass matrix K assuming that angular-velocity Jacobians are 0⃗.
@@ -333,8 +333,8 @@ class Constraint: public ConnectedBodies
 	template<std::size_t N>
 		[[nodiscard]]
 		ConstraintMassMatrix<N>
-		calculate_K (JacobianV<N> const& Jv1,
-					 JacobianV<N> const& Jv2) const;
+		compute_K (JacobianV<N> const& Jv1,
+				   JacobianV<N> const& Jv2) const;
 
 	/**
 	 * Calculate mass matrix K assuming that linear-velocity Jacobians are 0⃗.
@@ -342,34 +342,34 @@ class Constraint: public ConnectedBodies
 	template<std::size_t N>
 		[[nodiscard]]
 		ConstraintMassMatrix<N>
-		calculate_K (JacobianW<N> const& Jw1,
-					 JacobianW<N> const& Jw2) const;
+		compute_K (JacobianW<N> const& Jw1,
+				   JacobianW<N> const& Jw2) const;
 
 	template<std::size_t N>
 		[[nodiscard]]
 		ConstraintZMatrix<N>
-		calculate_Z (JacobianV<N> const& Jv1,
-					 JacobianW<N> const& Jw1,
-					 JacobianV<N> const& Jv2,
-					 JacobianW<N> const& Jw2,
-					 si::Time const dt) const
-		{ return -1.0 / dt * inv (calculate_K (Jv1, Jw1, Jv2, Jw2)); }
+		compute_Z (JacobianV<N> const& Jv1,
+				   JacobianW<N> const& Jw1,
+				   JacobianV<N> const& Jv2,
+				   JacobianW<N> const& Jw2,
+				   si::Time const dt) const
+		{ return -1.0 / dt * inv (compute_K (Jv1, Jw1, Jv2, Jw2)); }
 
 	template<std::size_t N>
 		[[nodiscard]]
 		ConstraintZMatrix<N>
-		calculate_Z (JacobianV<N> const& Jv1,
-					 JacobianV<N> const& Jv2,
-					 si::Time const dt) const
-		{ return -1.0 / dt * inv (calculate_K (Jv1, Jv2)); }
+		compute_Z (JacobianV<N> const& Jv1,
+				   JacobianV<N> const& Jv2,
+				   si::Time const dt) const
+		{ return -1.0 / dt * inv (compute_K (Jv1, Jv2)); }
 
 	template<std::size_t N>
 		[[nodiscard]]
 		ConstraintZMatrix<N>
-		calculate_Z (JacobianW<N> const& Jw1,
-					 JacobianW<N> const& Jw2,
-					 si::Time const dt) const
-		{ return -1.0 / dt * inv (calculate_K (Jw1, Jw2)); }
+		compute_Z (JacobianW<N> const& Jw1,
+				   JacobianW<N> const& Jw2,
+				   si::Time const dt) const
+		{ return -1.0 / dt * inv (compute_K (Jw1, Jw2)); }
 
 	/**
 	 * Adds Constraint Mixing Factor (CFM) to the given K matrix.
@@ -424,11 +424,11 @@ Constraint::constraint_forces (VelocityMoments<WorldSpace> const& vm_1, Velocity
 
 template<std::size_t N>
 	inline ConstraintForces
-	Constraint::calculate_constraint_forces (JacobianV<N> const& Jv1,
-											 JacobianW<N> const& Jw1,
-											 JacobianV<N> const& Jv2,
-											 JacobianW<N> const& Jw2,
-											 Lambda<N> const& lambda) const
+	Constraint::compute_constraint_forces (JacobianV<N> const& Jv1,
+										   JacobianW<N> const& Jw1,
+										   JacobianV<N> const& Jv2,
+										   JacobianW<N> const& Jw2,
+										   Lambda<N> const& lambda) const
 	{
 		auto const Fc1 = ~Jv1 * lambda;
 		auto const Tc1 = ~Jw1 * lambda;
@@ -444,12 +444,12 @@ template<std::size_t N>
 
 template<std::size_t N>
 	inline Constraint::Jacobian<N>
-	Constraint::calculate_jacobian (VelocityMoments<WorldSpace> const& vm_1,
-									JacobianV<N> const& Jv1,
-									JacobianW<N> const& Jw1,
-									VelocityMoments<WorldSpace> const& vm_2,
-									JacobianV<N> const& Jv2,
-									JacobianW<N> const& Jw2) const
+	Constraint::compute_jacobian (VelocityMoments<WorldSpace> const& vm_1,
+								  JacobianV<N> const& Jv1,
+								  JacobianW<N> const& Jw1,
+								  VelocityMoments<WorldSpace> const& vm_2,
+								  JacobianV<N> const& Jv2,
+								  JacobianW<N> const& Jw2) const
 	{
 		constexpr auto inv_radian = decltype (1.0 / 1_rad) { 1 };
 
@@ -468,10 +468,10 @@ template<std::size_t N>
 
 template<std::size_t N>
 	inline Constraint::Lambda<N>
-	Constraint::calculate_lambda (LocationConstraint<N> const& location_constraint,
-								  Jacobian<N> const& J,
-								  ConstraintMassMatrix<N> const& K,
-								  si::Time const dt) const
+	Constraint::compute_lambda (LocationConstraint<N> const& location_constraint,
+								Jacobian<N> const& J,
+								ConstraintMassMatrix<N> const& K,
+								si::Time const dt) const
 	{
 		auto const inv_dt = 1 / dt;
 		auto const stabilization_bias = baumgarte_factor() * inv_dt * location_constraint;
@@ -481,10 +481,10 @@ template<std::size_t N>
 
 template<std::size_t N>
 	inline Constraint::Lambda<N>
-	Constraint::calculate_lambda (LocationConstraint<N> const& location_constraint,
-								  Jacobian<N> const& J,
-								  ConstraintZMatrix<N> const& Z,
-								  si::Time const dt) const
+	Constraint::compute_lambda (LocationConstraint<N> const& location_constraint,
+								Jacobian<N> const& J,
+								ConstraintZMatrix<N> const& Z,
+								si::Time const dt) const
 	{
 		auto const inv_dt = 1 / dt;
 		auto const stabilization_bias = baumgarte_factor() * inv_dt * location_constraint;
@@ -494,10 +494,10 @@ template<std::size_t N>
 
 template<std::size_t N>
 	inline Constraint::ConstraintMassMatrix<N>
-	Constraint::calculate_K (JacobianV<N> const& Jv1,
-							 JacobianW<N> const& Jw1,
-							 JacobianV<N> const& Jv2,
-							 JacobianW<N> const& Jw2) const
+	Constraint::compute_K (JacobianV<N> const& Jv1,
+						   JacobianW<N> const& Jw1,
+						   JacobianV<N> const& Jv2,
+						   JacobianW<N> const& Jw2) const
 	{
 		auto const& inv_M1 = body_1().iteration().inv_M;
 		auto const& inv_I1 = body_1().iteration().inv_I;
@@ -517,8 +517,8 @@ template<std::size_t N>
 
 template<std::size_t N>
 	inline Constraint::ConstraintMassMatrix<N>
-	Constraint::calculate_K (JacobianV<N> const& Jv1,
-							 JacobianV<N> const& Jv2) const
+	Constraint::compute_K (JacobianV<N> const& Jv1,
+						   JacobianV<N> const& Jv2) const
 	{
 		auto const& inv_M1 = body_1().iteration().inv_M;
 		auto const& inv_M2 = body_2().iteration().inv_M;
@@ -533,8 +533,8 @@ template<std::size_t N>
 
 template<std::size_t N>
 	inline Constraint::ConstraintMassMatrix<N>
-	Constraint::calculate_K (JacobianW<N> const& Jw1,
-							 JacobianW<N> const& Jw2) const
+	Constraint::compute_K (JacobianW<N> const& Jw1,
+						   JacobianW<N> const& Jw2) const
 	{
 		auto const& inv_I1 = body_1().iteration().inv_I;
 		auto const& inv_I2 = body_2().iteration().inv_I;

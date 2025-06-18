@@ -25,7 +25,7 @@
 namespace xf {
 
 math::Vector<float, 2>
-calculate_cie_xy_blackbody_color (si::Temperature const temperature, std::function<float (float)> const attenuator)
+compute_cie_xy_blackbody_color (si::Temperature const temperature, std::function<float (float)> const attenuator)
 {
 	// Using a simple table for the CIE 1931 2° Standard Observer at 10 nm intervals.
 

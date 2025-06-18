@@ -270,9 +270,9 @@ namespace xf {
 template<math::CoordinateSystem Space = void>
 	[[nodiscard]]
 	constexpr ForceMoments<Space>
-	calculate_force_moments (MassMoments<Space> const& mm, AccelerationMoments<Space> const& am)
+	compute_force_moments (MassMoments<Space> const& mm, AccelerationMoments<Space> const& am)
 	{
-		return calculate_force_moments (mm, am);
+		return compute_force_moments (mm, am);
 	}
 
 
@@ -281,7 +281,7 @@ template<math::CoordinateSystem Space = void>
 	constexpr ForceMoments<Space>
 	operator* (MassMoments<Space> const& mm, AccelerationMoments<Space> const& am)
 	{
-		return calculate_force_moments (mm, am);
+		return compute_force_moments (mm, am);
 	}
 
 
@@ -290,7 +290,7 @@ template<math::CoordinateSystem Space = void>
 	constexpr ForceMoments<Space>
 	operator* (AccelerationMoments<Space> const& am, MassMoments<Space> const& mm)
 	{
-		return calculate_force_moments (mm, am);
+		return compute_force_moments (mm, am);
 	}
 
 } // namespace xf

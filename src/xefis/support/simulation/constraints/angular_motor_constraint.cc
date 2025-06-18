@@ -37,7 +37,7 @@ AngularMotorConstraint::initialize_step (si::Time const dt)
 
 	_Jw1.put (1_m * ~hinge.a1, 0, 0);
 	_Jw2.put (1_m * -~hinge.a1, 0, 0);
-	_Z = calculate_Z (_Jw1, _Jw2, dt);
+	_Z = compute_Z (_Jw1, _Jw2, dt);
 	_location_constraint_value = _max_angular_velocity * 1_m / 1_rad * 1_s;
 }
 
@@ -45,11 +45,11 @@ AngularMotorConstraint::initialize_step (si::Time const dt)
 ConstraintForces
 AngularMotorConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, VelocityMoments<WorldSpace> const& vm_2, si::Time dt)
 {
-	auto const J = calculate_jacobian (vm_1, _Jv, _Jw1, vm_2, _Jv, _Jw2);
-	auto lambda = calculate_lambda (_location_constraint_value, J, _Z, dt);
+	auto const J = compute_jacobian (vm_1, _Jv, _Jw1, vm_2, _Jv, _Jw2);
+	auto lambda = compute_lambda (_location_constraint_value, J, _Z, dt);
 	lambda = std::clamp (lambda.scalar(), -_force, +_force); // TODO scalar?
 
-	return calculate_constraint_forces (_Jv, _Jw1, _Jv, _Jw2, lambda);
+	return compute_constraint_forces (_Jv, _Jw1, _Jv, _Jw2, lambda);
 }
 
 } // namespace xf::rigid_body

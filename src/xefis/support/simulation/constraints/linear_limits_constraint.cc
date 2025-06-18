@@ -48,7 +48,7 @@ LinearLimitsConstraint::initialize_step (si::Time const dt)
 	_min_Jv2.put (~slider_data.a, 0, 0);
 	_min_Jw2.put (slider_data.r2xa, 0, 0);
 	_min_location_constraint_value = slider_data.distance - *_min_distance;
-	_min_Z = calculate_Z (_min_Jv1, _min_Jw1, _min_Jv2, _min_Jw2, dt);
+	_min_Z = compute_Z (_min_Jv1, _min_Jw1, _min_Jv2, _min_Jw2, dt);
 
 	// TODO doesn't seem to work correctly; perhaps look at symmetry of _min_Jw1 == _max_Jw2 in angular_limits
 	// TODO and try to replicate it here:
@@ -57,7 +57,7 @@ LinearLimitsConstraint::initialize_step (si::Time const dt)
 	_max_Jv2.put (-~slider_data.a, 0, 0);
 	_max_Jw2.put (-slider_data.r2xa, 0, 0);
 	_max_location_constraint_value = *_max_distance - slider_data.distance;
-	_max_Z = calculate_Z (_max_Jv1, _max_Jw1, _max_Jv2, _max_Jw2, dt);
+	_max_Z = compute_Z (_max_Jv1, _max_Jw1, _max_Jv2, _max_Jw2, dt);
 }
 
 
@@ -85,10 +85,10 @@ LinearLimitsConstraint::min_distance_corrections (VelocityMoments<WorldSpace> co
 {
 	if (_min_distance && slider_data.distance < *_min_distance)
 	{
-		auto const J = calculate_jacobian (vm_1, _min_Jv1, _min_Jw1, vm_2, _min_Jv2, _min_Jw2);
-		auto const lambda = calculate_lambda (_min_location_constraint_value, J, _min_Z, dt);
+		auto const J = compute_jacobian (vm_1, _min_Jv1, _min_Jw1, vm_2, _min_Jv2, _min_Jw2);
+		auto const lambda = compute_lambda (_min_location_constraint_value, J, _min_Z, dt);
 
-		return calculate_constraint_forces (_min_Jv1, _min_Jw1, _min_Jv2, _min_Jw2, lambda);
+		return compute_constraint_forces (_min_Jv1, _min_Jw1, _min_Jv2, _min_Jw2, lambda);
 	}
 	else
 		return std::nullopt;
@@ -103,10 +103,10 @@ LinearLimitsConstraint::max_distance_corrections (VelocityMoments<WorldSpace> co
 {
 	if (_max_distance && slider_data.distance > *_max_distance)
 	{
-		auto const J = calculate_jacobian (vm_1, _max_Jv1, _max_Jw1, vm_2, _max_Jv2, _max_Jw2);
-		auto const lambda = calculate_lambda (_max_location_constraint_value, J, _max_Z, dt);
+		auto const J = compute_jacobian (vm_1, _max_Jv1, _max_Jw1, vm_2, _max_Jv2, _max_Jw2);
+		auto const lambda = compute_lambda (_max_location_constraint_value, J, _max_Z, dt);
 
-		return calculate_constraint_forces (_max_Jv1, _max_Jw1, _max_Jv2, _max_Jw2, lambda);
+		return compute_constraint_forces (_max_Jv1, _max_Jw1, _max_Jv2, _max_Jw2, lambda);
 	}
 	else
 		return std::nullopt;

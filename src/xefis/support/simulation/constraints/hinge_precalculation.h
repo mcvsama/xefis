@@ -137,7 +137,7 @@ class HingePrecalculation: public FramePrecalculation<HingePrecalculationData>
   protected:
 	// FramePrecalculation API
 	void
-	calculate (HingePrecalculationData&) override;
+	compute (HingePrecalculationData&) override;
 
   private:
 	// Anchor as visible from each body:

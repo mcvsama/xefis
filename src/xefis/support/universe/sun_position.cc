@@ -27,7 +27,7 @@
 namespace xf {
 
 EclipticCoordinates
-calculate_sun_ecliptic_position (double const days_since_J2000)
+compute_sun_ecliptic_position (double const days_since_J2000)
 {
 	// These calculations are based on <https://en.wikipedia.org/wiki/Position_of_the_Sun#Approximate_position>.
 
@@ -50,7 +50,7 @@ calculate_sun_ecliptic_position (double const days_since_J2000)
 
 
 EquatorialCoordinates
-calculate_sun_equatorial_position (si::Angle const& ecliptic_longitude, double const days_since_J2000)
+compute_sun_equatorial_position (si::Angle const& ecliptic_longitude, double const days_since_J2000)
 {
 	// These calculations are based on <https://en.wikipedia.org/wiki/Position_of_the_Sun#Approximate_position>.
 
@@ -67,18 +67,18 @@ calculate_sun_equatorial_position (si::Angle const& ecliptic_longitude, double c
 
 
 HorizontalCoordinates
-calculate_sun_horizontal_position (si::Angle const sun_declination, si::Angle const observer_latitude, si::Angle const hour_angle)
+compute_sun_horizontal_position (si::Angle const sun_declination, si::Angle const observer_latitude, si::Angle const hour_angle)
 {
-	auto const sun_altitude = calculate_sun_altitude (sun_declination, observer_latitude, hour_angle);
+	auto const sun_altitude = compute_sun_altitude (sun_declination, observer_latitude, hour_angle);
 	return {
 		.altitude = sun_altitude,
-		.azimuth = calculate_sun_azimuth (sun_declination, observer_latitude, hour_angle, sun_altitude),
+		.azimuth = compute_sun_azimuth (sun_declination, observer_latitude, hour_angle, sun_altitude),
 	};
 }
 
 
 si::Angle
-calculate_sun_altitude (si::Angle const sun_declination, si::Angle const observer_latitude, si::Angle const hour_angle)
+compute_sun_altitude (si::Angle const sun_declination, si::Angle const observer_latitude, si::Angle const hour_angle)
 {
 	auto const arg = sin (observer_latitude) * sin (sun_declination) + cos (observer_latitude) * cos (sun_declination) * cos (hour_angle);
 	return 1_rad * asin (std::clamp (arg, -1.0, +1.0));
@@ -86,7 +86,7 @@ calculate_sun_altitude (si::Angle const sun_declination, si::Angle const observe
 
 
 si::Angle
-calculate_sun_azimuth (si::Angle const sun_declination, si::Angle const observer_latitude, si::Angle const hour_angle, si::Angle const sun_altitude)
+compute_sun_azimuth (si::Angle const sun_declination, si::Angle const observer_latitude, si::Angle const hour_angle, si::Angle const sun_altitude)
 {
 	// Formulas returned by ChatGPT:
 

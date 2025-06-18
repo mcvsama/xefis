@@ -360,7 +360,7 @@ is_visible_from (si::LonLatRadius<> const observer_position, si::LonLatRadius<> 
  */
 [[nodiscard]]
 constexpr si::Angle
-calculate_horizon_angle (si::Length const sphere_radius, si::Length const distance_from_center)
+compute_horizon_angle (si::Length const sphere_radius, si::Length const distance_from_center)
 {
 	return -1_rad * acos (sphere_radius / distance_from_center);
 }

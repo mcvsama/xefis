@@ -147,9 +147,9 @@ mean (si::Angle const lhs, si::Angle const rhs)
 
 
 RotationQuaternion<WorldSpace>
-calculate_ecef_to_celestial_rotation (double const julian_date)
+compute_ecef_to_celestial_rotation (double const julian_date)
 {
-	auto const theta = calculate_greenwich_mean_sidereal_time_at_0h_ut (julian_date);
+	auto const theta = compute_greenwich_mean_sidereal_time_at_0h_ut (julian_date);
 	auto const half  = 0.5 * theta;
 	return {
 		cos (half),	// w

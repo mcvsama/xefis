@@ -182,9 +182,9 @@ template<math::CoordinateSystem TargetSpace, math::CoordinateSystem SourceSpace>
  */
 template<math::CoordinateSystem Space>
 	MassMomentsAtArm<Space>
-	calculate_mass_moments_at_arm (Airfoil const& airfoil, si::Density const material_density)
+	compute_mass_moments_at_arm (Airfoil const& airfoil, si::Density const material_density)
 	{
-		return calculate_mass_moments_at_arm<Space> (airfoil.spline(), airfoil.chord_length(), airfoil.wing_length(), material_density);
+		return compute_mass_moments_at_arm<Space> (airfoil.spline(), airfoil.chord_length(), airfoil.wing_length(), material_density);
 	}
 
 } // namespace xf

@@ -167,7 +167,7 @@ namespace xf {
 template<math::CoordinateSystem Space = void>
 	[[nodiscard]]
 	constexpr AccelerationMoments<Space>
-	calculate_acceleration_moments (ForceMoments<Space> const& fm, MassMoments<Space> const& mm)
+	compute_acceleration_moments (ForceMoments<Space> const& fm, MassMoments<Space> const& mm)
 	{
 		return {
 			fm.force() / mm.mass(),
@@ -182,14 +182,14 @@ template<math::CoordinateSystem Space = void>
 	constexpr AccelerationMoments<Space>
 	operator/ (ForceMoments<Space> const& fm, MassMoments<Space> const& mm)
 	{
-		return calculate_acceleration_moments (fm, mm);
+		return compute_acceleration_moments (fm, mm);
 	}
 
 
 template<math::CoordinateSystem Space = void>
 	[[nodiscard]]
 	constexpr AccelerationMoments<Space>
-	calculate_acceleration_moments (VelocityMoments<Space> const& vm, si::Time const time)
+	compute_acceleration_moments (VelocityMoments<Space> const& vm, si::Time const time)
 	{
 		return {
 			vm.velocity() / time,
@@ -203,7 +203,7 @@ template<math::CoordinateSystem Space = void>
 	constexpr AccelerationMoments<Space>
 	operator/ (VelocityMoments<Space> const& vm, si::Time const time)
 	{
-		return calculate_acceleration_moments (vm, time);
+		return compute_acceleration_moments (vm, time);
 	}
 
 } // namespace xf

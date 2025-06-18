@@ -208,7 +208,7 @@ fill_in_uncomputed_points_on_sphere (Shape& shape)
 		auto const& lower = strips[0];
 		auto& upper = strips[1];
 
-		// Odd points are not calculated, need to be copied from the even points on the next strip.
+		// Odd points are not computed, need to be copied from the even points on the next strip.
 		for (std::size_t i = 1; i < lower.vertices.size(); i += 2)
 			upper.vertices[i] = lower.vertices[i - 1];
 	}
@@ -324,7 +324,7 @@ template<class SetupMaterial>
 				if (iv == 0)
 					add_vertex ({ angle_h, angle_v });
 				else
-					vertices.emplace_back(); // This point will be calculated in fill_in_uncomputed_points_on_sphere().
+					vertices.emplace_back(); // This point will be computed in fill_in_uncomputed_points_on_sphere().
 			}
 		}
 
@@ -395,7 +395,7 @@ template<class SetupMaterial>
 		}
 
 		auto first_strip = true;
-		// First, calculate only the lower-latitude points for each stack.
+		// First, compute only the lower-latitude points for each stack.
 		// The top ones are shared, so we'll just copy them later. This way
 		// we'll avoid calling setup_material() twice for the same points.
 		// TODO Optimize poles (setup_material is called multiple times for each pole)
@@ -428,7 +428,7 @@ template<class SetupMaterial>
 				if (first_strip)
 					add_vertex ({ longitude, latitudes[0] });
 				else
-					vertices.emplace_back(); // This point will be calculated in fill_in_uncomputed_points_on_sphere().
+					vertices.emplace_back(); // This point will be computed in fill_in_uncomputed_points_on_sphere().
 			}
 
 			if (params.symmetric_0_180)
@@ -444,7 +444,7 @@ template<class SetupMaterial>
 					if (first_strip)
 						add_vertex ({ -longitude, latitudes[0] }, false);
 					else
-						vertices.emplace_back(); // This point will be calculated in fill_in_uncomputed_points_on_sphere().
+						vertices.emplace_back(); // This point will be computed in fill_in_uncomputed_points_on_sphere().
 				}
 			}
 

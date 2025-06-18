@@ -28,7 +28,7 @@
 namespace xf::sim {
 
 Wing::Wing (Airfoil const& airfoil, si::Density const material_density):
-	Body (calculate_body_com_mass_moments (airfoil, material_density)),
+	Body (compute_body_com_mass_moments (airfoil, material_density)),
 	_airfoil (airfoil)
 {
 	set_shape (make_airfoil_shape ({
@@ -122,11 +122,11 @@ Wing::enable_smoothing (si::Time const smoothing_time, si::Time const precision)
 
 
 MassMomentsAtArm<BodyCOM>
-Wing::calculate_body_com_mass_moments (Airfoil const& airfoil, si::Density const material_density)
+Wing::compute_body_com_mass_moments (Airfoil const& airfoil, si::Density const material_density)
 {
 	// Well, let AirfoilSplineSpace and BodyCOM be actually the same, so an identity rotation:
 	auto const rotation = RotationQuaternion<BodyCOM, AirfoilSplineSpace> (math::identity);
-	return rotation * calculate_mass_moments_at_arm<AirfoilSplineSpace> (airfoil, material_density);
+	return rotation * compute_mass_moments_at_arm<AirfoilSplineSpace> (airfoil, material_density);
 }
 
 } // namespace xf::sim

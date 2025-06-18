@@ -148,7 +148,7 @@ class AirfoilSplineWidget: public CanvasWidget
 	// If not relative to COM, then it's relative to space origin in AirfoilSplineSpace:
 	bool						_center_of_pressure_position_relative_to_com { false };
 	si::Force					_force_per_spline_space_unit { 500_N };
-	bool						_pens_calculated { false };
+	bool						_pens_computed { false };
 	QPen						_coordinate_lines_pen;
 	QPen						_airfoil_pen;
 	QBrush						_airfoil_brush;

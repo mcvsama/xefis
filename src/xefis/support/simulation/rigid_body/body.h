@@ -381,7 +381,7 @@ class Body: public Noncopyable
 	// Impulses applied for the duration of the simulation frame:
 	mutable std::optional<ForceMoments<WorldSpace>>		_world_space_applied_impulses;
 	ForceMoments<BodyCOM>								_applied_impulses;
-	// Stuff calculated when simulation is run:
+	// Stuff computed when simulation is run:
 	BodyIteration										_iteration;
 	// Body shape:
 	std::optional<Shape>								_shape;
@@ -581,7 +581,7 @@ template<CoordinateSystemConcept Space>
 		{
 			// The resultant_force() assumes origin as the center of mass, so for Wrenches in WorldSpace coordinates
 			// it gives incorrect results, since C.O.M. is rarely at the WorldSpace origin.
-			// So first transform Wrench with its position to BodyCOM, only then calculate resultant force.
+			// So first transform Wrench with its position to BodyCOM, only then compute resultant force.
 			_applied_impulses += resultant_force (_placement.bound_transform_to_body (wrench));
 		}
 		else if constexpr (std::is_same_v<Space, BodyCOM>)

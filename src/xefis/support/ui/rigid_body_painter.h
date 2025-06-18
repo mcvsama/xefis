@@ -142,7 +142,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	struct Planet
 	{
 		rigid_body::Body const*	body				{ nullptr };
-		// If set to true, sky_dome_shape will be recalculated:
+		// If set to true, sky_dome_shape will be recomputed:
 		bool					need_new_sky_dome	{ true };
 		Shape					sky_dome_shape;
 		Shape					ground_shape;
@@ -256,8 +256,8 @@ class RigidBodyPainter: protected QOpenGLFunctions
 		set_followed (Object const& object) noexcept
 		{
 			_followed = &object;
-			calculate_followed_position();
-			calculate_camera_transform();
+			compute_followed_position();
+			compute_camera_transform();
 		}
 
 	/**
@@ -497,7 +497,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 
   private:
 	void
-	precalculate();
+	precompute();
 
 	void
 	setup_camera (QOpenGLPaintDevice&);
@@ -545,7 +545,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	/**
 	 * Rotates OpenGL world so that Z direction is towards the Sun.
 	 * Preconditions:
-	 *  • _sun_local_hour_angle and _sun_declination are calculated first.
+	 *  • _sun_local_hour_angle and _sun_declination are computed first.
 	 *  • current OpenGL rotation is identity.
 	 */
 	void
@@ -655,7 +655,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	sky_correction (SpaceVector<float, RGBSpace> rgb, SunPosition const&) const;
 
 	void
-	calculate_followed_position();
+	compute_followed_position();
 
 	[[nodiscard]]
 	SpaceLength<WorldSpace>
@@ -702,7 +702,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	 */
 	[[nodiscard]]
 	Shape
-	calculate_sky_dome_shape();
+	compute_sky_dome_shape();
 
 	/**
 	 * Check whether sky box can be computed, and if so, compute it.
@@ -718,7 +718,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	compute_sky_box_visibility (si::Angle const sun_altitude_above_horizon) const;
 
 	void
-	calculate_camera_transform();
+	compute_camera_transform();
 
 	/**
 	 * Make sure camera never goes under the surface of the Earth.
@@ -733,7 +733,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 
 	[[nodiscard]]
 	constexpr float
-	calculate_sun_visible_surface_factor (si::Angle const sun_altitude_above_horizon);
+	compute_sun_visible_surface_factor (si::Angle const sun_altitude_above_horizon);
 
 	/**
 	 * When sun face starts to become obscured by the horizon, pretend that the center of the sun
@@ -828,7 +828,7 @@ RigidBodyPainter::followed_body() const noexcept
 
 
 constexpr float
-RigidBodyPainter::calculate_sun_visible_surface_factor (si::Angle const sun_altitude_above_horizon)
+RigidBodyPainter::compute_sun_visible_surface_factor (si::Angle const sun_altitude_above_horizon)
 {
 	auto const v = neutrino::renormalize (sun_altitude_above_horizon,
 										  Range { -kSunFaceAngularRadius, +kSunFaceAngularRadius },

@@ -28,7 +28,7 @@
 namespace xf {
 
 /**
- * Air-data and forces calculated for a given airfoil for given air conditions
+ * Air-data and forces computed for a given airfoil for given air conditions
  * and physical properties of the airfoil.
  */
 template<class Space>
