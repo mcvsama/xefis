@@ -17,7 +17,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/nature/force_moments.h>
-#include <xefis/support/simulation/constraints/hinge_precalculation.h>
+#include <xefis/support/simulation/constraints/hinge_precomputation.h>
 #include <xefis/support/simulation/rigid_body/constraint.h>
 
 // Standard:
@@ -31,14 +31,14 @@ class HingeConstraint: public Constraint
   public:
 	// Ctor
 	explicit
-	HingeConstraint (HingePrecalculation&);
+	HingeConstraint (HingePrecomputation&);
 
 	/**
-	 * Return reference to HingePrecalculation.
+	 * Return reference to HingePrecomputation.
 	 */
-	HingePrecalculation const&
-	hinge_precalculation() const noexcept
-		{ return _hinge_precalculation; }
+	HingePrecomputation const&
+	hinge_precomputation() const noexcept
+		{ return _hinge_precomputation; }
 
 	// Constraint API
 	void
@@ -50,7 +50,7 @@ class HingeConstraint: public Constraint
 	do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, VelocityMoments<WorldSpace> const& vm_2, si::Time dt) override;
 
   private:
-	HingePrecalculation&	_hinge_precalculation;
+	HingePrecomputation&	_hinge_precomputation;
 	JacobianV<5>			_Jv1;
 	JacobianW<5>			_Jw1;
 	JacobianV<5>			_Jv2;

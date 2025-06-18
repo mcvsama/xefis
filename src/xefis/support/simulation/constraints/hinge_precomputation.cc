@@ -12,7 +12,7 @@
  */
 
 // Local:
-#include "hinge_precalculation.h"
+#include "hinge_precomputation.h"
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -25,17 +25,17 @@
 
 namespace xf::rigid_body {
 
-HingePrecalculation::HingePrecalculation (Body& body_1, Body& body_2):
+HingePrecomputation::HingePrecomputation (Body& body_1, Body& body_2):
 	FramePrecomputation (body_1, body_2),
 	_fixed_orientation (body_1.placement(), body_2.placement())
 { }
 
 
-HingePrecalculation::HingePrecalculation (SpaceLength<BodyCOM> const& anchor_point_1,
+HingePrecomputation::HingePrecomputation (SpaceLength<BodyCOM> const& anchor_point_1,
 										  SpaceLength<BodyCOM> const& anchor_point_2,
 										  Body& body_1,
 										  Body& body_2):
-	HingePrecalculation (body_1, body_2)
+	HingePrecomputation (body_1, body_2)
 {
 	auto const pl_1 = body_1.placement();
 	auto const pl_2 = body_2.placement();
@@ -49,11 +49,11 @@ HingePrecalculation::HingePrecalculation (SpaceLength<BodyCOM> const& anchor_poi
 }
 
 
-HingePrecalculation::HingePrecalculation (Body& body_1,
+HingePrecomputation::HingePrecomputation (Body& body_1,
 										  Body& body_2,
 										  SpaceLength<BodyCOM> const& anchor_point_1,
 										  SpaceLength<BodyCOM> const& anchor_point_2):
-	HingePrecalculation (body_1, body_2)
+	HingePrecomputation (body_1, body_2)
 {
 	auto const pl_1 = body_1.placement();
 	auto const pl_2 = body_2.placement();
@@ -67,11 +67,11 @@ HingePrecalculation::HingePrecalculation (Body& body_1,
 }
 
 
-HingePrecalculation::HingePrecalculation (Body& body_1,
+HingePrecomputation::HingePrecomputation (Body& body_1,
 										  SpaceLength<WorldSpace> const& anchor_point_1,
 										  SpaceLength<WorldSpace> const& anchor_point_2,
 										  Body& body_2):
-	HingePrecalculation (body_1, body_2)
+	HingePrecomputation (body_1, body_2)
 {
 	auto const pl_1 = body_1.placement();
 	auto const pl_2 = body_2.placement();
@@ -87,7 +87,7 @@ HingePrecalculation::HingePrecalculation (Body& body_1,
 
 
 void
-HingePrecalculation::compute (HingePrecalculationData& data)
+HingePrecomputation::compute (HingePrecomputationData& data)
 {
 	auto const pl_1 = body_1().placement();
 	auto const pl_2 = body_2().placement();

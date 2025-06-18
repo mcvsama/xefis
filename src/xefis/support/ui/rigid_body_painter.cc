@@ -911,8 +911,8 @@ RigidBodyPainter::paint (rigid_body::Constraint const& constraint)
 
 			if (auto const* hinge = dynamic_cast<rigid_body::HingeConstraint const*> (&constraint))
 			{
-				auto const a1 = b1.placement().unbound_transform_to_base (hinge->hinge_precalculation().body_1_anchor());
-				auto const hinge_1 = b1.placement().unbound_transform_to_base (hinge->hinge_precalculation().body_1_hinge());
+				auto const a1 = b1.placement().unbound_transform_to_base (hinge->hinge_precomputation().body_1_anchor());
+				auto const hinge_1 = b1.placement().unbound_transform_to_base (hinge->hinge_precomputation().body_1_hinge());
 				auto const hinge_start_1 = com1 + a1;
 				auto const hinge_end_1 = hinge_start_1 + hinge_1;
 				auto const hinge_center = hinge_start_1 + 0.5 * hinge_1;

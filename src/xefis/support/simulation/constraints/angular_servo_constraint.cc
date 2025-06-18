@@ -29,21 +29,21 @@
 
 namespace xf::rigid_body {
 
-AngularServoConstraint::AngularServoConstraint (HingePrecalculation& hinge_precalculation,
+AngularServoConstraint::AngularServoConstraint (HingePrecomputation& hinge_precomputation,
 												Range<si::Angle> const angle_range,
 												si::Angle const backlash,
 												AngularVelocityPotential const angular_velocity_potential,
 												TorquePotential const torque_potential):
-	Constraint (hinge_precalculation),
+	Constraint (hinge_precomputation),
 	Resistor ("AngularServoConstraint", kInitialResistance),
-	_hinge (hinge_precalculation),
+	_hinge (hinge_precomputation),
 	_pid_controller ({ .p = 50.0, .i = 1.0, .d = 1.0 }, 0_deg),
 	_angle_range (angle_range),
 	_backlash (backlash),
 	_failure_model (kExpectedLifetime, kNormalOperationTemperature, kAbsoluteMaximumTemperatureRange.max()),
 	_angular_velocity_potential (angular_velocity_potential),
 	_torque_potential (torque_potential),
-	_motor_constraint (hinge_precalculation)
+	_motor_constraint (hinge_precomputation)
 {
 	set_label ("angular servo");
 	_pid_controller.set_integral_limit ({ -0.1_deg * 1_s, +0.1_deg * 1_s });
@@ -153,20 +153,20 @@ AngularServoConstraint::update_pid_controller (si::Time const dt)
 
 
 std::unique_ptr<AngularServoConstraint>
-make_standard_servo_constraint (HingePrecalculation& hinge_precalculation, float scale)
+make_standard_servo_constraint (HingePrecomputation& hinge_precomputation, float scale)
 {
 	auto const angular_velocity_potential = kStandardAngularVelocityPotential / std::pow (scale, 0.25); // More or less, not being precise here.
 	auto const torque_potential = kStandardTorquePotential * scale;
-	return std::make_unique<AngularServoConstraint> (hinge_precalculation, Range { -90_deg, +90_deg }, 0.5_deg, angular_velocity_potential, torque_potential);
+	return std::make_unique<AngularServoConstraint> (hinge_precomputation, Range { -90_deg, +90_deg }, 0.5_deg, angular_velocity_potential, torque_potential);
 }
 
 
 std::unique_ptr<AngularServoConstraint>
-make_standard_9gram_servo_constraint (HingePrecalculation& hinge_precalculation, float scale)
+make_standard_9gram_servo_constraint (HingePrecomputation& hinge_precomputation, float scale)
 {
 	auto const angular_velocity_potential = k9gramAngularVelocityPotential / std::pow (scale, 0.25); // More or less, not being precise here.
 	auto const torque_potential = k9gramTorquePotential * scale;
-	return std::make_unique<AngularServoConstraint> (hinge_precalculation, Range { -90_deg, +90_deg }, 0.5_deg, angular_velocity_potential, torque_potential);
+	return std::make_unique<AngularServoConstraint> (hinge_precomputation, Range { -90_deg, +90_deg }, 0.5_deg, angular_velocity_potential, torque_potential);
 }
 
 } // namespace xf::rigid_body

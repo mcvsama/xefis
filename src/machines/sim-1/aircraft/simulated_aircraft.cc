@@ -227,17 +227,17 @@ make_aircraft (xf::rigid_body::System& rigid_body_system, Models& models)
 
 	// Constraints
 
-	auto& wing_l_hinge = rigid_body_system.add<rb::HingePrecalculation> (fuselage, wing_l, wing_l.origin<BodyCOM>(), wing_l.origin<BodyCOM>() - x_wing_chord);
-	auto& wing_r_hinge = rigid_body_system.add<rb::HingePrecalculation> (fuselage, wing_r, wing_r.origin<BodyCOM>() + z_wing_length, wing_r.origin<BodyCOM>() + z_wing_length - x_wing_chord);
+	auto& wing_l_hinge = rigid_body_system.add<rb::HingePrecomputation> (fuselage, wing_l, wing_l.origin<BodyCOM>(), wing_l.origin<BodyCOM>() - x_wing_chord);
+	auto& wing_r_hinge = rigid_body_system.add<rb::HingePrecomputation> (fuselage, wing_r, wing_r.origin<BodyCOM>() + z_wing_length, wing_r.origin<BodyCOM>() + z_wing_length - x_wing_chord);
 
-	auto& winglet_l_hinge = rigid_body_system.add<rb::HingePrecalculation> (wing_l, winglet_l, winglet_l.origin<BodyCOM>(), winglet_l.origin<BodyCOM>() + x_wing_chord);
-	auto& winglet_r_hinge = rigid_body_system.add<rb::HingePrecalculation> (wing_r.origin<BodyCOM>(), wing_r.origin<BodyCOM>() + x_wing_chord, wing_r, winglet_r);
+	auto& winglet_l_hinge = rigid_body_system.add<rb::HingePrecomputation> (wing_l, winglet_l, winglet_l.origin<BodyCOM>(), winglet_l.origin<BodyCOM>() + x_wing_chord);
+	auto& winglet_r_hinge = rigid_body_system.add<rb::HingePrecomputation> (wing_r.origin<BodyCOM>(), wing_r.origin<BodyCOM>() + x_wing_chord, wing_r, winglet_r);
 
-	auto& aileron_l_hinge = rigid_body_system.add<rb::HingePrecalculation> (wing_l, aileron_l, aileron_l.origin<BodyCOM>(), aileron_l.origin<BodyCOM>() + z_aileron_length);
-	auto& aileron_r_hinge = rigid_body_system.add<rb::HingePrecalculation> (wing_r, aileron_r, aileron_r.origin<BodyCOM>(), aileron_r.origin<BodyCOM>() + z_aileron_length);
+	auto& aileron_l_hinge = rigid_body_system.add<rb::HingePrecomputation> (wing_l, aileron_l, aileron_l.origin<BodyCOM>(), aileron_l.origin<BodyCOM>() + z_aileron_length);
+	auto& aileron_r_hinge = rigid_body_system.add<rb::HingePrecomputation> (wing_r, aileron_r, aileron_r.origin<BodyCOM>(), aileron_r.origin<BodyCOM>() + z_aileron_length);
 
-	auto& elevator_hinge = rigid_body_system.add<rb::HingePrecalculation> (tail_h, elevator, elevator.origin<BodyCOM>(), elevator.origin<BodyCOM>() + z_elevator_length);
-	auto& rudder_hinge = rigid_body_system.add<rb::HingePrecalculation> (tail_v, rudder, rudder.origin<BodyCOM>(), rudder.origin<BodyCOM>() + z_rudder_length);
+	auto& elevator_hinge = rigid_body_system.add<rb::HingePrecomputation> (tail_h, elevator, elevator.origin<BodyCOM>(), elevator.origin<BodyCOM>() + z_elevator_length);
+	auto& rudder_hinge = rigid_body_system.add<rb::HingePrecomputation> (tail_v, rudder, rudder.origin<BodyCOM>(), rudder.origin<BodyCOM>() + z_rudder_length);
 
 	// Servo limits:
 	rigid_body_system.add<rb::AngularLimitsConstraint> (aileron_l_hinge, xf::Range { -60_deg, +60_deg });

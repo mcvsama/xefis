@@ -24,9 +24,9 @@
 
 namespace xf::rigid_body {
 
-HingeConstraint::HingeConstraint (HingePrecalculation& hinge_precalculation):
-	Constraint (hinge_precalculation),
-	_hinge_precalculation (hinge_precalculation)
+HingeConstraint::HingeConstraint (HingePrecomputation& hinge_precomputation):
+	Constraint (hinge_precomputation),
+	_hinge_precomputation (hinge_precomputation)
 {
 	set_label ("hinge");
 
@@ -55,7 +55,7 @@ HingeConstraint::HingeConstraint (HingePrecalculation& hinge_precalculation):
 void
 HingeConstraint::initialize_step (si::Time const dt)
 {
-	auto const& hinge = _hinge_precalculation.data();
+	auto const& hinge = _hinge_precomputation.data();
 
 	// Translation:
 	_Jw1.put (make_pseudotensor (hinge.r1), 0, 0);
