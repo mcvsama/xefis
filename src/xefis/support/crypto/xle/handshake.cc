@@ -60,11 +60,11 @@ HandshakeMaster::generate_handshake_blob (si::Time const unix_timestamp)
 
 
 Blob
-HandshakeMaster::calculate_key (BlobView const slave_handshake_blob)
+HandshakeMaster::compute_key (BlobView const slave_handshake_blob)
 {
 	auto const slave_handshake = parse_and_verify_slave_handshake_blob (slave_handshake_blob);
-	Blob const ephemeral_key_with_weak_bits = _dhe_exchange.calculate_key_with_weak_bits (slave_handshake.dhe_exchange_blob);
-	Blob const ephemeral_key = calculate_hash<kHashAlgorithm> (ephemeral_key_with_weak_bits);
+	Blob const ephemeral_key_with_weak_bits = _dhe_exchange.compute_key_with_weak_bits (slave_handshake.dhe_exchange_blob);
+	Blob const ephemeral_key = compute_hash<kHashAlgorithm> (ephemeral_key_with_weak_bits);
 
 	return ephemeral_key;
 }
@@ -76,7 +76,7 @@ HandshakeMaster::make_master_handshake_blob (MasterHandshake const& master_hands
 	Blob const salt = random_blob (8, _random_device);
 	Blob const handshake_id_blob = to_blob (master_handshake.handshake_id);
 	Blob const handshake_data = salt + handshake_id_blob + to_blob (master_handshake.unix_timestamp_ms) + master_handshake.dhe_exchange_blob;
-	Blob const signature = calculate_hmac<kHashAlgorithm> ({ .data = handshake_data, .key = *_master_signature_key }).substr (0, _hmac_size);
+	Blob const signature = compute_hmac<kHashAlgorithm> ({ .data = handshake_data, .key = *_master_signature_key }).substr (0, _hmac_size);
 
 	return handshake_data + signature;
 }
@@ -92,14 +92,14 @@ HandshakeMaster::parse_and_verify_slave_handshake_blob (BlobView const slave_han
 	extracted_signature.remove_prefix (extracted_dhe_exchange_blob.size());
 
 	BlobView const extracted_handshake_data = slave_handshake_blob.substr (0, slave_handshake_blob.size() - _hmac_size);
-	Blob const calculated_signature = calculate_hmac<kHashAlgorithm> ({ .data = extracted_handshake_data, .key = *_slave_signature_key }).substr (0, _hmac_size);
+	Blob const computed_signature = compute_hmac<kHashAlgorithm> ({ .data = extracted_handshake_data, .key = *_slave_signature_key }).substr (0, _hmac_size);
 
 	SlaveHandshake extracted;
 	extracted.handshake_id = neutrino::parse<decltype (extracted.handshake_id)> (slave_handshake_blob.substr (8, 8));
 	extracted.unix_timestamp_ms = neutrino::parse<decltype (extracted.unix_timestamp_ms)> (slave_handshake_blob.substr (16, 8));
 	extracted.dhe_exchange_blob = extracted_dhe_exchange_blob;
 
-	if (extracted_signature != calculated_signature)
+	if (extracted_signature != computed_signature)
 		throw Exception (ErrorCode::WrongSignature, "wrong signature");
 
 	if (abs (1_ms * extracted.unix_timestamp_ms - neutrino::TimeHelper::utc_now()) > _max_time_difference)
@@ -138,8 +138,8 @@ HandshakeSlave::generate_handshake_blob_and_key (BlobView const master_handshake
 		throw Exception (ErrorCode::DeltaTimeTooHigh, "delta time too high");
 
 	Blob const dhe_exchange_blob = _dhe_exchange.generate_exchange_blob();
-	Blob const ephemeral_key_with_weak_bits = _dhe_exchange.calculate_key_with_weak_bits (master_handshake.dhe_exchange_blob);
-	Blob const ephemeral_key = calculate_hash<kHashAlgorithm> (ephemeral_key_with_weak_bits);
+	Blob const ephemeral_key_with_weak_bits = _dhe_exchange.compute_key_with_weak_bits (master_handshake.dhe_exchange_blob);
+	Blob const ephemeral_key = compute_hash<kHashAlgorithm> (ephemeral_key_with_weak_bits);
 
 	return {
 		.handshake_response = make_slave_handshake_blob ({
@@ -158,7 +158,7 @@ HandshakeSlave::make_slave_handshake_blob (SlaveHandshake const& slave_handshake
 	Blob const salt = random_blob (8, _random_device);
 	Blob const handshake_id_blob = to_blob (slave_handshake.handshake_id);
 	Blob const handshake_data = salt + handshake_id_blob + to_blob (slave_handshake.unix_timestamp_ms) + slave_handshake.dhe_exchange_blob;
-	Blob const signature = calculate_hmac<kHashAlgorithm> ({ .data = handshake_data, .key = *_slave_signature_key }).substr (0, _hmac_size);
+	Blob const signature = compute_hmac<kHashAlgorithm> ({ .data = handshake_data, .key = *_slave_signature_key }).substr (0, _hmac_size);
 
 	return handshake_data + signature;
 }
@@ -175,14 +175,14 @@ HandshakeSlave::parse_and_verify_master_handshake_blob (BlobView const master_ha
 	extracted_signature.remove_prefix (extracted_dhe_exchange_blob.size());
 
 	BlobView const extracted_handshake_data = master_handshake.substr (0, master_handshake.size() - _hmac_size);
-	Blob const calculated_signature = calculate_hmac<kHashAlgorithm> ({ .data = extracted_handshake_data, .key = *_master_signature_key }).substr (0, _hmac_size);
+	Blob const computed_signature = compute_hmac<kHashAlgorithm> ({ .data = extracted_handshake_data, .key = *_master_signature_key }).substr (0, _hmac_size);
 
 	MasterHandshake extracted;
 	extracted.handshake_id = neutrino::parse<decltype (extracted.handshake_id)> (master_handshake.substr (8, 8));
 	extracted.unix_timestamp_ms = neutrino::parse<decltype (extracted.unix_timestamp_ms)> (master_handshake.substr (16, 8));
 	extracted.dhe_exchange_blob = extracted_dhe_exchange_blob;
 
-	if (extracted_signature != calculated_signature)
+	if (extracted_signature != computed_signature)
 		throw Exception (ErrorCode::WrongSignature, "wrong signature");
 
 	return extracted;

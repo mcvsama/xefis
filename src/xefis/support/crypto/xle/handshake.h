@@ -37,7 +37,7 @@ namespace xf::crypto::xle {
 using HandshakeID = uint64_t;
 
 /**
- * Generates/parses handshake blobs and calculates final ephemeral key from
+ * Generates/parses handshake blobs and computes final ephemeral key from
  * the handshake for master and slave ends. The resulting ephemeral key from
  * the DHE is hashed to get uniform pseudorandom distribution.
  */
@@ -144,12 +144,12 @@ class HandshakeMaster: public Handshake
 
 	/**
 	 * Return the ephemeral key to use for encryption.
-	 * If key can't be calculated (eg. it was used before or the handshake is incorrect),
+	 * If key can't be computed (eg. it was used before or the handshake is incorrect),
 	 * throws Exception with appropriate error code.
 	 */
 	[[nodiscard]]
 	Blob
-	calculate_key (BlobView slave_handshake_blob);
+	compute_key (BlobView slave_handshake_blob);
 
   private:
 	[[nodiscard]]

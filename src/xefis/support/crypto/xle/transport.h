@@ -99,7 +99,7 @@ class Transport
 	 */
 	Blob
 	data_encryption_key_hash() const
-		{ return calculate_hash<Hash::SHA3_256> (*_data_encryption_key); }
+		{ return compute_hash<Hash::SHA3_256> (*_data_encryption_key); }
 
 	/**
 	 * Return how much larger the resulting packet will be compared to plain text.
@@ -128,7 +128,7 @@ class Transmitter: public Transport
 	/**
 	 * Return next encrypted packet.
 	 *
-	 * \throws std::logic_error if calculated HMAC size < configured hmac_size.
+	 * \throws std::logic_error if computed HMAC size < configured hmac_size.
 	 */
 	[[nodiscard]]
 	Blob
