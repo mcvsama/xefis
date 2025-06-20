@@ -132,11 +132,11 @@ AFCS::knob_speed_change (int delta)
 	switch (_speed_control)
 	{
 		case SpeedControl::KIAS:
-			_mcp_ias = xf::clamped (_mcp_ias + 1_kt * delta, kSpeedRange);
+			_mcp_ias = neutrino::clamp (_mcp_ias + 1_kt * delta, kSpeedRange);
 			break;
 
 		case SpeedControl::Mach:
-			_mcp_mach = xf::clamped (_mcp_mach + kMachStep * delta, kMachRange);
+			_mcp_mach = neutrino::clamp (_mcp_mach + kMachStep * delta, kMachRange);
 			break;
 	}
 }
@@ -376,7 +376,7 @@ AFCS::knob_altitude_change (int delta)
 			altitude_step = 100_ft;
 			break;
 	}
-	_mcp_altitude = xf::clamped (_mcp_altitude + altitude_step * delta, kAltitudeRange);
+	_mcp_altitude = neutrino::clamp (_mcp_altitude + altitude_step * delta, kAltitudeRange);
 }
 
 
@@ -447,7 +447,7 @@ AFCS::knob_vertical_change (int delta)
 		case VerticalControl::VS:
 			if (!_mcp_vs)
 				_mcp_vs = 0_fpm;
-			_mcp_vs = xf::clamped (*_mcp_vs + kVSStep * delta, kVSRange);
+			_mcp_vs = neutrino::clamp (*_mcp_vs + kVSStep * delta, kVSRange);
 
 			// Disengage on 0 crossing:
 			if (xf::Range (-0.5 * kVSStep, 0.5 * kVSStep).includes (*_mcp_vs))
@@ -460,7 +460,7 @@ AFCS::knob_vertical_change (int delta)
 		case VerticalControl::FPA:
 			if (!_mcp_fpa)
 				_mcp_fpa = 0_deg;
-			_mcp_fpa = xf::clamped (*_mcp_fpa + kFPAStep * delta, kFPARange);
+			_mcp_fpa = neutrino::clamp (*_mcp_fpa + kFPAStep * delta, kFPARange);
 
 			// Disengage on 0 crossing:
 			if (xf::Range (-0.5 * kFPAStep, +0.5 * kFPAStep).includes (*_mcp_fpa))

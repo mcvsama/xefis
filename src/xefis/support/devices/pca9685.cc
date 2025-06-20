@@ -131,8 +131,8 @@ PCA9685::get_config_for_pwm (si::Time duty_cycle)
 	uint16_t on_time = 0;
 	uint16_t off_time = 4095 * (duty_cycle / _output_period) / y_corr;
 
-	xf::clamp<uint16_t> (on_time, 0, 4095);
-	xf::clamp<uint16_t> (off_time, 0, 4095);
+	neutrino::clamp_inplace<uint16_t> (on_time, 0, 4095);
+	neutrino::clamp_inplace<uint16_t> (off_time, 0, 4095);
 
 	boost::endian::native_to_little (on_time);
 	boost::endian::native_to_little (off_time);

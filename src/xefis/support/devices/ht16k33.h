@@ -540,7 +540,7 @@ HT16K33::set_brightness (uint8_t brightness)
 inline void
 HT16K33::set_brightness (float brightness)
 {
-	set_brightness (static_cast<uint8_t> (16 * xf::clamped (brightness, 0.0f, 1.0f)));
+	set_brightness (static_cast<uint8_t> (16 * std::clamp (brightness, 0.0f, 1.0f)));
 }
 
 

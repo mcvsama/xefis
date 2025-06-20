@@ -166,7 +166,7 @@ AFCS_FD_Roll::compute_roll (xf::PIDController<si::Angle, si::Angle>& pid,
 	xf::Range roll_limits { -*_io.roll_limits, +*_io.roll_limits };
 
 	if (cmd_direction && measured_direction)
-		return xf::clamped (pid (*cmd_direction, *measured_direction, update_dt), roll_limits);
+		return neutrino::clamp (pid (*cmd_direction, *measured_direction, update_dt), roll_limits);
 	else
 	{
 		pid.reset();

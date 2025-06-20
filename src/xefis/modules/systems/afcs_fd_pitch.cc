@@ -192,7 +192,7 @@ template<class Input, class Control>
 		xf::Range pitch_limits { -*_io.pitch_limits, +*_io.pitch_limits };
 
 		if (cmd_param && measured_param)
-			return xf::clamped (pid (*cmd_param, *measured_param, update_dt), pitch_limits);
+			return neutrino::clamp (pid (*cmd_param, *measured_param, update_dt), pitch_limits);
 		else
 		{
 			pid.reset();

@@ -85,8 +85,8 @@ AFCS_Autothrottle::compute_thrust()
 					// There's no 1:1 correlaction between them.
 					// TODO use _ias_pid.set_output_limit (...);
 					xf::Range output_extents { *_io.output_thrust_minimum, *_io.output_thrust_maximum };
-					computed_thrust = xf::clamped (_ias_pid_smoother (_ias_pid (*_io.cmd_ias, *_io.measured_ias, dt), dt),
-												   output_extents);
+					computed_thrust = neutrino::clamp (_ias_pid_smoother (_ias_pid (*_io.cmd_ias, *_io.measured_ias, dt), dt),
+													   output_extents);
 					// TODO make PID control the change rate of thrust, not the thrust directly. Maybe incorporate
 					// something into the PIDController object itself? Or create another function-like class.
 				}

@@ -39,7 +39,7 @@ Parameters::sanitize()
 {
 	using xf::floored_mod;
 
-	range = xf::clamped<si::Length> (range, 1_ft, 5000_nmi);
+	range = std::clamp<si::Length> (range, 1_ft, 5000_nmi);
 
 	if (heading_magnetic)
 		heading_magnetic = floored_mod (*heading_magnetic, 360_deg);
@@ -839,7 +839,7 @@ PaintingWork::paint_altitude_reach()
 	if (!_p.altitude_reach_distance || (*_p.altitude_reach_distance < 0.005f * _p.range) || (0.8f * _p.range < *_p.altitude_reach_distance))
 		return;
 
-	float len = xf::clamped (to_px (6_nmi), 2.f * _c.q, 7.f * _c.q);
+	float len = std::clamp (to_px (6_nmi), 2.f * _c.q, 7.f * _c.q);
 	float pos = to_px (*_p.altitude_reach_distance);
 	QRectF rect (0.f, 0.f, len, len);
 	_aids.centrify (rect);
@@ -1194,7 +1194,7 @@ PaintingWork::paint_course()
 	if (_p.course_deviation)
 	{
 		bool filled = false;
-		si::Angle deviation = xf::clamped<si::Angle> (*_p.course_deviation, -2.5_deg, +2.5_deg);
+		si::Angle deviation = std::clamp<si::Angle> (*_p.course_deviation, -2.5_deg, +2.5_deg);
 
 		if (abs (*_p.course_deviation) <= abs (deviation))
 			filled = true;
@@ -1658,7 +1658,7 @@ PaintingWork::paint_navaids()
 						_painter.drawLine (tr_l.map (QPointF (0.0, 0.0)), tr_l.map (QPointF (0.0, -length_px)));
 						_painter.drawLine (tr_r.map (QPointF (0.0, 0.0)), tr_r.map (QPointF (0.0, -length_px)));
 						// Extended runway:
-						float const m_px = xf::clamped<float> (to_px (1_m), 0.02f, 0.04f);
+						float const m_px = std::clamp<float> (to_px (1_m), 0.02f, 0.04f);
 						QPen dashed_pen = _aids.get_pen (Qt::white, 1.0, Qt::DashLine);
 						dashed_pen.setDashPattern (QVector<qreal>() << 300 * m_px << 200 * m_px);
 						_painter.setPen (dashed_pen);
@@ -2163,7 +2163,7 @@ HSI::process (xf::Cycle const& cycle)
 	params.track_lateral_rotation = _io.track_lateral_rotation.get_optional();
 
 	if (params.track_lateral_rotation)
-		params.track_lateral_rotation = xf::clamped<si::AngularVelocity> (*params.track_lateral_rotation, si::convert (-1_Hz), si::convert (+1_Hz));
+		params.track_lateral_rotation = std::clamp<si::AngularVelocity> (*params.track_lateral_rotation, si::convert (-1_Hz), si::convert (+1_Hz));
 
 	params.altitude_reach_distance = _io.target_altitude_reach_distance.get_optional();
 	params.wind_from_magnetic_heading = _io.wind_from_magnetic.get_optional();

@@ -22,6 +22,7 @@
 #include <neutrino/qt/qfontmetrics.h>
 
 // Standard:
+#include <algorithm>
 #include <cstddef>
 
 
@@ -99,7 +100,7 @@ Flaps::async_paint (xf::PaintRequest const& paint_request, PaintingParams const&
 	// Filled block showing current value:
 	if (pp.current_angle)
 	{
-		si::Angle current = xf::clamped<si::Angle> (*pp.current_angle, 0_deg, pp.maximum_angle);
+		si::Angle current = std::clamp<si::Angle> (*pp.current_angle, 0_deg, pp.maximum_angle);
 		QRectF filled_block = block;
 		filled_block.setHeight (current / pp.maximum_angle * filled_block.height());
 		painter.setPen (Qt::NoPen);
@@ -111,7 +112,7 @@ Flaps::async_paint (xf::PaintRequest const& paint_request, PaintingParams const&
 	if (pp.set_angle)
 	{
 		// Green line:
-		si::Angle setting = xf::clamped<si::Angle> (*pp.set_angle, 0_deg, pp.maximum_angle);
+		si::Angle setting = std::clamp<si::Angle> (*pp.set_angle, 0_deg, pp.maximum_angle);
 		float w = 0.3f * block.width();
 		float s = block.top() + setting / pp.maximum_angle * block.height();
 		painter.setPen (aids->get_pen (Qt::green, 2.f));

@@ -144,7 +144,8 @@ ETSAirspeed::offset_collected()
 
 	// Limit offset:
 	uint16_t saved_offset = _offset;
-	xf::clamp (_offset, kRawValueMinimum, kRawValueMaximum);
+	neutrino::clamp_inplace (_offset, kRawValueMinimum, kRawValueMaximum);
+
 	if (saved_offset != _offset)
 		_logger << "Offset clipped to: " << _offset << std::endl;
 }

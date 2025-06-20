@@ -165,14 +165,14 @@ template<class Value>
 		{
 			auto v = (_converter && _io.reference) ? _converter (*_io.reference) : _io.reference.to_floating_point();
 			values.reference_str = BasicGauge::stringify (v, *_io.format, _io.precision);
-			values.normalized_reference = xf::renormalize (xf::clamped (*_io.reference, range), range, BasicGauge::kNormalizedRange);
+			values.normalized_reference = xf::renormalize (neutrino::clamp (*_io.reference, range), range, BasicGauge::kNormalizedRange);
 		}
 
 		if (_io.target)
-			values.normalized_target = xf::renormalize (xf::clamped (*_io.target, range), range, BasicGauge::kNormalizedRange);
+			values.normalized_target = xf::renormalize (neutrino::clamp (*_io.target, range), range, BasicGauge::kNormalizedRange);
 
 		if (_io.automatic)
-			values.normalized_automatic = xf::renormalize (xf::clamped (*_io.automatic, range), range, BasicGauge::kNormalizedRange);
+			values.normalized_automatic = xf::renormalize (neutrino::clamp (*_io.automatic, range), range, BasicGauge::kNormalizedRange);
 
 		return std::packaged_task<void()> ([this, pr = std::move (paint_request), gv = std::move (values)] {
 			async_paint (pr, gv);
