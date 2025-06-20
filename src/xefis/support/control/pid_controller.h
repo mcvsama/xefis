@@ -307,7 +307,7 @@ template<class V, class C, class P>
 		if (_winding)
 		{
 			// TODO do it better
-			error = clamped<Input> (measured - _setpoint, Input (-2.0), Input (+2.0));
+			error = std::clamp<Input> (measured - _setpoint, Input (-2.0), Input (+2.0));
 
 			if (abs (error) > Input (1.0))
 				error = error - sgn (error) * Input (2.0);
@@ -319,7 +319,7 @@ template<class V, class C, class P>
 		_integrated_error += error * dt;
 
 		if (_integral_limit)
-			clamp (_integrated_error, *_integral_limit);
+			clamp_inplace (_integrated_error, *_integral_limit);
 
 		// D:
 		_error_derivative = (error - _previous_error) / dt;
@@ -329,7 +329,7 @@ template<class V, class C, class P>
 
 		// P and the rest:
 		auto anti_error_action = -_gain * (_p * error + _i * _integrated_error / 1_s + _d * _error_derivative * 1_s);
-		_output = clamped<ProcessVariable> (ProcessVariable (si::quantity (anti_error_action)), _output_limit);
+		_output = neutrino::clamp<ProcessVariable> (ProcessVariable (si::quantity (anti_error_action)), _output_limit);
 		_previous_error = error;
 
 		return _output;

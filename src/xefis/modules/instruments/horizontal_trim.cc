@@ -77,7 +77,7 @@ HorizontalTrim::async_paint (xf::PaintRequest const& paint_request, PaintingPara
 	auto& ref_max = pp.trim_reference_maximum;
 
 	if (trim)
-		trim = xf::clamped (*trim, -1.0, +1.0);
+		trim = std::clamp (*trim, -1.0, +1.0);
 
 	double h = aids->font_2.digit_height;
 	double v = aids->width() - h;

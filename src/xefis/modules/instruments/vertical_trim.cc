@@ -70,7 +70,7 @@ VerticalTrim::async_paint (xf::PaintRequest const& paint_request, PaintingParams
 	auto& ref_max = pp.trim_reference_maximum;
 
 	if (trim)
-		xf::clamp (*trim, -1.0, +1.0);
+		neutrino::clamp_inplace (*trim, -1.0, +1.0);
 
 	double h = aids->font_2.digit_height;
 	double v = aids->height() - h;

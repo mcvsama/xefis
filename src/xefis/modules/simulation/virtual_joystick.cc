@@ -341,16 +341,16 @@ VirtualLinearWidget::value() const noexcept
 		switch (_orientation)
 		{
 			case Horizontal:
-				v = xf::clamped<float> (_value + _control->delta().x() / width(), kInternalRange);
+				v = neutrino::clamp<float> (_value + _control->delta().x() / width(), kInternalRange);
 				break;
 
 			case Vertical:
-				v = xf::clamped<float> (_value - _control->delta().y() / height(), kInternalRange);
+				v = neutrino::clamp<float> (_value - _control->delta().y() / height(), kInternalRange);
 				break;
 		}
 	}
 	else
-		v = xf::clamped<float> (_value, kInternalRange);
+		v = neutrino::clamp<float> (_value, kInternalRange);
 
 	return xf::renormalize (v, kInternalRange, _range);
 }

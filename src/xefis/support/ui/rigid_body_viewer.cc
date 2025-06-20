@@ -179,7 +179,7 @@ RigidBodyViewer::mouseMoveEvent (QMouseEvent* event)
 	{
 		auto const scale = kRotationScale / pixel_density;
 		_camera_rotation.x() += scale * delta.y();
-		_camera_rotation.x() = clamped<si::Angle> (_camera_rotation.x(), { -90_deg, +90_deg });
+		_camera_rotation.x() = neutrino::clamp<si::Angle> (_camera_rotation.x(), { -90_deg, +90_deg });
 		_camera_rotation.y() = -floored_mod (-_camera_rotation.y() - scale * delta.x(), 360_deg);
 		forward_camera_rotation();
 	}

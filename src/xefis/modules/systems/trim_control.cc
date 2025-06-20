@@ -99,7 +99,7 @@ TrimControl::update_trim()
 void
 TrimControl::update_trim_without_sound()
 {
-	_trim_value = xf::clamped (_trim_value + (_trimming_up ? 1 : _trimming_down ? -1 : 0) * *_io.trim_step, -1.0, 1.0);
+	_trim_value = std::clamp (_trim_value + (_trimming_up ? 1 : _trimming_down ? -1 : 0) * *_io.trim_step, -1.0, 1.0);
 	_io.output_trim_value = _trim_value;
 }
 

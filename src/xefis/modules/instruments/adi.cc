@@ -24,8 +24,8 @@
 #include <neutrino/si/utils.h>
 
 // Standard:
-#include <cstddef>
 #include <algorithm>
+#include <cstddef>
 #include <format>
 
 
@@ -82,10 +82,10 @@ Parameters::sanitize()
 	// Limit FPM position:
 	{
 		if (this->flight_path_alpha)
-			this->flight_path_alpha = xf::clamped<si::Angle> (*this->flight_path_alpha, -25.0_deg, +25.0_deg);
+			this->flight_path_alpha = std::clamp<si::Angle> (*this->flight_path_alpha, -25.0_deg, +25.0_deg);
 
 		if (this->flight_path_beta)
-			this->flight_path_beta = xf::clamped<si::Angle> (*this->flight_path_beta, -25.0_deg, +25.0_deg);
+			this->flight_path_beta = std::clamp<si::Angle> (*this->flight_path_beta, -25.0_deg, +25.0_deg);
 	}
 
 	// Speed limits:
@@ -97,28 +97,28 @@ Parameters::sanitize()
 		}
 
 		if (this->speed_mach)
-			this->speed_mach = xf::clamped (*this->speed_mach, 0.0, 9.99);
+			this->speed_mach = std::clamp (*this->speed_mach, 0.0, 9.99);
 
 		if (this->speed_minimum)
-			this->speed_minimum = xf::clamped<si::Velocity> (*this->speed_minimum, 0.0_kt, 9999.99_kt);
+			this->speed_minimum = std::clamp<si::Velocity> (*this->speed_minimum, 0.0_kt, 9999.99_kt);
 
 		if (this->speed_minimum_maneuver)
-			this->speed_minimum_maneuver = xf::clamped<si::Velocity> (*this->speed_minimum_maneuver, 0.0_kt, 9999.99_kt);
+			this->speed_minimum_maneuver = std::clamp<si::Velocity> (*this->speed_minimum_maneuver, 0.0_kt, 9999.99_kt);
 
 		if (this->speed_maximum_maneuver)
-			this->speed_maximum_maneuver = xf::clamped<si::Velocity> (*this->speed_maximum_maneuver, 0.0_kt, 9999.99_kt);
+			this->speed_maximum_maneuver = std::clamp<si::Velocity> (*this->speed_maximum_maneuver, 0.0_kt, 9999.99_kt);
 
 		if (this->speed_maximum)
-			this->speed_maximum = xf::clamped<si::Velocity> (*this->speed_maximum, 0.0_kt, 9999.99_kt);
+			this->speed_maximum = std::clamp<si::Velocity> (*this->speed_maximum, 0.0_kt, 9999.99_kt);
 	}
 
 	// Altitude limits:
 	{
 		if (this->altitude_amsl)
-			this->altitude_amsl = xf::clamped<si::Length> (*this->altitude_amsl, -99999_ft, +99999_ft);
+			this->altitude_amsl = std::clamp<si::Length> (*this->altitude_amsl, -99999_ft, +99999_ft);
 
 		if (this->vertical_speed)
-			this->vertical_speed = xf::clamped<si::Velocity> (*this->vertical_speed, -9999_fpm, +9999_fpm);
+			this->vertical_speed = std::clamp<si::Velocity> (*this->vertical_speed, -9999_fpm, +9999_fpm);
 	}
 }
 
@@ -704,7 +704,7 @@ ArtificialHorizon::paint_bank_angle_indicator (AdiPaintRequest& pr) const
 
 		if (pr.params.slip_skid)
 		{
-			pr.painter.translate (-xf::clamped (pr.params.slip_skid->in<si::Degree>(), -4.0, +4.0) * 0.03 * w, 0.0);
+			pr.painter.translate (-std::clamp (pr.params.slip_skid->in<si::Degree>(), -4.0, +4.0) * 0.03 * w, 0.0);
 
 			if (pr.params.roll_warning || pr.params.slip_skid_warning)
 				pr.painter.setPen (warning_pen);
@@ -1249,7 +1249,7 @@ VelocityLadder::paint_speed_tendency (AdiPaintRequest& pr, float const x) const
 		if (*pr.params.speed_lookahead < *pr.params.speed)
 			pr.painter.scale (1.f, -1.f);
 
-		float const lookahead_pixels = abs (kt_to_px (pr, xf::clamped<si::Velocity> (*pr.params.speed_lookahead, 1_kt * pr.params.vl_minimum, 1_kt * pr.params.vl_maximum)));
+		float const lookahead_pixels = abs (kt_to_px (pr, std::clamp<si::Velocity> (*pr.params.speed_lookahead, 1_kt * pr.params.vl_minimum, 1_kt * pr.params.vl_maximum)));
 		float const length = std::min<float> (_ladder_rect.height() / 2.f, lookahead_pixels) - 0.5f * x;
 
 		if (length > 0.2f * x)
@@ -1304,8 +1304,8 @@ VelocityLadder::paint_bugs (AdiPaintRequest& pr, float const x) const
 		// Speed bug:
 		if (pr.params.cmd_speed)
 		{
-			float const cmd_speed_pixels = kt_to_px (pr, xf::clamped<si::Velocity> (*pr.params.cmd_speed, 1_kt * pr.params.vl_minimum, 1_kt * pr.params.vl_maximum));
-			float const posy = xf::clamped<float> (cmd_speed_pixels, -_ladder_rect.height() / 2.0, _ladder_rect.height() / 2.0);
+			float const cmd_speed_pixels = kt_to_px (pr, std::clamp<si::Velocity> (*pr.params.cmd_speed, 1_kt * pr.params.vl_minimum, 1_kt * pr.params.vl_maximum));
+			float const posy = std::clamp<float> (cmd_speed_pixels, -_ladder_rect.height() / 2.0, _ladder_rect.height() / 2.0);
 			pr.painter.setClipRect (_ladder_rect.translated (2.5f * x, 0.f));
 			pr.painter.translate (1.25f * x, posy);
 			pr.painter.setBrush (Qt::NoBrush);
@@ -1862,8 +1862,8 @@ AltitudeLadder::paint_bugs (AdiPaintRequest& pr, float const x) const
 		// AP bug:
 		if (pr.params.cmd_altitude)
 		{
-			si::Length cmd_altitude = xf::clamped<si::Length> (*pr.params.cmd_altitude, -99999_ft, +99999_ft);
-			float posy = xf::clamped (ft_to_px (pr, cmd_altitude),
+			si::Length cmd_altitude = std::clamp<si::Length> (*pr.params.cmd_altitude, -99999_ft, +99999_ft);
+			float posy = std::clamp (ft_to_px (pr, cmd_altitude),
 									  static_cast<float> (-_ladder_rect.height() / 2), static_cast<float> (_ladder_rect.height() / 2));
 			QPolygonF const bug_shape ({
 				QPointF (0.f, 0.f),
@@ -2139,7 +2139,7 @@ AltitudeLadder::paint_ap_setting (AdiPaintRequest& pr) const
 {
 	if (pr.params.cmd_altitude)
 	{
-		si::Length cmd_altitude = xf::clamped<si::Length> (*pr.params.cmd_altitude, -99999_ft, +99999_ft);
+		si::Length cmd_altitude = std::clamp<si::Length> (*pr.params.cmd_altitude, -99999_ft, +99999_ft);
 
 		QFont const& b_font = pr.aids.font_5.font;
 		QFontMetricsF const b_metrics (b_font);
@@ -2440,7 +2440,7 @@ PaintingWork::paint_flight_director (AdiPaintRequest& pr) const
 		if (pr.params.flight_director_pitch)
 		{
 			si::Angle pitch = si::cos (*pr.params.orientation_roll) * (*pr.params.flight_director_pitch - *pr.params.orientation_pitch);
-			pitch = xf::clamped (pitch, -range, +range);
+			pitch = std::clamp (pitch, -range, +range);
 			float const ypos = pr.pitch_to_px (pitch);
 
 			for (auto const& pen: pens)
@@ -2457,7 +2457,7 @@ PaintingWork::paint_flight_director (AdiPaintRequest& pr) const
 			if (abs (roll) > 180_deg)
 				roll = roll - sgn (roll.in<si::Degree>()) * 360_deg;
 
-			roll = xf::clamped (roll, -range, +range);
+			roll = std::clamp (roll, -range, +range);
 
 			float const xpos = pr.heading_to_px (roll) / 2.f;
 
@@ -2489,8 +2489,8 @@ PaintingWork::paint_control_surfaces (AdiPaintRequest& pr) const
 		float const w = pr.aids.lesser_dimension() * 0.2f / 9.f;
 		si::Angle const range = 17.5_deg;
 
-		si::Angle pitch = xf::renormalize (xf::clamped (pr.params.control_surfaces_elevator, -1.0f, +1.0f), -1.0f, +1.0f, -range, +range);
-		si::Angle roll = xf::renormalize (xf::clamped (pr.params.control_surfaces_ailerons, -1.0f, +1.0f), -1.0f, +1.0f, -range, +range);
+		si::Angle pitch = xf::renormalize (std::clamp (pr.params.control_surfaces_elevator, -1.0f, +1.0f), -1.0f, +1.0f, -range, +range);
+		si::Angle roll = xf::renormalize (std::clamp (pr.params.control_surfaces_ailerons, -1.0f, +1.0f), -1.0f, +1.0f, -range, +range);
 
 		float ypos = pr.pitch_to_px (pitch);
 		float xpos = pr.heading_to_px (roll);
@@ -2537,7 +2537,7 @@ PaintingWork::paint_altitude_agl (AdiPaintRequest& pr) const
 {
 	if (pr.params.altitude_agl)
 	{
-		si::Length aagl = xf::clamped<si::Length> (*pr.params.altitude_agl, -9999_ft, +99999_ft);
+		si::Length aagl = std::clamp<si::Length> (*pr.params.altitude_agl, -9999_ft, +99999_ft);
 		QFont const& radar_altimeter_font = pr.aids.font_5.font;
 		float const digit_width = pr.aids.font_5.digit_width;
 		float const digit_height = pr.aids.font_5.digit_height;
@@ -2665,12 +2665,12 @@ PaintingWork::paint_nav (AdiPaintRequest& pr) const
 			si::Angle approach_deviation;
 
 			if (original_approach_deviation)
-				approach_deviation = xf::clamped<si::Angle> (*original_approach_deviation, -2.25_deg, +2.25_deg);
+				approach_deviation = std::clamp<si::Angle> (*original_approach_deviation, -2.25_deg, +2.25_deg);
 
 			si::Angle path_deviation;
 
 			if (original_path_deviation)
-				path_deviation = xf::clamped<si::Angle> (*original_path_deviation, -2.25_deg, +2.25_deg);
+				path_deviation = std::clamp<si::Angle> (*original_path_deviation, -2.25_deg, +2.25_deg);
 
 			QRectF rect (0.f, 0.f, 0.385f * ld, 0.055f * ld);
 			pr.aids.centrify (rect);
@@ -2811,8 +2811,8 @@ PaintingWork::paint_nav (AdiPaintRequest& pr) const
 		float w = 0.15f * ld;
 		float h = 0.05f * ld;
 		float p = 1.3f;
-		float offset = 0.5f * xf::clamped (pr.params.deviation_lateral_approach->in<si::Degree>(), -1.5, +1.5);
-		float ypos = -pr.pitch_to_px (xf::clamped<si::Angle> (*pr.params.raising_runway_position + 3.5_deg, 3.5_deg, 25_deg));
+		float offset = 0.5f * std::clamp (pr.params.deviation_lateral_approach->in<si::Degree>(), -1.5, +1.5);
+		float ypos = -pr.pitch_to_px (std::clamp<si::Angle> (*pr.params.raising_runway_position + 3.5_deg, 3.5_deg, 25_deg));
 
 		pr.painter.setTransform (pr.precomputed.center_transform);
 		pr.painter.translate (0.f, ypos);
@@ -2970,7 +2970,7 @@ PaintingWork::paint_critical_aoa (AdiPaintRequest& pr) const
 	{
 		pr.painter.setClipping (false);
 		pr.painter.setTransform (pr.precomputed.center_transform);
-		pr.painter.translate (0.f, pr.pitch_to_px (xf::clamped<si::Angle> (*pr.params.critical_aoa - *pr.params.aoa_alpha, -20_deg, +16_deg)));
+		pr.painter.translate (0.f, pr.pitch_to_px (std::clamp<si::Angle> (*pr.params.critical_aoa - *pr.params.aoa_alpha, -20_deg, +16_deg)));
 
 		float const w = pr.aids.lesser_dimension() * 3.f / 9.f;
 
@@ -3307,7 +3307,7 @@ ADI::process (xf::Cycle const& cycle)
 	if (*_io.enable_raising_runway && _io.navaid_reference_visible.value_or (false) && _io.altitude_agl &&
 		_io.flight_path_deviation_lateral_approach && *_io.altitude_agl <= *_io.raising_runway_visibility)
 	{
-		params.raising_runway_position = xf::clamped<si::Length> (_io.altitude_agl.value_or (0_ft), 0_ft, *_io.raising_runway_threshold) / *_io.raising_runway_threshold * 25_deg;
+		params.raising_runway_position = std::clamp<si::Length> (_io.altitude_agl.value_or (0_ft), 0_ft, *_io.raising_runway_threshold) / *_io.raising_runway_threshold * 25_deg;
 	}
 	else
 		params.raising_runway_position.reset();

@@ -105,8 +105,8 @@ HT16K33::SingleLED::SingleLED (xf::ModuleIn<bool>& socket, Row row, Column colum
 	_row (row),
 	_column (column)
 {
-	xf::clamp (_row, LEDMatrix::kMinRow, LEDMatrix::kMaxRow);
-	xf::clamp (_column, LEDMatrix::kMinColumn, LEDMatrix::kMaxColumn);
+	neutrino::clamp_inplace (_row, LEDMatrix::kMinRow, LEDMatrix::kMaxRow);
+	neutrino::clamp_inplace (_column, LEDMatrix::kMinColumn, LEDMatrix::kMaxColumn);
 }
 
 
@@ -122,8 +122,8 @@ HT16K33::SingleSwitch::SingleSwitch (xf::ModuleOut<bool>& socket, Row row, Colum
 	_row (row),
 	_column (column)
 {
-	xf::clamp (_row, KeyMatrix::kMinRow, KeyMatrix::kMaxRow);
-	xf::clamp (_column, KeyMatrix::kMinColumn, KeyMatrix::kMaxColumn);
+	neutrino::clamp_inplace (_row, KeyMatrix::kMinRow, KeyMatrix::kMaxRow);
+	neutrino::clamp_inplace (_column, KeyMatrix::kMinColumn, KeyMatrix::kMaxColumn);
 }
 
 
@@ -200,7 +200,7 @@ HT16K33::update()
 
 		_i2c_device.write (kDisplayRegister | display_bits);
 
-		uint8_t brightness = xf::clamped<uint8_t> (_brightness, 0, kMaxBrightness);
+		uint8_t brightness = std::clamp<uint8_t> (_brightness, 0, kMaxBrightness);
 
 		_i2c_device.write (kBrightnessRegister | brightness);
 
@@ -279,7 +279,7 @@ void
 HT16K33::update_timers()
 {
 	// According to docs, each scan takes 20 ms, so limit sampling rate to 50 Hz:
-	auto scan_frequency = xf::clamped (_scan_frequency, 0_Hz, _reliable_mode ? 25_Hz : 50_Hz);
+	auto scan_frequency = std::clamp (_scan_frequency, 0_Hz, _reliable_mode ? 25_Hz : 50_Hz);
 	_scan_timer->setInterval ((1.0 / scan_frequency).in<si::Millisecond>());
 	_scan_timer->start();
 }

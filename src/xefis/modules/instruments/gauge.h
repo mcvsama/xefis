@@ -21,6 +21,7 @@
 #include <xefis/core/sockets/socket.h>
 
 // Standard:
+#include <algorithm>
 #include <cstddef>
 #include <format>
 #include <cmath>
@@ -105,7 +106,7 @@ BasicGauge::GaugeValues::get_from (auto const& module, auto const& range, std::o
 	if (module.value)
 	{
 		value_str = BasicGauge::stringify (floating_point_value, *module.format, module.precision);
-		normalized_value = xf::renormalize (xf::clamped (*module.value, range), range, kNormalizedRange);
+		normalized_value = xf::renormalize (neutrino::clamp (*module.value, range), range, kNormalizedRange);
 	}
 
 	if (module.value_minimum_critical)

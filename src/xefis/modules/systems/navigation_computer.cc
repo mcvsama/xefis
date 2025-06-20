@@ -288,7 +288,7 @@ NavigationComputer::compute_track()
 			if (si::isfinite (rotation_speed))
 			{
 				rotation_speed = _track_lateral_rotation_smoother (rotation_speed, update_dt);
-				result_rotation_speed = xf::clamped<si::AngularVelocity> (rotation_speed, si::convert (-1_Hz), si::convert (+1_Hz));
+				result_rotation_speed = std::clamp<si::AngularVelocity> (rotation_speed, si::convert (-1_Hz), si::convert (+1_Hz));
 			}
 			else
 				_track_lateral_rotation_smoother.invalidate();

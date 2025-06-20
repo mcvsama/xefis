@@ -71,7 +71,7 @@ FlapsControl::process (xf::Cycle const&)
 
 	if (_requested_setting.value_changed() && _io.requested_setting)
 	{
-		_setting = xf::clamped<si::Angle> (*_io.requested_setting, _extents);
+		_setting = neutrino::clamp<si::Angle> (*_io.requested_setting, _extents);
 		_timer->start();
 	}
 }

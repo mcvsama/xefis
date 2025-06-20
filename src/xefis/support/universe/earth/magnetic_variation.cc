@@ -224,7 +224,7 @@ MagneticVariationImpl::yymmdd_to_julian_days( int yyyy, int mm, int dd )
     int64_t jd;
 	int yy;
 
-	yy = clamped (yyyy, 1950, 2049);
+	yy = std::clamp (yyyy, 1950, 2049);
     jd = dd - 32075L + 1461L * (yy + 4800L + (mm - 14) / 12 ) / 4;
     jd = jd + 367L * (mm - 2 - (mm - 14) / 12*12) / 12;
     jd = jd - 3 * ((yy + 4900L + (mm - 14) / 12) / 100) / 4;

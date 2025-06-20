@@ -169,7 +169,7 @@ PerformanceComputer::compute_glide_ratio()
 	{
 		si::Velocity forward_speed = *_io.speed_gs;
 		int ratio = (forward_speed > 1_kt)
-			? xf::clamped<int> (forward_speed / *_io.vertical_speed, -99, +99)
+			? std::clamp<int> (forward_speed / *_io.vertical_speed, -99, +99)
 			: 0;
 		_io.glide_ratio = ratio;
 

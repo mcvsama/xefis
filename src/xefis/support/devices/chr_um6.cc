@@ -163,7 +163,7 @@ CHRUM6::sample_rate_setting (si::Frequency const frequency) noexcept
 {
 	// Use formula from the spec: freq = (280/255) * sample_rate + 20.
 	uint32_t x = (std::max ((frequency - 20_Hz), 0.1_Hz) / (280.0 / 255.0)).in<si::Hertz>();
-	return xf::clamped (x, 0u, 255u);
+	return std::clamp (x, 0u, 255u);
 }
 
 
