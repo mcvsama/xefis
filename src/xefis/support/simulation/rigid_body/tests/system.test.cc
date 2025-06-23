@@ -46,8 +46,8 @@
 namespace xf::test {
 namespace {
 
-static constexpr SpaceVector<si::Force, WorldSpace>		kNoForce	{ 0_N, 0_N, 0_N };
-static constexpr SpaceVector<si::Torque, WorldSpace>	kNoTorque	{ 0_Nm, 0_Nm, 0_Nm };
+static constexpr SpaceForce<WorldSpace>		kNoForce	{ 0_N, 0_N, 0_N };
+static constexpr SpaceTorque<WorldSpace>	kNoTorque	{ 0_Nm, 0_Nm, 0_Nm };
 
 xf::Logger g_null_logger;
 

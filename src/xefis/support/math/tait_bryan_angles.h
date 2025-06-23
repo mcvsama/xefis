@@ -98,7 +98,7 @@ tait_bryan_angles (RotationQuaternion<ECEFSpace, AirframeSpace> const& body_rota
 
 [[nodiscard]]
 inline TaitBryanAngles
-tait_bryan_angles (RotationMatrix<ECEFSpace, AirframeSpace> const& body_coordinates, SpaceVector<si::Length, ECEFSpace> const& position)
+tait_bryan_angles (RotationMatrix<ECEFSpace, AirframeSpace> const& body_coordinates, SpaceLength<ECEFSpace> const& position)
 {
 	return tait_bryan_angles (RotationQuaternion (body_coordinates), to_polar (position));
 }
@@ -106,7 +106,7 @@ tait_bryan_angles (RotationMatrix<ECEFSpace, AirframeSpace> const& body_coordina
 
 [[nodiscard]]
 inline TaitBryanAngles
-tait_bryan_angles (RotationQuaternion<ECEFSpace, AirframeSpace> const& body_rotation, SpaceVector<si::Length, ECEFSpace> const& position)
+tait_bryan_angles (RotationQuaternion<ECEFSpace, AirframeSpace> const& body_rotation, SpaceLength<ECEFSpace> const& position)
 {
 	return tait_bryan_angles (body_rotation, to_polar (position));
 }

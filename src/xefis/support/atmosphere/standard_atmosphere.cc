@@ -129,7 +129,7 @@ standard_temperature_gradient (std::map<si::Length, InternationalStandardAtmosph
 
 
 Air<ECEFSpace>
-StandardAtmosphere::air_at (SpaceVector<si::Length, ECEFSpace> const& position) const
+StandardAtmosphere::air_at (SpaceLength<ECEFSpace> const& position) const
 {
 	return air_at_radius (abs (position));
 }

@@ -37,7 +37,7 @@ template<math::CoordinateSystem pBaseSpace = void, math::CoordinateSystem pSpace
 		using BaseSpace				= pBaseSpace;
 		using Space					= pSpace;
 
-		using Position				= SpaceVector<si::Length, BaseSpace>;
+		using Position				= SpaceLength<BaseSpace>;
 		using BodyRotation			= RotationQuaternion<BaseSpace, Space>;
 		using BaseRotation			= RotationQuaternion<Space, BaseSpace>;
 		using BodyRotationMatrix	= RotationMatrix<BaseSpace, Space>;
@@ -125,7 +125,7 @@ template<math::CoordinateSystem pBaseSpace = void, math::CoordinateSystem pSpace
 		 * Translate in-place the body by a relative vector in Space.
 		 */
 		void
-		translate_frame (SpaceVector<si::Length, Space> const& vector)
+		translate_frame (SpaceLength<Space> const& vector)
 			requires (!std::is_same<BaseSpace, Space>())
 		{ translate (_body_rotation * vector); }
 
@@ -187,9 +187,9 @@ template<math::CoordinateSystem pBaseSpace = void, math::CoordinateSystem pSpace
 				{ return _body_rotation * input; }
 
 	  private:
-		SpaceVector<si::Length, BaseSpace>	_position		{ math::zero };
-		BaseRotation						_base_rotation	{ math::identity };
-		BodyRotation						_body_rotation	{ math::identity };
+		SpaceLength<BaseSpace>	_position		{ math::zero };
+		BaseRotation			_base_rotation	{ math::identity };
+		BodyRotation			_body_rotation	{ math::identity };
 	};
 
 
