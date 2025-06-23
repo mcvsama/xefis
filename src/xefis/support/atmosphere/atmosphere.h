@@ -37,7 +37,7 @@ class Atmosphere
 
 	[[nodiscard]]
 	virtual Air<ECEFSpace>
-	air_at (SpaceVector<si::Length, ECEFSpace> const& position) const = 0;
+	air_at (SpaceLength<ECEFSpace> const& position) const = 0;
 };
 
 } // namespace xf

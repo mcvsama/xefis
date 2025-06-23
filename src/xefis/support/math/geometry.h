@@ -387,7 +387,7 @@ template<math::CoordinateSystem TargetSpace = ECEFSpace>
 
 template<math::CoordinateSystem TargetSpace = ECEFSpace>
 	[[nodiscard]]
-	constexpr SpaceVector<si::Length, TargetSpace>
+	constexpr SpaceLength<TargetSpace>
 	to_cartesian (si::LonLatRadius<> const& position)
 	{
 		return position.radius() * to_cartesian<TargetSpace> (static_cast<si::LonLat const&> (position));

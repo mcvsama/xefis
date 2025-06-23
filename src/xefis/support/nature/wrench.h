@@ -45,17 +45,17 @@ template<math::CoordinateSystem Space = void>
 
 		// Ctor
 		constexpr
-		Wrench (ForceMoments<Space> const&, SpaceVector<si::Length, Space> const& position);
+		Wrench (ForceMoments<Space> const&, SpaceLength<Space> const& position);
 
 		// Ctor
 		constexpr
-		Wrench (SpaceVector<si::Force, Space> const& force, SpaceVector<si::Torque, Space> const& torque, SpaceVector<si::Length, Space> const& position);
+		Wrench (SpaceForce<Space> const& force, SpaceTorque<Space> const& torque, SpaceLength<Space> const& position);
 
 		/**
 		 * Force's root.
 		 */
 		[[nodiscard]]
-		SpaceVector<si::Length, Space> const&
+		SpaceLength<Space> const&
 		position() const noexcept
 			{ return _position; }
 
@@ -63,11 +63,11 @@ template<math::CoordinateSystem Space = void>
 		 * Set force's root.
 		 */
 		void
-		set_position (SpaceVector<si::Length, Space> const& position)
+		set_position (SpaceLength<Space> const& position)
 			{ _position = position; }
 
 	  private:
-		SpaceVector<si::Length, Space>	_position	{ math::zero };
+		SpaceLength<Space>	_position	{ math::zero };
 	};
 
 
@@ -80,7 +80,7 @@ template<math::CoordinateSystem Space>
 
 template<math::CoordinateSystem Space>
 	constexpr
-	Wrench<Space>::Wrench (ForceMoments<Space> const& force_torque, SpaceVector<si::Length, Space> const& position):
+	Wrench<Space>::Wrench (ForceMoments<Space> const& force_torque, SpaceLength<Space> const& position):
 		ForceMoments<Space> (force_torque),
 		_position (position)
 	{ }
@@ -88,7 +88,7 @@ template<math::CoordinateSystem Space>
 
 template<math::CoordinateSystem Space>
 	constexpr
-	Wrench<Space>::Wrench (SpaceVector<si::Force, Space> const& force, SpaceVector<si::Torque, Space> const& torque, SpaceVector<si::Length, Space> const& position):
+	Wrench<Space>::Wrench (SpaceForce<Space> const& force, SpaceTorque<Space> const& torque, SpaceLength<Space> const& position):
 		ForceMoments<Space> (force, torque),
 		_position (position)
 	{ }

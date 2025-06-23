@@ -37,7 +37,7 @@ class StandardAtmosphere: public Atmosphere
   public:
 	[[nodiscard]]
 	Air<ECEFSpace>
-	air_at (SpaceVector<si::Length, ECEFSpace> const& position) const override;
+	air_at (SpaceLength<ECEFSpace> const& position) const override;
 
 	[[nodiscard]]
 	Air<ECEFSpace>

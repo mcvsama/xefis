@@ -25,7 +25,7 @@
 
 
 VirtualTemperatureSensor::VirtualTemperatureSensor (xf::sim::FlightSimulation const& flight_simulation,
-													xf::SpaceVector<si::Length, xf::AirframeFrame> const& mount_location,
+													xf::SpaceLength<xf::AirframeFrame> const& mount_location,
 													xf::Logger const& logger,
 													std::string_view const instance):
 	VirtualTemperatureSensorIO (instance),

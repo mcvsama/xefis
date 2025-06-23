@@ -206,7 +206,7 @@ class GLSpace
 	 */
 	template<math::CoordinateSystem Space>
 		void
-		translate (SpaceVector<si::Length, Space> const& offset)
+		translate (SpaceLength<Space> const& offset)
 			{ translate (offset * _position_scale); }
 
 	/**
@@ -292,7 +292,7 @@ class GLSpace
 	 */
 	template<math::CoordinateSystem Space>
 		void
-		add_vertex (SpaceVector<si::Length, Space> position)
+		add_vertex (SpaceLength<Space> position)
 			{ add_vertex (position * _position_scale); }
 
 	/**

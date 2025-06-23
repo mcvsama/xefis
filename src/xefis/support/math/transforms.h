@@ -45,7 +45,7 @@ airframe_to_ecef_rotation (TaitBryanAngles const& angles, si::LonLat const& posi
 
 [[nodiscard]]
 inline RotationMatrix<ECEFSpace, AirframeSpace>
-airframe_to_ecef_rotation_matrix (TaitBryanAngles const& angles, SpaceVector<si::Length, ECEFSpace> const& position)
+airframe_to_ecef_rotation_matrix (TaitBryanAngles const& angles, SpaceLength<ECEFSpace> const& position)
 {
 	return airframe_to_ecef_rotation_matrix (angles, to_polar (position));
 }
@@ -53,7 +53,7 @@ airframe_to_ecef_rotation_matrix (TaitBryanAngles const& angles, SpaceVector<si:
 
 [[nodiscard]]
 inline RotationQuaternion<ECEFSpace, AirframeSpace>
-airframe_to_ecef_rotation (TaitBryanAngles const& angles, SpaceVector<si::Length, ECEFSpace> const& position)
+airframe_to_ecef_rotation (TaitBryanAngles const& angles, SpaceLength<ECEFSpace> const& position)
 {
 	return airframe_to_ecef_rotation (angles, to_polar (position));
 }
@@ -74,7 +74,7 @@ ecef_to_ned_rotation (si::LonLat const& position)
 
 [[nodiscard]]
 inline RotationMatrix<NEDSpace, ECEFSpace>
-ecef_to_ned_rotation_matrix (SpaceVector<si::Length, ECEFSpace> const& position)
+ecef_to_ned_rotation_matrix (SpaceLength<ECEFSpace> const& position)
 {
 	return ecef_to_ned_rotation_matrix (to_polar (position));
 }
@@ -82,7 +82,7 @@ ecef_to_ned_rotation_matrix (SpaceVector<si::Length, ECEFSpace> const& position)
 
 [[nodiscard]]
 inline RotationQuaternion<NEDSpace, ECEFSpace>
-ecef_to_ned_rotation (SpaceVector<si::Length, ECEFSpace> const& position)
+ecef_to_ned_rotation (SpaceLength<ECEFSpace> const& position)
 {
 	return ecef_to_ned_rotation (to_polar (position));
 }

@@ -141,7 +141,7 @@ AtmosphericScattering::compute_incident_light (SpaceLength<> const& observer_pos
 
 				if (light_samples_taken == _p.num_light_direction_samples)
 				{
-					SpaceVector<si::Length> tau = kRayleighBeta * (sky_optical_depth.r + light_optical_depth.r) + kMieBeta * 1.1f * (sky_optical_depth.m + light_optical_depth.m);
+					SpaceLength tau = kRayleighBeta * (sky_optical_depth.r + light_optical_depth.r) + kMieBeta * 1.1f * (sky_optical_depth.m + light_optical_depth.m);
 					SpaceVector<double> const tau_float = tau / 1_m;
 					SpaceVector<double> const attenuation { neutrino::fast_exp (-tau_float[0]), neutrino::fast_exp (-tau_float[1]), neutrino::fast_exp (-tau_float[2]) };
 					contribution.r += attenuation * hr.in<si::Meter>();

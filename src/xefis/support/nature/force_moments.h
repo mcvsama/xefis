@@ -42,7 +42,7 @@ template<math::CoordinateSystem Space = void>
 
 		// Ctor
 		constexpr
-		ForceMoments (SpaceVector<si::Force, Space> const& force, SpaceVector<si::Torque, Space> const& torque);
+		ForceMoments (SpaceForce<Space> const& force, SpaceTorque<Space> const& torque);
 
 		constexpr ForceMoments&
 		operator+= (ForceMoments const&);
@@ -51,33 +51,33 @@ template<math::CoordinateSystem Space = void>
 		operator-= (ForceMoments const&);
 
 		constexpr ForceMoments&
-		operator+= (SpaceVector<si::Force, Space> const&);
+		operator+= (SpaceForce<Space> const&);
 
 		constexpr ForceMoments&
-		operator-= (SpaceVector<si::Force, Space> const&);
+		operator-= (SpaceForce<Space> const&);
 
 		constexpr ForceMoments&
-		operator+= (SpaceVector<si::Torque, Space> const&);
+		operator+= (SpaceTorque<Space> const&);
 
 		constexpr ForceMoments&
-		operator-= (SpaceVector<si::Torque, Space> const&);
+		operator-= (SpaceTorque<Space> const&);
 
 		[[nodiscard]]
-		constexpr SpaceVector<si::Force, Space> const&
+		constexpr SpaceForce<Space> const&
 		force() const noexcept
 			{ return _force; }
 
 		constexpr void
-		set_force (SpaceVector<si::Force, Space> const& force)
+		set_force (SpaceForce<Space> const& force)
 			{ _force = force; }
 
 		[[nodiscard]]
-		constexpr SpaceVector<si::Torque, Space> const&
+		constexpr SpaceTorque<Space> const&
 		torque() const noexcept
 			{ return _torque; }
 
 		constexpr void
-		set_torque (SpaceVector<si::Torque, Space> const& torque)
+		set_torque (SpaceTorque<Space> const& torque)
 			{ _torque = torque; }
 
 		/**
@@ -85,7 +85,7 @@ template<math::CoordinateSystem Space = void>
 		 * That is return resultant force as if this was a wrench with force/torque application point at -point.
 		 */
 		constexpr ForceMoments<Space>
-		at (SpaceVector<si::Length, Space> const& point) const;
+		at (SpaceLength<Space> const& point) const;
 
 	  public:
 		static ForceMoments<Space>
@@ -93,14 +93,14 @@ template<math::CoordinateSystem Space = void>
 			{ return ForceMoments<Space> (math::zero, math::zero); }
 
 	  private:
-		SpaceVector<si::Force, Space>	_force	{ 0_N, 0_N, 0_N };
-		SpaceVector<si::Torque, Space>	_torque	{ 0_Nm, 0_Nm, 0_Nm };
+		SpaceForce<Space>	_force	{ 0_N, 0_N, 0_N };
+		SpaceTorque<Space>	_torque	{ 0_Nm, 0_Nm, 0_Nm };
 	};
 
 
 template<math::CoordinateSystem Space>
 	constexpr
-	ForceMoments<Space>::ForceMoments (SpaceVector<si::Force, Space> const& force, SpaceVector<si::Torque, Space> const& torque):
+	ForceMoments<Space>::ForceMoments (SpaceForce<Space> const& force, SpaceTorque<Space> const& torque):
 		_force (force),
 		_torque (torque)
 	{ }
@@ -128,7 +128,7 @@ template<math::CoordinateSystem Space>
 
 template<math::CoordinateSystem Space>
 	constexpr ForceMoments<Space>&
-	ForceMoments<Space>::operator+= (SpaceVector<si::Force, Space> const& other)
+	ForceMoments<Space>::operator+= (SpaceForce<Space> const& other)
 	{
 		_force += other;
 		return *this;
@@ -137,7 +137,7 @@ template<math::CoordinateSystem Space>
 
 template<math::CoordinateSystem Space>
 	constexpr ForceMoments<Space>&
-	ForceMoments<Space>::operator-= (SpaceVector<si::Force, Space> const& other)
+	ForceMoments<Space>::operator-= (SpaceForce<Space> const& other)
 	{
 		_force -= other;
 		return *this;
@@ -146,7 +146,7 @@ template<math::CoordinateSystem Space>
 
 template<math::CoordinateSystem Space>
 	constexpr ForceMoments<Space>&
-	ForceMoments<Space>::operator+= (SpaceVector<si::Torque, Space> const& other)
+	ForceMoments<Space>::operator+= (SpaceTorque<Space> const& other)
 	{
 		_torque += other;
 		return *this;
@@ -155,7 +155,7 @@ template<math::CoordinateSystem Space>
 
 template<math::CoordinateSystem Space>
 	constexpr ForceMoments<Space>&
-	ForceMoments<Space>::operator-= (SpaceVector<si::Torque, Space> const& other)
+	ForceMoments<Space>::operator-= (SpaceTorque<Space> const& other)
 	{
 		_torque -= other;
 		return *this;
@@ -164,7 +164,7 @@ template<math::CoordinateSystem Space>
 
 template<math::CoordinateSystem Space>
 	constexpr ForceMoments<Space>
-	ForceMoments<Space>::at (SpaceVector<si::Length, Space> const& point) const
+	ForceMoments<Space>::at (SpaceLength<Space> const& point) const
 	{
 		auto const additional_torque = cross_product (-point, _force);
 
@@ -198,7 +198,7 @@ template<math::CoordinateSystem Space>
 
 template<math::CoordinateSystem Space>
 	constexpr ForceMoments<Space>
-	operator+ (ForceMoments<Space> a, SpaceVector<si::Force, Space> const& b)
+	operator+ (ForceMoments<Space> a, SpaceForce<Space> const& b)
 	{
 		return a += b;
 	}
@@ -206,7 +206,7 @@ template<math::CoordinateSystem Space>
 
 template<math::CoordinateSystem Space>
 	constexpr ForceMoments<Space>
-	operator+ (ForceMoments<Space> a, SpaceVector<si::Torque, Space> const& b)
+	operator+ (ForceMoments<Space> a, SpaceTorque<Space> const& b)
 	{
 		return a += b;
 	}
@@ -233,7 +233,7 @@ template<math::CoordinateSystem Space>
 
 template<math::CoordinateSystem Space>
 	constexpr ForceMoments<Space>
-	operator- (ForceMoments<Space> a, SpaceVector<si::Force, Space> const& b)
+	operator- (ForceMoments<Space> a, SpaceForce<Space> const& b)
 	{
 		return a -= b;
 	}
@@ -241,7 +241,7 @@ template<math::CoordinateSystem Space>
 
 template<math::CoordinateSystem Space>
 	constexpr ForceMoments<Space>
-	operator- (ForceMoments<Space> a, SpaceVector<si::Torque, Space> const& b)
+	operator- (ForceMoments<Space> a, SpaceTorque<Space> const& b)
 	{
 		return a -= b;
 	}
