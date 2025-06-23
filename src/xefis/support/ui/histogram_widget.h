@@ -80,11 +80,11 @@ class HistogramWidget: public CanvasWidget
 	Style						_style				{ Style::Bars };
 	std::vector<float>			_marks;
 	std::vector<std::size_t>	_bins;
-	std::size_t					_y_max;
-	QString						_x_min_str;
-	QString						_x_mid_str;
-	QString						_x_max_str;
-	QString						_y_max_str;
+	std::size_t					_max_y;
+	QString						_min_x_str;
+	QString						_mid_x_str;
+	QString						_max_x_str;
+	QString						_max_y_str;
 	std::size_t					_grid_lines			{ 10 };
 	bool						_y_legend_visible	{ false };
 };
@@ -95,18 +95,18 @@ template<class Value>
 	HistogramWidget::set_data (Histogram<Value> const& histogram, std::vector<Value> marks)
 	{
 		_bins = histogram.bins();
-		_y_max = histogram.y_max();
-		_x_min_str = QString::fromStdString (std::format ("{:.6f}", histogram.x_min()));
-		_x_mid_str = QString::fromStdString (std::format ("{:.6f}", 0.5f * (histogram.x_min() + histogram.x_max())));
-		_x_max_str = QString::fromStdString (std::format ("{:.6f}", histogram.x_max()));
-		_y_max_str = QString::fromStdString (std::format ("{}", histogram.y_max()));
+		_max_y = histogram.max_y();
+		_min_x_str = QString::fromStdString (std::format ("{:.6f}", histogram.min_x()));
+		_mid_x_str = QString::fromStdString (std::format ("{:.6f}", 0.5f * (histogram.min_x() + histogram.max_x())));
+		_max_x_str = QString::fromStdString (std::format ("{:.6f}", histogram.max_x()));
+		_max_y_str = QString::fromStdString (std::format ("{}", histogram.max_y()));
 
 		_marks.reserve (marks.size());
 		_marks.clear();
 
 		for (auto const& m: marks)
 		{
-			auto const pos = renormalize (m, { histogram.x_min(), histogram.x_max() }, Range { 0.0f, 1.0f });
+			auto const pos = renormalize (m, { histogram.min_x(), histogram.max_x() }, Range { 0.0f, 1.0f });
 
 			if (0.0f <= pos && pos <= 1.0f)
 				_marks.emplace_back (pos);

@@ -84,7 +84,7 @@ HistogramWidget::update_canvas()
 	ph.setup_painter (painter);
 
 	QFontMetricsF const font_metrics (font());
-	float const y_max_str_width = _y_legend_visible ? std::max (font_metrics.horizontalAdvance (_y_max_str), font_metrics.horizontalAdvance ("0000")) : 0.0f;
+	float const max_y_str_width = _y_legend_visible ? std::max (font_metrics.horizontalAdvance (_max_y_str), font_metrics.horizontalAdvance ("0000")) : 0.0f;
 	auto const axes_width = ph.em_pixels (0.1f);
 	auto const chart_width = ph.em_pixels (0.05f);
 	auto const grid_width = ph.em_pixels (0.03f);
@@ -92,11 +92,11 @@ HistogramWidget::update_canvas()
 	auto const bug_length = ph.em_pixels (0.4f);
 
 	QRectF const drawable_rect = rect().adjusted (axes_width, axes_width, -axes_width, -axes_width);
-	QRectF const axes_rect = drawable_rect.adjusted (y_max_str_width + bug_length, 0.5f * text_height, 0.0f, -(text_height + bug_length));
+	QRectF const axes_rect = drawable_rect.adjusted (max_y_str_width + bug_length, 0.5f * text_height, 0.0f, -(text_height + bug_length));
 	QRectF const chart_rect = axes_rect.adjusted (0.5f * axes_width, 0.0f, 0.0f, -0.5f * axes_width);
 
 	auto const n_bins = _bins.size();
-	auto const inv_y_max = chart_rect.height() / _y_max;
+	auto const inv_max_y = chart_rect.height() / _max_y;
 	auto const bin_width = chart_rect.width() / n_bins;
 
 	canvas.fill (pal.color (QPalette::Active, QPalette::Window));
@@ -152,7 +152,7 @@ HistogramWidget::update_canvas()
 					line << QPointF (0.0f, 0.0f);
 
 					for (auto const& bin: _bins | boost::adaptors::indexed (0))
-						line << QPointF ((bin.index() + 0.5f) * bin_width, bin.value() * inv_y_max);
+						line << QPointF ((bin.index() + 0.5f) * bin_width, bin.value() * inv_max_y);
 
 					line << QPointF (chart_rect.width(), 0.0f);
 
@@ -172,7 +172,7 @@ HistogramWidget::update_canvas()
 					{
 						auto const x = (bin.index() + 0.5f) * bin_width;
 
-						painter.drawLine (QPointF (x, 0.0f), QPointF (x, bin.value() * inv_y_max));
+						painter.drawLine (QPointF (x, 0.0f), QPointF (x, bin.value() * inv_max_y));
 					}
 					break;
 				}
@@ -193,8 +193,8 @@ HistogramWidget::update_canvas()
 		// Top-value text:
 		if (_y_legend_visible)
 		{
-			QRectF y_max_text_rect (rect().topLeft(), rect().topLeft() + QPointF (y_max_str_width, neutrino::line_height (font_metrics)));
-			painter.drawText (y_max_text_rect, Qt::AlignVCenter | Qt::AlignRight, _y_max_str);
+			QRectF max_y_text_rect (rect().topLeft(), rect().topLeft() + QPointF (max_y_str_width, neutrino::line_height (font_metrics)));
+			painter.drawText (max_y_text_rect, Qt::AlignVCenter | Qt::AlignRight, _max_y_str);
 		}
 
 		// Min/expected/max values:
@@ -213,9 +213,9 @@ HistogramWidget::update_canvas()
 			painter.drawText (text_rect, Qt::AlignCenter, text);
 		};
 
-		paint_x_value (_x_min_str, 0u, Qt::AlignLeft);
-		paint_x_value (_x_mid_str, n_bins / 2, Qt::AlignCenter);
-		paint_x_value (_x_max_str, n_bins, Qt::AlignRight);
+		paint_x_value (_min_x_str, 0u, Qt::AlignLeft);
+		paint_x_value (_mid_x_str, n_bins / 2, Qt::AlignCenter);
+		paint_x_value (_max_x_str, n_bins, Qt::AlignRight);
 	}
 }
 
