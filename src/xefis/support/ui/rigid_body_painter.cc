@@ -911,8 +911,8 @@ RigidBodyPainter::paint (rigid_body::Constraint const& constraint)
 
 			if (auto const* hinge = dynamic_cast<rigid_body::HingeConstraint const*> (&constraint))
 			{
-				auto const a1 = b1.placement().unbound_transform_to_base (hinge->hinge_precomputation().body_1_anchor());
-				auto const hinge_1 = b1.placement().unbound_transform_to_base (hinge->hinge_precomputation().body_1_hinge());
+				auto const a1 = b1.placement().rotate_to_base (hinge->hinge_precomputation().body_1_anchor());
+				auto const hinge_1 = b1.placement().rotate_to_base (hinge->hinge_precomputation().body_1_hinge());
 				auto const hinge_start_1 = com1 + a1;
 				auto const hinge_end_1 = hinge_start_1 + hinge_1;
 				auto const hinge_center = hinge_start_1 + 0.5 * hinge_1;
@@ -1046,11 +1046,11 @@ RigidBodyPainter::paint_forces (rigid_body::Body const& body)
 			{
 				auto const& forces = params->forces;
 				auto const& pl = wing->placement();
-				auto const at = pl.bound_transform_to_base (forces.center_of_pressure) - cp;
+				auto const at = pl.rotate_translate_to_base (forces.center_of_pressure) - cp;
 
-				draw_arrow (at, pl.unbound_transform_to_base (forces.lift) * force_to_length, make_material (lift_color));
-				draw_arrow (at, pl.unbound_transform_to_base (forces.drag) * force_to_length, make_material (drag_color));
-				draw_arrow (at, pl.unbound_transform_to_base (forces.pitching_moment) * torque_to_length, make_material (torque_color));
+				draw_arrow (at, pl.rotate_to_base (forces.lift) * force_to_length, make_material (lift_color));
+				draw_arrow (at, pl.rotate_to_base (forces.drag) * force_to_length, make_material (drag_color));
+				draw_arrow (at, pl.rotate_to_base (forces.pitching_moment) * torque_to_length, make_material (torque_color));
 			}
 		}
 	}
@@ -1081,7 +1081,7 @@ RigidBodyPainter::paint_angular_momentum (rigid_body::Body const& body)
 	auto const com = body.placement().position() - _camera.position();
 	auto const I = body.mass_moments<BodyCOM>().inertia_tensor();
 	auto const L = I * body.velocity_moments<BodyCOM>().angular_velocity();
-	auto const L_world = body.placement().unbound_transform_to_base (L);
+	auto const L_world = body.placement().rotate_to_base (L);
 
 	draw_arrow (com, L_world * angular_momentum_to_length, make_material (Qt::darkBlue));
 }

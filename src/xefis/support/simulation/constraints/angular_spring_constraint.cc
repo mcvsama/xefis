@@ -42,7 +42,7 @@ AngularSpringConstraint::initialize_step (si::Time)
 {
 	auto const pl_1 = Constraint::body_1().placement();
 	// body_1_hinge() and body_2_hinge() should be equal in WorldSpace coordinates.
-	_hinge_axis = pl_1.unbound_transform_to_base (_hinge.body_1_normalized_hinge()) / abs (_hinge.body_1_normalized_hinge());
+	_hinge_axis = pl_1.rotate_to_base (_hinge.body_1_normalized_hinge()) / abs (_hinge.body_1_normalized_hinge());
 }
 
 
