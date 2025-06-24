@@ -114,7 +114,7 @@ AFCS_FD_Pitch::compute_pitch()
 
 	// TODO use transistor
 
-	auto use_result = [&](std::optional<si::Angle> const& use_pitch) {
+	auto use_result = [&] (std::optional<si::Angle> const& use_pitch) {
 		if (use_pitch)
 			pitch = use_pitch;
 		else

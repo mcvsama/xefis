@@ -55,7 +55,7 @@ parse_hex_string (QString const& string)
 
 	enum State { MSB, LSB, Colon };
 
-	auto from_xdigit = [&string](QChar const& c) -> uint8_t
+	auto from_xdigit = [&string] (QChar const& c) -> uint8_t
 	{
 		static xf::HexTable const hextable;
 

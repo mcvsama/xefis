@@ -202,7 +202,7 @@ AirDataComputer::compute_altitude()
 	if (_io.pressure_static &&
 		(*_io.pressure_use_std || _io.pressure_qnh))
 	{
-		auto do_compute_altitude = [&](si::Pressure pressure_setting) -> si::Length {
+		auto do_compute_altitude = [&] (si::Pressure pressure_setting) -> si::Length {
 			// Good for heights below tropopause (36 kft):
 			double a = 6.8755856e-6;
 			double b = 5.2558797;
@@ -459,7 +459,7 @@ AirDataComputer::compute_mach()
 
 			auto const initial_mach = _io.speed_mach ? *_io.speed_mach : subsonic_mach;
 
-			_io.speed_mach = xf::converge<double> (initial_mach, 1e-9, 100, [&](double M_it) {
+			_io.speed_mach = xf::converge<double> (initial_mach, 1e-9, 100, [&] (double M_it) {
 				return 0.88128485 * std::sqrt ((qc / p + 1.0) * std::pow (1.0 - 1 / (7.0 * M_it * M_it), 2.5));
 			});
 

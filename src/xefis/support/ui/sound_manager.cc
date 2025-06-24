@@ -25,7 +25,7 @@ namespace xf {
 
 SoundManager::Sound::Sound (QString const& wav_file_name)
 {
-	auto exit = [&](int, QProcess::ExitStatus) {
+	auto exit = [&] (int, QProcess::ExitStatus) {
 		_finished = true;
 	};
 

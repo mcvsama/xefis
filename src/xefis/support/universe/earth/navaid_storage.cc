@@ -258,7 +258,7 @@ NavaidStorage::find_by_frequency (si::LonLat const& position, Navaid::Type type,
 			result.push_back (*r->second);
 	}
 
-	std::sort (result.begin(), result.end(), [&](Navaid const& a, Navaid const& b) -> bool {
+	std::sort (result.begin(), result.end(), [&] (Navaid const& a, Navaid const& b) -> bool {
 		return xf::haversine (position, a.position()) < xf::haversine (position, b.position());
 	});
 

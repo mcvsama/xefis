@@ -136,7 +136,7 @@ NavigationComputer::compute_position()
 	// Delayed positioning (after enough distance has been traveled):
 	if (_positions.back().valid)
 	{
-		auto add_accurate_position = [&](Positions& accurate_positions, float accuracy_times, si::Time max_time_difference) -> void
+		auto add_accurate_position = [&] (Positions& accurate_positions, float accuracy_times, si::Time max_time_difference) -> void
 		{
 			Position const& new_position = _positions.back();
 			si::Length worse_accuracy = std::max (new_position.lateral_position_stddev, accurate_positions.back().lateral_position_stddev);
