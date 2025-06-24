@@ -3,8 +3,7 @@
 
 namespace sim1::control_surface_airfoil {
 
-static xf::AirfoilSpline const
-kSpline {
+static auto const kSpline = xf::AirfoilSpline {
 	{ 1.000020,  0.001191 },
 	{ 0.993423,  0.001393 },
 	{ 0.980225,  0.001798 },
@@ -148,8 +147,7 @@ kSpline {
 	{ 1.000020, -0.001189 },
 };
 
-static nu::Field<double, si::Angle, double> const
-kLiftField {
+static auto const kLiftField = math::Field<double, si::Angle, double> {
 	{
 		31000.0,
 		{
@@ -378,8 +376,7 @@ kLiftField {
 	},
 };
 
-static nu::Field<double, si::Angle, double> const
-kDragField {
+static auto const kDragField = math::Field<double, si::Angle, double> {
 	{
 		31000.0,
 		{
@@ -608,8 +605,7 @@ kDragField {
 	},
 };
 
-static nu::Field<double, si::Angle, double> const
-kPitchingMomentField {
+static auto const kPitchingMomentField = math::Field<double, si::Angle, double> {
 	{
 		31000.0,
 		{
@@ -838,8 +834,7 @@ kPitchingMomentField {
 	},
 };
 
-static nu::Field<double, si::Angle, double> const
-kCenterOfPressureOffsetField {
+static auto const kCenterOfPressureOffsetField = math::Field<double, si::Angle, double> {
 	{
 		31000.0,
 		{

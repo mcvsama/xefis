@@ -52,7 +52,7 @@ Drag::Drag (QDomElement const& config)
 	if (data.empty())
 		throw nu::BadConfiguration ("drag module not properly configured");
 
-	_aoa_to_cd = nu::Field<si::Angle, DragCoefficient> (std::move (data));
+	_aoa_to_cd = math::Field<si::Angle, DragCoefficient> (std::move (data));
 }
 
 

@@ -71,8 +71,8 @@ class Lift
 
   private:
 	// TODO Reynolds to Angle to LiftCoefficient
-	nu::Field<si::Angle, LiftCoefficient>	_aoa_to_cl {};
-	nu::Field<LiftCoefficient, si::Angle>	_cl_to_aoa_normal_regime {};
+	math::Field<si::Angle, LiftCoefficient>	_aoa_to_cl {};
+	math::Field<LiftCoefficient, si::Angle>	_cl_to_aoa_normal_regime {};
 	LiftCoefficient							_max_cl;
 	si::Angle								_critical_aoa;
 };

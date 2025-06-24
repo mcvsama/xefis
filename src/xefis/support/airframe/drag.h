@@ -52,7 +52,7 @@ class Drag
 	get_cd (si::Angle aoa) const;
 
   private:
-	nu::Field<si::Angle, DragCoefficient> _aoa_to_cd {};
+	math::Field<si::Angle, DragCoefficient> _aoa_to_cd {};
 };
 
 

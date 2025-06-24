@@ -71,7 +71,7 @@ ProcessingLoopWidget::refresh()
 		if (!samples.empty())
 		{
 			auto const [range, grid_lines] = nu::get_max_for_axis<Milliseconds> (*std::max_element (samples.begin(), samples.end()));
-			nu::Histogram<Milliseconds> histogram (samples.begin(), samples.end(), range / 100, 0.0_ms, range);
+			auto const histogram = math::Histogram<Milliseconds> (samples.begin(), samples.end(), range / 100, 0.0_ms, range);
 
 			_communication_time_histogram->set_data (histogram, { _processing_loop.period() });
 			_communication_time_histogram->set_grid_lines (grid_lines);
@@ -85,7 +85,7 @@ ProcessingLoopWidget::refresh()
 		if (!samples.empty())
 		{
 			auto const [range, grid_lines] = nu::get_max_for_axis<Milliseconds> (*std::max_element (samples.begin(), samples.end()));
-			nu::Histogram<Milliseconds> histogram (samples.begin(), samples.end(), range / 100, 0.0_ms, range);
+			auto const histogram = math::Histogram<Milliseconds> (samples.begin(), samples.end(), range / 100, 0.0_ms, range);
 
 			_processing_time_histogram->set_data (histogram, { _processing_loop.period() });
 			_processing_time_histogram->set_grid_lines (grid_lines);
@@ -102,7 +102,7 @@ ProcessingLoopWidget::refresh()
 			auto const min = *minmax.first;
 			auto const max = *minmax.second;
 			auto const [range, grid_lines] = nu::get_max_for_axis<Milliseconds> (std::max (-min, max));
-			nu::Histogram<Milliseconds> histogram (samples.begin(), samples.end(), range / 50, -range, range);
+			auto const histogram = math::Histogram<Milliseconds> (samples.begin(), samples.end(), range / 50, -range, range);
 
 			_processing_latency_histogram->set_data (histogram, { -_processing_loop.period(), _processing_loop.period() });
 			_processing_latency_histogram->set_grid_lines (2 * grid_lines);
