@@ -113,21 +113,21 @@ Module::ModuleSocketAPI::unregister_output_socket (BasicModuleOut& socket)
 }
 
 
-nu::Sequence<std::vector<BasicSetting*>::const_iterator>
+std::ranges::subrange<std::vector<BasicSetting*>::const_iterator>
 Module::ModuleSocketAPI::settings() const noexcept
 {
 	return { _module._registered_settings.begin(), _module._registered_settings.end() };
 }
 
 
-nu::Sequence<std::vector<BasicModuleIn*>::const_iterator>
+std::ranges::subrange<std::vector<BasicModuleIn*>::const_iterator>
 Module::ModuleSocketAPI::input_sockets() const noexcept
 {
 	return { _module._registered_input_sockets.begin(), _module._registered_input_sockets.end() };
 }
 
 
-nu::Sequence<std::vector<BasicModuleOut*>::const_iterator>
+std::ranges::subrange<std::vector<BasicModuleOut*>::const_iterator>
 Module::ModuleSocketAPI::output_sockets() const noexcept
 {
 	return { _module._registered_output_sockets.begin(), _module._registered_output_sockets.end() };

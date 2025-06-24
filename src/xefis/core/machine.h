@@ -21,10 +21,10 @@
 
 // Neutrino:
 #include <neutrino/noncopyable.h>
-#include <neutrino/sequence.h>
 
 // Standard:
 #include <cstddef>
+#include <ranges>
 #include <vector>
 
 
@@ -62,28 +62,28 @@ class Machine: private nu::Noncopyable
 	/**
 	 * A sequence of registered processing loops.
 	 */
-	nu::Sequence<ProcessingLoops::iterator>
+	std::ranges::subrange<ProcessingLoops::iterator>
 	processing_loops() noexcept
 		{ return { _processing_loops.begin(), _processing_loops.end() }; }
 
 	/**
 	 * A sequence of registered processing loops.
 	 */
-	nu::Sequence<ProcessingLoops::const_iterator>
+	std::ranges::subrange<ProcessingLoops::const_iterator>
 	processing_loops() const noexcept
 		{ return { _processing_loops.begin(), _processing_loops.end() }; }
 
 	/**
 	 * A sequence of registered screens.
 	 */
-	nu::Sequence<Screens::iterator>
+	std::ranges::subrange<Screens::iterator>
 	screens() noexcept
 		{ return { _screens.begin(), _screens.end() }; }
 
 	/**
 	 * A sequence of registered processing loops.
 	 */
-	nu::Sequence<Screens::const_iterator>
+	std::ranges::subrange<Screens::const_iterator>
 	screens() const noexcept
 		{ return { _screens.begin(), _screens.end() }; }
 

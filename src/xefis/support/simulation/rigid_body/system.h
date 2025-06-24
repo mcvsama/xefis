@@ -23,7 +23,6 @@
 
 // Neutrino:
 #include <neutrino/noncopyable.h>
-#include <neutrino/sequence.h>
 
 // Standard:
 #include <cstddef>

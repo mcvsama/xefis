@@ -25,7 +25,6 @@
 // Neutrino:
 #include <neutrino/qt/qstring.h>
 #include <neutrino/qt/qutils.h>
-#include <neutrino/sequence.h>
 
 // Qt:
 #include <QTreeWidget>
@@ -129,7 +128,7 @@ class SocketTree: public QWidget
 
 	template<class Iterator>
 		void
-		populate (nu::Sequence<Iterator> const&);
+		populate (std::ranges::subrange<Iterator> const&);
 
   private:
 	void
@@ -155,7 +154,7 @@ class SocketTree: public QWidget
 
 template<class Iterator>
 	inline void
-	SocketTree::populate (nu::Sequence<Iterator> const& sequence)
+	SocketTree::populate (std::ranges::subrange<Iterator> const& sequence)
 	{
 		Item root ("Root", *_tree->invisibleRootItem());
 
