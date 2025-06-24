@@ -192,16 +192,16 @@ CameraControls::CameraControls (RigidBodyViewer& viewer, QWidget* parent):
 	on_value_change (_polar_lon, polar_changed);
 	on_value_change (_polar_radius, polar_changed);
 
-	QObject::connect (cockpit_view, &QRadioButton::clicked, [this](bool) {
+	QObject::connect (cockpit_view, &QRadioButton::clicked, [this] (bool) {
 		_rigid_body_viewer.set_camera_mode (RigidBodyPainter::CockpitView);
 	});
-	QObject::connect (chase_view, &QRadioButton::clicked, [this](bool) {
+	QObject::connect (chase_view, &QRadioButton::clicked, [this] (bool) {
 		_rigid_body_viewer.set_camera_mode (RigidBodyPainter::ChaseView);
 	});
-	QObject::connect (rc_pilot_view, &QRadioButton::clicked, [this](bool) {
+	QObject::connect (rc_pilot_view, &QRadioButton::clicked, [this] (bool) {
 		_rigid_body_viewer.set_camera_mode (RigidBodyPainter::RCPilotView);
 	});
-	QObject::connect (fixed_view, &QRadioButton::clicked, [this](bool) {
+	QObject::connect (fixed_view, &QRadioButton::clicked, [this] (bool) {
 		_rigid_body_viewer.set_camera_mode (RigidBodyPainter::FixedView);
 	});
 

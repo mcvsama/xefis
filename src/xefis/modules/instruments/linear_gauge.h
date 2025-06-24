@@ -202,7 +202,7 @@ template<class Value>
 		float const r = 6.5f * q;
 		float const kValueSpanLength = (p1 - p0).y();
 
-		auto get_length = [kValueSpanLength](std::optional<float> const& normalized) -> std::optional<float> {
+		auto get_length = [kValueSpanLength] (std::optional<float> const& normalized) -> std::optional<float> {
 			if (normalized)
 				return kValueSpanLength * *normalized;
 			else

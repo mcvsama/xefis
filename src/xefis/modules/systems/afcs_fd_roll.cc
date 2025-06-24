@@ -97,7 +97,7 @@ AFCS_FD_Roll::compute_roll()
 
 	// TODO use transistor for output
 
-	auto use_result = [&](std::optional<si::Angle> const& use_roll) {
+	auto use_result = [&] (std::optional<si::Angle> const& use_roll) {
 		if (use_roll)
 			roll = use_roll;
 		else

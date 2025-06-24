@@ -515,7 +515,7 @@ CHRUM6::status_verify (xf::CHRUM6::Read req)
 	bool serviceable = true;
 	bool caution = false;
 
-	auto isset = [&](StatusRegister reg) -> bool
+	auto isset = [&] (StatusRegister reg) -> bool
 	{
 		return !!(req.value() & static_cast<uint32_t> (reg));
 	};

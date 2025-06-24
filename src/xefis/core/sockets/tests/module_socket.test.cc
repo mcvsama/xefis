@@ -466,7 +466,7 @@ AutoTest t6 ("xf::Socket various behavior", for_all_types ([](auto value1, auto)
 	ModuleOut<T> out { &module, "out" };
 	ModuleIn<T> in { &module, "in" };
 
-	in << std::function ([&](std::optional<T>) -> std::optional<T> { throw std::runtime_error ("test"); }) << out;
+	in << std::function ([&] (std::optional<T>) -> std::optional<T> { throw std::runtime_error ("test"); }) << out;
 
 	test_asserts::verify ("nil_by_fetch_exception flag is false before first fetching",
 						  !in.nil_by_fetch_exception());

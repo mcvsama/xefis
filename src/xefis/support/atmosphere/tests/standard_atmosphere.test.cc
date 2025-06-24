@@ -28,7 +28,7 @@ namespace {
 template<class Function>
 	void test_nans_for_altitude (Function&& function)
 	{
-		auto const check = [&function](si::Length altitude) {
+		auto const check = [&function] (si::Length altitude) {
 			test_asserts::verify ("returned NaN for altitude " + to_string (altitude),
 								  !isnan (function (altitude)));
 		};

@@ -2660,7 +2660,7 @@ PaintingWork::paint_nav (AdiPaintRequest& pr) const
 
 		QPen ladder_pen (pr.kLadderBorderColor, pr.aids.pen_width (0.75f), Qt::SolidLine, Qt::RoundCap, Qt::MiterJoin);
 
-		auto paint_ladder = [&](std::optional<si::Angle> original_approach_deviation, std::optional<si::Angle> original_path_deviation) -> void
+		auto paint_ladder = [&] (std::optional<si::Angle> original_approach_deviation, std::optional<si::Angle> original_path_deviation) -> void
 		{
 			si::Angle approach_deviation;
 
@@ -2897,7 +2897,7 @@ PaintingWork::paint_hints (AdiPaintRequest& pr) const
 		QFont const font_big = pr.aids.scaled_default_font (1.5f);
 		QFont const font_small = pr.aids.scaled_default_font (1.1f);
 
-		auto paint_big_rect = [&](QPointF point) -> void
+		auto paint_big_rect = [&] (QPointF point) -> void
 		{
 			float v = 0.03f * pr.q;
 			QRectF frame (point, QSizeF (1.9f * pr.q, xf::InstrumentAids::FontInfo::get_digit_height (font_big)));
@@ -2906,7 +2906,7 @@ PaintingWork::paint_hints (AdiPaintRequest& pr) const
 			pr.painter.drawRect (frame);
 		};
 
-		auto paint_armed_rect = [&](QPointF point) -> void
+		auto paint_armed_rect = [&] (QPointF point) -> void
 		{
 			float v = 0.025f * pr.q;
 			QRectF frame (point, QSizeF (1.9f * pr.q, xf::InstrumentAids::FontInfo::get_digit_height (font_small)));
