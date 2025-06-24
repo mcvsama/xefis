@@ -40,7 +40,7 @@ class Drag
 	/**
 	 * Get range of AOA for which lift is defined.
 	 */
-	Range<si::Angle>
+	nu::Range<si::Angle>
 	get_aoa_range() const noexcept;
 
 	/**
@@ -52,11 +52,11 @@ class Drag
 	get_cd (si::Angle aoa) const;
 
   private:
-	Field<si::Angle, DragCoefficient> _aoa_to_cd { };
+	nu::Field<si::Angle, DragCoefficient> _aoa_to_cd {};
 };
 
 
-inline Range<si::Angle>
+inline nu::Range<si::Angle>
 Drag::get_aoa_range() const noexcept
 {
 	return _aoa_to_cd.domain();

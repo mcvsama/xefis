@@ -27,7 +27,7 @@
 
 namespace xf {
 
-using ReynoldsNumber = StrongType<double, struct ReynoldsType>;
+using ReynoldsNumber = nu::StrongType<double, struct ReynoldsType>;
 
 
 constexpr ReynoldsNumber

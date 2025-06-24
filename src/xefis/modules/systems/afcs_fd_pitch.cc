@@ -26,7 +26,7 @@
 #include <cstddef>
 
 
-AFCS_FD_Pitch::AFCS_FD_Pitch (xf::ProcessingLoop& loop, xf::Logger const& logger, std::string_view const instance):
+AFCS_FD_Pitch::AFCS_FD_Pitch (xf::ProcessingLoop& loop, nu::Logger const& logger, std::string_view const instance):
 	AFCS_FD_Pitch_IO (loop, instance),
 	_logger (logger.with_context (std::string (kLoggerScope) + "#" + instance))
 {
@@ -83,7 +83,7 @@ AFCS_FD_Pitch::process (xf::Cycle const& cycle)
 void
 AFCS_FD_Pitch::rescue (xf::Cycle const& cycle, std::exception_ptr eptr)
 {
-	using namespace xf::exception_ops;
+	using namespace nu::exception_ops;
 
 	if (!_io.autonomous.value_or (true))
 		_io.operative = false;
@@ -189,10 +189,10 @@ template<class Input, class Control>
 								  xf::ModuleIn<Input> const& measured_param,
 								  si::Time update_dt) const
 	{
-		xf::Range pitch_limits { -*_io.pitch_limits, +*_io.pitch_limits };
+		nu::Range pitch_limits { -*_io.pitch_limits, +*_io.pitch_limits };
 
 		if (cmd_param && measured_param)
-			return neutrino::clamp (pid (*cmd_param, *measured_param, update_dt), pitch_limits);
+			return nu::clamp (pid (*cmd_param, *measured_param, update_dt), pitch_limits);
 		else
 		{
 			pid.reset();

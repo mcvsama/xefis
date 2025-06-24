@@ -33,7 +33,7 @@ LinearLimitsConstraint::LinearLimitsConstraint (SliderPrecomputation& slider_pre
 }
 
 
-LinearLimitsConstraint::LinearLimitsConstraint (SliderPrecomputation& slider_precomputation, Range<si::Length> const range):
+LinearLimitsConstraint::LinearLimitsConstraint (SliderPrecomputation& slider_precomputation, nu::Range<si::Length> const range):
 	LinearLimitsConstraint (slider_precomputation, range.min(), range.max())
 { }
 

@@ -34,7 +34,7 @@
 
 namespace xf {
 
-class InvalidBinaryString: public Exception
+class InvalidBinaryString: public nu::Exception
 {
   public:
 	using Exception::Exception;
@@ -68,7 +68,7 @@ parse_hex_string (QString const& string)
 	};
 
 	Blob blob;
-	blob.reserve (neutrino::to_unsigned ((string.size() + 1) / 3));
+	blob.reserve (nu::to_unsigned ((string.size() + 1) / 3));
 	State state = MSB;
 	Blob::value_type val = 0;
 

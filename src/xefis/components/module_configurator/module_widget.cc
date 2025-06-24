@@ -41,7 +41,7 @@ ModuleWidget::ModuleWidget (Module& module, QWidget* parent):
 	_module (module),
 	_instrument (dynamic_cast<Instrument*> (&_module))
 {
-	auto full_name_str = neutrino::to_qstring (identifier (module));
+	auto full_name_str = nu::to_qstring (identifier (module));
 	auto const ph = PaintHelper (*this);
 
 	QString module_type = _instrument ? "Instrument " : "Module ";
@@ -64,7 +64,7 @@ ModuleWidget::ModuleWidget (Module& module, QWidget* parent):
 	{
 		auto module_config_widget = module_with_config_widget->configurator_widget();
 		tabs->addTab (module_config_widget, "Module config");
-		neutrino::break_ownership (*tabs, *module_config_widget);
+		nu::break_ownership (*tabs, *module_config_widget);
 	}
 
 	auto* layout = new QVBoxLayout (this);
@@ -99,8 +99,8 @@ ModuleWidget::refresh()
 
 		if (!samples.empty())
 		{
-			auto const [range, grid_lines] = get_max_for_axis<Milliseconds> (*std::max_element (samples.begin(), samples.end()));
-			xf::Histogram<Milliseconds> histogram (samples.begin(), samples.end(), range / 100, 0.0_ms, range);
+			auto const [range, grid_lines] = nu::get_max_for_axis<Milliseconds> (*std::max_element (samples.begin(), samples.end()));
+			nu::Histogram<Milliseconds> histogram (samples.begin(), samples.end(), range / 100, 0.0_ms, range);
 
 			_communication_time_histogram->set_data (histogram, { accounting_api.cycle_time() });
 			_communication_time_histogram->set_grid_lines (grid_lines);
@@ -116,8 +116,8 @@ ModuleWidget::refresh()
 
 		if (!samples.empty())
 		{
-			auto const [range, grid_lines] = get_max_for_axis<Milliseconds> (*std::max_element (samples.begin(), samples.end()));
-			xf::Histogram<Milliseconds> histogram (samples.begin(), samples.end(), range / 100, 0.0_ms, range);
+			auto const [range, grid_lines] = nu::get_max_for_axis<Milliseconds> (*std::max_element (samples.begin(), samples.end()));
+			nu::Histogram<Milliseconds> histogram (samples.begin(), samples.end(), range / 100, 0.0_ms, range);
 
 			_processing_time_histogram->set_data (histogram, { accounting_api.cycle_time() });
 			_processing_time_histogram->set_grid_lines (grid_lines);
@@ -129,8 +129,8 @@ ModuleWidget::refresh()
 	{
 		auto const accounting_api = Instrument::AccountingAPI (*_instrument);
 		auto const& samples = accounting_api.painting_times();
-		auto const [range, grid_lines] = get_max_for_axis<Milliseconds> (*std::max_element (samples.begin(), samples.end()));
-		xf::Histogram<Milliseconds> histogram (samples.begin(), samples.end(), range / 100, 0.0_ms, range);
+		auto const [range, grid_lines] = nu::get_max_for_axis<Milliseconds> (*std::max_element (samples.begin(), samples.end()));
+		nu::Histogram<Milliseconds> histogram (samples.begin(), samples.end(), range / 100, 0.0_ms, range);
 
 		_painting_time_histogram->set_data (histogram, { accounting_api.frame_time() });
 		_painting_time_histogram->set_grid_lines (grid_lines);

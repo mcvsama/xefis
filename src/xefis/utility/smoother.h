@@ -185,7 +185,7 @@ SmootherBase::set_smoothing_time (si::Time smoothing_time)
 	if (millis < 3)
 		millis = 3;
 
-	set_smoothing_time_impl (neutrino::to_unsigned (millis));
+	set_smoothing_time_impl (nu::to_unsigned (millis));
 }
 
 

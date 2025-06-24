@@ -29,7 +29,7 @@ PacketReader::PacketReader (Blob const& magic, ParseCallback parse):
 	_parse (parse)
 {
 	if (_magic.empty())
-		throw Exception ("magic value must not be empty");
+		throw nu::Exception ("magic value must not be empty");
 }
 
 
@@ -51,7 +51,7 @@ PacketReader::set_buffer_capacity (std::size_t bytes) noexcept
 void
 PacketReader::feed (Blob const& data)
 {
-	using neutrino::to_signed;
+	using nu::to_signed;
 
 	if (_capacity > 0 && _buffer.size() + data.size() > _capacity)
 	{

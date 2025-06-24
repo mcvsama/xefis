@@ -40,8 +40,8 @@ struct SlicesStacks
 
 struct LonLatRanges
 {
-	Range<si::Angle>	longitude;
-	Range<si::Angle>	latitude;
+	nu::Range<si::Angle>	longitude;
+	nu::Range<si::Angle>	latitude;
 };
 
 
@@ -76,7 +76,7 @@ compute_angle_from_center_viewpoint (si::Angle const view_angle, si::Length cons
 LonLatRanges
 compute_visible_lon_lat_ranges (si::Angle const horizon_angle, si::Length const earth_radius, si::LonLatRadius<> const observer_position)
 {
-	auto longitude_range = Range<si::Angle>();
+	auto longitude_range = nu::Range<si::Angle>();
 
 	auto const alpha = -horizon_angle;
 
@@ -84,15 +84,15 @@ compute_visible_lon_lat_ranges (si::Angle const horizon_angle, si::Length const 
 	auto const pole_visible = abs (observer_position_in_ecef.z()) > earth_radius;
 
 	if (pole_visible)
-		longitude_range = Range<si::Angle> { -180_deg, +180_deg };
+		longitude_range = nu::Range<si::Angle> { -180_deg, +180_deg };
 	else
 	{
-		auto const x = (cos (alpha) - square (sin (observer_position.lat()))) / square (cos (observer_position.lat()));
+		auto const x = (cos (alpha) - nu::square (sin (observer_position.lat()))) / nu::square (cos (observer_position.lat()));
 		auto const b = 1_rad * std::acos (std::clamp (x, -1.0, +1.0));
-		longitude_range = Range (observer_position.lon() - b, observer_position.lon() + b);
+		longitude_range = nu::Range (observer_position.lon() - b, observer_position.lon() + b);
 	}
 
-	auto const latitude_range = Range (std::max<si::Angle> (-90_deg, observer_position.lat() - alpha), std::min<si::Angle> (90_deg, observer_position.lat() + alpha));
+	auto const latitude_range = nu::Range (std::max<si::Angle> (-90_deg, observer_position.lat() - alpha), std::min<si::Angle> (90_deg, observer_position.lat() + alpha));
 
 	return {
 		.longitude = longitude_range,
@@ -185,7 +185,7 @@ compute_dome_slices_and_stacks (si::Angle const horizon_angle)
 			for (auto f = 0.0f; f < 1.0f; )
 			{
 				auto const curved = f * f * f;
-				auto const latitude = neutrino::renormalize (curved, Range { 0.0f, 1.0f }, Range<si::Angle> { horizon_angle - horizon_epsilon, -90_deg });
+				auto const latitude = nu::renormalize (curved, nu::Range { 0.0f, 1.0f }, nu::Range<si::Angle> { horizon_angle - horizon_epsilon, -90_deg });
 				result.stack_angles.push_back (latitude);
 				f += step;
 			}
@@ -200,13 +200,13 @@ compute_dome_slices_and_stacks (si::Angle const horizon_angle)
 		// Sky:
 		{
 			auto const step = 1.0f / n_sky_stacks;
-			auto const power_factor = neutrino::renormalize (horizon_angle, Range<si::Angle> { 0_deg, -90_deg }, Range { 3.0, 6.0 });
+			auto const power_factor = nu::renormalize (horizon_angle, nu::Range<si::Angle> { 0_deg, -90_deg }, nu::Range { 3.0, 6.0 });
 			auto const limit = 1 - horizon_angle / -120_deg; // 120 instead of 90 is to avoid artifacts when there are too few stacks.
 
 			for (auto f = 0.0f; f < limit; )
 			{
 				auto const curved = std::pow (f, power_factor);
-				auto const latitude = neutrino::renormalize (curved, Range { 0.0f, 1.0f }, Range<si::Angle> { horizon_angle + horizon_epsilon, +90_deg });
+				auto const latitude = nu::renormalize (curved, nu::Range { 0.0f, 1.0f }, nu::Range<si::Angle> { horizon_angle + horizon_epsilon, +90_deg });
 				result.stack_angles.push_back (latitude);
 				f += step;
 			}
@@ -273,8 +273,8 @@ compute_ground_shape (si::LonLatRadius<> const observer_position,
 			.texture = earth_texture,
 			.setup_material = [&] (ShapeMaterial& material, si::LonLat const sphere_position) {
 				material.texture_position = {
-					neutrino::renormalize (sphere_position.lon(), Range { -180_deg, +180_deg }, Range { 0.0f, 1.0f }),
-					neutrino::renormalize (sphere_position.lat(), Range { -90_deg, +90_deg }, Range { 1.0f, 0.0f }),
+					nu::renormalize (sphere_position.lon(), nu::Range { -180_deg, +180_deg }, nu::Range { 0.0f, 1.0f }),
+					nu::renormalize (sphere_position.lat(), nu::Range { -90_deg, +90_deg }, nu::Range { 1.0f, 0.0f }),
 				};
 			},
 		});
@@ -285,7 +285,7 @@ compute_ground_shape (si::LonLatRadius<> const observer_position,
 
 
 Shape
-compute_sky_dome_shape (SkyDomeParameters const& p, neutrino::WorkPerformer* const work_performer)
+compute_sky_dome_shape (SkyDomeParameters const& p, nu::WorkPerformer* const work_performer)
 {
 	auto horizon_angle = compute_horizon_angle (p.earth_radius, p.observer_position.radius());
 
@@ -301,7 +301,7 @@ compute_sky_dome_shape (SkyDomeParameters const& p, neutrino::WorkPerformer* con
 		.stack_angles = ss.stack_angles,
 		.material = kBlackMatte,
 		.symmetric_0_180 = true,
-		.setup_material = [&] (ShapeMaterial& material, si::LonLat const sphere_position, WaitGroup::WorkToken&& work_token) {
+		.setup_material = [&] (ShapeMaterial& material, si::LonLat const sphere_position, nu::WaitGroup::WorkToken&& work_token) {
 			// The shape originally assumes that the sun is always at 0° (more dense net is around 0°).
 			// This needs a correction when used with AtmosphericScattering so that the sun is also always at 0° to match the mesh:
 			auto const sky_position = si::LonLat (sphere_position.lon() + 180_deg - p.sun_position.azimuth, sphere_position.lat());

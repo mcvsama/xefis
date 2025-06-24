@@ -57,7 +57,7 @@ Datatable::Line::Line (std::string_view const label, xf::BasicSocket const& sock
 void
 Datatable::Line::read()
 {
-	*_stringified.lock() = neutrino::to_qstring (socket.to_string());
+	*_stringified.lock() = nu::to_qstring (socket.to_string());
 }
 
 
@@ -133,7 +133,7 @@ Datatable::async_paint (xf::PaintRequest const& paint_request) const
 	label_font.setPixelSize (aids->font_pixel_size (_label_font_size));
 	value_font.setPixelSize (aids->font_pixel_size (_value_font_size));
 
-	double line_height = std::max (neutrino::line_height (QFontMetricsF (label_font)), neutrino::line_height (QFontMetricsF (value_font)));
+	double line_height = std::max (nu::line_height (QFontMetricsF (label_font)), nu::line_height (QFontMetricsF (value_font)));
 	double empty_height = aids->height() - line_height * _list.size();
 
 	if (_alignment & Qt::AlignVCenter)
@@ -151,7 +151,7 @@ Datatable::async_paint (xf::PaintRequest const& paint_request) const
 		// Label:
 		painter.setFont (label_font);
 		painter.setPen (aids->get_pen (line.label_color, 1.0));
-		painter.fast_draw_text (left, Qt::AlignLeft | Qt::AlignBottom, neutrino::to_qstring (line.label));
+		painter.fast_draw_text (left, Qt::AlignLeft | Qt::AlignBottom, nu::to_qstring (line.label));
 		// Valu
 		painter.setFont (value_font);
 		painter.setPen (aids->get_pen (line.value_color, 1.0));

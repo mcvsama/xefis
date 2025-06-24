@@ -66,7 +66,7 @@ class LiftMod
 		 * Return range of allowed IAS speeds
 		 * for this flaps or spoilers setting.
 		 */
-		Range<si::Speed> const&
+		nu::Range<si::Speed> const&
 		speed_range() const noexcept;
 
 		/**
@@ -103,13 +103,13 @@ class LiftMod
 		link (Setting const* prev, Setting const* next);
 
 	  private:
-		QString				_label				= "<none>";
-		si::Angle			_angle				= 0_deg;
-		Range<si::Speed>	_speed_range		= { 0_kt, 9999_kt };
-		si::Angle			_aoa_correction		= 0_deg;
-		double				_cl_correction		= 0.0;
-		Setting const*		_next				= nullptr;
-		Setting const*		_prev				= nullptr;
+		QString					_label				= "<none>";
+		si::Angle				_angle				= 0_deg;
+		nu::Range<si::Speed>	_speed_range		= { 0_kt, 9999_kt };
+		si::Angle				_aoa_correction		= 0_deg;
+		double					_cl_correction		= 0.0;
+		Setting const*			_next				= nullptr;
+		Setting const*			_prev				= nullptr;
 	};
 
 	typedef std::map<si::Angle, Setting> Settings;
@@ -158,7 +158,7 @@ class LiftMod
 	 * Compute speeds range for given surfaces angle.
 	 * Value is interpolated.
 	 */
-	Range<si::Speed>
+	nu::Range<si::Speed>
 	get_speed_range (si::Angle surfaces_angle) const;
 
 	/**
@@ -191,7 +191,7 @@ LiftMod::Setting::angle() const noexcept
 }
 
 
-inline Range<si::Speed> const&
+inline nu::Range<si::Speed> const&
 LiftMod::Setting::speed_range() const noexcept
 {
 	return _speed_range;

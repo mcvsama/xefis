@@ -90,7 +90,7 @@ Xefis::Xefis (int& argc, char** argv):
 	// Print warnings about broken rendering when using QT_SCALE_FACTOR:
 	if (const char* QT_SCALE_FACTOR = std::getenv ("QT_SCALE_FACTOR"))
 	{
-		auto const factor = neutrino::parse<double> (QT_SCALE_FACTOR);
+		auto const factor = nu::parse<double> (QT_SCALE_FACTOR);
 
 		if (std::abs (factor - 1.0) > 1e-4)
 		{
@@ -109,7 +109,7 @@ Xefis::Xefis (int& argc, char** argv):
 			<< "Otherwise expect fonts to be too large or too small.\n";
 	}
 
-	Exception::log (_logger, [&] {
+	nu::Exception::log (_logger, [&] {
 		QImageReader::setAllocationLimit (512);
 
 		_system = std::make_unique<System> (_logger);
@@ -138,9 +138,9 @@ Xefis::notify (QObject* receiver, QEvent* event)
 	}
 	catch (...)
 	{
-		using namespace exception_ops;
+		using namespace nu::exception_ops;
 
-		_logger << demangle (typeid (*receiver)) << "/" << demangle (typeid (*event)) << " yielded exception: " << std::endl << std::current_exception() << std::endl;
+		_logger << nu::demangle (typeid (*receiver)) << "/" << nu::demangle (typeid (*event)) << " yielded exception: " << std::endl << std::current_exception() << std::endl;
 	}
 
 	return false;
@@ -155,11 +155,11 @@ Xefis::quit()
 }
 
 
-Logger const&
+nu::Logger const&
 Xefis::fallback_exception_logger()
 {
-	static LoggerOutput	fallback_exception_logger_output	{ std::cerr };
-	static Logger		fallback_exception_logger			{ fallback_exception_logger_output };
+	static nu::LoggerOutput	fallback_exception_logger_output	{ std::cerr };
+	static nu::Logger		fallback_exception_logger			{ fallback_exception_logger_output };
 
 	return fallback_exception_logger;
 }
@@ -173,7 +173,7 @@ Xefis::setup_unix_signals_handler()
 	_posix_signals_check_timer->setSingleShot (false);
 	_posix_signals_check_timer->setInterval ((100_ms).in<si::Millisecond>());
 	QObject::connect (_posix_signals_check_timer, &QTimer::timeout, [&] {
-		if (g_hup_received.load())
+		if (nu::g_hup_received.load())
 		{
 			_logger << "HUP received, exiting." << std::endl;
 			quit();
@@ -227,17 +227,17 @@ Xefis::parse_args (int argc, char** argv)
 			if (arg_value.empty())
 				throw MissingValueException (arg_name);
 
-			_options.watchdog_write_fd = neutrino::parse<int> (arg_value);
+			_options.watchdog_write_fd = nu::parse<int> (arg_value);
 		}
 		else if (arg_name == "--watchdog-read-fd")
 		{
 			if (arg_value.empty())
 				throw MissingValueException (arg_name);
 
-			_options.watchdog_read_fd = neutrino::parse<int> (arg_value);
+			_options.watchdog_read_fd = nu::parse<int> (arg_value);
 		}
 		else
-			throw Exception ("unrecognized option '" + arg_name + "', try --help");
+			throw nu::Exception ("unrecognized option '" + arg_name + "', try --help");
 	}
 }
 

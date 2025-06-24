@@ -64,12 +64,12 @@ class AngularServoConstraint:
   public:
 	using TorqueEfficacy		= decltype (1_Nm / 1_W);
 
-	static constexpr si::Resistance			kInitialResistance					{ 1_kOhm };
-	static constexpr si::Time				kExpectedLifetime					{ 1000 * 365 * 86400_s };
-	static constexpr si::Temperature		kNormalOperationTemperature			{ 25_degC };
+	static constexpr si::Resistance			kInitialResistance						{ 1_kOhm };
+	static constexpr si::Time				kExpectedLifetime						{ 1000 * 365 * 86400_s };
+	static constexpr si::Temperature		kNormalOperationTemperature				{ 25_degC };
 	// Absolute maximum ratings:
-	static constexpr Range<si::Voltage>		kAbsoluteMaximumVoltageRange		{ -0.1_V, 7.2_V };
-	static constexpr Range<si::Temperature>	kAbsoluteMaximumTemperatureRange	{ -10_degC, 70_degC };
+	static constexpr nu::Range<si::Voltage>		kAbsoluteMaximumVoltageRange		{ -0.1_V, 7.2_V };
+	static constexpr nu::Range<si::Temperature>	kAbsoluteMaximumTemperatureRange	{ -10_degC, 70_degC };
 
   public:
 	/**
@@ -79,7 +79,7 @@ class AngularServoConstraint:
 	 *			Otherwise, the servo will not act at all.
 	 */
 	explicit
-	AngularServoConstraint (HingePrecomputation&, Range<si::Angle> angle_range, si::Angle backlash, AngularVelocityPotential, TorquePotential);
+	AngularServoConstraint (HingePrecomputation&, nu::Range<si::Angle> angle_range, si::Angle backlash, AngularVelocityPotential, TorquePotential);
 
 	[[nodiscard]]
 	xf::sim::ServoOrientation
@@ -94,7 +94,7 @@ class AngularServoConstraint:
 	 * Return angle range.
 	 */
 	[[nodiscard]]
-	Range<si::Angle>
+	nu::Range<si::Angle>
 	angle_range() const noexcept
 		{ return _angle_range; }
 
@@ -179,7 +179,7 @@ class AngularServoConstraint:
 	HingePrecomputation&									_hinge;
 	xf::sim::ServoOrientation								_orientation			{ xf::sim::ServoOrientation::Normal };
 	xf::PIDController<si::Angle, double>					_pid_controller;
-	Range<si::Angle>										_angle_range;
+	nu::Range<si::Angle>									_angle_range;
 	si::Angle												_backlash;
 	si::Angle												_setpoint				{ _angle_range.midpoint() };
 	std::variant<std::monostate, double, TorqueEfficacy>	_effic;

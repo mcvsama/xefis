@@ -52,10 +52,10 @@ Parameters::sanitize()
 		std::optional<si::Angle> r;
 
 		if (this->orientation_pitch)
-			p = xf::floored_mod (*this->orientation_pitch + 180_deg, 360_deg) - 180_deg;
+			p = nu::floored_mod (*this->orientation_pitch + 180_deg, 360_deg) - 180_deg;
 
 		if (this->orientation_roll)
-			r = xf::floored_mod (*this->orientation_roll + 180_deg, 360_deg) - 180_deg;
+			r = nu::floored_mod (*this->orientation_roll + 180_deg, 360_deg) - 180_deg;
 
 		if (p && r)
 		{
@@ -77,7 +77,7 @@ Parameters::sanitize()
 		}
 
 		if (this->orientation_heading)
-			this->orientation_heading = xf::floored_mod (*this->orientation_heading, 360_deg);
+			this->orientation_heading = nu::floored_mod (*this->orientation_heading, 360_deg);
 	}
 
 	// Limit FPM position:
@@ -220,7 +220,7 @@ AdiPaintRequest::paint_rotating_value (QRectF const& rect, float position, float
 
 	QFont const font = painter.font();
 	QFontMetricsF const font_metrics (font);
-	float height = height_scale * neutrino::line_height (font_metrics);
+	float height = height_scale * nu::line_height (font_metrics);
 
 	// A little bit father to ensure next/prev are hidden beyond clipping area:
 	auto const a_little_bit_farther = 1.0f;
@@ -273,7 +273,7 @@ AdiPaintRequest::paint_rotating_digit (QRectF const& box, float const value, int
 	QString sc = zero_mark && c == 0 ? (black_zero ? " " : (xc >= 0.f ? "G" : "-")) : QString::number (c);
 
 	if (std::abs (dtr) < delta && (two_zeros || std::abs (value) >= round_target / 2))
-		pos = xf::floored_mod (-dtr * (0.5f / delta), 1.f) - 0.5f;
+		pos = nu::floored_mod (-dtr * (0.5f / delta), 1.f) - 0.5f;
 
 	paint_rotating_value (box, pos, height_scale, sa, sb, sc);
 }
@@ -284,7 +284,7 @@ AdiPaintRequest::paint_dashed_zone (QColor const& color, QRectF const& target)
 {
 	QFontMetricsF const metrics (painter.font());
 	float const w = 0.7f * metrics.horizontalAdvance ("0");
-	float const h = 0.55f * neutrino::line_height (metrics);
+	float const h = 0.55f * nu::line_height (metrics);
 	QPointF const center = target.center();
 	QRectF box (center - QPointF (w / 2.f, h / 1.9f), QSizeF (w, h));
 	QPen pen = aids.get_pen (color, 1.2f);
@@ -307,7 +307,7 @@ AdiPaintRequest::paint_horizontal_failure_flag (QString const& message, QPointF 
 {
 	QPen const normal_pen = aids.get_pen (color, 1.0f);
 	QFontMetricsF const metrics (font);
-	QRectF box (0.f, 0.f, metrics.horizontalAdvance (message) + 0.65f * metrics.horizontalAdvance ("0"), neutrino::line_height (metrics));
+	QRectF box (0.f, 0.f, metrics.horizontalAdvance (message) + 0.65f * metrics.horizontalAdvance ("0"), nu::line_height (metrics));
 
 	aids.centrify (box);
 	box.translate (center);
@@ -330,7 +330,7 @@ AdiPaintRequest::paint_vertical_failure_flag (QString const& message, QPointF co
 {
 	QPen const normal_pen = aids.get_pen (color, 1.0f);
 	float const digit_width = 1.6f * xf::InstrumentAids::FontInfo::get_digit_width (font);
-	float const digit_height = 1.f * neutrino::line_height (QFontMetricsF (font));
+	float const digit_height = 1.f * nu::line_height (QFontMetricsF (font));
 
 	QRectF box (0.f, 0.f, 1.f * digit_width, message.size() * digit_height);
 	aids.centrify (box);
@@ -535,7 +535,7 @@ ArtificialHorizon::paint_pitch_scale (AdiPaintRequest& pr) const
 
 		// Pitch scale is clipped to small rectangle, so narrow it even more:
 		float const clipped_pitch_factor = 0.45f;
-		xf::Range<si::Angle> deg_range (*pr.params.orientation_pitch - clipped_pitch_factor * 0.485f * pr.params.fov,
+		nu::Range<si::Angle> deg_range (*pr.params.orientation_pitch - clipped_pitch_factor * 0.485f * pr.params.fov,
 										*pr.params.orientation_pitch + clipped_pitch_factor * 0.365f * pr.params.fov);
 
 		pr.painter.setPen (pr.aids.get_pen (Qt::white, 1.f));
@@ -756,7 +756,7 @@ ArtificialHorizon::paint_heading (AdiPaintRequest& pr) const
 		if (pr.params.orientation_heading)
 		{
 			float clipped_pitch_factor = 0.5f;
-			xf::Range<si::Angle> deg_range (*pr.params.orientation_heading - clipped_pitch_factor * 0.485f * pr.params.fov,
+			nu::Range<si::Angle> deg_range (*pr.params.orientation_heading - clipped_pitch_factor * 0.485f * pr.params.fov,
 											*pr.params.orientation_heading + clipped_pitch_factor * 0.350f * pr.params.fov);
 
 			pr.painter.setTransform (_heading_transform * _horizon_transform);
@@ -778,7 +778,8 @@ ArtificialHorizon::paint_heading (AdiPaintRequest& pr) const
 						pr.painter.drawLine (QPointF (d05, -w / 36.f), QPointF (d05, 0.f));
 					});
 
-					QString text = neutrino::to_qstring (std::format ("{:02.0f}", xf::floored_mod (1.f * deg, 360.f) / 10));
+					QString text = nu::to_qstring (std::format ("{:02.0f}", nu::floored_mod (1.f * deg, 360.f) / 10));
+
 					if (text == "00")
 						text = "N";
 					else if (text == "09")
@@ -787,6 +788,7 @@ ArtificialHorizon::paint_heading (AdiPaintRequest& pr) const
 						text = "S";
 					else if (text == "27")
 						text = "W";
+
 					pr.painter.fast_draw_text (QRectF (d10 - 2.f * fpxs, 0.f, 4.f * fpxs, fpxs),
 											   Qt::AlignVCenter | Qt::AlignHCenter, text, pr.default_shadow);
 				}
@@ -1095,7 +1097,7 @@ VelocityLadder::paint_black_box (AdiPaintRequest& pr, float const x) const
 								 QString::number (static_cast<int> (std::abs (std::fmod (1.f * _rounded_speed + 1.f, 10.f)))),
 								 QString::number (static_cast<int> (std::abs (std::fmod (1.f * _rounded_speed, 10.f)))),
 								 *pr.params.speed > (1_kt * pr.params.vl_minimum + 0.5_kt)
-									? QString::number (static_cast<int> (xf::floored_mod (1.f * _rounded_speed - 1.f, 10.f)))
+									? QString::number (static_cast<int> (nu::floored_mod (1.f * _rounded_speed - 1.f, 10.f)))
 									: " ");
 	}
 }
@@ -1369,7 +1371,7 @@ VelocityLadder::paint_ap_setting (AdiPaintRequest& pr) const
 		// Mach info has priority:
 		if (pr.params.cmd_mach)
 		{
-			value = neutrino::to_qstring (std::format ("{:5.3f}", *pr.params.cmd_mach));
+			value = nu::to_qstring (std::format ("{:5.3f}", *pr.params.cmd_mach));
 
 			if (value.size() > 0 && value[0] == '0')
 				value = value.mid (1);
@@ -1411,7 +1413,7 @@ VelocityLadder::paint_novspd_flag (AdiPaintRequest& pr) const
 		QString const sb = "VSPD";
 		QFont const font = pr.aids.scaled_default_font (1.8f);
 		QFontMetricsF const metrics (font);
-		float const font_height = 0.9f * neutrino::line_height (metrics);
+		float const font_height = 0.9f * nu::line_height (metrics);
 
 		QRectF rect (0.f, 0.f, metrics.horizontalAdvance (sa), font_height * (sb.size() + 1));
 		rect.moveLeft (0.9f * pr.q);
@@ -2123,7 +2125,7 @@ AltitudeLadder::paint_pressure (AdiPaintRequest& pr, float const x) const
 		{
 			pr.painter.setFont (pr.aids.font_3.font);
 			pr.painter.fast_draw_text (QPointF (0.5f * (nn_rect.left() + uu_rect.right()), nn_rect.bottom()), Qt::AlignHCenter | Qt::AlignBottom, "STD", pr.default_shadow);
-			pr.painter.translate (0.f, 0.9f * neutrino::line_height (metrics_a));
+			pr.painter.translate (0.f, 0.9f * nu::line_height (metrics_a));
 			pr.painter.setPen (QPen (Qt::white, 1.f, Qt::SolidLine, Qt::RoundCap));
 		}
 
@@ -2162,7 +2164,7 @@ AltitudeLadder::paint_ap_setting (AdiPaintRequest& pr) const
 		QRectF s_digits_box (0.f, 0.f, s_digits * s_digit_width + margin, 1.3f * b_digit_height);
 		QRectF box_rect (_ladder_rect.left(), _ladder_rect.top() - 1.4f * b_digits_box.height(),
 						 b_digits_box.width() + s_digits_box.width(), b_digits_box.height());
-		QRectF metric_rect (box_rect.topLeft() - QPointF (0.f, 1.25f * neutrino::line_height (m_metrics)), box_rect.topRight());
+		QRectF metric_rect (box_rect.topLeft() - QPointF (0.f, 1.25f * nu::line_height (m_metrics)), box_rect.topRight());
 		b_digits_box.translate (box_rect.left(), box_rect.top());
 		s_digits_box.translate (b_digits_box.right(), b_digits_box.top());
 
@@ -2217,7 +2219,7 @@ AltitudeLadder::paint_ap_setting (AdiPaintRequest& pr) const
 		QRectF box_11000 = b_digits_box.adjusted (margin, margin, 0.f, -margin);
 		QString minus_sign_s = cmd_altitude < -0.5_ft ? pr.aids.kMinusSignStrUTF8 : "";
 		pr.painter.fast_draw_text (box_11000, Qt::AlignVCenter | Qt::AlignRight,
-								   minus_sign_s + QString::number (std::abs (xf::symmetric_round (cmd_altitude.in<si::Foot>()) / 1000)),
+								   minus_sign_s + QString::number (std::abs (nu::symmetric_round (cmd_altitude.in<si::Foot>()) / 1000)),
 								   pr.default_shadow);
 
 		pr.painter.setFont (s_font);
@@ -2422,7 +2424,7 @@ PaintingWork::paint_center_cross (AdiPaintRequest& pr, bool const center_box, bo
 void
 PaintingWork::paint_flight_director (AdiPaintRequest& pr) const
 {
-	using xf::sgn;
+	using nu::sgn;
 	using std::abs;
 
 	float const w = pr.aids.lesser_dimension() * 1.4f / 9.f;
@@ -2476,7 +2478,7 @@ PaintingWork::paint_flight_director (AdiPaintRequest& pr) const
 		pr.painter.setFont (pr.aids.font_2.font);
 		pr.painter.fast_draw_text (QPointF (2.95 * pr.q, 4.385 * pr.q),
 								   Qt::AlignRight | Qt::AlignBottom,
-								   neutrino::to_qstring (*pr.params.flight_director_active_name),
+								   nu::to_qstring (*pr.params.flight_director_active_name),
 								   pr.default_shadow);
 	}
 }
@@ -2490,8 +2492,8 @@ PaintingWork::paint_control_surfaces (AdiPaintRequest& pr) const
 		float const w = pr.aids.lesser_dimension() * 0.2f / 9.f;
 		si::Angle const range = 17.5_deg;
 
-		si::Angle pitch = xf::renormalize (std::clamp (pr.params.control_surfaces_elevator, -1.0f, +1.0f), -1.0f, +1.0f, -range, +range);
-		si::Angle roll = xf::renormalize (std::clamp (pr.params.control_surfaces_ailerons, -1.0f, +1.0f), -1.0f, +1.0f, -range, +range);
+		si::Angle pitch = nu::renormalize (std::clamp (pr.params.control_surfaces_elevator, -1.0f, +1.0f), -1.0f, +1.0f, -range, +range);
+		si::Angle roll = nu::renormalize (std::clamp (pr.params.control_surfaces_ailerons, -1.0f, +1.0f), -1.0f, +1.0f, -range, +range);
 
 		float ypos = pr.pitch_to_px (pitch);
 		float xpos = pr.heading_to_px (roll);
@@ -2589,9 +2591,9 @@ PaintingWork::paint_decision_height_setting (AdiPaintRequest& pr) const
 		QString mins_str = pr.params.decision_height_type;
 		QString alt_str = QString ("%1").arg (pr.params.decision_height_setting.in<si::Foot>(), 0, 'f', 0);
 
-		QRectF mins_rect (1.35f * x, 1.8f * x, metrics_a.horizontalAdvance (mins_str), neutrino::line_height (metrics_a));
+		QRectF mins_rect (1.35f * x, 1.8f * x, metrics_a.horizontalAdvance (mins_str), nu::line_height (metrics_a));
 		mins_rect.moveRight (mins_rect.left());
-		QRectF alt_rect (0.f, 0.f, metrics_b.horizontalAdvance (alt_str), neutrino::line_height (metrics_b));
+		QRectF alt_rect (0.f, 0.f, metrics_b.horizontalAdvance (alt_str), nu::line_height (metrics_b));
 		alt_rect.moveTopRight (mins_rect.bottomRight());
 
 		QPen decision_height_pen = pr.aids.get_pen (pr.get_decision_height_color(), 1.f);
@@ -2634,10 +2636,10 @@ PaintingWork::paint_nav (AdiPaintRequest& pr) const
 		QString loc_str = pr.params.navaid_identifier;
 		if (pr.params.navaid_course_magnetic)
 		{
-			int course_int = xf::symmetric_round (pr.params.navaid_course_magnetic->in<si::Degree>());
+			int course_int = nu::symmetric_round (pr.params.navaid_course_magnetic->in<si::Degree>());
 			if (course_int == 0)
 				course_int = 360;
-			loc_str += neutrino::to_qstring (std::format ("/{:03d}°", course_int));
+			loc_str += nu::to_qstring (std::format ("/{:03d}°", course_int));
 		}
 
 		pr.painter.setPen (Qt::white);
@@ -2653,7 +2655,7 @@ PaintingWork::paint_nav (AdiPaintRequest& pr) const
 
 		QString dme_val = "DME ---";
 		if (pr.params.navaid_distance)
-			dme_val = neutrino::to_qstring (std::format ("DME {:.1f}", pr.params.navaid_distance->in<si::NauticalMile>()));
+			dme_val = nu::to_qstring (std::format ("DME {:.1f}", pr.params.navaid_distance->in<si::NauticalMile>()));
 
 		pr.painter.setPen (Qt::white);
 		pr.painter.setFont (pr.aids.font_1.font);
@@ -3028,7 +3030,7 @@ PaintingWork::paint_input_alert (AdiPaintRequest& pr) const
 	pr.painter.setBrush (QBrush (QColor (0xdd, 0, 0)));
 	pr.painter.setFont (font);
 
-	QRectF rect (-0.6f * width, -0.5f * neutrino::line_height (font_metrics), 1.2f * width, 1.2f * neutrino::line_height (font_metrics));
+	QRectF rect (-0.6f * width, -0.5f * nu::line_height (font_metrics), 1.2f * width, 1.2f * nu::line_height (font_metrics));
 
 	pr.painter.drawRect (rect);
 	pr.painter.fast_draw_text (rect, Qt::AlignVCenter | Qt::AlignHCenter, alert, pr.default_shadow);
@@ -3133,7 +3135,7 @@ ADI::process (xf::Cycle const& cycle)
 	// Flaps UP bug:
 	if (_io.speed_flaps_up_speed && _io.speed_flaps_up_label)
 	{
-		_speed_flaps_up_current_label = neutrino::to_qstring (*_io.speed_flaps_up_label);
+		_speed_flaps_up_current_label = nu::to_qstring (*_io.speed_flaps_up_label);
 		params.speed_bugs[_speed_flaps_up_current_label] = *_io.speed_flaps_up_speed;
 	}
 	else
@@ -3142,7 +3144,7 @@ ADI::process (xf::Cycle const& cycle)
 	// Flaps "a" bug:
 	if (_io.speed_flaps_a_speed && _io.speed_flaps_a_label)
 	{
-		_speed_flaps_a_current_label = neutrino::to_qstring (*_io.speed_flaps_a_label);
+		_speed_flaps_a_current_label = nu::to_qstring (*_io.speed_flaps_a_label);
 		params.speed_bugs[_speed_flaps_a_current_label] = *_io.speed_flaps_a_speed;
 	}
 	else
@@ -3151,7 +3153,7 @@ ADI::process (xf::Cycle const& cycle)
 	// Flaps "b" bug:
 	if (_io.speed_flaps_b_speed && _io.speed_flaps_b_label)
 	{
-		_speed_flaps_b_current_label = neutrino::to_qstring (*_io.speed_flaps_b_label);
+		_speed_flaps_b_current_label = nu::to_qstring (*_io.speed_flaps_b_label);
 		params.speed_bugs[_speed_flaps_b_current_label] = *_io.speed_flaps_b_speed;
 	}
 	else
@@ -3204,7 +3206,7 @@ ADI::process (xf::Cycle const& cycle)
 	params.altitude_landing_warning_hi = *_io.altitude_landing_warning_hi;
 	params.altitude_landing_warning_lo = *_io.altitude_landing_warning_lo;
 	// Decision height
-	params.decision_height_type = neutrino::to_qstring (_io.decision_height_type.value_or (""));
+	params.decision_height_type = nu::to_qstring (_io.decision_height_type.value_or (""));
 	params.decision_height_amsl =
 		_io.decision_height_setting
 			? _io.decision_height_amsl.get_optional()
@@ -3279,8 +3281,8 @@ ADI::process (xf::Cycle const& cycle)
 	params.navaid_reference_visible = _io.navaid_reference_visible.value_or (false);
 	params.navaid_course_magnetic = _io.navaid_course_magnetic.get_optional();
 	params.navaid_distance = _io.navaid_distance.get_optional();
-	params.navaid_hint = neutrino::to_qstring (_io.navaid_type_hint.value_or (""));
-	params.navaid_identifier = neutrino::to_qstring (_io.navaid_identifier.value_or (""));
+	params.navaid_hint = nu::to_qstring (_io.navaid_type_hint.value_or (""));
+	params.navaid_identifier = nu::to_qstring (_io.navaid_identifier.value_or (""));
 	// Approach, flight path deviations
 	params.deviation_vertical_failure =
 		!_io.flight_path_deviation_vertical_serviceable.value_or (true) ||
@@ -3314,24 +3316,24 @@ ADI::process (xf::Cycle const& cycle)
 		params.raising_runway_position.reset();
 	// Control hint
 	if (_io.flight_mode_hint_visible.value_or (false))
-		params.control_hint = neutrino::to_qstring (_io.flight_mode_hint.value_or (""));
+		params.control_hint = nu::to_qstring (_io.flight_mode_hint.value_or (""));
 	else
 		params.control_hint.reset();
 
 	params.control_hint_focus = _io.flight_mode_hint_visible.modification_age() < *_io.focus_duration || _io.flight_mode_hint.modification_age() < *_io.focus_duration;
 	// FMA
 	params.fma_visible = _io.flight_mode_fma_visible.value_or (false);
-	params.fma_speed_hint = neutrino::to_qstring (_io.flight_mode_fma_speed_hint.value_or (""));
+	params.fma_speed_hint = nu::to_qstring (_io.flight_mode_fma_speed_hint.value_or (""));
 	params.fma_speed_focus = _io.flight_mode_fma_speed_hint.modification_age() < *_io.focus_duration;
-	params.fma_speed_armed_hint = neutrino::to_qstring (_io.flight_mode_fma_speed_armed_hint.value_or (""));
+	params.fma_speed_armed_hint = nu::to_qstring (_io.flight_mode_fma_speed_armed_hint.value_or (""));
 	params.fma_speed_armed_focus = _io.flight_mode_fma_speed_armed_hint.modification_age() < *_io.focus_duration;
-	params.fma_lateral_hint = neutrino::to_qstring (_io.flight_mode_fma_lateral_hint.value_or (""));
+	params.fma_lateral_hint = nu::to_qstring (_io.flight_mode_fma_lateral_hint.value_or (""));
 	params.fma_lateral_focus = _io.flight_mode_fma_lateral_hint.modification_age() < *_io.focus_duration;
-	params.fma_lateral_armed_hint = neutrino::to_qstring (_io.flight_mode_fma_lateral_armed_hint.value_or (""));
+	params.fma_lateral_armed_hint = nu::to_qstring (_io.flight_mode_fma_lateral_armed_hint.value_or (""));
 	params.fma_lateral_armed_focus = _io.flight_mode_fma_lateral_armed_hint.modification_age() < *_io.focus_duration;
-	params.fma_vertical_hint = neutrino::to_qstring (_io.flight_mode_fma_vertical_hint.value_or (""));
+	params.fma_vertical_hint = nu::to_qstring (_io.flight_mode_fma_vertical_hint.value_or (""));
 	params.fma_vertical_focus = _io.flight_mode_fma_vertical_hint.modification_age() < *_io.focus_duration;
-	params.fma_vertical_armed_hint = neutrino::to_qstring (_io.flight_mode_fma_vertical_armed_hint.value_or (""));
+	params.fma_vertical_armed_hint = nu::to_qstring (_io.flight_mode_fma_vertical_armed_hint.value_or (""));
 	params.fma_vertical_armed_focus = _io.flight_mode_fma_vertical_armed_hint.modification_age() < *_io.focus_duration;
 	// TCAS
 	params.tcas_ra_pitch_minimum = _io.tcas_resolution_advisory_pitch_minimum.get_optional();
@@ -3403,8 +3405,8 @@ ADI::compute_fpv()
 
 	if (_io.fpv_visible.value_or (false) && !hidden && _io.orientation_pitch && _io.orientation_roll && _io.track_vertical && heading && track_lateral)
 	{
-		si::Angle vdiff = neutrino::wrap_within_range (*_io.orientation_pitch - *_io.track_vertical, -180_deg, +180_deg);
-		si::Angle hdiff = neutrino::wrap_within_range (**heading - **track_lateral, -180_deg, +180_deg);
+		si::Angle vdiff = nu::wrap_within_range (*_io.orientation_pitch - *_io.track_vertical, -180_deg, +180_deg);
+		si::Angle hdiff = nu::wrap_within_range (**heading - **track_lateral, -180_deg, +180_deg);
 		si::Angle roll = *_io.orientation_roll;
 
 		_computed_fpv_alpha = vdiff * si::cos (roll) + hdiff * si::sin (roll);
@@ -3433,7 +3435,7 @@ template<class FloatingPoint>
 
 template<class FloatingPoint>
 	bool
-	ADI::is_sane (xf::Socket<FloatingPoint> const& socket, xf::Range<FloatingPoint> const& sane_range)
+	ADI::is_sane (xf::Socket<FloatingPoint> const& socket, nu::Range<FloatingPoint> const& sane_range)
 	{
 		return is_sane (socket) && sane_range.includes (*socket);
 	}

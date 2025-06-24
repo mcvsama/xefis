@@ -144,7 +144,7 @@ SimulatorWidget::make_simulation_controls()
 	});
 	update_start_stop_icon();
 
-	auto* step_sim_button = new QPushButton (neutrino::to_qstring (std::format ("Single step: Δt = {} s", _simulator.frame_duration().in<si::Second>())), this);
+	auto* step_sim_button = new QPushButton (nu::to_qstring (std::format ("Single step: Δt = {} s", _simulator.frame_duration().in<si::Second>())), this);
 	QObject::connect (step_sim_button, &QPushButton::pressed, [this, update_start_stop_icon] {
 		if (_rigid_body_viewer)
 			_rigid_body_viewer->step();
@@ -163,7 +163,7 @@ SimulatorWidget::make_simulation_controls()
 	speed_slider->setRange (1, 200);
 	QObject::connect (speed_slider, &QSlider::valueChanged, [this, speed_label] (int value) {
 		_simulation_speed = value / 100.0f;
-		speed_label->setText (to_qstring (std::format ("{:d}%", value)));
+		speed_label->setText (nu::to_qstring (std::format ("{:d}%", value)));
 	});
 	speed_slider->setValue (100);
 
@@ -294,7 +294,7 @@ SimulatorWidget::make_solar_time_controls (PaintHelper const& ph)
 
 	auto* set_to_system_time = new QPushButton ("Set to system time");
 	QObject::connect (set_to_system_time, &QPushButton::clicked, [this] {
-		_solar_simulation_time_delta = TimeHelper::utc_now() - _simulator.simulation_time();
+		_solar_simulation_time_delta = nu::TimeHelper::utc_now() - _simulator.simulation_time();
 		update_solar_time_widgets();
 	});
 
@@ -304,7 +304,7 @@ SimulatorWidget::make_solar_time_controls (PaintHelper const& ph)
 		{
 			auto const longitude = _rigid_body_viewer->followed_position().lon();
 			auto const time_delta = (longitude / 360_deg) * 24_h;
-			auto const time_rounded_to_days = std::floor (TimeHelper::utc_now() / 86400_s) * 86400_s;
+			auto const time_rounded_to_days = std::floor (nu::TimeHelper::utc_now() / 86400_s) * 86400_s;
 			_solar_simulation_time_delta = time_rounded_to_days + 12_h - time_delta - _simulator.simulation_time();
 			update_solar_time_widgets();
 		}
@@ -458,7 +458,7 @@ SimulatorWidget::update_simulation_time_label()
 	auto const rounded_simulation_time = std::chrono::time_point_cast<std::chrono::seconds> (simulation_time);
 	auto const elapsed_time = _simulator.elapsed_time().in<si::Second>();
 	auto const text = std::format ("{:%Y-%m-%d %H:%M:%S} UTC ({:.6f} s)", rounded_simulation_time, elapsed_time);
-	_simulation_time_label->setText (neutrino::to_qstring (text));
+	_simulation_time_label->setText (nu::to_qstring (text));
 }
 
 
@@ -521,7 +521,7 @@ SimulatorWidget::update_simulation_performance_label (si::Time const dt)
 	auto const text = std::format ("{:.0f}%", 100.0f * perf);
 	auto const prefix = perf < 1.0 ? "<span style='color: red'>" : "<span>";
 	auto const suffix = "</span>";
-	_simulation_performance_value_label->setText (prefix + neutrino::to_qstring (text) + suffix);
+	_simulation_performance_value_label->setText (prefix + nu::to_qstring (text) + suffix);
 }
 
 } // namespace xf

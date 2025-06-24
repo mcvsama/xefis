@@ -52,7 +52,7 @@ BodyItem::refresh()
 {
 	auto const signals_blocker = QSignalBlocker (treeWidget());
 
-	setText (0, neutrino::to_qstring (_body.label()));
+	setText (0, nu::to_qstring (_body.label()));
 
 	if (_body.broken())
 		setForeground (0 , QBrush (Qt::gray));

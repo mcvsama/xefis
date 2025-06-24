@@ -39,7 +39,7 @@ ProcessingLoopWidget::ProcessingLoopWidget (ProcessingLoop& processing_loop, QWi
 	_processing_loop (processing_loop)
 {
 	auto const ph = PaintHelper (*this);
-	auto [name_strip, name_label] = create_colored_strip_label (neutrino::to_qstring (_processing_loop.instance()).toHtmlEscaped(), QColor (0xff, 0xd7, 0), Qt::AlignBottom, this);
+	auto [name_strip, name_label] = create_colored_strip_label (nu::to_qstring (_processing_loop.instance()).toHtmlEscaped(), QColor (0xff, 0xd7, 0), Qt::AlignBottom, this);
 
 	auto tabs = new QTabWidget (this);
 	tabs->addTab (create_performance_tab(), "Performance");
@@ -70,8 +70,8 @@ ProcessingLoopWidget::refresh()
 
 		if (!samples.empty())
 		{
-			auto const [range, grid_lines] = get_max_for_axis<Milliseconds> (*std::max_element (samples.begin(), samples.end()));
-			xf::Histogram<Milliseconds> histogram (samples.begin(), samples.end(), range / 100, 0.0_ms, range);
+			auto const [range, grid_lines] = nu::get_max_for_axis<Milliseconds> (*std::max_element (samples.begin(), samples.end()));
+			nu::Histogram<Milliseconds> histogram (samples.begin(), samples.end(), range / 100, 0.0_ms, range);
 
 			_communication_time_histogram->set_data (histogram, { _processing_loop.period() });
 			_communication_time_histogram->set_grid_lines (grid_lines);
@@ -84,8 +84,8 @@ ProcessingLoopWidget::refresh()
 
 		if (!samples.empty())
 		{
-			auto const [range, grid_lines] = get_max_for_axis<Milliseconds> (*std::max_element (samples.begin(), samples.end()));
-			xf::Histogram<Milliseconds> histogram (samples.begin(), samples.end(), range / 100, 0.0_ms, range);
+			auto const [range, grid_lines] = nu::get_max_for_axis<Milliseconds> (*std::max_element (samples.begin(), samples.end()));
+			nu::Histogram<Milliseconds> histogram (samples.begin(), samples.end(), range / 100, 0.0_ms, range);
 
 			_processing_time_histogram->set_data (histogram, { _processing_loop.period() });
 			_processing_time_histogram->set_grid_lines (grid_lines);
@@ -101,8 +101,8 @@ ProcessingLoopWidget::refresh()
 			auto const minmax = std::minmax_element (samples.begin(), samples.end());
 			auto const min = *minmax.first;
 			auto const max = *minmax.second;
-			auto const [range, grid_lines] = get_max_for_axis<Milliseconds> (std::max (-min, max));
-			xf::Histogram<Milliseconds> histogram (samples.begin(), samples.end(), range / 50, -range, range);
+			auto const [range, grid_lines] = nu::get_max_for_axis<Milliseconds> (std::max (-min, max));
+			nu::Histogram<Milliseconds> histogram (samples.begin(), samples.end(), range / 50, -range, range);
 
 			_processing_latency_histogram->set_data (histogram, { -_processing_loop.period(), _processing_loop.period() });
 			_processing_latency_histogram->set_grid_lines (2 * grid_lines);

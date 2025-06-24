@@ -249,7 +249,7 @@ TextLayout::Fragment::Fragment (QString const& text, QFont const& font, QColor c
 {
 	_width = _metrics.horizontalAdvance (text);
 	double const hardcoded_additional_factor = 0.9;
-	_height = _line_height_factor * hardcoded_additional_factor * neutrino::line_height (_metrics);
+	_height = _line_height_factor * hardcoded_additional_factor * nu::line_height (_metrics);
 }
 
 
@@ -334,7 +334,7 @@ TextLayout::add_fragment (const char* text, QFont const& font, QColor const& col
 inline void
 TextLayout::add_fragment (std::string const& text, QFont const& font, QColor const& color, QPen const& box_pen)
 {
-	add_fragment (neutrino::to_qstring (text), font, color, box_pen);
+	add_fragment (nu::to_qstring (text), font, color, box_pen);
 }
 
 

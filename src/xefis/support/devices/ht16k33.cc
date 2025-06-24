@@ -105,8 +105,8 @@ HT16K33::SingleLED::SingleLED (xf::ModuleIn<bool>& socket, Row row, Column colum
 	_row (row),
 	_column (column)
 {
-	neutrino::clamp_inplace (_row, LEDMatrix::kMinRow, LEDMatrix::kMaxRow);
-	neutrino::clamp_inplace (_column, LEDMatrix::kMinColumn, LEDMatrix::kMaxColumn);
+	nu::clamp_inplace (_row, LEDMatrix::kMinRow, LEDMatrix::kMaxRow);
+	nu::clamp_inplace (_column, LEDMatrix::kMinColumn, LEDMatrix::kMaxColumn);
 }
 
 
@@ -122,8 +122,8 @@ HT16K33::SingleSwitch::SingleSwitch (xf::ModuleOut<bool>& socket, Row row, Colum
 	_row (row),
 	_column (column)
 {
-	neutrino::clamp_inplace (_row, KeyMatrix::kMinRow, KeyMatrix::kMaxRow);
-	neutrino::clamp_inplace (_column, KeyMatrix::kMinColumn, KeyMatrix::kMaxColumn);
+	nu::clamp_inplace (_row, KeyMatrix::kMinRow, KeyMatrix::kMaxRow);
+	nu::clamp_inplace (_column, KeyMatrix::kMinColumn, KeyMatrix::kMaxColumn);
 }
 
 
@@ -145,7 +145,7 @@ HT16K33::SingleSwitch::invalidate()
 }
 
 
-HT16K33::HT16K33 (i2c::Device&& i2c_device, Logger const& logger):
+HT16K33::HT16K33 (nu::i2c::Device&& i2c_device, nu::Logger const& logger):
 	_i2c_device (std::move (i2c_device)),
 	_logger (logger)
 {
@@ -263,7 +263,7 @@ HT16K33::guard (std::function<void()> guarded_code)
 	try {
 		guarded_code();
 	}
-	catch (xf::IOError& e)
+	catch (nu::IOError& e)
 	{
 		_logger << "I/O error: " << e.message() << std::endl;
 		reinitialize();

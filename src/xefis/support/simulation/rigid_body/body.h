@@ -48,7 +48,7 @@ namespace xf::rigid_body {
 /**
  * Rigid body.
  */
-class Body: public Noncopyable
+class Body: public nu::Noncopyable
 {
   public:
 	enum ShapeType

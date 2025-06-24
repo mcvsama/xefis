@@ -84,7 +84,7 @@ class NavaidStorage
   public:
 	// Ctor
 	explicit
-	NavaidStorage (Logger const&,
+	NavaidStorage (nu::Logger const&,
 				   std::string_view const nav_file,
 				   std::string_view const fix_file,
 				   std::string_view const apt_file);
@@ -156,7 +156,7 @@ class NavaidStorage
 	std::atomic<bool>	_loaded				{ false };
 	std::atomic<bool>	_destroying			{ false };
 	std::atomic<bool>	_logged_destroying	{ false };
-	Logger				_logger;
+	nu::Logger			_logger;
 	std::string			_nav_dat_file;
 	std::string			_fix_dat_file;
 	std::string			_apt_dat_file;

@@ -81,7 +81,7 @@ template<class V>
 		BasicModuleOut (owner_and_data_source, path)
 	{
 		if (!owner_and_data_source)
-			throw xf::InvalidArgument ("ModuleOut requires non-null module pointer");
+			throw nu::InvalidArgument ("ModuleOut requires non-null module pointer");
 
 		_module = owner_and_data_source;
 		Module::ModuleSocketAPI (*_module).register_output_socket (*this);

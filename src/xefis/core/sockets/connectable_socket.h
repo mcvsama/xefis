@@ -174,7 +174,7 @@ template<class pObservedValue, class pAssignedValue = pObservedValue>
  * from connected sockets.
  * By default it's Xefis::fallback_exception_logger().
  */
-Logger const*
+nu::Logger const*
 connectable_socket_fetch_exception_logger();
 
 /**
@@ -182,7 +182,7 @@ connectable_socket_fetch_exception_logger();
  * May be nullptr to hide exception.
  */
 void
-set_connectable_socket_fetch_exception_logger (Logger const*);
+set_connectable_socket_fetch_exception_logger (nu::Logger const*);
 
 
 template<class OV, class AV>
@@ -295,7 +295,7 @@ template<class OV, class AV>
 		this->set_nil_by_fetch_exception (false);
 
 		auto const execute = [&] {
-			std::visit (overload {
+			std::visit (nu::overload {
 				[&] (std::monostate) {
 					this->protected_set_nil();
 				},
@@ -312,7 +312,7 @@ template<class OV, class AV>
 		};
 
 		if (auto const* logger = connectable_socket_fetch_exception_logger())
-			thrown = Exception::catch_and_log (*logger, execute);
+			thrown = nu::Exception::catch_and_log (*logger, execute);
 		else
 		{
 			try {
@@ -335,7 +335,7 @@ template<class OV, class AV>
 	{
 		if (_transformer)
 		{
-			return std::visit (overload {
+			return std::visit (nu::overload {
 				[&] (Transformer1 const& transformer) -> std::optional<ObservedValue> {
 					if (value)
 						return transformer (*value);
@@ -367,7 +367,7 @@ template<class OV, class AV>
 	inline void
 	ConnectableSocket<OV, AV>::inc_source_readers_count()
 	{
-		std::visit (overload {
+		std::visit (nu::overload {
 			[&] (std::monostate) noexcept {
 				// No action
 			},
@@ -388,7 +388,7 @@ template<class OV, class AV>
 	inline void
 	ConnectableSocket<OV, AV>::dec_source_readers_count()
 	{
-		std::visit (overload {
+		std::visit (nu::overload {
 			[&] (std::monostate) noexcept {
 				// No action
 			},

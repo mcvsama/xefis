@@ -125,14 +125,14 @@ class SimulatorWidget: public QWidget
 	void
 	update_simulation_performance_label (si::Time dt);
 
-	static std::optional<Responsibility>
+	static std::optional<nu::Responsibility>
 	bool_lock (bool& lock_variable);
 
   private:
-	Logger							_logger;
+	nu::Logger						_logger;
 	Machine*						_machine						{ nullptr };
 	Simulator&						_simulator;
-	neutrino::WorkPerformer			_graphics_work_performer		{ 2 * std::thread::hardware_concurrency(), _logger.with_context ("graphics work performer") };
+	nu::WorkPerformer				_graphics_work_performer		{ 2 * std::thread::hardware_concurrency(), _logger.with_context ("graphics work performer") };
 
 	// Basic widgets
 
@@ -153,7 +153,7 @@ class SimulatorWidget: public QWidget
 	float							_simulation_speed				{ 1.0f };
 	float							_last_finite_performance		{ 1.0f };
 	Smoother<float>					_performance_smoother			{ 100_ms, 10_ms };
-	std::optional<neutrino::Responsibility>
+	std::optional<nu::Responsibility>
 									_disconnect_item_changed_signal;
 
 	// Time tab
@@ -191,7 +191,7 @@ SimulatorWidget::set_followed (rigid_body::Body const& followed_body) noexcept
 
 
 // TODO neutrino utils
-inline std::optional<Responsibility>
+inline std::optional<nu::Responsibility>
 SimulatorWidget::bool_lock (bool& lock_variable)
 {
 	if (lock_variable)
@@ -199,7 +199,7 @@ SimulatorWidget::bool_lock (bool& lock_variable)
 	else
 	{
 		lock_variable = true;
-		return Responsibility ([&lock_variable] { lock_variable = false; });
+		return nu::Responsibility ([&lock_variable] { lock_variable = false; });
 	}
 }
 

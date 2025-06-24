@@ -29,7 +29,7 @@ namespace xf::nmea {
  * Thrown when trying to construct a NMEA sentence object
  * from non-compatible NMEA string sentence.
  */
-class InvalidType: public Exception
+class InvalidType: public nu::Exception
 {
   public:
 	/**
@@ -47,7 +47,7 @@ class InvalidType: public Exception
 /**
  * Thrown when sentence checksum doesn't match sentence contents.
  */
-class InvalidChecksum: public Exception
+class InvalidChecksum: public nu::Exception
 {
   public:
 	InvalidChecksum (uint8_t expected_checksum, uint8_t actual_checksum):
@@ -60,7 +60,7 @@ class InvalidChecksum: public Exception
 /**
  * Thrown on general sentence parse error.
  */
-class InvalidSentence: public Exception
+class InvalidSentence: public nu::Exception
 {
   public:
 	using Exception::Exception;

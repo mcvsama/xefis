@@ -37,8 +37,9 @@
 #include <future>
 
 
-namespace si = neutrino::si;
-using namespace neutrino::si::literals;
+namespace nu = neutrino;
+namespace si = nu::si;
+using namespace nu::si::literals;
 
 
 // TODO handle nans
@@ -330,7 +331,7 @@ class PaintingWork
   public:
 	// Ctor
 	explicit
-	PaintingWork (xf::PaintRequest const&, xf::InstrumentSupport const&, xf::NavaidStorage const&, Parameters const&, ResizeCache&, CurrentNavaids&, Mutable&, xf::Logger const&);
+	PaintingWork (xf::PaintRequest const&, xf::InstrumentSupport const&, xf::NavaidStorage const&, Parameters const&, ResizeCache&, CurrentNavaids&, Mutable&, nu::Logger const&);
 
 	void
 	paint();
@@ -442,7 +443,7 @@ class PaintingWork
 	to_px (si::Length miles) const;
 
   private:
-	xf::Logger const&						_logger;
+	nu::Logger const&						_logger;
 	xf::PaintRequest const&					_paint_request;
 	xf::NavaidStorage const&				_navaid_storage;
 	Parameters const&						_p;
@@ -583,7 +584,7 @@ class HSI: public HSI_IO
 
   public:
 	// Ctor
-	HSI (xf::ProcessingLoop&, xf::Graphics const&, xf::NavaidStorage const&, xf::Logger const&, std::string_view const instance = {});
+	HSI (xf::ProcessingLoop&, xf::Graphics const&, xf::NavaidStorage const&, nu::Logger const&, std::string_view const instance = {});
 
 	// Module API
 	void
@@ -595,13 +596,13 @@ class HSI: public HSI_IO
 
   private:
 	HSI_IO&													_io { *this };
-	xf::Logger												_logger;
+	nu::Logger												_logger;
 	xf::NavaidStorage const&								_navaid_storage;
 	xf::InstrumentSupport									_instrument_support;
-	xf::Synchronized<hsi_detail::Parameters> mutable		_parameters;
-	xf::Synchronized<hsi_detail::ResizeCache> mutable		_resize_cache;
-	xf::Synchronized<hsi_detail::CurrentNavaids> mutable	_current_navaids;
-	xf::Synchronized<hsi_detail::Mutable> mutable			_mutable;
+	nu::Synchronized<hsi_detail::Parameters> mutable		_parameters;
+	nu::Synchronized<hsi_detail::ResizeCache> mutable		_resize_cache;
+	nu::Synchronized<hsi_detail::CurrentNavaids> mutable	_current_navaids;
+	nu::Synchronized<hsi_detail::Mutable> mutable			_mutable;
 };
 
 #endif

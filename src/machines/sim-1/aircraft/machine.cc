@@ -38,21 +38,21 @@ Machine::connect_modules()
 	_hardware.slave_transceiver.handshake_request				<< _hardware.ground_to_air_data.encryption_handshake_request;
 	_hardware.air_to_ground_data.encryption_handshake_response	<< _hardware.slave_transceiver.handshake_response;
 
-	constexpr auto kAileronsLimits = xf::Range { -30_deg, +30_deg };
-	constexpr auto kElevatorLimits = xf::Range { -30_deg, +30_deg };
-	constexpr auto kRudderLimits = xf::Range { -30_deg, +30_deg };
+	constexpr auto kAileronsLimits = nu::Range { -30_deg, +30_deg };
+	constexpr auto kElevatorLimits = nu::Range { -30_deg, +30_deg };
+	constexpr auto kRudderLimits = nu::Range { -30_deg, +30_deg };
 
 	auto const throttle_to_power = std::function ([](double v) {
 		return 1_W * v;
 	});
 	auto const joystick_to_elevator = std::function ([&] (double const angle) -> si::Angle {
-		return neutrino::renormalize (angle, xf::Range { -1.0, +1.0 }, kElevatorLimits);
+		return neutrino::renormalize (angle, nu::Range { -1.0, +1.0 }, kElevatorLimits);
 	});
 	auto const joystick_to_ailerons = std::function ([&] (double const angle) -> si::Angle {
-		return neutrino::renormalize (angle, xf::Range { -1.0, +1.0 }, kAileronsLimits);
+		return neutrino::renormalize (angle, nu::Range { -1.0, +1.0 }, kAileronsLimits);
 	});
 	auto const joystick_to_rudder = std::function ([&] (double const angle) -> si::Angle {
-		return neutrino::renormalize (angle, xf::Range { -1.0, +1.0 }, kRudderLimits);
+		return neutrino::renormalize (angle, nu::Range { -1.0, +1.0 }, kRudderLimits);
 	});
 
 	_data_center.joystick_pitch	<< _hardware.ground_to_air_data.joystick_pitch;

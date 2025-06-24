@@ -93,7 +93,7 @@ class VirtualJoystickWidget: public xf::Widget
 
 class VirtualLinearWidget: public xf::Widget
 {
-	static constexpr xf::Range	kInternalRange	{ 0.0f, 1.0f };
+	static constexpr nu::Range	kInternalRange	{ 0.0f, 1.0f };
 	static constexpr float		kMarginEm		{ 0.5 };
 
   public:
@@ -112,7 +112,7 @@ class VirtualLinearWidget: public xf::Widget
   public:
 	// Ctor
 	explicit
-	VirtualLinearWidget (xf::Range<float>, Orientation, Style, QWidget* parent);
+	VirtualLinearWidget (nu::Range<float>, Orientation, Style, QWidget* parent);
 
 	/**
 	 * Set value.
@@ -144,7 +144,7 @@ class VirtualLinearWidget: public xf::Widget
 	mouseMoveEvent (QMouseEvent*) override;
 
   private:
-	xf::Range<float>			_range;
+	nu::Range<float>			_range;
 	Orientation					_orientation;
 	Style						_style;
 	float						_value			{ 0.0 };
@@ -183,7 +183,6 @@ VirtualJoystickWidget::position() const noexcept
 	if (_control)
 	{
 		using std::abs;
-		using xf::sgn;
 
 		auto const m2 = 2 * _paint_helper.em_pixels (kMarginEm);
 		auto const size = std::min (width() - m2, height() - m2);
@@ -191,8 +190,8 @@ VirtualJoystickWidget::position() const noexcept
 
 		if (abs (pos.x()) > 1.0 || abs (pos.y()) > 1.0)
 		{
-			auto const sx = sgn (pos.x());
-			auto const sy = sgn (pos.y());
+			auto const sx = nu::sgn (pos.x());
+			auto const sy = nu::sgn (pos.y());
 
 			if (abs (pos.x()) > abs (pos.y()))
 				return QPointF (sx, -sx / pos.x() * pos.y());
@@ -303,7 +302,7 @@ VirtualJoystickWidget::mouseMoveEvent (QMouseEvent* event)
 }
 
 
-VirtualLinearWidget::VirtualLinearWidget (xf::Range<float> range, Orientation orientation, Style style, QWidget* parent):
+VirtualLinearWidget::VirtualLinearWidget (nu::Range<float> range, Orientation orientation, Style style, QWidget* parent):
 	Widget (parent),
 	_range (range),
 	_orientation (orientation),
@@ -327,7 +326,7 @@ VirtualLinearWidget::VirtualLinearWidget (xf::Range<float> range, Orientation or
 void
 VirtualLinearWidget::set_value (float v)
 {
-	_value = xf::renormalize (v, _range, kInternalRange);
+	_value = nu::renormalize (v, _range, kInternalRange);
 	update();
 }
 
@@ -342,18 +341,18 @@ VirtualLinearWidget::value() const noexcept
 		switch (_orientation)
 		{
 			case Horizontal:
-				v = neutrino::clamp<float> (_value + _control->delta().x() / width(), kInternalRange);
+				v = nu::clamp<float> (_value + _control->delta().x() / width(), kInternalRange);
 				break;
 
 			case Vertical:
-				v = neutrino::clamp<float> (_value - _control->delta().y() / height(), kInternalRange);
+				v = nu::clamp<float> (_value - _control->delta().y() / height(), kInternalRange);
 				break;
 		}
 	}
 	else
-		v = neutrino::clamp<float> (_value, kInternalRange);
+		v = nu::clamp<float> (_value, kInternalRange);
 
-	return xf::renormalize (v, kInternalRange, _range);
+	return nu::renormalize (v, kInternalRange, _range);
 }
 
 
@@ -380,7 +379,7 @@ VirtualLinearWidget::paintEvent (QPaintEvent*)
 	{
 		auto const color = outlining ? Qt::black : Qt::white;
 		auto const added_width = outlining ? _paint_helper.em_pixels (0.2) : 0.0;
-		auto const y = xf::renormalize (value(), _range, kInternalRange) * r.height();
+		auto const y = nu::renormalize (value(), _range, kInternalRange) * r.height();
 
 		// Throttle:
 		painter.setPen (QPen (color, added_width + _paint_helper.em_pixels (0.1), Qt::SolidLine, Qt::FlatCap));
@@ -437,7 +436,7 @@ VirtualJoystick::VirtualJoystick (xf::ProcessingLoop& loop, xf::Machine* machine
 	using namespace std::literals;
 
 	_widget = new xf::Widget (nullptr);
-	_widget->setWindowTitle (neutrino::to_qstring ("XEFIS virtual joystick" + (instance.empty() ? ""s : ": "s + instance)));
+	_widget->setWindowTitle (nu::to_qstring ("XEFIS virtual joystick" + (instance.empty() ? ""s : ": "s + instance)));
 	xf::set_kde_blur_background (*_widget, true);
 
 	_joystick_widget = new VirtualJoystickWidget (machine, _widget);

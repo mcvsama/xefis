@@ -40,10 +40,10 @@ class QuitInstruction { };
 inline int
 setup_xefis_executable (int argc, char** argv, std::function<void()> run_app_function)
 {
-	signal (SIGILL, neutrino::fail);
-	signal (SIGFPE, neutrino::fail);
-	signal (SIGSEGV, neutrino::fail);
-	signal (SIGHUP, [](int) { neutrino::g_hup_received.store (true); });
+	signal (SIGILL, nu::fail);
+	signal (SIGFPE, nu::fail);
+	signal (SIGSEGV, nu::fail);
+	signal (SIGHUP, [](int) { nu::g_hup_received.store (true); });
 
 	setenv ("LC_ALL", "POSIX", 1);
 	setlocale (LC_ALL, "POSIX");
@@ -52,8 +52,8 @@ setup_xefis_executable (int argc, char** argv, std::function<void()> run_app_fun
 		if (argc == 2 && (strcmp (argv[1], "-v") == 0 || strcmp (argv[1], "--version") == 0))
 		{
 			std::cout << "Xefis" << std::endl;
-			std::cout << "Commit: " << xf::version::commit << std::endl;
-			std::cout << "Branch: " << xf::version::branch << std::endl;
+			std::cout << "Commit: " << nu::version::commit << std::endl;
+			std::cout << "Branch: " << nu::version::branch << std::endl;
 			std::clog << "CXXFLAGS: " << CXXFLAGS << std::endl;
 			std::clog << std::endl;
 		}
@@ -64,9 +64,9 @@ setup_xefis_executable (int argc, char** argv, std::function<void()> run_app_fun
 	{
 		return EXIT_SUCCESS;
 	}
-	catch (xf::Exception& e)
+	catch (nu::Exception& e)
 	{
-		using namespace xf::exception_ops;
+		using namespace nu::exception_ops;
 
 		std::cerr << "Fatal error: " << e << std::endl;
 		return EXIT_FAILURE;

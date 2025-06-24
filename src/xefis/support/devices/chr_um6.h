@@ -508,13 +508,13 @@ class CHRUM6
   public:
 	// Ctor
 	explicit
-	CHRUM6 (SerialPort* serial_port, Logger const&);
+	CHRUM6 (nu::SerialPort* serial_port, nu::Logger const&);
 
 	/**
 	 * Set logger.
 	 */
 	void
-	set_logger (Logger const&);
+	set_logger (nu::Logger const&);
 
 	/**
 	 * Set callback indicating serial port failure.
@@ -642,7 +642,7 @@ class CHRUM6
 		}
 
   private:
-	SerialPort*								_serial_port	{ nullptr };
+	nu::SerialPort*							_serial_port	{ nullptr };
 	std::unique_ptr<PacketReader>			_packet_reader;
 	std::function<void()>					_communication_failure_callback;
 	std::function<void()>					_alive_check_callback;
@@ -650,7 +650,7 @@ class CHRUM6
 	bool									_auto_retry		{ false };
 	std::queue<std::unique_ptr<Request>>	_requests;
 	std::unique_ptr<Request>				_current_req;
-	Logger									_logger;
+	nu::Logger								_logger;
 };
 
 
@@ -682,7 +682,7 @@ CHRUM6::Request::duration() const noexcept
 	if (finished())
 		return data()->finish_timestamp - data()->start_timestamp;
 	else
-		return TimeHelper::utc_now() - data()->start_timestamp;
+		return nu::TimeHelper::utc_now() - data()->start_timestamp;
 }
 
 

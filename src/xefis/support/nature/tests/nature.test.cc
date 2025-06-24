@@ -28,7 +28,10 @@
 namespace xf::test {
 namespace {
 
-AutoTest t1 ("Nature: MassMomentsAtArm calculations", []{
+namespace test_asserts = nu::test_asserts;
+
+
+nu::AutoTest t1 ("Nature: MassMomentsAtArm calculations", []{
 	{
 		auto identity = RotationQuaternion (math::identity);
 		SpaceMatrix<si::MomentOfInertia> const moi2 {
@@ -84,7 +87,7 @@ AutoTest t1 ("Nature: MassMomentsAtArm calculations", []{
 });
 
 
-AutoTest t2 ("Nature: VelocityMoments calculations", []{
+nu::AutoTest t2 ("Nature: VelocityMoments calculations", []{
 	test_asserts::verify_equal_with_epsilon ("(0) velocities are added correctly",
 											 add (VelocityMoments<> ({ -1_mps, 0_mps, 0_mps }, { 0_radps, 0_radps, 1_radps }),
 												  VelocityMoments<> ({ +1_mps, 0_mps, 0_mps }, { 0_radps, 0_radps, 0_radps }),
@@ -112,7 +115,7 @@ AutoTest t2 ("Nature: VelocityMoments calculations", []{
 });
 
 
-AutoTest t3 ("Nature: Wrench: resultant_force()", []{
+nu::AutoTest t3 ("Nature: Wrench: resultant_force()", []{
 	Wrench<> w1 ({ 0_N, 1_N, 0_N }, { 0_Nm, 0_Nm, 0_Nm }, { 1_m, 0_m, 0_m });
 	Wrench<> w2 ({ 0_N, 0_N, 0_N }, { 0_Nm, 0_Nm, 1_Nm }, { 2_m, 0_m, 0_m });
 	Wrench<> w3 ({ 0_N, 2_N, 0_N }, { 0_Nm, 0_Nm, 1_Nm }, { 2_m, 0_m, 0_m });
@@ -132,7 +135,7 @@ AutoTest t3 ("Nature: Wrench: resultant_force()", []{
 });
 
 
-AutoTest t4 ("Nature: Wrench + offset", []{
+nu::AutoTest t4 ("Nature: Wrench + offset", []{
 	Wrench<> w1 ({ 0_N, 1_N, 0_N }, { 0_Nm, 0_Nm, 0_Nm }, { 1_m, 0_m, 0_m });
 	Wrench<> w2 ({ 0_N, 0_N, 0_N }, { 0_Nm, 0_Nm, 1_Nm }, { 2_m, 0_m, 0_m });
 	Wrench<> w3 ({ 0_N, 2_N, 0_N }, { 0_Nm, 0_Nm, 1_Nm }, { 2_m, 0_m, 0_m });

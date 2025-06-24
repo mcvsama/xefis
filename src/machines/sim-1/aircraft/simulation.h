@@ -48,7 +48,7 @@ class Simulation: public neutrino::Noncopyable
   public:
 	// Ctor
 	explicit
-	Simulation (Machine&, Models&, si::LonLatRadius<> const location, neutrino::Logger const&);
+	Simulation (Machine&, Models&, si::LonLatRadius<> const location, nu::Logger const&);
 
 	SimulatedAircraft&
 	aircraft() noexcept
@@ -67,7 +67,7 @@ class Simulation: public neutrino::Noncopyable
 		{ _simulator_widget->show(); }
 
   private:
-	xf::Logger							_logger;
+	nu::Logger							_logger;
 	Models&								_models;
 	xf::rigid_body::System				_rigid_body_system			{ _models.standard_atmosphere };
 	xf::rigid_body::ImpulseSolver		_rigid_body_solver			{ _rigid_body_system, 1 };

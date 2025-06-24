@@ -71,7 +71,7 @@ class BasicGauge: public xf::Instrument
 	};
 
   protected:
-	static constexpr	xf::Range<FloatingPoint>	kNormalizedRange	{ 0.0f, 1.0f };
+	static constexpr	nu::Range<FloatingPoint>	kNormalizedRange	{ 0.0f, 1.0f };
 	static inline		QColor const				kSilver				{ 0xbb, 0xbd, 0xbf };
 	static inline		QColor const				kWarningColor		{ 255, 200, 0 };
 	static inline		QColor const				kCriticalColor		{ 255, 35, 35 };
@@ -106,20 +106,20 @@ BasicGauge::GaugeValues::get_from (auto const& module, auto const& range, std::o
 	if (module.value)
 	{
 		value_str = BasicGauge::stringify (floating_point_value, *module.format, module.precision);
-		normalized_value = xf::renormalize (neutrino::clamp (*module.value, range), range, kNormalizedRange);
+		normalized_value = nu::renormalize (nu::clamp (*module.value, range), range, kNormalizedRange);
 	}
 
 	if (module.value_minimum_critical)
-		normalized_minimum_critical = xf::renormalize (*module.value_minimum_critical, range, kNormalizedRange);
+		normalized_minimum_critical = nu::renormalize (*module.value_minimum_critical, range, kNormalizedRange);
 
 	if (module.value_minimum_warning)
-		normalized_minimum_warning = xf::renormalize (*module.value_minimum_warning, range, kNormalizedRange);
+		normalized_minimum_warning = nu::renormalize (*module.value_minimum_warning, range, kNormalizedRange);
 
 	if (module.value_maximum_warning)
-		normalized_maximum_warning = xf::renormalize (*module.value_maximum_warning, range, kNormalizedRange);
+		normalized_maximum_warning = nu::renormalize (*module.value_maximum_warning, range, kNormalizedRange);
 
 	if (module.value_maximum_critical)
-		normalized_maximum_critical = xf::renormalize (*module.value_maximum_critical, range, kNormalizedRange);
+		normalized_maximum_critical = nu::renormalize (*module.value_maximum_critical, range, kNormalizedRange);
 
 	if (normalized_value)
 	{

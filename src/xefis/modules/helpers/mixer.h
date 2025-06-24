@@ -69,7 +69,7 @@ template<class pValue>
 	  public:
 		// Ctor
 		explicit
-		Mixer (xf::Logger const&, std::string_view const instance = {});
+		Mixer (nu::Logger const&, std::string_view const instance = {});
 
 	  protected:
 		// Module API
@@ -82,7 +82,7 @@ template<class pValue>
 
 	  private:
 		MixerIO&						_io					{ *this };
-		xf::Logger						_logger;
+		nu::Logger						_logger;
 		xf::SocketValueChanged<Value>	_input_a_changed	{ _io.input_a_value };
 		xf::SocketValueChanged<Value>	_input_b_changed	{ _io.input_b_value };
 	};
@@ -94,7 +94,7 @@ template<class pValue>
 
 
 template<class V>
-	Mixer<V>::Mixer (xf::Logger const& logger, std::string const& instance):
+	Mixer<V>::Mixer (nu::Logger const& logger, std::string const& instance):
 		MixerIO<V> (instance),
 		_logger (logger.with_context (std::string (kLoggerScope) + "#" + instance))
 	{ }

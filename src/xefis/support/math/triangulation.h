@@ -75,7 +75,7 @@ template<class Scalar, class Space, class Iterator>
 			auto const a12 = 1_rad * std::arg (v12);
 			auto const a13 = 1_rad * std::arg (v13);
 
-			return neutrino::wrap_within_range (a12 - a13, Range { -180_deg, +180_deg });
+			return nu::wrap_within_range (a12 - a13, nu::Range { -180_deg, +180_deg });
 		};
 
 		auto const is_convex = [&turn] (Vertex const& v1, Vertex const& v2, Vertex const& v3)

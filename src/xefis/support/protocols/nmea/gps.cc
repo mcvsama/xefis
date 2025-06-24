@@ -37,8 +37,8 @@ using std::to_string;
 static inline unsigned int
 mknum (char c10, char c01)
 {
-	return digit_from_ascii (c10) * 10u
-		 + digit_from_ascii (c01);
+	return nu::digit_from_ascii (c10) * 10u
+		 + nu::digit_from_ascii (c01);
 }
 
 
@@ -55,17 +55,17 @@ UnsupportedSentenceType::UnsupportedSentenceType (std::string const& sentence):
 GPSTimeOfDay::GPSTimeOfDay (std::string const& gps_time)
 {
 	if (gps_time.size() < 6)
-		throw InvalidFormat ("invalid format of GPS time-of-day: '" + gps_time + "'");
+		throw nu::InvalidFormat ("invalid format of GPS time-of-day: '" + gps_time + "'");
 
 	try {
 		hours = mknum (gps_time[0], gps_time[1]);
 		minutes = mknum (gps_time[2], gps_time[3]);
 		seconds = mknum (gps_time[4], gps_time[5]);
-		seconds_fraction = neutrino::parse<double> (gps_time.substr (6));
+		seconds_fraction = nu::parse<double> (gps_time.substr (6));
 	}
-	catch (InvalidFormat& e)
+	catch (nu::InvalidFormat& e)
 	{
-		std::throw_with_nested (InvalidFormat ("invalid format of GPS time-of-day"));
+		std::throw_with_nested (nu::InvalidFormat ("invalid format of GPS time-of-day"));
 	}
 }
 
@@ -73,16 +73,16 @@ GPSTimeOfDay::GPSTimeOfDay (std::string const& gps_time)
 GPSDate::GPSDate (std::string const& gps_date)
 {
 	if (gps_date.size() != 6)
-		throw InvalidFormat ("invalid format of GPS date: '" + gps_date + "'");
+		throw nu::InvalidFormat ("invalid format of GPS date: '" + gps_date + "'");
 
 	try {
 		day = mknum (gps_date[0], gps_date[1]);
 		month = mknum (gps_date[2], gps_date[3]);
 		year = 2000 + mknum (gps_date[4], gps_date[5]);
 	}
-	catch (InvalidFormat& e)
+	catch (nu::InvalidFormat& e)
 	{
-		std::throw_with_nested (InvalidFormat ("invalid format of GPS date"));
+		std::throw_with_nested (nu::InvalidFormat ("invalid format of GPS date"));
 	}
 }
 
@@ -114,7 +114,7 @@ GPGGA::GPGGA (std::string const& sentence):
 
 	if (val().size() == 1 && std::isdigit (val()[0]))
 	{
-		int fq = digit_from_ascii (val()[0]);
+		int fq = nu::digit_from_ascii (val()[0]);
 		// Integer range check:
 		if (fq <= static_cast<int> (GPSFixQuality::Simulated) &&
 			fq >= static_cast<int> (GPSFixQuality::Invalid))
@@ -128,9 +128,9 @@ GPGGA::GPGGA (std::string const& sentence):
 		return;
 
 	try {
-		this->tracked_satellites = neutrino::parse<unsigned int> (val());
+		this->tracked_satellites = nu::parse<unsigned int> (val());
 	}
-	catch (ParseException&)
+	catch (nu::ParseException&)
 	{ }
 
 	// Horizontal dilution of position:
@@ -138,9 +138,9 @@ GPGGA::GPGGA (std::string const& sentence):
 		return;
 
 	try {
-		this->hdop = neutrino::parse<double> (val());
+		this->hdop = nu::parse<double> (val());
 	}
-	catch (ParseException&)
+	catch (nu::ParseException&)
 	{ }
 
 	// Altitude above mean sea level (in meters):
@@ -148,9 +148,9 @@ GPGGA::GPGGA (std::string const& sentence):
 		return;
 
 	try {
-		this->altitude_amsl = 1_m * neutrino::parse<double> (val());
+		this->altitude_amsl = 1_m * nu::parse<double> (val());
 	}
-	catch (ParseException&)
+	catch (nu::ParseException&)
 	{ }
 
 	// Ensure that unit is 'M' (meters):
@@ -168,9 +168,9 @@ GPGGA::GPGGA (std::string const& sentence):
 		return;
 
 	try {
-		this->geoid_height = 1_m * neutrino::parse<double> (val());
+		this->geoid_height = 1_m * nu::parse<double> (val());
 	}
-	catch (ParseException&)
+	catch (nu::ParseException&)
 	{ }
 
 	// Ensure that unit is 'M' (meters):
@@ -188,9 +188,9 @@ GPGGA::GPGGA (std::string const& sentence):
 		return;
 
 	try {
-		this->dgps_last_update_time = 1_s * neutrino::parse<double> (val());
+		this->dgps_last_update_time = 1_s * nu::parse<double> (val());
 	}
-	catch (ParseException&)
+	catch (nu::ParseException&)
 	{ }
 
 	// DGPS station identifier:
@@ -198,9 +198,9 @@ GPGGA::GPGGA (std::string const& sentence):
 		return;
 
 	try {
-		this->dgps_station_id = neutrino::parse<std::decay_t<decltype (*this->dgps_station_id)>> (val());
+		this->dgps_station_id = nu::parse<std::decay_t<decltype (*this->dgps_station_id)>> (val());
 	}
-	catch (ParseException&)
+	catch (nu::ParseException&)
 	{ }
 }
 
@@ -262,9 +262,9 @@ GPGSA::GPGSA (std::string const& sentence):
 
 		try {
 			if (!val().empty())
-				this->satellites[i] = neutrino::parse<unsigned int> (val());
+				this->satellites[i] = nu::parse<unsigned int> (val());
 		}
-		catch (ParseException&)
+		catch (nu::ParseException&)
 		{ }
 	}
 
@@ -273,9 +273,9 @@ GPGSA::GPGSA (std::string const& sentence):
 		return;
 
 	try {
-		this->pdop = neutrino::parse<double> (val());
+		this->pdop = nu::parse<double> (val());
 	}
-	catch (ParseException&)
+	catch (nu::ParseException&)
 	{ }
 
 	// HDOP:
@@ -283,9 +283,9 @@ GPGSA::GPGSA (std::string const& sentence):
 		return;
 
 	try {
-		this->hdop = neutrino::parse<double> (val());
+		this->hdop = nu::parse<double> (val());
 	}
-	catch (ParseException&)
+	catch (nu::ParseException&)
 	{ }
 
 	// VDOP:
@@ -293,9 +293,9 @@ GPGSA::GPGSA (std::string const& sentence):
 		return;
 
 	try {
-		this->vdop = neutrino::parse<double> (val());
+		this->vdop = nu::parse<double> (val());
 	}
-	catch (ParseException&)
+	catch (nu::ParseException&)
 	{ }
 }
 
@@ -335,9 +335,9 @@ GPRMC::GPRMC (std::string const& sentence):
 		return;
 
 	try {
-		this->ground_speed = 1_kt * neutrino::parse<double> (val());
+		this->ground_speed = 1_kt * nu::parse<double> (val());
 	}
-	catch (ParseException&)
+	catch (nu::ParseException&)
 	{ }
 
 	// Track angle in degrees True:
@@ -345,9 +345,9 @@ GPRMC::GPRMC (std::string const& sentence):
 		return;
 
 	try {
-		this->track_true = 1_deg * neutrino::parse<double> (val());
+		this->track_true = 1_deg * nu::parse<double> (val());
 	}
-	catch (ParseException&)
+	catch (nu::ParseException&)
 	{ }
 
 	// Fix date:
@@ -362,9 +362,9 @@ GPRMC::GPRMC (std::string const& sentence):
 		return;
 
 	try {
-		this->magnetic_variation = 1_deg * neutrino::parse<double> (val());
+		this->magnetic_variation = 1_deg * nu::parse<double> (val());
 	}
-	catch (ParseException&)
+	catch (nu::ParseException&)
 	{ }
 
 	// East/West:

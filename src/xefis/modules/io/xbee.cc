@@ -45,7 +45,7 @@
 #include <iomanip>
 
 
-XBee::XBee (xf::ProcessingLoop& loop, xf::Logger const& logger, std::string_view const instance):
+XBee::XBee (xf::ProcessingLoop& loop, nu::Logger const& logger, std::string_view const instance):
 	XBeeIO (loop, instance),
 	_logger (logger.with_context (std::string (kLoggerScope) + "#" + instance))
 {
@@ -175,7 +175,7 @@ XBee::read()
 	std::string buffer;
 
 	bool err = false;
-	bool exc = xf::Exception::catch_and_log (_logger, [&] {
+	bool exc = nu::Exception::catch_and_log (_logger, [&] {
 		// Read as much as possible:
 		for (;;)
 		{
@@ -201,7 +201,7 @@ XBee::read()
 			}
 			else
 			{
-				buffer.resize (prev_size + neutrino::to_unsigned (n));
+				buffer.resize (prev_size + nu::to_unsigned (n));
 
 				if (n == 0)
 				{
@@ -449,7 +449,7 @@ XBee::configure_modem (uint8_t frame_id, ATResponseStatus status, std::string_vi
 			full_at += static_cast<char> (b);
 
 		if (*_io.debug)
-			debug() << "Sending AT command " << at << ": " << neutrino::to_hex_string (full_at) << std::endl;
+			debug() << "Sending AT command " << at << ": " << nu::to_hex_string (full_at) << std::endl;
 
 		int written = 0;
 		_last_at_command = full_at;
@@ -498,13 +498,13 @@ XBee::configure_modem (uint8_t frame_id, ATResponseStatus status, std::string_vi
 				break;
 
 			case ConfigurationStep::ReadHardwareVersion:
-				_logger << "Hardware version: " << neutrino::to_hex_string (response) << std::endl;
+				_logger << "Hardware version: " << nu::to_hex_string (response) << std::endl;
 
 				request_at (ConfigurationStep::ReadFirmwareVersion, "VR");
 				break;
 
 			case ConfigurationStep::ReadFirmwareVersion:
-				_logger << "Firmware version: " << neutrino::to_hex_string (response) << std::endl;
+				_logger << "Firmware version: " << nu::to_hex_string (response) << std::endl;
 
 				request_at (ConfigurationStep::ReadSerialNumberH, "SH");
 				break;
@@ -516,7 +516,7 @@ XBee::configure_modem (uint8_t frame_id, ATResponseStatus status, std::string_vi
 
 			case ConfigurationStep::ReadSerialNumberL:
 				_serial_number_bin += response;
-				_logger << "Serial number: " << neutrino::to_hex_string (_serial_number_bin) << std::endl;
+				_logger << "Serial number: " << nu::to_hex_string (_serial_number_bin) << std::endl;
 
 				request_at (ConfigurationStep::DisableSleep, "SM", { 0x00 });
 				break;
@@ -610,7 +610,7 @@ std::string
 XBee::make_frame (std::string_view const data) const
 {
 	if (data.size() > 0xffff)
-		throw xf::Exception ("max frame size is 0xffff");
+		throw nu::Exception ("max frame size is 0xffff");
 
 	std::string result;
 
@@ -804,9 +804,9 @@ XBee::process_packet (std::string& input, ResponseAPI& api, std::string& data)
 		}
 
 		// Discard non-parseable data:
-		input.erase (input.begin(), input.begin() + neutrino::to_signed (p));
+		input.erase (input.begin(), input.begin() + nu::to_signed (p));
 
-		_io.input_errors = *_io.input_errors + neutrino::to_signed (p);
+		_io.input_errors = *_io.input_errors + nu::to_signed (p);
 
 		// Delimiter (1B) + packet size (2B) + data (1B) + checksum (1B) gives
 		// at least 5 bytes:
@@ -846,7 +846,7 @@ void
 XBee::process_rx64_frame (std::string_view const frame)
 {
 	if (*_io.debug)
-		debug() << ">> RX64 data: " << neutrino::to_hex_string (frame) << std::endl;
+		debug() << ">> RX64 data: " << nu::to_hex_string (frame) << std::endl;
 
 	// At least 11 bytes:
 	if (frame.size() < 11)
@@ -880,7 +880,7 @@ void
 XBee::process_rx16_frame (std::string_view const frame)
 {
 	if (*_io.debug)
-		debug() << ">> RX16 data: " << neutrino::to_hex_string (frame) << std::endl;
+		debug() << ">> RX16 data: " << nu::to_hex_string (frame) << std::endl;
 
 	// At least 5 bytes:
 	if (frame.size() < 5)
@@ -891,7 +891,7 @@ XBee::process_rx16_frame (std::string_view const frame)
 	// Address must match our peer's address:
 	if (address != *_io.remote_address)
 	{
-		_logger << "Got packet from unknown address: " << neutrino::to_hex_string (frame.substr (0, 2)) << ". Ignoring." << std::endl;
+		_logger << "Got packet from unknown address: " << nu::to_hex_string (frame.substr (0, 2)) << ". Ignoring." << std::endl;
 		return;
 	}
 
@@ -918,7 +918,7 @@ void
 XBee::process_modem_status_frame (std::string_view const data)
 {
 	if (*_io.debug)
-		debug() << ">> Modem status: " << neutrino::to_hex_string (data) << std::endl;
+		debug() << ">> Modem status: " << nu::to_hex_string (data) << std::endl;
 
 	if (data.size() < 1)
 		return;
@@ -977,7 +977,7 @@ void
 XBee::process_at_response_frame (std::string_view const frame)
 {
 	if (*_io.debug)
-		debug() << ">> AT status: " << neutrino::to_hex_string (frame) << std::endl;
+		debug() << ">> AT status: " << nu::to_hex_string (frame) << std::endl;
 
 	// Response must be at least 4 bytes long:
 	if (frame.size() < 4)
@@ -1008,7 +1008,7 @@ XBee::process_at_response_frame (std::string_view const frame)
 			case ATResponseStatus::InvalidParameter:	log << "Invalid parameter"; break;
 			default:									log << "?"; break;
 		}
-		log << ", data: " << neutrino::to_hex_string (response_data) << std::endl;
+		log << ", data: " << nu::to_hex_string (response_data) << std::endl;
 	}
 
 	// Response data: bytes
@@ -1037,7 +1037,7 @@ XBee::report_rssi (int dbm)
 
 	// Convert dBm to milliwatts:
 	si::Power power = 1_mW * std::pow (10.0, 0.1 * static_cast<double> (dbm));
-	si::Time now = xf::TimeHelper::utc_now();
+	si::Time now = nu::TimeHelper::utc_now();
 	_io.rssi = _rssi_smoother (power, now - _last_rssi_time);
 	_last_rssi_time = now;
 }

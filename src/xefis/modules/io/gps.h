@@ -36,8 +36,9 @@
 #include <map>
 
 
-namespace si = neutrino::si;
-using namespace neutrino::si::literals;
+namespace nu = neutrino;
+namespace si = nu::si;
+using namespace nu::si::literals;
 
 
 class GPS_IO: public xf::Module
@@ -239,8 +240,8 @@ class GPS:
 		PowerCycle&							_power_cycle;
 
 		unsigned int						_requested_physical_baud_rate;
-		xf::SerialPort::Configuration		_serial_port_config;
-		std::unique_ptr<xf::SerialPort>		_serial_port;
+		nu::SerialPort::Configuration		_serial_port_config;
+		std::unique_ptr<nu::SerialPort>		_serial_port;
 		xf::nmea::Parser					_nmea_parser;
 		bool								_reliable_fix_quality	= false;
 		bool								_first_message_received	= false;
@@ -302,7 +303,7 @@ class GPS:
   public:
 	// Ctor
 	explicit
-	GPS (xf::ProcessingLoop&, xf::System*, xf::SerialPort::Configuration const&, xf::Logger const&, std::string_view const instance = {});
+	GPS (xf::ProcessingLoop&, xf::System*, nu::SerialPort::Configuration const&, nu::Logger const&, std::string_view const instance = {});
 
 	// Dtor
 	~GPS();
@@ -347,12 +348,13 @@ class GPS:
 	void
 	update_clock (xf::nmea::GPSDate const&, xf::nmea::GPSTimeOfDay const&);
 
-	xf::Logger&
-	logger();
+	nu::Logger&
+	logger()
+		{ return _logger; }
 
   private:
 	GPS_IO&							_io							{ *this };
-	xf::Logger						_logger;
+	nu::Logger						_logger;
 	xf::System*						_system;
 	std::unique_ptr<PowerCycle>		_power_cycle;
 	// Used to wait a bit after a failure:
@@ -360,16 +362,9 @@ class GPS:
 	bool							_power_cycle_requested		{ false };
 	bool							_reliable_fix_quality		{ false };
 	unsigned int					_power_cycle_attempts		{ 0 };
-	xf::SerialPort::Configuration	_serial_port_config;
+	nu::SerialPort::Configuration	_serial_port_config;
 	bool							_clock_synchronized			{ false };
 };
-
-
-inline xf::Logger&
-GPS::logger()
-{
-	return _logger;
-}
 
 #endif
 

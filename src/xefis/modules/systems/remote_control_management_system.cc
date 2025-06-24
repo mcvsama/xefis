@@ -76,7 +76,7 @@ RemoteControlManagementSystem::compute_distances_to_home()
 		_io.distance_vertical = alt_diff;
 		_io.distance_ground = ground_dist;
 		_io.distance_vlos = si::sqrt (ground_dist * ground_dist + alt_diff * alt_diff);
-		_io.true_home_direction = xf::floored_mod (xf::initial_bearing (curr, home), 360_deg);
+		_io.true_home_direction = nu::floored_mod (xf::initial_bearing (curr, home), 360_deg);
 	}
 	else
 	{

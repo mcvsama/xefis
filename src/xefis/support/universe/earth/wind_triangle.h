@@ -191,7 +191,7 @@ WindTriangle::air_speed() const
 inline si::Angle
 WindTriangle::air_direction() const
 {
-	return floored_mod (1_rad * std::arg (_air_vector), 360_deg);
+	return nu::floored_mod (1_rad * std::arg (_air_vector), 360_deg);
 }
 
 
@@ -205,7 +205,7 @@ WindTriangle::ground_speed() const
 inline si::Angle
 WindTriangle::ground_direction() const
 {
-	return floored_mod (1_rad * std::arg (_ground_vector), 360_deg);
+	return nu::floored_mod (1_rad * std::arg (_ground_vector), 360_deg);
 }
 
 
@@ -219,14 +219,14 @@ WindTriangle::wind_speed() const
 inline si::Angle
 WindTriangle::wind_direction() const
 {
-	return floored_mod (1_rad * std::arg (_wind_vector), 360_deg);
+	return nu::floored_mod (1_rad * std::arg (_wind_vector), 360_deg);
 }
 
 
 inline si::Angle
 WindTriangle::wind_from() const
 {
-	return floored_mod (wind_direction() + 180_deg, 360_deg);
+	return nu::floored_mod (wind_direction() + 180_deg, 360_deg);
 }
 
 

@@ -40,7 +40,7 @@ namespace xf::electrical {
  * Solver will not reflect changes after network is reconfigured. A new Solver must be created
  * after changes are made to the network.
  */
-class NodeVoltageSolver: public Noncopyable
+class NodeVoltageSolver: public nu::Noncopyable
 {
   public:
 	static constexpr uint32_t kDefaultMaxIterations = 10000;
@@ -74,7 +74,7 @@ class NodeVoltageSolver: public Noncopyable
 		si::Voltage				voltage;
 	};
 
-	class SNetwork: public Noncopyable
+	class SNetwork: public nu::Noncopyable
 	{
 	  public:
 		std::vector<SNode>		nodes;

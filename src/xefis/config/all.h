@@ -23,7 +23,10 @@
 
 namespace xf {
 
-using namespace neutrino;
+namespace nu = neutrino;
+namespace si = neutrino::si;
+namespace math = neutrino::math;
+
 using namespace neutrino::si::literals;
 using namespace neutrino::debug;
 

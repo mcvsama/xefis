@@ -27,7 +27,7 @@ namespace xf::nmea {
 /**
  * Thrown when NMEA or PMTK sentence type can't be resolved.
  */
-class UnsupportedSentenceType: public Exception
+class UnsupportedSentenceType: public nu::Exception
 {
   public:
 	explicit

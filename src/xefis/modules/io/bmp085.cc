@@ -31,7 +31,7 @@
 #include <iostream>
 
 
-BMP085::BMP085 (xf::ProcessingLoop& loop, xf::Logger const& logger, std::string_view const instance):
+BMP085::BMP085 (xf::ProcessingLoop& loop, nu::Logger const& logger, std::string_view const instance):
 	BMP085_IO (loop, instance),
 	_logger (logger.with_context (std::string (kLoggerScope) + "#" + instance))
 {
@@ -48,7 +48,7 @@ void
 BMP085::initialize()
 {
 	_i2c_device.bus().set_bus_number (_io.i2c_bus);
-	_i2c_device.set_address (xf::i2c::Address (_io.i2c_address));
+	_i2c_device.set_address (nu::i2c::Address (_io.i2c_address));
 
 	guard ([&] {
 		hw_initialize();
@@ -215,7 +215,7 @@ BMP085::guard (std::function<void()> guarded_code)
 	try {
 		guarded_code();
 	}
-	catch (xf::IOError& e)
+	catch (nu::IOError& e)
 	{
 		_logger << "I/O error: " << e.message() << std::endl;
 		hw_reinitialize();

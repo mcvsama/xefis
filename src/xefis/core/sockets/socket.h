@@ -258,7 +258,7 @@ template<class V>
 	{
 		if (_fallback_value != fallback_value)
 		{
-			_modification_timestamp = TimeHelper::utc_now();
+			_modification_timestamp = nu::TimeHelper::utc_now();
 			_valid_timestamp = _modification_timestamp;
 			_fallback_value = fallback_value;
 			++_serial;
@@ -312,7 +312,7 @@ template<class V>
 	{
 		if (_value)
 		{
-			_modification_timestamp = TimeHelper::utc_now();
+			_modification_timestamp = nu::TimeHelper::utc_now();
 			_value.reset();
 			++_serial;
 		}
@@ -347,7 +347,7 @@ template<class V>
 	{
 		if (!_value || *_value != value)
 		{
-			_modification_timestamp = TimeHelper::utc_now();
+			_modification_timestamp = nu::TimeHelper::utc_now();
 			_valid_timestamp = _modification_timestamp;
 			_value = value;
 			++_serial;

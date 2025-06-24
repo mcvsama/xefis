@@ -32,7 +32,9 @@
 namespace xf::test {
 namespace {
 
-using namespace si::units;
+namespace test_asserts = nu::test_asserts;
+
+using namespace nu::si::units;
 using namespace std::literals;
 
 inline namespace test_enum {
@@ -74,7 +76,7 @@ template<std::same_as<TestEnum> Enum>
 		else if (str == "Value2")
 			return TestEnum::Value2;
 		else
-			throw Exception ("invalid enum string \"" + std::string (str) + "\"");
+			throw nu::Exception ("invalid enum string \"" + std::string (str) + "\"");
 	}
 
 
@@ -103,13 +105,13 @@ template<std::same_as<TestEnumWithNil> Enum>
 		else if (str == "")
 			return TestEnumWithNil::xf_nil_value;
 		else
-			throw Exception ("invalid enum string \"" + std::string (str) + "\"");
+			throw nu::Exception ("invalid enum string \"" + std::string (str) + "\"");
 	}
 
 } // namespace test_enum
 
 
-xf::Logger g_null_logger;
+nu::Logger g_null_logger;
 
 
 template<class T>
@@ -155,7 +157,7 @@ template<class T>
 	std::string
 	desc_type (std::string str)
 	{
-		return std::string (str) + " <" + xf::demangle (typeid (T).name()) + ">";
+		return std::string (str) + " <" + nu::demangle (typeid (T).name()) + ">";
 	}
 
 
@@ -173,7 +175,7 @@ template<class T, template<class> class AnySocket>
 							  !socket.valid());
 
 		test_asserts::verify (desc_type<T> ("reading nil socket with operator*() throws"),
-							  Exception::catch_and_log (g_null_logger, [&]{ static_cast<void> (*socket); }));
+							  nu::Exception::catch_and_log (g_null_logger, [&]{ static_cast<void> (*socket); }));
 
 		test_asserts::verify (desc_type<T> ("reading nil socket with get_optional() returns empty std::optional"),
 							  !socket.get_optional().has_value());
@@ -191,7 +193,7 @@ template<class T, template<class> class AnySocket>
 							  !!socket);
 
 		test_asserts::verify (desc_type<T> ("reading " + what + " with operator*() does not throw"),
-							  !Exception::catch_and_log (g_null_logger, [&]{ static_cast<void> (*socket); }));
+							  !nu::Exception::catch_and_log (g_null_logger, [&]{ static_cast<void> (*socket); }));
 
 		test_asserts::verify (desc_type<T> ("socket's value != test_value"),
 							  *socket != test_value);
@@ -217,7 +219,7 @@ template<class T>
 	}
 
 
-AutoTest t1 ("xf::Socket nil and non-nil values", for_all_types ([](auto value1, auto value2) {
+nu::AutoTest t1 ("xf::Socket nil and non-nil values", for_all_types ([](auto value1, auto value2) {
 	TestEnvironment<decltype (value1)> env;
 
 	// The socket should initially be nil:
@@ -244,7 +246,7 @@ AutoTest t1 ("xf::Socket nil and non-nil values", for_all_types ([](auto value1,
 }));
 
 
-AutoTest t2 ("xf::Socket fallback values", for_all_types ([](auto value1, auto value2) {
+nu::AutoTest t2 ("xf::Socket fallback values", for_all_types ([](auto value1, auto value2) {
 	using T = decltype (value1);
 
 	{
@@ -320,7 +322,7 @@ AutoTest t2 ("xf::Socket fallback values", for_all_types ([](auto value1, auto v
 }));
 
 
-AutoTest t3 ("xf::Socket serial numbers", for_all_types ([](auto value1, auto value2) {
+nu::AutoTest t3 ("xf::Socket serial numbers", for_all_types ([](auto value1, auto value2) {
 	using T = decltype (value1);
 
 	// Serial number:
@@ -363,7 +365,7 @@ AutoTest t3 ("xf::Socket serial numbers", for_all_types ([](auto value1, auto va
 }));
 
 
-AutoTest t4 ("xf::Socket transferring data", for_all_types ([](auto value1, auto value2) {
+nu::AutoTest t4 ("xf::Socket transferring data", for_all_types ([](auto value1, auto value2) {
 	using T = decltype (value1);
 
 	TestEnvironment<T> env;
@@ -390,7 +392,7 @@ AutoTest t4 ("xf::Socket transferring data", for_all_types ([](auto value1, auto
 }));
 
 
-AutoTest t5 ("xf::Socket serialization", for_all_types ([](auto value1, auto value2) {
+nu::AutoTest t5 ("xf::Socket serialization", for_all_types ([](auto value1, auto value2) {
 	using T = decltype (value1);
 
 	// Serialization:
@@ -412,7 +414,7 @@ AutoTest t5 ("xf::Socket serialization", for_all_types ([](auto value1, auto val
 			if constexpr (si::is_quantity<T>())
 			{
 				test_asserts::verify ("from_string() throws when units are incompatible",
-									  Exception::catch_and_log (g_null_logger, [&]{ env.out.from_string ("1.15 m^2"); }));
+									  nu::Exception::catch_and_log (g_null_logger, [&]{ env.out.from_string ("1.15 m^2"); }));
 			}
 		}
 
@@ -458,7 +460,7 @@ AutoTest t5 ("xf::Socket serialization", for_all_types ([](auto value1, auto val
 }));
 
 
-AutoTest t6 ("xf::Socket various behavior", for_all_types ([](auto value1, auto) {
+nu::AutoTest t6 ("xf::Socket various behavior", for_all_types ([](auto value1, auto) {
 	using T = decltype (value1);
 
 	TestProcessingLoop loop (0.1_s);
@@ -471,13 +473,13 @@ AutoTest t6 ("xf::Socket various behavior", for_all_types ([](auto value1, auto)
 	test_asserts::verify ("nil_by_fetch_exception flag is false before first fetching",
 						  !in.nil_by_fetch_exception());
 	test_asserts::verify ("fetch() doesn't throw when a transform function throws",
-						  !Exception::catch_and_log (g_null_logger, [&]{ in.fetch (TestCycle()); }));
+						  !nu::Exception::catch_and_log (g_null_logger, [&]{ in.fetch (TestCycle()); }));
 	test_asserts::verify ("fetch() signals nil_by_fetch_exception flag when a transform function throws",
 						  in.nil_by_fetch_exception());
 }));
 
 
-AutoTest t7 ("xf::Socket operator=", for_all_types ([](auto value1, auto value2) {
+nu::AutoTest t7 ("xf::Socket operator=", for_all_types ([](auto value1, auto value2) {
 	using T = decltype (value1);
 
 	TestProcessingLoop loop (0.1_s);
@@ -499,7 +501,7 @@ AutoTest t7 ("xf::Socket operator=", for_all_types ([](auto value1, auto value2)
 }));
 
 
-AutoTest t8 ("xf::Socket << 5; xf::Socket << \"abc\"", []{
+nu::AutoTest t8 ("xf::Socket << 5; xf::Socket << \"abc\"", []{
 	TestEnvironment<int> env1;
 	TestEnvironment<std::string> env2;
 
@@ -513,7 +515,7 @@ AutoTest t8 ("xf::Socket << 5; xf::Socket << \"abc\"", []{
 });
 
 
-AutoTest t9 ("xf::Socket << std::unique_ptr<xf::Socket>", []{
+nu::AutoTest t9 ("xf::Socket << std::unique_ptr<xf::Socket>", []{
 	TestEnvironment<int> env1;
 
 	// TODO Zabroń konstrukcji ConnectableSocket (5), bo przy następnym fetchu i tak się zniluje,
@@ -531,7 +533,7 @@ AutoTest t9 ("xf::Socket << std::unique_ptr<xf::Socket>", []{
 });
 
 
-AutoTest t10 ("xf::ConnectableSocket expression", []{
+nu::AutoTest t10 ("xf::ConnectableSocket expression", []{
 	TestEnvironment<int32_t> env;
 
 	env.in << std::function<int (int)> ([](auto const value) { return value * 2; }) << env.out;
@@ -542,7 +544,7 @@ AutoTest t10 ("xf::ConnectableSocket expression", []{
 });
 
 
-AutoTest t11 ("xf::ConnectableSocket expression (different input/output types)", []{
+nu::AutoTest t11 ("xf::ConnectableSocket expression (different input/output types)", []{
 	TestProcessingLoop			loop	{ 0.1_s };
 	Module						module	{ loop };
 	ModuleOut<int>				out		{ &module, "out" };
@@ -561,7 +563,7 @@ AutoTest t11 ("xf::ConnectableSocket expression (different input/output types)",
 });
 
 
-AutoTest t12 ("xf::ConnectableSocket expression (reactions to nil)", []{
+nu::AutoTest t12 ("xf::ConnectableSocket expression (reactions to nil)", []{
 	TestProcessingLoop			loop	{ 0.1_s };
 	Module						module	{ loop };
 	ModuleOut<int>				out		{ &module, "out" };

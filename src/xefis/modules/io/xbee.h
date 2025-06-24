@@ -34,8 +34,9 @@
 #include <map>
 
 
-namespace si = neutrino::si;
-using namespace neutrino::si::literals;
+namespace nu = neutrino;
+namespace si = nu::si;
+using namespace nu::si::literals;
 
 
 class XBeeIO: public xf::Module
@@ -177,7 +178,7 @@ class XBee:
 
   public:
 	// Ctor
-	XBee (xf::ProcessingLoop&, xf::Logger const&, std::string_view const instance = {});
+	XBee (xf::ProcessingLoop&, nu::Logger const&, std::string_view const instance = {});
 
 	// Dtor
 	~XBee();
@@ -426,12 +427,12 @@ class XBee:
 	/**
 	 * A logger that adds "DEBUG" message.
 	 */
-	xf::LogBlock
+	nu::LogBlock
 	debug() const;
 
   private:
 	XBeeIO&								_io						{ *this };
-	xf::Logger							_logger;
+	nu::Logger							_logger;
 	std::unique_ptr<QSocketNotifier>	_notifier;
 	int									_device					{ 0 };
 	QTimer*								_restart_timer			{ nullptr };
@@ -462,7 +463,7 @@ XBee::configured() const noexcept
 }
 
 
-inline xf::LogBlock
+inline nu::LogBlock
 XBee::debug() const
 {
 	return _logger << "DEBUG ";

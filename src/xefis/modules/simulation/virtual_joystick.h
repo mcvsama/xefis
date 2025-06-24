@@ -26,6 +26,9 @@
 #include <xefis/support/ui/widget.h>
 
 
+namespace nu = neutrino;
+
+
 class VirtualJoystickWidget;
 class VirtualLinearWidget;
 

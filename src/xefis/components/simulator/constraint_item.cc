@@ -52,7 +52,7 @@ ConstraintItem::refresh()
 {
 	auto const signals_blocker = QSignalBlocker (treeWidget());
 
-	setText (0, neutrino::to_qstring (_constraint.label()));
+	setText (0, nu::to_qstring (_constraint.label()));
 
 	if (_constraint.broken())
 		setForeground (0 , QBrush (Qt::gray));

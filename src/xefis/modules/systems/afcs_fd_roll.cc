@@ -26,7 +26,7 @@
 #include <cstddef>
 
 
-AFCS_FD_Roll::AFCS_FD_Roll (xf::ProcessingLoop& loop, xf::Logger const& logger, std::string_view const instance):
+AFCS_FD_Roll::AFCS_FD_Roll (xf::ProcessingLoop& loop, nu::Logger const& logger, std::string_view const instance):
 	AFCS_FD_Roll_IO (loop, instance),
 	_logger (logger.with_context (std::string (kLoggerScope) + "#" + instance))
 {
@@ -74,7 +74,7 @@ AFCS_FD_Roll::process (xf::Cycle const& cycle)
 void
 AFCS_FD_Roll::rescue (xf::Cycle const& cycle, std::exception_ptr eptr)
 {
-	using namespace xf::exception_ops;
+	using namespace nu::exception_ops;
 
 	if (!_io.autonomous.value_or (true))
 		_io.operative = false;
@@ -163,10 +163,10 @@ AFCS_FD_Roll::compute_roll (xf::PIDController<si::Angle, si::Angle>& pid,
 							xf::ModuleIn<si::Angle> const& measured_direction,
 							si::Time update_dt) const
 {
-	xf::Range roll_limits { -*_io.roll_limits, +*_io.roll_limits };
+	nu::Range roll_limits { -*_io.roll_limits, +*_io.roll_limits };
 
 	if (cmd_direction && measured_direction)
-		return neutrino::clamp (pid (*cmd_direction, *measured_direction, update_dt), roll_limits);
+		return nu::clamp (pid (*cmd_direction, *measured_direction, update_dt), roll_limits);
 	else
 	{
 		pid.reset();

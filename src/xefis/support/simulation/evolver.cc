@@ -23,14 +23,14 @@
 
 namespace xf {
 
-Evolver::Evolver (si::Time const initial_simulation_time, si::Time const frame_duration, Logger const& logger, Evolve const evolve):
+Evolver::Evolver (si::Time const initial_simulation_time, si::Time const frame_duration, nu::Logger const& logger, Evolve const evolve):
 	_logger (logger),
 	_initial_simulation_time (initial_simulation_time),
 	_frame_duration (frame_duration),
 	_evolve (evolve)
 {
 	if (!_evolve)
-		throw InvalidArgument ("'evolve' paramter must not be nullptr");
+		throw nu::InvalidArgument ("'evolve' paramter must not be nullptr");
 }
 
 
@@ -40,7 +40,7 @@ Evolver::evolve (si::Time const duration)
 	_target_time += duration;
 	auto frames = 0u;
 	auto const prev_elapsed_time = _elapsed_time;
-	auto const real_time_taken = TimeHelper::measure ([&] {
+	auto const real_time_taken = nu::TimeHelper::measure ([&] {
 		while (_elapsed_time < _target_time)
 		{
 			_evolve (_frame_duration);
@@ -62,7 +62,7 @@ Evolver::EvolutionResult
 Evolver::evolve (std::size_t const frames)
 {
 	auto const prev_elapsed_time = _elapsed_time;
-	auto const real_time_taken = TimeHelper::measure ([&] {
+	auto const real_time_taken = nu::TimeHelper::measure ([&] {
 		for (std::size_t i = 0; i < frames; ++i)
 		{
 			_evolve (_frame_duration);

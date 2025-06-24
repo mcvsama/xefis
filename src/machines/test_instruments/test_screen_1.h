@@ -43,7 +43,7 @@ class TestScreen1: public xf::Screen
   public:
 	// Ctor
 	explicit
-	TestScreen1 (xf::ProcessingLoop&, xf::ScreenSpec const&, xf::Graphics const&, xf::NavaidStorage const&, xf::Machine&, xf::Logger const& logger);
+	TestScreen1 (xf::ProcessingLoop&, xf::ScreenSpec const&, xf::Graphics const&, xf::NavaidStorage const&, xf::Machine&, nu::Logger const& logger);
 
   private:
 	void
@@ -56,7 +56,7 @@ class TestScreen1: public xf::Screen
 	connect_instruments();
 
   private:
-	xf::Logger							_logger;
+	nu::Logger							_logger;
 	xf::Graphics const&					_graphics;
 	xf::NavaidStorage const&			_navaid_storage;
 
@@ -97,9 +97,9 @@ class TestScreen1: public xf::Screen
 	// Since work performers perform tasks provided by modules (painting stuff, etc),
 	// they should be deleted first, to make sure no task is being executed when the module
 	// itself is deleted.
-	xf::WorkPerformer					_adi_work_performer;
-	xf::WorkPerformer					_hsi_work_performer;
-	xf::WorkPerformer					_others_work_performer;
+	nu::WorkPerformer					_adi_work_performer;
+	nu::WorkPerformer					_hsi_work_performer;
+	nu::WorkPerformer					_others_work_performer;
 };
 
 #endif

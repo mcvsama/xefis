@@ -27,7 +27,8 @@
 #include <cstddef>
 
 
-namespace si = neutrino::si;
+namespace nu = neutrino;
+namespace si = nu::si;
 
 
 class FlapsIO: public xf::Instrument

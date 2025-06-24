@@ -25,7 +25,10 @@
 namespace xf::test {
 namespace {
 
-AutoTest t_parse_hex_string("parse_hex_string()", []{
+namespace test_asserts = nu::test_asserts;
+
+
+nu::AutoTest t_parse_hex_string("parse_hex_string()", []{
 	// Valid inputs:
 	test_asserts::verify_equal ("Single byte 'A5'", parse_hex_string ("A5"), Blob { 0xA5 });
 	test_asserts::verify_equal ("Two bytes 'A5:B2'", parse_hex_string ("A5:B2"), Blob { 0xA5, 0xB2 });
@@ -33,7 +36,7 @@ AutoTest t_parse_hex_string("parse_hex_string()", []{
 	test_asserts::verify_equal ("Four bytes 'AB:CD:EF:12'", parse_hex_string ("AB:CD:EF:12"), Blob {0xAB, 0xCD, 0xEF, 0x12});
 	test_asserts::verify_equal ("Empty string", parse_hex_string (""), Blob());
 
-	// Invalid inputs (should throw xf::Exception):
+	// Invalid inputs (should throw nu::Exception):
 	test_asserts::verify_throws ("Odd hex digit count 'A5:B'", []{ parse_hex_string ("A5:B"); });
 	test_asserts::verify_throws ("Invalid character 'G1:23:45'", []{ parse_hex_string ("G1:23:45"); });
 	test_asserts::verify_throws ("Double colon '12:34:56::78'", []{ parse_hex_string ("12:34:56::78"); });
@@ -41,7 +44,7 @@ AutoTest t_parse_hex_string("parse_hex_string()", []{
 });
 
 
-AutoTest t_parse_color ("parse_color()", []{
+nu::AutoTest t_parse_color ("parse_color()", []{
 	// Named colors:
 	test_asserts::verify_equal ("Named color 'red'", parse_color ("red"), QColor(Qt::red));
 	test_asserts::verify_equal ("Named color 'green'", parse_color ("green"), QColor(Qt::green));

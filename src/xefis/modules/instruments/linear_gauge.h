@@ -118,7 +118,7 @@ template<class Value>
 		xf::SocketObserver									_inputs_observer;
 		Converter											_converter;
 		// Cached stuff:
-		xf::Synchronized<std::vector<PointInfo>> mutable	_point_infos;
+		nu::Synchronized<std::vector<PointInfo>> mutable	_point_infos;
 	};
 
 
@@ -150,7 +150,7 @@ template<class Value>
 	inline std::packaged_task<void()>
 	LinearGauge<Value>::paint (xf::PaintRequest paint_request) const
 	{
-		xf::Range const range { *_io.value_minimum, *_io.value_maximum };
+		nu::Range const range { *_io.value_minimum, *_io.value_maximum };
 
 		GaugeValues values;
 		values.get_from (*this, range, (_converter && _io.value) ? _converter (*_io.value) : _io.value.to_floating_point());
@@ -160,7 +160,7 @@ template<class Value>
 		values.note_str = *_io.note;
 
 		if (_io.value)
-			values.inbound = xf::Range { 0.0f, 1.0f }.includes (xf::renormalize (*_io.value, range, BasicGauge::kNormalizedRange));
+			values.inbound = nu::Range { 0.0f, 1.0f }.includes (nu::renormalize (*_io.value, range, BasicGauge::kNormalizedRange));
 
 		return std::packaged_task<void()> ([this, pr = std::move (paint_request), gv = std::move (values)] {
 			async_paint (pr, gv);
@@ -325,7 +325,7 @@ template<class Value>
 				<< QPointF (0.f, 0.f)
 				<< QPointF (1.5f * q, -0.5f * q)
 				<< QPointF (1.5f * q, +0.5f * q);
-			triangle.translate (p1.x() + 0.25f * q, xf::renormalize<qreal> (*values.normalized_value, 0.0f, 1.0f, p0.y(), p1.y()));
+			triangle.translate (p1.x() + 0.25f * q, nu::renormalize<qreal> (*values.normalized_value, 0.0f, 1.0f, p0.y(), p1.y()));
 			painter.paint (aids.default_shadow(), [&] {
 				painter.drawPolygon (triangle);
 			});
@@ -341,7 +341,7 @@ template<class Value>
 		font.setPixelSize (font.pixelSize() * values.font_scale);
 		QFontMetricsF const metrics (font);
 		float const char_width = metrics.horizontalAdvance ("0");
-		float const hcorr = 0.025f * neutrino::line_height (metrics);
+		float const hcorr = 0.025f * nu::line_height (metrics);
 
 		QPen text_pen = aids.get_pen (Qt::white, 0.8f);
 		QPen box_pen = text_pen;
@@ -362,7 +362,7 @@ template<class Value>
 		auto const note_distance = 0.5f * char_width;
 		QPointF text_position;
 		QPointF note_position;
-		QString const sample_text = neutrino::to_qstring (std::format (values.format, 0.0));
+		QString const sample_text = nu::to_qstring (std::format (values.format, 0.0));
 		painter.setFont (font);
 		QRectF text_rect = painter.get_text_box (QPointF (p0.x() - 1.25 * q, aids.height() / 2.f), Qt::AlignRight | Qt::AlignVCenter, sample_text);
 		text_rect.adjust (-2 * value_box_inner_margin, 0, 0.f, -2.f * hcorr);
@@ -388,7 +388,7 @@ template<class Value>
 		// Text:
 		if (values.value_str)
 		{
-			auto const value_qstr = neutrino::to_qstring (*values.value_str);
+			auto const value_qstr = nu::to_qstring (*values.value_str);
 			painter.setPen (text_pen);
 			painter.fast_draw_text (text_position, Qt::AlignVCenter | Qt::AlignRight, value_qstr);
 		}
@@ -397,7 +397,7 @@ template<class Value>
 		if (!values.note_str.empty())
 		{
 			auto const align_lr = values.mirrored_style ? Qt::AlignLeft : Qt::AlignRight;
-			auto const value_qstr = neutrino::to_qstring (values.note_str);
+			auto const value_qstr = nu::to_qstring (values.note_str);
 			painter.setPen (text_pen);
 			painter.fast_draw_text (note_position, Qt::AlignVCenter | align_lr, value_qstr);
 		}

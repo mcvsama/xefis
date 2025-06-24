@@ -65,7 +65,7 @@ class SoundManager
 
   public:
 	// Ctor
-	SoundManager (Logger const&);
+	SoundManager (nu::Logger const&);
 
 	// Dtor
 	~SoundManager();
@@ -83,7 +83,7 @@ class SoundManager
 	cleanup();
 
   private:
-	Logger								_logger;
+	nu::Logger							_logger;
 	std::set<std::shared_ptr<Sound>>	_sounds;
 };
 

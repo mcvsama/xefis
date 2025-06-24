@@ -30,8 +30,9 @@
 #include <cstddef>
 
 
-namespace si = neutrino::si;
-using namespace neutrino::si::literals;
+namespace nu = neutrino;
+namespace si = nu::si;
+using namespace nu::si::literals;
 
 
 class AFCS_FD_Pitch_IO: public xf::Module
@@ -106,7 +107,7 @@ class AFCS_FD_Pitch: public AFCS_FD_Pitch_IO
   public:
 	// Ctor
 	explicit
-	AFCS_FD_Pitch (xf::ProcessingLoop&, xf::Logger const&, std::string_view const instance = {});
+	AFCS_FD_Pitch (xf::ProcessingLoop&, nu::Logger const&, std::string_view const instance = {});
 
   protected:
 	// Module API
@@ -146,7 +147,7 @@ class AFCS_FD_Pitch: public AFCS_FD_Pitch_IO
 
   private:
 	AFCS_FD_Pitch_IO&				_io						{ *this };
-	xf::Logger						_logger;
+	nu::Logger						_logger;
 	IAS_PID							_ias_pid;
 	MachPID							_mach_pid;
 	AltitudePID						_altitude_pid;

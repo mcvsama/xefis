@@ -34,10 +34,13 @@
 namespace xf::test {
 namespace {
 
+namespace test_asserts = nu::test_asserts;
+
+
 std::filesystem::path const	kTestDataDir	= "share/tests/xefis/support/simulation/electrical/tests/network.test/";
 
 
-AutoTest t_r_1 ("Electrical: network R.1 single R", []{
+nu::AutoTest t_r_1 ("Electrical: network R.1 single R", []{
 	electrical::Network network;
 	auto& gnd = network.make_node ("GND");
 	auto& vcc = network.make_node ("VCC");
@@ -56,7 +59,7 @@ AutoTest t_r_1 ("Electrical: network R.1 single R", []{
 });
 
 
-AutoTest t_r_2 ("Electrical: network R.2 parallel R", []{
+nu::AutoTest t_r_2 ("Electrical: network R.2 parallel R", []{
 	electrical::Network network;
 	auto& gnd = network.make_node ("GND");
 	auto& vcc = network.make_node ("VCC");
@@ -80,7 +83,7 @@ AutoTest t_r_2 ("Electrical: network R.2 parallel R", []{
 });
 
 
-AutoTest t_r_3 ("Electrical: network R.3 serial R", []{
+nu::AutoTest t_r_3 ("Electrical: network R.3 serial R", []{
 	electrical::Network network;
 	auto& gnd = network.make_node ("GND");
 	auto& vcc = network.make_node ("VCC");
@@ -118,7 +121,7 @@ AutoTest t_r_3 ("Electrical: network R.3 serial R", []{
 });
 
 
-AutoTest t_r_4 ("Electrical: network R.4", []{
+nu::AutoTest t_r_4 ("Electrical: network R.4", []{
 	electrical::Network network;
 	auto& gnd = network.make_node ("GND");
 	auto& vcc = network.make_node ("VCC");
@@ -154,7 +157,7 @@ AutoTest t_r_4 ("Electrical: network R.4", []{
 });
 
 
-AutoTest t_c_1 ("Electrical: network C.1", []{
+nu::AutoTest t_c_1 ("Electrical: network C.1", []{
 	constexpr bool write_file = false;
 
 	electrical::Network network;
@@ -177,7 +180,7 @@ AutoTest t_c_1 ("Electrical: network C.1", []{
 	// Errors accumulate during integration (evolution), so required precision when comparing must be far less than simulation precision:
 	auto const required_precision = 1000 * precision;
 	electrical::NodeVoltageSolver solver (network, precision, 1000);
-	TestValues test_values;
+	nu::TestValues test_values;
 
 	for (int j = 0; j < 6; ++j)
 	{
@@ -194,7 +197,7 @@ AutoTest t_c_1 ("Electrical: network C.1", []{
 });
 
 
-AutoTest t_c_2 ("Electrical: network C.2", []{
+nu::AutoTest t_c_2 ("Electrical: network C.2", []{
 	constexpr bool write_file = false;
 	constexpr auto high_z = 1_GOhm;
 
@@ -228,7 +231,7 @@ AutoTest t_c_2 ("Electrical: network C.2", []{
 	auto const precision = write_file ? 1e-9 : 1e-6;
 	auto const required_precision = 1000 * precision;
 	electrical::NodeVoltageSolver solver (network, precision, 20000);
-	TestValues test_values;
+	nu::TestValues test_values;
 
 	for (; t < 0.1_ms; t += dt)
 	{
@@ -251,7 +254,7 @@ AutoTest t_c_2 ("Electrical: network C.2", []{
 });
 
 
-AutoTest t_v_1 ("Electrical: network V.1 (two voltage sources)", []{
+nu::AutoTest t_v_1 ("Electrical: network V.1 (two voltage sources)", []{
 	electrical::Network network;
 	auto& gnd = network.make_node ("GND");
 	auto& vcc1 = network.make_node ("VCC1");

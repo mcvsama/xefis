@@ -34,9 +34,11 @@
 namespace xf::test {
 namespace {
 
+namespace test_asserts = nu::test_asserts;
+
 constexpr auto	kISSHeight = xf::kEarthMeanRadius + 405.5_km;
 
-xf::Logger g_null_logger;
+nu::Logger g_null_logger;
 
 
 std::unique_ptr<rigid_body::Body>
@@ -62,7 +64,7 @@ make_iss()
 }
 
 
-AutoTest t_1 ("rigid_body::System: 90-minute simulation of gravitational forces", []{
+nu::AutoTest t_1 ("rigid_body::System: 90-minute simulation of gravitational forces", []{
 	auto rigid_body_system = rigid_body::System();
 	auto rigid_body_solver = rigid_body::ImpulseSolver (rigid_body_system);
 	auto const& iss = rigid_body_system.add (make_iss());

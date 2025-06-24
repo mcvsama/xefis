@@ -86,8 +86,8 @@ ObservationWidget::ObservationWidget (rigid_body::Body* body):
 	if (_body)
 	{
 		auto basic_info_group = add_basic_observables();
-		basic_info_group.add_observable ("Load factor", [this, prev_time = TimeHelper::utc_now()]() mutable {
-			auto const now = TimeHelper::utc_now();
+		basic_info_group.add_observable ("Load factor", [this, prev_time = nu::TimeHelper::utc_now()]() mutable {
+			auto const now = nu::TimeHelper::utc_now();
 			auto const dt = now - prev_time;
 			prev_time = now;
 
@@ -147,7 +147,7 @@ ObservationWidget::update_observed_values (rigid_body::Body const* planet_body)
 	for (auto& observable: _observables)
 	{
 		auto const text = observable.get ? observable.get() : "–";
-		observable.value_label->setText (neutrino::to_qstring (text));
+		observable.value_label->setText (nu::to_qstring (text));
 
 		// TODO handle observable.set
 	}
@@ -157,7 +157,7 @@ ObservationWidget::update_observed_values (rigid_body::Body const* planet_body)
 ObservationWidgetGroup
 ObservationWidget::add_group (std::u8string_view const title)
 {
-	auto* group_box = new QGroupBox (to_qstring (title), this);
+	auto* group_box = new QGroupBox (nu::to_qstring (title), this);
 	auto* group_box_layout = new QGridLayout (group_box);
 	auto const row = _layout.rowCount();
 	_layout.addWidget (group_box, row, 0, 1, 2);
@@ -171,13 +171,13 @@ ObservationWidget::add_basic_observables()
 	auto group = add_group();
 
 	group.add_observable ("Mass", [this]() {
-		return neutrino::format_unit (_mass_moments.mass().in<si::Gram>(), 6, "g");
+		return nu::format_unit (_mass_moments.mass().in<si::Gram>(), 6, "g");
 	});
 	group.add_observable ("Translational kinetic energy", [this]() {
-		return neutrino::format_unit (_translational_kinetic_energy.in<si::Joule>(), 6, "J");
+		return nu::format_unit (_translational_kinetic_energy.in<si::Joule>(), 6, "J");
 	});
 	group.add_observable ("Rotational kinetic energy", [this]() {
-		return neutrino::format_unit (_rotational_kinetic_energy.in<si::Joule>(), 6, "J");
+		return nu::format_unit (_rotational_kinetic_energy.in<si::Joule>(), 6, "J");
 	});
 
 	return group;
@@ -249,7 +249,7 @@ ObservationWidget::add_observable (std::string_view const name, Getter const get
 	_observables.emplace_back (value_label, getter, setter);
 
 	auto row = layout.rowCount();
-	layout.addWidget (new QLabel (neutrino::to_qstring (std::string (name))), row, 0);
+	layout.addWidget (new QLabel (nu::to_qstring (std::string (name))), row, 0);
 	layout.addWidget (value_label, row, 1);
 
 	return *value_label;

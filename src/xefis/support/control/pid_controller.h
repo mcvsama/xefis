@@ -155,7 +155,7 @@ template<class pInput, class pProcessVariable = pInput, class pParam = double>
 		/**
 		 * I (integral) parameter limit.
 		 */
-		std::optional<Range<Integral>>
+		std::optional<nu::Range<Integral>>
 		integral_limit() const noexcept
 			{ return _integral_limit; }
 
@@ -163,20 +163,20 @@ template<class pInput, class pProcessVariable = pInput, class pParam = double>
 		 * Set I (integral) parameter limit.
 		 */
 		void
-		set_integral_limit (Range<Integral> limit) noexcept
+		set_integral_limit (nu::Range<Integral> limit) noexcept
 			{ _integral_limit = limit; }
 
 		/**
 		 * Set I (integral) parameter limit.
 		 */
 		void
-		set_integral_limit (std::optional<Range<Integral>> limit) noexcept
+		set_integral_limit (std::optional<nu::Range<Integral>> limit) noexcept
 			{ _integral_limit = limit; }
 
 		/**
 		 * Output limit.
 		 */
-		Range<ProcessVariable>
+		nu::Range<ProcessVariable>
 		output_limit() const noexcept
 			{ return _output_limit; }
 
@@ -184,7 +184,7 @@ template<class pInput, class pProcessVariable = pInput, class pParam = double>
 		 * Set output limit.
 		 */
 		void
-		set_output_limit (Range<ProcessVariable> limit) noexcept
+		set_output_limit (nu::Range<ProcessVariable> limit) noexcept
 			{ _output_limit = limit; }
 
 		/**
@@ -244,18 +244,18 @@ template<class pInput, class pProcessVariable = pInput, class pParam = double>
 		reset() noexcept;
 
 	  private:
-		bool							_winding					= false;
-		Input							_setpoint					{ };
-		Input							_previous_error				{ };
-		Integral						_integrated_error			{ };
-		Derivative						_error_derivative			{ };
-		Param							_p							= 0.0;
-		Param							_i							= 0.0;
-		std::optional<Range<Integral>>	_integral_limit;
-		Param							_d							= 0.0;
-		Param							_gain						= 1.0;
-		ProcessVariable					_output						{ };
-		Range<ProcessVariable>			_output_limit				{ -std::numeric_limits<ProcessVariable>::max(), std::numeric_limits<ProcessVariable>::max() };
+		bool								_winding					= false;
+		Input								_setpoint					{ };
+		Input								_previous_error				{ };
+		Integral							_integrated_error			{ };
+		Derivative							_error_derivative			{ };
+		Param								_p							= 0.0;
+		Param								_i							= 0.0;
+		std::optional<nu::Range<Integral>>	_integral_limit;
+		Param								_d							= 0.0;
+		Param								_gain						= 1.0;
+		ProcessVariable						_output						{ };
+		nu::Range<ProcessVariable>			_output_limit				{ -std::numeric_limits<ProcessVariable>::max(), std::numeric_limits<ProcessVariable>::max() };
 	};
 
 
@@ -310,7 +310,7 @@ template<class V, class C, class P>
 			error = std::clamp<Input> (measured - _setpoint, Input (-2.0), Input (+2.0));
 
 			if (abs (error) > Input (1.0))
-				error = error - sgn (error) * Input (2.0);
+				error = error - nu::sgn (error) * Input (2.0);
 		}
 		else
 			error = measured - _setpoint;
@@ -329,7 +329,7 @@ template<class V, class C, class P>
 
 		// P and the rest:
 		auto anti_error_action = -_gain * (_p * error + _i * _integrated_error / 1_s + _d * _error_derivative * 1_s);
-		_output = neutrino::clamp<ProcessVariable> (ProcessVariable (si::quantity (anti_error_action)), _output_limit);
+		_output = nu::clamp<ProcessVariable> (ProcessVariable (si::quantity (anti_error_action)), _output_limit);
 		_previous_error = error;
 
 		return _output;

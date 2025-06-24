@@ -32,6 +32,7 @@
 
 namespace xf::xle_transceiver_test {
 
+namespace test_asserts = nu::test_asserts;
 namespace xle = xf::crypto::xle;
 
 auto constinit kKeysDebugging = false;
@@ -198,11 +199,11 @@ AutoTestT1::auto_test_t1()
 				test_asserts::verify (p + "session_prepared_future is valid", expectations.session_prepared_future->valid());
 
 				if (expectations.session_prepared_future_is_ready)
-					test_asserts::verify (p + "session_prepared_future is ready", ready (*expectations.session_prepared_future));
+					test_asserts::verify (p + "session_prepared_future is ready", nu::ready (*expectations.session_prepared_future));
 				else
-					test_asserts::verify (p + "session_prepared_future is not ready", !ready (*expectations.session_prepared_future));
+					test_asserts::verify (p + "session_prepared_future is not ready", !nu::ready (*expectations.session_prepared_future));
 
-				if (ready (*expectations.session_prepared_future))
+				if (nu::ready (*expectations.session_prepared_future))
 				{
 					bool got_generic_handshake_exception = false;
 
@@ -223,11 +224,11 @@ AutoTestT1::auto_test_t1()
 				test_asserts::verify (p + "session_activated_future is valid", expectations.session_activated_future->valid());
 
 				if (expectations.session_activated_future_is_ready)
-					test_asserts::verify (p + "session_activated_future is ready", ready (*expectations.session_activated_future));
+					test_asserts::verify (p + "session_activated_future is ready", nu::ready (*expectations.session_activated_future));
 				else
-					test_asserts::verify (p + "session_activated_future is not ready", !ready (*expectations.session_activated_future));
+					test_asserts::verify (p + "session_activated_future is not ready", !nu::ready (*expectations.session_activated_future));
 
-				if (ready (*expectations.session_activated_future))
+				if (nu::ready (*expectations.session_activated_future))
 				{
 					bool got_generic_handshake_exception = false;
 
@@ -246,7 +247,7 @@ AutoTestT1::auto_test_t1()
 			if (expectations.previous_session_activated_future)
 			{
 				test_asserts::verify (p + "previous_session_activated_future is valid", expectations.previous_session_activated_future->valid());
-				test_asserts::verify (p + "previous_session_activated_future is ready", ready (*expectations.previous_session_activated_future));
+				test_asserts::verify (p + "previous_session_activated_future is ready", nu::ready (*expectations.previous_session_activated_future));
 
 				bool got_generic_handshake_exception = false;
 				bool got_handshake_aborted_exception = false;
@@ -297,8 +298,8 @@ AutoTestT1::auto_test_t1()
 					auto const print_m_session_keys = [&] (std::string_view const prefix, auto* session) {
 						if (session)
 						{
-							std::cout << std::format ("    {} TX == {} {}\n", prefix, session->id(), session->tx_key_hash() ? to_hex_string (*session->tx_key_hash()) : "-");
-							std::cout << std::format ("    {} RX == {} {}\n", prefix, session->id(), session->rx_key_hash() ? to_hex_string (*session->rx_key_hash()) : "-");
+							std::cout << std::format ("    {} TX == {} {}\n", prefix, session->id(), session->tx_key_hash() ? nu::to_hex_string (*session->tx_key_hash()) : "-");
+							std::cout << std::format ("    {} RX == {} {}\n", prefix, session->id(), session->rx_key_hash() ? nu::to_hex_string (*session->rx_key_hash()) : "-");
 						}
 						else
 						{
@@ -310,8 +311,8 @@ AutoTestT1::auto_test_t1()
 					auto const print_s_session_keys = [&] (std::string_view const prefix, auto* session) {
 						if (session)
 						{
-							std::cout << std::format ("    {} TX == {} {}\n", prefix, session->id(), to_hex_string (session->tx_key_hash()));
-							std::cout << std::format ("    {} RX == {} {}\n", prefix, session->id(), to_hex_string (session->rx_key_hash()));
+							std::cout << std::format ("    {} TX == {} {}\n", prefix, session->id(), nu::to_hex_string (session->tx_key_hash()));
+							std::cout << std::format ("    {} RX == {} {}\n", prefix, session->id(), nu::to_hex_string (session->rx_key_hash()));
 						}
 						else
 						{
@@ -579,8 +580,8 @@ auto_test_t2()
 	master.handshake_response << std::function (make_random_loss ("slave → master")) << slave.handshake_response;
 
 	auto const test_communication = [&] (std::string p, std::optional<bool> expected_to_fail_opt = std::nullopt) {
-		static auto const p1 = to_blob ("(master → slave) message");
-		static auto const p2 = to_blob ("(slave → master) message");
+		static auto const p1 = nu::to_blob ("(master → slave) message");
+		static auto const p2 = nu::to_blob ("(slave → master) message");
 
 		p += ": ";
 
@@ -601,7 +602,7 @@ auto_test_t2()
 		}
 		catch (...)
 		{
-			exception_message = neutrino::describe_exception (std::current_exception());
+			exception_message = nu::describe_exception (std::current_exception());
 		}
 
 		if (expected_to_fail_opt)
@@ -626,20 +627,20 @@ auto_test_t2()
 
 		do {
 			loop.next_cycles (2);
-		} while (!ready (session_prepared));
+		} while (!nu::ready (session_prepared));
 
 		do {
 			loop.next_cycles (2);
 			test_communication ("just after calling start_handshake()");
-		} while (!ready (session_activated));
+		} while (!nu::ready (session_activated));
 
 		session_prepared.get();
 	}
 }
 
 
-AutoTest t1 ("Xefis Lossy Encryption/Protocol: handshaking gives correct keys", AutoTestT1::auto_test_t1);
-AutoTest t2 ("Xefis Lossy Encryption/Protocol: handshaking eventually works even on lossy channel", auto_test_t2);
+nu::AutoTest t1 ("Xefis Lossy Encryption/Protocol: handshaking gives correct keys", AutoTestT1::auto_test_t1);
+nu::AutoTest t2 ("Xefis Lossy Encryption/Protocol: handshaking eventually works even on lossy channel", auto_test_t2);
 
 } // namespace xf::xle_transceiver_test
 

@@ -37,7 +37,7 @@ Handshake::Handshake (boost::random::random_device& random_device, Params const&
 	_random_device (random_device),
 	_master_signature_key (params.master_signature_key),
 	_slave_signature_key (params.slave_signature_key),
-	_dhe_exchange (random_device, RFC3526_Group14<DiffieHellmanExchange::Integer>),
+	_dhe_exchange (random_device, nu::RFC3526_Group14<nu::DiffieHellmanExchange::Integer>),
 	_hmac_size (params.hmac_size),
 	_max_time_difference (params.max_time_difference)
 { }
@@ -53,7 +53,7 @@ HandshakeMaster::generate_handshake_blob (si::Time const unix_timestamp)
 
 	return make_master_handshake_blob ({
 		.handshake_id = _handshake_id,
-		.unix_timestamp_ms = round_to<uint64_t> (unix_timestamp.in<si::Millisecond>()),
+		.unix_timestamp_ms = nu::round_to<uint64_t> (unix_timestamp.in<si::Millisecond>()),
 		.dhe_exchange_blob = _dhe_exchange.generate_exchange_blob(),
 	});
 }
@@ -64,7 +64,7 @@ HandshakeMaster::compute_key (BlobView const slave_handshake_blob)
 {
 	auto const slave_handshake = parse_and_verify_slave_handshake_blob (slave_handshake_blob);
 	Blob const ephemeral_key_with_weak_bits = _dhe_exchange.compute_key_with_weak_bits (slave_handshake.dhe_exchange_blob);
-	Blob const ephemeral_key = compute_hash<kHashAlgorithm> (ephemeral_key_with_weak_bits);
+	Blob const ephemeral_key = nu::compute_hash<kHashAlgorithm> (ephemeral_key_with_weak_bits);
 
 	return ephemeral_key;
 }
@@ -73,10 +73,10 @@ HandshakeMaster::compute_key (BlobView const slave_handshake_blob)
 Blob
 HandshakeMaster::make_master_handshake_blob (MasterHandshake const& master_handshake)
 {
-	Blob const salt = random_blob (8, _random_device);
-	Blob const handshake_id_blob = to_blob (master_handshake.handshake_id);
-	Blob const handshake_data = salt + handshake_id_blob + to_blob (master_handshake.unix_timestamp_ms) + master_handshake.dhe_exchange_blob;
-	Blob const signature = compute_hmac<kHashAlgorithm> ({ .data = handshake_data, .key = *_master_signature_key }).substr (0, _hmac_size);
+	Blob const salt = nu::random_blob (8, _random_device);
+	Blob const handshake_id_blob = nu::to_blob (master_handshake.handshake_id);
+	Blob const handshake_data = salt + handshake_id_blob + nu::to_blob (master_handshake.unix_timestamp_ms) + master_handshake.dhe_exchange_blob;
+	Blob const signature = nu::compute_hmac<kHashAlgorithm> ({ .data = handshake_data, .key = *_master_signature_key }).substr (0, _hmac_size);
 
 	return handshake_data + signature;
 }
@@ -92,17 +92,17 @@ HandshakeMaster::parse_and_verify_slave_handshake_blob (BlobView const slave_han
 	extracted_signature.remove_prefix (extracted_dhe_exchange_blob.size());
 
 	BlobView const extracted_handshake_data = slave_handshake_blob.substr (0, slave_handshake_blob.size() - _hmac_size);
-	Blob const computed_signature = compute_hmac<kHashAlgorithm> ({ .data = extracted_handshake_data, .key = *_slave_signature_key }).substr (0, _hmac_size);
+	Blob const computed_signature = nu::compute_hmac<kHashAlgorithm> ({ .data = extracted_handshake_data, .key = *_slave_signature_key }).substr (0, _hmac_size);
 
 	SlaveHandshake extracted;
-	extracted.handshake_id = neutrino::parse<decltype (extracted.handshake_id)> (slave_handshake_blob.substr (8, 8));
-	extracted.unix_timestamp_ms = neutrino::parse<decltype (extracted.unix_timestamp_ms)> (slave_handshake_blob.substr (16, 8));
+	extracted.handshake_id = nu::parse<decltype (extracted.handshake_id)> (slave_handshake_blob.substr (8, 8));
+	extracted.unix_timestamp_ms = nu::parse<decltype (extracted.unix_timestamp_ms)> (slave_handshake_blob.substr (16, 8));
 	extracted.dhe_exchange_blob = extracted_dhe_exchange_blob;
 
 	if (extracted_signature != computed_signature)
 		throw Exception (ErrorCode::WrongSignature, "wrong signature");
 
-	if (abs (1_ms * extracted.unix_timestamp_ms - neutrino::TimeHelper::utc_now()) > _max_time_difference)
+	if (abs (1_ms * extracted.unix_timestamp_ms - nu::TimeHelper::utc_now()) > _max_time_difference)
 		throw Exception (ErrorCode::DeltaTimeTooHigh, "delta time too high");
 
 	if (extracted.handshake_id != _handshake_id)
@@ -134,17 +134,17 @@ HandshakeSlave::generate_handshake_blob_and_key (BlobView const master_handshake
 	if (_key_check_callbacks.store_key_function)
 		_key_check_callbacks.store_key_function (master_handshake.handshake_id);
 
-	if (abs (1_ms * master_handshake.unix_timestamp_ms - neutrino::TimeHelper::utc_now()) > _max_time_difference)
+	if (abs (1_ms * master_handshake.unix_timestamp_ms - nu::TimeHelper::utc_now()) > _max_time_difference)
 		throw Exception (ErrorCode::DeltaTimeTooHigh, "delta time too high");
 
 	Blob const dhe_exchange_blob = _dhe_exchange.generate_exchange_blob();
 	Blob const ephemeral_key_with_weak_bits = _dhe_exchange.compute_key_with_weak_bits (master_handshake.dhe_exchange_blob);
-	Blob const ephemeral_key = compute_hash<kHashAlgorithm> (ephemeral_key_with_weak_bits);
+	Blob const ephemeral_key = nu::compute_hash<kHashAlgorithm> (ephemeral_key_with_weak_bits);
 
 	return {
 		.handshake_response = make_slave_handshake_blob ({
 			.handshake_id = master_handshake.handshake_id,
-			.unix_timestamp_ms = round_to<uint64_t> (unix_timestamp.in<si::Millisecond>()),
+			.unix_timestamp_ms = nu::round_to<uint64_t> (unix_timestamp.in<si::Millisecond>()),
 			.dhe_exchange_blob = dhe_exchange_blob,
 		}),
 		.ephemeral_key = ephemeral_key,
@@ -155,10 +155,10 @@ HandshakeSlave::generate_handshake_blob_and_key (BlobView const master_handshake
 Blob
 HandshakeSlave::make_slave_handshake_blob (SlaveHandshake const& slave_handshake)
 {
-	Blob const salt = random_blob (8, _random_device);
-	Blob const handshake_id_blob = to_blob (slave_handshake.handshake_id);
-	Blob const handshake_data = salt + handshake_id_blob + to_blob (slave_handshake.unix_timestamp_ms) + slave_handshake.dhe_exchange_blob;
-	Blob const signature = compute_hmac<kHashAlgorithm> ({ .data = handshake_data, .key = *_slave_signature_key }).substr (0, _hmac_size);
+	Blob const salt = nu::random_blob (8, _random_device);
+	Blob const handshake_id_blob = nu::to_blob (slave_handshake.handshake_id);
+	Blob const handshake_data = salt + handshake_id_blob + nu::to_blob (slave_handshake.unix_timestamp_ms) + slave_handshake.dhe_exchange_blob;
+	Blob const signature = nu::compute_hmac<kHashAlgorithm> ({ .data = handshake_data, .key = *_slave_signature_key }).substr (0, _hmac_size);
 
 	return handshake_data + signature;
 }
@@ -175,11 +175,11 @@ HandshakeSlave::parse_and_verify_master_handshake_blob (BlobView const master_ha
 	extracted_signature.remove_prefix (extracted_dhe_exchange_blob.size());
 
 	BlobView const extracted_handshake_data = master_handshake.substr (0, master_handshake.size() - _hmac_size);
-	Blob const computed_signature = compute_hmac<kHashAlgorithm> ({ .data = extracted_handshake_data, .key = *_master_signature_key }).substr (0, _hmac_size);
+	Blob const computed_signature = nu::compute_hmac<kHashAlgorithm> ({ .data = extracted_handshake_data, .key = *_master_signature_key }).substr (0, _hmac_size);
 
 	MasterHandshake extracted;
-	extracted.handshake_id = neutrino::parse<decltype (extracted.handshake_id)> (master_handshake.substr (8, 8));
-	extracted.unix_timestamp_ms = neutrino::parse<decltype (extracted.unix_timestamp_ms)> (master_handshake.substr (16, 8));
+	extracted.handshake_id = nu::parse<decltype (extracted.handshake_id)> (master_handshake.substr (8, 8));
+	extracted.unix_timestamp_ms = nu::parse<decltype (extracted.unix_timestamp_ms)> (master_handshake.substr (16, 8));
 	extracted.dhe_exchange_blob = extracted_dhe_exchange_blob;
 
 	if (extracted_signature != computed_signature)

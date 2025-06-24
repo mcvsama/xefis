@@ -40,7 +40,7 @@
 #include <iomanip>
 
 
-CHRUM6::CHRUM6 (xf::ProcessingLoop& loop, xf::SerialPort&& serial_port, xf::Logger const& logger, std::string_view const instance):
+CHRUM6::CHRUM6 (xf::ProcessingLoop& loop, nu::SerialPort&& serial_port, nu::Logger const& logger, std::string_view const instance):
 	CHRUM6_IO (loop, instance),
 	_logger (logger.with_context (std::string (kLoggerScope) + "#" + instance)),
 	_serial_port (std::move (serial_port))
@@ -119,7 +119,7 @@ CHRUM6::process (xf::Cycle const&)
 void
 CHRUM6::open_device()
 {
-	bool has_thrown = xf::Exception::catch_and_log (_logger, [&] {
+	bool has_thrown = nu::Exception::catch_and_log (_logger, [&] {
 		_alive_check_timer->start();
 
 		reset();
@@ -386,7 +386,7 @@ CHRUM6::process_message (xf::CHRUM6::Read req)
 			if (req.success() && _io.serviceable.value_or (false))
 			{
 				si::Angle const factor = 0.0109863_deg;
-				_io.orientation_heading_magnetic = neutrino::wrap_within_range<si::Angle> (factor * req.value_upper16(), 0_deg, 360_deg);
+				_io.orientation_heading_magnetic = nu::wrap_within_range<si::Angle> (factor * req.value_upper16(), 0_deg, 360_deg);
 			}
 			break;
 		}

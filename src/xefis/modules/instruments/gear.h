@@ -27,6 +27,9 @@
 #include <cstddef>
 
 
+namespace nu = neutrino;
+
+
 class GearIO: public xf::Instrument
 {
   public:

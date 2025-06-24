@@ -41,7 +41,7 @@ class ScreenWidget: public ConfigWidget
 	class Widgets
 	{
 	  public:
-		WorkPerformer const*		work_performer			{ nullptr };
+		nu::WorkPerformer const*	work_performer			{ nullptr };
 		// List of modules that use given WorkPerformer:
 		std::string					module_names;
 		xf::HistogramWidget*		start_latency_histogram	{ nullptr };
@@ -69,7 +69,7 @@ class ScreenWidget: public ConfigWidget
 	xf::HistogramWidget*		_painting_time_histogram	{ nullptr };
 	xf::HistogramStatsWidget*	_painting_time_stats		{ nullptr };
 	QTimer*						_refresh_timer;
-	std::unordered_map<WorkPerformer const*, Widgets>
+	std::unordered_map<nu::WorkPerformer const*, Widgets>
 								_work_performer_widgets		{ 10 };
 };
 

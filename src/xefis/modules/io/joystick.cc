@@ -68,12 +68,12 @@ JoystickInput::Button::set_value (float value)
 }
 
 
-JoystickInput::Axis::Axis (QDomElement const& axis_element, xf::ModuleOut<double>& socket, xf::ModuleOut<si::Angle>& angle_socket, xf::Range<si::Angle>& angle_range):
+JoystickInput::Axis::Axis (QDomElement const& axis_element, xf::ModuleOut<double>& socket, xf::ModuleOut<si::Angle>& angle_socket, nu::Range<si::Angle>& angle_range):
 	Axis (axis_element, socket, angle_socket, angle_range, { }, { })
 { }
 
 
-JoystickInput::Axis::Axis (QDomElement const& axis_element, xf::ModuleOut<double>& socket, xf::ModuleOut<si::Angle>& angle_socket, xf::Range<si::Angle>& angle_range,
+JoystickInput::Axis::Axis (QDomElement const& axis_element, xf::ModuleOut<double>& socket, xf::ModuleOut<si::Angle>& angle_socket, nu::Range<si::Angle>& angle_range,
 						   std::optional<HandlerID> up_button_id, std::optional<HandlerID> down_button_id):
 	_socket (socket),
 	_angle_socket (angle_socket),
@@ -81,7 +81,7 @@ JoystickInput::Axis::Axis (QDomElement const& axis_element, xf::ModuleOut<double
 	_up_button_id (up_button_id),
 	_down_button_id (down_button_id)
 {
-	for (QDomElement const& v: xf::iterate_sub_elements (axis_element))
+	for (QDomElement const& v: nu::iterate_sub_elements (axis_element))
 	{
 		if (v == "center")
 			_center = v.text().toFloat();
@@ -95,7 +95,7 @@ JoystickInput::Axis::Axis (QDomElement const& axis_element, xf::ModuleOut<double
 			_power = v.text().toFloat();
 		else if (v == "output")
 		{
-			for (QDomElement const& w: xf::iterate_sub_elements (v))
+			for (QDomElement const& w: nu::iterate_sub_elements (v))
 			{
 				if (w == "minimum")
 					_output_minimum = w.text().toFloat();
@@ -104,7 +104,7 @@ JoystickInput::Axis::Axis (QDomElement const& axis_element, xf::ModuleOut<double
 			}
 		}
 		else
-			throw xf::UnexpectedDomElement (v);
+			throw nu::UnexpectedDomElement (v);
 	}
 }
 
@@ -158,22 +158,22 @@ JoystickInput::Axis::set_value (float value)
 	if (std::abs (value) < _dead_zone)
 		value = 0.f;
 	else
-		value = value - xf::sgn (value) * _dead_zone;
+		value = value - nu::sgn (value) * _dead_zone;
 	// Reverse:
 	value *= _reverse;
 	// Scale:
 	value *= _scale;
 	// Power:
-	value = xf::sgn (value) * std::pow (std::abs (value), _power);
+	value = nu::sgn (value) * std::pow (std::abs (value), _power);
 	// Renormalize from standard [-1.0, 1.0]:
-	value = xf::renormalize (value, xf::Range (-1.f, 1.f), xf::Range (_output_minimum, _output_maximum));
+	value = nu::renormalize (value, nu::Range (-1.f, 1.f), nu::Range (_output_minimum, _output_maximum));
 
 	_socket = value;
-	_angle_socket = xf::renormalize (value, { -1.0f, +1.0f }, _angle_range);
+	_angle_socket = nu::renormalize (value, { -1.0f, +1.0f }, _angle_range);
 }
 
 
-JoystickInput::JoystickInput (xf::ProcessingLoop& loop, QDomElement const& config, xf::Logger const& logger, std::string_view const instance):
+JoystickInput::JoystickInput (xf::ProcessingLoop& loop, QDomElement const& config, nu::Logger const& logger, std::string_view const instance):
 	JoystickInputIO (loop, instance),
 	_logger (logger.with_context (std::string (kLoggerScope) + "#" + instance))
 {
@@ -189,7 +189,7 @@ JoystickInput::JoystickInput (xf::ProcessingLoop& loop, QDomElement const& confi
 		_angle_axis_ranges[handler_id] = { -45_deg, +45_deg };
 	}
 
-	for (QDomElement const& e: xf::iterate_sub_elements (config))
+	for (QDomElement const& e: nu::iterate_sub_elements (config))
 	{
 		if (e == "axis")
 		{
@@ -219,10 +219,10 @@ JoystickInput::JoystickInput (xf::ProcessingLoop& loop, QDomElement const& confi
 					}
 				}
 				else
-					throw xf::BadDomAttribute (e, "id");
+					throw nu::BadDomAttribute (e, "id");
 			}
 			else
-				throw xf::MissingDomAttribute (e, "id");
+				throw nu::MissingDomAttribute (e, "id");
 		}
 		else if (e == "button")
 		{
@@ -233,19 +233,19 @@ JoystickInput::JoystickInput (xf::ProcessingLoop& loop, QDomElement const& confi
 				if (id < _handlers.size())
 					_handlers[id].push_back (std::make_shared<Button> (e, *_button_sockets[id]));
 				else
-					throw xf::BadDomAttribute (e, "id");
+					throw nu::BadDomAttribute (e, "id");
 			}
 			else
-				throw xf::MissingDomAttribute (e, "id");
+				throw nu::MissingDomAttribute (e, "id");
 		}
 		else if (e == "device")
 			_device_path = e.text().toStdString();
 		else
-			throw xf::UnexpectedDomElement (e);
+			throw nu::UnexpectedDomElement (e);
 	}
 
 	if (!_device_path)
-		throw xf::MissingDomElement (config, "device");
+		throw nu::MissingDomElement (config, "device");
 
 	_reopen_timer = std::make_unique<QTimer> (this);
 	_reopen_timer->setInterval (500);

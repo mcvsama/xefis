@@ -32,7 +32,7 @@
 #include <map>
 
 
-AirDataComputer::AirDataComputer (xf::ProcessingLoop& loop, xf::Airframe* airframe, xf::Logger const& logger, std::string_view const instance):
+AirDataComputer::AirDataComputer (xf::ProcessingLoop& loop, xf::Airframe* airframe, nu::Logger const& logger, std::string_view const instance):
 	AirDataComputerIO (loop, instance),
 	_logger (logger.with_context (std::string (kLoggerScope) + "#" + instance)),
 	_airframe (airframe)

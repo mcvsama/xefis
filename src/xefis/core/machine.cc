@@ -39,7 +39,7 @@ Machine::show_configurator()
 	if (!_configurator_widget)
 	{
 		_configurator_widget = std::make_unique<ConfiguratorWidget> (*this, nullptr);
-		auto lh = default_line_height (_configurator_widget.get());
+		auto lh = nu::default_line_height (_configurator_widget.get());
 		_configurator_widget->resize (50 * lh, 30 * lh);
 	}
 

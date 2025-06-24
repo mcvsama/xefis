@@ -33,7 +33,7 @@ namespace xf {
 class ConfiguratorWidget;
 
 
-class Machine: private Noncopyable
+class Machine: private nu::Noncopyable
 {
   private:
 	using ProcessingLoops	= std::list<ProcessingLoop*>;
@@ -62,28 +62,28 @@ class Machine: private Noncopyable
 	/**
 	 * A sequence of registered processing loops.
 	 */
-	Sequence<ProcessingLoops::iterator>
+	nu::Sequence<ProcessingLoops::iterator>
 	processing_loops() noexcept
 		{ return { _processing_loops.begin(), _processing_loops.end() }; }
 
 	/**
 	 * A sequence of registered processing loops.
 	 */
-	Sequence<ProcessingLoops::const_iterator>
+	nu::Sequence<ProcessingLoops::const_iterator>
 	processing_loops() const noexcept
 		{ return { _processing_loops.begin(), _processing_loops.end() }; }
 
 	/**
 	 * A sequence of registered screens.
 	 */
-	Sequence<Screens::iterator>
+	nu::Sequence<Screens::iterator>
 	screens() noexcept
 		{ return { _screens.begin(), _screens.end() }; }
 
 	/**
 	 * A sequence of registered processing loops.
 	 */
-	Sequence<Screens::const_iterator>
+	nu::Sequence<Screens::const_iterator>
 	screens() const noexcept
 		{ return { _screens.begin(), _screens.end() }; }
 

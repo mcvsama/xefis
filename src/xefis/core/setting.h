@@ -107,7 +107,7 @@ template<class pValue>
 	  public:
 		typedef pValue Value;
 
-		class Uninitialized: public xf::Exception
+		class Uninitialized: public nu::Exception
 		{
 		  public:
 			using Exception::Exception;

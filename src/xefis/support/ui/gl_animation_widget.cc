@@ -51,7 +51,7 @@ GLAnimationWidget::GLAnimationWidget (QWidget* parent, RefreshRate const refresh
 void
 GLAnimationWidget::set_refresh_rate (RefreshRate const refresh_rate)
 {
-	_current_refresh_rate = std::visit (overload {
+	_current_refresh_rate = std::visit (nu::overload {
 		[](si::Frequency const fps)
 			{ return fps; },
 

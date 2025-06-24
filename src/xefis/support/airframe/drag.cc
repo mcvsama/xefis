@@ -33,15 +33,15 @@ Drag::Drag (QDomElement const& config)
 {
 	decltype (_aoa_to_cd)::DataMap data;
 
-	for (QDomElement const& e: xf::iterate_sub_elements (config))
+	for (QDomElement const& e: nu::iterate_sub_elements (config))
 	{
 		if (e == "point")
 		{
 			if (!e.hasAttribute ("aoa"))
-				throw MissingDomAttribute (e, "aoa");
+				throw nu::MissingDomAttribute (e, "aoa");
 
 			if (!e.hasAttribute ("cd"))
-				throw MissingDomAttribute (e, "cd");
+				throw nu::MissingDomAttribute (e, "cd");
 
 			auto aoa = si::parse<si::Angle> (e.attribute ("aoa").toStdString());
 			DragCoefficient cd = e.attribute ("cd").toDouble();
@@ -50,9 +50,9 @@ Drag::Drag (QDomElement const& config)
 	}
 
 	if (data.empty())
-		throw BadConfiguration ("drag module not properly configured");
+		throw nu::BadConfiguration ("drag module not properly configured");
 
-	_aoa_to_cd = Field<si::Angle, DragCoefficient> (std::move (data));
+	_aoa_to_cd = nu::Field<si::Angle, DragCoefficient> (std::move (data));
 }
 
 

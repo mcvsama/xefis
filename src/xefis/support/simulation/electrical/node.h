@@ -30,7 +30,7 @@ namespace xf::electrical {
 
 class Element;
 
-class Node: public Noncopyable
+class Node: public nu::Noncopyable
 {
   public:
 	enum Direction: int8_t

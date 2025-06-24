@@ -39,7 +39,7 @@ class LinearLimitsConstraint: public Constraint
 
 	// Ctor
 	explicit
-	LinearLimitsConstraint (SliderPrecomputation&, Range<si::Length>);
+	LinearLimitsConstraint (SliderPrecomputation&, nu::Range<si::Length>);
 
 	/**
 	 * Set minimum distance between objects.
@@ -65,7 +65,7 @@ class LinearLimitsConstraint: public Constraint
 	 * Set minimum and maximum angles.
 	 */
 	void
-	set_distances (Range<si::Length>);
+	set_distances (nu::Range<si::Length>);
 
 	// Constraint API
 	void
@@ -123,7 +123,7 @@ LinearLimitsConstraint::set_distances (std::optional<si::Length> const min_dista
 
 
 inline void
-LinearLimitsConstraint::set_distances (Range<si::Length> const range)
+LinearLimitsConstraint::set_distances (nu::Range<si::Length> const range)
 {
 	set_distances (range.min(), range.max());
 }

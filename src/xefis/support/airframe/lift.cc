@@ -36,14 +36,14 @@ Lift::Lift (QDomElement const& config)
 {
 	decltype (_aoa_to_cl)::DataMap data;
 
-	for (QDomElement const& e: xf::iterate_sub_elements (config))
+	for (QDomElement const& e: nu::iterate_sub_elements (config))
 	{
 		if (e == "point")
 		{
 			if (!e.hasAttribute ("aoa"))
-				throw MissingDomAttribute (e, "aoa");
+				throw nu::MissingDomAttribute (e, "aoa");
 			if (!e.hasAttribute ("cl"))
-				throw MissingDomAttribute (e, "cl");
+				throw nu::MissingDomAttribute (e, "cl");
 
 			auto aoa = si::parse<si::Angle> (e.attribute ("aoa").toStdString());
 			LiftCoefficient cl (e.attribute ("cl").toDouble());
@@ -52,9 +52,9 @@ Lift::Lift (QDomElement const& config)
 	}
 
 	if (data.empty())
-		throw BadConfiguration ("lift module not properly configured");
+		throw nu::BadConfiguration ("lift module not properly configured");
 
-	_aoa_to_cl = Field<si::Angle, LiftCoefficient> (std::move (data));
+	_aoa_to_cl = nu::Field<si::Angle, LiftCoefficient> (std::move (data));
 	// TODO initialize _cl_to_aoa_normal_regime
 
 	// Find maximum C_L and AOA angle for maximum C_L (critical AOA):

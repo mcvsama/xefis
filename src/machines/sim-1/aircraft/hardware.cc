@@ -23,7 +23,7 @@
 
 namespace sim1::aircraft {
 
-Hardware::Hardware (xf::ProcessingLoop& loop, xf::Logger const& logger):
+Hardware::Hardware (xf::ProcessingLoop& loop, nu::Logger const& logger):
 	_logger (logger),
 	_loop (loop)
 {

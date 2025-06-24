@@ -34,8 +34,9 @@
 #include <cstddef>
 
 
-namespace si = neutrino::si;
-using namespace neutrino::si::literals;
+namespace nu = neutrino;
+namespace si = nu::si;
+using namespace nu::si::literals;
 
 
 class ETSAirspeedIO: public xf::Module
@@ -90,7 +91,7 @@ class ETSAirspeed:
   public:
 	// Ctor
 	explicit
-	ETSAirspeed (xf::ProcessingLoop&, xf::i2c::Device&&, xf::Logger const&, std::string_view const instance = {});
+	ETSAirspeed (xf::ProcessingLoop&, nu::i2c::Device&&, nu::Logger const&, std::string_view const instance = {});
 
 	// Module API
 	void
@@ -132,8 +133,8 @@ class ETSAirspeed:
 
   private:
 	ETSAirspeedIO&				_io								{ *this };
-	xf::Logger					_logger;
-	xf::i2c::Device				_device;
+	nu::Logger					_logger;
+	nu::i2c::Device				_device;
 	Stage						_stage							{ Stage::Calibrating };
 	QTimer*						_device_initialization_timer;
 	QTimer*						_periodic_read_timer;

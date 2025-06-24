@@ -215,7 +215,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	 *			If provided, must have at least 2 threads.
 	 */
 	explicit
-	RigidBodyPainter (si::PixelDensity, WorkPerformer* = nullptr);
+	RigidBodyPainter (si::PixelDensity, nu::WorkPerformer* = nullptr);
 
 	/**
 	 * Return true when the painter is finally ready and loaded all
@@ -230,7 +230,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	 * Pass nullptr to disable.
 	 */
 	void
-	use_work_performer (neutrino::WorkPerformer* work_performer)
+	use_work_performer (nu::WorkPerformer* work_performer)
 		{ _work_performer = work_performer; }
 
 	/**
@@ -251,7 +251,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	 * Call set_followed_to_none() to disable camera following.
 	 */
 	template<class Object>
-		requires neutrino::SameAsAnyOf<Object, rigid_body::Group, rigid_body::Body>
+		requires nu::SameAsAnyOf<Object, rigid_body::Group, rigid_body::Body>
 		void
 		set_followed (Object const& object) noexcept
 		{
@@ -332,7 +332,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	 * Draw given object as focused (painted differently).
 	 */
 	template<class Object>
-		requires neutrino::SameAsAnyOf<Object, rigid_body::Group, rigid_body::Body, rigid_body::Constraint>
+		requires nu::SameAsAnyOf<Object, rigid_body::Group, rigid_body::Body, rigid_body::Constraint>
 		void
 		set_focused (Object const& object) noexcept
 			{ _focused = &object; }
@@ -372,7 +372,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	 * Return a focused group, body or constraint, if set, or nullptr.
 	 */
 	template<class Object>
-		requires neutrino::SameAsAnyOf<Object, rigid_body::Group, rigid_body::Body, rigid_body::Constraint>
+		requires nu::SameAsAnyOf<Object, rigid_body::Group, rigid_body::Body, rigid_body::Constraint>
 		[[nodiscard]]
 		Object const*
 		focused() const noexcept
@@ -388,7 +388,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	 * Call set_hovered_to_none() set none as hovered.
 	 */
 	template<class Object>
-		requires neutrino::SameAsAnyOf<Object, rigid_body::Body, rigid_body::Constraint>
+		requires nu::SameAsAnyOf<Object, rigid_body::Body, rigid_body::Constraint>
 		void
 		set_hovered (Object const& object) noexcept
 			{ _hovered = &object; }
@@ -401,7 +401,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	 * Return a hovered group, body or constraint, if set, or nullptr.
 	 */
 	template<class Object>
-		requires neutrino::SameAsAnyOf<Object, rigid_body::Body, rigid_body::Constraint>
+		requires nu::SameAsAnyOf<Object, rigid_body::Body, rigid_body::Constraint>
 		[[nodiscard]]
 		Object const*
 		hovered() const noexcept
@@ -754,7 +754,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
   private:
 	si::PixelDensity				_pixel_density;
 	si::Angle						_fov						{ 40_deg };
-	neutrino::ValueOrPtr<neutrino::WorkPerformer, std::size_t, xf::Logger const&>
+	nu::ValueOrPtr<nu::WorkPerformer, std::size_t, nu::Logger const&>
 									_work_performer;
 	si::Time						_time;
 	si::Time						_prev_saved_time;
@@ -798,9 +798,9 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	std::optional<Sun>				_sun;
 	std::optional<Universe>			_universe;
 
-	static Synchronized<std::shared_future<PlanetTextureImages>>
+	static nu::Synchronized<std::shared_future<PlanetTextureImages>>
 									_planet_texture_images;
-	static Synchronized<std::shared_future<UniverseTextureImages>>
+	static nu::Synchronized<std::shared_future<UniverseTextureImages>>
 									_universe_texture_images;
 	std::optional<PlanetTextures>	_planet_textures;
 	std::optional<UniverseTextures>	_universe_textures;
@@ -830,9 +830,9 @@ RigidBodyPainter::followed_body() const noexcept
 constexpr float
 RigidBodyPainter::compute_sun_visible_surface_factor (si::Angle const sun_altitude_above_horizon)
 {
-	auto const v = neutrino::renormalize (sun_altitude_above_horizon,
-										  Range { -kSunFaceAngularRadius, +kSunFaceAngularRadius },
-										  Range { 0.0f, 1.0f });
+	auto const v = nu::renormalize (sun_altitude_above_horizon,
+									nu::Range { -kSunFaceAngularRadius, +kSunFaceAngularRadius },
+									nu::Range { 0.0f, 1.0f });
 	return std::clamp<float> (v, 0.0f, 1.0f);
 }
 

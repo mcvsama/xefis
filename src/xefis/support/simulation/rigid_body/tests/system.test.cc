@@ -49,7 +49,7 @@ namespace {
 static constexpr SpaceForce<WorldSpace>		kNoForce	{ 0_N, 0_N, 0_N };
 static constexpr SpaceTorque<WorldSpace>	kNoTorque	{ 0_Nm, 0_Nm, 0_Nm };
 
-xf::Logger g_null_logger;
+nu::Logger g_null_logger;
 
 auto const no_rotation = kNoRotation<WorldSpace, BodyCOM>;
 auto const gravity_acceleration = 9.81_mps2;
@@ -91,7 +91,7 @@ run (rigid_body::System& system, rigid_body::Body* followed_body, std::function<
 	auto solver = rigid_body::ImpulseSolver (system, 1);
 	system.set_baumgarte_factor (0.5);
 
-	neutrino::DummyQApplication app;
+	nu::DummyQApplication app;
 
 	Evolver evolver (0_s, 1_ms, g_null_logger, [&] (si::Time const dt) {
 		if (apply_forces)
@@ -101,7 +101,7 @@ run (rigid_body::System& system, rigid_body::Body* followed_body, std::function<
 	});
 
 	QWidget w (nullptr);
-	auto const lh = neutrino::default_line_height (&w);
+	auto const lh = nu::default_line_height (&w);
 
 	RigidBodyViewer viewer (nullptr, 60_Hz);
 	viewer.set_rigid_body_system (&system);
@@ -124,7 +124,7 @@ run (rigid_body::System& system, rigid_body::Body* followed_body, std::function<
 }
 
 
-ManualTest t_1 ("rigid_body::System: airplane", []{
+nu::ManualTest t_1 ("rigid_body::System: airplane", []{
 	static xf::AirfoilSpline const
 	kSpline {
 		{ 1.00,  +0.00 },
@@ -174,7 +174,7 @@ ManualTest t_1 ("rigid_body::System: airplane", []{
 });
 
 
-ManualTest t_2 ("rigid_body::System: fixed constraints", []{
+nu::ManualTest t_2 ("rigid_body::System: fixed constraints", []{
 	rigid_body::System system;
 
 	auto& body1 = system.add<rigid_body::Body> (make_body_mass_moments (10_kg));
@@ -197,7 +197,7 @@ ManualTest t_2 ("rigid_body::System: fixed constraints", []{
 });
 
 
-ManualTest t_2_1 ("rigid_body::System: more fixed constraints", []{
+nu::ManualTest t_2_1 ("rigid_body::System: more fixed constraints", []{
 	rigid_body::System system;
 
 	auto& body1 = system.add<rigid_body::Body> (make_body_mass_moments (10_kg));
@@ -235,7 +235,7 @@ ManualTest t_2_1 ("rigid_body::System: more fixed constraints", []{
 });
 
 
-ManualTest t_3 ("rigid_body::System: hinge constraints", []{
+nu::ManualTest t_3 ("rigid_body::System: hinge constraints", []{
 	rigid_body::System system;
 
 	auto& body1 = system.add<rigid_body::Body> (make_body_mass_moments (10_kg));
@@ -268,7 +268,7 @@ ManualTest t_3 ("rigid_body::System: hinge constraints", []{
 });
 
 
-ManualTest t_4 ("rigid_body::System: multiple constraints", []{
+nu::ManualTest t_4 ("rigid_body::System: multiple constraints", []{
 	rigid_body::System system;
 
 	auto& body1 = system.add<rigid_body::Body> (make_body_mass_moments (10_kg));
@@ -317,7 +317,7 @@ ManualTest t_4 ("rigid_body::System: multiple constraints", []{
 });
 
 
-ManualTest t_5 ("rigid_body::System: intermediate axis of rotation", []{
+nu::ManualTest t_5 ("rigid_body::System: intermediate axis of rotation", []{
 	rigid_body::System system;
 
 	auto const add_variant = [&system] (SpaceLength<WorldSpace> const& position_offset) -> rigid_body::Body&

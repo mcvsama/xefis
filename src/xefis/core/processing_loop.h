@@ -44,7 +44,7 @@ class Xefis;
 class ProcessingLoop:
 	public QObject,
 	public Module,
-	public LoggerTagProvider
+	public nu::LoggerTagProvider
 {
   public:
 	ModuleOut<si::Frequency>	actual_frequency	{ this, "actual_frequency" };
@@ -59,7 +59,7 @@ class ProcessingLoop:
   public:
 	// Ctor
 	explicit
-	ProcessingLoop (std::string_view const instance, si::Frequency loop_frequency, Logger const&);
+	ProcessingLoop (std::string_view const instance, si::Frequency loop_frequency, nu::Logger const&);
 
 	explicit
 	ProcessingLoop (ProcessingLoop const&) = delete;
@@ -113,7 +113,7 @@ class ProcessingLoop:
 	 * A sequence of modules loaded into this processing loop.
 	 */
 	[[nodiscard]]
-    Sequence<Modules::iterator>
+    nu::Sequence<Modules::iterator>
 	modules() noexcept
         { return { _modules.begin(), _modules.end() }; }
 
@@ -121,7 +121,7 @@ class ProcessingLoop:
 	 * A sequence of modules loaded into this processing loop.
 	 */
 	[[nodiscard]]
-    Sequence<Modules::const_iterator>
+    nu::Sequence<Modules::const_iterator>
 	modules() const noexcept
         { return { _modules.begin(), _modules.end() }; }
 
@@ -164,7 +164,7 @@ class ProcessingLoop:
   private:
 	QTimer*								_loop_timer;
 	si::Time							_loop_period;
-	std::optional<Timestamp>			_previous_timestamp;
+	std::optional<nu::Timestamp>		_previous_timestamp;
 	std::vector<Module*>				_uninitialized_modules;
 	std::optional<Cycle>				_current_cycle;
 	Modules                             _modules;
@@ -172,7 +172,7 @@ class ProcessingLoop:
 	boost::circular_buffer<si::Time>	_processing_times		{ kMaxProcessingTimesBackLog };
 	boost::circular_buffer<si::Time>	_processing_latencies	{ kMaxProcessingTimesBackLog };
 	Cycle::Number						_next_cycle_number		{ 1 };
-	Logger								_logger;
+	nu::Logger							_logger;
 };
 
 

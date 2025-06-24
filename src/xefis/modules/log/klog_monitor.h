@@ -27,6 +27,9 @@
 #include <array>
 
 
+namespace nu = neutrino;
+
+
 class KLogMonitorIO: public xf::Module
 {
   public:

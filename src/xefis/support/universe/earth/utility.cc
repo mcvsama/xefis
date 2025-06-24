@@ -84,7 +84,7 @@ great_arcs_angle (si::LonLat const& a, si::LonLat const& common, si::LonLat cons
 	std::complex<si::Angle::Value> const x1 (z1.lon().in<si::Degree>(), z1.lat().in<si::Degree>());
 	std::complex<si::Angle::Value> const x2 (z2.lon().in<si::Degree>(), z2.lat().in<si::Degree>());
 
-	return 1_deg * xf::floored_mod<double> ((1_rad * (arg (x1) - arg (x2))).in<si::Degree>(), 360.0);
+	return 1_deg * nu::floored_mod<double> ((1_rad * (arg (x1) - arg (x2))).in<si::Degree>(), 360.0);
 }
 
 
@@ -92,7 +92,7 @@ std::string
 to_dms (si::Angle const a, bool const three_digits)
 {
 	auto const angle_degs = a.in<si::Degree>();
-	auto const degs = std::trunc (neutrino::wrap_within_range (angle_degs, -180.0, +180.0));
+	auto const degs = std::trunc (nu::wrap_within_range (angle_degs, -180.0, +180.0));
 	auto const remainder = 60.0 * std::abs (angle_degs - degs);
 	auto const mins = std::floor (remainder);
 	auto const secs = 60.0 * std::abs (remainder - mins);

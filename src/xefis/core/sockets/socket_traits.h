@@ -67,8 +67,8 @@ template<class Value>
 
 		if (socket)
 		{
-			using neutrino::to_blob;
-			using neutrino::si::to_blob;
+			using nu::to_blob;
+			using nu::si::to_blob;
 
 			Blob converted = to_blob (*socket);
 			std::copy (converted.begin(), converted.end(), std::next (result.begin()));
@@ -86,8 +86,8 @@ template<class Value, template<class> class AnySocket>
 		{
 			if (blob[0] == not_nil)
 			{
-				using neutrino::parse;
-				using neutrino::si::parse;
+				using nu::parse;
+				using nu::si::parse;
 
 				blob.remove_prefix (1);
 				assign (module_out, parse<Value> (blob));
@@ -96,7 +96,7 @@ template<class Value, template<class> class AnySocket>
 				assign (module_out, xf::nil);
 		}
 		else
-			throw InvalidBlobSize (blob.size(), constant_blob_size);
+			throw nu::InvalidBlobSize (blob.size(), constant_blob_size);
 	}
 
 
@@ -109,8 +109,8 @@ template<class Value, template<class> class AnySocket>
 		else
 		{
 			try {
-				using neutrino::parse;
-				using neutrino::si::parse;
+				using nu::parse;
+				using nu::si::parse;
 
 				assign (socket, parse<Value> (str));
 			}
@@ -131,7 +131,7 @@ template<class Value, class Char>
 		using Enum = Value;
 		using Integer = std::underlying_type_t<Enum>;
 
-		return static_cast<Enum> (neutrino::parse<Integer, Char> (str, base));
+		return static_cast<Enum> (nu::parse<Integer, Char> (str, base));
 	}
 
 
@@ -144,7 +144,7 @@ template<class Value, class Char>
 		using Enum = Value;
 		using Integer = std::underlying_type_t<Enum>;
 
-		return static_cast<Enum> (neutrino::parse<Integer, Char> (str, base));
+		return static_cast<Enum> (nu::parse<Integer, Char> (str, base));
 	}
 
 } // namespace xf::detail
@@ -203,7 +203,7 @@ template<class Enum>
 				detail::assign (module_out, xf::nil);
 			else
 			{
-				using neutrino::parse;
+				using nu::parse;
 				using detail::parse;
 				detail::assign (module_out, parse<Enum> (str));
 			}
@@ -233,8 +233,8 @@ template<class Enum>
 
 				if (socket)
 				{
-					using neutrino::to_blob;
-					using neutrino::si::to_blob;
+					using nu::to_blob;
+					using nu::si::to_blob;
 
 					Blob tmp = to_blob (static_cast<std::underlying_type_t<Enum>> (*socket));
 					std::copy (tmp.begin(), tmp.end(), std::next (result.begin()));
@@ -251,7 +251,7 @@ template<class Enum>
 			{
 				if (blob.size() == constant_blob_size())
 				{
-					auto enum_value = neutrino::parse<Enum> (blob);
+					auto enum_value = nu::parse<Enum> (blob);
 
 					if (enum_value == Enum::xf_nil_value)
 						detail::assign (module_out, xf::nil);
@@ -259,7 +259,7 @@ template<class Enum>
 						detail::assign (module_out, enum_value);
 				}
 				else
-					throw InvalidBlobSize (blob.size(), constant_blob_size());
+					throw nu::InvalidBlobSize (blob.size(), constant_blob_size());
 			}
 			else
 				detail::apply_generic_blob_parse (module_out, blob, constant_blob_size());
@@ -374,8 +374,8 @@ template<std::floating_point FloatingPoint>
 		static inline Blob
 		to_blob (Socket<FloatingPoint> const& socket)
 		{
-			using neutrino::to_blob;
-			using neutrino::si::to_blob;
+			using nu::to_blob;
+			using nu::si::to_blob;
 
 			if (socket)
 				return to_blob (*socket);
@@ -388,7 +388,7 @@ template<std::floating_point FloatingPoint>
 		{
 			if (blob.size() == constant_blob_size())
 			{
-				auto const fp = parse<FloatingPoint> (blob);
+				auto const fp = nu::parse<FloatingPoint> (blob);
 
 				if (std::isnan (fp))
 					detail::assign (module_out, xf::nil);
@@ -396,7 +396,7 @@ template<std::floating_point FloatingPoint>
 					detail::assign (module_out, fp);
 			}
 			else
-				throw InvalidBlobSize (blob.size(), constant_blob_size());
+				throw nu::InvalidBlobSize (blob.size(), constant_blob_size());
 		}
 	};
 
@@ -489,7 +489,7 @@ template<>
 					detail::assign (module_out, !!blob[0]);
 			}
 			else
-				throw InvalidBlobSize (blob.size(), constant_blob_size());
+				throw nu::InvalidBlobSize (blob.size(), constant_blob_size());
 		}
 	};
 
@@ -566,7 +566,7 @@ template<>
 		static size_t
 		constant_blob_size()
 		{
-			throw InvalidCall ("SocketTraits<std::string>::constant_blob_size()");
+			throw nu::InvalidCall ("SocketTraits<std::string>::constant_blob_size()");
 		}
 
 		static inline std::string
@@ -611,7 +611,7 @@ template<>
 		from_blob (AssignableSocket<std::string>& module_out, BlobView blob)
 		{
 			if (blob.empty())
-				throw InvalidBlobSize (0);
+				throw nu::InvalidBlobSize (0);
 			else
 			{
 				if (blob[0] == detail::not_nil)
@@ -664,7 +664,7 @@ template<class Unit>
 			if (str == settings.nil_value)
 				detail::assign (module_out, xf::nil);
 			else
-				detail::assign (module_out, neutrino::si::parse<si::Quantity<Unit>> (str));
+				detail::assign (module_out, nu::si::parse<si::Quantity<Unit>> (str));
 		}
 
 		static inline std::optional<float128_t>

@@ -61,7 +61,7 @@ Parser::process_next()
 	std::string::size_type parsed = 0;
 
 	// Make sure to remove parsed data from the input buffer:
-	Responsibility remove_parsed_sockets ([&] {
+	nu::Responsibility remove_parsed_sockets ([&] {
 		_input_buffer.erase (0, parsed);
 	});
 

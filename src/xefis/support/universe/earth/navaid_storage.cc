@@ -36,7 +36,7 @@
 
 namespace xf {
 
-class GzDataFileIteratorException: public Exception
+class GzDataFileIteratorException: public nu::Exception
 {
   public:
 	// Ctor
@@ -73,7 +73,7 @@ class GzDataFileIterator
 
   private:
 	QFile							_file;
-	std::unique_ptr<QZDevice>		_decompressor;
+	std::unique_ptr<nu::QZDevice>	_decompressor;
 	std::unique_ptr<QTextStream>	_decompressed_stream;
 	std::unique_ptr<QTextStream>	_line_stream;
 	QString							_line;
@@ -82,15 +82,15 @@ class GzDataFileIterator
 
 inline
 GzDataFileIterator::GzDataFileIterator (std::string_view const path):
-	_file (neutrino::to_qstring (std::string (path)))
+	_file (nu::to_qstring (std::string (path)))
 {
 	using namespace std::string_literals;
 
 	if (_file.open (QFile::ReadOnly))
 	{
-		_decompressor = std::make_unique<QZDevice> (&_file);
+		_decompressor = std::make_unique<nu::QZDevice> (&_file);
 
-		if (_decompressor->open (QZDevice::ReadOnly))
+		if (_decompressor->open (nu::QZDevice::ReadOnly))
 		{
 			_decompressed_stream = std::make_unique<QTextStream> (_decompressor.get());
 			// Skip two first lines (file origin and copyrights):
@@ -129,7 +129,7 @@ GzDataFileIterator::operator*()
 }
 
 
-NavaidStorage::NavaidStorage (Logger const& logger,
+NavaidStorage::NavaidStorage (nu::Logger const& logger,
 							  std::string_view const nav_file,
 							  std::string_view const fix_file,
 							  std::string_view const apt_file):
@@ -193,7 +193,7 @@ NavaidStorage::async_loader()
 {
 	_async_requested = true;
 	return std::packaged_task<void()> ([this] {
-		Exception::catch_and_log (_logger, std::bind (&NavaidStorage::load, this));
+		nu::Exception::catch_and_log (_logger, std::bind (&NavaidStorage::load, this));
 		_loaded = true;
 	});
 }

@@ -32,7 +32,7 @@ class BasicSocket;
 /**
  * Exception object thrown when trying to read a nil socket.
  */
-class NilValueException: public Exception
+class NilValueException: public nu::Exception
 {
   public:
 	// Ctor

@@ -27,6 +27,9 @@
 #include <cstddef>
 
 
+namespace nu = neutrino;
+
+
 // TODO handle nans
 class VerticalTrimIO: public xf::Instrument
 {

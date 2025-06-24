@@ -34,7 +34,7 @@
 
 namespace xf {
 
-using WidthForHeight = StrongType<float, struct WidthForHeightType>;
+using WidthForHeight = nu::StrongType<float, struct WidthForHeightType>;
 
 
 class InstrumentAids
@@ -148,7 +148,7 @@ class InstrumentAids
 	 * Return font modified to have given xf::FontPixelSize.
 	 */
 	static QFont
-	resized (QFont const&, FontPixelSize);
+	resized (QFont const&, nu::FontPixelSize);
 
 	/**
 	 * Scale and return default instrument font.

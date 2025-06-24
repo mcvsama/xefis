@@ -81,7 +81,7 @@ class GLColor
 	[[nodiscard]]
 	constexpr float
 	norm() const
-		{ return std::sqrt (square (_color_array[0]) + square (_color_array[1]) + square (_color_array[2])); }
+		{ return std::sqrt (nu::square (_color_array[0]) + nu::square (_color_array[1]) + nu::square (_color_array[2])); }
 
 	/**
 	 * Factor is in range [0, 1].

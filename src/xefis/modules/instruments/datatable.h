@@ -34,6 +34,9 @@
 #include <optional>
 
 
+namespace nu = neutrino;
+
+
 // TODO handle nans
 class Datatable:
 	public xf::Instrument,
@@ -79,7 +82,7 @@ class Datatable:
 		xf::BasicSocket const&		socket;
 
 	  private:
-		xf::Synchronized<QString>	_stringified;
+		nu::Synchronized<QString>	_stringified;
 	};
 
   public:

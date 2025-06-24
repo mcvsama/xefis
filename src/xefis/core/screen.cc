@@ -41,7 +41,7 @@ static constexpr char		kLogoPath[]			= "share/images/xefis.svg";
 static constexpr si::Time	kLogoDisplayTime	= 2_s;
 
 
-InstrumentDetails::InstrumentDetails (Instrument& instrument, WorkPerformer& work_performer):
+InstrumentDetails::InstrumentDetails (Instrument& instrument, nu::WorkPerformer& work_performer):
 	instrument (instrument),
 	work_performer (&work_performer)
 { }
@@ -62,7 +62,7 @@ InstrumentDetails::compute_position (QSize const canvas_size)
 }
 
 
-Screen::Screen (ScreenSpec const& spec, Graphics const& graphics, Machine& machine, std::string_view const instance, Logger const& logger):
+Screen::Screen (ScreenSpec const& spec, Graphics const& graphics, Machine& machine, std::string_view const instance, nu::Logger const& logger):
 	QWidget (nullptr),
 	NamedInstance (instance),
 	_machine (machine),
@@ -108,7 +108,7 @@ Screen::~Screen()
 
 
 void
-Screen::register_instrument (Instrument& instrument, WorkPerformer& work_performer)
+Screen::register_instrument (Instrument& instrument, nu::WorkPerformer& work_performer)
 {
 	_instruments_set.insert (&instrument);
 	auto const [inserted_at, inserted] = _instrument_details_map.emplace (std::make_pair (&instrument, InstrumentDetails (instrument, work_performer)));
@@ -129,7 +129,7 @@ Screen::deregister_instrument (Instrument& instrument)
 		wait_for_async_paint (*details);
 		_instrument_details_map.erase (&instrument);
 		auto new_end = std::remove (_z_index_order.begin(), _z_index_order.end(), details);
-		_z_index_order.resize (neutrino::to_unsigned (new_end - _z_index_order.begin()));
+		_z_index_order.resize (nu::to_unsigned (new_end - _z_index_order.begin()));
 	}
 
 	_instruments_set.erase (&instrument);
@@ -182,7 +182,7 @@ Screen::wait()
 }
 
 
-WorkPerformer*
+nu::WorkPerformer*
 Screen::work_performer_for (Instrument const& instrument) const
 {
 	if (auto* details = find_details (instrument))
@@ -193,7 +193,7 @@ Screen::work_performer_for (Instrument const& instrument) const
 
 
 WorkPerformerMetrics const*
-Screen::work_performer_metrics_for (WorkPerformer const& work_performer) const
+Screen::work_performer_metrics_for (nu::WorkPerformer const& work_performer) const
 {
 	if (auto metrics = _work_performer_metrics.find (&work_performer);
 		metrics != _work_performer_metrics.end())
@@ -276,9 +276,9 @@ Screen::update_instruments()
 
 		if (details->computed_position->isValid())
 		{
-			if (valid_and_ready (details->result))
+			if (nu::valid_and_ready (details->result))
 			{
-				Exception::catch_and_log (_logger, [&] {
+				nu::Exception::catch_and_log (_logger, [&] {
 					auto const perf_metrics = details->result.get();
 					// Update per-instrument metrics:
 					{
@@ -305,10 +305,10 @@ Screen::update_instruments()
 				details->previous_size = details->computed_position->size();
 
 				auto task = instrument.paint (std::move (paint_request));
-				auto request_time = TimeHelper::utc_now();
+				auto request_time = nu::TimeHelper::utc_now();
 				auto measured_task = [t = std::move (task), request_time]() mutable noexcept {
-					auto const start_time = TimeHelper::utc_now();
-					auto const painting_time = TimeHelper::measure (t);
+					auto const start_time = nu::TimeHelper::utc_now();
+					auto const painting_time = nu::TimeHelper::measure (t);
 
 					return PaintPerformanceMetrics {
 						start_time - request_time,
@@ -358,7 +358,7 @@ Screen::wait_for_async_paint (InstrumentDetails& details)
 {
 	auto const& result = details.result;
 
-	while (result.valid() && !ready (result))
+	while (result.valid() && !nu::ready (result))
 		result.wait();
 }
 

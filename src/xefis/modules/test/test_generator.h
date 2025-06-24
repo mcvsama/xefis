@@ -30,13 +30,14 @@
 #include <vector>
 
 
-namespace si = neutrino::si;
-using namespace neutrino::si::literals;
+namespace nu = neutrino;
+namespace si = nu::si;
+using namespace nu::si::literals;
 
 
 template<class Value>
 	concept UsefulWithRange = requires (Value const& v) {
-		xf::Range<Value> (v, v);
+		nu::Range<Value> (v, v);
 		v / 1_s;
 	};
 
@@ -97,13 +98,13 @@ class TestGenerator: public xf::Module
 
 	/**
 	 * Create and manage new output socket for sockets that can be used
-	 * with xf::Range<>.
+	 * with nu::Range<>.
 	 */
 	template<UsefulWithRange Value>
 		xf::ModuleOut<Value>&
 		create_socket (std::string_view const identifier,
 					   Value initial_value,
-					   xf::Range<Value> value_range,
+					   nu::Range<Value> value_range,
 					   RateOfChange<Value> rate_of_change,
 					   BorderCondition border_condition = BorderCondition::Mirroring,
 					   TestNilCondition const nil_condition = {});
@@ -159,7 +160,7 @@ template<UsefulWithRange Value>
 	inline xf::ModuleOut<Value>&
 	TestGenerator::create_socket (std::string_view const identifier,
 								  Value const initial_value,
-								  xf::Range<Value> const value_range,
+								  nu::Range<Value> const value_range,
 								  RateOfChange<Value> const rate_of_change,
 								  BorderCondition border_condition,
 								  TestNilCondition const nil_condition)
@@ -174,7 +175,7 @@ template<UsefulWithRange Value>
 			RangeGenerator (TestGenerator* test_generator,
 							std::string_view const identifier,
 							Value const initial_value,
-							xf::Range<Value> const value_range,
+							nu::Range<Value> const value_range,
 							RateOfChange<Value> const rate_of_change,
 							BorderCondition const border_condition,
 							TestNilCondition const nil_condition):
@@ -227,7 +228,7 @@ template<UsefulWithRange Value>
 		  private:
 			Value const				_initial_value;
 			Value					_current_value;
-			xf::Range<Value> const	_value_range;
+			nu::Range<Value> const	_value_range;
 			RateOfChange<Value>		_rate_of_change;
 			BorderCondition const	_border_condition;
 		};
@@ -273,7 +274,7 @@ template<class Value>
 
 				auto const& variant = std::get<0> (_values_and_intervals[_current_index]);
 
-				std::visit (xf::overload {
+				std::visit (nu::overload {
 					[&] (Value const& value) {
 						this->socket = value;
 					},

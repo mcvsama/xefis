@@ -46,8 +46,8 @@ class TestCycle: public Cycle
 	}
 
   private:
-	static inline xf::LoggerOutput	s_logger_output	{ std::clog };
-	static inline xf::Logger		s_null_logger	{ s_logger_output };
+	static inline nu::LoggerOutput	s_logger_output	{ std::clog };
+	static inline nu::Logger		s_null_logger	{ s_logger_output };
 };
 
 } // namespace xf::test

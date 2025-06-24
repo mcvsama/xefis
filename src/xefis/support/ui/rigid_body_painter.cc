@@ -61,8 +61,8 @@ constexpr auto kGLSkyLight2				= GL_LIGHT5;
 constexpr auto kGLSkyLight3				= GL_LIGHT6;
 constexpr auto kGLSkyLight4				= GL_LIGHT7;
 
-Synchronized<std::shared_future<RigidBodyPainter::PlanetTextureImages>>		RigidBodyPainter::_planet_texture_images;
-Synchronized<std::shared_future<RigidBodyPainter::UniverseTextureImages>>	RigidBodyPainter::_universe_texture_images;
+nu::Synchronized<std::shared_future<RigidBodyPainter::PlanetTextureImages>>		RigidBodyPainter::_planet_texture_images;
+nu::Synchronized<std::shared_future<RigidBodyPainter::UniverseTextureImages>>	RigidBodyPainter::_universe_texture_images;
 
 std::array<RigidBodyPainter::SkyLight, 5> const RigidBodyPainter::Planet::sky_lights = {{
 	{
@@ -88,16 +88,16 @@ std::array<RigidBodyPainter::SkyLight, 5> const RigidBodyPainter::Planet::sky_li
 }};
 
 
-RigidBodyPainter::RigidBodyPainter (si::PixelDensity const pixel_density, WorkPerformer* work_performer):
+RigidBodyPainter::RigidBodyPainter (si::PixelDensity const pixel_density, nu::WorkPerformer* work_performer):
 	_pixel_density (pixel_density),
 	// Work performer needs at least two threads: compute_sky_dome_shape() will be placed as a task, but it will
 	// also create its own subtasks. If it would only have 1 thread, the computation subtasks would
 	// infinitely wait for the first task to end (deadlock).
-	_work_performer (work_performer, std::in_place, 2, Logger()),
+	_work_performer (work_performer, std::in_place, 2, nu::Logger()),
 	_gl (pixel_density * kDefaultPositionScale)
 {
 	if (work_performer && work_performer->threads_number() < 2)
-		throw InvalidArgument ("provided WorkPerformer must have at least 2 threads");
+		throw nu::InvalidArgument ("provided WorkPerformer must have at least 2 threads");
 
 	use_work_performer (work_performer);
 	compute_camera_transform();
@@ -107,8 +107,8 @@ RigidBodyPainter::RigidBodyPainter (si::PixelDensity const pixel_density, WorkPe
 bool
 RigidBodyPainter::ready() const
 {
-	return (!_planet || valid_and_ready (*_planet_texture_images.lock()))
-		&& (!_universe || valid_and_ready (*_universe_texture_images.lock()));
+	return (!_planet || nu::valid_and_ready (*_planet_texture_images.lock()))
+		&& (!_universe || nu::valid_and_ready (*_universe_texture_images.lock()));
 }
 
 
@@ -267,9 +267,9 @@ RigidBodyPainter::precompute()
 {
 	if (_planet)
 	{
-		auto const followed_body_normalized_height = neutrino::renormalize (_followed_polar_position.radius(), Range { kEarthMeanRadius, kAtmosphereRadius }, Range { 0.0f, 1.0f });
+		auto const followed_body_normalized_height = nu::renormalize (_followed_polar_position.radius(), nu::Range { kEarthMeanRadius, kAtmosphereRadius }, nu::Range { 0.0f, 1.0f });
 		_planet->followed_body_normalized_amsl_height = std::clamp<float> (followed_body_normalized_height, 0.0f, 1.0f);
-		_planet->camera_normalized_amsl_height = neutrino::renormalize (_camera_polar_position.radius(), Range { kEarthMeanRadius, kAtmosphereRadius }, Range { 0.0f, 1.0f });
+		_planet->camera_normalized_amsl_height = nu::renormalize (_camera_polar_position.radius(), nu::Range { kEarthMeanRadius, kAtmosphereRadius }, nu::Range { 0.0f, 1.0f });
 		_planet->camera_clamped_normalized_amsl_height = std::clamp<float> (_planet->camera_normalized_amsl_height, 0.0f, 1.0f);
 	}
 
@@ -613,7 +613,7 @@ RigidBodyPainter::paint_universe_and_sun()
 		// Sun:
 		_gl.save_context ([&] {
 			auto const magnification_at_0_amsl = sun_altitude_above_horizon
-				? neutrino::renormalize (*sun_altitude_above_horizon, Range { 0_deg, 90_deg }, Range { kSunSunsetMagnification, kSunNoonMagnification })
+				? nu::renormalize (*sun_altitude_above_horizon, nu::Range { 0_deg, 90_deg }, nu::Range { kSunSunsetMagnification, kSunNoonMagnification })
 				: 1.0f;
 			// Correct for the fact that the magnification only happens inside atmosphere:
 			_sun->magnification = _planet
@@ -645,7 +645,7 @@ RigidBodyPainter::paint_universe_and_sun()
 			_gl.rotate (_user_camera_angles[0] - 2 * _user_camera_angles[1] + time_dependent_angle, 0, 0, 1);
 
 			auto const sun_visibility = sun_altitude_above_horizon
-				? 1.0f - square (1.0f - compute_sun_visible_surface_factor (*sun_altitude_above_horizon))
+				? 1.0f - nu::square (1.0f - compute_sun_visible_surface_factor (*sun_altitude_above_horizon))
 				: 1.0f;
 			auto const alpha_height_factor = _planet ? _planet->camera_clamped_normalized_amsl_height : 1.0f;
 
@@ -1127,10 +1127,10 @@ RigidBodyPainter::sky_correction (SpaceVector<float, RGBSpace> rgb, SunPosition 
 
 		if (abs_altitude < altitude_threshold)
 		{
-			auto const from = Range { altitude_threshold, 0_deg };
-			auto const to = Range { 1.0, reduce_green_to_sqrt };
-			auto const factor = neutrino::renormalize (sun_position.horizontal_coordinates.altitude, from, to);
-			rgb[1] *= square (factor);
+			auto const from = nu::Range { altitude_threshold, 0_deg };
+			auto const to = nu::Range { 1.0, reduce_green_to_sqrt };
+			auto const factor = nu::renormalize (sun_position.horizontal_coordinates.altitude, from, to);
+			rgb[1] *= nu::square (factor);
 		}
 	}
 
@@ -1317,7 +1317,7 @@ RigidBodyPainter::check_planet_textures()
 	{
 		auto images_accessor = _planet_texture_images.lock();
 
-		if (valid_and_ready (*images_accessor))
+		if (nu::valid_and_ready (*images_accessor))
 		{
 			auto const& images = images_accessor->get();
 
@@ -1339,7 +1339,7 @@ RigidBodyPainter::check_universe_textures()
 	{
 		auto images_accessor = _universe_texture_images.lock();
 
-		if (valid_and_ready (*images_accessor))
+		if (nu::valid_and_ready (*images_accessor))
 		{
 			auto const& images = images_accessor->get();
 
@@ -1420,8 +1420,8 @@ RigidBodyPainter::compute_sky_box_visibility (si::Angle const sun_altitude_above
 	if (_planet)
 	{
 		// Make the universe sky box visible when high above the surface, but also at night:
-		auto const night_time_visibility = neutrino::renormalize (sun_altitude_above_horizon, Range { -3_deg, -8_deg }, Range { 0.0f, 0.5f });
-		auto const altitude_visibility = neutrino::renormalize (_planet->camera_normalized_amsl_height, Range { 0.8f, 1.5f }, Range { 0.0f, 1.0f });
+		auto const night_time_visibility = nu::renormalize (sun_altitude_above_horizon, nu::Range { -3_deg, -8_deg }, nu::Range { 0.0f, 0.5f });
+		auto const altitude_visibility = nu::renormalize (_planet->camera_normalized_amsl_height, nu::Range { 0.8f, 1.5f }, nu::Range { 0.0f, 1.0f });
 		return std::max (altitude_visibility, night_time_visibility);
 	}
 	else
@@ -1558,7 +1558,7 @@ RigidBodyPainter::make_sun_shines_shape()
 		.material = kWhiteMatte,
 		.setup_material = [=] (ShapeMaterial& material, si::LonLat const position) {
 			auto const actual_radius = 0.02f;
-			float const norm = renormalize<si::Angle> (position.lat(), Range { 0_deg, 90_deg }, Range { 0.0f, 1.0f });
+			float const norm = renormalize<si::Angle> (position.lat(), nu::Range { 0_deg, 90_deg }, nu::Range { 0.0f, 1.0f });
 			float const alpha = std::pow (norm + actual_radius, 6.0f);
 			material.gl_emission_color = { 1.0f, 1.0f, 1.0f, alpha };
 		},

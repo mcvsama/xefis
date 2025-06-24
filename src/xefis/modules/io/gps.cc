@@ -35,7 +35,7 @@
 #include <ctime>
 
 
-using namespace xf::exception_ops;
+using namespace nu::exception_ops;
 
 
 GPS::Connection::Connection (GPS& gps_module, PowerCycle& power_cycle, unsigned int baud_rate):
@@ -55,7 +55,7 @@ GPS::Connection::Connection (GPS& gps_module, PowerCycle& power_cycle, unsigned 
 	_serial_port_config = gps_module._serial_port_config;
 	_serial_port_config.set_baud_rate (baud_rate);
 
-	_serial_port = std::make_unique<xf::SerialPort> (std::bind (&GPS::Connection::serial_data_ready, this),
+	_serial_port = std::make_unique<nu::SerialPort> (std::bind (&GPS::Connection::serial_data_ready, this),
 													 std::bind (&GPS::Connection::serial_failure, this));
 	_serial_port->set_max_read_failures (3);
 	_serial_port->set_logger (_gps_module.logger().with_context ("serial port"));
@@ -93,7 +93,7 @@ GPS::Connection::open_device()
 {
 	_serial_port->set_configuration (_serial_port_config);
 
-	bool has_thrown = xf::Exception::catch_and_log (_gps_module._logger, [&] {
+	bool has_thrown = nu::Exception::catch_and_log (_gps_module._logger, [&] {
 		_alive_check_timer->start();
 		_gps_module.logger() << "Opening device " << _gps_module._serial_port_config.device_path() << " at " << _serial_port_config.baud_rate() << " bps" << std::endl;
 
@@ -171,7 +171,7 @@ GPS::Connection::serial_data_ready()
 		try {
 			auto const gps_message = _nmea_parser.process_next();
 
-			std::visit (xf::overload {
+			std::visit (nu::overload {
 				[&] (xf::nmea::GPGGA const& msg) {
 					process_nmea_sentence (msg);
 				},
@@ -228,7 +228,7 @@ GPS::Connection::process_nmea_sentence (xf::nmea::GPGGA const& sentence)
 	_gps_module._io.geoid_height = sentence.geoid_height;
 	_gps_module._io.dgps_station_id = sentence.dgps_station_id;
 	// Use system time as reference:
-	_gps_module._io.fix_system_timestamp = xf::TimeHelper::utc_now();
+	_gps_module._io.fix_system_timestamp = nu::TimeHelper::utc_now();
 	_gps_module._reliable_fix_quality = sentence.reliable_fix_quality();
 }
 
@@ -510,7 +510,7 @@ GPS::PowerCycle::notify_connection_established()
 }
 
 
-GPS::GPS (xf::ProcessingLoop& loop, xf::System* system, xf::SerialPort::Configuration const& serial_port_config, xf::Logger const& logger, std::string_view const instance):
+GPS::GPS (xf::ProcessingLoop& loop, xf::System* system, nu::SerialPort::Configuration const& serial_port_config, nu::Logger const& logger, std::string_view const instance):
 	GPS_IO (loop, instance),
 	_logger (logger.with_context (std::string (kLoggerScope) + "#" + instance)),
 	_system (system),

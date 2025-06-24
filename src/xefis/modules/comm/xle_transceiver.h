@@ -43,7 +43,7 @@ struct AutoTestT1;
 
 namespace xf::crypto::xle {
 
-namespace si = neutrino::si;
+namespace si = nu::si;
 
 enum class Role {
 	Master,
@@ -130,7 +130,7 @@ class Transceiver
 	 *			How many bytes the encrypted packet will be bigger than the original unencrypted one.
 	 */
 	explicit
-	Transceiver (Role, size_t ciphertext_expansion, xf::Logger const&);
+	Transceiver (Role, size_t ciphertext_expansion, nu::Logger const&);
 
 	// Dtor
 	virtual
@@ -253,13 +253,13 @@ class Transceiver
 	std::string
 	role_name() const;
 
-	xf::Logger const&
+	nu::Logger const&
 	logger() const noexcept
 		{ return _logger; }
 
   private:
 	Role const	_role;
-	xf::Logger	_logger;
+	nu::Logger	_logger;
 	size_t		_ciphertext_expansion;
 };
 
@@ -329,7 +329,7 @@ class MasterTransceiver:
      */
 	class Session:
 		public Transceiver::Session,
-		public neutrino::Noncopyable
+		public nu::Noncopyable
 	{
 		static inline size_t _id_generator = 0;
 
@@ -361,7 +361,7 @@ class MasterTransceiver:
 
 			// Ctor
 			explicit
-			Connected (Secure<Blob> const& ephemeral_key, CryptoParams const& params);
+			Connected (nu::Secure<Blob> const& ephemeral_key, CryptoParams const& params);
 		};
 
 		// Ctor
@@ -474,7 +474,7 @@ class MasterTransceiver:
   public:
 	// Ctor
 	explicit
-	MasterTransceiver (xf::ProcessingLoop&, CryptoParams const&, xf::Logger const&, std::string_view const instance = {});
+	MasterTransceiver (xf::ProcessingLoop&, CryptoParams const&, nu::Logger const&, std::string_view const instance = {});
 
 	/**
 	 * Perform a handshake.
@@ -585,7 +585,7 @@ class SlaveTransceiver:
      */
 	class Session:
 		public Transceiver::Session,
-		public neutrino::Noncopyable
+		public nu::Noncopyable
 	{
 		static inline size_t _id_generator = 0;
 
@@ -597,7 +597,7 @@ class SlaveTransceiver:
 				 HandshakeSlave::KeyCheckFunctions const);
 
 		[[nodiscard]]
-		Secure<Blob> const&
+		nu::Secure<Blob> const&
 		handshake_response() const noexcept
 			{ return _handshake_response; }
 
@@ -636,7 +636,7 @@ class SlaveTransceiver:
 			{ return _receiver->decrypt_packet (packet, maximum_allowed_sequence_number); }
 
 	  private:
-		Secure<Blob>						_handshake_response;
+		nu::Secure<Blob>					_handshake_response;
 		std::optional<Transmitter>			_transmitter;
 		std::optional<Receiver>				_receiver;
 		HandshakeSlave::KeyCheckFunctions	_key_check_functions;
@@ -648,7 +648,7 @@ class SlaveTransceiver:
 	SlaveTransceiver (xf::ProcessingLoop&,
 					  CryptoParams const&,
 					  HandshakeSlave::KeyCheckFunctions const,
-					  xf::Logger const&,
+					  nu::Logger const&,
 					  std::string_view const instance = {});
 
 	/**

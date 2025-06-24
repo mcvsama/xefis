@@ -90,7 +90,7 @@ CHRUM6::Read::value_lower16() const noexcept
 }
 
 
-CHRUM6::CHRUM6 (SerialPort* serial_port, Logger const& logger):
+CHRUM6::CHRUM6 (nu::SerialPort* serial_port, nu::Logger const& logger):
 	_serial_port (serial_port)
 {
 	_serial_port->set_data_ready_callback (std::bind (&CHRUM6::serial_ready, this));
@@ -105,7 +105,7 @@ CHRUM6::CHRUM6 (SerialPort* serial_port, Logger const& logger):
 
 
 void
-CHRUM6::set_logger (Logger const& logger)
+CHRUM6::set_logger (nu::Logger const& logger)
 {
 	_logger = logger.with_context (kLoggerScope);
 	_serial_port->set_logger (_logger);
@@ -338,7 +338,7 @@ CHRUM6::process_packet (uint32_t address, bool failed, bool, uint32_t data)
 	if (_alive_check_callback)
 		_alive_check_callback();
 
-	si::Time const now = TimeHelper::utc_now();
+	si::Time const now = nu::TimeHelper::utc_now();
 
 	if (failed)
 	{

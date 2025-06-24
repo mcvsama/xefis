@@ -33,7 +33,7 @@ AngularLimitsConstraint::AngularLimitsConstraint (HingePrecomputation& hinge_pre
 }
 
 
-AngularLimitsConstraint::AngularLimitsConstraint (HingePrecomputation& hinge_precomputation, Range<si::Angle> const range):
+AngularLimitsConstraint::AngularLimitsConstraint (HingePrecomputation& hinge_precomputation, nu::Range<si::Angle> const range):
 	AngularLimitsConstraint (hinge_precomputation, range.min(), range.max())
 { }
 

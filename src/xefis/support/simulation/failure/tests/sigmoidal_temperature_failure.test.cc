@@ -25,6 +25,9 @@
 namespace xf::test {
 namespace {
 
+namespace test_asserts = nu::test_asserts;
+
+
 si::Time
 test_lifetime (SigmoidalTemperatureFailure& failure_model, si::Temperature const test_temperature)
 {
@@ -41,7 +44,7 @@ test_lifetime (SigmoidalTemperatureFailure& failure_model, si::Temperature const
 }
 
 
-AutoTest t_1 ("SigmoidalTemperatureFailure", []{
+nu::AutoTest t_1 ("SigmoidalTemperatureFailure", []{
 	auto const expected_lifetime = 1000_s;
 	SigmoidalTemperatureFailure failure_model (expected_lifetime, 300_K, 400_K);
 

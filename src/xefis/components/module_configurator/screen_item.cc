@@ -37,8 +37,8 @@ ScreenItem::ScreenItem (Screen& screen, QTreeWidget& parent):
 	QTreeWidgetItem (&parent, { "", "", "" }),
 	_screen (screen)
 {
-	setup_appereance (*this);
-	setText (ConfigurableItemsList::NameColumn, neutrino::to_qstring (_screen.instance()));
+	nu::setup_appereance (*this);
+	setText (ConfigurableItemsList::NameColumn, nu::to_qstring (_screen.instance()));
 }
 
 } // namespace xf::configurator

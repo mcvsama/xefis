@@ -33,7 +33,7 @@ template<class pArgumentX, class pArgumentY>
 		using ArgumentX	= pArgumentX;
 		using ArgumentY	= pArgumentY;
 		using Color		= math::Vector<float, 3>;
-		using Field		= neutrino::Field<ArgumentX, ArgumentY, Color>;
+		using Field		= nu::Field<ArgumentX, ArgumentY, Color>;
 		using DataMap	= Field::DataMap;
 
 	  public:
@@ -65,7 +65,7 @@ template<class pArgumentX, class pArgumentY>
 		Color
 		operator[] (ArgumentX const& x, ArgumentY const& y) const
 			{ return _field (x, y); }
-		// FIXME error: 
+		// FIXME error:
 		// in Field: return renormalize (Color), Range<Color>, Range<Color>);
 
 	  private:

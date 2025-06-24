@@ -34,14 +34,14 @@
 #include "udp.h"
 
 
-UDP::UDP (xf::ProcessingLoop& loop, Parameters const parameters, xf::Logger const& logger, std::string_view const instance):
+UDP::UDP (xf::ProcessingLoop& loop, Parameters const parameters, nu::Logger const& logger, std::string_view const instance):
 	Module (loop, instance),
 	_parameters (parameters),
 	_logger (logger.with_context (std::string (kLoggerScope) + "#" + instance))
 {
 	if (_parameters.tx_udp_address)
 	{
-		_tx_qhostaddress = QHostAddress (neutrino::to_qstring (_parameters.tx_udp_address->host));
+		_tx_qhostaddress = QHostAddress (nu::to_qstring (_parameters.tx_udp_address->host));
 		_tx = std::make_unique<QUdpSocket>();
 	}
 
@@ -49,7 +49,7 @@ UDP::UDP (xf::ProcessingLoop& loop, Parameters const parameters, xf::Logger cons
 	{
 		_rx = std::make_unique<QUdpSocket>();
 
-		if (!_rx->bind (QHostAddress (neutrino::to_qstring (_parameters.rx_udp_address->host)), _parameters.rx_udp_address->port, QUdpSocket::ShareAddress))
+		if (!_rx->bind (QHostAddress (nu::to_qstring (_parameters.rx_udp_address->host)), _parameters.rx_udp_address->port, QUdpSocket::ShareAddress))
 			_logger << std::format ("Failed to bind to address {}:{}\n", _parameters.rx_udp_address->host, _parameters.rx_udp_address->port);
 
 		QObject::connect (_rx.get(), &QUdpSocket::readyRead, [this] { got_udp_packet(); });
@@ -89,7 +89,7 @@ UDP::got_udp_packet()
 	if (_parameters.rx_interference)
 		interfere (_received_datagram);
 
-	this->receive = std::string (_received_datagram.data(), neutrino::to_unsigned (_received_datagram.size()));
+	this->receive = std::string (_received_datagram.data(), nu::to_unsigned (_received_datagram.size()));
 }
 
 

@@ -147,8 +147,8 @@ PerformanceComputer::compute_wind()
 		wt.set_air_vector (*_io.speed_tas, *_io.orientation_heading_true);
 		wt.set_ground_vector (*_io.speed_gs, *_io.track_lateral_true);
 		wt.compute_wind_vector();
-		_io.wind_from_true = xf::floored_mod (_wind_direction_smoother (wt.wind_from(), update_dt), 360_deg);
-		_io.wind_from_magnetic = xf::true_to_magnetic (*_io.wind_from_true, *_io.magnetic_declination);
+		_io.wind_from_true = nu::floored_mod (_wind_direction_smoother (wt.wind_from(), update_dt), 360_deg);
+		_io.wind_from_magnetic = nu::true_to_magnetic (*_io.wind_from_true, *_io.magnetic_declination);
 		_io.wind_tas = _wind_speed_smoother (wt.wind_speed(), update_dt);
 	}
 	else
@@ -260,7 +260,7 @@ PerformanceComputer::compute_speeds()
 	// V_a; since the formula is almost identical as for V_s, use V_s_0_deg:
 	if (_airframe && _io.v_s_0_deg)
 	{
-		xf::Range<double> lf_limits = _airframe->load_factor_limits();
+		nu::Range<double> lf_limits = _airframe->load_factor_limits();
 		double max_lf = std::min (lf_limits.max(), -lf_limits.min());
 		_io.v_a = std::sqrt (max_lf) * *_io.v_s_0_deg;
 	}
@@ -303,8 +303,7 @@ PerformanceComputer::compute_speeds_vbg()
 	{
 		xf::FlapsAngle flaps_angle (*_io.flaps_angle);
 		xf::SpoilersAngle spoilers_angle (*_io.spoilers_angle);
-
-		xf::Range<si::Angle> aoa_range = _airframe->get_defined_aoa_range();
+		nu::Range<si::Angle> aoa_range = _airframe->get_defined_aoa_range();
 
 		std::optional<si::Angle> v_bg_aoa;
 		double v_bg_ratio = std::numeric_limits<double>::max();

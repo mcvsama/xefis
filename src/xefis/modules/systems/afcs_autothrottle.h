@@ -31,8 +31,9 @@
 #include <utility>
 
 
-namespace si = neutrino::si;
-using namespace neutrino::si::literals;
+namespace nu = neutrino;
+namespace si = nu::si;
+using namespace nu::si::literals;
 
 
 class AFCS_Autothrottle_IO: public xf::Module

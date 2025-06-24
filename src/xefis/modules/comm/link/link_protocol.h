@@ -45,7 +45,8 @@
 #define XEFIS_LINK_RECV_DEBUG 0
 
 
-namespace si = neutrino::si;
+namespace nu = neutrino;
+namespace si = nu::si;
 
 class InputLink;
 
@@ -71,7 +72,7 @@ class LinkProtocol
 	/**
 	 * Thrown when one of Envelopes has different unique_prefix string size than the others.
 	 */
-	class InvalidMagicSize: public xf::Exception
+	class InvalidMagicSize: public nu::Exception
 	{
 	  public:
 		explicit
@@ -100,14 +101,14 @@ class LinkProtocol
 		 * Serialize data and add it to the blob.
 		 */
 		virtual void
-		produce (Blob&, xf::Logger const&) = 0;
+		produce (Blob&, nu::Logger const&) = 0;
 
 		/**
 		 * Parse data and set temporary variables.
 		 * Data will be output when apply() is called.
 		 */
 		virtual Blob::const_iterator
-		consume (Blob::const_iterator, Blob::const_iterator, xf::Logger const&) = 0;
+		consume (Blob::const_iterator, Blob::const_iterator, nu::Logger const&) = 0;
 
 		/**
 		 * Apply parsed data to sockets, etc.
@@ -138,10 +139,10 @@ class LinkProtocol
 		size() const override;
 
 		void
-		produce (Blob&, xf::Logger const&) override;
+		produce (Blob&, nu::Logger const&) override;
 
 		Blob::const_iterator
-		consume (Blob::const_iterator, Blob::const_iterator, xf::Logger const&) override;
+		consume (Blob::const_iterator, Blob::const_iterator, nu::Logger const&) override;
 
 		void
 		apply() override;
@@ -285,11 +286,11 @@ class LinkProtocol
 			size() const override;
 
 			void
-			produce (Blob& blob, xf::Logger const&) override
+			produce (Blob& blob, nu::Logger const&) override
 				{ _produce (blob); }
 
 			Blob::const_iterator
-			consume (Blob::const_iterator const begin, Blob::const_iterator const end, xf::Logger const&) override
+			consume (Blob::const_iterator const begin, Blob::const_iterator const end, nu::Logger const&) override
 				{ return _consume (begin, end); }
 
 			void
@@ -381,10 +382,10 @@ class LinkProtocol
 		size() const override;
 
 		void
-		produce (Blob&, xf::Logger const&) override;
+		produce (Blob&, nu::Logger const&) override;
 
 		Blob::const_iterator
-		consume (Blob::const_iterator, Blob::const_iterator, xf::Logger const&) override;
+		consume (Blob::const_iterator, Blob::const_iterator, nu::Logger const&) override;
 
 		void
 		apply() override;
@@ -424,10 +425,10 @@ class LinkProtocol
 		size() const override;
 
 		void
-		produce (Blob&, xf::Logger const&) override;
+		produce (Blob&, nu::Logger const&) override;
 
 		Blob::const_iterator
-		consume (Blob::const_iterator, Blob::const_iterator, xf::Logger const&) override;
+		consume (Blob::const_iterator, Blob::const_iterator, nu::Logger const&) override;
 
 	  private:
 		std::string		_name;
@@ -478,10 +479,10 @@ class LinkProtocol
 		size() const override;
 
 		void
-		produce (Blob& blob, xf::Logger const&) override;
+		produce (Blob& blob, nu::Logger const&) override;
 
 		Blob::const_iterator
-		consume (Blob::const_iterator, Blob::const_iterator, xf::Logger const&) override;
+		consume (Blob::const_iterator, Blob::const_iterator, nu::Logger const&) override;
 
 	  private:
 		std::string						_name;
@@ -504,10 +505,10 @@ class LinkProtocol
 	size() const;
 
 	void
-	produce (Blob&, xf::Logger const&);
+	produce (Blob&, nu::Logger const&);
 
 	Blob::const_iterator
-	consume (Blob::const_iterator begin, Blob::const_iterator end, InputLink*, QTimer* reacquire_timer, QTimer* failsafe_timer, xf::Logger const&);
+	consume (Blob::const_iterator begin, Blob::const_iterator end, InputLink*, QTimer* reacquire_timer, QTimer* failsafe_timer, nu::Logger const&);
 
 	void
 	failsafe();
@@ -623,7 +624,7 @@ class LinkProtocol
 		bitfield_socket (xf::Socket<Unsigned>& socket, Bitfield::UnsignedParams<Unsigned>&& params = {})
 		{
 			if (!fits_in_bits (params.value_if_nil, params.bits))
-				throw xf::InvalidArgument ("value_if_nil doesn't fit in given number of bits");
+				throw nu::InvalidArgument ("value_if_nil doesn't fit in given number of bits");
 
 			return {
 				.socket				= socket,
@@ -644,7 +645,7 @@ class LinkProtocol
 		bitfield_socket (xf::AssignableSocket<Unsigned>& assignable_socket, Bitfield::UnsignedParams<Unsigned>&& params = {})
 		{
 			if (!fits_in_bits (params.value_if_nil, params.bits))
-				throw xf::InvalidArgument ("value_if_nil doesn't fit in given number of bits");
+				throw nu::InvalidArgument ("value_if_nil doesn't fit in given number of bits");
 
 			return {
 				.socket				= assignable_socket,
@@ -671,7 +672,7 @@ class LinkProtocol
   private:
 	static constexpr bool
 	fits_in_bits (uint_least64_t value, uint8_t bits)
-		{ return value == 0 || value < xf::static_pow<uint_least64_t> (2U, bits); }
+		{ return value == 0 || value < nu::static_pow<uint_least64_t> (2U, bits); }
 
   private:
 	std::vector<std::shared_ptr<Envelope>>		_envelopes;
@@ -695,11 +696,11 @@ template<uint16_t B, class V>
 				? *_socket
 				: _value_if_nil;
 
-			serialize<xf::int_for_width_t<kBytes>> (int_value, blob);
+			serialize<nu::int_for_width_t<kBytes>> (int_value, blob);
 		};
 
 		_consume = [this] (Blob::const_iterator begin, Blob::const_iterator end) -> Blob::const_iterator {
-			return unserialize<xf::int_for_width_t<kBytes>> (begin, end);
+			return unserialize<nu::int_for_width_t<kBytes>> (begin, end);
 		};
 	}
 
@@ -723,7 +724,7 @@ template<uint16_t B, class V>
 						: (*_socket).base_value()
 					: _value_if_nil;
 
-				serialize<neutrino::float_for_width_t<kBytes>> (value, blob);
+				serialize<nu::float_for_width_t<kBytes>> (value, blob);
 			}
 			else if constexpr (std::is_floating_point<Value>())
 			{
@@ -733,12 +734,12 @@ template<uint16_t B, class V>
 						: *_socket
 					: _value_if_nil;
 
-				serialize<neutrino::float_for_width_t<kBytes>> (value, blob);
+				serialize<nu::float_for_width_t<kBytes>> (value, blob);
 			}
 		};
 
 		_consume = [this] (Blob::const_iterator begin, Blob::const_iterator end) -> Blob::const_iterator {
-			return unserialize<neutrino::float_for_width_t<kBytes>> (begin, end);
+			return unserialize<nu::float_for_width_t<kBytes>> (begin, end);
 		};
 	}
 
@@ -840,19 +841,19 @@ template<uint16_t B, class V>
 						// Strings longer than kBufferB will be truncated:
 						uint16_t const size = std::min<size_t> (kBufferB, string.size());
 						uint16_t const le_size = size;
-						neutrino::perhaps_native_to_little_inplace (le_size);
+						nu::perhaps_native_to_little_inplace (le_size);
 
-						auto append_iterator = blob.begin() + neutrino::to_signed (append_pos);
-						append_iterator = neutrino::copy_value_to_memory (le_size, append_iterator);
+						auto append_iterator = blob.begin() + nu::to_signed (append_pos);
+						append_iterator = nu::copy_value_to_memory (le_size, append_iterator);
 						append_iterator = std::copy (string.begin(), string.begin() + size, append_iterator);
 						std::fill (append_iterator, blob.end(), 0);
 					}
 					else
 					{
 						uint16_t const le_nil = kNilStringSize;
-						neutrino::perhaps_native_to_little_inplace (le_nil);
+						nu::perhaps_native_to_little_inplace (le_nil);
 
-						auto const append_iterator = neutrino::copy_value_to_memory (le_nil, blob.begin() + neutrino::to_signed (append_pos));
+						auto const append_iterator = nu::copy_value_to_memory (le_nil, blob.begin() + nu::to_signed (append_pos));
 						std::fill (append_iterator, blob.end(), 0);
 					}
 				}
@@ -866,25 +867,25 @@ template<uint16_t B, class V>
 					auto const append_meta = []<class AppendIterator>(uint16_t serial, uint16_t size, uint16_t block_number, AppendIterator append_iterator)
 						-> AppendIterator
 					{
-						neutrino::perhaps_native_to_little_inplace (serial);
-						neutrino::perhaps_native_to_little_inplace (size);
-						neutrino::perhaps_native_to_little_inplace (block_number);
+						nu::perhaps_native_to_little_inplace (serial);
+						nu::perhaps_native_to_little_inplace (size);
+						nu::perhaps_native_to_little_inplace (block_number);
 
-						append_iterator = neutrino::copy_value_to_memory (serial, append_iterator);
-						append_iterator = neutrino::copy_value_to_memory (size, append_iterator);
-						append_iterator = neutrino::copy_value_to_memory (block_number, append_iterator);
+						append_iterator = nu::copy_value_to_memory (serial, append_iterator);
+						append_iterator = nu::copy_value_to_memory (size, append_iterator);
+						append_iterator = nu::copy_value_to_memory (block_number, append_iterator);
 
 						return append_iterator;
 					};
 
-					auto append_iterator = blob.begin() + neutrino::to_signed (append_pos);
+					auto append_iterator = blob.begin() + nu::to_signed (append_pos);
 
 					if (src)
 					{
 						auto& string = *src;
 
 						if (string.size() > kMaxStringSize)
-							throw xf::Exception (std::format ("LinkProtocol: can't encode string longer than {} bytes", kMaxStringSize));
+							throw nu::Exception (std::format ("LinkProtocol: can't encode string longer than {} bytes", kMaxStringSize));
 
 						if (string.empty())
 							append_iterator = append_meta (_current_serial, string.size(), 0, append_iterator);
@@ -905,7 +906,7 @@ template<uint16_t B, class V>
 								bytes_to_copy = block_size;
 
 							auto const copy_begin = string.begin() + block_number * block_size;
-							auto const copy_end = copy_begin + neutrino::to_signed (bytes_to_copy);
+							auto const copy_end = copy_begin + nu::to_signed (bytes_to_copy);
 							append_iterator = std::copy (copy_begin, copy_end, append_iterator);
 						}
 
@@ -925,7 +926,7 @@ template<uint16_t B, class V>
 			{
 				auto const size = sizeof (CastType);
 				auto casted = static_cast<CastType> (src);
-				neutrino::perhaps_native_to_little_inplace (casted);
+				nu::perhaps_native_to_little_inplace (casted);
 				uint8_t* ptr = reinterpret_cast<uint8_t*> (&casted);
 				blob.resize (blob.size() + size);
 				std::copy (ptr, ptr + size, &blob[blob.size() - size]);
@@ -945,12 +946,12 @@ template<uint16_t B, class V>
 					auto constexpr kMetaB = kTruncatedStringMetaSize;
 					auto constexpr kBufferB = kBytes;
 
-					if (neutrino::to_unsigned (std::distance (begin, end)) < kMetaB + kBufferB)
+					if (nu::to_unsigned (std::distance (begin, end)) < kMetaB + kBufferB)
 						throw ParseError();
 
 					uint16_t size;
-					auto read_iterator = neutrino::copy_memory_to_value (begin, size);
-					neutrino::perhaps_little_to_native_inplace (size);
+					auto read_iterator = nu::copy_memory_to_value (begin, size);
+					nu::perhaps_little_to_native_inplace (size);
 
 					if (size == kNilStringSize)
 						_value.reset();
@@ -977,13 +978,13 @@ template<uint16_t B, class V>
 					uint16_t size;
 					uint16_t block_number;
 
-					auto read_iterator = neutrino::copy_memory_to_value (begin, serial);
-					read_iterator = neutrino::copy_memory_to_value (read_iterator, size);
-					read_iterator = neutrino::copy_memory_to_value (read_iterator, block_number);
+					auto read_iterator = nu::copy_memory_to_value (begin, serial);
+					read_iterator = nu::copy_memory_to_value (read_iterator, size);
+					read_iterator = nu::copy_memory_to_value (read_iterator, block_number);
 
-					neutrino::perhaps_little_to_native_inplace (serial);
-					neutrino::perhaps_little_to_native_inplace (size);
-					neutrino::perhaps_little_to_native_inplace (block_number);
+					nu::perhaps_little_to_native_inplace (serial);
+					nu::perhaps_little_to_native_inplace (size);
+					nu::perhaps_little_to_native_inplace (block_number);
 
 					if (size == kNilStringSize)
 					{
@@ -1052,14 +1053,14 @@ template<uint16_t B, class V>
 			}
 			else
 			{
-				if (neutrino::to_unsigned (std::distance (begin, end)) < sizeof (CastType))
+				if (nu::to_unsigned (std::distance (begin, end)) < sizeof (CastType))
 					throw ParseError();
 
 				std::size_t size = sizeof (CastType);
-				auto const work_end = begin + neutrino::to_signed (size);
+				auto const work_end = begin + nu::to_signed (size);
 				CastType cast_value;
 				std::copy (begin, work_end, reinterpret_cast<uint8_t*> (&cast_value));
-				neutrino::perhaps_little_to_native_inplace (cast_value);
+				nu::perhaps_little_to_native_inplace (cast_value);
 
 				if constexpr (si::FloatingPointOrQuantity<Value>)
 				{

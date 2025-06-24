@@ -23,7 +23,7 @@
 #include <xefis/support/sockets/socket_changed.h>
 
 
-namespace si = neutrino::si;
+namespace si = nu::si;
 
 
 struct InputLinkParams
@@ -53,7 +53,7 @@ class InputLink: public xf::Module
   public:
 	// Ctor
 	explicit
-	InputLink (xf::ProcessingLoop&, std::unique_ptr<LinkProtocol>, InputLinkParams const&, xf::Logger const&, std::string_view const instance = {});
+	InputLink (xf::ProcessingLoop&, std::unique_ptr<LinkProtocol>, InputLinkParams const&, nu::Logger const&, std::string_view const instance = {});
 
 	void
 	process (xf::Cycle const&) override;
@@ -72,7 +72,7 @@ class InputLink: public xf::Module
 	reacquire();
 
   private:
-	xf::Logger						_logger;
+	nu::Logger						_logger;
 	std::unique_ptr<QTimer>			_failsafe_timer;
 	std::unique_ptr<QTimer>			_reacquire_timer;
 	Blob							_input_blob;

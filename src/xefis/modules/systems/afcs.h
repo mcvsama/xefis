@@ -34,8 +34,9 @@
 #include <string>
 
 
-namespace si = neutrino::si;
-using namespace neutrino::si::literals;
+namespace nu = neutrino;
+namespace si = nu::si;
+using namespace nu::si::literals;
 
 
 class AFCS_IO: public xf::Module
@@ -188,14 +189,14 @@ class AFCS_IO: public xf::Module
 class AFCS: public AFCS_IO
 {
   private:
-	static constexpr xf::Range<si::Velocity>	kSpeedRange		{ 10_kt, 300_kt };
-	static constexpr xf::Range<double>			kMachRange		{ 0.000, 1.000 };
+	static constexpr nu::Range<si::Velocity>	kSpeedRange		{ 10_kt, 300_kt };
+	static constexpr nu::Range<double>			kMachRange		{ 0.000, 1.000 };
 	static constexpr double						kMachStep		{ 0.001 };
-	static constexpr xf::Range<si::Length>		kAltitudeRange	{ -5000_ft, 50'000_ft };
+	static constexpr nu::Range<si::Length>		kAltitudeRange	{ -5000_ft, 50'000_ft };
 	static constexpr si::Velocity				kVSStep			{ 10_fpm };
-	static constexpr xf::Range<si::Velocity>	kVSRange		{ -8'000_fpm, +8'000_fpm };
+	static constexpr nu::Range<si::Velocity>	kVSRange		{ -8'000_fpm, +8'000_fpm };
 	static constexpr si::Angle					kFPAStep		{ 0.1_deg };
-	static constexpr xf::Range<si::Angle>		kFPARange		{ -10_deg, +10_deg };
+	static constexpr nu::Range<si::Angle>		kFPARange		{ -10_deg, +10_deg };
 
 	// TODO ensure those classes are used
 	class DisengageAP: public std::runtime_error

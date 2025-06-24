@@ -46,7 +46,7 @@ template<class pValue>
 	  public:
 		// Ctor
 		explicit
-		RangeSmoother (Range<Value> range, si::Time smoothing_time = 1_ms, si::Time precision = 1_ms) noexcept;
+		RangeSmoother (nu::Range<Value> range, si::Time smoothing_time = 1_ms, si::Time precision = 1_ms) noexcept;
 
 		/**
 		 * Resets smoother to initial state (or given value).
@@ -96,7 +96,7 @@ template<class pValue>
 	  private:
 		si::Time						_accumulated_dt		= 0_s;
 		Value							_z;
-		Range<Value>					_range;
+		nu::Range<Value>				_range;
 		boost::circular_buffer<Value>	_history;
 		boost::circular_buffer<double>	_history_cos;
 		boost::circular_buffer<double>	_history_sin;
@@ -106,7 +106,7 @@ template<class pValue>
 
 template<class V>
 	inline
-	RangeSmoother<V>::RangeSmoother (Range<Value> range, si::Time smoothing_time, si::Time precision) noexcept:
+	RangeSmoother<V>::RangeSmoother (nu::Range<Value> range, si::Time smoothing_time, si::Time precision) noexcept:
 		_range (range)
 	{
 		set_smoothing_time (smoothing_time);
@@ -135,7 +135,7 @@ template<class V>
 		std::fill (_history.begin(), _history.end(), value);
 		std::fill (_history_cos.begin(), _history_cos.end(), std::cos (encircle (value)));
 		std::fill (_history_sin.begin(), _history_sin.end(), std::sin (encircle (value)));
-		_z = neutrino::wrap_within_range<Value> (_z, _range);
+		_z = nu::wrap_within_range<Value> (_z, _range);
 	}
 
 
@@ -189,7 +189,7 @@ template<class V>
 			y /= _history.size() - 1;
 			x *= 2.0;
 			y *= 2.0; // Window energy correction.
-			_z = neutrino::wrap_within_range<Value> (decircle (std::atan2 (y, x)), _range);
+			_z = nu::wrap_within_range<Value> (decircle (std::atan2 (y, x)), _range);
 
 			_accumulated_dt = 0_s;
 		}
@@ -226,7 +226,7 @@ template<class V>
 	inline double
 	RangeSmoother<V>::encircle (Value s) const noexcept
 	{
-		return renormalize (s, _range, Range<double> (0.0, 2.0 * std::numbers::pi));
+		return renormalize (s, _range, nu::Range<double> (0.0, 2.0 * std::numbers::pi));
 	}
 
 
@@ -234,7 +234,7 @@ template<class V>
 	inline typename RangeSmoother<V>::Value
 	RangeSmoother<V>::decircle (double s) const noexcept
 	{
-		return renormalize (s, Range<double> (0.0, 2.0 * std::numbers::pi), _range);
+		return renormalize (s, nu::Range<double> (0.0, 2.0 * std::numbers::pi), _range);
 	}
 
 

@@ -32,7 +32,7 @@
 namespace xf::test {
 namespace {
 
-using namespace neutrino::si;
+namespace test_asserts = nu::test_asserts;
 
 
 template<math::CoordinateSystem TS = void, math::CoordinateSystem SS = void>
@@ -41,7 +41,7 @@ template<math::CoordinateSystem TS = void, math::CoordinateSystem SS = void>
 	{
 		using std::numbers::pi;
 
-		auto const angle = neutrino::renormalize (rand(), Range<double> (0, RAND_MAX), Range<si::Angle> (-2_rad * pi, +2_rad * pi));
+		auto const angle = nu::renormalize (rand(), nu::Range<double> (0, RAND_MAX), nu::Range<si::Angle> (-2_rad * pi, +2_rad * pi));
 		auto const axis = SpaceVector<double, TS> { 1.0 * rand(), 1.0 * rand(), 1.0 * rand() }.normalized();
 		auto const q = quaternion_rotation_about<TS, SS> (axis, angle);
 
@@ -59,7 +59,7 @@ template<math::Scalar S = double, math::CoordinateSystem Space = void>
 	}
 
 
-AutoTest t1 ("Math: rotations with Quaternion", []{
+nu::AutoTest t1 ("Math: rotations with Quaternion", []{
 	using std::numbers::pi;
 
 	auto const vx = SpaceLength { 1_m, 0_m, 0_m };
@@ -87,7 +87,7 @@ AutoTest t1 ("Math: rotations with Quaternion", []{
 });
 
 
-AutoTest t2 ("Math: rotations with Quaternion (angle range π…2π)", []{
+nu::AutoTest t2 ("Math: rotations with Quaternion (angle range π…2π)", []{
 	using std::numbers::pi;
 
 	for (auto const a: { -0.9_rad * pi, +0.9_rad * pi })
@@ -101,7 +101,7 @@ AutoTest t2 ("Math: rotations with Quaternion (angle range π…2π)", []{
 });
 
 
-AutoTest t3 ("Math: composing quaternion rotations", []{
+nu::AutoTest t3 ("Math: composing quaternion rotations", []{
 	for (int i = 0; i < 1000; ++i)
 	{
 		auto const vec = random_vector();
@@ -130,7 +130,7 @@ AutoTest t3 ("Math: composing quaternion rotations", []{
 });
 
 
-AutoTest t4 ("Math: Quaternion-Matrix compatibility", []{
+nu::AutoTest t4 ("Math: Quaternion-Matrix compatibility", []{
 	using std::numbers::pi;
 
 	test_asserts::verify_equal_with_epsilon ("rotation_vector (90_deg rotation) is π/2",
@@ -177,13 +177,13 @@ AutoTest t4 ("Math: Quaternion-Matrix compatibility", []{
 });
 
 
-AutoTest t5 ("Math: random rotations fuzz", []{
+nu::AutoTest t5 ("Math: random rotations fuzz", []{
 	using std::numbers::pi;
 
 	for (int i = 0; i < 1000; ++i)
 	{
 		auto const vec = random_vector();
-		auto const a = neutrino::renormalize (rand(), Range<double> (0, RAND_MAX), Range<si::Angle> (-1_rad * pi, +1_rad * pi));
+		auto const a = nu::renormalize (rand(), nu::Range<double> (0, RAND_MAX), nu::Range<si::Angle> (-1_rad * pi, +1_rad * pi));
 		auto const x = SpaceVector { 1.0 * rand(), 1.0 * rand(), 1.0 * rand() }.normalized();
 		auto const q_rotation = quaternion_rotation_about (x, a);
 		auto const m_rotation = matrix_rotation_about (x, a);
@@ -238,7 +238,7 @@ AutoTest t5 ("Math: random rotations fuzz", []{
 });
 
 
-AutoTest t6 ("Math: fixed orientation helper rotations", []{
+nu::AutoTest t6 ("Math: fixed orientation helper rotations", []{
 	for (int i = 0; i < 100; ++i)
 	{
 		auto const position = SpaceLength<WorldSpace> { 1_m, 1_m, 1_m };

@@ -30,7 +30,7 @@ SingleMachineManager::SingleMachineManager (std::unique_ptr<Machine> machine, Xe
 	_machine (std::move (machine))
 {
 	if (!_machine)
-		throw InvalidArgument ("SingleMachineManager: machine must be non-null");
+		throw nu::InvalidArgument ("SingleMachineManager: machine must be non-null");
 
 	_configurator_widget = std::make_unique<ConfiguratorWidget> (*_machine, nullptr);
 }

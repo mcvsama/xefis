@@ -80,7 +80,7 @@ compute_ground_shape (si::LonLatRadius<> const observer_position,
 
 [[nodiscard]]
 Shape
-compute_sky_dome_shape (SkyDomeParameters const& params, neutrino::WorkPerformer* work_performer = nullptr);
+compute_sky_dome_shape (SkyDomeParameters const& params, nu::WorkPerformer* work_performer = nullptr);
 
 } // namespace xf
 

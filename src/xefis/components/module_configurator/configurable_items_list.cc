@@ -57,7 +57,7 @@ ConfigurableItemsList::ConfigurableItemsList (Machine& machine, QWidget* parent)
 	layout->setContentsMargins (0, 0, 0, 0);
 	layout->addWidget (_list);
 
-	auto lh = default_line_height (this);
+	auto lh = nu::default_line_height (this);
 	setMinimumWidth (25.0f * lh);
 
 	_refresh_timer = new QTimer (this);
@@ -92,7 +92,7 @@ template<class TempContainer, class ItemToPointerMapper>
 				auto new_end = std::remove (container.begin(), container.end(), ptr);
 
 				if (new_end != container.end())
-					container.resize (neutrino::to_unsigned (std::distance (container.begin(), new_end)));
+					container.resize (nu::to_unsigned (std::distance (container.begin(), new_end)));
 				else
 					delete tree.takeChild (ci--);
 			}

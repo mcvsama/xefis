@@ -109,8 +109,8 @@ compute_greenwich_mean_sidereal_time_at_0h_ut (double const julian_date)
 		+ 0.065707485828 * whole_days_since_epoch
 		+ 1.00273790935 * hours_since_midnight
 		+ 0.0854103 * centuries_since_epoch
-		+ 0.0000258 * neutrino::square (centuries_since_epoch);
-	return 15_deg * floored_mod (gmst_hours, 24.0);
+		+ 0.0000258 * nu::square (centuries_since_epoch);
+	return 15_deg * nu::floored_mod (gmst_hours, 24.0);
 }
 
 

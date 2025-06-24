@@ -43,7 +43,7 @@ AngularServo::AngularServo (rigid_body::AngularServoConstraint& constraint, si::
 void
 AngularServo::set_setpoint (si::Angle const setpoint)
 {
-	_constraint.set_setpoint (neutrino::quantized (setpoint, 1 / _resolution, _constraint.angle_range()));
+	_constraint.set_setpoint (nu::quantized (setpoint, 1 / _resolution, _constraint.angle_range()));
 }
 
 

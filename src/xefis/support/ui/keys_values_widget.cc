@@ -31,7 +31,7 @@ KeysValuesWidget::KeysValuesWidget (std::u8string_view const title, QWidget* par
 	_layout (new QGridLayout (this))
 {
 	setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Fixed);
-	setTitle (to_qstring (title));
+	setTitle (nu::to_qstring (title));
 }
 
 
@@ -39,7 +39,7 @@ void
 KeysValuesWidget::add (std::u8string_view const title, QLabel& value_label)
 {
 	auto const row = _layout->rowCount();
-	_layout->addWidget (new QLabel (to_qstring (title)), row, 0);
+	_layout->addWidget (new QLabel (nu::to_qstring (title)), row, 0);
 	_layout->addWidget (&value_label, row, 1);
 }
 

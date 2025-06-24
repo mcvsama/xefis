@@ -50,7 +50,7 @@ SoundManager::Sound::stop()
 }
 
 
-SoundManager::SoundManager (Logger const& logger):
+SoundManager::SoundManager (nu::Logger const& logger):
 	_logger (logger.with_context ("<sound manager>"))
 {
 	_logger << "Creating SoundManager" << std::endl;

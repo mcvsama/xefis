@@ -71,7 +71,7 @@ debug_bool (std::string const& name, bool default_value, std::function<void()> c
 	else
 	{
 		auto& details = check_boxes.emplace(
-			std::make_pair (name, Details { new QCheckBox (neutrino::to_qstring (name)), default_value })
+			std::make_pair (name, Details { new QCheckBox (nu::to_qstring (name)), default_value })
 		).first->second;
 
 		auto& check_box = *details.check_box;
