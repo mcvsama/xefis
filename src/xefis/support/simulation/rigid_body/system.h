@@ -41,7 +41,7 @@ class Group;
 /**
  * A system of rigid bodies connected with constraints.
  */
-class System: private Noncopyable
+class System: private nu::Noncopyable
 {
   public:
 	using FramePrecomputations	= std::vector<std::unique_ptr<BasicFramePrecomputation>>;

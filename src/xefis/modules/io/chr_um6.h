@@ -35,8 +35,9 @@
 #include <memory>
 
 
-namespace si = neutrino::si;
-using namespace neutrino::si::literals;
+namespace nu = neutrino;
+namespace si = nu::si;
+using namespace nu::si::literals;
 
 
 class CHRUM6_IO: public xf::Module
@@ -105,7 +106,7 @@ class CHRUM6:
   public:
 	// Ctor
 	explicit
-	CHRUM6 (xf::ProcessingLoop&, xf::SerialPort&& serial_port, xf::Logger const&, std::string_view const instance = {});
+	CHRUM6 (xf::ProcessingLoop&, nu::SerialPort&& serial_port, nu::Logger const&, std::string_view const instance = {});
 
 	// Module API
 	void
@@ -251,12 +252,12 @@ class CHRUM6:
 
   private:
 	CHRUM6_IO&									_io									{ *this };
-	xf::Logger									_logger;
+	nu::Logger									_logger;
 	std::unique_ptr<QTimer>						_restart_timer;
 	std::unique_ptr<QTimer>						_alive_check_timer;
 	std::unique_ptr<QTimer>						_status_check_timer;
 	std::unique_ptr<QTimer>						_initialization_timer;
-	xf::SerialPort								_serial_port;
+	nu::SerialPort								_serial_port;
 	std::unique_ptr<xf::CHRUM6>					_sensor;
 	int											_failure_count						{ 0 };
 	Stage										_stage								{ Stage::Initialize };

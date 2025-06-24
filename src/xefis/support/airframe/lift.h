@@ -40,7 +40,7 @@ class Lift
 	/**
 	 * Get range of AOA for which lift is defined.
 	 */
-	Range<si::Angle>
+	nu::Range<si::Angle>
 	get_aoa_range() const noexcept;
 
 	/**
@@ -71,14 +71,14 @@ class Lift
 
   private:
 	// TODO Reynolds to Angle to LiftCoefficient
-	Field<si::Angle, LiftCoefficient>	_aoa_to_cl					{ };
-	Field<LiftCoefficient, si::Angle>	_cl_to_aoa_normal_regime	{ };
-	LiftCoefficient						_max_cl;
-	si::Angle							_critical_aoa;
+	nu::Field<si::Angle, LiftCoefficient>	_aoa_to_cl {};
+	nu::Field<LiftCoefficient, si::Angle>	_cl_to_aoa_normal_regime {};
+	LiftCoefficient							_max_cl;
+	si::Angle								_critical_aoa;
 };
 
 
-inline Range<si::Angle>
+inline nu::Range<si::Angle>
 Lift::get_aoa_range() const noexcept
 {
 	return _aoa_to_cl.domain();

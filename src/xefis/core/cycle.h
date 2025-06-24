@@ -37,7 +37,7 @@ class Cycle
   public:
 	// Ctor
 	explicit
-	Cycle (Number number, si::Time update_time, si::Time update_dt, si::Time intended_update_dt, Logger const&);
+	Cycle (Number number, si::Time update_time, si::Time update_dt, si::Time intended_update_dt, nu::Logger const&);
 
 	/**
 	 * Return this cycle serial number.
@@ -77,7 +77,7 @@ class Cycle
 	 * Return logger to use.
 	 */
 	[[nodiscard]]
-	Logger const&
+	nu::Logger const&
 	logger() const noexcept
 		{ return _logger; }
 
@@ -86,12 +86,12 @@ class Cycle
 	si::Time	_update_time;
 	si::Time	_update_dt;
 	si::Time	_intended_update_dt;
-	Logger		_logger;
+	nu::Logger	_logger;
 };
 
 
 inline
-Cycle::Cycle (Number number, si::Time update_time, si::Time update_dt, si::Time intended_update_dt, Logger const& logger):
+Cycle::Cycle (Number number, si::Time update_time, si::Time update_dt, si::Time intended_update_dt, nu::Logger const& logger):
 	_number (number),
 	_update_time (update_time),
 	_update_dt (update_dt),

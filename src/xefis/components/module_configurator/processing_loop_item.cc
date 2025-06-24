@@ -37,8 +37,8 @@ ProcessingLoopItem::ProcessingLoopItem (ProcessingLoop& processing_loop, QTreeWi
 	QTreeWidgetItem (&parent, { "", "", "" }),
 	_processing_loop (processing_loop)
 {
-	setup_appereance (*this);
-	setText (ConfigurableItemsList::NameColumn, neutrino::to_qstring (_processing_loop.instance()));
+	nu::setup_appereance (*this);
+	setText (ConfigurableItemsList::NameColumn, nu::to_qstring (_processing_loop.instance()));
 }
 
 } // namespace xf::configurator

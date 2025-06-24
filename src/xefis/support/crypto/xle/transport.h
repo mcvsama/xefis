@@ -61,7 +61,7 @@ class Transport
 		SeqNumFromFarFuture,
 	};
 
-	class DecryptionFailure: public neutrino::Exception
+	class DecryptionFailure: public nu::Exception
 	{
 	  public:
 		DecryptionFailure (ErrorCode, std::string_view const message);
@@ -75,11 +75,11 @@ class Transport
 	};
 
   protected:
-	static constexpr Hash::Algorithm const kSignatureHMACHashAlgorithm = Hash::SHA3_256;
-	static constexpr Hash::Algorithm const kDataEncryptionKeyHKDFHashAlgorithm = Hash::SHA3_256;
-	static constexpr Hash::Algorithm const kDataNonceHashAlgorithm = Hash::SHA3_256;
-	static constexpr Hash::Algorithm const kSeqNumEncryptionKeyHKDFHashAlgorithm = Hash::SHA3_256;
-	static constexpr Hash::Algorithm const kSeqNumNonceHashAlgorithm = Hash::SHA3_256;
+	static constexpr nu::Hash::Algorithm const kSignatureHMACHashAlgorithm				= nu::Hash::SHA3_256;
+	static constexpr nu::Hash::Algorithm const kDataEncryptionKeyHKDFHashAlgorithm		= nu::Hash::SHA3_256;
+	static constexpr nu::Hash::Algorithm const kDataNonceHashAlgorithm					= nu::Hash::SHA3_256;
+	static constexpr nu::Hash::Algorithm const kSeqNumEncryptionKeyHKDFHashAlgorithm	= nu::Hash::SHA3_256;
+	static constexpr nu::Hash::Algorithm const kSeqNumNonceHashAlgorithm				= nu::Hash::SHA3_256;
 
   public:
 	// Ctor
@@ -99,7 +99,7 @@ class Transport
 	 */
 	Blob
 	data_encryption_key_hash() const
-		{ return compute_hash<Hash::SHA3_256> (*_data_encryption_key); }
+		{ return nu::compute_hash<nu::Hash::SHA3_256> (*_data_encryption_key); }
 
 	/**
 	 * Return how much larger the resulting packet will be compared to plain text.
@@ -110,11 +110,11 @@ class Transport
 		{ return sizeof (SequenceNumber) + hmac_size + kDataSaltSize; }
 
   protected:
-	size_t			_hmac_size;
-	Secure<Blob>	_hmac_key;
-	Secure<Blob>	_data_encryption_key;
-	Secure<Blob>	_seq_num_encryption_key;
-	SequenceNumber	_sequence_number	{ 0 };
+	size_t				_hmac_size;
+	nu::Secure<Blob>	_hmac_key;
+	nu::Secure<Blob>	_data_encryption_key;
+	nu::Secure<Blob>	_seq_num_encryption_key;
+	SequenceNumber		_sequence_number	{ 0 };
 };
 
 
@@ -158,7 +158,7 @@ class Receiver: public Transport
 
 inline
 Transport::DecryptionFailure::DecryptionFailure (ErrorCode const error_code, std::string_view const message):
-	neutrino::Exception (message, false),
+	nu::Exception (message, false),
 	_error_code (error_code)
 { }
 

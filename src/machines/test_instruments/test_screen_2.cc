@@ -21,7 +21,7 @@
 #include <cstddef>
 
 
-TestScreen2::TestScreen2 (xf::ProcessingLoop& loop, xf::ScreenSpec const& spec, xf::Graphics const& graphics, xf::NavaidStorage const& navaid_storage, xf::Machine& machine, xf::Logger const& logger):
+TestScreen2::TestScreen2 (xf::ProcessingLoop& loop, xf::ScreenSpec const& spec, xf::Graphics const& graphics, xf::NavaidStorage const& navaid_storage, xf::Machine& machine, nu::Logger const& logger):
 	Screen (spec, graphics, machine, "Test Screen 2", logger.with_context ("TestScreen2")),
 	_logger (logger),
 	_graphics (graphics),

@@ -36,8 +36,9 @@
 #include <cstddef>
 
 
-namespace si = neutrino::si;
-using namespace neutrino::si::literals;
+namespace nu = neutrino;
+namespace si = nu::si;
+using namespace nu::si::literals;
 
 
 namespace adi_detail {
@@ -413,7 +414,7 @@ class ArtificialHorizon
 	static inline QColor const	kGroundShadow	{ get_darker_alpha (kGroundColor, 400, 127) };
 
   private:
-	xf::Synchronized<ArtificialHorizon*> mutable
+	nu::Synchronized<ArtificialHorizon*> mutable
 					_mutable_this { this };
 
 	QTransform		_pitch_transform;
@@ -477,7 +478,7 @@ class VelocityLadder
 	kt_to_px (AdiPaintRequest&, si::Velocity) const;
 
   private:
-	xf::Synchronized<VelocityLadder*> mutable _mutable_this { this };
+	nu::Synchronized<VelocityLadder*> mutable _mutable_this { this };
 	QTransform		_transform;
 	si::Velocity	_min_shown;
 	si::Velocity	_max_shown;
@@ -554,7 +555,7 @@ class AltitudeLadder
 	ft_to_px (AdiPaintRequest&, si::Length) const;
 
   private:
-	xf::Synchronized<AltitudeLadder*> mutable _mutable_this { this };
+	nu::Synchronized<AltitudeLadder*> mutable _mutable_this { this };
 	QTransform			_transform;
 	si::Length			_min_shown;
 	si::Length			_max_shown;
@@ -626,7 +627,7 @@ class PaintingWork
 	paint_radar_altimeter_failure (AdiPaintRequest&) const;
 
   private:
-	xf::Synchronized<PaintingWork*>	mutable
+	nu::Synchronized<PaintingWork*>	mutable
 							_mutable_this						{ this };
 
 	Parameters				_parameters;
@@ -862,13 +863,13 @@ class ADI: public ADI_IO
 	 */
 	template<class FloatingPoint>
 		bool
-		is_sane (xf::Socket<FloatingPoint> const&, xf::Range<FloatingPoint> const&);
+		is_sane (xf::Socket<FloatingPoint> const&, nu::Range<FloatingPoint> const&);
 
   private:
 	ADI_IO&										_io { *this };
 	xf::SocketObserver							_fpv_computer;
 	adi_detail::PaintingWork					_painting_work;
-	xf::Synchronized<adi_detail::Parameters>	_parameters;
+	nu::Synchronized<adi_detail::Parameters>	_parameters;
 	xf::EventTimestamper						_decision_height_became_visible;
 	xf::EventTimestamper						_altitude_agl_became_visible;
 	xf::EventTimestamper						_speed_failure_timestamp;

@@ -55,7 +55,7 @@ Simulation::Simulation (Machine& machine, Models& models, si::LonLatRadius<> con
 		.max_angular_velocity	= 1e6_radps,
 	});
 
-	_simulator.emplace (_rigid_body_system, _rigid_body_solver, neutrino::TimeHelper::utc_now(), 1_ms, _logger.with_context ("Simulator"));
+	_simulator.emplace (_rigid_body_system, _rigid_body_solver, nu::TimeHelper::utc_now(), 1_ms, _logger.with_context ("Simulator"));
 
 	_simulator_widget.emplace (*_simulator, nullptr);
 	_simulator_widget->set_machine (&machine);

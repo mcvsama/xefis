@@ -23,7 +23,7 @@ namespace xf {
 void
 TextLayout::Fragment::paint (QPointF top_left, TextPainter& painter, std::optional<Shadow> shadow) const
 {
-	QPointF lh_corr (0.0, 0.5 * (neutrino::line_height (_metrics) - _height));
+	QPointF lh_corr (0.0, 0.5 * (nu::line_height (_metrics) - _height));
 	painter.setFont (_font);
 	painter.setPen (QPen (_color, 1.0));
 	painter.fast_draw_text (top_left - lh_corr, Qt::AlignTop | Qt::AlignLeft, _text, shadow);

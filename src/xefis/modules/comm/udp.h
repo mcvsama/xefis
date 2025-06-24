@@ -31,6 +31,9 @@
 #include <cstddef>
 
 
+namespace nu = neutrino;
+
+
 class UDP: public xf::Module
 {
   public:
@@ -69,7 +72,7 @@ class UDP: public xf::Module
   public:
 	// Ctor
 	explicit
-	UDP (xf::ProcessingLoop&, Parameters, xf::Logger const&, std::string_view const instance = {});
+	UDP (xf::ProcessingLoop&, Parameters, nu::Logger const&, std::string_view const instance = {});
 
 	// Module API
 	void
@@ -91,7 +94,7 @@ class UDP: public xf::Module
 
   private:
 	Parameters						_parameters;
-	xf::Logger						_logger;
+	nu::Logger						_logger;
 	QByteArray						_received_datagram;
 	xf::SocketChanged				_send_changed	{ this->send };
 	QHostAddress					_tx_qhostaddress;

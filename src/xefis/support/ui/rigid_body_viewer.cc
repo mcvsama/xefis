@@ -32,7 +32,7 @@
 
 namespace xf {
 
-RigidBodyViewer::RigidBodyViewer (QWidget* parent, RefreshRate const refresh_rate, neutrino::WorkPerformer* work_performer):
+RigidBodyViewer::RigidBodyViewer (QWidget* parent, RefreshRate const refresh_rate, nu::WorkPerformer* work_performer):
 	GLAnimationWidget (parent, refresh_rate, std::bind (&RigidBodyViewer::paint, this, std::placeholders::_1)),
 	_rigid_body_painter (si::PixelDensity (screen()->physicalDotsPerInch()), work_performer)
 {
@@ -179,8 +179,8 @@ RigidBodyViewer::mouseMoveEvent (QMouseEvent* event)
 	{
 		auto const scale = kRotationScale / pixel_density;
 		_camera_rotation.x() += scale * delta.y();
-		_camera_rotation.x() = neutrino::clamp<si::Angle> (_camera_rotation.x(), { -90_deg, +90_deg });
-		_camera_rotation.y() = -floored_mod (-_camera_rotation.y() - scale * delta.x(), 360_deg);
+		_camera_rotation.x() = nu::clamp<si::Angle> (_camera_rotation.x(), { -90_deg, +90_deg });
+		_camera_rotation.y() = -nu::floored_mod (-_camera_rotation.y() - scale * delta.x(), 360_deg);
 		forward_camera_rotation();
 	}
 

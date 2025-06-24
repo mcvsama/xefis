@@ -249,7 +249,7 @@ template<TriangleConcept Triangle>
 	triangle_surface_normal (Triangle const& triangle)
 	{
 		if (std::size (triangle) != 3)
-			throw InvalidArgument ("triangle_surface_normal(): std::size (triangle) must be 3");
+			throw nu::InvalidArgument ("triangle_surface_normal(): std::size (triangle) must be 3");
 
 		return triangle_surface_normal (triangle[0], triangle[1], triangle[2]);
 	}
@@ -278,7 +278,7 @@ area_2d (TriangleConcept auto const& triangle)
 	using std::size;
 
 	if (size (triangle) != 3)
-		throw InvalidArgument ("area(): std::size (triangle) must be 3");
+		throw nu::InvalidArgument ("area(): std::size (triangle) must be 3");
 
 	return area_2d (triangle[0], triangle[1], triangle[2]);
 }

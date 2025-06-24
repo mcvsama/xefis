@@ -36,8 +36,8 @@ TextPainter::Cache::Glyph::Glyph (QFont const& font, QColor color, QChar charact
 {
 	QFontMetricsF metrics (font);
 	position_correction.setX (position_correction.x() * metrics.horizontalAdvance ("0"));
-	position_correction.setY (position_correction.y() * neutrino::line_height (metrics));
-	QSize size (std::ceil (metrics.horizontalAdvance (character)) + 1, std::ceil (neutrino::line_height (metrics)) + 1);
+	position_correction.setY (position_correction.y() * nu::line_height (metrics));
+	QSize size (std::ceil (metrics.horizontalAdvance (character)) + 1, std::ceil (nu::line_height (metrics)) + 1);
 	QImage image (size, QImage::Format_ARGB32_Premultiplied);
 	QColor alpha = color;
 	alpha.setAlpha (0);
@@ -116,7 +116,7 @@ QRectF
 TextPainter::get_text_box (QPointF const& position, Qt::Alignment flags, QString const& text) const
 {
 	QFontMetricsF metrics (font());
-	QRectF target (position.x(), position.y(), metrics.horizontalAdvance (text), neutrino::line_height (metrics));
+	QRectF target (position.x(), position.y(), metrics.horizontalAdvance (text), nu::line_height (metrics));
 	apply_alignment (target, flags);
 
 	return target;
@@ -132,7 +132,7 @@ TextPainter::get_vertical_text_box (QPointF const& position, Qt::Alignment flags
 	for (auto const& c: text)
 		widest_char = std::max<float> (widest_char, metrics.horizontalAdvance (c));
 
-	QRectF target (position.x(), position.y(), widest_char, neutrino::line_height (metrics) * text.size());
+	QRectF target (position.x(), position.y(), widest_char, nu::line_height (metrics) * text.size());
 	apply_alignment (target, flags);
 
 	return target;
@@ -143,7 +143,7 @@ void
 TextPainter::fast_draw_text (QPointF const& position, QString const& text, std::optional<Shadow> shadow)
 {
 	QFontMetricsF metrics (font());
-	QRectF target (position - QPointF (0.f, metrics.ascent()), QSizeF (metrics.horizontalAdvance (text), neutrino::line_height (metrics)));
+	QRectF target (position - QPointF (0.f, metrics.ascent()), QSizeF (metrics.horizontalAdvance (text), nu::line_height (metrics)));
 	fast_draw_text (target, {}, text, shadow);
 }
 
@@ -170,9 +170,9 @@ TextPainter::fast_draw_text (QRectF const& target, Qt::Alignment flags, QString 
 		offset.setX (target.left());
 
 	if (flags & Qt::AlignVCenter)
-		offset.setY (target_center.y() - 0.5f * neutrino::line_height (metrics));
+		offset.setY (target_center.y() - 0.5f * nu::line_height (metrics));
 	else if (flags & Qt::AlignBottom)
-		offset.setY (target.bottom() - neutrino::line_height (metrics));
+		offset.setY (target.bottom() - nu::line_height (metrics));
 	else // default: AlignTop
 		offset.setY (target.top());
 
@@ -218,8 +218,8 @@ TextPainter::fast_draw_text (QRectF const& target, Qt::Alignment flags, QString 
 		if (glyph == glyphs_cache->end())
 			glyph = glyphs_cache->insert ({ *c, Cache::Glyph (font(), color, *c, _position_correction, shadow) }).first;
 
-		float fx = floored_mod<float> (offset.x(), 1.f);
-		float fy = floored_mod<float> (offset.y(), 1.f);
+		float fx = nu::floored_mod<float> (offset.x(), 1.f);
+		float fy = nu::floored_mod<float> (offset.y(), 1.f);
 		int dx = std::clamp<int> (fx * Cache::Glyph::Rank, 0, Cache::Glyph::Rank - 1);
 		int dy = std::clamp<int> (fy * Cache::Glyph::Rank, 0, Cache::Glyph::Rank - 1);
 		drawImage (QPoint (offset.x(), offset.y()), glyph->second.data->positions[dx][dy]);
@@ -237,8 +237,8 @@ TextPainter::fast_draw_vertical_text (QPointF const& position, Qt::Alignment fla
 	QFontMetricsF metrics (font());
 	QRectF rect = get_vertical_text_box (position, flags, text);
 
-	QPointF top_char (rect.center().x(), rect.top() + 0.5f * neutrino::line_height (metrics));
-	QPointF char_height (0.f, neutrino::line_height (metrics));
+	QPointF top_char (rect.center().x(), rect.top() + 0.5f * nu::line_height (metrics));
+	QPointF char_height (0.f, nu::line_height (metrics));
 
 	for (int i = 0; i < text.size(); ++i)
 		fast_draw_text (top_char + i * char_height, Qt::AlignVCenter | Qt::AlignHCenter, text[i], shadow);

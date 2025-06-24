@@ -29,12 +29,14 @@
 namespace xf::test {
 namespace {
 
+namespace test_asserts = nu::test_asserts;
+
 using TestedType = int64_t;
 
 constexpr TestedType kValue1 = 5;
 constexpr TestedType kValue2 = -100;
 
-xf::Logger g_null_logger;
+nu::Logger g_null_logger;
 
 
 class TestCycle: public Cycle
@@ -81,7 +83,7 @@ template<class T>
 	};
 
 
-AutoTest t1 ("xf::SocketObserver noticing changes", []{
+nu::AutoTest t1 ("xf::SocketObserver noticing changes", []{
 	TestEnvironment<TestedType> env;
 
 	env.out = kValue1;
@@ -98,7 +100,7 @@ AutoTest t1 ("xf::SocketObserver noticing changes", []{
 });
 
 
-AutoTest t2 ("xf::SocketObserver set_minimum_dt()", []{
+nu::AutoTest t2 ("xf::SocketObserver set_minimum_dt()", []{
 	TestEnvironment<TestedType> env;
 
 	env.observer.set_minimum_dt (5_s);
@@ -113,7 +115,7 @@ AutoTest t2 ("xf::SocketObserver set_minimum_dt()", []{
 });
 
 
-AutoTest t3 ("xf::SocketObserver serial()", []{
+nu::AutoTest t3 ("xf::SocketObserver serial()", []{
 	TestEnvironment<TestedType> env;
 
 	auto serial = env.observer.serial();
@@ -131,7 +133,7 @@ AutoTest t3 ("xf::SocketObserver serial()", []{
 });
 
 
-AutoTest t4 ("xf::SocketObserver update_time()", []{
+nu::AutoTest t4 ("xf::SocketObserver update_time()", []{
 	TestEnvironment<TestedType> env;
 
 	auto ut = (env.cycle += 1_s).update_time();
@@ -152,7 +154,7 @@ AutoTest t4 ("xf::SocketObserver update_time()", []{
 });
 
 
-AutoTest t5 ("xf::SocketObserver touch()", []{
+nu::AutoTest t5 ("xf::SocketObserver touch()", []{
 	TestEnvironment<TestedType> env;
 
 	env.out = kValue1;
@@ -171,7 +173,7 @@ AutoTest t5 ("xf::SocketObserver touch()", []{
 });
 
 
-AutoTest t6 ("xf::SocketObserver depending smoothers", []{
+nu::AutoTest t6 ("xf::SocketObserver depending smoothers", []{
 	TestEnvironment<TestedType> env;
 	xf::Smoother<TestedType> smoother { 5_s };
 
@@ -192,7 +194,7 @@ AutoTest t6 ("xf::SocketObserver depending smoothers", []{
 });
 
 
-AutoTest t7 ("xf::SocketObserver observing other observers", []{
+nu::AutoTest t7 ("xf::SocketObserver observing other observers", []{
 	// TODO
 });
 

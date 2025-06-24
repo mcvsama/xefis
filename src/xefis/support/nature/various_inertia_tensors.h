@@ -48,9 +48,9 @@ template<math::CoordinateSystem Space = void>
 	make_cuboid_inertia_tensor (si::Mass const& mass, SpaceLength<> const& dimensions)
 	{
 		auto const k = mass / 12.0;
-		auto const i00 = k * (square (dimensions[1]) + square (dimensions[2]));
-		auto const i11 = k * (square (dimensions[0]) + square (dimensions[2]));
-		auto const i22 = k * (square (dimensions[0]) + square (dimensions[1]));
+		auto const i00 = k * (nu::square (dimensions[1]) + nu::square (dimensions[2]));
+		auto const i11 = k * (nu::square (dimensions[0]) + nu::square (dimensions[2]));
+		auto const i22 = k * (nu::square (dimensions[0]) + nu::square (dimensions[1]));
 		auto const zero = 0_kg * 0_m2;
 
 		return {
@@ -73,7 +73,7 @@ template<math::CoordinateSystem Space = void>
 	inline InertiaTensor<Space>
 	make_hollow_sphere_inertia_tensor (MassRadius const& params)
 	{
-		auto const i = params.mass * (2.0 / 3.0) * square (params.radius);
+		auto const i = params.mass * (2.0 / 3.0) * nu::square (params.radius);
 		auto const zero = 0_kg * 0_m2;
 
 		return {
@@ -88,7 +88,7 @@ template<math::CoordinateSystem Space = void>
 	inline InertiaTensor<Space>
 	make_solid_sphere_inertia_tensor (MassRadius const& params)
 	{
-		auto const i = params.mass * (2.0 / 5.0) * square (params.radius);
+		auto const i = params.mass * (2.0 / 5.0) * nu::square (params.radius);
 		auto const zero = 0_kg * 0_m2;
 
 		return {
@@ -107,9 +107,9 @@ template<math::CoordinateSystem Space = void>
 	inline InertiaTensor<Space>
 	make_centered_solid_cylinder_inertia_tensor (MassRadiusLength const& params)
 	{
-		auto const i00 = params.mass * (1.0 / 12.0) * (3.0 * square (params.radius) + square (params.length));
-		auto const i11 = params.mass * (1.0 / 12.0) * (3.0 * square (params.radius) + square (params.length));
-		auto const i22 = params.mass * (1.0 / 2.0) * square (params.radius);
+		auto const i00 = params.mass * (1.0 / 12.0) * (3.0 * nu::square (params.radius) + nu::square (params.length));
+		auto const i11 = params.mass * (1.0 / 12.0) * (3.0 * nu::square (params.radius) + nu::square (params.length));
+		auto const i22 = params.mass * (1.0 / 2.0) * nu::square (params.radius);
 		auto const zero = 0_kg * 0_m2;
 
 		return {

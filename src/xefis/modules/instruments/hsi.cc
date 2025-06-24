@@ -37,7 +37,7 @@ namespace hsi_detail {
 void
 Parameters::sanitize()
 {
-	using xf::floored_mod;
+	using nu::floored_mod;
 
 	range = std::clamp<si::Length> (range, 1_ft, 5000_nmi);
 
@@ -64,7 +64,7 @@ Parameters::sanitize()
 }
 
 
-PaintingWork::PaintingWork (xf::PaintRequest const& paint_request, xf::InstrumentSupport const& instrument_support, xf::NavaidStorage const& navaid_storage, Parameters const& parameters, ResizeCache& resize_cache, CurrentNavaids& current_navaids, Mutable& mutable_, xf::Logger const& logger):
+PaintingWork::PaintingWork (xf::PaintRequest const& paint_request, xf::InstrumentSupport const& instrument_support, xf::NavaidStorage const& navaid_storage, Parameters const& parameters, ResizeCache& resize_cache, CurrentNavaids& current_navaids, Mutable& mutable_, nu::Logger const& logger):
 	_logger (logger),
 	_paint_request (paint_request),
 	_navaid_storage (navaid_storage),
@@ -77,7 +77,7 @@ PaintingWork::PaintingWork (xf::PaintRequest const& paint_request, xf::Instrumen
 	_aids (*_aids_ptr)
 {
 	if (_p.track_magnetic && _p.heading_magnetic && _p.heading_true)
-		_track_true = xf::floored_mod (*_p.track_magnetic + (*_p.heading_true - *_p.heading_magnetic), 360_deg);
+		_track_true = nu::floored_mod (*_p.track_magnetic + (*_p.heading_true - *_p.heading_magnetic), 360_deg);
 	else
 		_track_true.reset();
 
@@ -156,7 +156,7 @@ PaintingWork::PaintingWork (xf::PaintRequest const& paint_request, xf::Instrumen
 		if (_p.heading_mode == hsi::HeadingMode::True)
 			*_ap_bug_magnetic += *_p.heading_true - *_p.heading_magnetic;
 
-		_ap_bug_magnetic = xf::floored_mod (*_ap_bug_magnetic, 360_deg);
+		_ap_bug_magnetic = nu::floored_mod (*_ap_bug_magnetic, 360_deg);
 	}
 
 	if (_p.course_setting_magnetic && _p.heading_magnetic && _p.heading_true)
@@ -166,7 +166,7 @@ PaintingWork::PaintingWork (xf::PaintRequest const& paint_request, xf::Instrumen
 		if (_p.heading_mode == hsi::HeadingMode::True)
 			*_course_heading += *_p.heading_true - *_p.heading_magnetic;
 
-		_course_heading = xf::floored_mod (*_course_heading, 360_deg);
+		_course_heading = nu::floored_mod (*_course_heading, 360_deg);
 	}
 
 	_navaid_selected_visible =
@@ -479,13 +479,13 @@ PaintingWork::paint_aircraft()
 				QFont font_2 (_aids.font_5.font);
 				QFontMetricsF metrics_1 (font_1);
 				QFontMetricsF metrics_2 (font_2);
-				QRectF rect_v (0.f, 0.f, metrics_2.horizontalAdvance (text_v), neutrino::line_height (metrics_2));
+				QRectF rect_v (0.f, 0.f, metrics_2.horizontalAdvance (text_v), nu::line_height (metrics_2));
 				_aids.centrify (rect_v);
 				rect_v.adjust (-margin, 0.f, +margin, 0.f);
-				QRectF rect_1 (0.f, 0.f, metrics_1.horizontalAdvance (text_1), neutrino::line_height (metrics_1));
+				QRectF rect_1 (0.f, 0.f, metrics_1.horizontalAdvance (text_1), nu::line_height (metrics_1));
 				_aids.centrify (rect_1);
 				rect_1.moveRight (rect_v.left() - 0.2f * _c.q);
-				QRectF rect_2 (0.f, 0.f, metrics_1.horizontalAdvance (text_2), neutrino::line_height (metrics_1));
+				QRectF rect_2 (0.f, 0.f, metrics_1.horizontalAdvance (text_2), nu::line_height (metrics_1));
 				_aids.centrify (rect_2);
 				rect_2.moveLeft (rect_v.right() + 0.2f * _c.q);
 
@@ -644,7 +644,7 @@ PaintingWork::paint_ap_settings()
 		switch (_p.display_mode)
 		{
 			case hsi::DisplayMode::Auxiliary:
-				limited_rotation = xf::floored_mod (*_ap_bug_magnetic - *_rotation + 180_deg, 360_deg) - 180_deg;
+				limited_rotation = nu::floored_mod (*_ap_bug_magnetic - *_rotation + 180_deg, 360_deg) - 180_deg;
 				break;
 
 			default:
@@ -799,7 +799,7 @@ PaintingWork::paint_track (bool paint_heading_triangle)
 
 			if (draw_text)
 			{
-				QRectF half_range_rect (0.f, 0.f, metrics.horizontalAdvance (half_range_str), neutrino::line_height (metrics));
+				QRectF half_range_rect (0.f, 0.f, metrics.horizontalAdvance (half_range_str), nu::line_height (metrics));
 				_aids.centrify (half_range_rect);
 				half_range_rect.moveRight (-2.f * range_tick_hpx);
 				half_range_rect.translate (0.f, -range_tick_vpx);
@@ -847,7 +847,7 @@ PaintingWork::paint_altitude_reach()
 
 	if (std::isfinite (pos))
 	{
-		using namespace neutrino::painter_literals;
+		using namespace nu::painter_literals;
 
 		_painter.setTransform (_c.aircraft_center_transform);
 		_painter.setClipping (false);
@@ -1255,9 +1255,11 @@ PaintingWork::paint_selected_navaid_info()
 	std::string course_str = "/---°";
 	if (_p.navaid_selected_course_magnetic)
 	{
-		int course_int = xf::symmetric_round (_p.navaid_selected_course_magnetic->in<si::Degree>());
+		int course_int = nu::symmetric_round (_p.navaid_selected_course_magnetic->in<si::Degree>());
+
 		if (course_int == 0)
 			course_int = 360;
+
 		course_str = std::format ("/{:03d}°", course_int);
 	}
 
@@ -1490,11 +1492,11 @@ PaintingWork::paint_range()
 		QString r;
 
 		if (_p.range < 1_nmi)
-			r = neutrino::to_qstring (std::format ("{:.1f}", _p.range.in<si::NauticalMile>()));
+			r = nu::to_qstring (std::format ("{:.1f}", _p.range.in<si::NauticalMile>()));
 		else
-			r = neutrino::to_qstring (std::format ("{:d}", static_cast<int> (_p.range.in<si::NauticalMile>())));
+			r = nu::to_qstring (std::format ("{:d}", static_cast<int> (_p.range.in<si::NauticalMile>())));
 
-		QRectF rect (0.f, 0.f, std::max (metr_a.horizontalAdvance (s), metr_b.horizontalAdvance (r)) + 0.4f * _c.q, neutrino::line_height (metr_a) + neutrino::line_height (metr_b));
+		QRectF rect (0.f, 0.f, std::max (metr_a.horizontalAdvance (s), metr_b.horizontalAdvance (r)) + 0.4f * _c.q, nu::line_height (metr_a) + nu::line_height (metr_b));
 
 		_painter.setClipping (false);
 		_painter.resetTransform();
@@ -1854,7 +1856,7 @@ PaintingWork::paint_locs()
 		_painter.drawLine (pt_0, pt_1);
 		_painter.drawLine (pt_0, pt_2);
 
-		QPointF text_offset (0.5f * font_metrics.horizontalAdvance (navaid.identifier()), -0.35f * neutrino::line_height (font_metrics));
+		QPointF text_offset (0.5f * font_metrics.horizontalAdvance (navaid.identifier()), -0.35f * nu::line_height (font_metrics));
 		texts_to_paint.emplace_back (transform.map (pt_0 + QPointF (0.f, 0.6f * _c.q)) - text_offset, navaid.identifier());
 	};
 
@@ -2100,7 +2102,7 @@ PaintingWork::to_px (si::Length const length) const
 } // namespace hsi_detail
 
 
-HSI::HSI (xf::ProcessingLoop& loop, xf::Graphics const& graphics, xf::NavaidStorage const& navaid_storage, xf::Logger const& logger, std::string_view const instance):
+HSI::HSI (xf::ProcessingLoop& loop, xf::Graphics const& graphics, xf::NavaidStorage const& navaid_storage, nu::Logger const& logger, std::string_view const instance):
 	HSI_IO (loop, instance),
 	_logger (logger.with_context (std::string (kLoggerScope) + "#" + instance)),
 	_navaid_storage (navaid_storage),
@@ -2129,19 +2131,19 @@ HSI::process (xf::Cycle const& cycle)
 	params.course_setting_magnetic = _io.course_setting_magnetic.get_optional();
 	params.course_deviation = _io.course_deviation.get_optional();
 	params.course_to_flag = _io.course_to_flag.get_optional();
-	params.navaid_selected_reference = neutrino::to_qstring (_io.navaid_selected_reference.value_or (""));
-	params.navaid_selected_identifier = neutrino::to_qstring (_io.navaid_selected_identifier.value_or (""));
+	params.navaid_selected_reference = nu::to_qstring (_io.navaid_selected_reference.value_or (""));
+	params.navaid_selected_identifier = nu::to_qstring (_io.navaid_selected_identifier.value_or (""));
 	params.navaid_selected_distance = _io.navaid_selected_distance.get_optional();
 	params.navaid_selected_eta = _io.navaid_selected_eta.get_optional();
 	params.navaid_selected_course_magnetic = _io.navaid_selected_course_magnetic.get_optional();
-	params.navaid_left_reference = neutrino::to_qstring (_io.navaid_left_reference.value_or (""));
+	params.navaid_left_reference = nu::to_qstring (_io.navaid_left_reference.value_or (""));
 	params.navaid_left_type = _io.navaid_left_type.value_or (hsi::NavType::A);
-	params.navaid_left_identifier = neutrino::to_qstring (_io.navaid_left_identifier.value_or (""));
+	params.navaid_left_identifier = nu::to_qstring (_io.navaid_left_identifier.value_or (""));
 	params.navaid_left_distance = _io.navaid_left_distance.get_optional();
 	params.navaid_left_initial_bearing_magnetic = _io.navaid_left_initial_bearing_magnetic.get_optional();
 	params.navaid_right_type = _io.navaid_right_type.value_or (hsi::NavType::A);
-	params.navaid_right_reference = neutrino::to_qstring (_io.navaid_right_reference.value_or (""));
-	params.navaid_right_identifier = neutrino::to_qstring (_io.navaid_right_identifier.value_or (""));
+	params.navaid_right_reference = nu::to_qstring (_io.navaid_right_reference.value_or (""));
+	params.navaid_right_identifier = nu::to_qstring (_io.navaid_right_identifier.value_or (""));
 	params.navaid_right_distance = _io.navaid_right_distance.get_optional();
 	params.navaid_right_initial_bearing_magnetic = _io.navaid_right_initial_bearing_magnetic.get_optional();
 	params.navigation_required_performance = _io.navigation_required_performance.get_optional();
@@ -2181,8 +2183,8 @@ HSI::process (xf::Cycle const& cycle)
 	params.ndb_visible = _io.features_ndb.value_or (false);
 	params.loc_visible = _io.features_loc.value_or (false);
 	params.arpt_visible = _io.features_arpt.value_or (false);
-	params.highlighted_loc = neutrino::to_qstring (_io.localizer_id.value_or (""));
-	params.positioning_hint.set (_io.position_source ? std::make_optional (neutrino::to_qstring (*_io.position_source)) : std::nullopt, _io.position_source.modification_timestamp());
+	params.highlighted_loc = nu::to_qstring (_io.localizer_id.value_or (""));
+	params.positioning_hint.set (_io.position_source ? std::make_optional (nu::to_qstring (*_io.position_source)) : std::nullopt, _io.position_source.modification_timestamp());
 	params.tcas_on = _io.tcas_on.get_optional();
 	params.tcas_range = _io.tcas_range.get_optional();
 	params.arpt_runways_range_threshold = *_io.arpt_runways_range_threshold;

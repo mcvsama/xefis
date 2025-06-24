@@ -25,6 +25,9 @@
 namespace xf::test {
 namespace {
 
+namespace test_asserts = nu::test_asserts;
+
+
 template<class Function>
 	void test_nans_for_altitude (Function&& function)
 	{
@@ -43,22 +46,22 @@ template<class Function>
 	}
 
 
-AutoTest t_standard_density ("xf::standard_density() doesn't return NaNs", []{
+nu::AutoTest t_standard_density ("xf::standard_density() doesn't return NaNs", []{
 	test_nans_for_altitude (standard_density);
 });
 
 
-AutoTest t_standard_pressure ("xf::standard_pressure() doesn't return NaNs", []{
+nu::AutoTest t_standard_pressure ("xf::standard_pressure() doesn't return NaNs", []{
 	test_nans_for_altitude (standard_pressure);
 });
 
 
-AutoTest t_standard_temperature ("xf::standard_temperature() doesn't return NaNs", []{
+nu::AutoTest t_standard_temperature ("xf::standard_temperature() doesn't return NaNs", []{
 	test_nans_for_altitude (standard_temperature);
 });
 
 
-AutoTest t_standard_temperature_gradient ("xf::standard_temperature_gradient() doesn't return NaNs", []{
+nu::AutoTest t_standard_temperature_gradient ("xf::standard_temperature_gradient() doesn't return NaNs", []{
 	test_nans_for_altitude (standard_temperature_gradient);
 });
 

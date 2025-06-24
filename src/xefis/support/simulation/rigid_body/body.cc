@@ -106,7 +106,7 @@ Body::translational_kinetic_energy() const
 {
 	auto const mm = mass_moments<BodyCOM>();
 	auto const vm = velocity_moments<WorldSpace>();
-	return 0.5 * mm.mass() * square (abs (vm.velocity()));
+	return 0.5 * mm.mass() * nu::square (abs (vm.velocity()));
 }
 
 

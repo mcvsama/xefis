@@ -40,8 +40,8 @@ namespace xf {
  * perspective, but I guess it's OK enough as it is now.
  */
 class BasicSocket:
-	private Noncopyable,
-	private Nonmovable
+	private nu::Noncopyable,
+	private nu::Nonmovable
 {
 	template<class Value>
 		friend class Socket;
@@ -128,7 +128,7 @@ class BasicSocket:
 	[[nodiscard]]
 	si::Time
 	modification_age() const noexcept
-		{ return TimeHelper::utc_now() - modification_timestamp(); }
+		{ return nu::TimeHelper::utc_now() - modification_timestamp(); }
 
 	/**
 	 * Return timestamp of the last non-nil value.
@@ -145,7 +145,7 @@ class BasicSocket:
 	[[nodiscard]]
 	si::Time
 	valid_age() const noexcept
-		{ return TimeHelper::utc_now() - valid_timestamp(); }
+		{ return nu::TimeHelper::utc_now() - valid_timestamp(); }
 
 	/**
 	 * Number of sockets reading value from this socket.
@@ -275,7 +275,7 @@ inline void
 BasicSocket::dec_readers_count (BasicSocket* listener)
 {
 	auto new_end = std::remove (_targets.begin(), _targets.end(), listener);
-	_targets.resize (neutrino::to_unsigned (std::distance (_targets.begin(), new_end)));
+	_targets.resize (nu::to_unsigned (std::distance (_targets.begin(), new_end)));
 }
 
 } // namespace xf

@@ -29,7 +29,7 @@
 
 namespace xf::electrical {
 
-class Element: public Noncopyable
+class Element: public nu::Noncopyable
 {
   public:
 	enum Type

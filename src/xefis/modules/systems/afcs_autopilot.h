@@ -30,8 +30,9 @@
 #include <cstddef>
 
 
-namespace si = neutrino::si;
-using namespace neutrino::si::literals;
+namespace nu = neutrino;
+namespace si = nu::si;
+using namespace nu::si::literals;
 
 
 class AFCS_Autopilot_IO: public xf::Module
@@ -84,7 +85,7 @@ class AFCS_Autopilot: public AFCS_Autopilot_IO
   public:
 	// Ctor
 	explicit
-	AFCS_Autopilot (xf::ProcessingLoop&, xf::Logger const&, std::string_view const instance = {});
+	AFCS_Autopilot (xf::ProcessingLoop&, nu::Logger const&, std::string_view const instance = {});
 
   protected:
 	// Module API
@@ -114,7 +115,7 @@ class AFCS_Autopilot: public AFCS_Autopilot_IO
 
   private:
 	AFCS_Autopilot_IO&						_io					{ *this };
-	xf::Logger								_logger;
+	nu::Logger								_logger;
 	xf::PIDController<si::Angle, si::Angle>	_elevator_pid;
 	xf::PIDController<si::Angle, si::Angle>	_ailerons_pid;
 	xf::Smoother<si::Angle>					_elevator_smoother	{ 50_ms };

@@ -23,10 +23,10 @@
 
 namespace xf {
 
-std::optional<Logger> g_connectable_socket_exception_logger;
+std::optional<nu::Logger> g_connectable_socket_exception_logger;
 
 
-Logger const*
+nu::Logger const*
 connectable_socket_fetch_exception_logger()
 {
 	if (g_connectable_socket_exception_logger)
@@ -37,7 +37,7 @@ connectable_socket_fetch_exception_logger()
 
 
 void
-set_connectable_socket_fetch_exception_logger (Logger const* logger)
+set_connectable_socket_fetch_exception_logger (nu::Logger const* logger)
 {
 	if (logger)
 		g_connectable_socket_exception_logger = *logger;

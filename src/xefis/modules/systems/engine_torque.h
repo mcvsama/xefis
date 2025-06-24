@@ -29,14 +29,15 @@
 #include <variant>
 
 
-namespace si = neutrino::si;
-using namespace neutrino::si::literals;
+namespace nu = neutrino;
+namespace si = nu::si;
+using namespace nu::si::literals;
 
 
 class EngineTorqueIO: public xf::Module
 {
   public:
-	using EfficiencyField	= xf::Field<si::AngularVelocity, double>;
+	using EfficiencyField	= nu::Field<si::AngularVelocity, double>;
 	using EngineEfficiency	= std::variant<double, EfficiencyField>;
 	using MotorKv			= decltype (1_rpm / 1_V);
 

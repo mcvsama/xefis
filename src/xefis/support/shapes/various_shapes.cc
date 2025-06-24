@@ -285,7 +285,7 @@ template<class SetupMaterial>
 		Shape shape;
 		shape.triangle_strips().reserve (n_stacks);
 
-		[[maybe_unused]] auto all_materials_set_up = std::conditional_t<asynchronous_setup_material, neutrino::WaitGroup, std::monostate>();
+		[[maybe_unused]] auto all_materials_set_up = std::conditional_t<asynchronous_setup_material, nu::WaitGroup, std::monostate>();
 		[[maybe_unused]] auto all_setup_material_futures = std::conditional_t<future_based_setup_material, std::vector<std::future<void>>, std::monostate>();
 
 		if constexpr (future_based_setup_material)
@@ -377,15 +377,15 @@ template<class SetupMaterial>
 		auto const n_stacks = params.stack_angles.size();
 
 		if (n_slices < 3)
-			throw Exception ("IrregularSphereShapeParameters: must have at least 3 slices");
+			throw nu::Exception ("IrregularSphereShapeParameters: must have at least 3 slices");
 
 		if (n_stacks < 2)
-			throw Exception ("IrregularSphereShapeParameters: must have at least 2 stacks");
+			throw nu::Exception ("IrregularSphereShapeParameters: must have at least 2 stacks");
 
 		Shape shape;
 		shape.triangle_strips().reserve (n_stacks);
 
-		[[maybe_unused]] auto all_materials_set_up = std::conditional_t<asynchronous_setup_material, neutrino::WaitGroup, std::monostate>();
+		[[maybe_unused]] auto all_materials_set_up = std::conditional_t<asynchronous_setup_material, nu::WaitGroup, std::monostate>();
 		[[maybe_unused]] auto all_setup_material_futures = std::conditional_t<future_based_setup_material, std::vector<std::future<void>>, std::monostate>();
 
 		if constexpr (future_based_setup_material)
@@ -635,7 +635,7 @@ make_truncated_cone_shape (TruncatedConeShapeParameters const& params)
 
 
 Shape
-make_solid_circle (si::Length const radius, Range<si::Angle> const range, size_t num_slices, ShapeMaterial const& material)
+make_solid_circle (si::Length const radius, nu::Range<si::Angle> const range, size_t num_slices, ShapeMaterial const& material)
 {
 	if (num_slices < 3)
 		num_slices = 3;
@@ -685,11 +685,11 @@ make_airfoil_shape (AirfoilShapeParameters const& params)
 		top->vertices.emplace_back (SpaceLength<BodyOrigin> (0_m, 0_m, params.wing_length), SpaceVector<double, BodyOrigin> (0.0, 0.0, +1.0), params.material);
 	}
 
-	for (ptrdiff_t i = neutrino::to_signed (n_points) + 1; i > 0; --i)
+	for (ptrdiff_t i = nu::to_signed (n_points) + 1; i > 0; --i)
 	{
-		auto const prev_point = params.spline.points()[wrap_array_index (i - 1, n_points)];
-		auto const point = params.spline.points()[to_unsigned (i) % n_points];
-		auto const next_point = params.spline.points()[wrap_array_index (i + 1, n_points)];
+		auto const prev_point = params.spline.points()[nu::wrap_array_index (i - 1, n_points)];
+		auto const point = params.spline.points()[nu::to_unsigned (i) % n_points];
+		auto const next_point = params.spline.points()[nu::wrap_array_index (i + 1, n_points)];
 
 		auto const x_len = params.chord_length * point[0];
 		auto const y_len = params.chord_length * point[1];
@@ -768,7 +768,7 @@ make_propeller_shape (PropellerShapeParameters const& params)
 			auto const x_l = width * std::pow (std::sin (p_norm * pi), 0.5) * rotation_direction_factor;
 			auto const x_t = x_l * 0.5; // Trailing edge is flatter.
 			auto const z_b = pitch_height_b * std::pow (std::sin (std::pow (p_norm, 0.7) * pi), 3.0);
-			auto const z_f = pitch_height_f * square (std::sin (p_norm * pi));
+			auto const z_f = pitch_height_f * nu::square (std::sin (p_norm * pi));
 			vertices.emplace_back (SpaceLength<BodyOrigin> { -x_t, y, -z_b }, params.material);
 			vertices.emplace_back (SpaceLength<BodyOrigin> { +x_l, y, +z_f }, params.material);
 		}
@@ -894,7 +894,7 @@ void
 set_planar_normal (Shape::Triangle& triangle)
 {
 	if (triangle.vertices.size() != 3)
-		throw InvalidArgument ("set_planar_normal (Shape::Triangle&): std::size (triangle) must be 3");
+		throw nu::InvalidArgument ("set_planar_normal (Shape::Triangle&): std::size (triangle) must be 3");
 
 	auto const normal = triangle_surface_normal (triangle.vertices[0].position(),
 												 triangle.vertices[1].position(),
@@ -909,7 +909,7 @@ void
 set_planar_normal (std::span<ShapeVertex> triangle)
 {
 	if (triangle.size() != 3)
-		throw InvalidArgument ("set_planar_normal (span<>): std::size (triangle) must be 3");
+		throw nu::InvalidArgument ("set_planar_normal (span<>): std::size (triangle) must be 3");
 
 	auto const normal = triangle_surface_normal (triangle[0].position(),
 												 triangle[1].position(),

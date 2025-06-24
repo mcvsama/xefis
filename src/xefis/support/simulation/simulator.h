@@ -34,12 +34,12 @@ namespace xf {
 /**
  * Rigid body + electrical simulator.
  */
-class Simulator: public Noncopyable
+class Simulator: public nu::Noncopyable
 {
   public:
 	// Ctor
 	explicit
-	Simulator (rigid_body::System&, rigid_body::ImpulseSolver&, si::Time initial_simulation_time, si::Time frame_duration, Logger const&);
+	Simulator (rigid_body::System&, rigid_body::ImpulseSolver&, si::Time initial_simulation_time, si::Time frame_duration, nu::Logger const&);
 
 	/**
 	 * Return current simulation frame Δt.
@@ -106,7 +106,7 @@ class Simulator: public Noncopyable
 		{ return _evolver->performance(); }
 
   private:
-	xf::Logger						_logger;
+	nu::Logger						_logger;
 	rigid_body::System&				_rigid_body_system;
 	rigid_body::ImpulseSolver&		_rigid_body_solver;
 	std::optional<xf::Evolver>		_evolver;

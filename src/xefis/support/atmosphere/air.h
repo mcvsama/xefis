@@ -95,7 +95,7 @@ indicated_airspeed (si::Velocity true_airspeed, si::Length density_altitude)
 constexpr si::Pressure
 dynamic_pressure (si::Density const fluid_density, si::Velocity const fluid_speed)
 {
-	return 0.5 * fluid_density * square (fluid_speed);
+	return 0.5 * fluid_density * nu::square (fluid_speed);
 }
 
 

@@ -27,7 +27,7 @@ Simulator::Simulator (rigid_body::System& rigid_body_system,
 					  rigid_body::ImpulseSolver& rigid_body_solver,
 					  si::Time const initial_simulation_time,
 					  si::Time const frame_duration,
-					  Logger const& logger):
+					  nu::Logger const& logger):
 	_logger (logger),
 	_rigid_body_system (rigid_body_system),
 	_rigid_body_solver (rigid_body_solver)

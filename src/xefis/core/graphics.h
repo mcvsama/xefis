@@ -34,7 +34,7 @@ class Graphics
   public:
 	// Ctor
 	explicit
-	Graphics (Logger const&);
+	Graphics (nu::Logger const&);
 
 	/**
 	 * Basic instrument font.
@@ -58,9 +58,9 @@ class Graphics
 	setup_fonts();
 
   private:
-	Logger	_logger;
-	QFont	_instrument_font;
-	QFont	_panel_font;
+	nu::Logger	_logger;
+	QFont		_instrument_font;
+	QFont		_panel_font;
 };
 
 

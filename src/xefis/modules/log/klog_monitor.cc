@@ -52,7 +52,7 @@ KLogMonitor::check_klog()
 
 	if (auto len = klogctl (read_all_command, _buffer.data(), _buffer.size()); len > 0)
 	{
-		std::string buffer (_buffer.data(), neutrino::to_unsigned (len));
+		std::string buffer (_buffer.data(), nu::to_unsigned (len));
 		std::transform (buffer.begin(), buffer.end(), buffer.begin(), tolower);
 
 		// Search for OOMs:

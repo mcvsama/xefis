@@ -88,7 +88,7 @@ HistogramWidget::update_canvas()
 	auto const axes_width = ph.em_pixels (0.1f);
 	auto const chart_width = ph.em_pixels (0.05f);
 	auto const grid_width = ph.em_pixels (0.03f);
-	auto const text_height = neutrino::line_height (font_metrics);
+	auto const text_height = nu::line_height (font_metrics);
 	auto const bug_length = ph.em_pixels (0.4f);
 
 	QRectF const drawable_rect = rect().adjusted (axes_width, axes_width, -axes_width, -axes_width);
@@ -193,7 +193,7 @@ HistogramWidget::update_canvas()
 		// Top-value text:
 		if (_y_legend_visible)
 		{
-			QRectF max_y_text_rect (rect().topLeft(), rect().topLeft() + QPointF (max_y_str_width, neutrino::line_height (font_metrics)));
+			QRectF max_y_text_rect (rect().topLeft(), rect().topLeft() + QPointF (max_y_str_width, nu::line_height (font_metrics)));
 			painter.drawText (max_y_text_rect, Qt::AlignVCenter | Qt::AlignRight, _max_y_str);
 		}
 

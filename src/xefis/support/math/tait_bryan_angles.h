@@ -86,7 +86,7 @@ tait_bryan_angles (RotationQuaternion<ECEFSpace, AirframeSpace> const& body_rota
 	auto const x = q_relative.x();
 	auto const y = q_relative.y();
 	auto const z = q_relative.z();
-	auto const yy = square (y);
+	auto const yy = nu::square (y);
 
 	return TaitBryanAngles ({
 		.roll = 1_rad * std::atan2 (2.0 * (w * x + y * z), 1.0 - 2.0 * (x * x + yy)),

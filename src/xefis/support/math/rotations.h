@@ -111,7 +111,7 @@ template<math::Scalar S, math::CoordinateSystem Space>
 		using std::atan2;
 
 		auto const alpha = 1_rad * atan2 (vector[1], vector[0]);
-		auto const r = S (1) * std::sqrt (square (vector[0] / S (1)) + square (vector[1] / S (1)));
+		auto const r = S (1) * std::sqrt (nu::square (vector[0] / S (1)) + nu::square (vector[1] / S (1)));
 		auto const beta = 1_rad * -atan2 (vector[2], r);
 
 		return { alpha, beta };

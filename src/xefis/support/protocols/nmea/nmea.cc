@@ -53,13 +53,13 @@ Sentence::read_next()
 	if (comma == std::string::npos)
 	{
 		_val.resize (_sentence.size() - start_pos);
-		std::copy (_sentence.begin() + neutrino::to_signed (start_pos), _sentence.end(), _val.begin());
+		std::copy (_sentence.begin() + nu::to_signed (start_pos), _sentence.end(), _val.begin());
 		_pos = std::string::npos;
 	}
 	else
 	{
 		_val.resize (comma - start_pos);
-		std::copy (_sentence.begin() + neutrino::to_signed (start_pos), _sentence.begin() + neutrino::to_signed (comma), _val.begin());
+		std::copy (_sentence.begin() + nu::to_signed (start_pos), _sentence.begin() + nu::to_signed (comma), _val.begin());
 		_pos = comma + 1;
 	}
 
@@ -75,12 +75,12 @@ Sentence::read_latitude (std::optional<si::Angle>& latitude)
 
 	if (val().size() >= 3)
 	{
-		auto lat = 1_deg * (digit_from_ascii (val()[0]) * 10 +
-							digit_from_ascii (val()[1]));
+		auto lat = 1_deg * (nu::digit_from_ascii (val()[0]) * 10 +
+							nu::digit_from_ascii (val()[1]));
 		try {
-			latitude = lat + 1_deg * neutrino::parse<double> (val().substr (2)) / 60.0;
+			latitude = lat + 1_deg * nu::parse<double> (val().substr (2)) / 60.0;
 		}
-		catch (ParseException&)
+		catch (nu::ParseException&)
 		{ }
 	}
 
@@ -108,13 +108,13 @@ Sentence::read_longitude (std::optional<si::Angle>& longitude)
 
 	if (val().size() >= 4)
 	{
-		auto lon = 1_deg * (digit_from_ascii (val()[0]) * 100 +
-							digit_from_ascii (val()[1]) * 10 +
-							digit_from_ascii (val()[2]));
+		auto lon = 1_deg * (nu::digit_from_ascii (val()[0]) * 100 +
+							nu::digit_from_ascii (val()[1]) * 10 +
+							nu::digit_from_ascii (val()[2]));
 		try {
-			longitude = lon + 1_deg * neutrino::parse<double> (val().substr (3)) / 60.0;
+			longitude = lon + 1_deg * nu::parse<double> (val().substr (3)) / 60.0;
 		}
-		catch (ParseException&)
+		catch (nu::ParseException&)
 		{ }
 	}
 

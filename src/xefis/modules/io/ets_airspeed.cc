@@ -29,7 +29,7 @@
 #include <cstddef>
 
 
-ETSAirspeed::ETSAirspeed (xf::ProcessingLoop& loop, xf::i2c::Device&& device, xf::Logger const& logger, std::string_view const instance):
+ETSAirspeed::ETSAirspeed (xf::ProcessingLoop& loop, nu::i2c::Device&& device, nu::Logger const& logger, std::string_view const instance):
 	ETSAirspeedIO (loop, instance),
 	_logger (logger.with_context (std::string (kLoggerScope) + "#" + instance)),
 	_device (std::move (device))
@@ -144,7 +144,7 @@ ETSAirspeed::offset_collected()
 
 	// Limit offset:
 	uint16_t saved_offset = _offset;
-	neutrino::clamp_inplace (_offset, kRawValueMinimum, kRawValueMaximum);
+	nu::clamp_inplace (_offset, kRawValueMinimum, kRawValueMaximum);
 
 	if (saved_offset != _offset)
 		_logger << "Offset clipped to: " << _offset << std::endl;
@@ -157,7 +157,7 @@ ETSAirspeed::guard (std::function<void()> guarded_code)
 	try {
 		guarded_code();
 	}
-	catch (xf::IOError& e)
+	catch (nu::IOError& e)
 	{
 		_logger << "I/O error: " << e.message() << std::endl;
 		reinitialize();

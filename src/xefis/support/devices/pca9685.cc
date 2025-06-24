@@ -38,7 +38,7 @@
 
 namespace xf {
 
-PCA9685::PCA9685 (i2c::Device&& device, si::Time output_period, Logger const& logger):
+PCA9685::PCA9685 (nu::i2c::Device&& device, si::Time output_period, nu::Logger const& logger):
 	_i2c_device (std::move (device)),
 	_output_period (output_period),
 	_logger (logger)
@@ -131,8 +131,8 @@ PCA9685::get_config_for_pwm (si::Time duty_cycle)
 	uint16_t on_time = 0;
 	uint16_t off_time = 4095 * (duty_cycle / _output_period) / y_corr;
 
-	neutrino::clamp_inplace<uint16_t> (on_time, 0, 4095);
-	neutrino::clamp_inplace<uint16_t> (off_time, 0, 4095);
+	nu::clamp_inplace<uint16_t> (on_time, 0, 4095);
+	nu::clamp_inplace<uint16_t> (off_time, 0, 4095);
 
 	boost::endian::native_to_little (on_time);
 	boost::endian::native_to_little (off_time);
@@ -161,7 +161,7 @@ PCA9685::guard (std::function<void()> guarded_code)
 	try {
 		guarded_code();
 	}
-	catch (xf::IOError& e)
+	catch (nu::IOError& e)
 	{
 		_logger << "I/O error: " << e.message() << std::endl;
 		reinitialize();

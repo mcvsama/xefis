@@ -148,7 +148,7 @@ kSpline {
 	{ 1.000020, -0.001189 },
 };
 
-static xf::Field<double, si::Angle, double> const
+static nu::Field<double, si::Angle, double> const
 kLiftField {
 	{
 		31000.0,
@@ -378,7 +378,7 @@ kLiftField {
 	},
 };
 
-static xf::Field<double, si::Angle, double> const
+static nu::Field<double, si::Angle, double> const
 kDragField {
 	{
 		31000.0,
@@ -608,7 +608,7 @@ kDragField {
 	},
 };
 
-static xf::Field<double, si::Angle, double> const
+static nu::Field<double, si::Angle, double> const
 kPitchingMomentField {
 	{
 		31000.0,
@@ -838,7 +838,7 @@ kPitchingMomentField {
 	},
 };
 
-static xf::Field<double, si::Angle, double> const
+static nu::Field<double, si::Angle, double> const
 kCenterOfPressureOffsetField {
 	{
 		31000.0,

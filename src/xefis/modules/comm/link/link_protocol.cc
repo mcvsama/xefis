@@ -37,7 +37,7 @@
 #include <random>
 
 
-using namespace neutrino::si::literals;
+using namespace nu::si::literals;
 
 
 LinkProtocol::Sequence::Sequence (PacketList packets):
@@ -58,7 +58,7 @@ LinkProtocol::Sequence::size() const
 
 
 void
-LinkProtocol::Sequence::produce (Blob& blob, xf::Logger const& logger)
+LinkProtocol::Sequence::produce (Blob& blob, nu::Logger const& logger)
 {
 	for (auto const& packet: _packets)
 		packet->produce (blob, logger);
@@ -66,7 +66,7 @@ LinkProtocol::Sequence::produce (Blob& blob, xf::Logger const& logger)
 
 
 Blob::const_iterator
-LinkProtocol::Sequence::consume (Blob::const_iterator begin, Blob::const_iterator end, xf::Logger const& logger)
+LinkProtocol::Sequence::consume (Blob::const_iterator begin, Blob::const_iterator end, nu::Logger const& logger)
 {
 	for (auto const& packet: _packets)
 		begin = packet->consume (begin, end, logger);
@@ -115,7 +115,7 @@ LinkProtocol::Bitfield::size() const
 
 
 void
-LinkProtocol::Bitfield::produce (Blob& blob, xf::Logger const&)
+LinkProtocol::Bitfield::produce (Blob& blob, nu::Logger const&)
 {
 	std::vector<bool> bits;
 	bits.reserve (8 * size());
@@ -150,7 +150,7 @@ LinkProtocol::Bitfield::produce (Blob& blob, xf::Logger const&)
 
 
 Blob::const_iterator
-LinkProtocol::Bitfield::consume (Blob::const_iterator begin, Blob::const_iterator end, xf::Logger const&)
+LinkProtocol::Bitfield::consume (Blob::const_iterator begin, Blob::const_iterator end, nu::Logger const&)
 {
 	if (std::distance (begin, end) < static_cast<Blob::difference_type> (size()))
 		throw InsufficientDataError();
@@ -158,7 +158,7 @@ LinkProtocol::Bitfield::consume (Blob::const_iterator begin, Blob::const_iterato
 	std::vector<bool> bits;
 	bits.reserve (8 * size());
 
-	for (Blob::const_iterator cur = begin; cur < begin + neutrino::to_signed (size()); ++cur)
+	for (Blob::const_iterator cur = begin; cur < begin + nu::to_signed (size()); ++cur)
 		for (uint8_t b = 0; b < 8; ++b)
 			bits.push_back ((*cur >> b) & 1);
 
@@ -178,7 +178,7 @@ LinkProtocol::Bitfield::consume (Blob::const_iterator begin, Blob::const_iterato
 		}, bsvariant);
 	}
 
-	return begin + neutrino::to_signed (size());
+	return begin + nu::to_signed (size());
 }
 
 
@@ -228,7 +228,7 @@ LinkProtocol::Signature::size() const
 
 
 void
-LinkProtocol::Signature::produce (Blob& blob, xf::Logger const& logger)
+LinkProtocol::Signature::produce (Blob& blob, nu::Logger const& logger)
 {
 	_temp.clear();
 
@@ -241,7 +241,7 @@ LinkProtocol::Signature::produce (Blob& blob, xf::Logger const& logger)
 	for (unsigned int i = 0; i < _nonce_bytes; ++i)
 		_temp.push_back (distribution (_rng));
 
-	auto const hmac = xf::compute_hmac<xf::Hash::SHA3_256> ({ .data = _temp, .key = _key });
+	auto const hmac = nu::compute_hmac<nu::Hash::SHA3_256> ({ .data = _temp, .key = _key });
 	// Add some of the bytes of HMAC signature:
 	size_t hmac_bytes = std::min<size_t> (_signature_bytes, hmac.size());
 	_temp += hmac.substr (0, hmac_bytes);
@@ -252,7 +252,7 @@ LinkProtocol::Signature::produce (Blob& blob, xf::Logger const& logger)
 
 
 Blob::const_iterator
-LinkProtocol::Signature::consume (Blob::const_iterator begin, Blob::const_iterator end, xf::Logger const& logger)
+LinkProtocol::Signature::consume (Blob::const_iterator begin, Blob::const_iterator end, nu::Logger const& logger)
 {
 	auto const data_size = Sequence::size();
 	auto const whole_size = size();
@@ -260,25 +260,25 @@ LinkProtocol::Signature::consume (Blob::const_iterator begin, Blob::const_iterat
 	if (std::distance (begin, end) < static_cast<Blob::difference_type> (whole_size))
 		throw InsufficientDataError();
 
-	auto const sign_begin = begin + neutrino::to_signed (data_size + _nonce_bytes);
-	auto const sign_end = begin + neutrino::to_signed (whole_size);
+	auto const sign_begin = begin + nu::to_signed (data_size + _nonce_bytes);
+	auto const sign_end = begin + nu::to_signed (whole_size);
 
 	// Make a temporary copy of the data:
 	_temp.resize (data_size + _nonce_bytes);
 	std::copy (begin, sign_begin, _temp.begin());
 
-	auto const hmac = xf::compute_hmac<xf::Hash::SHA3_256> ({ .data = _temp, .key = _key });
+	auto const hmac = nu::compute_hmac<nu::Hash::SHA3_256> ({ .data = _temp, .key = _key });
 
 	// If HMACs differ, it's a parsing error:
 	if (!std::equal (sign_begin, sign_end, hmac.begin()))
 		throw ParseError();
 
-	auto const consuming_end = begin + neutrino::to_signed (data_size);
+	auto const consuming_end = begin + nu::to_signed (data_size);
 
 	if (Sequence::consume (begin, consuming_end, logger) != consuming_end)
 		throw ParseError();
 
-	return begin + neutrino::to_signed (whole_size);
+	return begin + nu::to_signed (whole_size);
 }
 
 
@@ -311,7 +311,7 @@ LinkProtocol::Envelope::size() const
 
 
 void
-LinkProtocol::Envelope::produce (Blob& blob, xf::Logger const& logger)
+LinkProtocol::Envelope::produce (Blob& blob, nu::Logger const& logger)
 {
 	if (!_send_predicate || _send_predicate())
 	{
@@ -329,7 +329,7 @@ LinkProtocol::Envelope::produce (Blob& blob, xf::Logger const& logger)
 				}
 				catch (...)
 				{
-					logger << "Could not produce envelope: " << neutrino::describe_exception (std::current_exception()) << "\n";
+					logger << "Could not produce envelope: " << nu::describe_exception (std::current_exception()) << "\n";
 					// Do not produce anything if encryption fails.
 				}
 			}
@@ -346,11 +346,11 @@ LinkProtocol::Envelope::produce (Blob& blob, xf::Logger const& logger)
 
 
 Blob::const_iterator
-LinkProtocol::Envelope::consume (Blob::const_iterator begin, Blob::const_iterator end, xf::Logger const& logger)
+LinkProtocol::Envelope::consume (Blob::const_iterator begin, Blob::const_iterator end, nu::Logger const& logger)
 {
 	if (_transceiver)
 	{
-		auto const envelope_end = std::next (begin, neutrino::to_signed (size()));
+		auto const envelope_end = std::next (begin, nu::to_signed (size()));
 
 		try {
 			if (_transceiver->ready())
@@ -359,12 +359,12 @@ LinkProtocol::Envelope::consume (Blob::const_iterator begin, Blob::const_iterato
 				auto read_iterator = Sequence::consume (decrypted.begin(), decrypted.end(), logger);
 
 				if (read_iterator != decrypted.end())
-					throw xf::Exception ("Envelope::consume(): not all data consumed by the envelope after decryption");
+					throw nu::Exception ("Envelope::consume(): not all data consumed by the envelope after decryption");
 			}
 		}
 		catch (...)
 		{
-			logger << "Could not consume envelope: " << neutrino::describe_exception (std::current_exception()) << "\n";
+			logger << "Could not consume envelope: " << nu::describe_exception (std::current_exception()) << "\n";
 			// TODO Maybe each envelope should have its own failsafe timer?
 			failsafe();
 		}
@@ -395,13 +395,13 @@ LinkProtocol::LinkProtocol (EnvelopeList envelopes):
 
 
 void
-LinkProtocol::produce (Blob& blob, [[maybe_unused]] xf::Logger const& logger)
+LinkProtocol::produce (Blob& blob, [[maybe_unused]] nu::Logger const& logger)
 {
 	for (auto& e: _envelopes)
 		e->produce (blob, logger);
 
 #if XEFIS_LINK_SEND_DEBUG
-	logger << "Send: " << neutrino::to_hex_string (blob, ":") << std::endl;
+	logger << "Send: " << nu::to_hex_string (blob, ":") << std::endl;
 #endif
 }
 
@@ -412,10 +412,10 @@ LinkProtocol::consume (Blob::const_iterator begin,
 					   InputLink* input_link,
 					   QTimer* reacquire_timer,
 					   QTimer* failsafe_timer,
-					   xf::Logger const& logger)
+					   nu::Logger const& logger)
 {
 #if XEFIS_LINK_RECV_DEBUG
-	logger << "Recv: " << neutrino::to_hex_string (BlobView (begin, end), ":") << std::endl;
+	logger << "Recv: " << nu::to_hex_string (BlobView (begin, end), ":") << std::endl;
 #endif
 
 	_aux_unique_prefix_buffer.resize (_unique_prefix_size);
@@ -438,10 +438,10 @@ LinkProtocol::consume (Blob::const_iterator begin,
 		bool return_from_outer_function = false;
 		Blob::const_iterator outer_result = begin;
 
-		xf::Exception::catch_and_log (logger, [&] {
+		nu::Exception::catch_and_log (logger, [&] {
 			try {
 				// Find the right unique_prefix and envelope:
-				std::copy (begin, begin + neutrino::to_signed (_unique_prefix_size), _aux_unique_prefix_buffer.begin());
+				std::copy (begin, begin + nu::to_signed (_unique_prefix_size), _aux_unique_prefix_buffer.begin());
 				auto envelope_and_unique_prefix = _envelope_unique_prefixes.find (_aux_unique_prefix_buffer);
 
 				// If not found, retry starting with next byte:
@@ -451,14 +451,14 @@ LinkProtocol::consume (Blob::const_iterator begin,
 				auto envelope = envelope_and_unique_prefix->second;
 				// Now see if we have enough data in input buffer for this envelope type.
 				// If not, return and retry when enough data is read.
-				if (neutrino::to_unsigned (std::distance (begin, end)) - _unique_prefix_size < envelope->size())
+				if (nu::to_unsigned (std::distance (begin, end)) - _unique_prefix_size < envelope->size())
 				{
 					return_from_outer_function = true;
 					outer_result = begin;
 					return;
 				}
 
-				auto e = envelope->consume (begin + neutrino::to_signed (_unique_prefix_size), end, logger);
+				auto e = envelope->consume (begin + nu::to_signed (_unique_prefix_size), end, logger);
 
 				if (e != begin)
 				{

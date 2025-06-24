@@ -32,8 +32,8 @@ class TestProcessingLoop: public ProcessingLoop
 {
   public:
 	static thread_local inline std::ostringstream	log_buffer;
-	static thread_local inline xf::LoggerOutput		logger_output	{ log_buffer };
-	static thread_local inline xf::Logger			logger			{ logger_output };
+	static thread_local inline nu::LoggerOutput		logger_output	{ log_buffer };
+	static thread_local inline nu::Logger			logger			{ logger_output };
 
   public:
 	// Ctor

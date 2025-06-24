@@ -26,7 +26,7 @@
 
 VirtualTemperatureSensor::VirtualTemperatureSensor (xf::sim::FlightSimulation const& flight_simulation,
 													xf::SpaceLength<xf::AirframeFrame> const& mount_location,
-													xf::Logger const& logger,
+													nu::Logger const& logger,
 													std::string_view const instance):
 	VirtualTemperatureSensorIO (instance),
 	_logger (logger.with_context (std::string (kLoggerScope) + "#" + instance)),

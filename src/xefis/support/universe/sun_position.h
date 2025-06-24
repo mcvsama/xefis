@@ -88,7 +88,7 @@ compute_solar_noon_altitude (si::Angle const sun_declination, si::Angle const ob
 constexpr si::Angle
 compute_hour_angle (si::Angle const local_sidereal_time, si::Angle const sun_right_ascension)
 {
-	return floored_mod (local_sidereal_time - sun_right_ascension, 360_deg);
+	return nu::floored_mod (local_sidereal_time - sun_right_ascension, 360_deg);
 }
 
 } // namespace xf

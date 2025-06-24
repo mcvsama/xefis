@@ -35,7 +35,7 @@ namespace xf::nmea {
 /**
  * Parser for NMEA protocol for GPS devices.
  */
-class Parser: private Noncopyable
+class Parser: private nu::Noncopyable
 {
   public:
 	/**

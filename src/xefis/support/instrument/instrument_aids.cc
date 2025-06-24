@@ -50,7 +50,7 @@ float
 InstrumentAids::FontInfo::get_digit_height (QFont const& font)
 {
 	constexpr float scale_down_line_height_factor = 0.7;
-	return scale_down_line_height_factor * neutrino::line_height (QFontMetricsF (font));
+	return scale_down_line_height_factor * nu::line_height (QFontMetricsF (font));
 }
 
 
@@ -85,7 +85,7 @@ InstrumentAids::resized (QFont const& font, si::Length height, si::PixelDensity 
 
 
 QFont
-InstrumentAids::resized (QFont const& font, FontPixelSize font_pixel_size)
+InstrumentAids::resized (QFont const& font, nu::FontPixelSize font_pixel_size)
 {
 	QFont copy { font };
 	copy.setPixelSize (*font_pixel_size);

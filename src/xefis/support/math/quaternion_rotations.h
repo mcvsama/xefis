@@ -113,7 +113,7 @@ template<math::CoordinateSystem TargetSpace = void, math::CoordinateSystem Sourc
 			axis = { 1.0, 0.0, 0.0 };
 
 		// Since angle() is always positive, we need to invert axis for cases -π…2π:
-		return 1.0 * sgn (rotation.w()) * axis;
+		return 1.0 * nu::sgn (rotation.w()) * axis;
 	}
 
 

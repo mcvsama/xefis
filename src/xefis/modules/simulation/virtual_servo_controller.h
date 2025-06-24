@@ -26,7 +26,8 @@
 #include <string_view>
 
 
-namespace si = neutrino::si;
+namespace nu = neutrino;
+namespace si = nu::si;
 
 
 /**

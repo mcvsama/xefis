@@ -28,8 +28,8 @@ namespace xf {
 
 using LiftCoefficient	= double;
 using DragCoefficient	= double;
-using FlapsAngle		= StrongType<si::Angle, struct FlapsAngleType>;
-using SpoilersAngle		= StrongType<si::Angle, struct SpoilersAngleType>;
+using FlapsAngle		= nu::StrongType<si::Angle, struct FlapsAngleType>;
+using SpoilersAngle		= nu::StrongType<si::Angle, struct SpoilersAngleType>;
 
 } // namespace xf
 

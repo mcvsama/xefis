@@ -71,7 +71,7 @@ VerticalTrim::async_paint (xf::PaintRequest const& paint_request, PaintingParams
 	auto& ref_max = pp.trim_reference_maximum;
 
 	if (trim)
-		neutrino::clamp_inplace (*trim, -1.0, +1.0);
+		nu::clamp_inplace (*trim, -1.0, +1.0);
 
 	double h = aids->font_2.digit_height;
 	double v = aids->height() - h;
@@ -169,7 +169,7 @@ VerticalTrim::async_paint (xf::PaintRequest const& paint_request, PaintingParams
 QString
 VerticalTrim::stringify (double value)
 {
-	QString result = neutrino::to_qstring (std::format ("{:+03.0f}", std::round (100.0 * value)));
+	QString result = nu::to_qstring (std::format ("{:+03.0f}", std::round (100.0 * value)));
 	// Remove +/- sign when 00:
 	if (result.mid (1, 2) == "00")
 		result[0] = ' ';

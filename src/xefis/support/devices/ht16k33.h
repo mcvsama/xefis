@@ -295,7 +295,7 @@ class HT16K33: public QObject
   public:
 	// Ctor
 	explicit
-	HT16K33 (i2c::Device&&, Logger const&);
+	HT16K33 (nu::i2c::Device&&, nu::Logger const&);
 
 	/**
 	 * Turn on/off displays and LEDs.
@@ -409,8 +409,8 @@ class HT16K33: public QObject
 	static constexpr size_t kMinusSignIndex	= 10;
 	static constexpr size_t kDotIndex		= 11;
 
-	i2c::Device						_i2c_device;
-	Logger							_logger;
+	nu::i2c::Device					_i2c_device;
+	nu::Logger						_logger;
 	bool							_displays_enabled	= true;
 	uint8_t							_brightness			= 16;
 	bool							_blinking_enabled	= false;
@@ -439,7 +439,7 @@ template<class V, class U>
 	{
 		for (auto row: _digit_rows)
 			if (row < 0 || row > 15)
-				throw Exception ("NumericDisplay: incorrect digit-rows configuration; max row index is 15");
+				throw nu::Exception ("NumericDisplay: incorrect digit-rows configuration; max row index is 15");
 	}
 
 

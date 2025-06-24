@@ -30,7 +30,7 @@ namespace xf::electrical {
  * Thrown when simulation could not converge on solution after a certain limit of
  * iterations.
  */
-class NotConverged: public Exception
+class NotConverged: public nu::Exception
 {
   public:
 	using Exception::Exception;

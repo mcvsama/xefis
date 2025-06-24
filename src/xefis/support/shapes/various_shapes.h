@@ -36,7 +36,7 @@
 namespace xf {
 
 using SynchronousSetupMaterial		= std::function<void (ShapeMaterial&, si::LonLat position)>;
-using AsynchronousSetupMaterial		= std::function<void (ShapeMaterial&, si::LonLat position, WaitGroup::WorkToken&&)>;
+using AsynchronousSetupMaterial		= std::function<void (ShapeMaterial&, si::LonLat position, nu::WaitGroup::WorkToken&&)>;
 using FutureBasedSetupMaterial		= std::function<std::future<void> (ShapeMaterial&, si::LonLat position)>; // In C++23 this requires explicit std::function() creation
 // Called by make_centered_sphere_shape() to get material for vertices.
 using MakeSphereMaterialCallback	= std::variant<std::monostate, SynchronousSetupMaterial, AsynchronousSetupMaterial, FutureBasedSetupMaterial>;
@@ -67,8 +67,8 @@ struct SphereShapeParameters
 	si::Length						radius;
 	std::size_t						n_slices		{ 10 };
 	std::size_t						n_stacks		{ 10 };
-	Range<si::Angle>				h_range			{ -180_deg, +180_deg };
-	Range<si::Angle>				v_range			{ -90_deg, +90_deg };
+	nu::Range<si::Angle>			h_range			{ -180_deg, +180_deg };
+	nu::Range<si::Angle>			v_range			{ -90_deg, +90_deg };
 	ShapeMaterial const&			material		{ };
 	MakeSphereMaterialCallback		setup_material	{ std::monostate() };
 	std::shared_ptr<QOpenGLTexture>	texture			{ nullptr };
@@ -94,7 +94,7 @@ struct CylinderShapeParameters
 {
 	si::Length				length;
 	si::Length				radius;
-	Range<si::Angle>		range				{ 0_deg, 360_deg };
+	nu::Range<si::Angle>	range				{ 0_deg, 360_deg };
 	std::size_t				num_faces			{ 10 };
 	bool					with_bottom			{ false };
 	bool					with_top			{ false };
@@ -106,7 +106,7 @@ struct ConeShapeParameters
 {
 	si::Length				length;
 	si::Length				radius;
-	Range<si::Angle>		range				{ 0_deg, 360_deg };
+	nu::Range<si::Angle>	range				{ 0_deg, 360_deg };
 	size_t					num_faces			{ 10 };
 	bool					with_bottom			{ false };
 	ShapeMaterial const&	material			{ };
@@ -118,7 +118,7 @@ struct TruncatedConeShapeParameters
 	si::Length				length;
 	si::Length				bottom_radius;
 	si::Length				top_radius;
-	Range<si::Angle>		range				{ 0_deg, 360_deg };
+	nu::Range<si::Angle>	range				{ 0_deg, 360_deg };
 	size_t					num_faces			{ 10 };
 	bool					with_bottom			{ false };
 	bool					with_top			{ false };
@@ -243,7 +243,7 @@ make_truncated_cone_shape (TruncatedConeShapeParameters const&);
  * Make a solid circle placed on X-Y plane.
  */
 Shape
-make_solid_circle (si::Length radius, Range<si::Angle> range, std::size_t num_slices, ShapeMaterial const& = {});
+make_solid_circle (si::Length radius, nu::Range<si::Angle> range, std::size_t num_slices, ShapeMaterial const& = {});
 
 /**
  * Make a wing shape. Extrude airfoil spline (defined in X-Y axes) along +Z axis.

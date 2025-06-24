@@ -36,7 +36,7 @@ FlapsControl::FlapsControl (xf::ProcessingLoop& loop, xf::Airframe& airframe, st
 		_settings_list.insert (s.second.angle());
 
 	if (_settings_list.empty())
-		throw xf::BadConfiguration ("missing flaps configuration");
+		throw nu::BadConfiguration ("missing flaps configuration");
 
 	_timer = std::make_unique<QTimer>();
 	_timer->setTimerType (Qt::PreciseTimer);
@@ -71,7 +71,7 @@ FlapsControl::process (xf::Cycle const&)
 
 	if (_requested_setting.value_changed() && _io.requested_setting)
 	{
-		_setting = neutrino::clamp<si::Angle> (*_io.requested_setting, _extents);
+		_setting = nu::clamp<si::Angle> (*_io.requested_setting, _extents);
 		_timer->start();
 	}
 }
@@ -83,7 +83,7 @@ FlapsControl::update_flap_position()
 	using si::abs;
 
 	si::Angle difference = _setting - _current;
-	double sgn = xf::sgn (difference.in<si::Degree>());
+	double sgn = nu::sgn (difference.in<si::Degree>());
 	si::Angle delta = kUpdateInterval * *_io.angular_velocity;
 
 	if (abs (difference) > delta)
@@ -100,6 +100,6 @@ FlapsControl::update_flap_position()
 	}
 
 	_io.current = _current;
-	_io.control = xf::renormalize (_current, _extents, *_io.control_extents);
+	_io.control = nu::renormalize (_current, _extents, *_io.control_extents);
 }
 

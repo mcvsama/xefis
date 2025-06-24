@@ -40,7 +40,7 @@ to_g (si::Acceleration acceleration)
 } // namespace
 
 
-TestScreen1::TestScreen1 (xf::ProcessingLoop& loop, xf::ScreenSpec const& spec, xf::Graphics const& graphics, xf::NavaidStorage const& navaid_storage, xf::Machine& machine, xf::Logger const& logger):
+TestScreen1::TestScreen1 (xf::ProcessingLoop& loop, xf::ScreenSpec const& spec, xf::Graphics const& graphics, xf::NavaidStorage const& navaid_storage, xf::Machine& machine, nu::Logger const& logger):
 	Screen (spec, graphics, machine, "Test Screen 1", logger.with_context ("TestScreen1")),
 	_logger (logger),
 	_graphics (graphics),

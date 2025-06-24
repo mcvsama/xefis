@@ -29,6 +29,9 @@
 #include <cstddef>
 
 
+namespace nu = neutrino;
+
+
 class Watchdog: public xf::Module
 {
   private:
@@ -37,7 +40,7 @@ class Watchdog: public xf::Module
   public:
 	// Ctor
 	explicit
-	Watchdog (xf::ProcessingLoop& loop, xf::Xefis*, xf::Logger const&, std::string_view const instance = {});
+	Watchdog (xf::ProcessingLoop& loop, xf::Xefis*, nu::Logger const&, std::string_view const instance = {});
 
   private:
 	/**
@@ -47,7 +50,7 @@ class Watchdog: public xf::Module
 	ping();
 
   private:
-	xf::Logger							_logger;
+	nu::Logger							_logger;
 	bool								_enabled			= false;
 	int									_watchdog_write_fd	= 0;
 	int									_watchdog_read_fd	= 0;

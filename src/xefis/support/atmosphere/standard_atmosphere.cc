@@ -57,10 +57,10 @@ international_standard_atmosphere_map()
 }
 
 
-Field<si::Length, si::Temperature> const&
+nu::Field<si::Length, si::Temperature> const&
 international_standard_atmosphere_temperature()
 {
-	static Field<si::Length, si::Temperature> const kInternationalStandardAtmosphereTemperature {
+	static nu::Field<si::Length, si::Temperature> const kInternationalStandardAtmosphereTemperature {
 		{ -0.61_km,  254.15_K },
 		{  0.0_km,   288.15_K },
 		{ 11.0_km,   216.65_K },
@@ -78,10 +78,10 @@ international_standard_atmosphere_temperature()
 
 // Map of temperature <-> dynamic viscosity taken from
 // <http://www.engineeringtoolbox.com/air-absolute-kinematic-viscosity-d_601.html>
-Field<si::Temperature, si::DynamicViscosity> const&
+nu::Field<si::Temperature, si::DynamicViscosity> const&
 air_temperature_to_dynamic_viscosity()
 {
-	static Field<si::Temperature, si::DynamicViscosity> const kAirTemperatureToDynamicViscosity {
+	static nu::Field<si::Temperature, si::DynamicViscosity> const kAirTemperatureToDynamicViscosity {
 		{  -40_degF, 157.591e-7_Pas },
 		{  -20_degF, 159.986e-7_Pas },
 		{    0_degF, 157.591e-7_Pas },

@@ -171,7 +171,7 @@ NavigationComputer::compute_magnetic_variation()
 			mv.set_altitude_amsl (*_io.position_altitude_amsl);
 		else
 			mv.set_altitude_amsl (0_ft);
-		QDate today = QDateTime::fromSecsSinceEpoch (xf::TimeHelper::utc_now().in<si::Second>()).date();
+		QDate today = QDateTime::fromSecsSinceEpoch (nu::TimeHelper::utc_now().in<si::Second>()).date();
 		mv.set_date (today.year(), today.month(), today.day());
 		mv.update();
 		_io.magnetic_declination = mv.magnetic_declination();
@@ -195,7 +195,7 @@ NavigationComputer::compute_headings()
 		_io.orientation_heading_magnetic = _orientation_heading_magnetic_smoother (*_io.input_orientation_heading_magnetic, update_dt);
 
 		if (_io.magnetic_declination)
-			_io.orientation_heading_true = xf::magnetic_to_true (*_io.orientation_heading_magnetic, *_io.magnetic_declination);
+			_io.orientation_heading_true = nu::magnetic_to_true (*_io.orientation_heading_magnetic, *_io.magnetic_declination);
 		else
 			_io.orientation_heading_true = xf::nil;
 	}
@@ -245,11 +245,11 @@ NavigationComputer::compute_track()
 			_io.track_vertical = _track_vertical_smoother (1_rad * std::atan (altitude_diff / distance), update_dt);
 
 			si::Angle initial_true_heading = xf::initial_bearing (pos_last.lateral_position, pos_prev.lateral_position);
-			si::Angle true_heading = xf::floored_mod (initial_true_heading + 180_deg, 360_deg);
+			si::Angle true_heading = nu::floored_mod (initial_true_heading + 180_deg, 360_deg);
 			_io.track_lateral_true = _track_lateral_true_smoother (true_heading, update_dt);
 
 			if (_io.magnetic_declination)
-				_io.track_lateral_magnetic = xf::true_to_magnetic (*_io.track_lateral_true, *_io.magnetic_declination);
+				_io.track_lateral_magnetic = nu::true_to_magnetic (*_io.track_lateral_true, *_io.magnetic_declination);
 			else
 				_io.track_lateral_magnetic = xf::nil;
 		}

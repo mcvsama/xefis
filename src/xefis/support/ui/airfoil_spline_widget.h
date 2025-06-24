@@ -119,7 +119,7 @@ class AirfoilSplineWidget: public CanvasWidget
 			if (_chord_length)
 				set_center_of_pressure_position<Space> (position / *_chord_length);
 			else
-				throw neutrino::PreconditionFailed ("chord length must be set");
+				throw nu::PreconditionFailed ("chord length must be set");
 		}
 
 	/**
@@ -165,7 +165,7 @@ class AirfoilSplineWidget: public CanvasWidget
 	// Values computed by prepare_for_painting():
 	QPolygonF					_airfoil_polygon;
 	// Range of airfoil spline points in AirfoilSplineSpace:
-	Range<double>				_range[2]; // X and Y respectively
+	nu::Range<double>			_range[2]; // X and Y respectively
 	// Computed by setup_painting_transform():
 	double						_scale { 1.0 };
 	QTransform					_painting_transform;

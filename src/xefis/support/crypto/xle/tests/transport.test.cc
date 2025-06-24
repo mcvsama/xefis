@@ -27,21 +27,24 @@
 namespace xf::test {
 namespace {
 
-AutoTest t1 ("Xefis Lossy Encryption/Transport: encryption and decryption", []{
-	Blob const key = to_blob ("abcdefghijklmnop");
+namespace test_asserts = nu::test_asserts;
+
+
+nu::AutoTest t1 ("Xefis Lossy Encryption/Transport: encryption and decryption", []{
+	Blob const key = nu::to_blob ("abcdefghijklmnop");
 
 	boost::random::random_device rnd;
 	xf::crypto::xle::Transmitter tx (rnd, { .ephemeral_session_key = key });
 	xf::crypto::xle::Receiver rx ({ .ephemeral_session_key = key });
 
-	Blob plain_text = to_blob ("");
+	Blob plain_text = nu::to_blob ("");
 	Blob encrypted = tx.encrypt_packet (plain_text);
 	Blob decrypted = rx.decrypt_packet (encrypted);
 
 	test_asserts::verify ("decryption (1) works", decrypted == plain_text);
 	test_asserts::verify ("encryption expansion is declared properly (1)", encrypted.size() - plain_text.size() == tx.ciphertext_expansion());
 
-	plain_text = to_blob ("some other plain text that is longer than the AES key size");
+	plain_text = nu::to_blob ("some other plain text that is longer than the AES key size");
 	encrypted = tx.encrypt_packet (plain_text);
 	decrypted = rx.decrypt_packet (encrypted);
 

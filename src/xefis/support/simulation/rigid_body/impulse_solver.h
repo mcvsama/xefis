@@ -66,7 +66,7 @@ class EvolutionDetails
 /**
  * Simple impulse solver for rigid_body::System.
  */
-class ImpulseSolver: private Noncopyable
+class ImpulseSolver: private nu::Noncopyable
 {
 	static constexpr size_t kDefaultMaxIterations { 1000 };
 

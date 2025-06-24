@@ -31,8 +31,9 @@
 #include <cstddef>
 
 
-namespace si = neutrino::si;
-using namespace neutrino::si::literals;
+namespace nu = neutrino;
+namespace si = nu::si;
+using namespace nu::si::literals;
 
 
 class BMP085_IO: public xf::Module
@@ -42,8 +43,8 @@ class BMP085_IO: public xf::Module
 	 * Settings
 	 */
 
-	xf::Setting<xf::i2c::Bus::ID>		i2c_bus						{ this, "i2c_bus" };
-	xf::Setting<xf::i2c::Address::ID>	i2c_address					{ this, "i2c_address" };
+	xf::Setting<nu::i2c::Bus::ID>		i2c_bus						{ this, "i2c_bus" };
+	xf::Setting<nu::i2c::Address::ID>	i2c_address					{ this, "i2c_address" };
 	xf::Setting<si::Time>				temperature_update_interval	{ this, "temperature_update_interval", 500_ms };
 	xf::Setting<si::Time>				pressure_update_interval	{ this, "pressure_update_interval", 50_ms };
 
@@ -87,7 +88,7 @@ class BMP085:
   public:
 	// Ctor
 	explicit
-	BMP085 (xf::ProcessingLoop&, xf::Logger const&, std::string_view const instance = {});
+	BMP085 (xf::ProcessingLoop&, nu::Logger const&, std::string_view const instance = {});
 
 	// Module API
 	void
@@ -146,9 +147,9 @@ class BMP085:
 	static constexpr uint8_t	MD_REG	= 0xbe;
 
 	BMP085_IO&					_io							{ *this };
-	xf::Logger					_logger;
+	nu::Logger					_logger;
 	// Data:
-	xf::i2c::Device				_i2c_device;
+	nu::i2c::Device				_i2c_device;
 	Oversampling				_oversampling				{ Oversampling3 };
 	si::Time					_pressure_waiting_times[4]	{ 4.5_ms, 7.5_ms, 13.5_ms, 25.5_ms };
 	std::unique_ptr<QTimer>		_reinitialize_timer;

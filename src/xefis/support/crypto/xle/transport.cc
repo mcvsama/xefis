@@ -31,24 +31,24 @@ namespace xf::crypto::xle {
 Transport::Transport (Params const& params):
 	_hmac_size (params.hmac_size)
 {
-	_hmac_key = compute_hkdf<kSignatureHMACHashAlgorithm> ({
+	_hmac_key = nu::compute_hkdf<kSignatureHMACHashAlgorithm> ({
 		.salt = params.authentication_secret,
 		.key_material = params.ephemeral_session_key,
-		.info = params.hkdf_user_info + to_blob ("hmac_key"),
+		.info = params.hkdf_user_info + nu::to_blob ("hmac_key"),
 		.result_length = 32,
 	});
 
-	_data_encryption_key = compute_hkdf<kDataEncryptionKeyHKDFHashAlgorithm> ({
+	_data_encryption_key = nu::compute_hkdf<kDataEncryptionKeyHKDFHashAlgorithm> ({
 		.salt = params.data_encryption_secret,
 		.key_material = params.ephemeral_session_key,
-		.info = params.hkdf_user_info + to_blob ("data_encryption_key"),
+		.info = params.hkdf_user_info + nu::to_blob ("data_encryption_key"),
 		.result_length = 32,
 	});
 
-	_seq_num_encryption_key = compute_hkdf<kSeqNumEncryptionKeyHKDFHashAlgorithm> ({
+	_seq_num_encryption_key = nu::compute_hkdf<kSeqNumEncryptionKeyHKDFHashAlgorithm> ({
 		.salt = params.seq_num_encryption_secret,
 		.key_material = params.ephemeral_session_key,
-		.info = params.hkdf_user_info + to_blob ("seq_num_encryption_key"),
+		.info = params.hkdf_user_info + nu::to_blob ("seq_num_encryption_key"),
 		.result_length = 32,
 	});
 }
@@ -80,9 +80,9 @@ Transmitter::encrypt_packet (BlobView const data)
 	++_sequence_number;
 
 	// It's required that to_blob() gives little-endian encoding:
-	auto const binary_sequence_number = to_blob (_sequence_number);
-	auto const salt = random_blob (kDataSaltSize, _random_device);
-	auto const full_hmac = compute_hmac<kSignatureHMACHashAlgorithm> ({
+	auto const binary_sequence_number = nu::to_blob (_sequence_number);
+	auto const salt = nu::random_blob (kDataSaltSize, _random_device);
+	auto const full_hmac = nu::compute_hmac<kSignatureHMACHashAlgorithm> ({
 		.data = data + salt + binary_sequence_number,
 		.key = *_hmac_key,
 	});
@@ -91,17 +91,17 @@ Transmitter::encrypt_packet (BlobView const data)
 		throw std::logic_error ("HMAC size doesn't fit requirements");
 
 	auto const hmac = full_hmac.substr (0, _hmac_size);
-	auto const encrypted_data = aes_ctr_xor ({
+	auto const encrypted_data = nu::aes_ctr_xor ({
 		.data = data + salt + hmac,
 		.key = *_data_encryption_key,
-		.nonce = compute_hash<kDataNonceHashAlgorithm> (binary_sequence_number).substr (0, 8),
+		.nonce = nu::compute_hash<kDataNonceHashAlgorithm> (binary_sequence_number).substr (0, 8),
 	});
-	auto const encrypted_sequence_number = aes_ctr_xor ({
+	auto const encrypted_sequence_number = nu::aes_ctr_xor ({
 		.data = binary_sequence_number,
 		.key = *_seq_num_encryption_key,
 		// Encrypted data must be at least 8 bytes, but longer is better for better entropy to avoid
 		// repeating nonce ever. That's why data salt is added before encryption.
-		.nonce = compute_hash<kSeqNumNonceHashAlgorithm> (encrypted_data).substr (0, 8),
+		.nonce = nu::compute_hash<kSeqNumNonceHashAlgorithm> (encrypted_data).substr (0, 8),
 	});
 	auto const encrypted_packet = encrypted_sequence_number + encrypted_data;
 
@@ -114,15 +114,15 @@ Receiver::decrypt_packet (BlobView const encrypted_packet, std::optional<Sequenc
 {
 	auto const encrypted_sequence_number = encrypted_packet.substr (0, sizeof (_sequence_number));
 	auto const encrypted_data = encrypted_packet.substr (sizeof (_sequence_number));
-	auto const binary_sequence_number = aes_ctr_xor ({
+	auto const binary_sequence_number = nu::aes_ctr_xor ({
 		.data = encrypted_sequence_number,
 		.key = *_seq_num_encryption_key,
-		.nonce = compute_hash<kSeqNumNonceHashAlgorithm> (encrypted_data).substr (0, 8),
+		.nonce = nu::compute_hash<kSeqNumNonceHashAlgorithm> (encrypted_data).substr (0, 8),
 	});
-	auto const data_with_hmac = aes_ctr_xor ({
+	auto const data_with_hmac = nu::aes_ctr_xor ({
 		.data = encrypted_data,
 		.key = *_data_encryption_key,
-		.nonce = compute_hash<kDataNonceHashAlgorithm> (binary_sequence_number).substr (0, 8),
+		.nonce = nu::compute_hash<kDataNonceHashAlgorithm> (binary_sequence_number).substr (0, 8),
 	});
 
 	if (data_with_hmac.size() >= kDataSaltSize + _hmac_size)
@@ -135,7 +135,7 @@ Receiver::decrypt_packet (BlobView const encrypted_packet, std::optional<Sequenc
 		salt.remove_suffix (_hmac_size);
 		hmac.remove_prefix (data.size() + kDataSaltSize);
 
-		auto const computed_full_hmac = compute_hmac<kSignatureHMACHashAlgorithm> ({
+		auto const computed_full_hmac = nu::compute_hmac<kSignatureHMACHashAlgorithm> ({
 			.data = Blob (data) + salt + binary_sequence_number,
 			.key = *_hmac_key,
 		});
@@ -143,7 +143,7 @@ Receiver::decrypt_packet (BlobView const encrypted_packet, std::optional<Sequenc
 
 		if (computed_hmac == hmac)
 		{
-			auto const sequence_number = parse<SequenceNumber> (binary_sequence_number);
+			auto const sequence_number = nu::parse<SequenceNumber> (binary_sequence_number);
 
 			if (sequence_number <= _sequence_number)
 				throw DecryptionFailure (ErrorCode::SeqNumFromPast, "sequence number from past is invalid");

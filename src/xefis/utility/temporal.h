@@ -109,7 +109,7 @@ template<class T>
 	inline
 	Temporal<T>::Temporal (ValueType&& value) noexcept (noexcept (ValueType (value))):
 		_value (std::forward<ValueType> (value)),
-		_update_time (TimeHelper::utc_now())
+		_update_time (nu::TimeHelper::utc_now())
 	{ }
 
 
@@ -126,7 +126,7 @@ template<class T>
 	Temporal<T>::operator= (ValueType&& value) noexcept (noexcept (value = value))
 	{
 		_value.operator= (std::forward<ValueType> (value));
-		_update_time = TimeHelper::utc_now();
+		_update_time = nu::TimeHelper::utc_now();
 	}
 
 

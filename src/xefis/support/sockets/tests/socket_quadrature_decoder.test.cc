@@ -33,6 +33,8 @@
 namespace xf::test {
 namespace {
 
+namespace test_asserts = nu::test_asserts;
+
 using Integer = int16_t;
 
 
@@ -47,7 +49,7 @@ template<class T>
 	}
 
 
-AutoTest t1 ("SocketQuadratureDecoder + SocketQuadratureCounter", []{
+nu::AutoTest t1 ("SocketQuadratureDecoder + SocketQuadratureCounter", []{
 	// SocketQuadratureDecoder will be tested by testing SocketQuadratureCounter, so no need for separate tests.
 
 	// Tuple is <input_a, input_b, delta, callback_expected>:

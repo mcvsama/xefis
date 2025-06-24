@@ -30,7 +30,7 @@
 
 namespace xf {
 
-System::System (Logger const& logger):
+System::System (nu::Logger const& logger):
 	_logger (logger.with_context ("<system>"))
 { }
 

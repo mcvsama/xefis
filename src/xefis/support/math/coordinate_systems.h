@@ -27,15 +27,15 @@
 namespace xf {
 
 // Earth-centered Earth-fixed frame of reference:
-class ECEFSpace: public neutrino::math::CoordinateSystemBase
+class ECEFSpace: public math::CoordinateSystemBase
 { };
 
 // Local-tangent-plane frame of reference:
-class NEDSpace: public neutrino::math::CoordinateSystemBase
+class NEDSpace: public math::CoordinateSystemBase
 { };
 
 // Simulated body frame of reference (X points to the front, Y to the right, Z down the body):
-class AirframeSpace: public neutrino::math::CoordinateSystemBase
+class AirframeSpace: public math::CoordinateSystemBase
 { };
 
 // Body space coordinate system, origin at body's center of mass:

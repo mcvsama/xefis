@@ -26,7 +26,7 @@
 #include <cstddef>
 
 
-using namespace neutrino::si::literals;
+using namespace nu::si::literals;
 
 
 Flaps::Flaps (xf::ProcessingLoop& loop, xf::Graphics const& graphics, std::string_view const instance):
@@ -80,7 +80,7 @@ Flaps::async_paint (xf::PaintRequest const& paint_request, PaintingParams const&
 	QFont setting_font = aids->font_3.font;
 	QFont label_font = aids->font_2.font;
 
-	float block_height = aids->height() - neutrino::line_height (QFontMetricsF (setting_font));
+	float block_height = aids->height() - nu::line_height (QFontMetricsF (setting_font));
 	float block_width = 6.0 / 40.0 * block_height;
 	QRectF block (0.f, 0.f, block_width, block_height);
 	aids->centrify (block);
@@ -122,8 +122,10 @@ Flaps::async_paint (xf::PaintRequest const& paint_request, PaintingParams const&
 
 		// Number or UP
 		QString number = "UP";
+
 		if (setting > 0.5_deg)
-			number = QString ("%1").arg (xf::symmetric_round (setting.in<si::Degree>()));
+			number = QString ("%1").arg (nu::symmetric_round (setting.in<si::Degree>()));
+
 		painter.setFont (setting_font);
 		painter.fast_draw_text (QPointF (block.right() + 2.f * w, s), Qt::AlignVCenter | Qt::AlignLeft, number);
 	}

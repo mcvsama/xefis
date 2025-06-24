@@ -106,8 +106,8 @@ class SocketTree: public QWidget
 					if (found == _children_map.end())
 					{
 						auto new_item = new SocketItem (std::next (begin) == end ? &socket : nullptr, _tree_item);
-						new_item->setText (SocketTree::NameColumn, neutrino::to_qstring (name));
-						setup_appereance (*new_item);
+						new_item->setText (SocketTree::NameColumn, nu::to_qstring (name));
+						nu::setup_appereance (*new_item);
 						found = _children_map.try_emplace (name, name, *new_item).first;
 					}
 
@@ -129,7 +129,7 @@ class SocketTree: public QWidget
 
 	template<class Iterator>
 		void
-		populate (Sequence<Iterator> const&);
+		populate (nu::Sequence<Iterator> const&);
 
   private:
 	void
@@ -155,7 +155,7 @@ class SocketTree: public QWidget
 
 template<class Iterator>
 	inline void
-	SocketTree::populate (Sequence<Iterator> const& sequence)
+	SocketTree::populate (nu::Sequence<Iterator> const& sequence)
 	{
 		Item root ("Root", *_tree->invisibleRootItem());
 

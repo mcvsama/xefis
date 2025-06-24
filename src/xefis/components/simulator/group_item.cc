@@ -51,7 +51,7 @@ void
 GroupItem::refresh()
 {
 	auto const signals_blocker = QSignalBlocker (treeWidget());
-	setText (0, neutrino::to_qstring (_group.label()));
+	setText (0, nu::to_qstring (_group.label()));
 }
 
 

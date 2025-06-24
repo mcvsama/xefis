@@ -240,10 +240,10 @@ make_aircraft (xf::rigid_body::System& rigid_body_system, Models& models)
 	auto& rudder_hinge = rigid_body_system.add<rb::HingePrecomputation> (tail_v, rudder, rudder.origin<BodyCOM>(), rudder.origin<BodyCOM>() + z_rudder_length);
 
 	// Servo limits:
-	rigid_body_system.add<rb::AngularLimitsConstraint> (aileron_l_hinge, xf::Range { -60_deg, +60_deg });
-	rigid_body_system.add<rb::AngularLimitsConstraint> (aileron_r_hinge, xf::Range { -60_deg, +60_deg });
-	rigid_body_system.add<rb::AngularLimitsConstraint> (elevator_hinge, xf::Range { -60_deg, +60_deg });
-	rigid_body_system.add<rb::AngularLimitsConstraint> (rudder_hinge, xf::Range { -60_deg, +60_deg });
+	rigid_body_system.add<rb::AngularLimitsConstraint> (aileron_l_hinge, nu::Range { -60_deg, +60_deg });
+	rigid_body_system.add<rb::AngularLimitsConstraint> (aileron_r_hinge, nu::Range { -60_deg, +60_deg });
+	rigid_body_system.add<rb::AngularLimitsConstraint> (elevator_hinge, nu::Range { -60_deg, +60_deg });
+	rigid_body_system.add<rb::AngularLimitsConstraint> (rudder_hinge, nu::Range { -60_deg, +60_deg });
 
 	auto& aileron_l_servo_constraint = rigid_body_system.add (rb::make_standard_servo_constraint (aileron_l_hinge, 3));
 	auto& aileron_r_servo_constraint = rigid_body_system.add (rb::make_standard_servo_constraint (aileron_r_hinge, 3));

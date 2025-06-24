@@ -178,7 +178,7 @@ HorizontalTrim::async_paint (xf::PaintRequest const& paint_request, PaintingPara
 QString
 HorizontalTrim::stringify (double value)
 {
-	QString result = neutrino::to_qstring (std::format ("{:+03d}", static_cast<int> (std::round (100.0 * value))));
+	QString result = nu::to_qstring (std::format ("{:+03d}", static_cast<int> (std::round (100.0 * value))));
 	// Remove +/- sign when 00:
 	if (result.mid (1, 2) == "00")
 		result[0] = ' ';

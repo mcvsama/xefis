@@ -157,7 +157,7 @@ ScreenSpec::base_font_height() const noexcept
 inline si::PixelDensity
 ScreenSpec::pixel_density() const noexcept
 {
-	return xf::diagonal (_position_and_size.size()) / _diagonal_length * _scale;
+	return nu::diagonal (_position_and_size.size()) / _diagonal_length * _scale;
 }
 
 

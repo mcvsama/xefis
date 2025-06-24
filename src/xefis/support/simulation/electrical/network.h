@@ -31,7 +31,7 @@
 
 namespace xf::electrical {
 
-class Network: public Noncopyable
+class Network: public nu::Noncopyable
 {
   public:
 	using Elements	= std::vector<std::unique_ptr<Element>>;

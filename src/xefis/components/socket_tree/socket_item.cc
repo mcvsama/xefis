@@ -69,11 +69,11 @@ SocketItem::read()
 			si::Degree::dynamic_unit(),
 		};
 
-		QString actual_value = neutrino::to_qstring (_socket->to_string (conv_settings));
-		neutrino::filter_printable_string (actual_value);
+		QString actual_value = nu::to_qstring (_socket->to_string (conv_settings));
+		nu::filter_printable_string (actual_value);
 
-		QString set_value = neutrino::to_qstring (_socket->to_string (conv_settings));
-		neutrino::filter_printable_string (set_value);
+		QString set_value = nu::to_qstring (_socket->to_string (conv_settings));
+		nu::filter_printable_string (set_value);
 
 		setTextAlignment (SocketTree::ActualValueColumn, Qt::AlignRight);
 		setText (SocketTree::ActualValueColumn, actual_value);

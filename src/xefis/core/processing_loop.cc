@@ -33,7 +33,7 @@
 
 namespace xf {
 
-ProcessingLoop::ProcessingLoop (std::string_view const instance, si::Frequency loop_frequency, Logger const& logger):
+ProcessingLoop::ProcessingLoop (std::string_view const instance, si::Frequency loop_frequency, nu::Logger const& logger):
 	Module (instance),
 	_loop_period (1.0 / loop_frequency),
 	_logger (logger)
@@ -43,7 +43,7 @@ ProcessingLoop::ProcessingLoop (std::string_view const instance, si::Frequency l
 	_loop_timer->setTimerType (Qt::PreciseTimer);
 	_loop_timer->setInterval (_loop_period.in<si::Millisecond>());
 	QObject::connect (_loop_timer, &QTimer::timeout, this, [this] {
-		execute_cycle (TimeHelper::utc_now());
+		execute_cycle (nu::TimeHelper::utc_now());
 	});
 
 	_logger.set_logger_tag_provider (*this);
@@ -90,12 +90,12 @@ ProcessingLoop::execute_cycle (si::Time const now)
 	for (auto* module: _modules)
 		Module::ProcessingLoopAPI (*module).reset_cache();
 
-	_communication_times.push_back (TimeHelper::measure ([this] {
+	_communication_times.push_back (nu::TimeHelper::measure ([this] {
 		for (auto* module: _modules)
 			Module::ProcessingLoopAPI (*module).communicate (*_current_cycle);
 	}));
 
-	_processing_times.push_back (TimeHelper::measure ([this] {
+	_processing_times.push_back (nu::TimeHelper::measure ([this] {
 		for (auto* module: _modules)
 		{
 			Module::AccountingAPI (*module).set_cycle_time (period());

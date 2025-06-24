@@ -54,7 +54,7 @@ LiftMod::Setting::link (Setting const* prev, Setting const* next)
 LiftMod::LiftMod (QDomElement const& config)
 {
 	// Parse config and populate _settings:
-	for (QDomElement const& e: xf::iterate_sub_elements (config))
+	for (QDomElement const& e: nu::iterate_sub_elements (config))
 	{
 		if (e == "setting")
 		{
@@ -64,7 +64,7 @@ LiftMod::LiftMod (QDomElement const& config)
 	}
 
 	if (_settings.empty())
-		throw BadConfiguration ("missing configuration");
+		throw nu::BadConfiguration ("missing configuration");
 
 	// Link all settings to each other, creating a double-linked list:
 	for (auto s = _settings.begin(); s != _settings.end(); ++s)
@@ -117,23 +117,23 @@ LiftMod::prev_setting (si::Angle const surface_angle) const
 si::Angle
 LiftMod::get_aoa_correction (si::Angle const surface_angle) const
 {
-	auto range = adjacent_find (_settings.begin(), _settings.end(), surface_angle, [](Settings::value_type pair) { return pair.first; });
+	auto range = nu::adjacent_find (_settings.begin(), _settings.end(), surface_angle, [](Settings::value_type pair) { return pair.first; });
 
-	Range<si::Angle> from (range.first->first, range.second->first);
-	Range<si::Angle> to (range.first->second.aoa_correction(), range.second->second.aoa_correction());
+	nu::Range<si::Angle> from (range.first->first, range.second->first);
+	nu::Range<si::Angle> to (range.first->second.aoa_correction(), range.second->second.aoa_correction());
 
 	return renormalize (surface_angle, from, to);
 }
 
 
-Range<si::Speed>
+nu::Range<si::Speed>
 LiftMod::get_speed_range (si::Angle const surface_angle) const
 {
-	auto range = adjacent_find (_settings.begin(), _settings.end(), surface_angle, [](Settings::value_type pair) { return pair.first; });
+	auto range = nu::adjacent_find (_settings.begin(), _settings.end(), surface_angle, [](Settings::value_type pair) { return pair.first; });
 
-	Range<si::Angle> from (range.first->first, range.second->first);
-	Range<si::Speed> to_min (range.first->second.speed_range().min(), range.first->second.speed_range().min());
-	Range<si::Speed> to_max (range.first->second.speed_range().max(), range.first->second.speed_range().max());
+	nu::Range<si::Angle> from (range.first->first, range.second->first);
+	nu::Range<si::Speed> to_min (range.first->second.speed_range().min(), range.first->second.speed_range().min());
+	nu::Range<si::Speed> to_max (range.first->second.speed_range().max(), range.first->second.speed_range().max());
 
 	return {
 		renormalize (surface_angle, from, to_min),
@@ -147,7 +147,7 @@ LiftMod::find_setting_iterator (si::Angle const surface_angle) const
 {
 	using std::abs;
 
-	auto range = adjacent_find (_settings.begin(), _settings.end(), surface_angle, [](Settings::value_type pair) { return pair.first; });
+	auto range = nu::adjacent_find (_settings.begin(), _settings.end(), surface_angle, [](Settings::value_type pair) { return pair.first; });
 
 	if (abs (surface_angle - range.first->first) < abs (surface_angle - range.second->first))
 		return range.first;

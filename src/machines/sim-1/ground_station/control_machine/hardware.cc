@@ -23,7 +23,7 @@
 
 namespace sim1::ground_station::control_machine {
 
-Hardware::Hardware (xf::ProcessingLoop& loop, xf::Machine* machine, xf::Logger const& logger):
+Hardware::Hardware (xf::ProcessingLoop& loop, xf::Machine* machine, nu::Logger const& logger):
 	_logger (logger),
 	_loop (loop),
 	_machine (machine)

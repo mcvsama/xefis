@@ -48,7 +48,7 @@ class ProcessingLoop;
 /**
  * Exception thrown when some settings in a module have not been initialized as required.
  */
-class UninitializedSettings: public Exception
+class UninitializedSettings: public nu::Exception
 {
   public:
 	// Ctor
@@ -74,7 +74,7 @@ class UninitializedSettings: public Exception
  */
 class Module:
 	public NamedInstance,
-	private Noncopyable
+	private nu::Noncopyable
 {
 	friend class ProcessingLoop;
 
@@ -140,19 +140,19 @@ class Module:
 		/**
 		 * Return registered settings.
 		 */
-		Sequence<std::vector<BasicSetting*>::const_iterator>
+		nu::Sequence<std::vector<BasicSetting*>::const_iterator>
 		settings() const noexcept;
 
 		/**
 		 * Return registered input sockets.
 		 */
-		Sequence<std::vector<BasicModuleIn*>::const_iterator>
+		nu::Sequence<std::vector<BasicModuleIn*>::const_iterator>
 		input_sockets() const noexcept;
 
 		/**
 		 * Return registered output sockets.
 		 */
-		Sequence<std::vector<BasicModuleOut*>::const_iterator>
+		nu::Sequence<std::vector<BasicModuleOut*>::const_iterator>
 		output_sockets() const noexcept;
 
 	  private:

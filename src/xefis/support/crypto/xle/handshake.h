@@ -96,13 +96,13 @@ class Handshake
 	Handshake (boost::random::random_device&, Params const&);
 
   protected:
-	static constexpr Hash::Algorithm const kHashAlgorithm = Hash::SHA3_256;
+	static constexpr nu::Hash::Algorithm const kHashAlgorithm = nu::Hash::SHA3_256;
 
   protected:
 	boost::random::random_device&	_random_device;
-	Secure<Blob> const				_master_signature_key;
-	Secure<Blob> const				_slave_signature_key;
-	DiffieHellmanExchange			_dhe_exchange;
+	nu::Secure<Blob> const			_master_signature_key;
+	nu::Secure<Blob> const			_slave_signature_key;
+	nu::DiffieHellmanExchange		_dhe_exchange;
 	size_t const					_hmac_size;
 	si::Time const					_max_time_difference;
 };
@@ -118,7 +118,7 @@ class HandshakeMaster: public Handshake
 		InvalidHandshakeID,
 	};
 
-	class Exception: public neutrino::Exception
+	class Exception: public nu::Exception
 	{
 	  public:
 		Exception (ErrorCode, std::string_view message);
@@ -187,7 +187,7 @@ class HandshakeSlave: public Handshake
 		DeltaTimeTooHigh,
 	};
 
-	class Exception: public neutrino::Exception
+	class Exception: public nu::Exception
 	{
 	  public:
 		Exception (ErrorCode, std::string_view message);
@@ -202,8 +202,8 @@ class HandshakeSlave: public Handshake
 
 	struct HandshakeAndKey
 	{
-		Secure<Blob>	handshake_response;
-		Secure<Blob>	ephemeral_key;
+		nu::Secure<Blob>	handshake_response;
+		nu::Secure<Blob>	ephemeral_key;
 	};
 
 	struct KeyCheckFunctions
@@ -240,14 +240,14 @@ class HandshakeSlave: public Handshake
 
 inline
 HandshakeMaster::Exception::Exception (ErrorCode const error_code, std::string_view const message):
-	neutrino::Exception (message, false),
+	nu::Exception (message, false),
 	_error_code (error_code)
 { }
 
 
 inline
 HandshakeSlave::Exception::Exception (ErrorCode const error_code, std::string_view const message):
-	neutrino::Exception (message, false),
+	nu::Exception (message, false),
 	_error_code (error_code)
 { }
 

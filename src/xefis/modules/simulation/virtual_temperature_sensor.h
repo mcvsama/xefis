@@ -63,7 +63,7 @@ class VirtualTemperatureSensor: public VirtualTemperatureSensorIO
 	VirtualTemperatureSensor (xf::sim::FlightSimulation const&,
 							  xf::rigid_body::Body& mount_body,
 							  xf::SpaceLength<xf::BodySpace> const& mount_location,
-							  xf::Logger const&,
+							  nu::Logger const&,
 							  std::string_view const instance = {});
 
 	// Module API
@@ -72,7 +72,7 @@ class VirtualTemperatureSensor: public VirtualTemperatureSensorIO
 
   private:
 	VirtualTemperatureSensorIO&				_io					{ *this };
-	xf::Logger								_logger;
+	nu::Logger								_logger;
 	xf::sim::FlightSimulation const&		_flight_simulation;
 	xf::SpaceLength<xf::BodySpace>			_mount_location;
 	// Device's noise:

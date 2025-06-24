@@ -127,7 +127,7 @@ template<class O>
 		if (_edited_object)
 		{
 			setEnabled (true);
-			_object_label->setText (neutrino::to_qstring (_edited_object->label()));
+			_object_label->setText (nu::to_qstring (_edited_object->label()));
 		}
 		else
 		{

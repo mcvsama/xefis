@@ -133,11 +133,11 @@ AFCS::knob_speed_change (int delta)
 	switch (_speed_control)
 	{
 		case SpeedControl::KIAS:
-			_mcp_ias = neutrino::clamp (_mcp_ias + 1_kt * delta, kSpeedRange);
+			_mcp_ias = nu::clamp (_mcp_ias + 1_kt * delta, kSpeedRange);
 			break;
 
 		case SpeedControl::Mach:
-			_mcp_mach = neutrino::clamp (_mcp_mach + kMachStep * delta, kMachRange);
+			_mcp_mach = nu::clamp (_mcp_mach + kMachStep * delta, kMachRange);
 			break;
 	}
 }
@@ -215,8 +215,8 @@ AFCS::knob_heading_change (int delta)
 			break;
 	}
 
-	_mcp_heading = xf::floored_mod (_mcp_heading + step * delta, 360_deg);
-	_mcp_track = xf::floored_mod (_mcp_track + step * delta, 360_deg);
+	_mcp_heading = nu::floored_mod (_mcp_heading + step * delta, 360_deg);
+	_mcp_track = nu::floored_mod (_mcp_track + step * delta, 360_deg);
 }
 
 
@@ -377,7 +377,7 @@ AFCS::knob_altitude_change (int delta)
 			altitude_step = 100_ft;
 			break;
 	}
-	_mcp_altitude = neutrino::clamp (_mcp_altitude + altitude_step * delta, kAltitudeRange);
+	_mcp_altitude = nu::clamp (_mcp_altitude + altitude_step * delta, kAltitudeRange);
 }
 
 
@@ -448,10 +448,10 @@ AFCS::knob_vertical_change (int delta)
 		case VerticalControl::VS:
 			if (!_mcp_vs)
 				_mcp_vs = 0_fpm;
-			_mcp_vs = neutrino::clamp (*_mcp_vs + kVSStep * delta, kVSRange);
+			_mcp_vs = nu::clamp (*_mcp_vs + kVSStep * delta, kVSRange);
 
 			// Disengage on 0 crossing:
-			if (xf::Range (-0.5 * kVSStep, 0.5 * kVSStep).includes (*_mcp_vs))
+			if (nu::Range (-0.5 * kVSStep, 0.5 * kVSStep).includes (*_mcp_vs))
 			{
 				_mcp_vs.reset();
 				perhaps_alt_hold();
@@ -461,10 +461,10 @@ AFCS::knob_vertical_change (int delta)
 		case VerticalControl::FPA:
 			if (!_mcp_fpa)
 				_mcp_fpa = 0_deg;
-			_mcp_fpa = neutrino::clamp (*_mcp_fpa + kFPAStep * delta, kFPARange);
+			_mcp_fpa = nu::clamp (*_mcp_fpa + kFPAStep * delta, kFPARange);
 
 			// Disengage on 0 crossing:
-			if (xf::Range (-0.5 * kFPAStep, +0.5 * kFPAStep).includes (*_mcp_fpa))
+			if (nu::Range (-0.5 * kFPAStep, +0.5 * kFPAStep).includes (*_mcp_fpa))
 			{
 				_mcp_fpa.reset();
 				perhaps_alt_hold();
@@ -577,9 +577,11 @@ AFCS::check_input()
 	if (std::any_of (checked_props.begin(), checked_props.end(), [](xf::BasicSocket* p) { return !p->valid(); }))
 	{
 		QStringList failed_props;
+
 		for (auto const& p: checked_props)
 			if (!p->valid())
-				failed_props.push_back (neutrino::to_qstring (p->path().string()));
+				failed_props.push_back (nu::to_qstring (p->path().string()));
+
 		throw Disengage ("invalid sensor input on props: " + failed_props.join (", ").toStdString());
 	}
 }
@@ -617,7 +619,7 @@ AFCS::update_mcp()
 	{
 		case SpeedControl::KIAS:
 			_io.mcp_speed_format_out = *_io.mcp_speed_format_kias;
-			_io.mcp_speed_display = xf::symmetric_round (_mcp_ias.in<si::Knot>());
+			_io.mcp_speed_display = nu::symmetric_round (_mcp_ias.in<si::Knot>());
 			break;
 
 		case SpeedControl::Mach:
@@ -633,11 +635,11 @@ AFCS::update_mcp()
 	switch (_lateral_control)
 	{
 		case LateralControl::Heading:
-			lateral_angle = xf::symmetric_round (_mcp_heading.in<si::Degree>());
+			lateral_angle = nu::symmetric_round (_mcp_heading.in<si::Degree>());
 			break;
 
 		case LateralControl::Track:
-			lateral_angle = xf::symmetric_round (_mcp_track.in<si::Degree>());
+			lateral_angle = nu::symmetric_round (_mcp_track.in<si::Degree>());
 			break;
 	}
 
@@ -648,7 +650,7 @@ AFCS::update_mcp()
 
 	// Altitude window:
 	_io.mcp_altitude_format_out = *_io.mcp_altitude_format;
-	_io.mcp_altitude_display = xf::symmetric_round (_mcp_altitude.in<si::Foot>());
+	_io.mcp_altitude_display = nu::symmetric_round (_mcp_altitude.in<si::Foot>());
 
 	// Vertical-control window:
 	switch (_vertical_control)
@@ -657,7 +659,7 @@ AFCS::update_mcp()
 			_io.mcp_vertical_format_out = *_io.mcp_vertical_format_vs;
 
 			if (_mcp_vs)
-				_io.mcp_vertical_display = xf::symmetric_round (_mcp_vs->in<si::FootPerMinute>());
+				_io.mcp_vertical_display = nu::symmetric_round (_mcp_vs->in<si::FootPerMinute>());
 			else
 				_io.mcp_vertical_display = xf::nil;
 			break;
@@ -666,7 +668,7 @@ AFCS::update_mcp()
 			_io.mcp_vertical_format_out = *_io.mcp_vertical_format_fpa;
 
 			if (_mcp_fpa)
-				_io.mcp_vertical_display = xf::symmetric_round (10.0 * _mcp_fpa->in<si::Degree>()) / 10.0;
+				_io.mcp_vertical_display = nu::symmetric_round (10.0 * _mcp_fpa->in<si::Degree>()) / 10.0;
 			else
 				_io.mcp_vertical_display = xf::nil;
 			break;

@@ -32,7 +32,7 @@ class System
   public:
 	// Ctor
 	explicit
-	System (Logger const&);
+	System (nu::Logger const&);
 
 	/**
 	 * Set system clock.
@@ -42,7 +42,7 @@ class System
 	set_clock (si::Time unix_time);
 
   private:
-	Logger _logger;
+	nu::Logger _logger;
 };
 
 } // namespace xf

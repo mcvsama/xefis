@@ -37,8 +37,9 @@
 #include <set>
 
 
-namespace si = neutrino::si;
-using namespace neutrino::si::literals;
+namespace nu = neutrino;
+namespace si = nu::si;
+using namespace nu::si::literals;
 
 
 class JoystickInputIO: public xf::Module
@@ -128,12 +129,12 @@ class JoystickInput:
 	  public:
 		// Ctor
 		explicit
-		Axis (QDomElement const& axis_element, xf::ModuleOut<double>&, xf::ModuleOut<si::Angle>&, xf::Range<si::Angle>& angle_range);
+		Axis (QDomElement const& axis_element, xf::ModuleOut<double>&, xf::ModuleOut<si::Angle>&, nu::Range<si::Angle>& angle_range);
 
 		/**
 		 * Make Axis that is emulated by two buttons on the joystick.
 		 */
-		Axis (QDomElement const& axis_element, xf::ModuleOut<double>&, xf::ModuleOut<si::Angle>&, xf::Range<si::Angle>& angle_range,
+		Axis (QDomElement const& axis_element, xf::ModuleOut<double>&, xf::ModuleOut<si::Angle>&, nu::Range<si::Angle>& angle_range,
 			  std::optional<HandlerID> up_button_id, std::optional<HandlerID> down_button_id);
 
 		xf::ModuleOut<double>&
@@ -152,7 +153,7 @@ class JoystickInput:
 	  private:
 		xf::ModuleOut<double>&		_socket;
 		xf::ModuleOut<si::Angle>&	_angle_socket;
-		xf::Range<si::Angle>&		_angle_range;
+		nu::Range<si::Angle>&		_angle_range;
 		float						_center			= 0.f;
 		float						_dead_zone		= 0.f;
 		float						_reverse		= 1.f;
@@ -170,12 +171,12 @@ class JoystickInput:
 	typedef std::array<std::unique_ptr<xf::ModuleOut<bool>>, kMaxEventID>		ButtonSockets;
 	typedef std::array<std::unique_ptr<xf::ModuleOut<double>>, kMaxEventID>		AxisSockets;
 	typedef std::array<std::unique_ptr<xf::ModuleOut<si::Angle>>, kMaxEventID>	AngleAxisSockets;
-	typedef std::array<xf::Range<si::Angle>, kMaxEventID>						AngleAxisRanges;
+	typedef std::array<nu::Range<si::Angle>, kMaxEventID>						AngleAxisRanges;
 
   public:
 	// Ctor
 	explicit
-	JoystickInput (xf::ProcessingLoop&, QDomElement const& config, xf::Logger const&, std::string_view const instance = {});
+	JoystickInput (xf::ProcessingLoop&, QDomElement const& config, nu::Logger const&, std::string_view const instance = {});
 
 	// Module API
 	void
@@ -199,7 +200,7 @@ class JoystickInput:
 	 * previous ranges.
 	 */
 	xf::ModuleOut<si::Angle>&
-	angle_axis (HandlerID, xf::Range<si::Angle>);
+	angle_axis (HandlerID, nu::Range<si::Angle>);
 
   private slots:
 	/**
@@ -235,7 +236,7 @@ class JoystickInput:
 
   private:
 	JoystickInputIO&					_io					{ *this };
-	xf::Logger							_logger;
+	nu::Logger							_logger;
 	std::optional<std::string>			_device_path;
 	int									_device				{ 0 };
 	std::unique_ptr<QSocketNotifier>	_notifier;
@@ -266,7 +267,7 @@ JoystickInput::axis (HandlerID const id)
 
 
 inline xf::ModuleOut<si::Angle>&
-JoystickInput::angle_axis (HandlerID const id, xf::Range<si::Angle> const range)
+JoystickInput::angle_axis (HandlerID const id, nu::Range<si::Angle> const range)
 {
 	_angle_axis_ranges[id] = range;
 	return *_angle_axis_sockets[id];

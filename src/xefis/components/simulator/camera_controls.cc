@@ -58,12 +58,12 @@ CameraControls::CameraControls (RigidBodyViewer& viewer, QWidget* parent):
 	auto const ph = PaintHelper (*this);
 	_coordinates = std::make_shared<EarthCoordinates>();
 
-	auto const new_spinbox = [this]<class Value, class ControlledValue> (neutrino::Range<Value> const range, Value const step, uint8_t const decimals, ControlledValue& controlled_value) {
+	auto const new_spinbox = [this]<class Value, class ControlledValue> (nu::Range<Value> const range, Value const step, uint8_t const decimals, ControlledValue& controlled_value) {
 		auto const one = Value (1);
 		auto* spinbox = new QDoubleSpinBox (this);
 		spinbox->setRange (range.min() / one, range.max() / one);
 		spinbox->setDecimals (decimals);
-		spinbox->setSuffix (neutrino::to_qstring (si::unit_suffix<Value>()));
+		spinbox->setSuffix (nu::to_qstring (si::unit_suffix<Value>()));
 		spinbox->setSingleStep (step / one);
 		// For now they're read only. See comment in update_rigid_body_viewer_camera_position().
 		spinbox->setEnabled (false);
@@ -75,7 +75,7 @@ CameraControls::CameraControls (RigidBodyViewer& viewer, QWidget* parent):
 		return spinbox;
 	};
 
-	auto const ecef_range = Range { -20'000_km, 20'000_km };
+	auto const ecef_range = nu::Range { -20'000_km, 20'000_km };
 	auto const ecef_step = 1_m;
 	auto const ecef_decimals = 3;
 

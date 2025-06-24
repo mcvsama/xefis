@@ -82,7 +82,7 @@ AtmosphericScattering::compute_incident_light (SpaceLength<> const& observer_pos
 
 		// Compute phase functions (scattering intensity based on angle between sun and view direction):
 		auto const g = 0.76; // Mie asymmetry factor (approximates forward scattering).
-		auto const gg = neutrino::square (g);
+		auto const gg = nu::square (g);
 		auto const mu = dot_product (ray_direction, sun_direction); // Cosine of the angle between the sun direction and the ray direction.
 		auto const phase = RayleighMie<double> {
 			.r = 3.0 / (16.0 * std::numbers::pi) * (1.0 + mu * mu),
@@ -106,8 +106,8 @@ AtmosphericScattering::compute_incident_light (SpaceLength<> const& observer_pos
 				auto const sky_sample_height = sky_sample_position.norm() - _p.earth_radius;
 
 				// Compute optical depth for Rayleigh and Mie scattering:
-				auto const hr = neutrino::fast_exp (-sky_sample_height * _inv_rayleigh_threshold) * sky_segment_length;
-				auto const hm = neutrino::fast_exp (-sky_sample_height * _inv_mie_threshold) * sky_segment_length;
+				auto const hr = nu::fast_exp (-sky_sample_height * _inv_rayleigh_threshold) * sky_segment_length;
+				auto const hm = nu::fast_exp (-sky_sample_height * _inv_mie_threshold) * sky_segment_length;
 				sky_optical_depth.r += hr;
 				sky_optical_depth.m += hm;
 
@@ -129,8 +129,8 @@ AtmosphericScattering::compute_incident_light (SpaceLength<> const& observer_pos
 					if (light_height < 0_m)
 						break;
 
-					light_optical_factor.r += neutrino::fast_exp (-light_height * _inv_rayleigh_threshold);
-					light_optical_factor.m += neutrino::fast_exp (-light_height * _inv_mie_threshold);
+					light_optical_factor.r += nu::fast_exp (-light_height * _inv_rayleigh_threshold);
+					light_optical_factor.m += nu::fast_exp (-light_height * _inv_mie_threshold);
 					light_current_distance += light_segment_length;
 				}
 
@@ -143,7 +143,7 @@ AtmosphericScattering::compute_incident_light (SpaceLength<> const& observer_pos
 				{
 					SpaceLength tau = kRayleighBeta * (sky_optical_depth.r + light_optical_depth.r) + kMieBeta * 1.1f * (sky_optical_depth.m + light_optical_depth.m);
 					SpaceVector<double> const tau_float = tau / 1_m;
-					SpaceVector<double> const attenuation { neutrino::fast_exp (-tau_float[0]), neutrino::fast_exp (-tau_float[1]), neutrino::fast_exp (-tau_float[2]) };
+					SpaceVector<double> const attenuation { nu::fast_exp (-tau_float[0]), nu::fast_exp (-tau_float[1]), nu::fast_exp (-tau_float[2]) };
 					contribution.r += attenuation * hr.in<si::Meter>();
 					contribution.m += attenuation * hm.in<si::Meter>();
 				}
@@ -177,7 +177,7 @@ AtmosphericScattering::ray_sphere_intersections (SpaceLength<> const& ray_origin
 	auto const sphere_radius_m = sphere_radius.in<si::Meter>();
 	auto const a = dot_product (ray_direction, ray_direction);
 	auto const b = 2 * dot_product (ray_direction, ray_origin_m);
-	auto const c = dot_product (ray_origin_m, ray_origin_m) - square (sphere_radius_m);
+	auto const c = dot_product (ray_origin_m, ray_origin_m) - nu::square (sphere_radius_m);
 
 	if (auto solution = solve_quadratic (a, b, c))
 	{

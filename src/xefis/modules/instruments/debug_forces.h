@@ -25,7 +25,8 @@
 #include <cstddef>
 
 
-namespace si = neutrino::si;
+namespace nu = neutrino;
+namespace si = nu::si;
 
 
 // TODO handle nans

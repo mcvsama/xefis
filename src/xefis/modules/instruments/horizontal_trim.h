@@ -28,6 +28,9 @@
 #include <cstddef>
 
 
+namespace nu = neutrino;
+
+
 // TODO handle nans
 class HorizontalTrimIO: public xf::Instrument
 {

@@ -33,10 +33,11 @@
 namespace xf::test {
 namespace {
 
+namespace test_asserts = nu::test_asserts;
 namespace xle = xf::crypto::xle;
 
-auto g_logger_output	= xf::LoggerOutput (std::clog);
-auto g_logger			= xf::Logger (g_logger_output);
+auto g_logger_output	= nu::LoggerOutput (std::clog);
+auto g_logger			= nu::Logger (g_logger_output);
 
 auto constexpr kFallbackBool	= true;
 auto constexpr kFallbackInt		= 12UL;
@@ -309,7 +310,7 @@ void transmit (LinkProtocol& tx_protocol, LinkProtocol& rx_protocol)
 }
 
 
-AutoTest t1 ("modules/io/link: protocol: valid data transmission", []{
+nu::AutoTest t1 ("modules/io/link: protocol: valid data transmission", []{
 	TestProcessingLoop loop (0.1_s);
 	Ground_Tx_Data tx (loop);
 	Air_Rx_Data rx (loop);
@@ -390,7 +391,7 @@ AutoTest t1 ("modules/io/link: protocol: valid data transmission", []{
 });
 
 
-AutoTest t2 ("modules/io/link: protocol: nils and out-of range values transmission", []{
+nu::AutoTest t2 ("modules/io/link: protocol: nils and out-of range values transmission", []{
 	TestProcessingLoop loop (0.1_s);
 	Ground_Tx_Data tx (loop);
 	Air_Rx_Data rx (loop);
@@ -439,7 +440,7 @@ AutoTest t2 ("modules/io/link: protocol: nils and out-of range values transmissi
 });
 
 
-AutoTest t3 ("modules/io/link: protocol: offsets increase precision", []{
+nu::AutoTest t3 ("modules/io/link: protocol: offsets increase precision", []{
 	TestProcessingLoop loop (0.1_s);
 	Ground_Tx_Data tx (loop);
 	Air_Rx_Data rx (loop);
@@ -457,7 +458,7 @@ AutoTest t3 ("modules/io/link: protocol: offsets increase precision", []{
 });
 
 
-AutoTest t4 ("modules/io/link: protocol: invalid data transmission (wrong signature)", []{
+nu::AutoTest t4 ("modules/io/link: protocol: invalid data transmission (wrong signature)", []{
 	// This tests signature verification and checks if values are retained or not, according to the protocol.
 
 	TestProcessingLoop loop (0.1_s);
@@ -551,7 +552,7 @@ AutoTest t4 ("modules/io/link: protocol: invalid data transmission (wrong signat
 });
 
 
-AutoTest t5 ("modules/io/link: protocol: send-every/send-offset", []{
+nu::AutoTest t5 ("modules/io/link: protocol: send-every/send-offset", []{
 	// The third envelope should be sent every two packets, starting from packet with index 1.
 
 	TestProcessingLoop loop (0.1_s);
@@ -594,7 +595,7 @@ AutoTest t5 ("modules/io/link: protocol: send-every/send-offset", []{
 });
 
 
-AutoTest t6 ("modules/io/link: protocol: encrypted channel works", []{
+nu::AutoTest t6 ("modules/io/link: protocol: encrypted channel works", []{
 	TestProcessingLoop loop (0.1_s);
 	Ground_Tx_Data ground_tx_data (loop);
 	Ground_Rx_Data ground_rx_data (loop);
@@ -626,7 +627,7 @@ AutoTest t6 ("modules/io/link: protocol: encrypted channel works", []{
 	auto [session_prepared, session_activated] = ground_transceiver.start_handshake();
 	auto constexpr kMaxCycles = 6u;
 
-	for (size_t cycles = 0; !ready (session_prepared) && !ready (session_activated); ++cycles)
+	for (size_t cycles = 0; !nu::ready (session_prepared) && !nu::ready (session_activated); ++cycles)
 	{
 		test_asserts::verify (std::format ("handshake completes in {} cycles", cycles), cycles < kMaxCycles);
 		loop.next_cycle();
@@ -637,7 +638,7 @@ AutoTest t6 ("modules/io/link: protocol: encrypted channel works", []{
 
 	// Ground to air encryption:
 	{
-		auto const u = to_blob ("hello!");
+		auto const u = nu::to_blob ("hello!");
 		auto const e = ground_transceiver.encrypt_packet (u);
 		auto const d = air_transceiver.decrypt_packet (e);
 
@@ -646,7 +647,7 @@ AutoTest t6 ("modules/io/link: protocol: encrypted channel works", []{
 
 	// Air to ground encryption:
 	{
-		auto const u = to_blob ("hello back!");
+		auto const u = nu::to_blob ("hello back!");
 		auto const e = air_transceiver.encrypt_packet (u);
 		auto const d = ground_transceiver.decrypt_packet (e);
 

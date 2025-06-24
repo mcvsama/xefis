@@ -51,16 +51,16 @@ template<class Value>
 	[[nodiscard]]
 	inline Value
 	debug_slider (std::string const& name,
-				  neutrino::Range<Value> const range,
+				  nu::Range<Value> const range,
 				  std::optional<Value> default_value = std::nullopt,
 				  Value const step = Value (1),
 				  std::function<void()> const callback = nullptr)
 	{
 		struct Details
 		{
-			QSlider*				slider;
-			neutrino::Range<Value>	range;
-			Value					value;
+			QSlider*			slider;
+			nu::Range<Value>	range;
+			Value				value;
 		};
 
 		static std::map<std::string, Details> sliders;
@@ -91,18 +91,18 @@ template<class Value>
 			auto ph = PaintHelper (slider);
 			slider.setMinimumWidth (ph.em_pixels_int (25));
 
-			auto* min_label = new QLabel (neutrino::to_qstring (std::format ("{}", range.min())));
+			auto* min_label = new QLabel (nu::to_qstring (std::format ("{}", range.min())));
 			min_label->setAlignment (Qt::AlignLeft);
 
-			auto* title_label = new QLabel (neutrino::to_qstring (std::format ("{}: {}", name, details.value)));
+			auto* title_label = new QLabel (nu::to_qstring (std::format ("{}: {}", name, details.value)));
 			title_label->setAlignment (Qt::AlignCenter);
 
-			auto* max_label = new QLabel (neutrino::to_qstring (std::format ("{}", range.max())));
+			auto* max_label = new QLabel (nu::to_qstring (std::format ("{}", range.max())));
 			max_label->setAlignment (Qt::AlignRight);
 
 			QObject::connect (&slider, &QSlider::valueChanged, [&details, name, step, title_label, callback] (int value) {
 				details.value = value * step;
-				title_label->setText (neutrino::to_qstring (std::format ("{}: {}", name, details.value)));
+				title_label->setText (nu::to_qstring (std::format ("{}: {}", name, details.value)));
 
 				if (callback)
 					callback();

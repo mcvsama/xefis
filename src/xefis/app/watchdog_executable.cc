@@ -35,8 +35,9 @@
 #include <vector>
 
 
-namespace si = neutrino::si;
-using namespace neutrino::si::literals;
+namespace nu = neutrino;
+namespace si = nu::si;
+using namespace nu::si::literals;
 
 
 enum class PingLoopResult
@@ -214,9 +215,9 @@ watchdog (int argc, char** argv, char**)
 int
 main (int argc, char** argv, char** envp)
 {
-	signal (SIGILL, xf::fail);
-	signal (SIGFPE, xf::fail);
-	signal (SIGSEGV, xf::fail);
+	signal (SIGILL, nu::fail);
+	signal (SIGFPE, nu::fail);
+	signal (SIGSEGV, nu::fail);
 
 	setenv ("LC_ALL", "POSIX", 1);
 	setlocale (LC_ALL, "POSIX");

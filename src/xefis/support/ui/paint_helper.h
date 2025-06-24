@@ -128,7 +128,7 @@ PaintHelper::pixel_density() const
 inline float
 PaintHelper::pixels (si::Length width) const
 {
-	return xf::pixels (width, pixel_density());
+	return nu::pixels (width, pixel_density());
 }
 
 
@@ -140,7 +140,7 @@ PaintHelper::em_pixels (float ems) const
 	if (v != -1)
 		return ems * v;
 	else
-		return ems * _font.pointSize() * xf::pixels_per_point (pixel_density());
+		return ems * _font.pointSize() * nu::pixels_per_point (pixel_density());
 }
 
 

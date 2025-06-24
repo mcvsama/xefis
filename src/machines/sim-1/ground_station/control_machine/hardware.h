@@ -46,10 +46,10 @@ class Hardware
   public:
 	// Ctor
 	explicit
-	Hardware (xf::ProcessingLoop&, xf::Machine*, xf::Logger const&);
+	Hardware (xf::ProcessingLoop&, xf::Machine*, nu::Logger const&);
 
   private:
-	xf::Logger			_logger;
+	nu::Logger			_logger;
 	xf::ProcessingLoop&	_loop;
 	xf::Machine*		_machine;
 

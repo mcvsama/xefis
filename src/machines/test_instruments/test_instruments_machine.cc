@@ -36,7 +36,7 @@ TestInstrumentsMachine::TestInstrumentsMachine (xf::Xefis& xefis):
 		return force / 1_N * 1_rad;
 	};
 
-	_work_performer = std::make_unique<xf::WorkPerformer> (std::thread::hardware_concurrency(), _logger);
+	_work_performer = std::make_unique<nu::WorkPerformer> (std::thread::hardware_concurrency(), _logger);
 
 	_navaid_storage = std::make_unique<xf::NavaidStorage> (_logger, "share/nav/nav.dat.gz", "share/nav/fix.dat.gz", "share/nav/apt.dat.gz");
 	_work_performer->submit (_navaid_storage->async_loader());

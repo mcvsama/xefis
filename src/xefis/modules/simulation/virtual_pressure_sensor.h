@@ -69,7 +69,7 @@ class VirtualPressureSensor: public VirtualPressureSensorIO
 	VirtualPressureSensor (xf::sim::FlightSimulation const&,
 						   Probe,
 						   xf::SpaceLength<xf::AirframeFrame> const& mount_location,
-						   xf::Logger const&,
+						   nu::Logger const&,
 						   std::string_view const instance = {});
 
 	// Module API
@@ -78,7 +78,7 @@ class VirtualPressureSensor: public VirtualPressureSensorIO
 
   private:
 	VirtualPressureSensorIO&				_io					{ *this };
-	xf::Logger								_logger;
+	nu::Logger								_logger;
 	xf::sim::FlightSimulation const&		_flight_simulation;
 	Probe									_probe;
 	xf::SpaceLength<xf::AirframeFrame>		_mount_location;

@@ -164,16 +164,16 @@ Status::process (xf::Cycle const& cycle)
 
 	// Update timestamp if there was anything new to show:
 	if (to_show < _hidden_messages.end())
-		_last_message_timestamp = xf::TimeHelper::utc_now();
+		_last_message_timestamp = nu::TimeHelper::utc_now();
 
 	std::copy (to_show, _hidden_messages.end(), std::back_inserter (_visible_messages));
-	_hidden_messages.resize (neutrino::to_unsigned (std::distance (_hidden_messages.begin(), to_show)));
+	_hidden_messages.resize (nu::to_unsigned (std::distance (_hidden_messages.begin(), to_show)));
 
 	auto to_hide = std::remove_if (_visible_messages.begin(), _visible_messages.end(),
 								   [](Message* m) { return !m->should_be_shown(); });
 
 	std::copy (to_hide, _visible_messages.end(), std::back_inserter (_hidden_messages));
-	_visible_messages.resize (neutrino::to_unsigned (std::distance (_visible_messages.begin(), to_hide)));
+	_visible_messages.resize (nu::to_unsigned (std::distance (_visible_messages.begin(), to_hide)));
 
 	// Update CAUTION and WARNING alarms:
 
@@ -211,7 +211,7 @@ Status::async_paint (xf::PaintRequest const& paint_request, PaintingParams const
 		cache->font = aids->font_3.font;
 		float margin = aids->pen_width (2.f);
 		QFontMetricsF metrics (cache->font);
-		cache->line_height = 0.85 * neutrino::line_height (metrics);
+		cache->line_height = 0.85 * nu::line_height (metrics);
 		// Compute space needed for more-up/more-down arrows and actual
 		// messages viewport.
 		cache->arrow_height = 0.5f * cache->line_height;
@@ -234,12 +234,12 @@ Status::async_paint (xf::PaintRequest const& paint_request, PaintingParams const
 
 	for (int i = 0; i < n; ++i)
 	{
-		Message const* message = pp.visible_messages[neutrino::to_unsigned (i + cache->scroll_pos)];
+		Message const* message = pp.visible_messages[nu::to_unsigned (i + cache->scroll_pos)];
 		painter.setPen (QPen (message->color()));
 		painter.fast_draw_text (QPointF (cache->viewport.left(),
 										 cache->viewport.top() + cache->line_height * (i + 0.5)),
 								Qt::AlignVCenter | Qt::AlignLeft,
-								neutrino::to_qstring (message->text()));
+								nu::to_qstring (message->text()));
 	}
 
 	// Cursor:
@@ -331,7 +331,7 @@ Status::cursor_del()
 	if (!cache->cursor_visible)
 		return;
 
-	_hidden_messages.push_back (_visible_messages[neutrino::to_unsigned (cache->cursor_pos)]);
+	_hidden_messages.push_back (_visible_messages[nu::to_unsigned (cache->cursor_pos)]);
 	_visible_messages.erase (_visible_messages.begin() + cache->cursor_pos);
 	_cursor_hide_timer->start();
 	cache->solve_scroll_and_cursor (_visible_messages);
@@ -352,7 +352,7 @@ Status::recall()
 void
 Status::clear()
 {
-	if (xf::TimeHelper::utc_now() - _last_message_timestamp > *_io.status_minimum_display_time)
+	if (nu::TimeHelper::utc_now() - _last_message_timestamp > *_io.status_minimum_display_time)
 	{
 		_hidden_messages.insert (_hidden_messages.end(), _visible_messages.begin(), _visible_messages.end());
 		_visible_messages.clear();

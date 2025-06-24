@@ -26,7 +26,7 @@
 
 namespace xf {
 
-class RGBSpace: public neutrino::math::CoordinateSystemBase
+class RGBSpace: public math::CoordinateSystemBase
 { };
 
 } // namespace xf

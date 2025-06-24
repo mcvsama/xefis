@@ -228,7 +228,7 @@ NodeVoltageSolver::simplify (Network const& network, SNetwork& snetwork)
 			// Make sure that element nodes have only 1 connection, to a normal node:
 			for (auto* node: { &node_a, &node_c })
 				if (node->connected_nodes().size() > 1)
-					throw InvalidArgument ("Element Node " + node->name() + " has too many connections, maximum 1 allowed");
+					throw nu::InvalidArgument ("Element Node " + node->name() + " has too many connections, maximum 1 allowed");
 
 			SNode* snode_a = node_a.connected_nodes().empty()
 				// This creates dangling edge:

@@ -33,8 +33,9 @@
 #include <set>
 
 
-namespace si = neutrino::si;
-using namespace neutrino::si::literals;
+namespace nu = neutrino;
+namespace si = nu::si;
+using namespace nu::si::literals;
 
 
 class FlapsControlIO: public xf::Module
@@ -47,7 +48,7 @@ class FlapsControlIO: public xf::Module
 	// How fast flaps should extend/retract:
 	xf::Setting<si::AngularVelocity>	angular_velocity	{ this, "angular_velocity", 10_deg / 1_s };
 	// Range of output_control socket:
-	xf::Setting<xf::Range<double>>		control_extents		{ this, "control_extents", { 0.0, 1.0 } };
+	xf::Setting<nu::Range<double>>		control_extents		{ this, "control_extents", { 0.0, 1.0 } };
 
 	/*
 	 * Input
@@ -90,7 +91,7 @@ class FlapsControl: public FlapsControlIO
   private:
 	FlapsControlIO&						_io					{ *this };
 	std::set<si::Angle>					_settings_list;
-	xf::Range<si::Angle>				_extents;
+	nu::Range<si::Angle>				_extents;
 	si::Angle							_setting;
 	si::Angle							_current;
 	std::unique_ptr<QTimer>				_timer;

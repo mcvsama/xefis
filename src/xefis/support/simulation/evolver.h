@@ -53,7 +53,7 @@ class Evolver
 	 *			Must not be nullptr.
 	 */
 	explicit
-	Evolver (si::Time initial_simulation_time, si::Time frame_duration, Logger const&, Evolve);
+	Evolver (si::Time initial_simulation_time, si::Time frame_duration, nu::Logger const&, Evolve);
 
 	/**
 	 * Return current simulation frame Δt.
@@ -110,7 +110,7 @@ class Evolver
 		{ return _performance; }
 
   private:
-	xf::Logger	_logger;
+	nu::Logger	_logger;
 	si::Time	_initial_simulation_time;
 	si::Time	_frame_duration;
 	Evolve		_evolve;

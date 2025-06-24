@@ -36,7 +36,7 @@
 #include <optional>
 
 
-namespace si = neutrino::si;
+namespace si = nu::si;
 
 
 // TODO handle nans
@@ -119,8 +119,8 @@ template<class Value>
 		xf::SocketObserver									_inputs_observer;
 		Converter											_converter;
 		// Cached struff, to prevent allocation on heap on every repaint:
-		xf::Synchronized<std::optional<float>> mutable		_box_text_width;
-		xf::Synchronized<std::vector<PointInfo>> mutable	_point_infos;
+		nu::Synchronized<std::optional<float>> mutable		_box_text_width;
+		nu::Synchronized<std::vector<PointInfo>> mutable	_point_infos;
 	};
 
 
@@ -155,7 +155,7 @@ template<class Value>
 	inline std::packaged_task<void()>
 	RadialGauge<Value>::paint (xf::PaintRequest paint_request) const
 	{
-		xf::Range const range { *_io.value_minimum, *_io.value_maximum };
+		nu::Range const range { *_io.value_minimum, *_io.value_maximum };
 
 		GaugeValues values;
 		values.get_from (*this, range, (_converter && _io.value) ? _converter (*_io.value) : _io.value.to_floating_point());
@@ -165,14 +165,14 @@ template<class Value>
 		{
 			auto v = (_converter && _io.reference) ? _converter (*_io.reference) : _io.reference.to_floating_point();
 			values.reference_str = BasicGauge::stringify (v, *_io.format, _io.precision);
-			values.normalized_reference = xf::renormalize (neutrino::clamp (*_io.reference, range), range, BasicGauge::kNormalizedRange);
+			values.normalized_reference = nu::renormalize (nu::clamp (*_io.reference, range), range, BasicGauge::kNormalizedRange);
 		}
 
 		if (_io.target)
-			values.normalized_target = xf::renormalize (neutrino::clamp (*_io.target, range), range, BasicGauge::kNormalizedRange);
+			values.normalized_target = nu::renormalize (nu::clamp (*_io.target, range), range, BasicGauge::kNormalizedRange);
 
 		if (_io.automatic)
-			values.normalized_automatic = xf::renormalize (neutrino::clamp (*_io.automatic, range), range, BasicGauge::kNormalizedRange);
+			values.normalized_automatic = nu::renormalize (nu::clamp (*_io.automatic, range), range, BasicGauge::kNormalizedRange);
 
 		return std::packaged_task<void()> ([this, pr = std::move (paint_request), gv = std::move (values)] {
 			async_paint (pr, gv);
@@ -230,14 +230,14 @@ template<class Value>
 
 			if (paint_request.size_changed() || !*box_text_width)
 			{
-				QString const sample_text = neutrino::to_qstring (std::format (values.format, 0.0));
+				QString const sample_text = nu::to_qstring (std::format (values.format, 0.0));
 				*box_text_width = metrics.horizontalAdvance (sample_text);
 			}
 
 			box_text_width_f = **box_text_width;
 		}
 
-		QRectF text_rect (0.5f * text_pen.width(), -0.6f * q, box_text_width_f, 0.9f * neutrino::line_height (metrics));
+		QRectF text_rect (0.5f * text_pen.width(), -0.6f * q, box_text_width_f, 0.9f * nu::line_height (metrics));
 		text_rect.translate (margin, -text_rect.height());
 		QRectF rect = text_rect.adjusted (-margin, 0, margin, 0);
 
@@ -249,7 +249,7 @@ template<class Value>
 				painter.setPen (box_pen);
 				painter.drawRect (rect);
 				painter.setPen (text_pen);
-				painter.fast_draw_text (text_rect, Qt::AlignRight | Qt::AlignVCenter, neutrino::to_qstring (*values.value_str));
+				painter.fast_draw_text (text_rect, Qt::AlignRight | Qt::AlignVCenter, nu::to_qstring (*values.value_str));
 			}
 			else
 			{
@@ -263,7 +263,7 @@ template<class Value>
 				painter.setPen (aids.get_pen (Qt::green, 1.0f));
 				painter.fast_draw_text (QPointF (text_rect.right() - zero_width + small_zero_width, text_rect.top()),
 										Qt::AlignBottom | Qt::AlignRight,
-										neutrino::to_qstring (*values.reference_str));
+										nu::to_qstring (*values.reference_str));
 			}
 		});
 	}
@@ -326,11 +326,11 @@ template<class Value>
 						zero_point_pen.setColor (BasicGauge::kWarningColor.lighter (120));
 					}
 
-					using namespace neutrino::painter_literals;
+					using namespace nu::painter_literals;
 
 					painter.setPen (Qt::NoPen);
 					painter.setBrush (brush);
-					painter.drawPie (rect, 0_qarcdeg, -neutrino::angle_for_qpainter (*value_angle));
+					painter.drawPie (rect, 0_qarcdeg, -nu::angle_for_qpainter (*value_angle));
 					painter.setPen (zero_point_pen);
 					painter.drawLine (QPointF (0.f, 0.f), QPointF (r, 0.f));
 				});
@@ -384,7 +384,7 @@ template<class Value>
 						if (next.zone == PointInfo::Minimums)
 						{
 							painter.setPen (next.pen);
-							painter.drawArc (rect, -neutrino::angle_for_qpainter (angle_0), -neutrino::angle_for_qpainter (span));
+							painter.drawArc (rect, -nu::angle_for_qpainter (angle_0), -nu::angle_for_qpainter (span));
 							painter.rotate (angle_1.template in<si::Degree>());
 							painter.drawLine (QPointF (r, 0.f), QPointF (r + next.tick_len, 0.f));
 						}
@@ -397,12 +397,12 @@ template<class Value>
 							else
 								painter.setPen (silver_pen);
 
-							painter.drawArc (rect, -neutrino::angle_for_qpainter (angle_0), -neutrino::angle_for_qpainter (span));
+							painter.drawArc (rect, -nu::angle_for_qpainter (angle_0), -nu::angle_for_qpainter (span));
 						}
 						else if (prev.zone == PointInfo::Maximums)
 						{
 							painter.setPen (prev.pen);
-							painter.drawArc (rect, -neutrino::angle_for_qpainter (angle_0), -neutrino::angle_for_qpainter (span));
+							painter.drawArc (rect, -nu::angle_for_qpainter (angle_0), -nu::angle_for_qpainter (span));
 							painter.rotate (angle_0.template in<si::Degree>());
 							painter.drawLine (QPointF (r, 0.f), QPointF (r + prev.tick_len, 0.f));
 						}
@@ -437,8 +437,8 @@ template<class Value>
 							painter.rotate ((angle - *value_angle).template in<si::Degree>());
 							painter.drawLine (QPointF (intr, 0.0), QPointF (extr, 0.0));
 							painter.drawArc (rect.adjusted (-ext_adj, -ext_adj, +ext_adj, +ext_adj),
-											 -neutrino::angle_for_qpainter (0_deg),
-											 -neutrino::angle_for_qpainter (*value_angle - angle));
+											 -nu::angle_for_qpainter (0_deg),
+											 -nu::angle_for_qpainter (*value_angle - angle));
 						});
 					});
 				};

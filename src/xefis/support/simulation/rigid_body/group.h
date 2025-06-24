@@ -37,7 +37,7 @@ class System;
  * A set of bodies that can be translated/rotated as a whole.
  * Group does not own bodies, rigid body System does.
  */
-class Group: private Noncopyable
+class Group: private nu::Noncopyable
 {
   public:
 	// Ctor

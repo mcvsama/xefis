@@ -40,7 +40,7 @@ class AngularLimitsConstraint: public Constraint
 
 	// Ctor
 	explicit
-	AngularLimitsConstraint (HingePrecomputation&, Range<si::Angle>);
+	AngularLimitsConstraint (HingePrecomputation&, nu::Range<si::Angle>);
 
 	/**
 	 * Set minimum hinge angle.
@@ -66,7 +66,7 @@ class AngularLimitsConstraint: public Constraint
 	 * Set minimum and maximum angles.
 	 */
 	void
-	set_angles (Range<si::Angle>);
+	set_angles (nu::Range<si::Angle>);
 
 	// Constraint API
 	void
@@ -120,7 +120,7 @@ AngularLimitsConstraint::set_angles (std::optional<si::Angle> const min_angle, s
 
 
 inline void
-AngularLimitsConstraint::set_angles (Range<si::Angle> const range)
+AngularLimitsConstraint::set_angles (nu::Range<si::Angle> const range)
 {
 	set_angles (range.min(), range.max());
 }

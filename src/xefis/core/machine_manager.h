@@ -30,7 +30,7 @@ namespace xf {
 /**
  * This object is created from the main executable.
  */
-class MachineManager: private Noncopyable
+class MachineManager: private nu::Noncopyable
 {
   public:
 	// Ctor

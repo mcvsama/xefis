@@ -77,12 +77,12 @@ class InstrumentDetails
 	// since it's not known if std::swap() on QImages is fast or not.
 	std::unique_ptr<QImage>					canvas;
 	std::unique_ptr<QImage>					canvas_to_use;
-	WorkPerformer*							work_performer;
+	nu::WorkPerformer*						work_performer;
 
   public:
 	// Ctor
 	explicit
-	InstrumentDetails (Instrument&, WorkPerformer& work_performer);
+	InstrumentDetails (Instrument&, nu::WorkPerformer& work_performer);
 
 	/**
 	 * Compute position of this instrument on canvas.
@@ -114,7 +114,7 @@ class WorkPerformerMetrics
 class Screen:
 	public QWidget,
 	public NamedInstance,
-	private Noncopyable
+	private nu::Noncopyable
 {
   private:
 	using InstrumentsSet = std::set<Instrument*>;
@@ -123,7 +123,7 @@ class Screen:
   public:
 	// Ctor
 	explicit
-	Screen (ScreenSpec const&, Graphics const&, Machine&, std::string_view const instance, Logger const&);
+	Screen (ScreenSpec const&, Graphics const&, Machine&, std::string_view const instance, nu::Logger const&);
 
 	// Dtor
 	~Screen();
@@ -132,7 +132,7 @@ class Screen:
 	 * Register instrument
 	 */
 	void
-	register_instrument (Instrument&, WorkPerformer&);
+	register_instrument (Instrument&, nu::WorkPerformer&);
 
 	/**
 	 * Deregister instrument
@@ -175,28 +175,28 @@ class Screen:
 	/**
 	 * Return the sequence of registered instruments.
 	 */
-	Sequence<InstrumentsSet::iterator>
+	nu::Sequence<InstrumentsSet::iterator>
 	instruments() noexcept
 		{ return { _instruments_set.begin(), _instruments_set.end() }; }
 
 	/**
 	 * Return the sequence of registered instruments.
 	 */
-	Sequence<InstrumentsSet::const_iterator>
+	nu::Sequence<InstrumentsSet::const_iterator>
 	instruments() const noexcept
 		{ return { _instruments_set.begin(), _instruments_set.end() }; }
 
 	/**
 	 * Return WorkPerformer for given instrument.
 	 */
-	WorkPerformer*
+	nu::WorkPerformer*
 	work_performer_for (Instrument const&) const;
 
 	/**
 	 * Return WorkPerformerMetrics object for given WorkPerformer object or nullptr.
 	 */
 	WorkPerformerMetrics const*
-	work_performer_metrics_for (WorkPerformer const&) const;
+	work_performer_metrics_for (nu::WorkPerformer const&) const;
 
   protected:
 	// QWidget API:
@@ -282,7 +282,7 @@ class Screen:
 
   private:
 	Machine&					_machine;
-	Logger						_logger;
+	nu::Logger					_logger;
 	QTimer*						_hide_logo_timer;
 	QTimer*						_refresh_timer;
 	QImage						_canvas;
@@ -295,7 +295,7 @@ class Screen:
 	si::Time const				_frame_time;
 	bool						_displaying_logo		{ true };
 	bool						_paint_bounding_boxes	{ false };
-	std::unordered_map<WorkPerformer const*, WorkPerformerMetrics>
+	std::unordered_map<nu::WorkPerformer const*, WorkPerformerMetrics>
 								_work_performer_metrics	{ 10 };
 };
 

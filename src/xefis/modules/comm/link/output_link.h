@@ -22,7 +22,7 @@
 #include <xefis/modules/comm/link/link_protocol.h>
 
 
-namespace si = neutrino::si;
+namespace si = nu::si;
 using namespace si::literals;
 
 
@@ -37,7 +37,7 @@ class OutputLink: public xf::Module
   public:
 	// Ctor
 	explicit
-	OutputLink (xf::ProcessingLoop&, std::unique_ptr<LinkProtocol>, si::Frequency send_frequency, xf::Logger const&, std::string_view const instance = {});
+	OutputLink (xf::ProcessingLoop&, std::unique_ptr<LinkProtocol>, si::Frequency send_frequency, nu::Logger const&, std::string_view const instance = {});
 
   protected:
 	// Module API
@@ -52,7 +52,7 @@ class OutputLink: public xf::Module
 	send_output();
 
   private:
-	xf::Logger						_logger;
+	nu::Logger						_logger;
 	std::unique_ptr<LinkProtocol>	_protocol;
 	si::Time						_previous_update_time	{ 0_s };
 	si::Time						_send_period;

@@ -36,8 +36,8 @@ ModuleItem::ModuleItem (Module& module, QTreeWidgetItem& parent):
 	QTreeWidgetItem (&parent, { "", "", "" }),
 	_module (module)
 {
-	setup_appereance (*this);
-	setText (ConfigurableItemsList::NameColumn, neutrino::to_qstring (identifier (_module)));
+	nu::setup_appereance (*this);
+	setText (ConfigurableItemsList::NameColumn, nu::to_qstring (identifier (_module)));
 }
 
 } // namespace xf::configurator

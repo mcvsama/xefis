@@ -47,7 +47,7 @@ class Xefis: public QApplication
 	/**
 	 * Thrown when user gives value to a command line option that doesn't take values.
 	 */
-	class NonValuedArgumentException: public Exception
+	class NonValuedArgumentException: public nu::Exception
 	{
 	  public:
 		explicit
@@ -57,7 +57,7 @@ class Xefis: public QApplication
 	/**
 	 * Thrown when user doesn't give a value to a command line option that takes values.
 	 */
-	class MissingValueException: public Exception
+	class MissingValueException: public nu::Exception
 	{
 	  public:
 		explicit
@@ -67,7 +67,7 @@ class Xefis: public QApplication
 	/**
 	 * Throw when attempted to access one of the support objects which is not yet initialized.
 	 */
-	class UninitializedServiceException: public Exception
+	class UninitializedServiceException: public nu::Exception
 	{
 	  public:
 		explicit
@@ -127,7 +127,7 @@ class Xefis: public QApplication
 	 * Return logger to use by machines.
 	 */
 	[[nodiscard]]
-	Logger const&
+	nu::Logger const&
 	logger() const noexcept
 		{ return _logger; }
 
@@ -135,7 +135,7 @@ class Xefis: public QApplication
 	 * Return global fallback exception logger (one to use when there's no better-fitted one).
 	 */
 	[[nodiscard]]
-	static Logger const&
+	static nu::Logger const&
 	fallback_exception_logger();
 
   private:
@@ -155,8 +155,8 @@ class Xefis: public QApplication
 	print_copyrights (std::ostream&);
 
   private:
-	LoggerOutput						_logger_output	{ std::clog };
-	Logger								_logger			{ _logger_output };
+	nu::LoggerOutput					_logger_output	{ std::clog };
+	nu::Logger							_logger			{ _logger_output };
 	Options								_options;
 	QTimer*								_posix_signals_check_timer;
 

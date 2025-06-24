@@ -38,7 +38,7 @@ static Blob const kSlaveToMaster { 0x02 };
 static thread_local boost::random::random_device transceiver_rnd;
 
 
-Transceiver::Transceiver (Role const role, size_t ciphertext_expansion, xf::Logger const& logger):
+Transceiver::Transceiver (Role const role, size_t ciphertext_expansion, nu::Logger const& logger):
 	_role (role),
 	_logger (logger),
 	_ciphertext_expansion (ciphertext_expansion)
@@ -103,13 +103,13 @@ Transceiver::encrypt_packet (BlobView const packet)
 				if (fallback)
 					return fallback();
 				else
-					std::throw_with_nested (Exception (std::format ("{}: {} thrown an exception; fallback unavailable", role_name(), session_name), false));
+					std::throw_with_nested (nu::Exception (std::format ("{}: {} thrown an exception; fallback unavailable", role_name(), session_name), false));
 			}
 		}
 		else if (fallback)
 			return fallback();
 		else
-			throw Exception (std::format ("{}: {} is unavailable; fallback is unavailable", role_name(), session_name), false);
+			throw nu::Exception (std::format ("{}: {} is unavailable; fallback is unavailable", role_name(), session_name), false);
 	};
 
 	return try_session (first_session_to_try, first_session_role, _role == Role::Master, [&] {
@@ -138,21 +138,21 @@ Transceiver::decrypt_packet (BlobView const packet, std::optional<Transport::Seq
 			catch (...)
 			{
 				if (fallback)
-					return fallback (std::format ("{}: {}", session_name, neutrino::describe_exception (std::current_exception())));
+					return fallback (std::format ("{}: {}", session_name, nu::describe_exception (std::current_exception())));
 				else
-					std::throw_with_nested (Exception (std::format ("{}: {} thrown an exception, fallback unavailable", role_name(), session_name), false));
+					std::throw_with_nested (nu::Exception (std::format ("{}: {} thrown an exception, fallback unavailable", role_name(), session_name), false));
 			}
 		}
 		else if (fallback)
 			return fallback (std::format ("{} unavailable", session_name));
 		else
-			throw Exception (std::format ("{}: {} is unavailable; fallback is unavailable", role_name(), session_name), false);
+			throw nu::Exception (std::format ("{}: {} is unavailable; fallback is unavailable", role_name(), session_name), false);
 	};
 
 	return try_session (active_session(), "active session", false, true, [&] (std::string const active_fallback_reason) -> Blob {
 		return try_session (previous_session(), "previous session", false, false, [&] (std::string const previous_fallback_reason) -> Blob {
 			return try_session (next_session_candidate(), "next session candidate", true, false, [&] (std::string const next_fallback_reason) -> Blob {
-				throw Exception (std::format ("{}: {}; {}; {}", role_name(), active_fallback_reason, previous_fallback_reason, next_fallback_reason), false);
+				throw nu::Exception (std::format ("{}: {}; {}; {}", role_name(), active_fallback_reason, previous_fallback_reason, next_fallback_reason), false);
 			});
 		});
 	});
@@ -179,11 +179,11 @@ MasterTransceiver::Session::HandshakeRequested::HandshakeRequested (CryptoParams
 		.hmac_size = params.hmac_size,
 		.max_time_difference = params.max_time_difference,
 	}),
-	handshake_request (handshake_master.generate_handshake_blob (neutrino::TimeHelper::utc_now()))
+	handshake_request (handshake_master.generate_handshake_blob (nu::TimeHelper::utc_now()))
 { }
 
 
-MasterTransceiver::Session::Connected::Connected (Secure<Blob> const& ephemeral_key, CryptoParams const& params):
+MasterTransceiver::Session::Connected::Connected (nu::Secure<Blob> const& ephemeral_key, CryptoParams const& params):
 	transmitter (transceiver_rnd, {
 		.ephemeral_session_key = *ephemeral_key,
 		.authentication_secret = params.authentication_secret,
@@ -234,22 +234,22 @@ MasterTransceiver::Session::set_handshake_response (Blob const& handshake_respon
 {
 	if (auto* hr = std::get_if<HandshakeRequested> (&_state))
 	{
-		auto const ephemeral_key = Secure (hr->handshake_master.compute_key (handshake_response));
+		auto const ephemeral_key = nu::Secure (hr->handshake_master.compute_key (handshake_response));
 		_state.emplace<Connected> (ephemeral_key, _crypto_params);
 		_session_prepared_promise.set_value();
 	}
 	else
-		throw Exception ("unexpected MasterTransceiver::Session::set_handshake_response() when not waiting for it", false);
+		throw nu::Exception ("unexpected MasterTransceiver::Session::set_handshake_response() when not waiting for it", false);
 }
 
 
 void
 MasterTransceiver::Session::abort (AbortReason const reason)
 {
-	if (!neutrino::ready (_session_prepared_future))
+	if (!nu::ready (_session_prepared_future))
 		_session_prepared_promise.set_exception (std::make_exception_ptr (HandshakeAborted({ reason })));
 
-	if (!neutrino::ready (_session_activated_future))
+	if (!nu::ready (_session_activated_future))
 		_session_activated_promise.set_exception (std::make_exception_ptr (HandshakeAborted({ reason })));
 }
 
@@ -280,7 +280,7 @@ MasterTransceiver::Session::transmitter()
 	if (auto* connected = std::get_if<Connected> (&_state))
 		return connected->transmitter;
 	else
-		throw Exception ("failed to encrypt packet: master transceiver not connected (handshake not finalized)", false);
+		throw nu::Exception ("failed to encrypt packet: master transceiver not connected (handshake not finalized)", false);
 }
 
 
@@ -290,11 +290,11 @@ MasterTransceiver::Session::receiver()
 	if (auto* connected = std::get_if<Connected> (&_state))
 		return connected->receiver;
 	else
-		throw Exception ("failed to decrypt packet: master transceiver not connected (handshake not finalized)", false);
+		throw nu::Exception ("failed to decrypt packet: master transceiver not connected (handshake not finalized)", false);
 }
 
 
-MasterTransceiver::MasterTransceiver (xf::ProcessingLoop& loop, CryptoParams const& params, xf::Logger const& logger, std::string_view const instance):
+MasterTransceiver::MasterTransceiver (xf::ProcessingLoop& loop, CryptoParams const& params, nu::Logger const& logger, std::string_view const instance):
 	Transceiver (Role::Master, Transport::ciphertext_expansion (params.hmac_size), logger.with_context (std::string (kLoggerScope) + "#" + instance)),
 	Module (loop, "MasterTransceiver"),
 	_crypto_params (params)
@@ -305,7 +305,7 @@ MasterTransceiver::StartHandshakeResult
 MasterTransceiver::start_handshake()
 {
 	_next_session_candidate = std::make_unique<Session> (_crypto_params);
-	this->handshake_request = to_string (_next_session_candidate->handshake_request());
+	this->handshake_request = nu::to_string (_next_session_candidate->handshake_request());
 
 	return {
 		.session_prepared	= _next_session_candidate->session_prepared(),
@@ -343,11 +343,11 @@ MasterTransceiver::process (Cycle const&)
 	try {
 		if (_handshake_response_changed.value_changed() && this->handshake_response.valid())
 			if (_next_session_candidate->waiting_for_handshake_response())
-				_next_session_candidate->set_handshake_response (to_blob (*this->handshake_response));
+				_next_session_candidate->set_handshake_response (nu::to_blob (*this->handshake_response));
 	}
 	catch (...)
 	{
-		logger() << std::format ("Exception when handling handshake response: {}\n", neutrino::describe_exception (std::current_exception()));
+		logger() << std::format ("Exception when handling handshake response: {}\n", nu::describe_exception (std::current_exception()));
 	}
 }
 
@@ -376,7 +376,7 @@ SlaveTransceiver::Session::Session (Blob const& handshake_request,
 		.hmac_size = params.hmac_size,
 		.max_time_difference = params.max_time_difference,
 	}, key_check_callbacks);
-	auto const response_and_key = handshake_slave.generate_handshake_blob_and_key (handshake_request, neutrino::TimeHelper::utc_now());
+	auto const response_and_key = handshake_slave.generate_handshake_blob_and_key (handshake_request, nu::TimeHelper::utc_now());
 	_handshake_response = response_and_key.handshake_response;
 	_transmitter.emplace (transceiver_rnd, Transmitter::Params {
 		.ephemeral_session_key = *response_and_key.ephemeral_key,
@@ -400,7 +400,7 @@ SlaveTransceiver::Session::Session (Blob const& handshake_request,
 SlaveTransceiver::SlaveTransceiver (xf::ProcessingLoop& loop,
 									CryptoParams const& params,
 									HandshakeSlave::KeyCheckFunctions const key_check_functions,
-									xf::Logger const& logger,
+									nu::Logger const& logger,
 									std::string_view const instance):
 	Transceiver (Role::Slave, Transport::ciphertext_expansion (params.hmac_size), logger.with_context (std::string (kLoggerScope) + "#" + instance)),
 	Module (loop, "SlaveTransceiver"),
@@ -435,13 +435,13 @@ SlaveTransceiver::process (Cycle const&)
 	try {
 		if (_handshake_request_changed.value_changed() && this->handshake_request.valid())
 		{
-			_next_session_candidate = std::make_unique<Session> (to_blob (*this->handshake_request), _crypto_params, _key_check_functions);
-			this->handshake_response = to_string (*_next_session_candidate->handshake_response());
+			_next_session_candidate = std::make_unique<Session> (nu::to_blob (*this->handshake_request), _crypto_params, _key_check_functions);
+			this->handshake_response = nu::to_string (*_next_session_candidate->handshake_response());
 		}
 	}
 	catch (...)
 	{
-		logger() << std::format ("Exception when handling handshake request: {}\n", neutrino::describe_exception (std::current_exception()));
+		logger() << std::format ("Exception when handling handshake request: {}\n", nu::describe_exception (std::current_exception()));
 	}
 }
 

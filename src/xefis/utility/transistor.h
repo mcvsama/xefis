@@ -199,7 +199,7 @@ template<class T>
 	Transistor<T>::process (Value s0, Value s1, Time dt) noexcept
 	{
 		Value f = _smoother.process (_selected_second ? 1.0 : 0.0, dt);
-		return _output = xf::renormalize (f, Range<double> (0.0, 1.0), Range<Value> (s0, s1));
+		return _output = nu::renormalize (f, nu::Range<double> (0.0, 1.0), nu::Range<Value> (s0, s1));
 	}
 
 

@@ -34,7 +34,7 @@
 namespace xf::test {
 namespace {
 
-ManualTest t_1 ("geometry: triangulate", []{
+nu::ManualTest t_1 ("geometry: triangulate", []{
 	static xf::AirfoilSpline const
 	kSpline {
 		{ 1.00,  +0.00 },
@@ -60,13 +60,13 @@ ManualTest t_1 ("geometry: triangulate", []{
 	spline_polygon << QPointF (v0[0], v0[1]);
 
 	{
-		DummyQApplication app;
+		nu::DummyQApplication app;
 
 		QWidget w (nullptr);
-		auto const lh = neutrino::default_line_height (&w);
+		auto const lh = nu::default_line_height (&w);
 		size_t draw_triangles = 0;
 
-		neutrino::TestWidget t (QSize (50 * lh, 50 * lh), 0.5_s, [&] (QPaintDevice& canvas) {
+		nu::TestWidget t (QSize (50 * lh, 50 * lh), 0.5_s, [&] (QPaintDevice& canvas) {
 			QPainter painter (&canvas);
 			painter.fillRect (t.rect(), Qt::black);
 

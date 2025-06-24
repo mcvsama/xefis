@@ -30,7 +30,7 @@ class GPSTimeOfDay;
 /**
  * Thrown when invalid GPS date/time is used in a function.
  */
-class BadDateTime: public Exception
+class BadDateTime: public nu::Exception
 {
   public:
 	BadDateTime (GPSDate const&, GPSTimeOfDay const&);

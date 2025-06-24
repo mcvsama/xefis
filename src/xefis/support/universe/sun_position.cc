@@ -38,8 +38,8 @@ compute_sun_ecliptic_position (double const days_since_J2000)
 	// The mean anomaly of the Sun:
 	auto const g_full_range = 357.528_deg + 0.9856003_deg * n;
 	// Put L and g in range 0…360°:
-	auto const L = floored_mod (L_full_range, 360_deg);
-	auto const g = floored_mod (g_full_range, 360_deg);
+	auto const L = nu::floored_mod (L_full_range, 360_deg);
+	auto const g = nu::floored_mod (g_full_range, 360_deg);
 
 	return {
 		.longitude = L + 1.915_deg * sin (g) + 0.020_deg * sin (2 * g),

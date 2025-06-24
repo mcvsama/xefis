@@ -33,16 +33,16 @@ class SingleLoopMachine: public xf::Machine
   public:
 	// Ctor
 	explicit
-	SingleLoopMachine (xf::Xefis&, xf::Logger const&, si::Frequency loop_frequency);
+	SingleLoopMachine (xf::Xefis&, nu::Logger const&, si::Frequency loop_frequency);
 
   protected:
 	[[nodiscard]]
-	xf::Logger&
+	nu::Logger&
 	logger()
 		{ return _logger; }
 
 	[[nodiscard]]
-	xf::Logger const&
+	nu::Logger const&
 	logger() const
 		{ return _logger; }
 
@@ -69,7 +69,7 @@ class SingleLoopMachine: public xf::Machine
 	connect_modules() = 0;
 
   private:
-	xf::Logger			_logger;
+	nu::Logger			_logger;
 	xf::ProcessingLoop	_loop;
 };
 

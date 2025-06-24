@@ -40,15 +40,15 @@ class Xefis;
  */
 struct AirframeDefinition
 {
-	Flaps			flaps;
-	Spoilers		spoilers;
-	Lift			lift;
-	Drag			drag;
+	Flaps				flaps;
+	Spoilers			spoilers;
+	Lift				lift;
+	Drag				drag;
 
-	si::Area		wings_area;
-	si::Length		wing_chord;
-	Range<double>	load_factor_limits;
-	si::Angle		safe_aoa_correction;
+	si::Area			wings_area;
+	si::Length			wing_chord;
+	nu::Range<double>	load_factor_limits;
+	si::Angle			safe_aoa_correction;
 };
 
 
@@ -78,7 +78,7 @@ class Airframe
 	/**
 	 * Return range of useful AOA, for which computations make sense.
 	 */
-	Range<si::Angle> const&
+	nu::Range<si::Angle> const&
 	get_defined_aoa_range() const noexcept;
 
 	/**
@@ -144,12 +144,12 @@ class Airframe
 	 * Return maximum safe load factor limits to fly at:
 	 * { negative G, positive G }.
 	 */
-	Range<double>
+	nu::Range<double>
 	load_factor_limits() const;
 
   private:
-	AirframeDefinition	_definition;
-	Range<si::Angle>	_defined_aoa_range;
+	AirframeDefinition		_definition;
+	nu::Range<si::Angle>	_defined_aoa_range;
 };
 
 
@@ -181,7 +181,7 @@ Airframe::drag() const
 }
 
 
-inline Range<si::Angle> const&
+inline nu::Range<si::Angle> const&
 Airframe::get_defined_aoa_range() const noexcept
 {
 	return _defined_aoa_range;
@@ -209,7 +209,7 @@ Airframe::safe_aoa_correction() const
 }
 
 
-inline Range<double>
+inline nu::Range<double>
 Airframe::load_factor_limits() const
 {
 	return _definition.load_factor_limits;

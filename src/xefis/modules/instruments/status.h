@@ -37,8 +37,9 @@
 #include <optional>
 
 
-namespace si = neutrino::si;
-using namespace neutrino::si::literals;
+namespace nu = neutrino;
+namespace si = nu::si;
+using namespace nu::si::literals;
 
 
 /**
@@ -273,7 +274,7 @@ class Status:
 	std::unique_ptr<QTimer>						_blink_timer;
 	std::unique_ptr<QTimer>						_cursor_hide_timer;
 	std::atomic<bool>							_blink_show						{ false };
-	xf::Synchronized<Cache> mutable				_cache;
+	nu::Synchronized<Cache> mutable				_cache;
 };
 
 

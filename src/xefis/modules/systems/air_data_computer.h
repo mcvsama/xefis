@@ -32,8 +32,9 @@
 #include <string>
 
 
-namespace si = neutrino::si;
-using namespace neutrino::si::literals;
+namespace nu = neutrino;
+namespace si = nu::si;
+using namespace nu::si::literals;
 
 
 class AirDataComputerIO: public xf::Module
@@ -100,7 +101,7 @@ class AirDataComputer: public AirDataComputerIO
   public:
 	// Ctor
 	explicit
-	AirDataComputer (xf::ProcessingLoop&, xf::Airframe*, xf::Logger const&, std::string_view const instance = {});
+	AirDataComputer (xf::ProcessingLoop&, xf::Airframe*, nu::Logger const&, std::string_view const instance = {});
 
   protected:
 	// Module API
@@ -155,7 +156,7 @@ class AirDataComputer: public AirDataComputerIO
 
   private:
 	AirDataComputerIO&			_io									{ *this };
-	xf::Logger					_logger;
+	nu::Logger					_logger;
 	bool						_ias_in_valid_range					{ false };
 	bool						_cas_in_valid_range					{ false };
 	bool						_prev_use_standard_pressure			{ false };

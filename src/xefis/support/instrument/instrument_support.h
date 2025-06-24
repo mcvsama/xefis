@@ -68,7 +68,7 @@ class InstrumentSupport
 
   private:
 	Graphics const&									_graphics;
-	xf::Synchronized<Data> mutable					_data;
+	nu::Synchronized<Data> mutable					_data;
 	static inline thread_local TextPainter::Cache	_text_painter_cache;
 };
 

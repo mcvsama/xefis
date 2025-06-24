@@ -93,7 +93,7 @@ class PCA9685: public QObject
   public:
 	// Ctor
 	explicit
-	PCA9685 (i2c::Device&&, si::Time output_period, Logger const&);
+	PCA9685 (nu::i2c::Device&&, si::Time output_period, nu::Logger const&);
 
 	/**
 	 * Return true if chip is serviceable.
@@ -157,12 +157,12 @@ class PCA9685: public QObject
 	guard (std::function<void()> guarded_code);
 
   private:
-	i2c::Device						_i2c_device;
+	nu::i2c::Device					_i2c_device;
 	QTimer*							_initialization_timer;
 	bool							_serviceable	{ false };
 	si::Time						_output_period;
 	std::array<si::Time, kChannels>	_duty_cycles;
-	Logger							_logger;
+	nu::Logger						_logger;
 };
 
 

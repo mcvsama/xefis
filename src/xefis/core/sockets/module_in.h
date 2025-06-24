@@ -85,7 +85,7 @@ template<class V>
 		ModuleIn (owner, path)
 	{
 		if (!owner)
-			throw xf::InvalidArgument ("ModuleOut requires non-null module pointer");
+			throw nu::InvalidArgument ("ModuleOut requires non-null module pointer");
 
 		this->set_fallback (fallback_value);
 	}

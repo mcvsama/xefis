@@ -25,7 +25,7 @@
 #include <cstddef>
 
 
-AFCS_Autopilot::AFCS_Autopilot (xf::ProcessingLoop& loop, xf::Logger const& logger, std::string_view const instance):
+AFCS_Autopilot::AFCS_Autopilot (xf::ProcessingLoop& loop, nu::Logger const& logger, std::string_view const instance):
 	AFCS_Autopilot_IO (loop, instance),
 	_logger (logger.with_context (std::string (kLoggerScope) + "#" + instance))
 {
@@ -77,7 +77,7 @@ AFCS_Autopilot::process (xf::Cycle const& cycle)
 void
 AFCS_Autopilot::rescue (xf::Cycle const& cycle, std::exception_ptr eptr)
 {
-	using namespace xf::exception_ops;
+	using namespace nu::exception_ops;
 
 	diagnose();
 	_io.serviceable = false;

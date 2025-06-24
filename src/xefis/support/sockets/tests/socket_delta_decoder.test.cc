@@ -27,7 +27,10 @@
 namespace xf::test {
 namespace {
 
-AutoTest t1 ("SocketDeltaDecoder", []{
+namespace test_asserts = nu::test_asserts;
+
+
+nu::AutoTest t1 ("SocketDeltaDecoder", []{
 	using Integer = int16_t;
 	using Callback = std::function<void (std::optional<Integer>)>;
 

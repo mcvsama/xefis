@@ -81,13 +81,13 @@ class RigidBodyViewer: public GLAnimationWidget
   public:
 	// Ctor
 	explicit
-	RigidBodyViewer (QWidget* parent, RefreshRate, neutrino::WorkPerformer* work_performer = nullptr);
+	RigidBodyViewer (QWidget* parent, RefreshRate, nu::WorkPerformer* work_performer = nullptr);
 
 	/**
 	 * Assign a thread pool for RigidBodyPainter.
 	 */
 	void
-	use_work_performer (neutrino::WorkPerformer* work_performer)
+	use_work_performer (nu::WorkPerformer* work_performer)
 		{ _rigid_body_painter.use_work_performer (work_performer); }
 
 	/**

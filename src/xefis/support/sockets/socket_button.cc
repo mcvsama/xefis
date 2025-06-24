@@ -34,7 +34,7 @@ SocketButton::process()
 {
 	auto const current_state = _socket.value_or (false);
 
-	std::visit (overload {
+	std::visit (nu::overload {
 		[&] (PressCallback const& press_callback) {
 			if (press_callback && current_state && !_last_state)
 				press_callback();
