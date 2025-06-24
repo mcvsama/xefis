@@ -30,8 +30,8 @@ FixedConstraint::FixedConstraint (Body& body_1, Body& body_2):
 {
 	set_label ("fixed constraint");
 	SpaceLength<WorldSpace> const origin (math::zero);
-	_anchor_1 = body_1.placement().bound_transform_to_body (origin);
-	_anchor_2 = body_2.placement().bound_transform_to_body (origin);
+	_anchor_1 = body_1.placement().rotate_translate_to_body (origin);
+	_anchor_2 = body_2.placement().rotate_translate_to_body (origin);
 
 	_Jv1 = JacobianV<6> {
 		// Translation:
@@ -88,8 +88,8 @@ FixedConstraint::initialize_step (si::Time const dt)
 	auto const x1 = placement_1.position();
 	auto const x2 = placement_2.position();
 
-	auto const r1 = placement_1.unbound_transform_to_base (_anchor_1);
-	auto const r2 = placement_2.unbound_transform_to_base (_anchor_2);
+	auto const r1 = placement_1.rotate_to_base (_anchor_1);
+	auto const r2 = placement_2.rotate_to_base (_anchor_2);
 
 	_Jw1.put (+make_pseudotensor (r1), 0, 0); // Translation
 	_Jw2.put (-make_pseudotensor (r2), 0, 0); // Translation

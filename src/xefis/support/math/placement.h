@@ -156,7 +156,7 @@ template<math::CoordinateSystem pBaseSpace = void, math::CoordinateSystem pSpace
 		template<class InputObject>
 			[[nodiscard]]
 			auto
-			bound_transform_to_body (InputObject const& input) const
+			rotate_translate_to_body (InputObject const& input) const
 				{ return _base_rotation * (input - _position); }
 
 		/**
@@ -165,7 +165,7 @@ template<math::CoordinateSystem pBaseSpace = void, math::CoordinateSystem pSpace
 		template<class InputObject>
 			[[nodiscard]]
 			auto
-			unbound_transform_to_body (InputObject const& input) const
+			rotate_to_body (InputObject const& input) const
 				{ return _base_rotation * input; }
 
 		/**
@@ -174,7 +174,7 @@ template<math::CoordinateSystem pBaseSpace = void, math::CoordinateSystem pSpace
 		template<class InputObject>
 			[[nodiscard]]
 			auto
-			bound_transform_to_base (InputObject const& input) const
+			rotate_translate_to_base (InputObject const& input) const
 				{ return _body_rotation * input + _position; }
 
 		/**
@@ -183,7 +183,7 @@ template<math::CoordinateSystem pBaseSpace = void, math::CoordinateSystem pSpace
 		template<class InputObject>
 			[[nodiscard]]
 			auto
-			unbound_transform_to_base (InputObject const& input) const
+			rotate_to_base (InputObject const& input) const
 				{ return _body_rotation * input; }
 
 	  private:

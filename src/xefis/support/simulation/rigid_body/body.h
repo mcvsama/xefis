@@ -404,7 +404,7 @@ template<CoordinateSystemConcept Space>
 			std::lock_guard lock (_optionals_mutex);
 
 			if (!_world_space_mass_moments)
-				_world_space_mass_moments = _placement.unbound_transform_to_base (_mass_moments);
+				_world_space_mass_moments = _placement.rotate_to_base (_mass_moments);
 
 			return *_world_space_mass_moments;
 		}
@@ -424,7 +424,7 @@ template<CoordinateSystemConcept Space>
 			std::lock_guard lock (_optionals_mutex);
 
 			if (!_body_space_velocity_moments)
-				_body_space_velocity_moments = _placement.unbound_transform_to_body (_velocity_moments);
+				_body_space_velocity_moments = _placement.rotate_to_body (_velocity_moments);
 
 			return *_body_space_velocity_moments;
 		}
@@ -442,7 +442,7 @@ template<CoordinateSystemConcept Space>
 		if constexpr (std::is_same_v<Space, WorldSpace>)
 			_velocity_moments = velocity_moments;
 		else if constexpr (std::is_same_v<Space, BodyCOM>)
-			_velocity_moments = _placement.unbound_transform_to_base (velocity_moments);
+			_velocity_moments = _placement.rotate_to_base (velocity_moments);
 		else
 			static_assert (false, "unsupported coordinate system");
 	}
@@ -459,7 +459,7 @@ template<CoordinateSystemConcept Space>
 			std::lock_guard lock (_optionals_mutex);
 
 			if (!_body_space_acceleration_moments)
-				_body_space_acceleration_moments = _placement.unbound_transform_to_body (_acceleration_moments);
+				_body_space_acceleration_moments = _placement.rotate_to_body (_acceleration_moments);
 
 			return *_body_space_acceleration_moments;
 		}
@@ -477,7 +477,7 @@ template<CoordinateSystemConcept Space>
 		if constexpr (std::is_same_v<Space, WorldSpace>)
 			_acceleration_moments = acceleration_moments;
 		else if constexpr (std::is_same_v<Space, BodyCOM>)
-			_acceleration_moments = _placement.unbound_transform_to_base (acceleration_moments);
+			_acceleration_moments = _placement.rotate_to_base (acceleration_moments);
 		else
 			static_assert (false, "unsupported coordinate system");
 	}
@@ -488,7 +488,7 @@ template<CoordinateSystemConcept Space>
 	Body::acceleration_moments_except_gravity() const
 	{
 		if constexpr (std::is_same_v<Space, WorldSpace>)
-			return _placement.unbound_transform_to_base (_body_space_acceleration_moments_except_gravity);
+			return _placement.rotate_to_base (_body_space_acceleration_moments_except_gravity);
 		else if constexpr (std::is_same_v<Space, BodyCOM>)
 			return _body_space_acceleration_moments_except_gravity;
 		else
@@ -501,7 +501,7 @@ template<CoordinateSystemConcept Space>
 	Body::set_acceleration_moments_except_gravity (AccelerationMoments<Space> const& acceleration_moments)
 	{
 		if constexpr (std::is_same_v<Space, WorldSpace>)
-			_body_space_acceleration_moments_except_gravity = _placement.unbound_transform_to_body (acceleration_moments);
+			_body_space_acceleration_moments_except_gravity = _placement.rotate_to_body (acceleration_moments);
 		else if constexpr (std::is_same_v<Space, BodyCOM>)
 			_body_space_acceleration_moments_except_gravity = acceleration_moments;
 		else
@@ -518,7 +518,7 @@ template<CoordinateSystemConcept Space>
 			std::lock_guard lock (_optionals_mutex);
 
 			if (!_world_space_applied_impulses)
-				_world_space_applied_impulses = _placement.unbound_transform_to_base (_applied_impulses);
+				_world_space_applied_impulses = _placement.rotate_to_base (_applied_impulses);
 
 			return *_world_space_applied_impulses;
 		}
@@ -536,7 +536,7 @@ template<CoordinateSystemConcept Space>
 		_world_space_applied_impulses.reset();
 
 		if constexpr (std::is_same_v<Space, WorldSpace>)
-			_applied_impulses += _placement.unbound_transform_to_body (force_moments);
+			_applied_impulses += _placement.rotate_to_body (force_moments);
 		else if constexpr (std::is_same_v<Space, BodyCOM>)
 			_applied_impulses += force_moments;
 		else
@@ -554,14 +554,14 @@ template<CoordinateSystemConcept ForceSpace, CoordinateSystemConcept PositionSpa
 		SpaceLength<BodyCOM> body_space_position;
 
 		if constexpr (std::is_same_v<ForceSpace, WorldSpace>)
-			body_space_force_moments = _placement.unbound_transform_to_body (force_moments);
+			body_space_force_moments = _placement.rotate_to_body (force_moments);
 		else if constexpr (std::is_same_v<ForceSpace, BodyCOM>)
 			body_space_force_moments = force_moments;
 		else
 			static_assert (false, "unsupported coordinate system");
 
 		if constexpr (std::is_same_v<PositionSpace, WorldSpace>)
-			body_space_position = _placement.bound_transform_to_body (position);
+			body_space_position = _placement.rotate_translate_to_body (position);
 		else if constexpr (std::is_same_v<ForceSpace, BodyCOM>)
 			body_space_position = position;
 		else
@@ -582,7 +582,7 @@ template<CoordinateSystemConcept Space>
 			// The resultant_force() assumes origin as the center of mass, so for Wrenches in WorldSpace coordinates
 			// it gives incorrect results, since C.O.M. is rarely at the WorldSpace origin.
 			// So first transform Wrench with its position to BodyCOM, only then compute resultant force.
-			_applied_impulses += resultant_force (_placement.bound_transform_to_body (wrench));
+			_applied_impulses += resultant_force (_placement.rotate_translate_to_body (wrench));
 		}
 		else if constexpr (std::is_same_v<Space, BodyCOM>)
 			_applied_impulses += resultant_force (wrench);
@@ -612,7 +612,7 @@ template<CoordinateSystemConcept Space>
 	Body::origin() const
 	{
 		if constexpr (std::is_same_v<Space, WorldSpace>)
-			return _placement.bound_transform_to_base (_origin_placement.position());
+			return _placement.rotate_translate_to_base (_origin_placement.position());
 		else if constexpr (std::is_same_v<Space, BodyCOM>)
 			return _origin_placement.position();
 		else if constexpr (std::is_same_v<Space, BodyOrigin>)

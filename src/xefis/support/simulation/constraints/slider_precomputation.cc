@@ -34,10 +34,10 @@ SliderPrecomputation::SliderPrecomputation (Body& body_1,
 
 	// Choose anchor point at world origin (it can be anything). Compute and save two relative vectors to it.
 	SpaceLength<WorldSpace> const origin (math::zero);
-	_anchor_1 = pl_1.bound_transform_to_body (origin);
-	_anchor_2 = pl_2.bound_transform_to_body (origin);
-	_axis_1 = pl_1.unbound_transform_to_body (axis);
-	_axis_2 = pl_2.unbound_transform_to_body (axis);
+	_anchor_1 = pl_1.rotate_translate_to_body (origin);
+	_anchor_2 = pl_2.rotate_translate_to_body (origin);
+	_axis_1 = pl_1.rotate_to_body (axis);
+	_axis_2 = pl_2.rotate_to_body (axis);
 }
 
 
@@ -49,10 +49,10 @@ SliderPrecomputation::compute (SliderPrecomputationData& data)
 
 	auto const x1 = pl_1.position();
 	auto const x2 = pl_2.position();
-	auto const r1 = pl_1.unbound_transform_to_base (_anchor_1);
-	auto const r2 = pl_2.unbound_transform_to_base (_anchor_2);
+	auto const r1 = pl_1.rotate_to_base (_anchor_1);
+	auto const r2 = pl_2.rotate_to_base (_anchor_2);
 	auto const u = x2 + r2 - x1 - r1;
-	auto const a1 = pl_1.unbound_transform_to_base (_axis_1);
+	auto const a1 = pl_1.rotate_to_base (_axis_1);
 	auto const distance = (~u * a1).scalar();
 	auto const z = find_non_colinear (a1);
 	auto const t1 = cross_product (a1, z).normalized();
