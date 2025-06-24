@@ -17,6 +17,9 @@
 // Xefis:
 #include <xefis/config/all.h>
 
+// Neutrino:
+#include <neutrino/qt/qstring.h>
+
 // Qt:
 #include <QSignalBlocker>
 
@@ -49,7 +52,7 @@ ConstraintItem::refresh()
 {
 	auto const signals_blocker = QSignalBlocker (treeWidget());
 
-	setText (0, QString::fromStdString (_constraint.label()));
+	setText (0, neutrino::to_qstring (_constraint.label()));
 
 	if (_constraint.broken())
 		setForeground (0 , QBrush (Qt::gray));

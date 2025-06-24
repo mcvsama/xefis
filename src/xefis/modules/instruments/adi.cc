@@ -21,6 +21,7 @@
 // Neutrino:
 #include <neutrino/numeric.h>
 #include <neutrino/qt/qfontmetrics.h>
+#include <neutrino/qt/qstring.h>
 #include <neutrino/si/utils.h>
 
 // Standard:
@@ -777,7 +778,7 @@ ArtificialHorizon::paint_heading (AdiPaintRequest& pr) const
 						pr.painter.drawLine (QPointF (d05, -w / 36.f), QPointF (d05, 0.f));
 					});
 
-					QString text = QString::fromStdString (std::format ("{:02.0f}", xf::floored_mod (1.f * deg, 360.f) / 10));
+					QString text = neutrino::to_qstring (std::format ("{:02.0f}", xf::floored_mod (1.f * deg, 360.f) / 10));
 					if (text == "00")
 						text = "N";
 					else if (text == "09")
@@ -1368,7 +1369,7 @@ VelocityLadder::paint_ap_setting (AdiPaintRequest& pr) const
 		// Mach info has priority:
 		if (pr.params.cmd_mach)
 		{
-			value = QString::fromStdString (std::format ("{:5.3f}", *pr.params.cmd_mach));
+			value = neutrino::to_qstring (std::format ("{:5.3f}", *pr.params.cmd_mach));
 
 			if (value.size() > 0 && value[0] == '0')
 				value = value.mid (1);
@@ -2475,7 +2476,7 @@ PaintingWork::paint_flight_director (AdiPaintRequest& pr) const
 		pr.painter.setFont (pr.aids.font_2.font);
 		pr.painter.fast_draw_text (QPointF (2.95 * pr.q, 4.385 * pr.q),
 								   Qt::AlignRight | Qt::AlignBottom,
-								   QString::fromStdString (*pr.params.flight_director_active_name),
+								   neutrino::to_qstring (*pr.params.flight_director_active_name),
 								   pr.default_shadow);
 	}
 }
@@ -2636,7 +2637,7 @@ PaintingWork::paint_nav (AdiPaintRequest& pr) const
 			int course_int = xf::symmetric_round (pr.params.navaid_course_magnetic->in<si::Degree>());
 			if (course_int == 0)
 				course_int = 360;
-			loc_str += QString::fromStdString (std::format ("/{:03d}°", course_int));
+			loc_str += neutrino::to_qstring (std::format ("/{:03d}°", course_int));
 		}
 
 		pr.painter.setPen (Qt::white);
@@ -2652,7 +2653,7 @@ PaintingWork::paint_nav (AdiPaintRequest& pr) const
 
 		QString dme_val = "DME ---";
 		if (pr.params.navaid_distance)
-			dme_val = QString::fromStdString (std::format ("DME {:.1f}", pr.params.navaid_distance->in<si::NauticalMile>()));
+			dme_val = neutrino::to_qstring (std::format ("DME {:.1f}", pr.params.navaid_distance->in<si::NauticalMile>()));
 
 		pr.painter.setPen (Qt::white);
 		pr.painter.setFont (pr.aids.font_1.font);
@@ -3132,7 +3133,7 @@ ADI::process (xf::Cycle const& cycle)
 	// Flaps UP bug:
 	if (_io.speed_flaps_up_speed && _io.speed_flaps_up_label)
 	{
-		_speed_flaps_up_current_label = QString::fromStdString (*_io.speed_flaps_up_label);
+		_speed_flaps_up_current_label = neutrino::to_qstring (*_io.speed_flaps_up_label);
 		params.speed_bugs[_speed_flaps_up_current_label] = *_io.speed_flaps_up_speed;
 	}
 	else
@@ -3141,7 +3142,7 @@ ADI::process (xf::Cycle const& cycle)
 	// Flaps "a" bug:
 	if (_io.speed_flaps_a_speed && _io.speed_flaps_a_label)
 	{
-		_speed_flaps_a_current_label = QString::fromStdString (*_io.speed_flaps_a_label);
+		_speed_flaps_a_current_label = neutrino::to_qstring (*_io.speed_flaps_a_label);
 		params.speed_bugs[_speed_flaps_a_current_label] = *_io.speed_flaps_a_speed;
 	}
 	else
@@ -3150,7 +3151,7 @@ ADI::process (xf::Cycle const& cycle)
 	// Flaps "b" bug:
 	if (_io.speed_flaps_b_speed && _io.speed_flaps_b_label)
 	{
-		_speed_flaps_b_current_label = QString::fromStdString (*_io.speed_flaps_b_label);
+		_speed_flaps_b_current_label = neutrino::to_qstring (*_io.speed_flaps_b_label);
 		params.speed_bugs[_speed_flaps_b_current_label] = *_io.speed_flaps_b_speed;
 	}
 	else
@@ -3203,7 +3204,7 @@ ADI::process (xf::Cycle const& cycle)
 	params.altitude_landing_warning_hi = *_io.altitude_landing_warning_hi;
 	params.altitude_landing_warning_lo = *_io.altitude_landing_warning_lo;
 	// Decision height
-	params.decision_height_type = QString::fromStdString (_io.decision_height_type.value_or (""));
+	params.decision_height_type = neutrino::to_qstring (_io.decision_height_type.value_or (""));
 	params.decision_height_amsl =
 		_io.decision_height_setting
 			? _io.decision_height_amsl.get_optional()
@@ -3278,8 +3279,8 @@ ADI::process (xf::Cycle const& cycle)
 	params.navaid_reference_visible = _io.navaid_reference_visible.value_or (false);
 	params.navaid_course_magnetic = _io.navaid_course_magnetic.get_optional();
 	params.navaid_distance = _io.navaid_distance.get_optional();
-	params.navaid_hint = QString::fromStdString (_io.navaid_type_hint.value_or (""));
-	params.navaid_identifier = QString::fromStdString (_io.navaid_identifier.value_or (""));
+	params.navaid_hint = neutrino::to_qstring (_io.navaid_type_hint.value_or (""));
+	params.navaid_identifier = neutrino::to_qstring (_io.navaid_identifier.value_or (""));
 	// Approach, flight path deviations
 	params.deviation_vertical_failure =
 		!_io.flight_path_deviation_vertical_serviceable.value_or (true) ||
@@ -3313,24 +3314,24 @@ ADI::process (xf::Cycle const& cycle)
 		params.raising_runway_position.reset();
 	// Control hint
 	if (_io.flight_mode_hint_visible.value_or (false))
-		params.control_hint = QString::fromStdString (_io.flight_mode_hint.value_or (""));
+		params.control_hint = neutrino::to_qstring (_io.flight_mode_hint.value_or (""));
 	else
 		params.control_hint.reset();
 
 	params.control_hint_focus = _io.flight_mode_hint_visible.modification_age() < *_io.focus_duration || _io.flight_mode_hint.modification_age() < *_io.focus_duration;
 	// FMA
 	params.fma_visible = _io.flight_mode_fma_visible.value_or (false);
-	params.fma_speed_hint = QString::fromStdString (_io.flight_mode_fma_speed_hint.value_or (""));
+	params.fma_speed_hint = neutrino::to_qstring (_io.flight_mode_fma_speed_hint.value_or (""));
 	params.fma_speed_focus = _io.flight_mode_fma_speed_hint.modification_age() < *_io.focus_duration;
-	params.fma_speed_armed_hint = QString::fromStdString (_io.flight_mode_fma_speed_armed_hint.value_or (""));
+	params.fma_speed_armed_hint = neutrino::to_qstring (_io.flight_mode_fma_speed_armed_hint.value_or (""));
 	params.fma_speed_armed_focus = _io.flight_mode_fma_speed_armed_hint.modification_age() < *_io.focus_duration;
-	params.fma_lateral_hint = QString::fromStdString (_io.flight_mode_fma_lateral_hint.value_or (""));
+	params.fma_lateral_hint = neutrino::to_qstring (_io.flight_mode_fma_lateral_hint.value_or (""));
 	params.fma_lateral_focus = _io.flight_mode_fma_lateral_hint.modification_age() < *_io.focus_duration;
-	params.fma_lateral_armed_hint = QString::fromStdString (_io.flight_mode_fma_lateral_armed_hint.value_or (""));
+	params.fma_lateral_armed_hint = neutrino::to_qstring (_io.flight_mode_fma_lateral_armed_hint.value_or (""));
 	params.fma_lateral_armed_focus = _io.flight_mode_fma_lateral_armed_hint.modification_age() < *_io.focus_duration;
-	params.fma_vertical_hint = QString::fromStdString (_io.flight_mode_fma_vertical_hint.value_or (""));
+	params.fma_vertical_hint = neutrino::to_qstring (_io.flight_mode_fma_vertical_hint.value_or (""));
 	params.fma_vertical_focus = _io.flight_mode_fma_vertical_hint.modification_age() < *_io.focus_duration;
-	params.fma_vertical_armed_hint = QString::fromStdString (_io.flight_mode_fma_vertical_armed_hint.value_or (""));
+	params.fma_vertical_armed_hint = neutrino::to_qstring (_io.flight_mode_fma_vertical_armed_hint.value_or (""));
 	params.fma_vertical_armed_focus = _io.flight_mode_fma_vertical_armed_hint.modification_age() < *_io.focus_duration;
 	// TCAS
 	params.tcas_ra_pitch_minimum = _io.tcas_resolution_advisory_pitch_minimum.get_optional();

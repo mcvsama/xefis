@@ -23,6 +23,7 @@
 #include <xefis/core/sockets/module_socket.h>
 
 // Neutrino:
+#include <neutrino/qt/qstring.h>
 #include <neutrino/qt/qutils.h>
 #include <neutrino/sequence.h>
 
@@ -105,7 +106,7 @@ class SocketTree: public QWidget
 					if (found == _children_map.end())
 					{
 						auto new_item = new SocketItem (std::next (begin) == end ? &socket : nullptr, _tree_item);
-						new_item->setText (SocketTree::NameColumn, QString::fromStdString (name));
+						new_item->setText (SocketTree::NameColumn, neutrino::to_qstring (name));
 						setup_appereance (*new_item);
 						found = _children_map.try_emplace (name, name, *new_item).first;
 					}

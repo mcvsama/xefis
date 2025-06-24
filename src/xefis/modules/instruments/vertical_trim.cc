@@ -19,6 +19,7 @@
 
 // Neutrino:
 #include <neutrino/numeric.h>
+#include <neutrino/qt/qstring.h>
 
 // Standard:
 #include <cstddef>
@@ -168,7 +169,7 @@ VerticalTrim::async_paint (xf::PaintRequest const& paint_request, PaintingParams
 QString
 VerticalTrim::stringify (double value)
 {
-	QString result = QString::fromStdString (std::format ("{:+03.0f}", std::round (100.0 * value)));
+	QString result = neutrino::to_qstring (std::format ("{:+03.0f}", std::round (100.0 * value)));
 	// Remove +/- sign when 00:
 	if (result.mid (1, 2) == "00")
 		result[0] = ' ';

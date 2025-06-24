@@ -21,6 +21,7 @@
 // Neutrino:
 #include <neutrino/math/histogram.h>
 #include <neutrino/numeric.h>
+#include <neutrino/qt/qstring.h>
 
 // Qt:
 #include <QWidget>
@@ -96,10 +97,10 @@ template<class Value>
 	{
 		_bins = histogram.bins();
 		_max_y = histogram.max_y();
-		_min_x_str = QString::fromStdString (std::format ("{:.6f}", histogram.min_x()));
-		_mid_x_str = QString::fromStdString (std::format ("{:.6f}", 0.5f * (histogram.min_x() + histogram.max_x())));
-		_max_x_str = QString::fromStdString (std::format ("{:.6f}", histogram.max_x()));
-		_max_y_str = QString::fromStdString (std::format ("{}", histogram.max_y()));
+		_min_x_str = neutrino::to_qstring (std::format ("{:.6f}", histogram.min_x()));
+		_mid_x_str = neutrino::to_qstring (std::format ("{:.6f}", 0.5f * (histogram.min_x() + histogram.max_x())));
+		_max_x_str = neutrino::to_qstring (std::format ("{:.6f}", histogram.max_x()));
+		_max_y_str = neutrino::to_qstring (std::format ("{}", histogram.max_y()));
 
 		_marks.reserve (marks.size());
 		_marks.clear();

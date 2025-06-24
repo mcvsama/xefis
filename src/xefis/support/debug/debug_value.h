@@ -19,6 +19,7 @@
 #include <xefis/support/ui/paint_helper.h>
 
 // Neutrino:
+#include <neutrino/qt/qstring.h>
 #include <neutrino/range.h>
 
 // Qt:
@@ -90,18 +91,18 @@ template<class Value>
 			auto ph = PaintHelper (slider);
 			slider.setMinimumWidth (ph.em_pixels_int (25));
 
-			auto* min_label = new QLabel (QString::fromStdString (std::format ("{}", range.min())));
+			auto* min_label = new QLabel (neutrino::to_qstring (std::format ("{}", range.min())));
 			min_label->setAlignment (Qt::AlignLeft);
 
-			auto* title_label = new QLabel (QString::fromStdString (std::format ("{}: {}", name, details.value)));
+			auto* title_label = new QLabel (neutrino::to_qstring (std::format ("{}: {}", name, details.value)));
 			title_label->setAlignment (Qt::AlignCenter);
 
-			auto* max_label = new QLabel (QString::fromStdString (std::format ("{}", range.max())));
+			auto* max_label = new QLabel (neutrino::to_qstring (std::format ("{}", range.max())));
 			max_label->setAlignment (Qt::AlignRight);
 
 			QObject::connect (&slider, &QSlider::valueChanged, [&details, name, step, title_label, callback] (int value) {
 				details.value = value * step;
-				title_label->setText (QString::fromStdString (std::format ("{}: {}", name, details.value)));
+				title_label->setText (neutrino::to_qstring (std::format ("{}: {}", name, details.value)));
 
 				if (callback)
 					callback();

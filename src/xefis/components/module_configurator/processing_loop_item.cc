@@ -20,6 +20,7 @@
 #include <xefis/core/processing_loop.h>
 
 // Neutrino:
+#include <neutrino/qt/qstring.h>
 #include <neutrino/qt/qutils.h>
 
 // Qt:
@@ -37,7 +38,7 @@ ProcessingLoopItem::ProcessingLoopItem (ProcessingLoop& processing_loop, QTreeWi
 	_processing_loop (processing_loop)
 {
 	setup_appereance (*this);
-	setText (ConfigurableItemsList::NameColumn, QString::fromStdString (_processing_loop.instance()));
+	setText (ConfigurableItemsList::NameColumn, neutrino::to_qstring (_processing_loop.instance()));
 }
 
 } // namespace xf::configurator

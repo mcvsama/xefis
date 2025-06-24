@@ -230,7 +230,7 @@ template<class Value>
 
 			if (paint_request.size_changed() || !*box_text_width)
 			{
-				QString const sample_text = QString::fromStdString (std::format (values.format, 0.0));
+				QString const sample_text = neutrino::to_qstring (std::format (values.format, 0.0));
 				*box_text_width = metrics.horizontalAdvance (sample_text);
 			}
 
@@ -249,7 +249,7 @@ template<class Value>
 				painter.setPen (box_pen);
 				painter.drawRect (rect);
 				painter.setPen (text_pen);
-				painter.fast_draw_text (text_rect, Qt::AlignRight | Qt::AlignVCenter, QString::fromStdString (*values.value_str));
+				painter.fast_draw_text (text_rect, Qt::AlignRight | Qt::AlignVCenter, neutrino::to_qstring (*values.value_str));
 			}
 			else
 			{
@@ -263,7 +263,7 @@ template<class Value>
 				painter.setPen (aids.get_pen (Qt::green, 1.0f));
 				painter.fast_draw_text (QPointF (text_rect.right() - zero_width + small_zero_width, text_rect.top()),
 										Qt::AlignBottom | Qt::AlignRight,
-										QString::fromStdString (*values.reference_str));
+										neutrino::to_qstring (*values.reference_str));
 			}
 		});
 	}

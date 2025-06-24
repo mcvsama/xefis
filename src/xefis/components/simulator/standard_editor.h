@@ -20,6 +20,9 @@
 #include <xefis/support/ui/paint_helper.h>
 #include <xefis/support/ui/widget.h>
 
+// Neutrino:
+#include <neutrino/qt/qstring.h>
+
 // Qt:
 #include <QLabel>
 
@@ -124,7 +127,7 @@ template<class O>
 		if (_edited_object)
 		{
 			setEnabled (true);
-			_object_label->setText (QString::fromStdString (_edited_object->label()));
+			_object_label->setText (neutrino::to_qstring (_edited_object->label()));
 		}
 		else
 		{

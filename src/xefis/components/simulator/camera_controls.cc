@@ -22,6 +22,7 @@
 #include <xefis/support/ui/paint_helper.h>
 
 // Neutrino:
+#include <neutrino/qt/qstring.h>
 #include <neutrino/range.h>
 
 // Qt:
@@ -62,7 +63,7 @@ CameraControls::CameraControls (RigidBodyViewer& viewer, QWidget* parent):
 		auto* spinbox = new QDoubleSpinBox (this);
 		spinbox->setRange (range.min() / one, range.max() / one);
 		spinbox->setDecimals (decimals);
-		spinbox->setSuffix (QString::fromStdString (si::unit_suffix<Value>()));
+		spinbox->setSuffix (neutrino::to_qstring (si::unit_suffix<Value>()));
 		spinbox->setSingleStep (step / one);
 		// For now they're read only. See comment in update_rigid_body_viewer_camera_position().
 		spinbox->setEnabled (false);

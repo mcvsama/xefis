@@ -41,7 +41,7 @@ ModuleWidget::ModuleWidget (Module& module, QWidget* parent):
 	_module (module),
 	_instrument (dynamic_cast<Instrument*> (&_module))
 {
-	auto full_name_str = QString::fromStdString (identifier (module));
+	auto full_name_str = neutrino::to_qstring (identifier (module));
 	auto const ph = PaintHelper (*this);
 
 	QString module_type = _instrument ? "Instrument " : "Module ";

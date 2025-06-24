@@ -20,6 +20,7 @@
 #include <xefis/core/module.h>
 
 // Neutrino:
+#include <neutrino/qt/qstring.h>
 #include <neutrino/qt/qutils.h>
 
 // Qt:
@@ -36,7 +37,7 @@ ModuleItem::ModuleItem (Module& module, QTreeWidgetItem& parent):
 	_module (module)
 {
 	setup_appereance (*this);
-	setText (ConfigurableItemsList::NameColumn, QString::fromStdString (identifier (_module)));
+	setText (ConfigurableItemsList::NameColumn, neutrino::to_qstring (identifier (_module)));
 }
 
 } // namespace xf::configurator

@@ -144,7 +144,7 @@ SimulatorWidget::make_simulation_controls()
 	});
 	update_start_stop_icon();
 
-	auto* step_sim_button = new QPushButton (QString::fromStdString (std::format ("Single step: Δt = {} s", _simulator.frame_duration().in<si::Second>())), this);
+	auto* step_sim_button = new QPushButton (neutrino::to_qstring (std::format ("Single step: Δt = {} s", _simulator.frame_duration().in<si::Second>())), this);
 	QObject::connect (step_sim_button, &QPushButton::pressed, [this, update_start_stop_icon] {
 		if (_rigid_body_viewer)
 			_rigid_body_viewer->step();
@@ -458,7 +458,7 @@ SimulatorWidget::update_simulation_time_label()
 	auto const rounded_simulation_time = std::chrono::time_point_cast<std::chrono::seconds> (simulation_time);
 	auto const elapsed_time = _simulator.elapsed_time().in<si::Second>();
 	auto const text = std::format ("{:%Y-%m-%d %H:%M:%S} UTC ({:.6f} s)", rounded_simulation_time, elapsed_time);
-	_simulation_time_label->setText (QString::fromStdString (text));
+	_simulation_time_label->setText (neutrino::to_qstring (text));
 }
 
 
@@ -521,7 +521,7 @@ SimulatorWidget::update_simulation_performance_label (si::Time const dt)
 	auto const text = std::format ("{:.0f}%", 100.0f * perf);
 	auto const prefix = perf < 1.0 ? "<span style='color: red'>" : "<span>";
 	auto const suffix = "</span>";
-	_simulation_performance_value_label->setText (prefix + QString::fromStdString (text) + suffix);
+	_simulation_performance_value_label->setText (prefix + neutrino::to_qstring (text) + suffix);
 }
 
 } // namespace xf
