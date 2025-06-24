@@ -18,7 +18,11 @@
 using namespace nu::si::literals;
 
 
-OutputLink::OutputLink (xf::ProcessingLoop& loop, std::unique_ptr<LinkProtocol> protocol, si::Frequency const send_frequency, nu::Logger const& logger, std::string_view const instance):
+OutputLink::OutputLink (xf::ProcessingLoop& loop,
+						std::unique_ptr<LinkProtocol> protocol,
+						si::Frequency const send_frequency,
+						nu::Logger const& logger,
+						std::string_view const instance):
 	Module (loop, instance),
 	_logger (logger.with_context (std::string (kLoggerScope) + "#" + instance)),
 	_protocol (std::move (protocol)),
