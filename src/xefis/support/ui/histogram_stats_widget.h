@@ -46,7 +46,7 @@ class HistogramStatsWidget: public xf::Widget
 	 */
 	template<class HistogramValue, class CriticalValue = HistogramValue>
 		void
-		set_data (nu::Histogram<HistogramValue> const&, std::optional<CriticalValue> critical_value = std::nullopt);
+		set_data (math::Histogram<HistogramValue> const&, std::optional<CriticalValue> critical_value = std::nullopt);
 
   private:
 	QLabel*	_num_samples_value;
@@ -62,7 +62,7 @@ class HistogramStatsWidget: public xf::Widget
 
 template<class HistogramValue, class CriticalValue>
 	inline void
-	HistogramStatsWidget::set_data (nu::Histogram<HistogramValue> const& histogram, std::optional<CriticalValue> critical_value)
+	HistogramStatsWidget::set_data (math::Histogram<HistogramValue> const& histogram, std::optional<CriticalValue> critical_value)
 	{
 		_num_samples_value->setText (QString::number (histogram.n_samples()));
 		_min_value->setText (nu::to_qstring (std::format ("{:.6f}", histogram.min())));

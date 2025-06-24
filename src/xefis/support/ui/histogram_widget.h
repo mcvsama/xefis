@@ -53,7 +53,7 @@ class HistogramWidget: public CanvasWidget
 	 */
 	template<class Value>
 		void
-		set_data (nu::Histogram<Value> const&, std::vector<Value> marks = {});
+		set_data (math::Histogram<Value> const&, std::vector<Value> marks = {});
 
 	/**
 	 * Set number of helper lines in the grid.
@@ -93,7 +93,7 @@ class HistogramWidget: public CanvasWidget
 
 template<class Value>
 	inline void
-	HistogramWidget::set_data (nu::Histogram<Value> const& histogram, std::vector<Value> marks)
+	HistogramWidget::set_data (math::Histogram<Value> const& histogram, std::vector<Value> marks)
 	{
 		_bins = histogram.bins();
 		_max_y = histogram.max_y();

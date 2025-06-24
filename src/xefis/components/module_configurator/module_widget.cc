@@ -100,7 +100,7 @@ ModuleWidget::refresh()
 		if (!samples.empty())
 		{
 			auto const [range, grid_lines] = nu::get_max_for_axis<Milliseconds> (*std::max_element (samples.begin(), samples.end()));
-			nu::Histogram<Milliseconds> histogram (samples.begin(), samples.end(), range / 100, 0.0_ms, range);
+			auto const histogram = math::Histogram<Milliseconds> (samples.begin(), samples.end(), range / 100, 0.0_ms, range);
 
 			_communication_time_histogram->set_data (histogram, { accounting_api.cycle_time() });
 			_communication_time_histogram->set_grid_lines (grid_lines);
@@ -117,7 +117,7 @@ ModuleWidget::refresh()
 		if (!samples.empty())
 		{
 			auto const [range, grid_lines] = nu::get_max_for_axis<Milliseconds> (*std::max_element (samples.begin(), samples.end()));
-			nu::Histogram<Milliseconds> histogram (samples.begin(), samples.end(), range / 100, 0.0_ms, range);
+			auto const histogram = math::Histogram<Milliseconds> (samples.begin(), samples.end(), range / 100, 0.0_ms, range);
 
 			_processing_time_histogram->set_data (histogram, { accounting_api.cycle_time() });
 			_processing_time_histogram->set_grid_lines (grid_lines);
@@ -130,7 +130,7 @@ ModuleWidget::refresh()
 		auto const accounting_api = Instrument::AccountingAPI (*_instrument);
 		auto const& samples = accounting_api.painting_times();
 		auto const [range, grid_lines] = nu::get_max_for_axis<Milliseconds> (*std::max_element (samples.begin(), samples.end()));
-		nu::Histogram<Milliseconds> histogram (samples.begin(), samples.end(), range / 100, 0.0_ms, range);
+		auto const histogram = math::Histogram<Milliseconds> (samples.begin(), samples.end(), range / 100, 0.0_ms, range);
 
 		_painting_time_histogram->set_data (histogram, { accounting_api.frame_time() });
 		_painting_time_histogram->set_grid_lines (grid_lines);

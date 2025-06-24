@@ -78,7 +78,7 @@ ScreenWidget::refresh()
 				if (!samples.empty())
 				{
 					auto const [range, grid_lines] = nu::get_max_for_axis<Milliseconds> (*std::max_element (samples.begin(), samples.end()));
-					nu::Histogram<Milliseconds> histogram (samples.begin(), samples.end(), range / 100, 0.0_ms, range);
+					auto const histogram = math::Histogram<Milliseconds> (samples.begin(), samples.end(), range / 100, 0.0_ms, range);
 
 					histogram_widget.set_data (histogram);
 					histogram_widget.set_grid_lines (grid_lines);

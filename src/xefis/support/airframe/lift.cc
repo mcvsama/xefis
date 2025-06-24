@@ -54,7 +54,7 @@ Lift::Lift (QDomElement const& config)
 	if (data.empty())
 		throw nu::BadConfiguration ("lift module not properly configured");
 
-	_aoa_to_cl = nu::Field<si::Angle, LiftCoefficient> (std::move (data));
+	_aoa_to_cl = math::Field<si::Angle, LiftCoefficient> (std::move (data));
 	// TODO initialize _cl_to_aoa_normal_regime
 
 	// Find maximum C_L and AOA angle for maximum C_L (critical AOA):
