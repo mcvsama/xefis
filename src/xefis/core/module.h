@@ -21,7 +21,6 @@
 
 // Neutrino:
 #include <neutrino/noncopyable.h>
-#include <neutrino/sequence.h>
 
 // Lib:
 #include <boost/circular_buffer.hpp>
@@ -32,6 +31,7 @@
 #include <exception>
 #include <optional>
 #include <memory>
+#include <ranges>
 #include <type_traits>
 
 
@@ -140,19 +140,19 @@ class Module:
 		/**
 		 * Return registered settings.
 		 */
-		nu::Sequence<std::vector<BasicSetting*>::const_iterator>
+		std::ranges::subrange<std::vector<BasicSetting*>::const_iterator>
 		settings() const noexcept;
 
 		/**
 		 * Return registered input sockets.
 		 */
-		nu::Sequence<std::vector<BasicModuleIn*>::const_iterator>
+		std::ranges::subrange<std::vector<BasicModuleIn*>::const_iterator>
 		input_sockets() const noexcept;
 
 		/**
 		 * Return registered output sockets.
 		 */
-		nu::Sequence<std::vector<BasicModuleOut*>::const_iterator>
+		std::ranges::subrange<std::vector<BasicModuleOut*>::const_iterator>
 		output_sockets() const noexcept;
 
 	  private:

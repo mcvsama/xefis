@@ -21,7 +21,6 @@
 // Neutrino:
 #include <neutrino/logger.h>
 #include <neutrino/noncopyable.h>
-#include <neutrino/sequence.h>
 #include <neutrino/time.h>
 
 // Qt:
@@ -29,6 +28,7 @@
 
 // Standard:
 #include <cstddef>
+#include <ranges>
 #include <vector>
 
 
@@ -113,7 +113,7 @@ class ProcessingLoop:
 	 * A sequence of modules loaded into this processing loop.
 	 */
 	[[nodiscard]]
-    nu::Sequence<Modules::iterator>
+    std::ranges::subrange<Modules::iterator>
 	modules() noexcept
         { return { _modules.begin(), _modules.end() }; }
 
@@ -121,7 +121,7 @@ class ProcessingLoop:
 	 * A sequence of modules loaded into this processing loop.
 	 */
 	[[nodiscard]]
-    nu::Sequence<Modules::const_iterator>
+	std::ranges::subrange<Modules::const_iterator>
 	modules() const noexcept
         { return { _modules.begin(), _modules.end() }; }
 

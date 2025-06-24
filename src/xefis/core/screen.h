@@ -25,7 +25,6 @@
 // Neutrino:
 #include <neutrino/logger.h>
 #include <neutrino/noncopyable.h>
-#include <neutrino/sequence.h>
 #include <neutrino/work_performer.h>
 
 // Qt:
@@ -175,14 +174,14 @@ class Screen:
 	/**
 	 * Return the sequence of registered instruments.
 	 */
-	nu::Sequence<InstrumentsSet::iterator>
+	std::ranges::subrange<InstrumentsSet::iterator>
 	instruments() noexcept
 		{ return { _instruments_set.begin(), _instruments_set.end() }; }
 
 	/**
 	 * Return the sequence of registered instruments.
 	 */
-	nu::Sequence<InstrumentsSet::const_iterator>
+	std::ranges::subrange<InstrumentsSet::const_iterator>
 	instruments() const noexcept
 		{ return { _instruments_set.begin(), _instruments_set.end() }; }
 
