@@ -132,7 +132,7 @@ class SimulatorWidget: public QWidget
 	nu::Logger						_logger;
 	Machine*						_machine						{ nullptr };
 	Simulator&						_simulator;
-	nu::WorkPerformer				_graphics_work_performer		{ 2 * std::thread::hardware_concurrency(), _logger.with_context ("graphics work performer") };
+	nu::WorkPerformer				_graphics_work_performer		{ 2 * std::max (1u, std::thread::hardware_concurrency()), _logger.with_context ("graphics work performer") };
 
 	// Basic widgets
 
