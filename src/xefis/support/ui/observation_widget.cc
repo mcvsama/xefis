@@ -147,7 +147,7 @@ ObservationWidget::update_observed_values (rigid_body::Body const* planet_body)
 	for (auto& observable: _observables)
 	{
 		auto const text = observable.get ? observable.get() : "–";
-		observable.value_label->setText (QString::fromStdString (text));
+		observable.value_label->setText (neutrino::to_qstring (text));
 
 		// TODO handle observable.set
 	}
@@ -249,7 +249,7 @@ ObservationWidget::add_observable (std::string_view const name, Getter const get
 	_observables.emplace_back (value_label, getter, setter);
 
 	auto row = layout.rowCount();
-	layout.addWidget (new QLabel (QString::fromStdString (std::string (name))), row, 0);
+	layout.addWidget (new QLabel (neutrino::to_qstring (std::string (name))), row, 0);
 	layout.addWidget (value_label, row, 1);
 
 	return *value_label;

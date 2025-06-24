@@ -20,6 +20,7 @@
 
 // Neutrino:
 #include <neutrino/math/histogram.h>
+#include <neutrino/qt/qstring.h>
 
 // Qt:
 #include <QWidget>
@@ -64,16 +65,16 @@ template<class HistogramValue, class CriticalValue>
 	HistogramStatsWidget::set_data (Histogram<HistogramValue> const& histogram, std::optional<CriticalValue> critical_value)
 	{
 		_num_samples_value->setText (QString::number (histogram.n_samples()));
-		_min_value->setText (QString::fromStdString (std::format ("{:.6f}", histogram.min())));
-		_max_value->setText (QString::fromStdString (std::format ("{:.6f}", histogram.max())));
-		_mean_value->setText (QString::fromStdString (std::format ("{:.6f}", histogram.mean())));
-		_median_value->setText (QString::fromStdString (std::format ("{:.6f}", histogram.median())));
-		_stddev_value->setText (QString::fromStdString (std::format ("{:.6f}", histogram.stddev())));
+		_min_value->setText (neutrino::to_qstring (std::format ("{:.6f}", histogram.min())));
+		_max_value->setText (neutrino::to_qstring (std::format ("{:.6f}", histogram.max())));
+		_mean_value->setText (neutrino::to_qstring (std::format ("{:.6f}", histogram.mean())));
+		_median_value->setText (neutrino::to_qstring (std::format ("{:.6f}", histogram.median())));
+		_stddev_value->setText (neutrino::to_qstring (std::format ("{:.6f}", histogram.stddev())));
 
 		if (critical_value)
 		{
-			_critical_label->setText (QString::fromStdString (std::format ("> {:.6f}: ", *critical_value)));
-			_critical_value->setText (QString::fromStdString (std::format ("{:.3f}%", 100 * histogram.normalized_percentile_for (*critical_value))));
+			_critical_label->setText (neutrino::to_qstring (std::format ("> {:.6f}: ", *critical_value)));
+			_critical_value->setText (neutrino::to_qstring (std::format ("{:.3f}%", 100 * histogram.normalized_percentile_for (*critical_value))));
 		}
 		else
 		{

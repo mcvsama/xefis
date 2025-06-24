@@ -38,7 +38,7 @@ ScreenWidget::ScreenWidget (Screen& screen, QWidget* parent):
 	_screen (screen)
 {
 	auto const ph = PaintHelper (*this);
-	auto [name_strip, name_label] = create_colored_strip_label (QString::fromStdString (_screen.instance()).toHtmlEscaped(), QColor (0xff, 0xaa, 0x00), Qt::AlignBottom, this);
+	auto [name_strip, name_label] = create_colored_strip_label (neutrino::to_qstring (_screen.instance()).toHtmlEscaped(), QColor (0xff, 0xaa, 0x00), Qt::AlignBottom, this);
 
 	auto tabs = new QTabWidget (this);
 	tabs->addTab (create_performance_tab(), "Performance");
@@ -137,14 +137,14 @@ ScreenWidget::create_performance_tab()
 			auto* tab = new QWidget (tabs);
 			tabs->addTab (tab, QString ("Work performer %1").arg (++pos));
 
-			auto* handled_modules_info = new QLabel ("<b>Modules handled by this work performer:</b><br/>" + QString::fromStdString (widgets.module_names).toHtmlEscaped(), tab);
+			auto* handled_modules_info = new QLabel ("<b>Modules handled by this work performer:</b><br/>" + neutrino::to_qstring (widgets.module_names).toHtmlEscaped(), tab);
 			handled_modules_info->setWordWrap (true);
 
 			std::tie (widgets.start_latency_histogram, widgets.start_latency_stats, widgets.start_latency_group)
-				= create_performance_widget (tab, QString::fromStdString ("Paint start latency (request start to painting start)"));
+				= create_performance_widget (tab, neutrino::to_qstring ("Paint start latency (request start to painting start)"));
 
 			std::tie (widgets.total_latency_histogram, widgets.total_latency_stats, widgets.total_latency_group)
-				= create_performance_widget (tab, QString::fromStdString ("Total latency (request start to painting finish)"));
+				= create_performance_widget (tab, neutrino::to_qstring ("Total latency (request start to painting finish)"));
 
 			auto* tab_layout = new QGridLayout (tab);
 			tab_layout->setContentsMargins (0, 0, 0, 0);

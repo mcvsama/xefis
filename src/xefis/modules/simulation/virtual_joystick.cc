@@ -23,6 +23,7 @@
 
 // Neutrino:
 #include <neutrino/numeric.h>
+#include <neutrino/qt/qstring.h>
 #include <neutrino/range.h>
 
 // Qt:
@@ -436,7 +437,7 @@ VirtualJoystick::VirtualJoystick (xf::ProcessingLoop& loop, xf::Machine* machine
 	using namespace std::literals;
 
 	_widget = new xf::Widget (nullptr);
-	_widget->setWindowTitle (QString::fromStdString ("XEFIS virtual joystick" + (instance.empty() ? ""s : ": "s + instance)));
+	_widget->setWindowTitle (neutrino::to_qstring ("XEFIS virtual joystick" + (instance.empty() ? ""s : ": "s + instance)));
 	xf::set_kde_blur_background (*_widget, true);
 
 	_joystick_widget = new VirtualJoystickWidget (machine, _widget);

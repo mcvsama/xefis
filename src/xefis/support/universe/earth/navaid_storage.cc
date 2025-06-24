@@ -21,6 +21,7 @@
 // Neutrino:
 #include <neutrino/exception.h>
 #include <neutrino/numeric.h>
+#include <neutrino/qt/qstring.h>
 #include <neutrino/qt/qzdevice.h>
 
 // Qt:
@@ -81,7 +82,7 @@ class GzDataFileIterator
 
 inline
 GzDataFileIterator::GzDataFileIterator (std::string_view const path):
-	_file (QString::fromStdString (std::string (path)))
+	_file (neutrino::to_qstring (std::string (path)))
 {
 	using namespace std::string_literals;
 

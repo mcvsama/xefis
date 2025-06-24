@@ -17,6 +17,9 @@
 // Xefis:
 #include <xefis/config/all.h>
 
+// Neutrino:
+#include <neutrino/qt/qstring.h>
+
 // Qt:
 #include <QSignalBlocker>
 
@@ -48,7 +51,7 @@ void
 GroupItem::refresh()
 {
 	auto const signals_blocker = QSignalBlocker (treeWidget());
-	setText (0, QString::fromStdString (_group.label()));
+	setText (0, neutrino::to_qstring (_group.label()));
 }
 
 

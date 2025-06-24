@@ -20,6 +20,7 @@
 
 // Neutrino:
 #include <neutrino/qt/qdom.h>
+#include <neutrino/qt/qstring.h>
 #include <neutrino/numeric.h>
 
 // Qt:
@@ -578,7 +579,7 @@ AFCS::check_input()
 		QStringList failed_props;
 		for (auto const& p: checked_props)
 			if (!p->valid())
-				failed_props.push_back (QString::fromStdString (p->path().string()));
+				failed_props.push_back (neutrino::to_qstring (p->path().string()));
 		throw Disengage ("invalid sensor input on props: " + failed_props.join (", ").toStdString());
 	}
 }

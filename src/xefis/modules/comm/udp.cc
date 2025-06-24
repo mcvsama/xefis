@@ -25,6 +25,7 @@
 
 // Neutrino:
 #include <neutrino/qt/qdom.h>
+#include <neutrino/qt/qstring.h>
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -40,7 +41,7 @@ UDP::UDP (xf::ProcessingLoop& loop, Parameters const parameters, xf::Logger cons
 {
 	if (_parameters.tx_udp_address)
 	{
-		_tx_qhostaddress = QHostAddress (QString::fromStdString (_parameters.tx_udp_address->host));
+		_tx_qhostaddress = QHostAddress (neutrino::to_qstring (_parameters.tx_udp_address->host));
 		_tx = std::make_unique<QUdpSocket>();
 	}
 
@@ -48,7 +49,7 @@ UDP::UDP (xf::ProcessingLoop& loop, Parameters const parameters, xf::Logger cons
 	{
 		_rx = std::make_unique<QUdpSocket>();
 
-		if (!_rx->bind (QHostAddress (QString::fromStdString (_parameters.rx_udp_address->host)), _parameters.rx_udp_address->port, QUdpSocket::ShareAddress))
+		if (!_rx->bind (QHostAddress (neutrino::to_qstring (_parameters.rx_udp_address->host)), _parameters.rx_udp_address->port, QUdpSocket::ShareAddress))
 			_logger << std::format ("Failed to bind to address {}:{}\n", _parameters.rx_udp_address->host, _parameters.rx_udp_address->port);
 
 		QObject::connect (_rx.get(), &QUdpSocket::readyRead, [this] { got_udp_packet(); });

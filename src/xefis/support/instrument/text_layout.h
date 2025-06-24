@@ -21,6 +21,7 @@
 
 // Neutrino:
 #include <neutrino/qt/qfontmetrics.h>
+#include <neutrino/qt/qstring.h>
 
 // Qt:
 #include <QtCore/QString>
@@ -333,7 +334,7 @@ TextLayout::add_fragment (const char* text, QFont const& font, QColor const& col
 inline void
 TextLayout::add_fragment (std::string const& text, QFont const& font, QColor const& color, QPen const& box_pen)
 {
-	add_fragment (QString::fromStdString (text), font, color, box_pen);
+	add_fragment (neutrino::to_qstring (text), font, color, box_pen);
 }
 
 

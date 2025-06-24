@@ -28,6 +28,7 @@
 
 // Neutrino:
 #include <neutrino/qt/qfontmetrics.h>
+#include <neutrino/qt/qstring.h>
 #include <neutrino/synchronized.h>
 
 // Standard:
@@ -361,7 +362,7 @@ template<class Value>
 		auto const note_distance = 0.5f * char_width;
 		QPointF text_position;
 		QPointF note_position;
-		QString const sample_text = QString::fromStdString (std::format (values.format, 0.0));
+		QString const sample_text = neutrino::to_qstring (std::format (values.format, 0.0));
 		painter.setFont (font);
 		QRectF text_rect = painter.get_text_box (QPointF (p0.x() - 1.25 * q, aids.height() / 2.f), Qt::AlignRight | Qt::AlignVCenter, sample_text);
 		text_rect.adjust (-2 * value_box_inner_margin, 0, 0.f, -2.f * hcorr);
@@ -387,7 +388,7 @@ template<class Value>
 		// Text:
 		if (values.value_str)
 		{
-			auto const value_qstr = QString::fromStdString (*values.value_str);
+			auto const value_qstr = neutrino::to_qstring (*values.value_str);
 			painter.setPen (text_pen);
 			painter.fast_draw_text (text_position, Qt::AlignVCenter | Qt::AlignRight, value_qstr);
 		}
@@ -396,7 +397,7 @@ template<class Value>
 		if (!values.note_str.empty())
 		{
 			auto const align_lr = values.mirrored_style ? Qt::AlignLeft : Qt::AlignRight;
-			auto const value_qstr = QString::fromStdString (values.note_str);
+			auto const value_qstr = neutrino::to_qstring (values.note_str);
 			painter.setPen (text_pen);
 			painter.fast_draw_text (note_position, Qt::AlignVCenter | align_lr, value_qstr);
 		}

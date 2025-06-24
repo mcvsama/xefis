@@ -20,6 +20,7 @@
 #include <xefis/core/screen.h>
 
 // Neutrino:
+#include <neutrino/qt/qstring.h>
 #include <neutrino/qt/qutils.h>
 
 // Qt:
@@ -37,7 +38,7 @@ ScreenItem::ScreenItem (Screen& screen, QTreeWidget& parent):
 	_screen (screen)
 {
 	setup_appereance (*this);
-	setText (ConfigurableItemsList::NameColumn, QString::fromStdString (_screen.instance()));
+	setText (ConfigurableItemsList::NameColumn, neutrino::to_qstring (_screen.instance()));
 }
 
 } // namespace xf::configurator

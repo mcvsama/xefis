@@ -19,6 +19,7 @@
 
 // Neutrino:
 #include <neutrino/qt/qfontmetrics.h>
+#include <neutrino/qt/qstring.h>
 #include <neutrino/time_helper.h>
 
 // Standard:
@@ -238,7 +239,7 @@ Status::async_paint (xf::PaintRequest const& paint_request, PaintingParams const
 		painter.fast_draw_text (QPointF (cache->viewport.left(),
 										 cache->viewport.top() + cache->line_height * (i + 0.5)),
 								Qt::AlignVCenter | Qt::AlignLeft,
-								QString::fromStdString (message->text()));
+								neutrino::to_qstring (message->text()));
 	}
 
 	// Cursor:

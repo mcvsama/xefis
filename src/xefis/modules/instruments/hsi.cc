@@ -1490,9 +1490,9 @@ PaintingWork::paint_range()
 		QString r;
 
 		if (_p.range < 1_nmi)
-			r = QString::fromStdString (std::format ("{:.1f}", _p.range.in<si::NauticalMile>()));
+			r = neutrino::to_qstring (std::format ("{:.1f}", _p.range.in<si::NauticalMile>()));
 		else
-			r = QString::fromStdString (std::format ("{:d}", static_cast<int> (_p.range.in<si::NauticalMile>())));
+			r = neutrino::to_qstring (std::format ("{:d}", static_cast<int> (_p.range.in<si::NauticalMile>())));
 
 		QRectF rect (0.f, 0.f, std::max (metr_a.horizontalAdvance (s), metr_b.horizontalAdvance (r)) + 0.4f * _c.q, neutrino::line_height (metr_a) + neutrino::line_height (metr_b));
 
@@ -2129,19 +2129,19 @@ HSI::process (xf::Cycle const& cycle)
 	params.course_setting_magnetic = _io.course_setting_magnetic.get_optional();
 	params.course_deviation = _io.course_deviation.get_optional();
 	params.course_to_flag = _io.course_to_flag.get_optional();
-	params.navaid_selected_reference = QString::fromStdString (_io.navaid_selected_reference.value_or (""));
-	params.navaid_selected_identifier = QString::fromStdString (_io.navaid_selected_identifier.value_or (""));
+	params.navaid_selected_reference = neutrino::to_qstring (_io.navaid_selected_reference.value_or (""));
+	params.navaid_selected_identifier = neutrino::to_qstring (_io.navaid_selected_identifier.value_or (""));
 	params.navaid_selected_distance = _io.navaid_selected_distance.get_optional();
 	params.navaid_selected_eta = _io.navaid_selected_eta.get_optional();
 	params.navaid_selected_course_magnetic = _io.navaid_selected_course_magnetic.get_optional();
-	params.navaid_left_reference = QString::fromStdString (_io.navaid_left_reference.value_or (""));
+	params.navaid_left_reference = neutrino::to_qstring (_io.navaid_left_reference.value_or (""));
 	params.navaid_left_type = _io.navaid_left_type.value_or (hsi::NavType::A);
-	params.navaid_left_identifier = QString::fromStdString (_io.navaid_left_identifier.value_or (""));
+	params.navaid_left_identifier = neutrino::to_qstring (_io.navaid_left_identifier.value_or (""));
 	params.navaid_left_distance = _io.navaid_left_distance.get_optional();
 	params.navaid_left_initial_bearing_magnetic = _io.navaid_left_initial_bearing_magnetic.get_optional();
 	params.navaid_right_type = _io.navaid_right_type.value_or (hsi::NavType::A);
-	params.navaid_right_reference = QString::fromStdString (_io.navaid_right_reference.value_or (""));
-	params.navaid_right_identifier = QString::fromStdString (_io.navaid_right_identifier.value_or (""));
+	params.navaid_right_reference = neutrino::to_qstring (_io.navaid_right_reference.value_or (""));
+	params.navaid_right_identifier = neutrino::to_qstring (_io.navaid_right_identifier.value_or (""));
 	params.navaid_right_distance = _io.navaid_right_distance.get_optional();
 	params.navaid_right_initial_bearing_magnetic = _io.navaid_right_initial_bearing_magnetic.get_optional();
 	params.navigation_required_performance = _io.navigation_required_performance.get_optional();
@@ -2181,8 +2181,8 @@ HSI::process (xf::Cycle const& cycle)
 	params.ndb_visible = _io.features_ndb.value_or (false);
 	params.loc_visible = _io.features_loc.value_or (false);
 	params.arpt_visible = _io.features_arpt.value_or (false);
-	params.highlighted_loc = QString::fromStdString (_io.localizer_id.value_or (""));
-	params.positioning_hint.set (_io.position_source ? std::make_optional (QString::fromStdString (*_io.position_source)) : std::nullopt, _io.position_source.modification_timestamp());
+	params.highlighted_loc = neutrino::to_qstring (_io.localizer_id.value_or (""));
+	params.positioning_hint.set (_io.position_source ? std::make_optional (neutrino::to_qstring (*_io.position_source)) : std::nullopt, _io.position_source.modification_timestamp());
 	params.tcas_on = _io.tcas_on.get_optional();
 	params.tcas_range = _io.tcas_range.get_optional();
 	params.arpt_runways_range_threshold = *_io.arpt_runways_range_threshold;
