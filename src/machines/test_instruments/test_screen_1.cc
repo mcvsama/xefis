@@ -34,7 +34,7 @@ to_degrees (si::Temperature temperature)
 
 
 float128_t
-to_g (si::Acceleration acceleration)
+to_gravity (si::Acceleration acceleration)
 	{ return acceleration.template in<si::Gravity>(); };
 
 } // namespace
@@ -59,14 +59,14 @@ TestScreen1::TestScreen1 (xf::ProcessingLoop& loop,
 	engine_l_current (loop, _graphics, nullptr, "engine.l.current"),
 	engine_l_temperature (loop, _graphics, to_degrees, "engine.l.temperature"),
 	engine_l_voltage (loop, _graphics, nullptr, "engine.l.voltage"),
-	engine_l_vibration (loop, _graphics, to_g, "engine.l.vibration"),
+	engine_l_vibration (loop, _graphics, to_gravity, "engine.l.vibration"),
 	engine_r_thrust (loop, _graphics, nullptr, "engine.r.thrust"),
 	engine_r_speed (loop, _graphics, to_n1, "engine.r.n1"),
 	engine_r_power (loop, _graphics, nullptr, "engine.r.power"),
 	engine_r_current (loop, _graphics, nullptr, "engine.r.current"),
 	engine_r_temperature (loop, _graphics, to_degrees, "engine.r.temperature"),
 	engine_r_voltage (loop, _graphics, nullptr, "engine.r.voltage"),
-	engine_r_vibration (loop, _graphics, to_g, "engine.r.vibration"),
+	engine_r_vibration (loop, _graphics, to_gravity, "engine.r.vibration"),
 	label_thrust (loop, _graphics, "eicas.label.thrust"),
 	label_pwr (loop, _graphics, "eicas.label.amps"),
 	label_n1 (loop, _graphics, "eicas.label.thr"),
@@ -278,9 +278,9 @@ TestScreen1::connect_instruments()
 
 	this->engine_l_vibration.format						= "{:3.1f}";
 	this->engine_l_vibration.font_scale					= 0.75;
-	this->engine_l_vibration.value_minimum				= 0_g;
-	this->engine_l_vibration.value_maximum_warning		= 1_g;
-	this->engine_l_vibration.value_maximum				= 1.25_g;
+	this->engine_l_vibration.value_minimum				= 0_G;
+	this->engine_l_vibration.value_maximum_warning		= 1_G;
+	this->engine_l_vibration.value_maximum				= 1.25_G;
 	this->engine_l_vibration.mirrored_style				= false;
 	this->engine_l_vibration.note						= "N₂";
 
@@ -329,9 +329,9 @@ TestScreen1::connect_instruments()
 
 	this->engine_r_vibration.format						= "{:3.1f}";
 	this->engine_r_vibration.font_scale					= 0.75;
-	this->engine_r_vibration.value_minimum				= 0_g;
-	this->engine_r_vibration.value_maximum_warning		= 1_g;
-	this->engine_r_vibration.value_maximum				= 1.25_g;
+	this->engine_r_vibration.value_minimum				= 0_G;
+	this->engine_r_vibration.value_maximum_warning		= 1_G;
+	this->engine_r_vibration.value_maximum				= 1.25_G;
 	this->engine_r_vibration.mirrored_style				= true;
 	this->engine_r_vibration.note						= "N₂";
 

@@ -324,7 +324,7 @@ TestInstrumentsMachine::TestInstrumentsMachine (xf::Xefis& xefis):
 
 	test_screen_1.engine_l_voltage.value									<< test_generator.create_socket<si::Voltage> ("engine/left/voltage", 16.8_V, { 11.1_V, 16.8_V }, 0.07_V / 1_s);
 
-	test_screen_1.engine_l_vibration.value									<< test_generator.create_socket<si::Acceleration> ("engine/left/vibration", 0.1_g, { 0.1_g, 1.2_g }, 0.025_g / 1_s);
+	test_screen_1.engine_l_vibration.value									<< test_generator.create_socket<si::Acceleration> ("engine/left/vibration", 0.1_G, { 0.1_G, 1.2_G }, 0.025_G / 1_s);
 
 	test_screen_1.engine_r_thrust.value										<< test_generator.create_socket<si::Force> ("engine/right/thrust", 0_N, { -0.3_N, 4.5_N }, 0.2_N / 1_s);
 	test_screen_1.engine_r_thrust.reference									<< 4.1_N;
@@ -342,7 +342,7 @@ TestInstrumentsMachine::TestInstrumentsMachine (xf::Xefis& xefis):
 	test_screen_1.engine_r_voltage.value									<< test_generator.create_socket<si::Voltage> ("engine/right/voltage", 16.8_V, { 11.1_V, 16.8_V }, 0.073_V / 1_s);
 
 	test_screen_1.engine_r_vibration.value
-		<< test_generator.create_socket<si::Acceleration> ("engine/right/vibration", 0.1_g, { 0.1_g, 1.2_g }, 0.025_g / 1_s, TestGenerator::BorderCondition::Mirroring, { .nil = 2.5_s, .not_nil = 6.5_s });
+		<< test_generator.create_socket<si::Acceleration> ("engine/right/vibration", 0.1_G, { 0.1_G, 1.2_G }, 0.025_G / 1_s, TestGenerator::BorderCondition::Mirroring, { .nil = 2.5_s, .not_nil = 6.5_s });
 
 	test_screen_1.gear.requested_down										<< true;
 	test_screen_1.gear.nose_up												<< false;
