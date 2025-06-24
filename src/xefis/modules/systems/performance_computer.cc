@@ -220,7 +220,7 @@ PerformanceComputer::compute_total_energy_variometer()
 				_prev_total_energy = total_energy;
 
 			si::Energy const energy_diff = total_energy - _prev_total_energy;
-			si::Power tev = energy_diff / update_dt;
+			si::Power const tev = energy_diff / update_dt;
 
 			// If IAS not in valid range, continue computations but only set output to nil.
 			_total_energy_variometer_smoother (tev, update_dt);
@@ -346,10 +346,10 @@ PerformanceComputer::get_stall_ias (si::Angle const max_bank_angle) const
 
 	if (_airframe)
 	{
-		xf::FlapsAngle flaps_angle (_io.flaps_angle.value_or (0_deg));
-		xf::SpoilersAngle spoilers_angle (_io.spoilers_angle.value_or (0_deg));
-		si::Angle max_safe_aoa = _airframe->get_max_safe_aoa (flaps_angle, spoilers_angle);
-		si::Acceleration load = 1_g / si::cos (max_bank_angle);
+		xf::FlapsAngle const flaps_angle (_io.flaps_angle.value_or (0_deg));
+		xf::SpoilersAngle const spoilers_angle (_io.spoilers_angle.value_or (0_deg));
+		si::Angle const max_safe_aoa = _airframe->get_max_safe_aoa (flaps_angle, spoilers_angle);
+		si::Acceleration const load = 1_G / si::cos (max_bank_angle);
 
 		auto tas = aoa_to_tas_now (max_safe_aoa, load);
 
