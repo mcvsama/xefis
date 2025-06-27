@@ -20,7 +20,7 @@
 #include <xefis/utility/hextable.h>
 
 // Neutrino:
-#include <neutrino/responsibility.h>
+#include <neutrino/scope_exit.h>
 
 // Standard:
 #include <cstddef>
@@ -61,7 +61,7 @@ Parser::process_next()
 	std::string::size_type parsed = 0;
 
 	// Make sure to remove parsed data from the input buffer:
-	nu::Responsibility remove_parsed_sockets ([&] {
+	nu::ScopeExit remove_parsed_sockets ([&] {
 		_input_buffer.erase (0, parsed);
 	});
 

@@ -27,7 +27,7 @@
 #include <xefis/utility/smoother.h>
 
 // Neutrino:
-#include <neutrino/responsibility.h>
+#include <neutrino/scope_exit.h>
 
 // Qt:
 #include <QDateTimeEdit>
@@ -125,7 +125,7 @@ class SimulatorWidget: public QWidget
 	void
 	update_simulation_performance_label (si::Time dt);
 
-	static std::optional<nu::Responsibility>
+	static std::optional<nu::ScopeExit>
 	bool_lock (bool& lock_variable);
 
   private:
@@ -153,8 +153,7 @@ class SimulatorWidget: public QWidget
 	float							_simulation_speed				{ 1.0f };
 	float							_last_finite_performance		{ 1.0f };
 	Smoother<float>					_performance_smoother			{ 100_ms, 10_ms };
-	std::optional<nu::Responsibility>
-									_disconnect_item_changed_signal;
+	std::optional<nu::ScopeExit>	_disconnect_item_changed_signal;
 
 	// Time tab
 
@@ -191,7 +190,7 @@ SimulatorWidget::set_followed (rigid_body::Body const& followed_body) noexcept
 
 
 // TODO neutrino utils
-inline std::optional<nu::Responsibility>
+inline std::optional<nu::ScopeExit>
 SimulatorWidget::bool_lock (bool& lock_variable)
 {
 	if (lock_variable)
@@ -199,7 +198,7 @@ SimulatorWidget::bool_lock (bool& lock_variable)
 	else
 	{
 		lock_variable = true;
-		return nu::Responsibility ([&lock_variable] { lock_variable = false; });
+		return nu::ScopeExit ([&lock_variable] { lock_variable = false; });
 	}
 }
 
