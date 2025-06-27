@@ -685,7 +685,7 @@ RigidBodyPainter::paint_planet()
 			});
 		}
 
-		if (_planet && _planet->sky_dome_shape)
+		if (_planet->sky_dome_shape)
 		{
 			// Sky and ground dome around the observer:
 			_gl.save_context ([&] {
