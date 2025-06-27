@@ -18,7 +18,7 @@
 #include <xefis/config/all.h>
 
 // Neutrino:
-#include <neutrino/responsibility.h>
+#include <neutrino/scope_exit.h>
 
 // Standard:
 #include <cstddef>
@@ -30,8 +30,8 @@ void
 ShadowPainter::paint (Shadow const& shadow, PaintFunction paint_function)
 {
 	{
-		auto saved_pen = pen();
-		nu::Responsibility pen_restore ([&] { setPen (saved_pen); });
+		auto const saved_pen = pen();
+		nu::ScopeExit pen_restore ([&] { setPen (saved_pen); });
 
 		auto const new_width = shadow.width_for_pen (saved_pen);
 		auto const old_width = saved_pen.widthF();
