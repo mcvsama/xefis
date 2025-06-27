@@ -278,7 +278,7 @@ Screen::update_instruments()
 		{
 			if (nu::valid_and_ready (details->result))
 			{
-				nu::Exception::catch_and_log (_logger, [&] {
+				nu::Exception::catch_and_log (_logger, [&]{
 					auto const perf_metrics = details->result.get();
 					// Update per-instrument metrics:
 					{

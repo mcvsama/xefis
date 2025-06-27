@@ -29,7 +29,7 @@ Gear::Gear (xf::ProcessingLoop& loop, xf::Graphics const& graphics, std::string_
 	GearIO (loop, instance),
 	InstrumentSupport (graphics)
 {
-	_inputs_observer.set_callback ([&] {
+	_inputs_observer.set_callback ([&]{
 		mark_dirty();
 	});
 	_inputs_observer.observe ({

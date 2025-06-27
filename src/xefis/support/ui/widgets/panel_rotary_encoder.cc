@@ -45,7 +45,7 @@ PanelRotaryEncoder::PanelRotaryEncoder (QWidget* parent, Panel* panel, QString c
 	_click_timer = std::make_unique<QTimer>();
 	_click_timer->setSingleShot (true);
 	_click_timer->setInterval (20);
-	QObject::connect (_click_timer.get(), &QTimer::timeout, [&] {
+	QObject::connect (_click_timer.get(), &QTimer::timeout, [&]{
 		if (_click_socket.configured())
 			_click_socket.write (false);
 	});

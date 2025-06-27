@@ -241,7 +241,7 @@ template<class Value>
 		text_rect.translate (margin, -text_rect.height());
 		QRectF rect = text_rect.adjusted (-margin, 0, margin, 0);
 
-		painter.save_context ([&] {
+		painter.save_context ([&]{
 			painter.setFont (font);
 
 			if (values.value_str)
@@ -308,11 +308,11 @@ template<class Value>
 		xf::Shadow black_shadow = aids.default_shadow();
 		black_shadow.set_color (Qt::black);
 
-		painter.save_context ([&] {
+		painter.save_context ([&]{
 			if (value_angle)
 			{
 				// Filled pie:
-				painter.save_context ([&] {
+				painter.save_context ([&]{
 					QBrush brush (kNormalFill, Qt::SolidPattern);
 
 					if (values.critical_condition)
@@ -337,7 +337,7 @@ template<class Value>
 			}
 
 			// Warning/critical bugs:
-			painter.save_context ([&] {
+			painter.save_context ([&]{
 				constexpr si::Angle angle_gap = 4_deg;
 
 				std::optional<si::Angle> const minimum_critical_angle = get_angle (values.normalized_minimum_critical);
@@ -376,7 +376,7 @@ template<class Value>
 					bool const add_min_gap = (prev.zone == PointInfo::Minimums) && (i > 0);
 					bool const add_max_gap = (next.zone == PointInfo::Maximums) && (i < point_infos->size() - 2);
 
-					painter.save_context ([&] {
+					painter.save_context ([&]{
 						auto const angle_0 = prev.angle + (add_min_gap ? angle_gap : 0_rad);
 						auto const angle_1 = next.angle - (add_max_gap ? angle_gap : 0_rad);
 						auto const span = angle_1 - angle_0;
@@ -427,8 +427,8 @@ template<class Value>
 
 				auto draw_outside_arc = [&] (si::Angle angle, float ext_adj, float intr, float extr, bool with_core_pointer)
 				{
-					painter.paint (black_shadow, [&] {
-						painter.save_context ([&] {
+					painter.paint (black_shadow, [&]{
+						painter.save_context ([&]{
 							if (with_core_pointer)
 								painter.drawLine (QPointF (0.0, 0.0), QPointF (extr, 0.0));
 							else
@@ -445,11 +445,11 @@ template<class Value>
 
 				if (automatic_angle)
 				{
-					painter.save_context ([&] {
+					painter.save_context ([&]{
 						painter.setPen (automatic_pen);
 						painter.rotate ((*automatic_angle - *value_angle).template in<si::Degree>());
 
-						painter.paint (black_shadow, [&] {
+						painter.paint (black_shadow, [&]{
 							float const e = 0.075;
 							float const p = 1.3 * pointer_pen.width();
 
@@ -470,7 +470,7 @@ template<class Value>
 					draw_outside_arc (*target_angle, 0.15 * r, 1.01 * r, 1.15 * r, true);
 				else
 				{
-					painter.paint (black_shadow, [&] {
+					painter.paint (black_shadow, [&]{
 						painter.drawLine (QPointF (0.0, 0.0), QPointF (0.99f * r, 0.0));
 					});
 				}

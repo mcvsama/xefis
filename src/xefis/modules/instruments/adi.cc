@@ -227,7 +227,7 @@ AdiPaintRequest::paint_rotating_value (QRectF const& rect, float position, float
 	QRectF box_next = rect.translated (0.f, -a_little_bit_farther * height);
 	QRectF box_prev = rect.translated (0.f, +a_little_bit_farther * height);
 
-	painter.save_context ([&] {
+	painter.save_context ([&]{
 		painter.setClipRect (rect);
 		painter.translate (0.f, -height * position);
 
@@ -291,7 +291,7 @@ AdiPaintRequest::paint_dashed_zone (QColor const& color, QRectF const& target)
 	QPointF const difx (box.width() / 2.5f, 0.f);
 	QPointF const dify (0.f, box.height() / 2.5f);
 	pen.setCapStyle (Qt::RoundCap);
-	painter.save_context ([&] {
+	painter.save_context ([&]{
 		painter.setPen (pen);
 		painter.drawLine (box.topLeft(), box.bottomRight());
 		painter.drawLine (box.topLeft() + difx, box.bottomRight() - dify);
@@ -316,7 +316,7 @@ AdiPaintRequest::paint_horizontal_failure_flag (QString const& message, QPointF 
 	painter.setBrush (Qt::black);
 	painter.setPen (focused ? normal_pen : Qt::NoPen);
 
-	painter.paint (default_shadow, [&] {
+	painter.paint (default_shadow, [&]{
 		painter.drawRect (box);
 	});
 
@@ -340,7 +340,7 @@ AdiPaintRequest::paint_vertical_failure_flag (QString const& message, QPointF co
 	painter.setBrush (Qt::black);
 	painter.setPen (focused ? normal_pen : Qt::NoPen);
 
-	painter.paint (default_shadow, [&] {
+	painter.paint (default_shadow, [&]{
 		painter.drawRect (box);
 	});
 	QPointF const top_letter = center + QPointF (0.f, -0.5f * digit_height * (message.size() - 1));
@@ -546,7 +546,7 @@ ArtificialHorizon::paint_pitch_scale (AdiPaintRequest& pr) const
 			if (deg_range.includes (1_deg * deg) && deg != 0)
 			{
 				float const d = pr.pitch_to_px (1_deg * deg);
-				pr.painter.paint (get_shadow (pr, deg), [&] {
+				pr.painter.paint (get_shadow (pr, deg), [&]{
 					pr.painter.drawLine (QPointF (-z, d), QPointF (z, d));
 				});
 				// Degs number:
@@ -566,7 +566,7 @@ ArtificialHorizon::paint_pitch_scale (AdiPaintRequest& pr) const
 			if (deg_range.includes (1_deg * deg) && deg % 10 != 0)
 			{
 				float const d = pr.pitch_to_px (1_deg * deg);
-				pr.painter.paint (get_shadow (pr, deg), [&] {
+				pr.painter.paint (get_shadow (pr, deg), [&]{
 					pr.painter.drawLine (QPointF (-z / 2.f, d), QPointF (z / 2.f, d));
 				});
 			}
@@ -578,7 +578,7 @@ ArtificialHorizon::paint_pitch_scale (AdiPaintRequest& pr) const
 			if (deg_range.includes (1_deg * deg / 10) && deg % 50 != 0)
 			{
 				float const d = pr.pitch_to_px (1_deg * deg / 10.f);
-				pr.painter.paint (get_shadow (pr, deg), [&] {
+				pr.painter.paint (get_shadow (pr, deg), [&]{
 					pr.painter.drawLine (QPointF (-z / 4.f, d), QPointF (z / 4.f, d));
 				});
 			}
@@ -591,7 +591,7 @@ ArtificialHorizon::paint_pitch_scale (AdiPaintRequest& pr) const
 			{
 				float const d = pr.pitch_to_px (1_deg * deg);
 				pr.painter.setPen (pr.aids.get_pen (Qt::white, 1.75f));
-				pr.painter.paint (get_shadow (pr, deg), [&] {
+				pr.painter.paint (get_shadow (pr, deg), [&]{
 					pr.painter.drawLine (QPointF (-z, d), QPointF (z, d));
 				});
 			}
@@ -646,7 +646,7 @@ ArtificialHorizon::paint_bank_angle_indicator (AdiPaintRequest& pr) const
 			QPointF const py (0.f, 0.05f * w);
 			QPolygonF const poly ({ p0, p0 - px - py, p0 + px - py });
 
-			pr.painter.paint (pr.default_shadow, [&] {
+			pr.painter.paint (pr.default_shadow, [&]{
 				pr.painter.drawPolygon (poly);
 			});
 		}
@@ -659,7 +659,7 @@ ArtificialHorizon::paint_bank_angle_indicator (AdiPaintRequest& pr) const
 			else if (std::abs (std::fmod (deg, 30.f)) < 1.f)
 				length *= 2.2f;
 
-			pr.painter.paint (get_shadow (pr, deg), [&] {
+			pr.painter.paint (get_shadow (pr, deg), [&]{
 				pr.painter.drawLine (QPointF (0.f, 0.f), QPointF (0.f, length));
 			});
 		}
@@ -691,14 +691,14 @@ ArtificialHorizon::paint_bank_angle_indicator (AdiPaintRequest& pr) const
 		{
 			pr.painter.setPen (warning_pen);
 			pr.painter.setBrush (warning_pen.color());
-			pr.painter.paint (pr.default_shadow, [&] {
+			pr.painter.paint (pr.default_shadow, [&]{
 				pr.painter.drawPolygon (bank_angle_polygon);
 			});
 		}
 		else
 		{
 			pr.painter.setPen (pen);
-			pr.painter.paint (pr.default_shadow, [&] {
+			pr.painter.paint (pr.default_shadow, [&]{
 				pr.painter.drawPolyline (bank_angle_polygon);
 			});
 		}
@@ -715,13 +715,13 @@ ArtificialHorizon::paint_bank_angle_indicator (AdiPaintRequest& pr) const
 			if (pr.params.slip_skid_warning)
 			{
 				pr.painter.setBrush (warning_pen.color());
-				pr.painter.paint (pr.default_shadow, [&] {
+				pr.painter.paint (pr.default_shadow, [&]{
 					pr.painter.drawPolygon (slip_skid_polygon);
 				});
 			}
 			else
 			{
-				pr.painter.paint (pr.default_shadow, [&] {
+				pr.painter.paint (pr.default_shadow, [&]{
 					pr.painter.drawPolyline (slip_skid_polygon);
 				});
 			}
@@ -770,11 +770,11 @@ ArtificialHorizon::paint_heading (AdiPaintRequest& pr) const
 					float const d10 = pr.heading_to_px (1_deg * deg);
 					float const d05 = pr.heading_to_px (1_deg * deg + 5_deg);
 					// 10° lines:
-					pr.painter.paint (pr.default_shadow, [&] {
+					pr.painter.paint (pr.default_shadow, [&]{
 						pr.painter.drawLine (QPointF (d10, -w / 18.f), QPointF (d10, 0.f));
 					});
 					// 5° lines:
-					pr.painter.paint (pr.default_shadow, [&] {
+					pr.painter.paint (pr.default_shadow, [&]{
 						pr.painter.drawLine (QPointF (d05, -w / 36.f), QPointF (d05, 0.f));
 					});
 
@@ -798,7 +798,7 @@ ArtificialHorizon::paint_heading (AdiPaintRequest& pr) const
 		// Main horizon line:
 		pr.painter.setTransform (_horizon_transform);
 		pr.painter.setPen (pr.aids.get_pen (Qt::white, 1.25f));
-		pr.painter.paint (pr.default_shadow, [&] {
+		pr.painter.paint (pr.default_shadow, [&]{
 			pr.painter.drawLine (QPointF (-1.25 * w, 0.f), QPointF (1.25f * w, 0.f));
 		});
 	}
@@ -829,7 +829,7 @@ ArtificialHorizon::paint_tcas_ra (AdiPaintRequest& pr) const
 			float const h2 = pr.heading_to_px (30_deg);
 			float const p2 = pr.pitch_to_px (pitch2);
 
-			pr.painter.paint (pr.default_shadow, [&] {
+			pr.painter.paint (pr.default_shadow, [&]{
 				pr.painter.drawLine (-h1, 0.f, +h1, 0.f);
 				pr.painter.drawLine (-h1, 0.f, -h2, p2);
 				pr.painter.drawLine (+h1, 0.f, +h2, p2);
@@ -884,7 +884,7 @@ ArtificialHorizon::paint_flight_path_marker (AdiPaintRequest& pr) const
 
 		xf::Shadow shadow = pr.default_shadow;
 
-		pr.painter.paint (shadow, [&] {
+		pr.painter.paint (shadow, [&]{
 			pr.painter.drawPath (_flight_path_marker_shape);
 		});
 	}
@@ -1072,7 +1072,7 @@ VelocityLadder::paint_black_box (AdiPaintRequest& pr, float const x) const
 			QPointF (0.f, +0.5f * x)
 		});
 
-		pr.painter.paint (pr.black_shadow, [&] {
+		pr.painter.paint (pr.black_shadow, [&]{
 			pr.painter.drawPolygon (black_box_polygon);
 		});
 
@@ -1115,7 +1115,7 @@ VelocityLadder::paint_ias_disagree (AdiPaintRequest& pr, float const x) const
 
 		QPointF const position (-1.75f * x, 9.5f * x);
 
-		pr.painter.paint (pr.default_shadow, [&] {
+		pr.painter.paint (pr.default_shadow, [&]{
 			pr.painter.fast_draw_text (position, Qt::AlignVCenter | Qt::AlignLeft, "IAS", pr.black_shadow);
 			pr.painter.fast_draw_text (position + QPointF (0.f, 0.9f * x), Qt::AlignVCenter | Qt::AlignLeft, "DISAGREE", pr.black_shadow);
 		});
@@ -1148,7 +1148,7 @@ VelocityLadder::paint_ladder_scale (AdiPaintRequest& pr, float const x) const
 				continue;
 
 			float posy = kt_to_px (pr, 1_kt * kt);
-			pr.painter.paint (pr.default_shadow, [&] {
+			pr.painter.paint (pr.default_shadow, [&]{
 				pr.painter.drawLine (QPointF (-0.8f * x, posy), QPointF (0.f, posy));
 			});
 
@@ -1197,7 +1197,7 @@ VelocityLadder::paint_speed_limits (AdiPaintRequest& pr, float const x) const
 				min_point - QPointF (p1w, 0.f)
 			});
 			pr.painter.setPen (pen_y);
-			pr.painter.paint (pr.default_shadow, [&] {
+			pr.painter.paint (pr.default_shadow, [&]{
 				pr.painter.drawPolyline (poly);
 			});
 		}
@@ -1210,7 +1210,7 @@ VelocityLadder::paint_speed_limits (AdiPaintRequest& pr, float const x) const
 				max_point - QPointF (p1w, 0.f)
 			});
 			pr.painter.setPen (pen_y);
-			pr.painter.paint (pr.default_shadow, [&] {
+			pr.painter.paint (pr.default_shadow, [&]{
 				pr.painter.drawPolyline (poly);
 			});
 		}
@@ -1267,7 +1267,7 @@ VelocityLadder::paint_speed_tendency (AdiPaintRequest& pr, float const x) const
 			});
 
 			pr.painter.setClipRect (QRectF (_ladder_rect.topLeft(), QPointF (_ladder_rect.right(), 0.f)));
-			pr.painter.paint (pr.default_shadow, [&] {
+			pr.painter.paint (pr.default_shadow, [&]{
 				pr.painter.drawPolygon (poly);
 			});
 		}
@@ -1294,7 +1294,7 @@ VelocityLadder::paint_bugs (AdiPaintRequest& pr, float const x) const
 				float posy = kt_to_px (pr, bug.second);
 				pr.painter.setPen (_speed_bug_pen);
 				pr.painter.setClipRect (_ladder_rect.translated (x, 0.f));
-				pr.painter.paint (pr.default_shadow, [&] {
+				pr.painter.paint (pr.default_shadow, [&]{
 					pr.painter.drawLine (QPointF (1.5f * x, posy), QPointF (2.25f * x, posy));
 				});
 				pr.painter.setClipping (false);
@@ -1611,7 +1611,7 @@ AltitudeLadder::paint_black_box (AdiPaintRequest& pr, float const x) const
 			pr.painter.setBrush (Qt::black);
 
 			// Metric box:
-			pr.painter.paint (pr.black_shadow, [&] {
+			pr.painter.paint (pr.black_shadow, [&]{
 				pr.painter.drawRect (_metric_box_rect);
 			});
 
@@ -1630,7 +1630,7 @@ AltitudeLadder::paint_black_box (AdiPaintRequest& pr, float const x) const
 		pr.painter.setBrush (Qt::black);
 
 		// Feet box:
-		pr.painter.paint (pr.black_shadow, [&] {
+		pr.painter.paint (pr.black_shadow, [&]{
 			pr.painter.drawPolygon (black_box_polygon);
 		});
 
@@ -1669,7 +1669,7 @@ AltitudeLadder::paint_altitude_disagree (AdiPaintRequest& pr, float const x) con
 
 		QPointF const position (-1.75f * x, 9.5f * x);
 
-		pr.painter.paint (pr.default_shadow, [&] {
+		pr.painter.paint (pr.default_shadow, [&]{
 			pr.painter.fast_draw_text (position, Qt::AlignVCenter | Qt::AlignLeft, "ALT", pr.black_shadow);
 			pr.painter.fast_draw_text (position + QPointF (0.f, 0.9f * x), Qt::AlignVCenter | Qt::AlignLeft, "DISAGREE", pr.black_shadow);
 		});
@@ -1705,7 +1705,7 @@ AltitudeLadder::paint_ladder_scale (AdiPaintRequest& pr, float const x) const
 			float posy = ft_to_px (pr, 1_ft * ft);
 
 			pr.painter.setPen (ft % pr.params.al_bold_every == 0 ? _scale_pen_2 : _scale_pen_1);
-			pr.painter.paint (pr.default_shadow, [&] {
+			pr.painter.paint (pr.default_shadow, [&]{
 				pr.painter.drawLine (QPointF (0.f, posy), QPointF (0.8f * x, posy));
 			});
 
@@ -1742,11 +1742,11 @@ AltitudeLadder::paint_ladder_scale (AdiPaintRequest& pr, float const x) const
 					float r, y;
 					r = big_text_box.left() + 4.0 * x;
 					y = posy - 0.75f * big_text_box.height();
-					pr.painter.paint (pr.default_shadow, [&] {
+					pr.painter.paint (pr.default_shadow, [&]{
 						pr.painter.drawLine (QPointF (big_text_box.left(), y), QPointF (r, y));
 					});
 					y = posy + 0.75f * big_text_box.height();
-					pr.painter.paint (pr.default_shadow, [&] {
+					pr.painter.paint (pr.default_shadow, [&]{
 						pr.painter.drawLine (QPointF (big_text_box.left(), y), QPointF (r, y));
 					});
 				}
@@ -1785,7 +1785,7 @@ AltitudeLadder::paint_altitude_tendency (AdiPaintRequest& pr, float const x) con
 				QPointF (0.f, -length)
 			});
 			pr.painter.setClipRect (QRectF (_ladder_rect.topLeft(), QPointF (_ladder_rect.right(), 0.f)));
-			pr.painter.paint (pr.default_shadow, [&] {
+			pr.painter.paint (pr.default_shadow, [&]{
 				pr.painter.drawPolygon (poly);
 			});
 		}
@@ -1815,7 +1815,7 @@ AltitudeLadder::paint_bugs (AdiPaintRequest& pr, float const x) const
 				pr.painter.setClipRect (_ladder_rect.adjusted (-x, 0.f, 0.f, 0.f));
 
 				pr.painter.setPen (_altitude_bug_pen);
-				pr.painter.paint (pr.default_shadow, [&] {
+				pr.painter.paint (pr.default_shadow, [&]{
 					pr.painter.drawLine (QPointF (-1.5f * x, posy), QPointF (-2.25f * x, posy));
 				});
 
@@ -1837,11 +1837,11 @@ AltitudeLadder::paint_bugs (AdiPaintRequest& pr, float const x) const
 
 			pr.painter.setClipRect (_ladder_rect.adjusted (-x, 0.f, 0.f, 0.f));
 			pr.painter.setPen (w);
-			pr.painter.paint (pr.default_shadow, [&] {
+			pr.painter.paint (pr.default_shadow, [&]{
 				pr.painter.drawPolyline (QPolygonF ({ p1, p2, p2 + QPointF (0.25f * x, 0.f) }));
 			});
 			pr.painter.setPen (_ldg_alt_pen);
-			pr.painter.paint (pr.default_shadow, [&] {
+			pr.painter.paint (pr.default_shadow, [&]{
 				pr.painter.drawLine (p0, p1);
 			});
 
@@ -1909,7 +1909,7 @@ AltitudeLadder::paint_bugs (AdiPaintRequest& pr, float const x) const
 					QPointF const c (_ladder_rect.left() - 0.65f * x, posy + 0.65f * x);
 					QPolygonF const poly ({ a, b, c });
 
-					pr.painter.paint (pr.default_shadow, [&] {
+					pr.painter.paint (pr.default_shadow, [&]{
 						pr.painter.drawLine (a, QPointF (_ladder_rect.right(), posy));
 						pr.painter.drawPolygon (poly);
 					});
@@ -1951,7 +1951,7 @@ AltitudeLadder::paint_vertical_speed (AdiPaintRequest& pr, float const x) const
 	// Scale:
 	pr.painter.setFont (pr.aids.font_1.font);
 	pr.painter.setPen (bold_white_pen);
-	pr.painter.paint (pr.default_shadow, [&] {
+	pr.painter.paint (pr.default_shadow, [&]{
 		pr.painter.drawLine (QPointF (0.f, 0.f), QPointF (0.5f * x, 0.f));
 	});
 
@@ -1960,7 +1960,7 @@ AltitudeLadder::paint_vertical_speed (AdiPaintRequest& pr, float const x) const
 		float const posy = -2.f * y * scale_vertical_speed (kfpm * 1000_fpm);
 		QRectF num_rect (-1.55f * x, posy - x, 1.3f * x, 2.f * x);
 
-		pr.painter.paint (pr.default_shadow, [&] {
+		pr.painter.paint (pr.default_shadow, [&]{
 			pr.painter.drawLine (QPointF (0.f, posy), QPointF (line_w, posy));
 		});
 		pr.painter.fast_draw_text (num_rect, Qt::AlignVCenter | Qt::AlignRight, QString::number (std::abs (static_cast<int> (kfpm))), pr.default_shadow);
@@ -1972,7 +1972,7 @@ AltitudeLadder::paint_vertical_speed (AdiPaintRequest& pr, float const x) const
 	{
 		float const posy = -2.f * y * scale_vertical_speed (kfpm * 1000_fpm);
 
-		pr.painter.paint (pr.default_shadow, [&] {
+		pr.painter.paint (pr.default_shadow, [&]{
 			pr.painter.drawLine (QPointF (0.f, posy), QPointF (line_w, posy));
 		});
 	}
@@ -1996,7 +1996,7 @@ AltitudeLadder::paint_vertical_speed (AdiPaintRequest& pr, float const x) const
 			QPointF (0.f, +1.5f * pw)
 		});
 
-		pr.painter.paint (pr.default_shadow, [&] {
+		pr.painter.paint (pr.default_shadow, [&]{
 			pr.painter.drawPolyline (rhomb.translated (1.25f * pw, posy));
 		});
 	}
@@ -2021,7 +2021,7 @@ AltitudeLadder::paint_vertical_speed (AdiPaintRequest& pr, float const x) const
 			QPointF (0.35f * x, s2)
 		});
 
-		pr.painter.paint (pr.default_shadow, [&] {
+		pr.painter.paint (pr.default_shadow, [&]{
 			pr.painter.drawPolygon (figure);
 		});
 	};
@@ -2043,7 +2043,7 @@ AltitudeLadder::paint_vertical_speed (AdiPaintRequest& pr, float const x) const
 		QPen indicator_pen = bold_white_pen;
 		indicator_pen.setCapStyle (Qt::FlatCap);
 		pr.painter.setPen (indicator_pen);
-		pr.painter.paint (pr.default_shadow, [&] {
+		pr.painter.paint (pr.default_shadow, [&]{
 			pr.painter.drawLine (QPointF (3.f * x, 0.f),
 								 QPointF (line_w, -2.f * y * scale_vertical_speed (*pr.params.vertical_speed)));
 		});
@@ -2403,7 +2403,7 @@ PaintingWork::paint_center_cross (AdiPaintRequest& pr, bool const center_box, bo
 		pr.painter.setPen (Qt::NoPen);
 		pr.painter.drawPolygon (a);
 		pr.painter.setPen (pr.aids.get_pen (Qt::white, 1.5f));
-		pr.painter.paint (pr.default_shadow, [&] {
+		pr.painter.paint (pr.default_shadow, [&]{
 			pr.painter.drawPolygon (b);
 			pr.painter.scale (-1.f, 1.f);
 			pr.painter.drawPolygon (b);
@@ -2414,7 +2414,7 @@ PaintingWork::paint_center_cross (AdiPaintRequest& pr, bool const center_box, bo
 	{
 		pr.painter.setPen (pr.aids.get_pen (Qt::white, 1.5f));
 		pr.painter.setBrush (Qt::NoBrush);
-		pr.painter.paint (pr.default_shadow, [&] {
+		pr.painter.paint (pr.default_shadow, [&]{
 			pr.painter.drawPolygon (a);
 		});
 	}
@@ -2613,7 +2613,7 @@ PaintingWork::paint_decision_height_setting (AdiPaintRequest& pr) const
 			QRectF frame = alt_rect.united (mins_rect).adjusted (-2.f * v, -0.75f * v, +2.f * v, 0.f);
 			pr.painter.setPen (decision_height_pen);
 			pr.painter.setBrush (Qt::NoBrush);
-			pr.painter.paint (pr.default_shadow, [&] {
+			pr.painter.paint (pr.default_shadow, [&]{
 				pr.painter.drawRect (frame);
 			});
 		}
@@ -2764,7 +2764,7 @@ PaintingWork::paint_nav (AdiPaintRequest& pr) const
 				for (float x: { -1.f, -0.5f, +0.5f, +1.f })
 					pr.painter.drawEllipse (elli.translated (0.15f * ld * x, 0.f));
 
-				pr.painter.paint (pr.default_shadow, [&] {
+				pr.painter.paint (pr.default_shadow, [&]{
 					pr.painter.drawLine (QPointF (0.f, -rect.height() / 3.f), QPointF (0.f, +rect.height() / 3.f));
 				});
 			}
@@ -2778,12 +2778,12 @@ PaintingWork::paint_nav (AdiPaintRequest& pr) const
 				{
 					float const sx = 0.15f * ld * x;
 
-					pr.painter.paint (pr.default_shadow, [&] {
+					pr.painter.paint (pr.default_shadow, [&]{
 						pr.painter.drawLine (QPointF (sx, -rect.height() / 2.75f), QPointF (sx, +rect.height() / 8.f));
 					});
 				}
 
-				pr.painter.paint (pr.default_shadow, [&] {
+				pr.painter.paint (pr.default_shadow, [&]{
 					pr.painter.drawLine (QPointF (0.f, -rect.height() / 2.1f), QPointF (0.f, +rect.height() / 6.f));
 				});
 			}
@@ -2870,7 +2870,7 @@ PaintingWork::paint_hints (AdiPaintRequest& pr) const
 			QRectF frame (text_hook, QSizeF (2.25f * pr.q, pr.aids.font_5.digit_height));
 			pr.aids.centrify (frame);
 			frame.adjust (0.f, -a, 0.f, +a);
-			pr.painter.paint (pr.default_shadow, [&] {
+			pr.painter.paint (pr.default_shadow, [&]{
 				pr.painter.drawRect (frame);
 			});
 		}
@@ -3085,7 +3085,7 @@ ADI::process (xf::Cycle const& cycle)
 	params.show_metric = _io.style_show_metric.value_or (false);
 	// Speed
 	params.speed_failure = !is_sane (_io.speed_ias, { 0_mps, 1000_mps });
-	_speed_failure_timestamp.update (cycle.update_time(), [&] {
+	_speed_failure_timestamp.update (cycle.update_time(), [&]{
 		return params.speed_failure;
 	});
 	params.speed_failure_focus = _speed_failure_timestamp.shorter_than (*_io.focus_duration);
@@ -3161,7 +3161,7 @@ ADI::process (xf::Cycle const& cycle)
 
 	// Orientation
 	params.orientation_failure = !is_sane (_io.orientation_pitch) || !is_sane (_io.orientation_roll);
-	_orientation_failure_timestamp.update (cycle.update_time(), [&] {
+	_orientation_failure_timestamp.update (cycle.update_time(), [&]{
 		return params.orientation_failure;
 	});
 	params.orientation_failure_focus = _orientation_failure_timestamp.shorter_than (*_io.focus_duration);
@@ -3173,7 +3173,7 @@ ADI::process (xf::Cycle const& cycle)
 	params.slip_skid = _io.slip_skid.get_optional();
 	// Flight path vector:
 	params.flight_path_marker_failure = _computed_fpv_failure;
-	_flight_path_marker_failure_timestamp.update (cycle.update_time(), [&] {
+	_flight_path_marker_failure_timestamp.update (cycle.update_time(), [&]{
 		return params.flight_path_marker_failure;
 	});
 	params.flight_path_marker_failure_focus = _flight_path_marker_failure_timestamp.shorter_than (*_io.focus_duration);
@@ -3187,19 +3187,19 @@ ADI::process (xf::Cycle const& cycle)
 			: std::nullopt;
 	// Altitude
 	params.altitude_failure = !is_sane (_io.altitude_amsl);
-	_altitude_failure_timestamp.update (cycle.update_time(), [&] {
+	_altitude_failure_timestamp.update (cycle.update_time(), [&]{
 		return params.altitude_failure;
 	});
 	params.altitude_failure_focus = _altitude_failure_timestamp.shorter_than (*_io.focus_duration);
 	params.altitude_amsl = _io.altitude_amsl.get_optional();
 	params.altitude_lookahead = _io.altitude_amsl_lookahead.get_optional();
 	params.altitude_agl_failure = !_io.altitude_agl_serviceable.value_or (true) || !is_sane (_io.altitude_agl);
-	_altitude_agl_failure_timestamp.update (cycle.update_time(), [&] {
+	_altitude_agl_failure_timestamp.update (cycle.update_time(), [&]{
 		return params.altitude_agl_failure;
 	});
 	params.altitude_agl_failure_focus = _altitude_agl_failure_timestamp.shorter_than (*_io.focus_duration);
 	params.altitude_agl = _io.altitude_agl.get_optional();
-	_altitude_agl_became_visible.update (cycle.update_time(), [&] {
+	_altitude_agl_became_visible.update (cycle.update_time(), [&]{
 		return _io.altitude_agl_serviceable && *_io.altitude_agl_serviceable && _io.altitude_agl;
 	});
 	params.altitude_agl_focus = _altitude_agl_became_visible.shorter_than (*_io.focus_duration);
@@ -3211,7 +3211,7 @@ ADI::process (xf::Cycle const& cycle)
 		_io.decision_height_setting
 			? _io.decision_height_amsl.get_optional()
 			: std::nullopt;
-	_decision_height_became_visible.update (cycle.update_time(), [&] {
+	_decision_height_became_visible.update (cycle.update_time(), [&]{
 		return _io.altitude_amsl && _io.decision_height_amsl &&
 			   *_io.altitude_amsl < *_io.decision_height_amsl;
 	});
@@ -3222,7 +3222,7 @@ ADI::process (xf::Cycle const& cycle)
 	params.landing_amsl = _io.landing_amsl.get_optional();
 	// Vertical speed
 	params.vertical_speed_failure = !is_sane (_io.vertical_speed);
-	_vertical_speed_failure_timestamp.update (cycle.update_time(), [&] {
+	_vertical_speed_failure_timestamp.update (cycle.update_time(), [&]{
 		return params.vertical_speed_failure;
 	});
 	params.vertical_speed_failure_focus = _vertical_speed_failure_timestamp.shorter_than (*_io.focus_duration);
@@ -3267,7 +3267,7 @@ ADI::process (xf::Cycle const& cycle)
 		 !is_sane (_io.flight_director_cmd_vertical_speed) ||
 		 !is_sane (_io.flight_director_cmd_fpa) ||
 		 (!is_sane (_io.flight_director_guidance_pitch) || !is_sane (_io.flight_director_guidance_roll)));
-	_flight_director_failure_timestamp.update (cycle.update_time(), [&] {
+	_flight_director_failure_timestamp.update (cycle.update_time(), [&]{
 		return params.flight_director_failure;
 	});
 	params.flight_director_failure_focus = _flight_director_failure_timestamp.shorter_than (*_io.focus_duration);
@@ -3289,7 +3289,7 @@ ADI::process (xf::Cycle const& cycle)
 		!is_sane (_io.flight_path_deviation_vertical) ||
 		!is_sane (_io.flight_path_deviation_vertical_approach) ||
 		!is_sane (_io.flight_path_deviation_vertical_flight_path);
-	_deviation_vertical_failure_timestamp.update (cycle.update_time(), [&] {
+	_deviation_vertical_failure_timestamp.update (cycle.update_time(), [&]{
 		return params.deviation_vertical_failure;
 	});
 	params.deviation_vertical_failure_focus = _deviation_vertical_failure_timestamp.shorter_than (*_io.focus_duration);
@@ -3299,7 +3299,7 @@ ADI::process (xf::Cycle const& cycle)
 		!_io.flight_path_deviation_lateral_serviceable.value_or (true) ||
 		!is_sane (_io.flight_path_deviation_lateral_approach) ||
 		!is_sane (_io.flight_path_deviation_lateral_flight_path);
-	_deviation_lateral_failure_timestamp.update (cycle.update_time(), [&] {
+	_deviation_lateral_failure_timestamp.update (cycle.update_time(), [&]{
 		return params.deviation_lateral_failure;
 	});
 	params.deviation_lateral_failure_focus = _deviation_lateral_failure_timestamp.shorter_than (*_io.focus_duration);
@@ -3344,12 +3344,12 @@ ADI::process (xf::Cycle const& cycle)
 	params.novspd_flag = _io.warning_novspd_flag.value_or (false);
 	params.ldgalt_flag = _io.warning_ldgalt_flag.value_or (false);
 	params.pitch_disagree = _io.warning_pitch_disagree.value_or (false);
-	_pitch_disagree_timestamp.update (cycle.update_time(), [&] {
+	_pitch_disagree_timestamp.update (cycle.update_time(), [&]{
 		return params.pitch_disagree;
 	});
 	params.pitch_disagree_focus = _pitch_disagree_timestamp.shorter_than (*_io.focus_duration);
 	params.roll_disagree = _io.warning_roll_disagree.value_or (false);
-	_roll_disagree_timestamp.update (cycle.update_time(), [&] {
+	_roll_disagree_timestamp.update (cycle.update_time(), [&]{
 		return params.roll_disagree;
 	});
 	params.roll_disagree_focus = _roll_disagree_timestamp.shorter_than (*_io.focus_duration);

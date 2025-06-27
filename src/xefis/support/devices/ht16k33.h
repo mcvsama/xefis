@@ -459,17 +459,17 @@ template<class V, class U>
 		for (auto c: QString ("%1").arg (integer))
 			digits.push_back (c.digitValue());
 
-		auto clear_all_digits = [&] {
+		auto clear_all_digits = [&]{
 			for (Row row: _digit_rows)
 				led_matrix.set_column (row, 0);
 		};
 
-		auto set_all_digits_9 = [&] {
+		auto set_all_digits_9 = [&]{
 			for (Row row: _digit_rows)
 				led_matrix.set_column (row, _digit_symbols[9]);
 		};
 
-		auto normally_display = [&] {
+		auto normally_display = [&]{
 			std::size_t ds = digits.size();
 
 			for (unsigned int i = 0; i < ds; ++i)

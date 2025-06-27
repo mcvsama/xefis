@@ -161,7 +161,7 @@ HT16K33::HT16K33 (nu::i2c::Device&& i2c_device, nu::Logger const& logger):
 
 	update_timers();
 
-	guard ([&] {
+	guard ([&]{
 		initialize();
 	});
 }
@@ -170,7 +170,7 @@ HT16K33::HT16K33 (nu::i2c::Device&& i2c_device, nu::Logger const& logger):
 void
 HT16K33::update()
 {
-	guard ([&] {
+	guard ([&]{
 		uint8_t display_bits = 0;
 
 		if (_displays_enabled)
@@ -216,7 +216,7 @@ HT16K33::update()
 void
 HT16K33::initialize()
 {
-	guard ([&] {
+	guard ([&]{
 		_i2c_device.write (kSetupRegister | kSetupOn);
 		_i2c_device.write (kRowIntRegister | kRowIntRow);
 	});
@@ -236,7 +236,7 @@ HT16K33::reinitialize()
 void
 HT16K33::pool_keys()
 {
-	guard ([&] {
+	guard ([&]{
 		// Check for interrupt flag:
 		uint8_t interrupt_flag = _i2c_device.read_register (kInterruptRegister);
 

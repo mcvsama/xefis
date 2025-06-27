@@ -70,7 +70,7 @@ ETSAirspeed::initialize()
 void
 ETSAirspeed::device_initialize()
 {
-	guard ([&] {
+	guard ([&]{
 		_device.open();
 		// Start gathering samples for computation of an offset:
 		_periodic_read_timer->start();
@@ -93,7 +93,7 @@ ETSAirspeed::reinitialize()
 void
 ETSAirspeed::read()
 {
-	guard ([&] {
+	guard ([&]{
 		uint16_t raw_value = _device.read_register<uint16_t> (kValueRegister);
 		boost::endian::little_to_native (raw_value);
 

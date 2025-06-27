@@ -40,7 +40,7 @@ GLAnimationWidget::GLAnimationWidget (QWidget* parent, RefreshRate const refresh
 
 	_refresh_timer = new QTimer (this);
 	_refresh_timer->setSingleShot (false);
-	QObject::connect (_refresh_timer, &QTimer::timeout, this, [&] { update(); });
+	QObject::connect (_refresh_timer, &QTimer::timeout, this, [&]{ update(); });
 	set_refresh_rate (refresh_rate);
 	_refresh_timer->start();
 

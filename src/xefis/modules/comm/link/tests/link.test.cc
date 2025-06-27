@@ -318,7 +318,7 @@ nu::AutoTest t1 ("modules/io/link: protocol: valid data transmission", []{
 	GroundToAirLinkProtocol rx_protocol (rx);
 	TestCycle cycle;
 
-	auto test = [&] {
+	auto test = [&]{
 		cycle += 1_s;
 		tx.fetch_all (cycle);
 		transmit (tx_protocol, rx_protocol);
@@ -338,7 +338,7 @@ nu::AutoTest t1 ("modules/io/link: protocol: valid data transmission", []{
 		test_asserts::verify ("uint_prop transmitted properly", *rx.uint_prop == *tx.uint_prop);
 	};
 
-	auto multiblock_test = [&] {
+	auto multiblock_test = [&]{
 		for (auto i = 0u; i < 4u; ++i)
 		{
 			cycle += 1_s;

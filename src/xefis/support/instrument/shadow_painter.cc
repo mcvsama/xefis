@@ -31,7 +31,7 @@ ShadowPainter::paint (Shadow const& shadow, PaintFunction paint_function)
 {
 	{
 		auto const saved_pen = pen();
-		nu::ScopeExit pen_restore ([&] { setPen (saved_pen); });
+		nu::ScopeExit pen_restore ([&]{ setPen (saved_pen); });
 
 		auto const new_width = shadow.width_for_pen (saved_pen);
 		auto const old_width = saved_pen.widthF();

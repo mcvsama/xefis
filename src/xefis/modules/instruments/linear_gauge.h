@@ -215,7 +215,7 @@ template<class Value>
 		QPen const critical_pen = aids.get_pen (BasicGauge::kCriticalColor, 1.1f);
 
 		// Gauge line:
-		painter.save_context ([&] {
+		painter.save_context ([&]{
 			float const length_gap = aids.pen_width (2.0);
 
 			std::optional<float> const minimum_critical_length = get_length (values.normalized_minimum_critical);
@@ -254,7 +254,7 @@ template<class Value>
 				bool const add_min_gap = (prev.zone == PointInfo::Minimums) && (i > 0);
 				bool const add_max_gap = (next.zone == PointInfo::Maximums) && (i < point_infos->size() - 2);
 
-				painter.save_context ([&] {
+				painter.save_context ([&]{
 					auto const length_0 = prev.length - (add_min_gap ? length_gap : 0.0f);
 					auto const length_1 = next.length + (add_max_gap ? length_gap : 0.0f);
 					QPointF const uy (0.0f, 1.0f);
@@ -326,7 +326,7 @@ template<class Value>
 				<< QPointF (1.5f * q, -0.5f * q)
 				<< QPointF (1.5f * q, +0.5f * q);
 			triangle.translate (p1.x() + 0.25f * q, nu::renormalize<qreal> (*values.normalized_value, 0.0f, 1.0f, p0.y(), p1.y()));
-			painter.paint (aids.default_shadow(), [&] {
+			painter.paint (aids.default_shadow(), [&]{
 				painter.drawPolygon (triangle);
 			});
 		}

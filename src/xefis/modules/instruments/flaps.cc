@@ -116,7 +116,7 @@ Flaps::async_paint (xf::PaintRequest const& paint_request, PaintingParams const&
 		float w = 0.3f * block.width();
 		float s = block.top() + setting / pp.maximum_angle * block.height();
 		painter.setPen (aids->get_pen (Qt::green, 2.f));
-		painter.paint (aids->default_shadow(), [&] {
+		painter.paint (aids->default_shadow(), [&]{
 			painter.drawLine (QPointF (block.left() - w, s), QPointF (block.right() + w, s));
 		});
 

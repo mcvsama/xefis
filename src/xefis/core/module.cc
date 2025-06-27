@@ -138,7 +138,7 @@ void
 Module::ProcessingLoopAPI::communicate (Cycle const& cycle)
 {
 	try {
-		auto communication_time = nu::TimeHelper::measure ([&] {
+		auto communication_time = nu::TimeHelper::measure ([&]{
 			_module.communicate (cycle);
 		});
 
@@ -163,7 +163,7 @@ Module::ProcessingLoopAPI::fetch_and_process (Cycle const& cycle)
 			for (auto* socket: _module._registered_input_sockets)
 				socket->fetch (cycle);
 
-			auto processing_time = nu::TimeHelper::measure ([&] {
+			auto processing_time = nu::TimeHelper::measure ([&]{
 				_module.process (cycle);
 			});
 

@@ -438,7 +438,7 @@ LinkProtocol::consume (Blob::const_iterator begin,
 		bool return_from_outer_function = false;
 		Blob::const_iterator outer_result = begin;
 
-		nu::Exception::catch_and_log (logger, [&] {
+		nu::Exception::catch_and_log (logger, [&]{
 			try {
 				// Find the right unique_prefix and envelope:
 				std::copy (begin, begin + nu::to_signed (_unique_prefix_size), _aux_unique_prefix_buffer.begin());
