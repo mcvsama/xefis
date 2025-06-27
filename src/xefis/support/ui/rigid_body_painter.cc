@@ -268,6 +268,7 @@ RigidBodyPainter::precompute()
 	if (_planet)
 	{
 		auto const followed_body_normalized_height = nu::renormalize (_followed_polar_position.radius(), nu::Range { kEarthMeanRadius, kAtmosphereRadius }, nu::Range { 0.0f, 1.0f });
+		_planet->horizon_angle = compute_horizon_angle (kEarthMeanRadius, _camera_polar_position.radius());
 		_planet->followed_body_normalized_amsl_height = std::clamp<float> (followed_body_normalized_height, 0.0f, 1.0f);
 		_planet->camera_normalized_amsl_height = nu::renormalize (_camera_polar_position.radius(), nu::Range { kEarthMeanRadius, kAtmosphereRadius }, nu::Range { 0.0f, 1.0f });
 		_planet->camera_clamped_normalized_amsl_height = std::clamp<float> (_planet->camera_normalized_amsl_height, 0.0f, 1.0f);
@@ -569,7 +570,6 @@ RigidBodyPainter::paint_universe_and_sun()
 
 	if (_planet && _sun)
 	{
-		_planet->horizon_angle = compute_horizon_angle (kEarthMeanRadius, _camera_polar_position.radius());
 		auto const sun_altitude = _sun->position.horizontal_coordinates.altitude;
 		sun_altitude_above_horizon = sun_altitude - _planet->horizon_angle;
 	}
