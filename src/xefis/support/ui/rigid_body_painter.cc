@@ -286,7 +286,7 @@ RigidBodyPainter::precompute()
 	}
 
 	check_textures();
-	check_sky_dome();
+	check_sky_dome_and_ground_shape();
 }
 
 
@@ -670,17 +670,20 @@ RigidBodyPainter::paint_planet()
 
 		// Ground:
 		// TODO it would be best if there was a shader that adds the dome sphere color to the drawn feature
-		_gl.save_context ([&] {
-			glFrontFace (GL_CCW);
-			glDisable (GL_BLEND);
-			glEnable (GL_DEPTH_TEST);
-			glEnable (GL_TEXTURE_2D);
-			glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-			_gl.translate (planet_position());
-			enable_only_lights (kCosmicSunLight);
-			_gl.draw (_planet->ground_shape);
-			glDisable (GL_TEXTURE_2D);
-		});
+		if (_planet->ground_shape)
+		{
+			_gl.save_context ([&] {
+				glFrontFace (GL_CCW);
+				glDisable (GL_BLEND);
+				glEnable (GL_DEPTH_TEST);
+				glEnable (GL_TEXTURE_2D);
+				glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+				_gl.translate (planet_position());
+				enable_only_lights (kCosmicSunLight);
+				_gl.draw (*_planet->ground_shape);
+				glDisable (GL_TEXTURE_2D);
+			});
+		}
 
 		if (_planet && _planet->sky_dome_shape)
 		{
@@ -1358,10 +1361,16 @@ RigidBodyPainter::check_universe_textures()
 
 
 void
-RigidBodyPainter::check_sky_dome()
+RigidBodyPainter::check_sky_dome_and_ground_shape()
 {
-	if (_planet && !_planet->sky_dome_shape)
-		_planet->sky_dome_shape = compute_sky_dome_shape();
+	if (_planet)
+	{
+		if (!_planet->sky_dome_shape)
+			_planet->sky_dome_shape = compute_sky_dome_shape();
+
+		if (!_planet->ground_shape && _planet_textures)
+			_planet->ground_shape = compute_ground_shape (_camera_polar_position, kEarthMeanRadius, _planet_textures->earth);
+	}
 }
 
 
@@ -1493,10 +1502,10 @@ RigidBodyPainter::compute_camera_transform()
 	if (_planet)
 	{
 		if (abs (_camera_position_for_sky_dome - _camera.position()) > 10_m)
+		{
 			_planet->sky_dome_shape.reset();
-
-		if (_planet_textures)
-			_planet->ground_shape = compute_ground_shape (_camera_polar_position, kEarthMeanRadius, _planet_textures->earth);
+			_planet->ground_shape.reset();
+		}
 	}
 
 	if (_camera_position_callback)

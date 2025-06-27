@@ -143,7 +143,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	{
 		rigid_body::Body const*	body				{ nullptr };
 		std::optional<Shape>	sky_dome_shape;
-		Shape					ground_shape;
+		std::optional<Shape>	ground_shape;
 		// Angle of horizon (always below 0°) as viewed from the camera position:
 		si::Angle				horizon_angle		{ 0_deg };
 		float					camera_normalized_amsl_height			{ 0.0f };
@@ -693,7 +693,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	 * Also if it has been finished, start using it.
 	 */
 	void
-	check_sky_dome();
+	check_sky_dome_and_ground_shape();
 
 	/**
 	 * \threadsafe	As long as atmospheric_scattering is unmodified.
