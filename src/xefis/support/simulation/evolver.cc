@@ -40,7 +40,7 @@ Evolver::evolve (si::Time const duration)
 	_target_time += duration;
 	auto frames = 0u;
 	auto const prev_elapsed_time = _elapsed_time;
-	auto const real_time_taken = nu::TimeHelper::measure ([&] {
+	auto const real_time_taken = nu::TimeHelper::measure ([&]{
 		while (_elapsed_time < _target_time)
 		{
 			_evolve (_frame_duration);
@@ -62,7 +62,7 @@ Evolver::EvolutionResult
 Evolver::evolve (std::size_t const frames)
 {
 	auto const prev_elapsed_time = _elapsed_time;
-	auto const real_time_taken = nu::TimeHelper::measure ([&] {
+	auto const real_time_taken = nu::TimeHelper::measure ([&]{
 		for (std::size_t i = 0; i < frames; ++i)
 		{
 			_evolve (_frame_duration);

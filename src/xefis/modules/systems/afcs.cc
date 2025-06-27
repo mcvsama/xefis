@@ -434,7 +434,7 @@ AFCS::button_press_gs()
 void
 AFCS::knob_vertical_change (int delta)
 {
-	auto perhaps_alt_hold = [&] {
+	auto perhaps_alt_hold = [&]{
 		if (_pitch_mode == PitchMode::MCP_ALT ||
 			_pitch_mode == PitchMode::VC)
 		{

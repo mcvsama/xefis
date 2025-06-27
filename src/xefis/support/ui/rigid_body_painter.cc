@@ -360,12 +360,12 @@ RigidBodyPainter::setup_sun_light()
 		glLightfv (kGLCosmicSunLight, GL_DIFFUSE, kSunColorInSpace.scaled (0.4f));
 		glLightfv (kGLCosmicSunLight, GL_SPECULAR, kSunColorInSpace.scaled (0.1f));
 
-		_gl.save_context ([&] {
+		_gl.save_context ([&]{
 			_gl.set_camera (_camera);
 
 			if (_sun)
 			{
-				_gl.save_context ([&] {
+				_gl.save_context ([&]{
 					_gl.load_identity();
 					_gl.set_camera_rotation_only (_camera);
 					make_z_towards_the_sun (_sun->position);
@@ -418,7 +418,7 @@ RigidBodyPainter::setup_sky_light()
 		// Sky lights:
 		for (auto& sky_light: _planet->sky_lights)
 		{
-			_gl.save_context ([&] {
+			_gl.save_context ([&]{
 				make_z_sky_top_x_sun_azimuth (_sun->position);
 				_gl.rotate_z (+sky_light.position.lon());
 				_gl.rotate_y (-sky_light.position.lat());
@@ -468,7 +468,7 @@ RigidBodyPainter::setup_feature_light()
 	glLightfv (kGLFeatureLight, GL_DIFFUSE, GLArray { 0.5f, 0.5f, 0.5f, 1.0f });
 	glLightfv (kGLFeatureLight, GL_SPECULAR, GLArray { 0.9f, 0.9f, 0.9f, 1.0f });
 
-	_gl.save_context ([&] {
+	_gl.save_context ([&]{
 		// Reset rotations and translations:
 		_gl.load_identity();
 		// Cast light from observer's position (Z = 1):
@@ -555,7 +555,7 @@ RigidBodyPainter::make_z_sky_top_x_sun_azimuth (SunPosition const& sun_position)
 void
 RigidBodyPainter::paint_world (rigid_body::System const& system)
 {
-	_gl.save_context ([&] {
+	_gl.save_context ([&]{
 		paint_universe_and_sun();
 		paint_planet();
 		paint_air_particles();
@@ -579,7 +579,7 @@ RigidBodyPainter::paint_universe_and_sun()
 
 	if (_universe && _universe->sky_box_shape)
 	{
-		_gl.save_context ([&] {
+		_gl.save_context ([&]{
 			auto const alpha = sun_altitude_above_horizon
 				? compute_sky_box_visibility (*sun_altitude_above_horizon)
 				: 1.0f;
@@ -612,7 +612,7 @@ RigidBodyPainter::paint_universe_and_sun()
 	if (_sun)
 	{
 		// Sun:
-		_gl.save_context ([&] {
+		_gl.save_context ([&]{
 			auto const magnification_at_0_amsl = sun_altitude_above_horizon
 				? nu::renormalize (*sun_altitude_above_horizon, nu::Range { 0_deg, 90_deg }, nu::Range { kSunSunsetMagnification, kSunNoonMagnification })
 				: 1.0f;
@@ -636,7 +636,7 @@ RigidBodyPainter::paint_universe_and_sun()
 			make_z_towards_the_sun (_sun->position);
 			// Z is now direction towards the Sun:
 			_gl.translate (0_m, 0_m, kSunDistance);
-			_gl.save_context ([&] {
+			_gl.save_context ([&]{
 				auto const scale = _sun->magnification;
 				glScalef (scale, scale, scale);
 				_gl.draw (_sun->face_shape);
@@ -650,7 +650,7 @@ RigidBodyPainter::paint_universe_and_sun()
 				: 1.0f;
 			auto const alpha_height_factor = _planet ? _planet->camera_clamped_normalized_amsl_height : 1.0f;
 
-			_gl.save_context ([&] {
+			_gl.save_context ([&]{
 				_gl.additional_parameters().alpha_factor = std::clamp<float> (alpha_height_factor * sun_visibility, 0.0f, 1.0f);
 				_gl.draw (_sun->shines_shape);
 			});
@@ -665,14 +665,14 @@ RigidBodyPainter::paint_planet()
 	if (!_planet)
 		return;
 
-	_gl.save_context ([&] {
+	_gl.save_context ([&]{
 		_gl.set_camera (_camera);
 
 		// Ground:
 		// TODO it would be best if there was a shader that adds the dome sphere color to the drawn feature
 		if (_planet->ground_shape)
 		{
-			_gl.save_context ([&] {
+			_gl.save_context ([&]{
 				glFrontFace (GL_CCW);
 				glDisable (GL_BLEND);
 				glEnable (GL_DEPTH_TEST);
@@ -688,7 +688,7 @@ RigidBodyPainter::paint_planet()
 		if (_planet->sky_dome_shape)
 		{
 			// Sky and ground dome around the observer:
-			_gl.save_context ([&] {
+			_gl.save_context ([&]{
 				_gl.set_camera_rotation_only (_camera);
 				// Rotate so that down is -Z.
 				make_z_sky_top_x_south();
@@ -716,7 +716,7 @@ RigidBodyPainter::paint_planet()
 void
 RigidBodyPainter::paint_air_particles()
 {
-	_gl.save_context ([&] {
+	_gl.save_context ([&]{
 		enable_appropriate_lights();
 		_gl.set_camera_rotation_only (_camera);
 		// Trick with rotating camera and then subtracting camera position from the object is to avoid problems with low precision OpenGL floats:
@@ -753,7 +753,7 @@ RigidBodyPainter::paint_air_particles()
 						static_cast<int64_t> (z.in<si::Meter>()),
 					};
 					_air_particles_prng.seed (seed);
-					_gl.save_context ([&] {
+					_gl.save_context ([&]{
 						// OpenGL's center of the view [0, 0, 0] is at body_pos, hence subtracting body_pos from
 						// absolute values (in WorldOrigin space) x, y, z here:
 						auto const wiggled_x = x - body_pos.x() + prng_factor * _air_particles_prng() - half_grid_size;
@@ -772,7 +772,7 @@ RigidBodyPainter::paint_air_particles()
 void
 RigidBodyPainter::paint (rigid_body::System const& system)
 {
-	_gl.save_context ([&] {
+	_gl.save_context ([&]{
 		enable_appropriate_lights();
 		_gl.set_camera_rotation_only (_camera);
 
@@ -850,7 +850,7 @@ RigidBodyPainter::transform_gl_from_body_center_of_mass_to_origin (rigid_body::B
 void
 RigidBodyPainter::paint (rigid_body::Body const& body, BodyRenderingConfig const& rendering)
 {
-	_gl.save_context ([&] {
+	_gl.save_context ([&]{
 		transform_gl_to_center_of_mass (body);
 
 		if (rendering.moments_of_inertia_visible)
@@ -861,7 +861,7 @@ RigidBodyPainter::paint (rigid_body::Body const& body, BodyRenderingConfig const
 
 		if (rendering.body_visible)
 		{
-			_gl.save_context ([&] {
+			_gl.save_context ([&]{
 				if (&body == focused_body())
 					_gl.additional_parameters().color_override = GLColor::from_rgb (0x00, 0xaa, 0x7f);
 				else if (hovered<rigid_body::Body>() == &body)
@@ -884,7 +884,7 @@ RigidBodyPainter::paint (rigid_body::Constraint const& constraint)
 {
 	if (constraint.enabled() && !constraint.broken())
 	{
-		_gl.save_context ([&] {
+		_gl.save_context ([&]{
 			auto const cp = _camera.position();
 			auto const& b1 = constraint.body_1();
 			auto const& b2 = constraint.body_2();
@@ -893,7 +893,7 @@ RigidBodyPainter::paint (rigid_body::Constraint const& constraint)
 
 			auto const rod_from_to = [this] (si::Length const radius, auto const& from, auto const& to, bool front_back_faces, ShapeMaterial const& material)
 			{
-				_gl.save_context ([&] {
+				_gl.save_context ([&]{
 					auto const diff = to - from;
 					_gl.translate (from);
 
@@ -949,7 +949,7 @@ RigidBodyPainter::paint_helpers (rigid_body::Group const& group, GroupRenderingC
 {
 	if (focused || rendering.center_of_mass_visible)
 	{
-		_gl.save_context ([&] {
+		_gl.save_context ([&]{
 			transform_gl_to_center_of_mass (group);
 			paint_center_of_mass();
 
@@ -965,7 +965,7 @@ RigidBodyPainter::paint_helpers (rigid_body::Body const& body, BodyRenderingConf
 {
 	if (focused || rendering.center_of_mass_visible || rendering.origin_visible)
 	{
-		_gl.save_context ([&] {
+		_gl.save_context ([&]{
 			transform_gl_to_center_of_mass (body);
 
 			if (focused || rendering.center_of_mass_visible)
@@ -992,7 +992,7 @@ RigidBodyPainter::paint_center_of_mass()
 {
 	auto const com_shape = make_center_of_mass_symbol_shape (_user_camera_translation.norm() / 150);
 
-	_gl.save_context ([&] {
+	_gl.save_context ([&]{
 		glDisable (GL_LIGHTING);
 		_gl.draw (com_shape);
 		glEnable (GL_LIGHTING);
@@ -1094,7 +1094,7 @@ RigidBodyPainter::paint_angular_momentum (rigid_body::Body const& body)
 void
 RigidBodyPainter::draw_arrow (SpaceLength<WorldSpace> const& origin, SpaceLength<WorldSpace> const& vector, ShapeMaterial const& material)
 {
-	_gl.save_context ([&] {
+	_gl.save_context ([&]{
 		auto const length = abs (vector);
 
 		if (length > 0_m)
@@ -1150,7 +1150,7 @@ RigidBodyPainter::paint_ecef_basis (QOpenGLPaintDevice& canvas)
 	auto const tx = -1.0 + 2 * pixels_from_edge / canvas.width();
 	auto const ty = -1.0 + 2 * pixels_from_edge / canvas.height();
 
-	_gl.save_context ([&] {
+	_gl.save_context ([&]{
 		glMatrixMode (GL_PROJECTION);
 		_gl.load_identity();
 		_gl.translate (tx, ty, -1.0);
@@ -1187,21 +1187,21 @@ RigidBodyPainter::paint_basis (si::Length const length)
 	// Root ball:
 	_gl.draw (make_centered_sphere_shape ({ .radius = 2 * radius, .n_slices = 8, .n_stacks = 4 }));
 	// X axis:
-	_gl.save_context ([&] {
+	_gl.save_context ([&]{
 		_gl.rotate_y (+90_deg);
 		_gl.draw (make_cylinder_shape ({ .length = length, .radius = radius, .num_faces = kNumFaces, .material = red }));
 		_gl.translate (0_m, 0_m, length);
 		_gl.draw (make_cone_shape ({ .length = cone_length, .radius = cone_radius, .num_faces = kNumFaces, .with_bottom = true, .material = red }));
 	});
 	// Y axis:
-	_gl.save_context ([&] {
+	_gl.save_context ([&]{
 		_gl.rotate_x (-90_deg);
 		_gl.draw (make_cylinder_shape ({ .length = length, .radius = radius, .num_faces = kNumFaces, .material = green }));
 		_gl.translate (0_m, 0_m, length);
 		_gl.draw (make_cone_shape ({ .length = cone_length, .radius = cone_radius, .num_faces = kNumFaces, .with_bottom = true, .material = green }));
 	});
 	// Z axis:
-	_gl.save_context ([&] {
+	_gl.save_context ([&]{
 		_gl.draw (make_cylinder_shape ({ .length = length, .radius = radius, .num_faces = kNumFaces, .material = blue }));
 		_gl.translate (0_m, 0_m, length);
 		_gl.draw (make_cone_shape ({ .length = cone_length, .radius = cone_radius, .num_faces = kNumFaces, .with_bottom = true, .material = blue }));

@@ -112,7 +112,7 @@ Transceiver::encrypt_packet (BlobView const packet)
 			throw nu::Exception (std::format ("{}: {} is unavailable; fallback is unavailable", role_name(), session_name), false);
 	};
 
-	return try_session (first_session_to_try, first_session_role, _role == Role::Master, [&] {
+	return try_session (first_session_to_try, first_session_role, _role == Role::Master, [&]{
 		return try_session (second_session_to_try, second_session_role, false);
 	});
 }

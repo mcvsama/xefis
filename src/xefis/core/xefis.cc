@@ -109,7 +109,7 @@ Xefis::Xefis (int& argc, char** argv):
 			<< "Otherwise expect fonts to be too large or too small.\n";
 	}
 
-	nu::Exception::log (_logger, [&] {
+	nu::Exception::log (_logger, [&]{
 		QImageReader::setAllocationLimit (512);
 
 		_system = std::make_unique<System> (_logger);
@@ -172,7 +172,7 @@ Xefis::setup_unix_signals_handler()
 	_posix_signals_check_timer = new QTimer (this);
 	_posix_signals_check_timer->setSingleShot (false);
 	_posix_signals_check_timer->setInterval ((100_ms).in<si::Millisecond>());
-	QObject::connect (_posix_signals_check_timer, &QTimer::timeout, [&] {
+	QObject::connect (_posix_signals_check_timer, &QTimer::timeout, [&]{
 		if (nu::g_hup_received.load())
 		{
 			_logger << "HUP received, exiting." << std::endl;

@@ -417,7 +417,7 @@ NavaidStorage::parse_apt_dat()
 	Navaid::Runways runways;
 	std::size_t loaded_airports = 0;
 
-	auto push_navaid = [&] {
+	auto push_navaid = [&]{
 		if (cur_land_airport && !runways.empty())
 		{
 			// Compute position:

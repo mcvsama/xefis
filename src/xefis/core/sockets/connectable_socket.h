@@ -294,7 +294,7 @@ template<class OV, class AV>
 		bool thrown = false;
 		this->set_nil_by_fetch_exception (false);
 
-		auto const execute = [&] {
+		auto const execute = [&]{
 			std::visit (nu::overload {
 				[&] (std::monostate) {
 					this->protected_set_nil();

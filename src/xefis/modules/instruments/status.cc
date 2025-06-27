@@ -116,7 +116,7 @@ Status::Status (xf::ProcessingLoop& loop, xf::Graphics const& graphics, std::str
 	_blink_timer = std::make_unique<QTimer>();
 	_blink_timer->setInterval (200);
 	_blink_timer->setSingleShot (false);
-	QObject::connect (_blink_timer.get(), &QTimer::timeout, [&] {
+	QObject::connect (_blink_timer.get(), &QTimer::timeout, [&]{
 		_blink_show = !_blink_show;
 		mark_dirty();
 	});
@@ -125,7 +125,7 @@ Status::Status (xf::ProcessingLoop& loop, xf::Graphics const& graphics, std::str
 	_cursor_hide_timer = std::make_unique<QTimer>();
 	_cursor_hide_timer->setInterval (5000);
 	_cursor_hide_timer->setSingleShot (true);
-	QObject::connect (_cursor_hide_timer.get(), &QTimer::timeout, [&] {
+	QObject::connect (_cursor_hide_timer.get(), &QTimer::timeout, [&]{
 		_cache.lock()->cursor_visible = false;
 		mark_dirty();
 	});

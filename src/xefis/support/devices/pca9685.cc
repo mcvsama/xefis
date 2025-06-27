@@ -67,7 +67,7 @@ PCA9685::set_duty_cycle (std::size_t channel_id, si::Time duty_cycle)
 void
 PCA9685::initialize()
 {
-	guard ([&] {
+	guard ([&]{
 		_i2c_device.open();
 
 		_logger << "Resetting PCA9685." << std::endl;
@@ -104,7 +104,7 @@ PCA9685::reinitialize()
 void
 PCA9685::update_chip()
 {
-	guard ([&] {
+	guard ([&]{
 		for (std::size_t ch = 0; ch < _duty_cycles.size(); ++ch)
 		{
 			// Fill in all 4 PWM registers:

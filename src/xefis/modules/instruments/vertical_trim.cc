@@ -114,7 +114,7 @@ VerticalTrim::async_paint (xf::PaintRequest const& paint_request, PaintingParams
 	if (ref)
 	{
 		painter.setPen (aids->get_pen (aids->kAutopilotColor, 2.0));
-		painter.paint (aids->default_shadow(), [&] {
+		painter.paint (aids->default_shadow(), [&]{
 			painter.drawLine (QPointF (aids->pen_width (0.5), -*ref * 0.5 * v),
 							  QPointF (aids->pen_width (7.5), -*ref * 0.5 * v));
 		});
@@ -136,7 +136,7 @@ VerticalTrim::async_paint (xf::PaintRequest const& paint_request, PaintingParams
 		QColor color = within_reference ? Qt::green : Qt::white;
 		painter.setPen (aids->get_pen (color, 0.0f));
 		painter.setBrush (color);
-		painter.paint (aids->default_shadow(), [&] {
+		painter.paint (aids->default_shadow(), [&]{
 			painter.drawPolygon (triangle.translated (0.0, -*trim * 0.5 * v));
 		});
 	}

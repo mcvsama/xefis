@@ -401,7 +401,7 @@ PaintingWork::paint_aircraft()
 
 	// Aircraft triangle - shadow and triangle:
 	_painter.setPen (_aids.get_pen (Qt::white, 1.f));
-	_painter.paint (_c.black_shadow, [&] {
+	_painter.paint (_c.black_shadow, [&]{
 		_painter.drawPolyline (_c.aircraft_shape);
 	});
 
@@ -736,7 +736,7 @@ PaintingWork::paint_directions()
 		for (int deg = 45; deg < 360; deg += 45)
 		{
 			_painter.rotate (45);
-			_painter.paint (_c.black_shadow, [&] {
+			_painter.paint (_c.black_shadow, [&]{
 				_painter.drawLine (QPointF (0.f, -1.025f * _c.r), QPointF (0.f, -1.125f * _c.r));
 			});
 		}
@@ -766,7 +766,7 @@ PaintingWork::paint_track (bool paint_heading_triangle)
 		if (_p.display_mode != hsi::DisplayMode::Auxiliary && _p.center_on_track)
 			extension = 0.6 * _c.q;
 
-		_painter.paint (_c.black_shadow, [&] {
+		_painter.paint (_c.black_shadow, [&]{
 			_painter.drawLine (QPointF (0.f, start_point), QPointF (0.f, -_c.r - extension));
 		});
 		_painter.setPen (_aids.get_pen (Qt::white, 1.3f, Qt::SolidLine, Qt::RoundCap));
@@ -793,7 +793,7 @@ PaintingWork::paint_track (bool paint_heading_triangle)
 
 			QString half_range_str = QString ("%1").arg (range.in<si::NauticalMile>(), 0, 'f', precision);
 
-			_painter.paint (_c.black_shadow, [&] {
+			_painter.paint (_c.black_shadow, [&]{
 				_painter.drawLine (QPointF (-range_tick_hpx, -range_tick_vpx), QPointF (range_tick_hpx, -range_tick_vpx));
 			});
 
@@ -826,7 +826,7 @@ PaintingWork::paint_track (bool paint_heading_triangle)
 		_painter.setPen (_aids.get_pen (Qt::white, 2.2f));
 		_painter.translate (0.f, -1.003f * _c.r);
 		_painter.scale (0.465f, -0.465f);
-		_painter.paint (_c.black_shadow, [&] {
+		_painter.paint (_c.black_shadow, [&]{
 			_painter.drawPolyline (_c.aircraft_shape);
 		});
 	}
@@ -923,7 +923,7 @@ PaintingWork::paint_trend_vector()
 			}
 			else if (!polygon.empty())
 			{
-				_painter.paint (_c.black_shadow, [&] {
+				_painter.paint (_c.black_shadow, [&]{
 					_painter.drawPolyline (polygon);
 				});
 				polygon.clear();
@@ -934,7 +934,7 @@ PaintingWork::paint_trend_vector()
 
 		if (!polygon.empty())
 		{
-			_painter.paint (_c.black_shadow, [&] {
+			_painter.paint (_c.black_shadow, [&]{
 				_painter.drawPolyline (polygon);
 			});
 		}
@@ -1001,7 +1001,7 @@ PaintingWork::paint_speeds_and_wind()
 		_painter.translate (0.8f * _c.q + _c.hmargin, 0.8f * _c.q + layout.height());
 		_painter.rotate ((*_p.wind_from_magnetic_heading - *_p.heading_magnetic + 180_deg).in<si::Degree>());
 		_painter.setPen (_aids.get_pen (Qt::white, 1.0));
-		_painter.paint (_c.black_shadow, [&] {
+		_painter.paint (_c.black_shadow, [&]{
 			auto const a = QPointF (0.f, -0.7f * _c.q);
 			auto const b = QPointF (0.f, +0.7f * _c.q);
 			auto const r = 0.15f * _c.q;
@@ -1057,7 +1057,7 @@ PaintingWork::paint_home_direction()
 				<< QPointF (+0.2 * z, -0.8 * z)
 				<< QPointF (0.0, -0.8 * z);
 			_painter.rotate ((*_p.true_home_direction - *_p.heading_true).in<si::Degree>());
-			_painter.paint (_c.black_shadow, [&] {
+			_painter.paint (_c.black_shadow, [&]{
 				_painter.drawPolyline (home_arrow);
 			});
 		}
@@ -1153,7 +1153,7 @@ PaintingWork::paint_course()
 	float const shadow_scale = shadow_pen_width / pink_pen_width;
 	float const dev_1_deg_px = 1.5f * k;
 
-	_painter.paint (_c.black_shadow, [&] {
+	_painter.paint (_c.black_shadow, [&]{
 		_painter.drawLine (QPointF (0.0, -3.5 * k), QPointF (0.0, -0.99 * _c.r));
 	});
 
@@ -1185,7 +1185,7 @@ PaintingWork::paint_course()
 		<< QPointF (+z, 3.5 * k - z)
 		<< QPointF (+z, 2.5 * k)
 		<< QPointF (-z, 2.5 * k);
-	_painter.paint (_c.black_shadow, [&] {
+	_painter.paint (_c.black_shadow, [&]{
 		_painter.drawPolyline (top_bar);
 		_painter.drawPolyline (bottom_bar);
 	});
@@ -1223,7 +1223,7 @@ PaintingWork::paint_course()
 
 	_painter.setPen (_aids.get_pen (Qt::white, 2.f));
 	_painter.setBrush (Qt::NoBrush);
-	_painter.paint (_c.black_shadow, [&] {
+	_painter.paint (_c.black_shadow, [&]{
 		for (float x: { -2.f, -1.f, +1.f, +2.f })
 			_painter.drawEllipse (elli.translated (dev_1_deg_px * x, 0.f));
 	});
@@ -1426,7 +1426,7 @@ PaintingWork::paint_pointers()
 			float const from_top = _c.r - 11.0 * z;
 			float const from_bottom = _c.r + 3.0 * z;
 
-			_painter.paint (_c.black_shadow, [&] {
+			_painter.paint (_c.black_shadow, [&]{
 				_painter.drawLine (QPointF (0.0, to_top + delta), QPointF (0.0, to_bottom));
 				_painter.drawLine (QPointF (0.0, to_top), QPointF (+z, to_top + 1.4 * z));
 				_painter.drawLine (QPointF (0.0, to_top), QPointF (-z, to_top + 1.4 * z));
@@ -1470,7 +1470,7 @@ PaintingWork::paint_pointers()
 				<< QPointF (-z, from_top + 1.2 * z)
 				<< QPointF (0.0, from_top);
 
-			_painter.paint (_c.black_shadow, [&] {
+			_painter.paint (_c.black_shadow, [&]{
 				_painter.drawPolyline (top_arrow);
 				_painter.drawPolyline (bottom_arrow);
 			});
@@ -1916,14 +1916,14 @@ PaintingWork::paint_tcas()
 				if (angle % 90 == 0)
 				{
 					_painter.setBrush (Qt::NoBrush);
-					_painter.paint (_c.black_shadow, [&] {
+					_painter.paint (_c.black_shadow, [&]{
 						_painter.drawEllipse (big_point);
 					});
 				}
 				else
 				{
 					_painter.setBrush (Qt::white);
-					_painter.paint (_c.black_shadow, [&] {
+					_painter.paint (_c.black_shadow, [&]{
 						_painter.drawEllipse (small_point);
 					});
 				}

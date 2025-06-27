@@ -93,7 +93,7 @@ GPS::Connection::open_device()
 {
 	_serial_port->set_configuration (_serial_port_config);
 
-	bool has_thrown = nu::Exception::catch_and_log (_gps_module._logger, [&] {
+	bool has_thrown = nu::Exception::catch_and_log (_gps_module._logger, [&]{
 		_alive_check_timer->start();
 		_gps_module.logger() << "Opening device " << _gps_module._serial_port_config.device_path() << " at " << _serial_port_config.baud_rate() << " bps" << std::endl;
 
