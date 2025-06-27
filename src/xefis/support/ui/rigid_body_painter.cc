@@ -120,7 +120,7 @@ RigidBodyPainter::set_time (si::Time const new_time)
 	if (abs (_time - _prev_saved_time) > 5_s)
 	{
 		if (_planet)
-			_planet->need_new_sky_dome = true;
+			_planet->sky_dome_shape.reset();
 
 		if (_universe)
 			check_sky_box();
@@ -210,7 +210,7 @@ RigidBodyPainter::set_sun_enabled (bool enabled)
 		_sun.reset();
 
 	if (_planet)
-		_planet->need_new_sky_dome = true;
+		_planet->sky_dome_shape.reset();
 }
 
 
@@ -682,7 +682,7 @@ RigidBodyPainter::paint_planet()
 			glDisable (GL_TEXTURE_2D);
 		});
 
-		if (_planet)
+		if (_planet && _planet->sky_dome_shape)
 		{
 			// Sky and ground dome around the observer:
 			_gl.save_context ([&] {
@@ -699,7 +699,7 @@ RigidBodyPainter::paint_planet()
 				// Blend with the universe: final_color = (1 - transmittance) * atmosphere_color + universe_color
 				glBlendFunc (GL_SRC_ALPHA, GL_ONE);
 				glEnable (GL_BLEND);
-				_gl.draw (_planet->sky_dome_shape);
+				_gl.draw (*_planet->sky_dome_shape);
 				glDisable (GL_BLEND);
 				glEnable (GL_LIGHTING);
 				glEnable (GL_DEPTH_TEST);
@@ -1327,7 +1327,7 @@ RigidBodyPainter::check_planet_textures()
 			};
 
 			// Reload SkyDome to include the Earth texture:
-			_planet->need_new_sky_dome = true;
+			_planet->sky_dome_shape.reset();
 		}
 	}
 }
@@ -1360,9 +1360,8 @@ RigidBodyPainter::check_universe_textures()
 void
 RigidBodyPainter::check_sky_dome()
 {
-	if (_planet)
-		if (std::exchange (_planet->need_new_sky_dome, false))
-			_planet->sky_dome_shape = compute_sky_dome_shape();
+	if (_planet && !_planet->sky_dome_shape)
+		_planet->sky_dome_shape = compute_sky_dome_shape();
 }
 
 
@@ -1494,7 +1493,7 @@ RigidBodyPainter::compute_camera_transform()
 	if (_planet)
 	{
 		if (abs (_camera_position_for_sky_dome - _camera.position()) > 10_m)
-			_planet->need_new_sky_dome = true;
+			_planet->sky_dome_shape.reset();
 
 		if (_planet_textures)
 			_planet->ground_shape = compute_ground_shape (_camera_polar_position, kEarthMeanRadius, _planet_textures->earth);

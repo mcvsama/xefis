@@ -142,9 +142,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	struct Planet
 	{
 		rigid_body::Body const*	body				{ nullptr };
-		// If set to true, sky_dome_shape will be recomputed:
-		bool					need_new_sky_dome	{ true };
-		Shape					sky_dome_shape;
+		std::optional<Shape>	sky_dome_shape;
 		Shape					ground_shape;
 		// Angle of horizon (always below 0°) as viewed from the camera position:
 		si::Angle				horizon_angle		{ 0_deg };
