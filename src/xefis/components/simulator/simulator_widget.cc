@@ -364,9 +364,9 @@ SimulatorWidget::make_body_controls()
 		update_editor_for (current);
 	});
 
-	_disconnect_item_changed_signal.emplace ([item_changed_connection] {
+	_disconnect_item_changed_signal = [item_changed_connection] {
 		QObject::disconnect (item_changed_connection);
-	});
+	};
 
 	QObject::connect (&*_items_tree, &QTreeWidget::itemEntered, [this] (QTreeWidgetItem* current, [[maybe_unused]] int column) {
 		if (!current)
