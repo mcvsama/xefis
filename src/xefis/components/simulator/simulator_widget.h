@@ -153,7 +153,7 @@ class SimulatorWidget: public QWidget
 	float							_simulation_speed				{ 1.0f };
 	float							_last_finite_performance		{ 1.0f };
 	Smoother<float>					_performance_smoother			{ 100_ms, 10_ms };
-	std::optional<nu::ScopeExit<>>	_disconnect_item_changed_signal;
+	nu::ScopeExit<>					_disconnect_item_changed_signal;
 
 	// Time tab
 
