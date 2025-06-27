@@ -134,6 +134,7 @@ void
 RigidBodyPainter::set_followed_to_none()
 {
 	_followed = std::monostate();
+	compute_followed_position();
 	compute_camera_transform();
 }
 
