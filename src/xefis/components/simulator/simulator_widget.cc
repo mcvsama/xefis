@@ -25,6 +25,7 @@
 
 // Neutrino:
 #include <neutrino/qt/qstring.h>
+#include <neutrino/utility.h>
 
 // Qt:
 #include <QDateTimeEdit>
@@ -244,7 +245,7 @@ SimulatorWidget::make_solar_time_controls (PaintHelper const& ph)
 	_day_of_year_slider->setRange (0, 364);
 	_day_of_year_slider->setMinimumWidth (ph.em_pixels_int (8.0));
 	QObject::connect (&*_day_of_year_slider, &QSlider::valueChanged, [this, locked = false] (int day_of_year) mutable {
-		if (auto const lock = bool_lock (locked))
+		if (auto const lock = nu::bool_lock (locked))
 		{
 			if (_solar_date_time_edit)
 			{
@@ -266,7 +267,7 @@ SimulatorWidget::make_solar_time_controls (PaintHelper const& ph)
 	_time_of_day_slider->setRange (0, 60 * 24);
 	_time_of_day_slider->setMinimumWidth (ph.em_pixels_int (8.0));
 	QObject::connect (&*_time_of_day_slider, &QSlider::valueChanged, [this, locked = false] (int minute_of_the_day) mutable {
-		if (auto const lock = bool_lock (locked))
+		if (auto const lock = nu::bool_lock (locked))
 		{
 			if (_solar_date_time_edit)
 			{
@@ -282,7 +283,7 @@ SimulatorWidget::make_solar_time_controls (PaintHelper const& ph)
 	_solar_date_time_edit.emplace();
 	_solar_date_time_edit->setTimeZone (QTimeZone::UTC);
 	QObject::connect (&*_solar_date_time_edit, &QDateTimeEdit::dateTimeChanged, [this, locked = false] (QDateTime const& date_time) mutable {
-		if (auto const lock = bool_lock (locked))
+		if (auto const lock = nu::bool_lock (locked))
 			set_solar_time (date_time);
 	});
 
