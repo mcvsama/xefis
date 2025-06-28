@@ -249,6 +249,8 @@ RigidBodyPainter::paint (rigid_body::System const& system, QOpenGLPaintDevice& c
 	precompute();
 	setup_camera (canvas);
 	setup_lights();
+	check_textures();
+	check_sky_dome_and_ground_shape();
 	paint_world (system);
 	paint_ecef_basis (canvas);
 	painter.endNativePainting();
@@ -284,9 +286,6 @@ RigidBodyPainter::precompute()
 		_sun->corrected_position_cartesian_horizontal_coordinates = compute_cartesian_horizontal_coordinates (_sun->corrected_position_horizontal_coordinates);
 		_sun->color_on_body = to_gl_color (compute_sun_light_color (_camera_polar_position, _sun->corrected_position_cartesian_horizontal_coordinates, _sun->atmospheric_scattering));
 	}
-
-	check_textures();
-	check_sky_dome_and_ground_shape();
 }
 
 
