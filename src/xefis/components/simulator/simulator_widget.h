@@ -125,9 +125,6 @@ class SimulatorWidget: public QWidget
 	void
 	update_simulation_performance_label (si::Time dt);
 
-	static std::optional<nu::ScopeExit<>>
-	bool_lock (bool& lock_variable);
-
   private:
 	nu::Logger						_logger;
 	Machine*						_machine						{ nullptr };
@@ -186,20 +183,6 @@ SimulatorWidget::set_followed (rigid_body::Body const& followed_body) noexcept
 {
 	_rigid_body_viewer->set_followed (followed_body);
 	_items_tree->refresh();
-}
-
-
-// TODO neutrino utils
-inline std::optional<nu::ScopeExit<>>
-SimulatorWidget::bool_lock (bool& lock_variable)
-{
-	if (lock_variable)
-		return std::nullopt;
-	else
-	{
-		lock_variable = true;
-		return nu::ScopeExit<> ([&lock_variable] { lock_variable = false; });
-	}
 }
 
 } // namespace xf
