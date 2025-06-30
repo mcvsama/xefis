@@ -64,7 +64,16 @@ Parameters::sanitize()
 }
 
 
-PaintingWork::PaintingWork (xf::PaintRequest const& paint_request, xf::InstrumentSupport const& instrument_support, xf::NavaidStorage const& navaid_storage, Parameters const& parameters, ResizeCache& resize_cache, CurrentNavaids& current_navaids, Mutable& mutable_, nu::Logger const& logger):
+PaintingWork::PaintingWork (
+	xf::PaintRequest const& paint_request,
+	xf::InstrumentSupport const& instrument_support,
+	xf::NavaidStorage const& navaid_storage,
+	Parameters const& parameters,
+	ResizeCache& resize_cache,
+	CurrentNavaids& current_navaids,
+	Mutable& mutable_,
+	nu::Logger const& logger
+):
 	_logger (logger),
 	_paint_request (paint_request),
 	_navaid_storage (navaid_storage),
