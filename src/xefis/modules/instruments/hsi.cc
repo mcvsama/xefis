@@ -2240,11 +2240,11 @@ HSI::paint (xf::PaintRequest paint_request) const
 		pr = std::move (paint_request),
 		pp = _parameters.load(),
 		rc_lock = _resize_cache.lock(),
-		cn = _current_navaids.load(),
+		cn_lock = _current_navaids.lock(),
 		mu_lock = _mutable.lock()
 	] mutable {
 		pp.sanitize();
-		hsi_detail::PaintingWork (pr, _instrument_support, _navaid_storage, pp, *rc_lock, cn, *mu_lock, _logger).paint();
+		hsi_detail::PaintingWork (pr, _instrument_support, _navaid_storage, pp, *rc_lock, *cn_lock, *mu_lock, _logger).paint();
 	});
 }
 
