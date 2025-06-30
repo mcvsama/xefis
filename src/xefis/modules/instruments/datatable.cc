@@ -57,14 +57,14 @@ Datatable::Line::Line (std::string_view const label, xf::BasicSocket const& sock
 void
 Datatable::Line::read()
 {
-	*_stringified.lock() = nu::to_qstring (socket.to_string());
+	_stringified.store (nu::to_qstring (socket.to_string()));
 }
 
 
 QString
 Datatable::Line::stringified() const
 {
-	return *_stringified.lock();
+	return _stringified.load();
 }
 
 

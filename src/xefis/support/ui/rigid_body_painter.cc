@@ -260,8 +260,8 @@ RigidBodyPainter::paint (rigid_body::System const& system, QOpenGLPaintDevice& c
 void
 RigidBodyPainter::drop_resources()
 {
-	*_planet_texture_images.lock() = {};
-	*_universe_texture_images.lock() = {};
+	_planet_texture_images.store ({});
+	_universe_texture_images.store ({});
 }
 
 

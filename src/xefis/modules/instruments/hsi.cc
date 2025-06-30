@@ -2227,7 +2227,7 @@ HSI::process (xf::Cycle const& cycle)
 		params.radio_range_critical = _io.radio_range_critical.get_optional();
 	}
 
-	*_parameters.lock() = params;
+	_parameters.store (params);
 	mark_dirty();
 }
 
@@ -2235,14 +2235,15 @@ HSI::process (xf::Cycle const& cycle)
 std::packaged_task<void()>
 HSI::paint (xf::PaintRequest paint_request) const
 {
-	auto parameters = *_parameters.lock();
-	auto current_navaids = *_current_navaids.lock();
-	auto mutable_lock = _mutable.lock();
-	auto resize_cache_lock = _resize_cache.lock();
-
-	parameters.sanitize();
-
-	return std::packaged_task<void()> ([this, pr = std::move (paint_request), pp = parameters, rc_lock = std::move (resize_cache_lock), cn = current_navaids, mu_lock = std::move (mutable_lock)]() mutable {
+	return std::packaged_task<void()> ([
+		this,
+		pr = std::move (paint_request),
+		pp = _parameters.load(),
+		rc_lock = _resize_cache.lock(),
+		cn = _current_navaids.load(),
+		mu_lock = _mutable.lock()
+	] mutable {
+		pp.sanitize();
 		hsi_detail::PaintingWork (pr, _instrument_support, _navaid_storage, pp, *rc_lock, cn, *mu_lock, _logger).paint();
 	});
 }
