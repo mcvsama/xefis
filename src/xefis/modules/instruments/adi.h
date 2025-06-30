@@ -414,8 +414,8 @@ class ArtificialHorizon
 	static inline QColor const	kGroundShadow	{ get_darker_alpha (kGroundColor, 400, 127) };
 
   private:
-	nu::Synchronized<ArtificialHorizon*> mutable
-					_mutable_this { this };
+	nu::Synchronized<ArtificialHorizon&> mutable
+					_mutable_this { *this };
 
 	QTransform		_pitch_transform;
 	QTransform		_roll_transform;
@@ -478,7 +478,7 @@ class VelocityLadder
 	kt_to_px (AdiPaintRequest&, si::Velocity) const;
 
   private:
-	nu::Synchronized<VelocityLadder*> mutable _mutable_this { this };
+	nu::Synchronized<VelocityLadder&> mutable _mutable_this { *this };
 	QTransform		_transform;
 	si::Velocity	_min_shown;
 	si::Velocity	_max_shown;
@@ -555,7 +555,7 @@ class AltitudeLadder
 	ft_to_px (AdiPaintRequest&, si::Length) const;
 
   private:
-	nu::Synchronized<AltitudeLadder*> mutable _mutable_this { this };
+	nu::Synchronized<AltitudeLadder&> mutable _mutable_this { *this };
 	QTransform			_transform;
 	si::Length			_min_shown;
 	si::Length			_max_shown;
@@ -627,8 +627,8 @@ class PaintingWork
 	paint_radar_altimeter_failure (AdiPaintRequest&) const;
 
   private:
-	nu::Synchronized<PaintingWork*>	mutable
-							_mutable_this						{ this };
+	nu::Synchronized<PaintingWork&>	mutable
+							_mutable_this						{ *this };
 
 	Parameters				_parameters;
 	Precomputed				_precomputed;

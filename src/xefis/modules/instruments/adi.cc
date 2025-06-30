@@ -395,7 +395,7 @@ ArtificialHorizon::paint (AdiPaintRequest& pr) const
 void
 ArtificialHorizon::precompute (AdiPaintRequest& pr) const
 {
-	(*_mutable_this.lock())->precompute (pr);
+	_mutable_this->precompute (pr);
 }
 
 
@@ -970,7 +970,7 @@ VelocityLadder::paint (AdiPaintRequest& pr) const
 void
 VelocityLadder::precompute (AdiPaintRequest& pr) const
 {
-	(*_mutable_this.lock())->precompute (pr);
+	_mutable_this->precompute (pr);
 }
 
 
@@ -1502,7 +1502,7 @@ AltitudeLadder::paint (AdiPaintRequest& pr) const
 void
 AltitudeLadder::precompute (AdiPaintRequest& pr) const
 {
-	(*_mutable_this.lock())->precompute (pr);
+	_mutable_this->precompute (pr);
 }
 
 
@@ -2345,7 +2345,7 @@ PaintingWork::paint (xf::PaintRequest const& paint_request, Parameters const& pa
 void
 PaintingWork::precompute (AdiPaintRequest& pr, Parameters const& params) const
 {
-	(*_mutable_this.lock())->precompute (pr, params);
+	_mutable_this->precompute (pr, params);
 }
 
 
@@ -3369,7 +3369,7 @@ ADI::process (xf::Cycle const& cycle)
 	params.al_line_every = *_io.altitude_ladder_line_every;
 	params.al_number_every = *_io.altitude_ladder_number_every;
 
-	*_parameters.lock() = params;
+	_parameters.store (params);
 	mark_dirty();
 }
 
@@ -3377,7 +3377,7 @@ ADI::process (xf::Cycle const& cycle)
 std::packaged_task<void()>
 ADI::paint (xf::PaintRequest paint_request) const
 {
-	return std::packaged_task<void()> ([this, pr = std::move (paint_request), pp = *_parameters.lock()] {
+	return std::packaged_task<void()> ([this, pr = std::move (paint_request), pp = _parameters.load()] {
 		_painting_work.paint (pr, pp);
 	});
 }

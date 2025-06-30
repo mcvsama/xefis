@@ -126,7 +126,7 @@ Status::Status (xf::ProcessingLoop& loop, xf::Graphics const& graphics, std::str
 	_cursor_hide_timer->setInterval (5000);
 	_cursor_hide_timer->setSingleShot (true);
 	QObject::connect (_cursor_hide_timer.get(), &QTimer::timeout, [&]{
-		_cache.lock()->cursor_visible = false;
+		_cache->cursor_visible = false;
 		mark_dirty();
 	});
 }
@@ -137,7 +137,7 @@ Status::add_message (std::string_view const text, Severity severity)
 {
 	Message& m = _messages.emplace_back (text, severity);
 	_hidden_messages.push_back (&m);
-	_cache.lock()->solve_scroll_and_cursor (_visible_messages);
+	_cache->solve_scroll_and_cursor (_visible_messages);
 	mark_dirty();
 	return m;
 }
@@ -344,7 +344,7 @@ Status::recall()
 {
 	_visible_messages.insert (_visible_messages.end(), _hidden_messages.begin(), _hidden_messages.end());
 	_hidden_messages.clear();
-	_cache.lock()->solve_scroll_and_cursor (_visible_messages);
+	_cache->solve_scroll_and_cursor (_visible_messages);
 	mark_dirty();
 }
 
@@ -356,7 +356,7 @@ Status::clear()
 	{
 		_hidden_messages.insert (_hidden_messages.end(), _visible_messages.begin(), _visible_messages.end());
 		_visible_messages.clear();
-		_cache.lock()->solve_scroll_and_cursor (_visible_messages);
+		_cache->solve_scroll_and_cursor (_visible_messages);
 		mark_dirty();
 	}
 }
