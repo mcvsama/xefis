@@ -466,7 +466,7 @@ inline void
 GLSpace::add_vertex (ShapeVertex const& vertex, Shape::Geometry const& geometry)
 {
 	set_vertex (vertex, geometry);
-	add_vertex (math::coordinate_system_cast<WorldSpace, void> (vertex.position()));
+	add_vertex (math::coordinate_system_cast<WorldSpace, void, BodyOrigin, void> (vertex.position()));
 }
 
 

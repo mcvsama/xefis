@@ -72,7 +72,8 @@ make_earth (bool include_actual_sphere)
 	if (include_actual_sphere)
 		shape += make_orb (kEarthMeanRadius, 360, 180);
 
-	auto earth = std::make_unique<Body> (MassMoments<BodyCOM> (kEarthMass, math::coordinate_system_cast<BodyCOM, BodyCOM> (kEarthMomentOfInertia)));
+	auto const body_com_earth_moment_of_inertia = math::coordinate_system_cast<BodyCOM, BodyCOM, ECEFSpace, ECEFSpace> (kEarthMomentOfInertia);
+	auto earth = std::make_unique<Body> (MassMoments<BodyCOM> (kEarthMass, body_com_earth_moment_of_inertia));
 	earth->set_shape (shape);
 	return earth;
 }

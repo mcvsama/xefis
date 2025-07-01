@@ -1218,7 +1218,7 @@ RigidBodyPainter::compute_followed_position()
 	else
 		_followed_position = { 0_m, 0_m, 0_m };
 
-	_followed_polar_position = to_polar (math::coordinate_system_cast<ECEFSpace, void> (_followed_position - planet_position()));
+	_followed_polar_position = to_polar (math::coordinate_system_cast<ECEFSpace, void, WorldSpace, void> (_followed_position - planet_position()));
 }
 
 
@@ -1460,7 +1460,7 @@ RigidBodyPainter::compute_camera_transform()
 
 			if (followed_body)
 			{
-				auto const base_rotation = math::coordinate_system_cast<WorldSpace, WorldSpace> (followed_body->placement().base_rotation());
+				auto const base_rotation = math::coordinate_system_cast<WorldSpace, WorldSpace, BodyCOM, WorldSpace> (followed_body->placement().base_rotation());
 				// Make an exception if we're following the planet body: we don't want to use aircraft coordinates
 				// for the planet, because it's unnatural:
 				if (_planet && _planet->body == followed_body)
