@@ -31,10 +31,21 @@ SingleLoopMachine::SingleLoopMachine (Xefis& xefis, nu::Logger const& logger, si
 
 
 void
+SingleLoopMachine::initialize()
+{
+	if (!_initialized)
+	{
+		connect_modules();
+		register_processing_loop (_loop);
+		_initialized = true;
+	}
+}
+
+
+void
 SingleLoopMachine::start()
 {
-	connect_modules();
-	register_processing_loop (_loop);
+	initialize();
 	_loop.start();
 }
 

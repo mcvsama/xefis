@@ -57,6 +57,12 @@ class SingleLoopMachine: public xf::Machine
 		{ return _loop; }
 
 	/**
+	 * Prepare the machine.
+	 */
+	void
+	initialize();
+
+	/**
 	 * Prepare and start the machine.
 	 */
 	void
@@ -71,6 +77,7 @@ class SingleLoopMachine: public xf::Machine
   private:
 	nu::Logger			_logger;
 	xf::ProcessingLoop	_loop;
+	bool				_initialized { false };
 };
 
 } // namespace xf
