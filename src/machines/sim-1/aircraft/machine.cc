@@ -29,7 +29,9 @@ Machine::Machine (xf::Xefis& xefis, si::LonLatRadius<> const location):
 	_simulation (*this, _models, location, logger().with_context ("simulation")),
 	_aircraft (_simulation.aircraft())
 {
-	start();
+	initialize();
+	// Not starting the machine, since we're in a simulation. The simulator widget will
+	// start/stop the loop when user presses appropriate start/pause button.
 }
 
 
