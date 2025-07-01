@@ -23,12 +23,21 @@
 
 namespace sim1::aircraft {
 
-Hardware::Hardware (xf::ProcessingLoop& loop, nu::Logger const& logger):
+Hardware::Hardware (SimulatedAircraft& aircraft, xf::ProcessingLoop& loop, nu::Logger const& logger):
 	_logger (logger),
-	_loop (loop)
+	_loop (loop),
+	_aircraft (aircraft)
 {
 	this->udp_link.send << this->air_to_ground_link.link_output;
 	this->ground_to_air_link.link_input << this->udp_link.receive;
+
+	this->total_air_temperature_sensor.update_interval = 10_ms;
+	this->total_air_temperature_sensor.noise = { 1_Pa, 1_Pa };
+	this->total_air_temperature_sensor.resolution = 0.1_Pa;
+
+	this->static_air_temperature_sensor.update_interval = 10_ms;
+	this->static_air_temperature_sensor.noise = { 1_Pa, 1_Pa };
+	this->static_air_temperature_sensor.resolution = 0.1_Pa;
 }
 
 } // namespace sim1::ground_station

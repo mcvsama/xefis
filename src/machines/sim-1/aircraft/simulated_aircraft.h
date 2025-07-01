@@ -17,6 +17,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/simulation/devices/angular_servo.h>
+#include <xefis/support/simulation/devices/prandtl_tube.h>
 #include <xefis/support/simulation/electrical/network.h>
 #include <xefis/support/simulation/rigid_body/system.h>
 
@@ -41,6 +42,8 @@ class SimulatedAircraft
 	xf::sim::AngularServo&		aileron_r_servo;
 	xf::sim::AngularServo&		elevator_servo;
 	xf::sim::AngularServo&		rudder_servo;
+
+	xf::sim::PrandtlTube&		prandtl_tube;
 };
 
 

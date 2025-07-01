@@ -15,6 +15,7 @@
 #define XEFIS__MACHINES__SIM_1__AIRCRAFT__HARDWARE_H__INCLUDED
 
 // Machine:
+#include <machines/sim-1/aircraft/simulated_aircraft.h>
 #include <machines/sim-1/common/link/air_to_ground.h>
 #include <machines/sim-1/common/link/crypto.h>
 #include <machines/sim-1/common/link/ground_to_air.h>
@@ -26,6 +27,7 @@
 #include <xefis/modules/comm/link/output_link.h>
 #include <xefis/modules/comm/udp.h>
 #include <xefis/modules/comm/xle_transceiver.h>
+#include <xefis/modules/simulation/virtual_pressure_sensor.h>
 #include <xefis/modules/simulation/virtual_servo_controller.h>
 
 // Standard:
@@ -42,16 +44,34 @@ class Hardware
   public:
 	// Ctor
 	explicit
-	Hardware (xf::ProcessingLoop&, nu::Logger const&);
+	Hardware (SimulatedAircraft& aircraft, xf::ProcessingLoop&, nu::Logger const&);
 
   private:
 	nu::Logger			_logger;
 	xf::ProcessingLoop&	_loop;
+	SimulatedAircraft	_aircraft;
 
   public:
-	VirtualServoController					servo_controller			{ _loop };
-	sim1::GroundToAirData<xf::ModuleOut>	ground_to_air_data			{ _loop };
-	sim1::AirToGroundData<xf::ModuleIn>		air_to_ground_data			{ _loop };
+	VirtualServoController servo_controller { _loop };
+
+	VirtualPressureSensor total_air_temperature_sensor {
+		_loop,
+		_aircraft.prandtl_tube,
+		VirtualPressureSensor::Pitot,
+		_logger.with_context ("total air temperature sensor"),
+		"total"
+	};
+
+	VirtualPressureSensor static_air_temperature_sensor {
+		_loop,
+		_aircraft.prandtl_tube,
+		VirtualPressureSensor::Static,
+		_logger.with_context ("static air temperature sensor"),
+		"static"
+	};
+
+	sim1::GroundToAirData<xf::ModuleOut> ground_to_air_data { _loop };
+	sim1::AirToGroundData<xf::ModuleIn> air_to_ground_data { _loop };
 
 	xle::SlaveTransceiver slave_transceiver {
 		_loop,
