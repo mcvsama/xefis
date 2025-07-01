@@ -32,6 +32,10 @@
 
 namespace xf::crypto::xle {
 
+// These need to be used as user-info with HKDF for keys used for encryption.
+// Different user-info for master-to-slave and slave-to-master channels are
+// required to avoid using the same key in both ways (keys should never be
+// reused for different purposes).
 static Blob const kMasterToSlave { 0x01 };
 static Blob const kSlaveToMaster { 0x02 };
 
@@ -190,6 +194,7 @@ MasterTransceiver::Session::Connected::Connected (nu::Secure<Blob> const& epheme
 		.data_encryption_secret = params.data_encryption_secret,
 		.seq_num_encryption_secret = params.seq_num_encryption_secret,
 		.hmac_size = params.hmac_size,
+		// This ensures actual keys are different for both directions:
 		.hkdf_user_info = kMasterToSlave,
 	}),
 	receiver ({
@@ -198,6 +203,7 @@ MasterTransceiver::Session::Connected::Connected (nu::Secure<Blob> const& epheme
 		.data_encryption_secret = params.data_encryption_secret,
 		.seq_num_encryption_secret = params.seq_num_encryption_secret,
 		.hmac_size = params.hmac_size,
+		// This ensures actual keys are different for both directions:
 		.hkdf_user_info = kSlaveToMaster,
 	})
 { }
@@ -384,6 +390,7 @@ SlaveTransceiver::Session::Session (Blob const& handshake_request,
 		.data_encryption_secret = params.data_encryption_secret,
 		.seq_num_encryption_secret = params.seq_num_encryption_secret,
 		.hmac_size = params.hmac_size,
+		// This ensures actual keys are different for both directions:
 		.hkdf_user_info = kSlaveToMaster,
 	});
 	_receiver.emplace (Receiver::Params {
@@ -392,6 +399,7 @@ SlaveTransceiver::Session::Session (Blob const& handshake_request,
 		.data_encryption_secret = params.data_encryption_secret,
 		.seq_num_encryption_secret = params.seq_num_encryption_secret,
 		.hmac_size = params.hmac_size,
+		// This ensures actual keys are different for both directions:
 		.hkdf_user_info = kMasterToSlave,
 	});
 }
