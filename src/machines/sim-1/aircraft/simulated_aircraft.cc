@@ -32,7 +32,6 @@
 #include <xefis/support/simulation/constraints/fixed_constraint.h>
 #include <xefis/support/simulation/constraints/hinge_constraint.h>
 #include <xefis/support/simulation/devices/angular_servo.h>
-#include <xefis/support/simulation/devices/prandtl_tube.h>
 #include <xefis/support/simulation/devices/wing.h>
 #include <xefis/support/simulation/rigid_body/concepts.h>
 #include <xefis/support/simulation/rigid_body/group.h>
@@ -318,6 +317,7 @@ make_aircraft (xf::rigid_body::System& rigid_body_system, Models& models)
 		.aileron_r_servo	= aileron_r_servo,
 		.elevator_servo		= elevator_servo,
 		.rudder_servo		= rudder_servo,
+		.prandtl_tube		= prandtl_tube,
 	};
 }
 

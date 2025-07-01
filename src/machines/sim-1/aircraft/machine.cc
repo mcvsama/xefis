@@ -26,7 +26,8 @@ namespace sim1::aircraft {
 
 Machine::Machine (xf::Xefis& xefis, si::LonLatRadius<> const location):
 	xf::SingleLoopMachine (xefis, xefis.logger(), 120_Hz),
-	_simulation (*this, _models, location, logger().with_context ("simulation"))
+	_simulation (*this, _models, location, logger().with_context ("simulation")),
+	_aircraft (_simulation.aircraft())
 {
 	start();
 }
@@ -74,11 +75,10 @@ Machine::connect_modules()
 	_data_center.engine_left_power	<< throttle_to_power << _data_center.throttle_left;
 	_data_center.engine_right_power	<< throttle_to_power << _data_center.throttle_right;
 
-	auto& aircraft = _simulation.aircraft();
-	_hardware.servo_controller.socket_for (aircraft.elevator_servo)		<< _data_center.elevator_angle;
-	_hardware.servo_controller.socket_for (aircraft.aileron_l_servo)	<< _data_center.aileron_left_angle;
-	_hardware.servo_controller.socket_for (aircraft.aileron_r_servo)	<< _data_center.aileron_right_angle;
-	_hardware.servo_controller.socket_for (aircraft.rudder_servo)		<< _data_center.rudder_angle;
+	_hardware.servo_controller.socket_for (_aircraft.elevator_servo)		<< _data_center.elevator_angle;
+	_hardware.servo_controller.socket_for (_aircraft.aileron_l_servo)	<< _data_center.aileron_left_angle;
+	_hardware.servo_controller.socket_for (_aircraft.aileron_r_servo)	<< _data_center.aileron_right_angle;
+	_hardware.servo_controller.socket_for (_aircraft.rudder_servo)		<< _data_center.rudder_angle;
 }
 
 } // namespace sim1::aircraft
