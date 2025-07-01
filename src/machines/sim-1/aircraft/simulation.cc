@@ -41,8 +41,8 @@ Simulation::Simulation (Machine& machine, Models& models, si::LonLatRadius<> con
 	_aircraft (make_aircraft (_rigid_body_system, _models))
 {
 	auto const tait_bryan_angles = xf::TaitBryanAngles ({ .roll = 0_deg, .pitch = -30_deg, .yaw = 0_deg });
-	_aircraft.rigid_group.rotate_about_world_origin (math::coordinate_system_cast<xf::WorldSpace, xf::WorldSpace> (airframe_to_ecef_rotation (tait_bryan_angles, location)));
-	_aircraft.rigid_group.translate (math::coordinate_system_cast<xf::WorldSpace, void> (xf::to_cartesian (location)));
+	_aircraft.rigid_group.rotate_about_world_origin (math::coordinate_system_cast<xf::WorldSpace, xf::WorldSpace, xf::ECEFSpace, xf::AirframeSpace> (airframe_to_ecef_rotation (tait_bryan_angles, location)));
+	_aircraft.rigid_group.translate (math::coordinate_system_cast<xf::WorldSpace, void, xf::ECEFSpace, void> (xf::to_cartesian (location)));
 
 	auto& earth = _rigid_body_system.add_gravitating (xf::rigid_body::make_earth());
 	earth.set_label ("Earth");

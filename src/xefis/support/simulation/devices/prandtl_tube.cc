@@ -54,7 +54,7 @@ PrandtlTube::PrandtlTube (Atmosphere const& atmosphere, PrandtlTubeParameters co
 si::Pressure
 PrandtlTube::static_pressure() const
 {
-	return _atmosphere->air_at (coordinate_system_cast<ECEFSpace, void> (placement().position())).pressure;
+	return _atmosphere->air_at (coordinate_system_cast<ECEFSpace, void, WorldSpace, void> (placement().position())).pressure;
 }
 
 
@@ -64,8 +64,8 @@ PrandtlTube::total_pressure() const
 	using math::coordinate_system_cast;
 
 	return xf::total_pressure (*_atmosphere,
-							   coordinate_system_cast<ECEFSpace, ECEFSpace> (placement()),
-							   coordinate_system_cast<ECEFSpace, void> (velocity_moments<WorldSpace>().velocity()));
+							   coordinate_system_cast<ECEFSpace, ECEFSpace, WorldSpace, BodyCOM> (placement()),
+							   coordinate_system_cast<ECEFSpace, void, WorldSpace, void> (velocity_moments<WorldSpace>().velocity()));
 }
 
 } // namespace xf::sim

@@ -46,7 +46,7 @@ make_iss()
 {
 	xf::SpaceLength<xf::ECEFSpace> const iss_ecef_position = to_cartesian (si::LonLatRadius (0_deg, 0_deg, kISSHeight));
 	xf::RotationQuaternion<WorldSpace> const iss_ecef_rotation =
-		math::coordinate_system_cast<WorldSpace, WorldSpace> (
+		math::coordinate_system_cast<WorldSpace, WorldSpace, ECEFSpace, AirframeSpace> (
 			xf::airframe_to_ecef_rotation (xf::TaitBryanAngles { 0_deg, 0_deg, 0_deg }, iss_ecef_position)
 		);
 	xf::SpaceVector<si::Velocity, WorldSpace> const iss_velocity { 0_mps, 0_mps, 27'600_kph };
@@ -55,8 +55,8 @@ make_iss()
 
 	auto body = std::make_unique<rigid_body::Body> (iss_mass_moments);
 	auto pl = body->placement();
-	pl.set_position (math::coordinate_system_cast<WorldSpace, void> (iss_ecef_position));
-	pl.set_body_rotation (math::coordinate_system_cast<WorldSpace, BodyCOM> (iss_ecef_rotation));
+	pl.set_position (math::coordinate_system_cast<WorldSpace, void, ECEFSpace, void> (iss_ecef_position));
+	pl.set_body_rotation (math::coordinate_system_cast<WorldSpace, BodyCOM, WorldSpace, WorldSpace> (iss_ecef_rotation));
 	body->set_placement (pl);
 	body->set_velocity_moments (VelocityMoments<WorldSpace> { iss_velocity, iss_angular_velocity });
 

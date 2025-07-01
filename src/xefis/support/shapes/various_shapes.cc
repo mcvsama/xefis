@@ -183,7 +183,7 @@ Shape
 make_cube_shape (xf::MassMomentsAtArm<BodyCOM> const& mm, ShapeMaterial const& material)
 {
 	auto shape = make_centered_cube_shape (mm.centered_at_center_of_mass(), material);
-	shape.translate (math::coordinate_system_cast<BodyOrigin, void> (mm.center_of_mass_position()));
+	shape.translate (math::coordinate_system_cast<BodyOrigin, void, BodyCOM, void> (mm.center_of_mass_position()));
 	return shape;
 }
 
@@ -306,7 +306,7 @@ template<class SetupMaterial>
 			si::Angle angle_h = params.h_range.min();
 
 			auto const add_vertex = [&] (si::LonLat const lonlat) {
-				auto const cartesian_position = math::coordinate_system_cast<BodyOrigin, void> (to_cartesian (lonlat));
+				auto const cartesian_position = math::coordinate_system_cast<BodyOrigin, void, ECEFSpace, void> (to_cartesian (lonlat));
 				auto& vertex = vertices.emplace_back (cartesian_position * params.radius, params.material);
 
 				if constexpr (synchronous_setup_material)
@@ -407,7 +407,7 @@ template<class SetupMaterial>
 			vertices.reserve (2 * n_slices * (params.symmetric_0_180 ? 2u : 1u));
 
 			auto const add_vertex = [&] (si::LonLat const lonlat, bool call_setup_material = true) {
-				auto const cartesian_position = math::coordinate_system_cast<BodyOrigin, void> (to_cartesian (lonlat));
+				auto const cartesian_position = math::coordinate_system_cast<BodyOrigin, void, ECEFSpace, void> (to_cartesian (lonlat));
 				auto& vertex = vertices.emplace_back (cartesian_position * params.radius, params.material);
 
 				if (call_setup_material)
