@@ -25,39 +25,40 @@
 #include <cstddef>
 
 
-VirtualPressureSensor::VirtualPressureSensor (xf::sim::FlightSimulation const& flight_simulation,
+VirtualPressureSensor::VirtualPressureSensor (xf::ProcessingLoop& loop,
+											  xf::sim::PrandtlTube const& prandtl_tube,
 											  Probe probe,
-											  xf::SpaceLength<xf::AirframeFrame> const& mount_location,
 											  nu::Logger const& logger,
 											  std::string_view const instance):
-	VirtualPressureSensorIO (instance),
+	VirtualPressureSensorIO (loop, instance),
 	_logger (logger.with_context (std::string (kLoggerScope) + "#" + instance)),
-	_flight_simulation (flight_simulation),
-	_probe (probe),
-	_mount_location (mount_location),
-	_noise (*_io.noise)
+	_prandtl_tube (prandtl_tube),
+	_probe (probe)
 { }
 
 
 void
 VirtualPressureSensor::process (xf::Cycle const& cycle)
 {
-	auto const atmstate = _flight_simulation.complete_atmosphere_state_at (_mount_location);
-	auto const& air = atmstate.air;
-
+	_noise = *_io.noise;
 	_io.serviceable = true;
 
 	if (_last_measure_time + *_io.update_interval < cycle.update_time())
 	{
-		si::Pressure result = _noise (_random_generator) + air.pressure;
+		si::Pressure pressure = _noise (_random_generator);
 
-		if (_probe == Pitot)
+		switch (_probe)
 		{
-			auto const true_airspeed = -atmstate.wind[0];
-			result += xf::dynamic_pressure (air.density, true_airspeed);
+			case Pitot:
+				pressure += _prandtl_tube.total_pressure();
+				break;
+
+			case Static:
+				pressure += _prandtl_tube.static_pressure();
+				break;
 		}
 
-		_io.pressure = xf::quantized (result, *_io.resolution);
+		_io.pressure = nu::quantized (pressure, *_io.resolution);
 		_last_measure_time = cycle.update_time();
 	}
 }

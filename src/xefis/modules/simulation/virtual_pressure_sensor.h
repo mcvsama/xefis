@@ -19,6 +19,7 @@
 #include <xefis/core/module.h>
 #include <xefis/core/setting.h>
 #include <xefis/core/sockets/module_socket.h>
+#include <xefis/support/simulation/devices/prandtl_tube.h>
 
 // Neutrino:
 #include <neutrino/math/normal_distribution.h>
@@ -28,6 +29,11 @@
 #include <random>
 
 
+namespace nu = neutrino;
+namespace si = nu::si;
+using namespace si::literals;
+
+
 class VirtualPressureSensorIO: public xf::Module
 {
   public:
@@ -35,16 +41,16 @@ class VirtualPressureSensorIO: public xf::Module
 	 * Settings
 	 */
 
-	xf::Setting<si::Time>							update_interval		{ this, "update_interval" };
-	xf::Setting<xf::NormalVariable<si::Pressure>>	noise				{ this, "noise" };
-	xf::Setting<si::Pressure>						resolution			{ this, "resolution" };
+	xf::Setting<si::Time>								update_interval		{ this, "update_interval" };
+	xf::Setting<nu::math::NormalVariable<si::Pressure>>	noise				{ this, "noise" };
+	xf::Setting<si::Pressure>							resolution			{ this, "resolution" };
 
 	/*
 	 * Output
 	 */
 
-	xf::ModuleOut<bool>								serviceable			{ this, "serviceable" };
-	xf::ModuleOut<si::Pressure>						pressure			{ this, "measured-pressure" };
+	xf::ModuleOut<bool>									serviceable			{ this, "serviceable" };
+	xf::ModuleOut<si::Pressure>							pressure			{ this, "measured-pressure" };
 
   public:
 	using xf::Module::Module;
@@ -66,9 +72,9 @@ class VirtualPressureSensor: public VirtualPressureSensorIO
   public:
 	// Ctor
 	explicit
-	VirtualPressureSensor (xf::sim::FlightSimulation const&,
+	VirtualPressureSensor (xf::ProcessingLoop&,
+						   xf::sim::PrandtlTube const&,
 						   Probe,
-						   xf::SpaceLength<xf::AirframeFrame> const& mount_location,
 						   nu::Logger const&,
 						   std::string_view const instance = {});
 
@@ -77,15 +83,15 @@ class VirtualPressureSensor: public VirtualPressureSensorIO
 	process (xf::Cycle const&) override;
 
   private:
-	VirtualPressureSensorIO&				_io					{ *this };
-	nu::Logger								_logger;
-	xf::sim::FlightSimulation const&		_flight_simulation;
-	Probe									_probe;
-	xf::SpaceLength<xf::AirframeFrame>		_mount_location;
+	// TODO Sigmoidal temperature failure
+	VirtualPressureSensorIO&					_io					{ *this };
+	nu::Logger									_logger;
+	xf::sim::PrandtlTube const&					_prandtl_tube;
+	Probe										_probe;
 	// Device's noise:
-	std::default_random_engine				_random_generator;
-	xf::NormalDistribution<si::Pressure>	_noise				{ 0_Pa, 0_Pa };
-	si::Time								_last_measure_time	{ 0_s };
+	std::default_random_engine					_random_generator;
+	nu::math::NormalDistribution<si::Pressure>	_noise				{ 0_Pa, 0_Pa };
+	si::Time									_last_measure_time	{ 0_s };
 };
 
 #endif
