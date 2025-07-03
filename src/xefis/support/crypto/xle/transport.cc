@@ -54,7 +54,7 @@ Transport::Transport (Params const& params):
 }
 
 
-Transmitter::Transmitter (boost::random::random_device& random_device, Params const& params):
+Transmitter::Transmitter (std::random_device& random_device, Params const& params):
 	Transport (params),
 	_random_device (random_device)
 { }

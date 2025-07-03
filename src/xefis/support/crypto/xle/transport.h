@@ -24,11 +24,9 @@
 #include <neutrino/crypto/secure.h>
 #include <neutrino/exception.h>
 
-// Boost:
-#include <boost/random/random_device.hpp>
-
 // Standard:
 #include <cstddef>
+#include <random>
 
 
 namespace xf::crypto::xle {
@@ -123,7 +121,7 @@ class Transmitter: public Transport
   public:
 	// Ctor
 	explicit
-	Transmitter (boost::random::random_device&, Params const&);
+	Transmitter (std::random_device&, Params const&);
 
 	/**
 	 * Return next encrypted packet.
@@ -135,7 +133,7 @@ class Transmitter: public Transport
 	encrypt_packet (BlobView);
 
   private:
-	boost::random::random_device& _random_device;
+	std::random_device& _random_device;
 };
 
 

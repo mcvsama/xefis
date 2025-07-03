@@ -59,7 +59,7 @@ class SigmoidalTemperatureFailure
   private:
 	si::Temperature						_stress_temperature;
 	decltype(1 / 1_K)					_k;
-	std::mt19937						_mersenne_twister		{ std::random_device{}() };
+	std::mt19937						_mersenne_twister		{ std::random_device {"/dev/urandom"}() };
 	std::uniform_real_distribution<>	_random_distribution	{ 0.0, 1.0 };
 };
 

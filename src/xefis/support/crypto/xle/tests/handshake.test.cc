@@ -18,11 +18,9 @@
 #include <neutrino/test/auto_test.h>
 #include <neutrino/time_helper.h>
 
-// Boost:
-#include <boost/random/random_device.hpp>
-
 // Standard:
 #include <cstddef>
+#include <random>
 #include <set>
 
 
@@ -53,7 +51,7 @@ HandshakeMaster::Params const params = {
 
 
 nu::AutoTest t1 ("Xefis Lossy Encryption/Handshake: correct handshake", []{
-	boost::random::random_device rnd;
+	auto rnd = std::random_device ("hw");
 	HandshakeMaster master (rnd, params);
 	HandshakeSlave slave (rnd, params, {});
 
@@ -68,7 +66,7 @@ nu::AutoTest t1 ("Xefis Lossy Encryption/Handshake: correct handshake", []{
 
 nu::AutoTest t2 ("Xefis Lossy Encryption/Handshake: handshake with wrong signature", []{
 	si::Time const now = nu::TimeHelper::utc_now();
-	boost::random::random_device rnd;
+	auto rnd = std::random_device ("hw");
 
 	{
 		HandshakeMaster master (rnd, {
@@ -130,7 +128,7 @@ nu::AutoTest t2 ("Xefis Lossy Encryption/Handshake: handshake with wrong signatu
 
 nu::AutoTest t3 ("Xefis Lossy Encryption/Handshake: reusing handshake ID", []{
 	auto const now = nu::TimeHelper::utc_now();
-	auto rnd = boost::random::random_device();
+	auto rnd = std::random_device ("hw");
 	auto used_handshake_ids = std::set<HandshakeID>();
 	HandshakeMaster master (rnd, params);
 	HandshakeSlave slave (rnd, params, {
@@ -160,7 +158,7 @@ nu::AutoTest t3 ("Xefis Lossy Encryption/Handshake: reusing handshake ID", []{
 
 
 nu::AutoTest t4 ("Xefis Lossy Encryption/Handshake: wrong timestamp on master side", []{
-	boost::random::random_device rnd;
+	auto rnd = std::random_device ("hw");
 	HandshakeMaster master (rnd, params);
 	HandshakeSlave slave (rnd, params, {});
 
@@ -183,7 +181,7 @@ nu::AutoTest t4 ("Xefis Lossy Encryption/Handshake: wrong timestamp on master si
 
 
 nu::AutoTest t5 ("Xefis Lossy Encryption/Handshake: wrong timestamp on slave side", []{
-	boost::random::random_device rnd;
+	auto rnd = std::random_device ("hw");
 	HandshakeMaster master (rnd, params);
 	HandshakeSlave slave (rnd, params, {});
 
@@ -208,7 +206,7 @@ nu::AutoTest t5 ("Xefis Lossy Encryption/Handshake: wrong timestamp on slave sid
 
 nu::AutoTest t6 ("Xefis Lossy Encryption/Handshake: mismatched handshake IDs", []{
 	auto const now = nu::TimeHelper::utc_now();
-	auto rnd = boost::random::random_device();
+	auto rnd = std::random_device ("hw");
 	auto used_handshake_ids = std::set<HandshakeID>();
 	HandshakeMaster master_1 (rnd, params);
 	HandshakeMaster master_2 (rnd, params);

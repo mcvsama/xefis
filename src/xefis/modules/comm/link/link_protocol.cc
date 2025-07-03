@@ -214,7 +214,7 @@ LinkProtocol::Signature::Signature (Params&& params):
 	_nonce_bytes (params.nonce_bytes),
 	_signature_bytes (params.signature_bytes),
 	_key (params.key),
-	_rng (std::random_device{}())
+	_rng (std::random_device {"hw"}())
 {
 	_temp.reserve (size());
 }

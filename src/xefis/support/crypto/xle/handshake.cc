@@ -23,17 +23,15 @@
 #include <neutrino/crypto/utility.h>
 #include <neutrino/numeric.h>
 
-// Boost:
-#include <boost/random.hpp>
-
 // Standard:
 #include <cstddef>
 #include <limits>
+#include <random>
 
 
 namespace xf::crypto::xle {
 
-Handshake::Handshake (boost::random::random_device& random_device, Params const& params):
+Handshake::Handshake (std::random_device& random_device, Params const& params):
 	_random_device (random_device),
 	_master_signature_key (params.master_signature_key),
 	_slave_signature_key (params.slave_signature_key),
@@ -48,7 +46,7 @@ HandshakeMaster::generate_handshake_blob (si::Time const unix_timestamp)
 {
 	using HandshakeIDLimits = std::numeric_limits<HandshakeID>;
 
-	auto handshake_id_distribution = boost::random::uniform_int_distribution<HandshakeID> (HandshakeIDLimits::min(), HandshakeIDLimits::max());
+	auto handshake_id_distribution = std::uniform_int_distribution<HandshakeID> (HandshakeIDLimits::min(), HandshakeIDLimits::max());
 	_handshake_id = handshake_id_distribution (_random_device);
 
 	return make_master_handshake_blob ({
@@ -112,7 +110,7 @@ HandshakeMaster::parse_and_verify_slave_handshake_blob (BlobView const slave_han
 }
 
 
-HandshakeSlave::HandshakeSlave (boost::random::random_device& rnd,
+HandshakeSlave::HandshakeSlave (std::random_device& rnd,
                                 Params const& params,
                                 KeyCheckFunctions const key_check_callbacks):
     Handshake (rnd, params),

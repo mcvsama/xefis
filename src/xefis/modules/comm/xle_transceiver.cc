@@ -23,11 +23,11 @@
 
 // Boost:
 #include <boost/random.hpp>
-#include <boost/random/random_device.hpp>
 
 // Standard:
 #include <cstddef>
 #include <future>
+#include <random>
 
 
 namespace xf::crypto::xle {
@@ -39,7 +39,7 @@ namespace xf::crypto::xle {
 static Blob const kMasterToSlave { 0x01 };
 static Blob const kSlaveToMaster { 0x02 };
 
-static thread_local boost::random::random_device transceiver_rnd;
+static thread_local std::random_device transceiver_rnd ("hw");
 
 
 Transceiver::Transceiver (Role const role, size_t ciphertext_expansion, nu::Logger const& logger):

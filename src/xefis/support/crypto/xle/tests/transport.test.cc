@@ -17,11 +17,9 @@
 // Neutrino:
 #include <neutrino/test/auto_test.h>
 
-// Boost:
-#include <boost/random/random_device.hpp>
-
 // Standard:
 #include <cstddef>
+#include <random>
 
 
 namespace xf::test {
@@ -33,7 +31,7 @@ namespace test_asserts = nu::test_asserts;
 nu::AutoTest t1 ("Xefis Lossy Encryption/Transport: encryption and decryption", []{
 	Blob const key = nu::to_blob ("abcdefghijklmnop");
 
-	boost::random::random_device rnd;
+	auto rnd = std::random_device ("hw");
 	xf::crypto::xle::Transmitter tx (rnd, { .ephemeral_session_key = key });
 	xf::crypto::xle::Receiver rx ({ .ephemeral_session_key = key });
 

@@ -23,12 +23,10 @@
 #include <neutrino/crypto/secure.h>
 #include <neutrino/exception.h>
 
-// Boost:
-#include <boost/random/random_device.hpp>
-
 // Standard:
 #include <cstddef>
 #include <functional>
+#include <random>
 #include <variant>
 
 
@@ -93,18 +91,18 @@ class Handshake
 
   public:
 	// Ctor
-	Handshake (boost::random::random_device&, Params const&);
+	Handshake (std::random_device&, Params const&);
 
   protected:
 	static constexpr nu::Hash::Algorithm const kHashAlgorithm = nu::Hash::SHA3_256;
 
   protected:
-	boost::random::random_device&	_random_device;
-	nu::Secure<Blob> const			_master_signature_key;
-	nu::Secure<Blob> const			_slave_signature_key;
-	nu::DiffieHellmanExchange		_dhe_exchange;
-	size_t const					_hmac_size;
-	si::Time const					_max_time_difference;
+	std::random_device&			_random_device;
+	nu::Secure<Blob> const		_master_signature_key;
+	nu::Secure<Blob> const		_slave_signature_key;
+	nu::DiffieHellmanExchange	_dhe_exchange;
+	size_t const				_hmac_size;
+	si::Time const				_max_time_difference;
 };
 
 
@@ -214,7 +212,7 @@ class HandshakeSlave: public Handshake
 
   public:
 	// Ctor
-	HandshakeSlave (boost::random::random_device&, Params const&, KeyCheckFunctions);
+	HandshakeSlave (std::random_device&, Params const&, KeyCheckFunctions);
 
 	/**
 	 * Generate handshake response blob to be sent to the initiator and the resulting

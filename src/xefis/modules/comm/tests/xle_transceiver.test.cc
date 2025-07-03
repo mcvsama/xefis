@@ -553,7 +553,7 @@ AutoTestT1::auto_test_t1()
 void
 auto_test_t2()
 {
-	auto rnd = boost::random::random_device();
+	auto rnd = std::random_device ("hw");
 	auto uniform_distribution = boost::random::uniform_int_distribution<size_t>();
 
 	auto make_random_loss = [&rnd, &uniform_distribution] (std::string_view const message) {
