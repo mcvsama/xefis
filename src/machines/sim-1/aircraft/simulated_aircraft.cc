@@ -22,6 +22,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/support/atmosphere/atmosphere.h>
 #include <xefis/support/math/geometry.h>
 #include <xefis/support/math/placement.h>
 #include <xefis/support/nature/various_inertia_tensors.h>
@@ -46,7 +47,7 @@
 namespace sim1::aircraft {
 
 SimulatedAircraft
-make_aircraft (xf::rigid_body::System& rigid_body_system, Models& models)
+make_aircraft (xf::rigid_body::System& rigid_body_system, xf::Atmosphere& simulated_atmosphere)
 {
 	namespace rb = xf::rigid_body;
 	using xf::BodyCOM;
@@ -220,7 +221,7 @@ make_aircraft (xf::rigid_body::System& rigid_body_system, Models& models)
 
 	// Prandtl tube
 
-	auto& prandtl_tube = aircraft_group.add<xf::sim::PrandtlTube> (models.standard_atmosphere, xf::sim::PrandtlTubeParameters { .mass = 0.1_kg, .length = 20_cm, .diameter = 1_cm }); // TODO mass = 25 g
+	auto& prandtl_tube = aircraft_group.add<xf::sim::PrandtlTube> (simulated_atmosphere, xf::sim::PrandtlTubeParameters { .mass = 0.1_kg, .length = 20_cm, .diameter = 1_cm }); // TODO mass = 25 g
 	prandtl_tube.set_label ("Prandtl tube");
 	prandtl_tube.move_origin_to (wing_l.origin<WorldSpace>() + xf::SpaceLength<WorldSpace> (0_m, -0.75 * main_wing_airfoil.wing_length(), 0_m));
 

@@ -20,6 +20,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/components/simulator/simulator_widget.h>
+#include <xefis/support/atmosphere/standard_atmosphere.h>
 #include <xefis/support/simulation/constraints/angular_servo_constraint.h>
 #include <xefis/support/simulation/electrical/network.h>
 #include <xefis/support/simulation/electrical/node_voltage_solver.h>
@@ -69,11 +70,12 @@ class Simulation: public neutrino::Noncopyable
   private:
 	nu::Logger							_logger;
 	Models&								_models;
-	xf::rigid_body::System				_rigid_body_system			{ _models.standard_atmosphere };
+	xf::StandardAtmosphere				_simulated_atmosphere; // TODO it should be some new SimulatedAtmosphere with winds
+	xf::rigid_body::System				_rigid_body_system			{ _simulated_atmosphere };
 	xf::rigid_body::ImpulseSolver		_rigid_body_solver			{ _rigid_body_system, 1 };
 	xf::electrical::Network				_electrical_network;
 	xf::electrical::NodeVoltageSolver	_electrical_network_solver	{ _electrical_network, 1e-3 };
-	SimulatedAircraft					_aircraft					{ make_aircraft (_rigid_body_system, _models) };
+	SimulatedAircraft					_aircraft					{ make_aircraft (_rigid_body_system, _simulated_atmosphere) };
 	std::optional<xf::Simulator>		_simulator;
 	std::optional<xf::SimulatorWidget>	_simulator_widget;
 };

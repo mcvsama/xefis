@@ -37,8 +37,7 @@ namespace sim1::aircraft {
 
 Simulation::Simulation (Machine& machine, Models& models, si::LonLatRadius<> const location, neutrino::Logger const& logger):
 	_logger (logger),
-	_models (models),
-	_aircraft (make_aircraft (_rigid_body_system, _models))
+	_models (models)
 {
 	auto const tait_bryan_angles = xf::TaitBryanAngles ({ .roll = 0_deg, .pitch = -30_deg, .yaw = 0_deg });
 	_aircraft.rigid_group.rotate_about_world_origin (math::coordinate_system_cast<xf::WorldSpace, xf::WorldSpace, xf::ECEFSpace, xf::AirframeSpace> (airframe_to_ecef_rotation (tait_bryan_angles, location)));
