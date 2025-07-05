@@ -42,7 +42,11 @@ PrandtlTube::PrandtlTube (Atmosphere const& atmosphere, PrandtlTubeParameters co
 	});
 	set_shape (shape);
 
-	auto const inertia_tensor_at_com = make_centered_solid_cylinder_inertia_tensor<BodyCOM> ({ .mass = params.mass, .radius = 0.5 * params.diameter, .length = params.length });
+	auto const inertia_tensor_at_com = make_centered_solid_cylinder_inertia_tensor<BodyCOM> ({
+		.mass = params.mass,
+		.radius = 0.5 * params.diameter,
+		.length = params.length,
+	});
 	// The inertia tensor we get is centered at space origin, but the Prandtl tube is not - it has origin at space origin. Therefore we need to shift the
 	// inertia tensor like it was viewed from the origin of the Prandtl tube, not from its COM.
 	auto const inertia_tensor_at_origin = inertia_tensor_com_to_point (params.mass, inertia_tensor_at_com, SpaceLength<BodyCOM> { 0_m, 0_m, 0.5 * params.length });
