@@ -20,6 +20,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/components/simulator/simulator_widget.h>
+#include <xefis/support/atmosphere/simulated_atmosphere.h>
 #include <xefis/support/atmosphere/standard_atmosphere.h>
 #include <xefis/support/simulation/constraints/angular_servo_constraint.h>
 #include <xefis/support/simulation/electrical/network.h>
@@ -70,7 +71,7 @@ class Simulation: public neutrino::Noncopyable
   private:
 	nu::Logger							_logger;
 	Models&								_models;
-	xf::StandardAtmosphere				_simulated_atmosphere; // TODO it should be some new SimulatedAtmosphere with winds
+	xf::SimulatedAtmosphere				_simulated_atmosphere;
 	xf::rigid_body::System				_rigid_body_system			{ _simulated_atmosphere };
 	xf::rigid_body::ImpulseSolver		_rigid_body_solver			{ _rigid_body_system, 1 };
 	xf::electrical::Network				_electrical_network;

@@ -28,9 +28,6 @@ namespace xf {
 
 /**
  * Standard atmosphere model.
- * TODO use Perlin noise for winds. http://flafla2.github.io/2014/08/09/perlinnoise.html
- * TODO use winds to affect density/pressure at that point.
- * TODO maybe the winds model should be a separate class plugged in into Atmosphere object?
  */
 class StandardAtmosphere: public Atmosphere
 {
