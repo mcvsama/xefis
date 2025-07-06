@@ -153,7 +153,7 @@ StandardAtmosphere::air_at_amsl (si::Length const geometric_altitude_amsl) const
 		.temperature = temperature,
 		.dynamic_viscosity = dynamic_air_viscosity (temperature),
 		.speed_of_sound = speed_of_sound (temperature),
-		.velocity = { 0_mps, 0_mps, 0_mps }, // TODO model the wind
+		.velocity = { 0_mps, 0_mps, 0_mps },
 	};
 }
 
