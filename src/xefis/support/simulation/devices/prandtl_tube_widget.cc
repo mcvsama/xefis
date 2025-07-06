@@ -17,7 +17,6 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/simulation/devices/prandtl_tube.h>
-#include <xefis/support/ui/paint_helper.h>
 
 // Standard:
 #include <cstddef>
