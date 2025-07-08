@@ -99,6 +99,18 @@ dynamic_pressure (si::Density const fluid_density, si::Velocity const fluid_spee
 }
 
 
+/**
+ * \param	sensor_normal_vector
+ *			Normalized sensor normal vector (pointing into the wind).
+ */
+[[nodiscard]]
+si::Pressure
+total_pressure (si::Pressure air_pressure,
+				si::Density air_density,
+				SpaceVector<si::Velocity, ECEFSpace> air_velocity,
+				SpaceVector<double, ECEFSpace> const& sensor_normal_vector,
+				SpaceVector<si::Velocity, ECEFSpace> sensor_velocity);
+
 [[nodiscard]]
 si::Pressure
 total_pressure (Air<ECEFSpace> const& air,

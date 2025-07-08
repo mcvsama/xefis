@@ -27,17 +27,28 @@
 namespace xf {
 
 si::Pressure
-total_pressure (Air<ECEFSpace> const& air,
+total_pressure (si::Pressure const air_pressure,
+				si::Density const air_density,
+				SpaceVector<si::Velocity, ECEFSpace> const air_velocity,
 				SpaceVector<double, ECEFSpace> const& sensor_normal_vector,
 				SpaceVector<si::Velocity, ECEFSpace> const sensor_velocity)
 {
 	// P_total is Pitot pressure (one that is measured byt the Pitot probe).
 	// P_total = P_static + air_density * velocity² / 2
 	// The velocity here is True Air Speed.
-	auto const velocity_relative_to_air = sensor_velocity - air.velocity;
+	auto const sensor_velocity_relative_to_air = sensor_velocity - air_velocity;
 	// Assuming sensor_normal_vector is normalized:
-	auto const velocity_on_sensor = projection_onto_normalized (velocity_relative_to_air, sensor_normal_vector);
-	return air.pressure + dynamic_pressure (air.density, abs (velocity_on_sensor));
+	auto const effective_sensor_velocity = projection_onto_normalized (sensor_velocity_relative_to_air, sensor_normal_vector);
+	return air_pressure + dynamic_pressure (air_density, abs (effective_sensor_velocity));
+}
+
+
+si::Pressure
+total_pressure (Air<ECEFSpace> const& air,
+				SpaceVector<double, ECEFSpace> const& sensor_normal_vector,
+				SpaceVector<si::Velocity, ECEFSpace> const sensor_velocity)
+{
+	return total_pressure (air.pressure, air.density, air.velocity, sensor_normal_vector, sensor_velocity);
 }
 
 
