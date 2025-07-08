@@ -19,6 +19,7 @@
 #include <xefis/support/atmosphere/atmosphere.h>
 #include <xefis/support/simulation/devices/angular_servo.h>
 #include <xefis/support/simulation/devices/prandtl_tube.h>
+#include <xefis/support/simulation/devices/temperature_sensor.h>
 #include <xefis/support/simulation/electrical/network.h>
 #include <xefis/support/simulation/rigid_body/system.h>
 
@@ -45,6 +46,7 @@ class SimulatedAircraft
 	xf::sim::AngularServo&		rudder_servo;
 
 	xf::sim::PrandtlTube&		prandtl_tube;
+	xf::sim::TemperatureSensor&	temperature_sensor;
 };
 
 

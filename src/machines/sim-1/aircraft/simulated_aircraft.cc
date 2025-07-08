@@ -226,6 +226,16 @@ make_aircraft (xf::rigid_body::System& rigid_body_system, xf::Atmosphere& simula
 	prandtl_tube.set_label ("Prandtl tube");
 	prandtl_tube.move_origin_to (wing_l.origin<WorldSpace>() + xf::SpaceLength<WorldSpace> (0_m, -0.75 * main_wing_airfoil.wing_length(), 0_m));
 
+	// Temperature sensor
+
+	auto temperature_sensor_params = xf::sim::TemperatureSensorParameters {
+		.mass = 0.01_kg,
+		.dimensions = { 2_cm, 1_cm, 1_cm },
+	};
+	auto& temperature_sensor = aircraft_group.add<xf::sim::TemperatureSensor> (simulated_atmosphere, temperature_sensor_params);
+	temperature_sensor.set_label ("temperature sensor");
+	temperature_sensor.move_origin_to (wing_l.origin<WorldSpace>() + xf::SpaceLength<WorldSpace> (0_m, -0.85 * main_wing_airfoil.wing_length(), 0_m));
+
 	// Constraints
 
 	auto& wing_l_hinge = rigid_body_system.add<rb::HingePrecomputation> (fuselage, wing_l, wing_l.origin<BodyCOM>(), wing_l.origin<BodyCOM>() - x_wing_chord);
@@ -279,6 +289,7 @@ make_aircraft (xf::rigid_body::System& rigid_body_system, xf::Atmosphere& simula
 	rudder_servo.constraint().set_voltage (6_V);
 
 	auto& prandtl_tube_fixed_constraint = rigid_body_system.add<rb::FixedConstraint> (wing_l, prandtl_tube);
+	auto& temperature_sensor_fixed_constraint = rigid_body_system.add<rb::FixedConstraint> (wing_l, temperature_sensor);
 
 	std::vector<rb::Constraint*> constraints = {
 		&rigid_body_system.add<rb::AngularSpringConstraint> (wing_l_hinge, rb::angular_spring_function (30_Nm / 1_deg)),
@@ -296,6 +307,7 @@ make_aircraft (xf::rigid_body::System& rigid_body_system, xf::Atmosphere& simula
 		&rigid_body_system.add<rb::HingeConstraint> (elevator_hinge),
 		&rigid_body_system.add<rb::HingeConstraint> (rudder_hinge),
 		&prandtl_tube_fixed_constraint,
+		&temperature_sensor_fixed_constraint,
 		&rigid_body_system.add<rb::FixedConstraint> (wing_l, aileron_l_servo),
 		&rigid_body_system.add<rb::FixedConstraint> (wing_r, aileron_r_servo),
 		&rigid_body_system.add<rb::FixedConstraint> (tail_h, elevator_servo),
@@ -309,6 +321,7 @@ make_aircraft (xf::rigid_body::System& rigid_body_system, xf::Atmosphere& simula
 	rigid_body_system.set_baumgarte_factor (0.3);
 	rigid_body_system.set_constraint_force_mixing_factor (1e-3);
 	prandtl_tube_fixed_constraint.set_baumgarte_factor (0.6);
+	temperature_sensor_fixed_constraint.set_baumgarte_factor (0.6);
 
 	aircraft_group.set_rotation_reference_body (&fuselage);
 
@@ -320,6 +333,7 @@ make_aircraft (xf::rigid_body::System& rigid_body_system, xf::Atmosphere& simula
 		.elevator_servo		= elevator_servo,
 		.rudder_servo		= rudder_servo,
 		.prandtl_tube		= prandtl_tube,
+		.temperature_sensor	= temperature_sensor,
 	};
 }
 

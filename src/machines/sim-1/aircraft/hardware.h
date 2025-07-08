@@ -29,6 +29,7 @@
 #include <xefis/modules/comm/xle_transceiver.h>
 #include <xefis/modules/simulation/virtual_pressure_sensor.h>
 #include <xefis/modules/simulation/virtual_servo_controller.h>
+#include <xefis/modules/simulation/virtual_temperature_sensor.h>
 
 // Standard:
 #include <cstddef>
@@ -68,6 +69,12 @@ class Hardware
 		VirtualPressureSensor::Static,
 		_logger.with_context ("static air pressure sensor"),
 		"static"
+	};
+
+	VirtualTemperatureSensor temperature_sensor {
+		_loop,
+		_aircraft.temperature_sensor,
+		_logger.with_context ("temperature sensor")
 	};
 
 	sim1::GroundToAirData<xf::ModuleOut> ground_to_air_data { _loop };

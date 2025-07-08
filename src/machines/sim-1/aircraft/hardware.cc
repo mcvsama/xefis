@@ -38,6 +38,10 @@ Hardware::Hardware (SimulatedAircraft& aircraft, xf::ProcessingLoop& loop, nu::L
 	this->static_air_pressure_sensor.update_interval = 10_ms;
 	this->static_air_pressure_sensor.noise = { 1_Pa, 1_Pa };
 	this->static_air_pressure_sensor.resolution = 0.1_Pa;
+
+	this->temperature_sensor.update_interval = 10_ms;
+	this->temperature_sensor.noise = { 0.1_K, 0.1_K };
+	this->temperature_sensor.resolution = 0.1_K;
 }
 
 } // namespace sim1::ground_station
