@@ -102,6 +102,7 @@ template<math::CoordinateSystem pBaseSpace = void, math::CoordinateSystem pSpace
 
 		/**
 		 * Return body's X, Y, Z axes viewed in BaseSpace coordinates.
+		 * The vectors are normalized (because we're actually returning a rotation matrix).
 		 */
 		[[nodiscard]]
 		BodyRotationMatrix

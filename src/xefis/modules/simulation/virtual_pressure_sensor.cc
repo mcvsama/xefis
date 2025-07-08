@@ -41,7 +41,7 @@ void
 VirtualPressureSensor::process (xf::Cycle const& cycle)
 {
 	_noise = *_io.noise;
-	_io.serviceable = true;
+	_io.serviceable = true; // TODO until sigmoidal temperature failure (_prandtl_tube.serviceable())
 
 	if (_last_measure_time + *_io.update_interval < cycle.update_time())
 	{

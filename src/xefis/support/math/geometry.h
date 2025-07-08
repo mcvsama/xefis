@@ -155,7 +155,8 @@ template<math::Scalar S, math::CoordinateSystem Space>
 
 
 /**
- * Project vector "vector" onto "onto" vector.
+ * Project vector `vector` onto `onto` vector.
+ * It "extends" or "shortens" the `onto` vector depending on `vector`'s length.
  */
 template<math::Scalar S1, math::Scalar S2, math::CoordinateSystem Space>
 	[[nodiscard]]

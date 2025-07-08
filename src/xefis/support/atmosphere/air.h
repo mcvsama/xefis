@@ -111,6 +111,10 @@ total_pressure (si::Pressure air_pressure,
 				SpaceVector<double, ECEFSpace> const& sensor_normal_vector,
 				SpaceVector<si::Velocity, ECEFSpace> sensor_velocity);
 
+/**
+ * \param	sensor_normal_vector
+ *			Normalized sensor normal vector (pointing into the wind).
+ */
 [[nodiscard]]
 si::Pressure
 total_pressure (Air<ECEFSpace> const& air,
