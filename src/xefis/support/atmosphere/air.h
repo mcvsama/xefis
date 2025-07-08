@@ -128,7 +128,7 @@ total_pressure (Air<ECEFSpace> const& air,
 si::Pressure
 total_pressure (Atmosphere const& atmosphere,
 				Placement<ECEFSpace> const& placement,
-				SpaceVector<si::Velocity, ECEFSpace> const sensor_velocity);
+				SpaceVector<si::Velocity, ECEFSpace> sensor_velocity);
 
 } // namespace xf
 
