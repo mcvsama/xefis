@@ -19,7 +19,7 @@
 #include <xefis/core/module.h>
 #include <xefis/core/setting.h>
 #include <xefis/core/sockets/module_socket.h>
-#include <xefis/support/simulation/aerodynamic.v0/flight_simulation.h>
+#include <xefis/support/simulation/devices/temperature_sensor.h>
 
 // Neutrino:
 #include <neutrino/math/normal_distribution.h>
@@ -29,6 +29,14 @@
 #include <random>
 
 
+namespace nu = neutrino;
+namespace si = nu::si;
+using namespace si::literals;
+
+
+/**
+ * Measures air stagnation temperature.
+ */
 class VirtualTemperatureSensorIO: public xf::Module
 {
   public:
@@ -36,16 +44,16 @@ class VirtualTemperatureSensorIO: public xf::Module
 	 * Settings
 	 */
 
-	xf::Setting<si::Time>								update_interval		{ this, "update_interval" };
-	xf::Setting<xf::NormalVariable<si::Temperature>>	noise				{ this, "noise" };
-	xf::Setting<si::Temperature>						resolution			{ this, "resolution" };
+	xf::Setting<si::Time>									update_interval		{ this, "update_interval" };
+	xf::Setting<nu::math::NormalVariable<si::Temperature>>	noise				{ this, "noise" };
+	xf::Setting<si::Temperature>							resolution			{ this, "resolution" };
 
 	/*
 	 * Output
 	 */
 
-	xf::ModuleOut<bool>									serviceable			{ this, "serviceable" };
-	xf::ModuleOut<si::Temperature>						temperature			{ this, "measured-temperature" };
+	xf::ModuleOut<bool>										serviceable			{ this, "serviceable" };
+	xf::ModuleOut<si::Temperature>							temperature			{ this, "measured-temperature" };
 
   public:
 	using xf::Module::Module;
@@ -60,9 +68,8 @@ class VirtualTemperatureSensor: public VirtualTemperatureSensorIO
   public:
 	// Ctor
 	explicit
-	VirtualTemperatureSensor (xf::sim::FlightSimulation const&,
-							  xf::rigid_body::Body& mount_body,
-							  xf::SpaceLength<xf::BodySpace> const& mount_location,
+	VirtualTemperatureSensor (xf::ProcessingLoop&,
+							  xf::sim::TemperatureSensor&,
 							  nu::Logger const&,
 							  std::string_view const instance = {});
 
@@ -71,14 +78,13 @@ class VirtualTemperatureSensor: public VirtualTemperatureSensorIO
 	process (xf::Cycle const&) override;
 
   private:
-	VirtualTemperatureSensorIO&				_io					{ *this };
-	nu::Logger								_logger;
-	xf::sim::FlightSimulation const&		_flight_simulation;
-	xf::SpaceLength<xf::BodySpace>			_mount_location;
+	VirtualTemperatureSensorIO&						_io					{ *this };
+	nu::Logger										_logger;
+	xf::sim::TemperatureSensor const&				_sensor;
 	// Device's noise:
-	std::default_random_engine				_random_generator;
-	xf::NormalDistribution<si::Temperature>	_noise				{ 0_K, 0_K };
-	si::Time								_last_measure_time	{ 0_s };
+	std::default_random_engine						_random_generator;
+	nu::math::NormalDistribution<si::Temperature>	_noise				{ 0_K, 0_K };
+	si::Time										_last_measure_time	{ 0_s };
 };
 
 #endif

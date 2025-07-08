@@ -24,29 +24,25 @@
 #include <cstddef>
 
 
-VirtualTemperatureSensor::VirtualTemperatureSensor (xf::sim::FlightSimulation const& flight_simulation,
-													xf::SpaceLength<xf::AirframeFrame> const& mount_location,
+VirtualTemperatureSensor::VirtualTemperatureSensor (xf::ProcessingLoop& loop,
+													xf::sim::TemperatureSensor& sensor,
 													nu::Logger const& logger,
 													std::string_view const instance):
-	VirtualTemperatureSensorIO (instance),
+	VirtualTemperatureSensorIO (loop, instance),
 	_logger (logger.with_context (std::string (kLoggerScope) + "#" + instance)),
-	_flight_simulation (flight_simulation),
-	_mount_location (mount_location),
-	_noise (*_io.noise)
+	_sensor (sensor)
 { }
 
 
 void
 VirtualTemperatureSensor::process (xf::Cycle const& cycle)
 {
-	auto const atmstate = _flight_simulation.complete_atmosphere_state_at (_mount_location);
-	auto const& air = atmstate.air;
-
-	_io.serviceable = true;
+	_noise = *_io.noise;
+	_io.serviceable = true; // TODO until sigmoidal temperature failure (_sensor.serviceable())
 
 	if (_last_measure_time + *_io.update_interval < cycle.update_time())
 	{
-		_io.temperature = xf::quantized (_noise (_random_generator) + air.temperature, *_io.resolution);
+		_io.temperature = nu::quantized (_noise (_random_generator) + _sensor.measured_temperature(), *_io.resolution);
 		_last_measure_time = cycle.update_time();
 	}
 }
