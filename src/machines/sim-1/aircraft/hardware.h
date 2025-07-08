@@ -54,19 +54,19 @@ class Hardware
   public:
 	VirtualServoController servo_controller { _loop };
 
-	VirtualPressureSensor total_air_temperature_sensor {
+	VirtualPressureSensor total_air_pressure_sensor {
 		_loop,
 		_aircraft.prandtl_tube,
 		VirtualPressureSensor::Pitot,
-		_logger.with_context ("total air temperature sensor"),
+		_logger.with_context ("total air pressure sensor"),
 		"total"
 	};
 
-	VirtualPressureSensor static_air_temperature_sensor {
+	VirtualPressureSensor static_air_pressure_sensor {
 		_loop,
 		_aircraft.prandtl_tube,
 		VirtualPressureSensor::Static,
-		_logger.with_context ("static air temperature sensor"),
+		_logger.with_context ("static air pressure sensor"),
 		"static"
 	};
 
