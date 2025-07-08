@@ -49,9 +49,10 @@ PrandtlTube::PrandtlTube (Atmosphere const& atmosphere, PrandtlTubeParameters co
 	});
 	// The inertia tensor we get is centered at space origin, but the Prandtl tube is not - it has origin at space origin. Therefore we need to shift the
 	// inertia tensor like it was viewed from the origin of the Prandtl tube, not from its COM.
-	auto const inertia_tensor_at_origin = inertia_tensor_com_to_point (params.mass, inertia_tensor_at_com, SpaceLength<BodyCOM> { 0_m, 0_m, 0.5 * params.length });
+	auto const offset = SpaceLength<BodyCOM> { 0_m, 0_m, 0.5 * params.length };
+	auto const inertia_tensor_at_origin = inertia_tensor_com_to_point (params.mass, inertia_tensor_at_com, offset);
 	// From that we can build MassMomentsAtArm which then can be auto converted to MassMoments when passed to set_mass_moments():
-	set_mass_moments (MassMomentsAtArm<BodyCOM> (params.mass, { 0_m, 0_m, 0.5 * params.length }, inertia_tensor_at_origin));
+	set_mass_moments (MassMomentsAtArm<BodyCOM> (params.mass, offset, inertia_tensor_at_origin));
 
 	// Make X point into the wind:
 	rotate_about_body_origin (xf::y_rotation<WorldSpace> (90_deg));
@@ -61,7 +62,8 @@ PrandtlTube::PrandtlTube (Atmosphere const& atmosphere, PrandtlTubeParameters co
 si::Pressure
 PrandtlTube::static_pressure() const
 {
-	return _atmosphere->air_at (coordinate_system_cast<ECEFSpace, void, WorldSpace, void> (placement().position())).pressure;
+	auto const sensor_position = coordinate_system_cast<ECEFSpace, void, WorldSpace, void> (placement().position());
+	return _atmosphere->air_at (sensor_position).pressure;
 }
 
 
@@ -70,9 +72,9 @@ PrandtlTube::total_pressure() const
 {
 	using math::coordinate_system_cast;
 
-	return xf::total_pressure (*_atmosphere,
-							   coordinate_system_cast<ECEFSpace, ECEFSpace, WorldSpace, BodyCOM> (placement()),
-							   coordinate_system_cast<ECEFSpace, void, WorldSpace, void> (velocity_moments<WorldSpace>().velocity()));
+	auto const sensor_position = coordinate_system_cast<ECEFSpace, ECEFSpace, WorldSpace, BodyCOM> (placement());
+	auto const sensor_velocity = coordinate_system_cast<ECEFSpace, void, WorldSpace, void> (velocity_moments<WorldSpace>().velocity());
+	return xf::total_pressure (*_atmosphere, sensor_position, sensor_velocity);
 }
 
 } // namespace xf::sim
