@@ -58,7 +58,7 @@ total_pressure (Atmosphere const& atmosphere,
 				SpaceVector<si::Velocity, ECEFSpace> const sensor_velocity)
 {
 	auto const air = atmosphere.air_at (placement.position());
-	auto const sensor_normal_vector = placement.body_coordinates().column (0);
+	auto const sensor_normal_vector = placement.body_coordinates().x_axis();
 	return total_pressure (air, sensor_normal_vector, sensor_velocity);
 }
 

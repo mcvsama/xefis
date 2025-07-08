@@ -34,7 +34,7 @@ namespace xf {
 constexpr auto
 north_vector (RotationMatrix<NEDSpace, ECEFSpace> const& ned_matrix)
 {
-	return ned_matrix.column (0);
+	return ned_matrix.x_axis();
 }
 
 
@@ -42,7 +42,7 @@ north_vector (RotationMatrix<NEDSpace, ECEFSpace> const& ned_matrix)
 constexpr auto
 east_vector (RotationMatrix<NEDSpace, ECEFSpace> const& ned_matrix)
 {
-	return ned_matrix.column (1);
+	return ned_matrix.y_axis();
 }
 
 
@@ -50,7 +50,7 @@ east_vector (RotationMatrix<NEDSpace, ECEFSpace> const& ned_matrix)
 constexpr auto
 down_vector (RotationMatrix<NEDSpace, ECEFSpace> const& ned_matrix)
 {
-	return ned_matrix.column (2);
+	return ned_matrix.z_axis();
 }
 
 

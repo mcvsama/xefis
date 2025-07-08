@@ -129,10 +129,10 @@ template<math::Scalar S, math::CoordinateSystem TargetSpace, math::CoordinateSys
 	constexpr SpaceMatrix<S, TargetSpace, SourceSpace>
 	orthogonalized (SpaceMatrix<S, TargetSpace, SourceSpace> const& m)
 	{
-		auto const new_y = orthogonalized (m.column (1), m.column (0));
-		auto const new_z = cross_product (m.column (0), new_y);
+		auto const new_y = orthogonalized (m.y_axis(), m.x_axis());
+		auto const new_z = cross_product (m.x_axis(), new_y);
 
-		return { m.column (0), new_y, new_z };
+		return { m.x_axis(), new_y, new_z };
 	}
 
 
