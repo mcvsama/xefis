@@ -77,7 +77,7 @@ Machine::connect_modules()
 	_data_center.engine_left_power	<< throttle_to_power << _data_center.throttle_left;
 	_data_center.engine_right_power	<< throttle_to_power << _data_center.throttle_right;
 
-	_hardware.servo_controller.socket_for (_aircraft.elevator_servo)		<< _data_center.elevator_angle;
+	_hardware.servo_controller.socket_for (_aircraft.elevator_servo)	<< _data_center.elevator_angle;
 	_hardware.servo_controller.socket_for (_aircraft.aileron_l_servo)	<< _data_center.aileron_left_angle;
 	_hardware.servo_controller.socket_for (_aircraft.aileron_r_servo)	<< _data_center.aileron_right_angle;
 	_hardware.servo_controller.socket_for (_aircraft.rudder_servo)		<< _data_center.rudder_angle;
