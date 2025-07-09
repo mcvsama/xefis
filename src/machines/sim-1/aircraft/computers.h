@@ -1,6 +1,6 @@
 /* vim:ts=4
  *
- * Copyleft 2008…2023  Michał Gawron
+ * Copyleft 2025  Michał Gawron
  * Marduk Unix Labs, http://mulabs.org/
  *
  * This program is free software: you can redistribute it and/or modify
