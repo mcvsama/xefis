@@ -30,11 +30,11 @@ Hardware::Hardware (SimulatedAircraft& aircraft, xf::ProcessingLoop& loop, nu::L
 {
 	this->air_total_pressure_sensor.update_interval = 10_ms;
 	this->air_total_pressure_sensor.noise = { 1_Pa, 1_Pa };
-	this->air_total_pressure_sensor.resolution = 0.1_Pa;
+	this->air_total_pressure_sensor.resolution = 3_Pa;
 
 	this->air_static_pressure_sensor.update_interval = 10_ms;
 	this->air_static_pressure_sensor.noise = { 1_Pa, 1_Pa };
-	this->air_static_pressure_sensor.resolution = 0.1_Pa;
+	this->air_static_pressure_sensor.resolution = 3_Pa;
 
 	this->air_temperature_sensor.update_interval = 10_ms;
 	this->air_temperature_sensor.noise = { 0.1_K, 0.1_K };
