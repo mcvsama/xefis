@@ -28,8 +28,6 @@ Hardware::Hardware (SimulatedAircraft& aircraft, xf::ProcessingLoop& loop, nu::L
 	_loop (loop),
 	_aircraft (aircraft)
 {
-	this->udp_link.send << this->air_to_ground_link.link_output;
-	this->ground_to_air_link.link_input << this->udp_link.receive;
 
 	this->total_air_pressure_sensor.update_interval = 10_ms;
 	this->total_air_pressure_sensor.noise = { 1_Pa, 1_Pa };

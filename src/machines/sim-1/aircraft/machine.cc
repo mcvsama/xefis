@@ -81,6 +81,9 @@ Machine::connect_modules()
 	_hardware.servo_controller.socket_for (_aircraft.aileron_l_servo)	<< _data_center.aileron_left_angle;
 	_hardware.servo_controller.socket_for (_aircraft.aileron_r_servo)	<< _data_center.aileron_right_angle;
 	_hardware.servo_controller.socket_for (_aircraft.rudder_servo)		<< _data_center.rudder_angle;
+
+	_hardware.udp_link.send						<< _hardware.air_to_ground_link.link_output;
+	_hardware.ground_to_air_link.link_input		<< _hardware.udp_link.receive;
 }
 
 } // namespace sim1::aircraft
