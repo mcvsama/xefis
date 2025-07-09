@@ -40,6 +40,8 @@ PrandtlTube::PrandtlTube (Atmosphere const& atmosphere, PrandtlTubeParameters co
 		.with_top = true,
 		.material = material,
 	});
+	// Make X point into the wind:
+	shape.rotate (xf::y_rotation<BodyOrigin> (90_deg));
 	set_shape (shape);
 
 	auto const inertia_tensor_at_com = make_centered_solid_cylinder_inertia_tensor<BodyCOM> ({
@@ -53,9 +55,6 @@ PrandtlTube::PrandtlTube (Atmosphere const& atmosphere, PrandtlTubeParameters co
 	auto const inertia_tensor_at_origin = inertia_tensor_com_to_point (params.mass, inertia_tensor_at_com, offset);
 	// From that we can build MassMomentsAtArm which then can be auto converted to MassMoments when passed to set_mass_moments():
 	set_mass_moments (MassMomentsAtArm<BodyCOM> (params.mass, offset, inertia_tensor_at_origin));
-
-	// Make X point into the wind:
-	rotate_about_body_origin (xf::y_rotation<WorldSpace> (90_deg));
 }
 
 
