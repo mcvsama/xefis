@@ -63,7 +63,7 @@ class Machine: public xf::SingleLoopMachine
   private:
 	DataCenter			_data_center	{ loop() };
 	Models				_models;
-	Computers			_computers;
+	Computers			_computers		{ loop(), logger() };
 	Simulation			_simulation;
 	SimulatedAircraft	_aircraft;
 	Hardware			_hardware		{ _aircraft, loop(), logger() };

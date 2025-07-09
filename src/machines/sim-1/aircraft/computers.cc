@@ -11,12 +11,11 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__MACHINES__SIM_1__AIRCRAFT__COMPUTERS_H__INCLUDED
-#define XEFIS__MACHINES__SIM_1__AIRCRAFT__COMPUTERS_H__INCLUDED
+// Local:
+#include "computers.h"
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/modules/systems/air_data_computer.h>
 
 // Standard:
 #include <cstddef>
@@ -24,24 +23,13 @@
 
 namespace sim1::aircraft {
 
-/**
- * Contains modules that calculate stuff from sensor data.
- */
-class Computers
+Computers::Computers (xf::ProcessingLoop& loop, nu::Logger const& logger):
+	_loop (loop),
+	_logger (logger)
 {
-  public:
-	// Ctor
-	Computers (xf::ProcessingLoop&, nu::Logger const&);
+	this->air_data_computer.ias_valid_minimum = 1_mps;
+	this->air_data_computer.ias_valid_maximum = 100_mps;
+}
 
-  private:
-	xf::ProcessingLoop&		_loop;
-	nu::Logger				_logger;
-
-  public:
-	AirDataComputer			air_data_computer	{ _loop, nullptr, _logger };
-};
-
-} // namespace sim1::aircraft
-
-#endif
+} // namespace sim1::ground_station
 

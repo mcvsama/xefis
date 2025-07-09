@@ -16,6 +16,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/support/nature/constants.h>
 #include <xefis/xefis_machine.h>
 
 // Standard:
@@ -82,8 +83,16 @@ Machine::connect_modules()
 	_hardware.servo_controller.socket_for (_aircraft.aileron_r_servo)	<< _data_center.aileron_right_angle;
 	_hardware.servo_controller.socket_for (_aircraft.rudder_servo)		<< _data_center.rudder_angle;
 
+	_computers.air_data_computer.pressure_use_std		<< xf::ConstantSource (false);
+	_computers.air_data_computer.pressure_qnh			<< xf::ConstantSource (xf::kStdAirPressure);
+	_computers.air_data_computer.pressure_static		<< _hardware.air_static_pressure_sensor.pressure;
+	_computers.air_data_computer.pressure_total			<< _hardware.air_total_pressure_sensor.pressure;
+	_computers.air_data_computer.total_air_temperature	<< _hardware.air_temperature_sensor.temperature;
+
 	_hardware.udp_link.send						<< _hardware.air_to_ground_link.link_output;
 	_hardware.ground_to_air_link.link_input		<< _hardware.udp_link.receive;
+
+	// TODO Monitor all 'serviceable' parameters of modules.
 }
 
 } // namespace sim1::aircraft
