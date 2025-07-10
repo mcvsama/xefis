@@ -32,8 +32,8 @@ nu::AutoTest t1 ("Xefis Lossy Encryption/Transport: encryption and decryption", 
 	Blob const key = nu::to_blob ("abcdefghijklmnop");
 
 	auto rnd = std::random_device ("hw");
-	xf::crypto::xle::Transmitter tx (rnd, { .ephemeral_session_key = key });
-	xf::crypto::xle::Receiver rx ({ .ephemeral_session_key = key });
+	auto tx = crypto::xle::Transmitter (rnd, { .ephemeral_session_key = key });
+	auto rx = crypto::xle::Receiver ({ .ephemeral_session_key = key });
 
 	Blob plain_text = nu::to_blob ("");
 	Blob encrypted = tx.encrypt_packet (plain_text);

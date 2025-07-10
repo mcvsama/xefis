@@ -33,7 +33,7 @@
 namespace xf::xle_transceiver_test {
 
 namespace test_asserts = nu::test_asserts;
-namespace xle = xf::crypto::xle;
+namespace xle = crypto::xle;
 
 auto constinit kKeysDebugging = false;
 auto constinit crypto_params = xle::Transceiver::CryptoParams {

@@ -36,7 +36,7 @@ namespace {
 
 namespace test_asserts = nu::test_asserts;
 
-constexpr auto	kISSHeight = xf::kEarthMeanRadius + 405.5_km;
+constexpr auto	kISSHeight = kEarthMeanRadius + 405.5_km;
 
 nu::Logger g_null_logger;
 
@@ -44,14 +44,14 @@ nu::Logger g_null_logger;
 std::unique_ptr<rigid_body::Body>
 make_iss()
 {
-	xf::SpaceLength<xf::ECEFSpace> const iss_ecef_position = to_cartesian (si::LonLatRadius (0_deg, 0_deg, kISSHeight));
-	xf::RotationQuaternion<WorldSpace> const iss_ecef_rotation =
+	SpaceLength<ECEFSpace> const iss_ecef_position = to_cartesian (si::LonLatRadius (0_deg, 0_deg, kISSHeight));
+	RotationQuaternion<WorldSpace> const iss_ecef_rotation =
 		math::coordinate_system_cast<WorldSpace, WorldSpace, ECEFSpace, AirframeSpace> (
-			xf::airframe_to_ecef_rotation (xf::TaitBryanAngles { 0_deg, 0_deg, 0_deg }, iss_ecef_position)
+			airframe_to_ecef_rotation (TaitBryanAngles { 0_deg, 0_deg, 0_deg }, iss_ecef_position)
 		);
-	xf::SpaceVector<si::Velocity, WorldSpace> const iss_velocity { 0_mps, 0_mps, 27'600_kph };
-	xf::SpaceVector<si::AngularVelocity, WorldSpace> const iss_angular_velocity (math::zero);
-	xf::MassMoments<BodyCOM> const iss_mass_moments (419'725_kg, math::identity);
+	SpaceVector<si::Velocity, WorldSpace> const iss_velocity { 0_mps, 0_mps, 27'600_kph };
+	SpaceVector<si::AngularVelocity, WorldSpace> const iss_angular_velocity (math::zero);
+	MassMoments<BodyCOM> const iss_mass_moments (419'725_kg, math::identity);
 
 	auto body = std::make_unique<rigid_body::Body> (iss_mass_moments);
 	auto pl = body->placement();

@@ -175,7 +175,7 @@ nu::AutoTest t5 ("xf::SocketObserver touch()", []{
 
 nu::AutoTest t6 ("xf::SocketObserver depending smoothers", []{
 	TestEnvironment<TestedType> env;
-	xf::Smoother<TestedType> smoother { 5_s };
+	Smoother<TestedType> smoother { 5_s };
 
 	env.observer.add_depending_smoother (smoother);
 	env.out = kValue1;

@@ -227,7 +227,7 @@ nu::AutoTest t6 ("Xefis Lossy Encryption/Handshake: mismatched handshake IDs", [
 	try {
 		Blob const key = master_2.compute_key (*slave_handshake_and_key.handshake_response);
 	}
-	catch (xf::crypto::xle::HandshakeMaster::Exception const& exception)
+	catch (crypto::xle::HandshakeMaster::Exception const& exception)
 	{
 		test_asserts::verify ("correct error is signalled", exception.error_code() == HandshakeMaster::ErrorCode::InvalidHandshakeID);
 		thrown_invalid_handshake_id = true;

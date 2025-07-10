@@ -520,7 +520,7 @@ nu::AutoTest t9 ("xf::Socket << std::unique_ptr<xf::Socket>", []{
 
 	// TODO Zabroń konstrukcji ConnectableSocket (5), bo przy następnym fetchu i tak się zniluje,
 	// albo zrób tak, że jest to ekwiwalent ConnectableSocket() << ConstantSource (5);
-	auto mid = std::make_unique<xf::ConnectableSocket<int>>();
+	auto mid = std::make_unique<ConnectableSocket<int>>();
 	*mid << 5;
 	auto& mid_ref = env1.in << std::move (mid);
 	env1.in.fetch (env1.cycle += 1_s);

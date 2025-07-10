@@ -34,7 +34,7 @@ namespace xf::test {
 namespace {
 
 namespace test_asserts = nu::test_asserts;
-namespace xle = xf::crypto::xle;
+namespace xle = crypto::xle;
 
 auto g_logger_output	= nu::LoggerOutput (std::clog);
 auto g_logger			= nu::Logger (g_logger_output);
@@ -270,10 +270,10 @@ class AirToGroundLinkProtocol: public LinkProtocol
 };
 
 
-using Ground_Tx_Data = GroundToAirData<xf::ModuleIn>;
-using Ground_Rx_Data = AirToGroundData<xf::ModuleOut>;
-using Air_Tx_Data = AirToGroundData<xf::ModuleIn>;
-using Air_Rx_Data = GroundToAirData<xf::ModuleOut>;
+using Ground_Tx_Data = GroundToAirData<ModuleIn>;
+using Ground_Rx_Data = AirToGroundData<ModuleOut>;
+using Air_Tx_Data = AirToGroundData<ModuleIn>;
+using Air_Rx_Data = GroundToAirData<ModuleOut>;
 
 auto constinit crypto_params = xle::Transceiver::CryptoParams {
 	.master_signature_key		= { 0x00, 0x01, 0x02, 0x03 },
@@ -287,14 +287,14 @@ auto constinit crypto_params = xle::Transceiver::CryptoParams {
 
 
 xle::MasterTransceiver
-get_ground_transceiver (xf::ProcessingLoop& loop)
+get_ground_transceiver (ProcessingLoop& loop)
 {
 	return xle::MasterTransceiver (loop, crypto_params, g_logger.with_context ("ground-transceiver"), "ground/transceiver");
 }
 
 
 xle::SlaveTransceiver
-get_air_transceiver (xf::ProcessingLoop& loop)
+get_air_transceiver (ProcessingLoop& loop)
 {
 	return xle::SlaveTransceiver (loop, crypto_params, {}, g_logger.with_context ("air-transceiver"), "air/transceiver");
 }
