@@ -323,7 +323,7 @@ AirDataComputer::compute_ias_lookahead()
 
 		si::Velocity est = _speed_ias_estimator (_speed_ias_lookahead_i_smoother (*_io.speed_ias, update_dt), update_dt);
 		est = _speed_ias_lookahead_o_smoother (est, update_dt);
-		_io.speed_ias_lookahead = est;
+		_io.speed_ias_lookahead = std::max (est, *_io.ias_valid_minimum);
 
 		if (si::abs (est - *_io.speed_ias) > 1.0_kt)
 			_ias_lookahead_computer.touch();
@@ -372,7 +372,8 @@ AirDataComputer::compute_cas_lookahead()
 
 		si::Velocity est = _speed_cas_estimator (_speed_cas_lookahead_i_smoother (*_io.speed_cas, update_dt), update_dt);
 		est = _speed_cas_lookahead_o_smoother (est, update_dt);
-		_io.speed_cas_lookahead = est;
+		// Also use minimum-IAS setting for CAS:
+		_io.speed_cas_lookahead = std::max (est, *_io.ias_valid_minimum);
 
 		if (si::abs (est - *_io.speed_cas) > 1.0_kt)
 			_cas_lookahead_computer.touch();
