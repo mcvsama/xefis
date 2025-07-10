@@ -84,7 +84,6 @@ class VirtualPressureSensor: public VirtualPressureSensorIO
 	process (xf::Cycle const&) override;
 
   private:
-	// TODO Sigmoidal temperature failure
 	VirtualPressureSensorIO&					_io					{ *this };
 	nu::Logger									_logger;
 	xf::sim::PrandtlTube const&					_prandtl_tube;
