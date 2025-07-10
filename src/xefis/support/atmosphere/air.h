@@ -60,7 +60,7 @@ template<class TargetSpace, class SourceSpace>
 
 [[nodiscard]]
 constexpr si::Velocity
-speed_of_sound (si::Temperature static_air_temperature)
+speed_of_sound (si::Temperature const static_air_temperature)
 {
 	return 38.967854_kt * std::sqrt (static_air_temperature.in<si::Kelvin>());
 }
@@ -73,7 +73,7 @@ dynamic_air_viscosity (si::Temperature);
 
 [[nodiscard]]
 constexpr si::Length
-density_altitude (si::Length pressure_altitude, si::Temperature static_air_temperature)
+density_altitude (si::Length const pressure_altitude, si::Temperature const static_air_temperature)
 {
 	float t_s = 273.15 + (15.0 - (0.0019812 * pressure_altitude.in<si::Foot>()));
 	return pressure_altitude + 1_ft * (t_s / 0.0019812) * (1.0 - std::pow (t_s / static_air_temperature.in<si::Kelvin>(), 0.2349690));
@@ -82,7 +82,7 @@ density_altitude (si::Length pressure_altitude, si::Temperature static_air_tempe
 
 [[nodiscard]]
 constexpr si::Velocity
-true_airspeed (si::Velocity indicated_airspeed, si::Length density_altitude)
+true_airspeed (si::Velocity const indicated_airspeed, si::Length const density_altitude)
 {
 	return indicated_airspeed / std::pow (1.0 - 6.8755856 * 1e-6 * density_altitude.in<si::Foot>(), 2.127940);
 }
@@ -90,7 +90,7 @@ true_airspeed (si::Velocity indicated_airspeed, si::Length density_altitude)
 
 [[nodiscard]]
 constexpr si::Velocity
-indicated_airspeed (si::Velocity true_airspeed, si::Length density_altitude)
+indicated_airspeed (si::Velocity const true_airspeed, si::Length const density_altitude)
 {
 	return true_airspeed * std::pow (1.0 - 6.8755856 * 1e-6 * density_altitude.in<si::Foot>(), 2.127940);
 }
