@@ -101,7 +101,7 @@ TemperatureSensor::compute_static_temperature() const
 	auto static_temperature = _static_temperature.lock();
 
 	if (!*static_temperature)
-		*static_temperature = _atmosphere.air_at (stagnation_point()).temperature;
+		*static_temperature = _atmosphere.temperature_at (stagnation_point());
 }
 
 
@@ -118,7 +118,7 @@ TemperatureSensor::compute_stagnation_temperature() const
 		// T_stagnation is what sensor measures at the stagnation point if probe is mounted ideally (into the wind).
 		// Formula:
 		//   T_stagnation = T_static + v² / (2 * Cp), where Cp for air ~= 1005 J/(kg⋅K)
-		auto const air_velocity = _atmosphere.air_at (stagnation_point()).velocity;
+		auto const air_velocity = _atmosphere.wind_velocity_at (stagnation_point());
 		auto const sensor_velocity = coordinate_system_cast<ECEFSpace, void, WorldSpace, void> (velocity_moments<WorldSpace>().velocity());
 		auto const sensor_velocity_relative_to_air = sensor_velocity - air_velocity;
 		auto const sensor_normal_vector = coordinate_system_cast<ECEFSpace, void, WorldSpace, void> (placement().body_coordinates().x_axis()); // `sensor_normal_vector` is normalized.

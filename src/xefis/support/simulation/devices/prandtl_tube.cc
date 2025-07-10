@@ -62,7 +62,7 @@ si::Pressure
 PrandtlTube::static_pressure() const
 {
 	auto const sensor_position = coordinate_system_cast<ECEFSpace, void, WorldSpace, void> (placement().position());
-	return _atmosphere->air_at (sensor_position).pressure;
+	return _atmosphere->pressure_at (sensor_position);
 }
 
 
