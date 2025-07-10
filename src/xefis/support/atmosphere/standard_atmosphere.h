@@ -32,6 +32,7 @@ namespace xf {
 class StandardAtmosphere: public Atmosphere
 {
   public:
+	// Atmosphere API
 	[[nodiscard]]
 	Air<ECEFSpace>
 	air_at (SpaceLength<ECEFSpace> const& position) const override;
@@ -43,6 +44,26 @@ class StandardAtmosphere: public Atmosphere
 	[[nodiscard]]
 	Air<ECEFSpace>
 	air_at_amsl (si::Length amsl_height) const;
+
+	// Atmosphere API
+	[[nodiscard]]
+	si::Density
+	density_at (SpaceLength<ECEFSpace> const& position) const override;
+
+	// Atmosphere API
+	[[nodiscard]]
+	si::Pressure
+	pressure_at (SpaceLength<ECEFSpace> const& position) const override;
+
+	// Atmosphere API
+	[[nodiscard]]
+	si::Temperature
+	temperature_at (SpaceLength<ECEFSpace> const& position) const override;
+
+	// Atmosphere API
+	[[nodiscard]]
+	SpaceVector<si::Velocity, ECEFSpace>
+	wind_velocity_at (SpaceLength<ECEFSpace> const& position) const override;
 };
 
 

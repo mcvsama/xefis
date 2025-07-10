@@ -32,9 +32,25 @@ namespace xf {
 class SimulatedAtmosphere: public Atmosphere
 {
   public:
+	// Atmosphere API
 	[[nodiscard]]
-	Air<ECEFSpace>
-	air_at (SpaceLength<ECEFSpace> const& position) const override;
+	si::Density
+	density_at (SpaceLength<ECEFSpace> const& position) const override;
+
+	// Atmosphere API
+	[[nodiscard]]
+	si::Pressure
+	pressure_at (SpaceLength<ECEFSpace> const& position) const override;
+
+	// Atmosphere API
+	[[nodiscard]]
+	si::Temperature
+	temperature_at (SpaceLength<ECEFSpace> const& position) const override;
+
+	// Atmosphere API
+	[[nodiscard]]
+	SpaceVector<si::Velocity, ECEFSpace>
+	wind_velocity_at (SpaceLength<ECEFSpace> const& position) const override;
 
   private:
 	StandardAtmosphere _standard_atmosphere;

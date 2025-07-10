@@ -123,6 +123,34 @@ StandardAtmosphere::air_at_amsl (si::Length const geometric_altitude_amsl) const
 
 
 si::Density
+StandardAtmosphere::density_at (SpaceLength<ECEFSpace> const& position) const
+{
+	return standard_density (abs (position) - kEarthMeanRadius);
+}
+
+
+si::Pressure
+StandardAtmosphere::pressure_at (SpaceLength<ECEFSpace> const& position) const
+{
+	return standard_pressure (abs (position) - kEarthMeanRadius);
+}
+
+
+si::Temperature
+StandardAtmosphere::temperature_at (SpaceLength<ECEFSpace> const& position) const
+{
+	return standard_temperature (abs (position) - kEarthMeanRadius);
+}
+
+
+SpaceVector<si::Velocity, ECEFSpace>
+StandardAtmosphere::wind_velocity_at (SpaceLength<ECEFSpace> const&) const
+{
+	return math::zero;
+}
+
+
+si::Density
 standard_density (si::Length geometric_altitude_amsl)
 {
 	// Using formulas from <https://en.wikipedia.org/wiki/Barometric_formula>

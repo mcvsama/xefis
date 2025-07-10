@@ -26,21 +26,37 @@
 
 namespace xf {
 
-Air<ECEFSpace>
-SimulatedAtmosphere::air_at (SpaceLength<ECEFSpace> const& position) const
+si::Density
+SimulatedAtmosphere::density_at (SpaceLength<ECEFSpace> const& position) const
+{
+	// TODO add variations in density
+	return _standard_atmosphere.density_at (position);
+}
+
+
+si::Pressure
+SimulatedAtmosphere::pressure_at (SpaceLength<ECEFSpace> const& position) const
+{
+	// TODO add variations in pressure
+	return _standard_atmosphere.pressure_at (position);
+}
+
+
+si::Temperature
+SimulatedAtmosphere::temperature_at (SpaceLength<ECEFSpace> const& position) const
+{
+	// TODO add variations in temperature
+	return _standard_atmosphere.temperature_at (position);
+}
+
+
+SpaceVector<si::Velocity, ECEFSpace>
+SimulatedAtmosphere::wind_velocity_at (SpaceLength<ECEFSpace> const& position) const
 {
 	// TODO Maybe use Perlin noise for winds. http://flafla2.github.io/2014/08/09/perlinnoise.html
 	// TODO Use winds to affect density/pressure at that point.
 	// TODO Maybe the winds model should be a separate class plugged in into Atmosphere object?
-	auto air = _standard_atmosphere.air_at (position);
-	// TODO add wind
-	// TODO add variations in densite
-	// TODO add variations in temperature
-	// TODO add variations in pressure
-	// TODO update dynamic_viscosity that depends on temperature
-	// TODO update speed_of_sound that depends on temperature
-	// TODO or rather move calculations of dynamic_viscosity and speed_of_sound to Air class, in ctor.
-	return air;
+	return _standard_atmosphere.wind_velocity_at (position);
 }
 
 } // namespace xf

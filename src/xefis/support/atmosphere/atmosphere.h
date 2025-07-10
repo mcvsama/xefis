@@ -35,9 +35,30 @@ class Atmosphere
 	virtual
 	~Atmosphere() = default;
 
+	/**
+	 * Gather air information for given position.
+	 * Default implementation uses density_at(), pressure_at(), etc.
+	 * to gather the data.
+	 */
 	[[nodiscard]]
 	virtual Air<ECEFSpace>
-	air_at (SpaceLength<ECEFSpace> const& position) const = 0;
+	air_at (SpaceLength<ECEFSpace> const& position) const;
+
+	[[nodiscard]]
+	virtual si::Density
+	density_at (SpaceLength<ECEFSpace> const& position) const = 0;
+
+	[[nodiscard]]
+	virtual si::Pressure
+	pressure_at (SpaceLength<ECEFSpace> const& position) const = 0;
+
+	[[nodiscard]]
+	virtual si::Temperature
+	temperature_at (SpaceLength<ECEFSpace> const& position) const = 0;
+
+	[[nodiscard]]
+	virtual SpaceVector<si::Velocity, ECEFSpace>
+	wind_velocity_at (SpaceLength<ECEFSpace> const& position) const = 0;
 };
 
 } // namespace xf
