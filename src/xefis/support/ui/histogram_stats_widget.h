@@ -19,6 +19,7 @@
 #include <xefis/support/ui/widget.h>
 
 // Neutrino:
+#include <neutrino/format.h>
 #include <neutrino/math/histogram.h>
 #include <neutrino/qt/qstring.h>
 
@@ -64,16 +65,17 @@ template<class HistogramValue, class CriticalValue>
 	inline void
 	HistogramStatsWidget::set_data (math::Histogram<HistogramValue> const& histogram, std::optional<CriticalValue> critical_value)
 	{
+		auto const precision = 3;
 		_num_samples_value->setText (QString::number (histogram.n_samples()));
-		_min_value->setText (nu::to_qstring (std::format ("{:.6f}", histogram.min())));
-		_max_value->setText (nu::to_qstring (std::format ("{:.6f}", histogram.max())));
-		_mean_value->setText (nu::to_qstring (std::format ("{:.6f}", histogram.mean())));
-		_median_value->setText (nu::to_qstring (std::format ("{:.6f}", histogram.median())));
-		_stddev_value->setText (nu::to_qstring (std::format ("{:.6f}", histogram.stddev())));
+		_min_value->setText (nu::to_qstring (nu::format_unit (histogram.min(), precision)));
+		_max_value->setText (nu::to_qstring (nu::format_unit (histogram.max(), precision)));
+		_mean_value->setText (nu::to_qstring (nu::format_unit (histogram.mean(), precision)));
+		_median_value->setText (nu::to_qstring (nu::format_unit (histogram.median(), precision)));
+		_stddev_value->setText (nu::to_qstring (nu::format_unit (histogram.stddev(), precision)));
 
 		if (critical_value)
 		{
-			_critical_label->setText (nu::to_qstring (std::format ("> {:.6f}: ", *critical_value)));
+			_critical_label->setText (nu::to_qstring (std::format ("> {}: ", nu::format_unit (*critical_value, 4))));
 			_critical_value->setText (nu::to_qstring (std::format ("{:.3f}%", 100 * histogram.normalized_percentile_for (*critical_value))));
 		}
 		else

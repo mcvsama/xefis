@@ -19,6 +19,7 @@
 #include <xefis/support/ui/canvas_widget.h>
 
 // Neutrino:
+#include <neutrino/format.h>
 #include <neutrino/math/histogram.h>
 #include <neutrino/numeric.h>
 #include <neutrino/qt/qstring.h>
@@ -97,9 +98,10 @@ template<class Value>
 	{
 		_bins = histogram.bins();
 		_max_y = histogram.max_y();
-		_min_x_str = nu::to_qstring (std::format ("{:.6f}", histogram.min_x()));
-		_mid_x_str = nu::to_qstring (std::format ("{:.6f}", 0.5f * (histogram.min_x() + histogram.max_x())));
-		_max_x_str = nu::to_qstring (std::format ("{:.6f}", histogram.max_x()));
+		auto const precision = 3;
+		_min_x_str = nu::to_qstring (nu::format_unit (histogram.min_x(), precision));
+		_mid_x_str = nu::to_qstring (nu::format_unit (0.5f * (histogram.min_x() + histogram.max_x()), precision));
+		_max_x_str = nu::to_qstring (nu::format_unit (histogram.max_x(), precision));
 		_max_y_str = nu::to_qstring (std::format ("{}", histogram.max_y()));
 
 		_marks.reserve (marks.size());
