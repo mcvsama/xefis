@@ -323,7 +323,7 @@ SimulatorWidget::make_solar_time_controls (PaintHelper const& ph)
 		{
 			auto const longitude = _rigid_body_viewer->followed_position().lon();
 			auto const time_delta = (longitude / 360_deg) * 24_h;
-			auto const time_rounded_to_days = std::floor (nu::TimeHelper::utc_now() / 86400_s) * 86400_s;
+			auto const time_rounded_to_days = std::floor (solar_time() / 86400_s) * 86400_s;
 			_solar_simulation_time_delta = time_rounded_to_days + 12_h - time_delta - _simulator.simulation_time();
 			update_solar_time_widgets();
 		}
