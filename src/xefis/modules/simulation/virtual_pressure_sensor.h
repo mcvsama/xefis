@@ -22,6 +22,7 @@
 #include <xefis/support/simulation/devices/prandtl_tube.h>
 
 // Neutrino:
+#include <neutrino/concepts.h>
 #include <neutrino/math/normal_distribution.h>
 
 // Standard:
@@ -73,7 +74,7 @@ class VirtualPressureSensor: public VirtualPressureSensorIO
 	// Ctor
 	explicit
 	VirtualPressureSensor (xf::ProcessingLoop&,
-						   xf::sim::PrandtlTube const&,
+						   nu::NonTemporary<xf::sim::PrandtlTube const&>,
 						   Probe,
 						   nu::Logger const&,
 						   std::string_view const instance = {});

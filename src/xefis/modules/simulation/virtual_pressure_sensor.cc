@@ -26,7 +26,7 @@
 
 
 VirtualPressureSensor::VirtualPressureSensor (xf::ProcessingLoop& loop,
-											  xf::sim::PrandtlTube const& prandtl_tube,
+											  nu::NonTemporary<xf::sim::PrandtlTube const&> prandtl_tube,
 											  Probe probe,
 											  nu::Logger const& logger,
 											  std::string_view const instance):

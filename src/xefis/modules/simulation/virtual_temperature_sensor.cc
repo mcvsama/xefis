@@ -25,7 +25,7 @@
 
 
 VirtualTemperatureSensor::VirtualTemperatureSensor (xf::ProcessingLoop& loop,
-													xf::sim::TemperatureSensor& sensor,
+													nu::NonTemporary<xf::sim::TemperatureSensor const&> sensor,
 													nu::Logger const& logger,
 													std::string_view const instance):
 	VirtualTemperatureSensorIO (loop, instance),

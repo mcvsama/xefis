@@ -22,6 +22,7 @@
 #include <xefis/support/simulation/devices/temperature_sensor.h>
 
 // Neutrino:
+#include <neutrino/concepts.h>
 #include <neutrino/math/normal_distribution.h>
 
 // Standard:
@@ -69,7 +70,7 @@ class VirtualTemperatureSensor: public VirtualTemperatureSensorIO
 	// Ctor
 	explicit
 	VirtualTemperatureSensor (xf::ProcessingLoop&,
-							  xf::sim::TemperatureSensor&,
+							  nu::NonTemporary<xf::sim::TemperatureSensor const&>,
 							  nu::Logger const&,
 							  std::string_view const instance = {});
 
