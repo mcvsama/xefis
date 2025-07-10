@@ -29,7 +29,7 @@ namespace xf::sim {
 
 PrandtlTube::PrandtlTube (Atmosphere const& atmosphere, PrandtlTubeParameters const& params):
 	Body (MassMoments<BodyCOM>()),
-	_atmosphere (&atmosphere)
+	_atmosphere (atmosphere)
 {
 	auto const material = make_material ({ 0xff, 0xaa, 0x00 });
 	auto shape = make_cylinder_shape ({
@@ -62,7 +62,7 @@ si::Pressure
 PrandtlTube::static_pressure() const
 {
 	auto const sensor_position = coordinate_system_cast<ECEFSpace, void, WorldSpace, void> (placement().position());
-	return _atmosphere->pressure_at (sensor_position);
+	return _atmosphere.pressure_at (sensor_position);
 }
 
 
@@ -73,7 +73,7 @@ PrandtlTube::total_pressure() const
 
 	auto const sensor_position = coordinate_system_cast<ECEFSpace, ECEFSpace, WorldSpace, BodyCOM> (placement());
 	auto const sensor_velocity = coordinate_system_cast<ECEFSpace, void, WorldSpace, void> (velocity_moments<WorldSpace>().velocity());
-	return xf::total_pressure (*_atmosphere, sensor_position, sensor_velocity);
+	return xf::total_pressure (_atmosphere, sensor_position, sensor_velocity);
 }
 
 } // namespace xf::sim

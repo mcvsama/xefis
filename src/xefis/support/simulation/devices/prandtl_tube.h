@@ -66,7 +66,7 @@ class PrandtlTube:
 		{ return std::make_unique<PrandtlTubeWidget> (*this); }
 
   private:
-	Atmosphere const* _atmosphere;
+	Atmosphere const& _atmosphere;
 };
 
 } // namespace xf::sim
