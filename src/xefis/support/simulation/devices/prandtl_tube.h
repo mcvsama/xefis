@@ -21,6 +21,9 @@
 #include <xefis/support/simulation/rigid_body/body.h>
 #include <xefis/support/ui/observation_widget.h>
 
+// Neutrino:
+#include <neutrino/synchronized.h>
+
 // Standard:
 #include <cstddef>
 
@@ -65,8 +68,14 @@ class PrandtlTube:
 	create_observation_widget() override
 		{ return std::make_unique<PrandtlTubeWidget> (*this); }
 
+	// Body API
+	void
+	evolve ([[maybe_unused]] si::Time dt) override;
+
   private:
-	Atmosphere const& _atmosphere;
+	Atmosphere const&										_atmosphere;
+	nu::Synchronized<std::optional<si::Pressure>> mutable	_static_pressure;
+	nu::Synchronized<std::optional<si::Pressure>> mutable	_total_pressure;
 };
 
 } // namespace xf::sim

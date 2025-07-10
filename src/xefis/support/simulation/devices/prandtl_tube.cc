@@ -61,19 +61,41 @@ PrandtlTube::PrandtlTube (Atmosphere const& atmosphere, PrandtlTubeParameters co
 si::Pressure
 PrandtlTube::static_pressure() const
 {
-	auto const sensor_position = coordinate_system_cast<ECEFSpace, void, WorldSpace, void> (placement().position());
-	return _atmosphere.pressure_at (sensor_position);
+	auto static_pressure = _static_pressure.lock();
+
+	if (!*static_pressure)
+	{
+		auto const sensor_position = coordinate_system_cast<ECEFSpace, void, WorldSpace, void> (placement().position());
+		*static_pressure = _atmosphere.pressure_at (sensor_position);
+	}
+
+	return static_pressure->value();
 }
 
 
 si::Pressure
 PrandtlTube::total_pressure() const
 {
-	using math::coordinate_system_cast;
+	auto total_pressure = _total_pressure.lock();
 
-	auto const sensor_position = coordinate_system_cast<ECEFSpace, ECEFSpace, WorldSpace, BodyCOM> (placement());
-	auto const sensor_velocity = coordinate_system_cast<ECEFSpace, void, WorldSpace, void> (velocity_moments<WorldSpace>().velocity());
-	return xf::total_pressure (_atmosphere, sensor_position, sensor_velocity);
+	if (!*total_pressure)
+	{
+		using math::coordinate_system_cast;
+
+		auto const sensor_position = coordinate_system_cast<ECEFSpace, ECEFSpace, WorldSpace, BodyCOM> (placement());
+		auto const sensor_velocity = coordinate_system_cast<ECEFSpace, void, WorldSpace, void> (velocity_moments<WorldSpace>().velocity());
+		*total_pressure = xf::total_pressure (_atmosphere, sensor_position, sensor_velocity);
+	}
+
+	return total_pressure->value();
+}
+
+
+void
+PrandtlTube::evolve ([[maybe_unused]] si::Time dt)
+{
+	_static_pressure->reset();
+	_total_pressure->reset();
 }
 
 } // namespace xf::sim
