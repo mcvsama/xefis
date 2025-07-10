@@ -63,9 +63,6 @@ standard_temperature (si::Length geometric_altitude_amsl);
 si::TemperatureGradient
 standard_temperature_gradient (si::Length geometric_altitude_amsl);
 
-si::DynamicViscosity
-dynamic_air_viscosity (si::Temperature);
-
 } // namespace xf
 
 #endif

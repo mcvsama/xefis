@@ -67,6 +67,11 @@ speed_of_sound (si::Temperature static_air_temperature)
 
 
 [[nodiscard]]
+si::DynamicViscosity
+dynamic_air_viscosity (si::Temperature);
+
+
+[[nodiscard]]
 constexpr si::Length
 density_altitude (si::Length pressure_altitude, si::Temperature static_air_temperature)
 {
