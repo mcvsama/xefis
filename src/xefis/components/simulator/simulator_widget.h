@@ -64,7 +64,8 @@ class SimulatorWidget: public QWidget
 	 * Pass nullptr to unset.
 	 */
 	void
-	set_machine (Machine* machine);
+	set_machine (Machine* machine)
+		{ _rigid_body_viewer->set_machine (machine); }
 
 	/**
 	 * Sets the followed group in the internal RigidBodyViewer.
@@ -159,13 +160,6 @@ class SimulatorWidget: public QWidget
 	// Solar time minus simulation time:
 	si::Time						_solar_simulation_time_delta	{ 0_s };
 };
-
-
-inline void
-SimulatorWidget::set_machine (Machine* const machine)
-{
-	_rigid_body_viewer->set_machine (machine);
-}
 
 
 inline void
