@@ -34,6 +34,9 @@ Simulator::Simulator (rigid_body::System& rigid_body_system,
 {
 	_evolver.emplace (initial_simulation_time, frame_duration, logger.with_context ("Evolver"), [this] (si::Time const dt) {
 		_rigid_body_solver.evolve (dt);
+
+		if (_additional_evolve)
+			_additional_evolve (dt);
 	});
 }
 

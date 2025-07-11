@@ -28,7 +28,10 @@
 
 // Standard:
 #include <cstddef>
+#include <memory>
+#include <optional>
 #include <ranges>
+#include <variant>
 #include <vector>
 
 
@@ -46,6 +49,23 @@ class ProcessingLoop:
 	public Module,
 	public nu::LoggerTagProvider
 {
+  private:
+	struct InternalTimer
+	{
+		explicit
+		InternalTimer (ProcessingLoop&);
+
+		QTimer	timer;
+	};
+
+	struct ExternalTimer
+	{
+		si::Time	current_time;
+		si::Time	integrated_time;
+	};
+
+	using Timer = std::variant<std::monostate, InternalTimer, ExternalTimer>;
+
   public:
 	ModuleOut<si::Frequency>	actual_frequency	{ this, "actual_frequency" };
 	ModuleOut<si::Time>			latency				{ this, "latency" };
@@ -81,7 +101,7 @@ class ProcessingLoop:
     register_module (Module&);
 
 	/**
-	 * Start looping.
+	 * Start looping using the internal timer.
 	 * On first call, initializes modules that were not initialized yet.
 	 */
 	void
@@ -92,6 +112,19 @@ class ProcessingLoop:
 	 */
 	void
 	stop();
+
+	/**
+	 * Advances loop time by given amount and executes appropriate number of cycles.
+	 * If internal timer was used, it gets stopped.
+	 */
+	void
+	advance (si::Time);
+
+	/**
+	 * Switches to external timer and sets current time.
+	 */
+	void
+	set_external_timer_time (si::Time);
 
 	/**
 	 * Return current processing cycle, if called during a processing cycle.
@@ -151,6 +184,24 @@ class ProcessingLoop:
 
   protected:
 	/**
+	 * Initialize not yet initialized modules.
+	 */
+	void
+	init_uninitialized_modules();
+
+	/**
+	 * Switches to internal timer.
+	 */
+	InternalTimer&
+	switch_to_internal_timer();
+
+	/**
+	 * Switches to external timer.
+	 */
+	ExternalTimer&
+	switch_to_external_timer (si::Time current_time = nu::TimeHelper::utc_now());
+
+	/**
 	 * Execute single loop cycle assuming that the current time is
 	 * given by "now".
 	 */
@@ -162,8 +213,8 @@ class ProcessingLoop:
 	logger_tag() const override;
 
   private:
-	QTimer*								_loop_timer;
 	si::Time							_loop_period;
+	Timer								_loop_timer;
 	std::optional<nu::Timestamp>		_previous_timestamp;
 	std::vector<Module*>				_uninitialized_modules;
 	std::optional<Cycle>				_current_cycle;

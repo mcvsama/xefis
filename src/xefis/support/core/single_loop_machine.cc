@@ -33,11 +33,10 @@ SingleLoopMachine::SingleLoopMachine (Xefis& xefis, nu::Logger const& logger, si
 void
 SingleLoopMachine::initialize()
 {
-	if (!_initialized)
+	if (!std::exchange (_initialized, true))
 	{
 		connect_modules();
 		register_processing_loop (_loop);
-		_initialized = true;
 	}
 }
 

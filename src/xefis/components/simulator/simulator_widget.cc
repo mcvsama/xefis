@@ -137,27 +137,11 @@ SimulatorWidget::make_simulation_controls()
 			start_stop_sim_button->setIcon (icon);
 		}
 	};
-	auto const update_processing_loops = [this] {
-		if (_machine)
-		{
-			if (_rigid_body_viewer->playback() == RigidBodyViewer::Playback::Running)
-			{
-				for (auto loop: _machine->processing_loops())
-					loop->start();
-			}
-			else
-			{
-				for (auto loop: _machine->processing_loops())
-					loop->stop();
-			}
-		}
-	};
-	QObject::connect (start_stop_sim_button, &QPushButton::pressed, [this, update_start_stop_icon, update_processing_loops] {
+	QObject::connect (start_stop_sim_button, &QPushButton::pressed, [this, update_start_stop_icon] {
 		if (_rigid_body_viewer)
 			_rigid_body_viewer->toggle_pause();
 
 		update_start_stop_icon();
-		update_processing_loops();
 	});
 	update_start_stop_icon();
 
@@ -167,8 +151,6 @@ SimulatorWidget::make_simulation_controls()
 			_rigid_body_viewer->step();
 
 		update_start_stop_icon();
-		// TODO handle single cycles in the Processing loop; calculate how many cycles are needed; compare ProcessingLoop::period() with RigidBody simulation
-		// period.
 	});
 
 	auto* speed_label = new QLabel ("–");

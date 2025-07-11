@@ -42,6 +42,13 @@ class Simulator: public nu::Noncopyable
 	Simulator (rigid_body::System&, rigid_body::ImpulseSolver&, si::Time initial_simulation_time, si::Time frame_duration, nu::Logger const&);
 
 	/**
+	 * Set additional evolution callback.
+	 */
+	void
+	set_additional_evolution_callback (Evolver::Evolve const evolve)
+		{ _additional_evolve = evolve; }
+
+	/**
 	 * Return current simulation frame Δt.
 	 */
 	[[nodiscard]]
@@ -106,10 +113,11 @@ class Simulator: public nu::Noncopyable
 		{ return _evolver->performance(); }
 
   private:
-	nu::Logger						_logger;
-	rigid_body::System&				_rigid_body_system;
-	rigid_body::ImpulseSolver&		_rigid_body_solver;
-	std::optional<xf::Evolver>		_evolver;
+	nu::Logger					_logger;
+	rigid_body::System&			_rigid_body_system;
+	rigid_body::ImpulseSolver&	_rigid_body_solver;
+	std::optional<Evolver>		_evolver;
+	Evolver::Evolve				_additional_evolve;
 };
 
 } // namespace xf

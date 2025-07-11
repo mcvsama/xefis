@@ -33,27 +33,69 @@
 
 namespace xf {
 
+ProcessingLoop::InternalTimer::InternalTimer (ProcessingLoop& loop)
+{
+	timer.setSingleShot (false);
+	timer.setTimerType (Qt::PreciseTimer);
+	timer.setInterval (loop.period().in<si::Millisecond>());
+	QObject::connect (&timer, &QTimer::timeout, [&loop] {
+		loop.execute_cycle (nu::TimeHelper::utc_now());
+	});
+}
+
+
 ProcessingLoop::ProcessingLoop (std::string_view const instance, si::Frequency loop_frequency, nu::Logger const& logger):
 	Module (instance),
 	_loop_period (1.0 / loop_frequency),
 	_logger (logger)
 {
-	_loop_timer = new QTimer (this);
-	_loop_timer->setSingleShot (false);
-	_loop_timer->setTimerType (Qt::PreciseTimer);
-	_loop_timer->setInterval (_loop_period.in<si::Millisecond>());
-	QObject::connect (_loop_timer, &QTimer::timeout, this, [this] {
-		execute_cycle (nu::TimeHelper::utc_now());
-	});
-
 	_logger.set_logger_tag_provider (*this);
-
 	register_module (*this);
 }
 
 
 void
 ProcessingLoop::start()
+{
+	init_uninitialized_modules();
+	switch_to_internal_timer().timer.start();
+}
+
+
+void
+ProcessingLoop::stop()
+{
+	if (auto* int_timer = std::get_if<InternalTimer> (&_loop_timer))
+		int_timer->timer.stop();
+}
+
+
+void
+ProcessingLoop::advance (si::Time const duration)
+{
+	init_uninitialized_modules();
+
+	auto& ext_timer = switch_to_external_timer();
+	ext_timer.integrated_time += duration;
+
+	while (ext_timer.integrated_time > _loop_period)
+	{
+		ext_timer.current_time += _loop_period;
+		execute_cycle (ext_timer.current_time);
+		ext_timer.integrated_time -= _loop_period;
+	}
+}
+
+
+void
+ProcessingLoop::set_external_timer_time (si::Time const time)
+{
+	switch_to_external_timer().current_time = time;
+}
+
+
+void
+ProcessingLoop::init_uninitialized_modules()
 {
 	for (auto* module: _uninitialized_modules)
 		Module::ModuleSocketAPI (*module).verify_settings();
@@ -62,14 +104,26 @@ ProcessingLoop::start()
 		module->initialize();
 
 	_uninitialized_modules.clear();
-	_loop_timer->start();
 }
 
 
-void
-ProcessingLoop::stop()
+ProcessingLoop::InternalTimer&
+ProcessingLoop::switch_to_internal_timer()
 {
-	_loop_timer->stop();
+	if (auto* int_timer = std::get_if<InternalTimer> (&_loop_timer))
+		return *int_timer;
+	else
+		return _loop_timer.emplace<InternalTimer> (*this);
+}
+
+
+ProcessingLoop::ExternalTimer&
+ProcessingLoop::switch_to_external_timer (si::Time const current_time)
+{
+	if (auto* ext_timer = std::get_if<ExternalTimer> (&_loop_timer))
+		return *ext_timer;
+	else
+		return _loop_timer.emplace<ExternalTimer> (current_time, 0_s);
 }
 
 

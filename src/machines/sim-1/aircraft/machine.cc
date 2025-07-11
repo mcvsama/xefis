@@ -31,8 +31,8 @@ Machine::Machine (xf::Xefis& xefis, si::LonLatRadius<> const location):
 	_aircraft (_simulation.aircraft())
 {
 	initialize();
-	// Not starting the machine, since we're in a simulation. The simulator widget will
-	// start/stop the loop when user presses appropriate start/pause button.
+	// Not starting the machine, since we're in a simulation. The simulator will
+	// manage the loop's time using `ProcessingLoop::advance (si::Time)`.
 }
 
 
