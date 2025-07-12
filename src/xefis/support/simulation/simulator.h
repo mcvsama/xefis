@@ -31,6 +31,9 @@
 
 namespace xf {
 
+class Machine;
+
+
 /**
  * Rigid body + electrical simulator.
  */
@@ -91,6 +94,14 @@ class Simulator: public nu::Noncopyable
 		{ return _rigid_body_system; }
 
 	/**
+	 * Set Machine to manage (start/stop and step along with the simulation).
+	 * Can be nullptr to disable machine managing.
+	 */
+	void
+	set_managed_machine (Machine* machine)
+		{ _machine = machine; }
+
+	/**
 	 * Evolve the rigid body system by given Δt. Multiple evolve() calls will be made on the System.
 	 */
 	void
@@ -118,6 +129,7 @@ class Simulator: public nu::Noncopyable
 	rigid_body::ImpulseSolver&	_rigid_body_solver;
 	std::optional<Evolver>		_evolver;
 	Evolver::Evolve				_additional_evolve;
+	Machine*					_machine { nullptr };
 };
 
 } // namespace xf

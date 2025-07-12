@@ -55,11 +55,7 @@ Simulation::Simulation (Machine& machine, Models& models, si::LonLatRadius<> con
 	});
 
 	auto& simulator = _simulator.emplace (_rigid_body_system, _rigid_body_solver, nu::TimeHelper::utc_now(), 1_ms, _logger.with_context ("Simulator"));
-	// We use external-time control of processing loops, since the simulation can be paused and stepped:
-	simulator.set_additional_evolution_callback ([&machine] (si::Time const frame_duration) {
-		for (auto loop: machine.processing_loops())
-			loop->advance (frame_duration);
-	});
+	_simulator->set_managed_machine (&machine);
 
 	_simulator_widget.emplace (simulator, nullptr);
 	_simulator_widget->set_machine (&machine);
