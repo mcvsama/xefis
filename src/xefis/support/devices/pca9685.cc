@@ -20,7 +20,7 @@
 // Neutrino:
 #include <neutrino/numeric.h>
 #include <neutrino/qt/qdom.h>
-#include <neutrino/time_helper.h>
+#include <neutrino/time.h>
 #include <neutrino/stdexcept.h>
 
 // Qt:

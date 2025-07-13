@@ -27,7 +27,7 @@
 
 // Neutrino:
 #include <neutrino/math/math.h>
-#include <neutrino/time_helper.h>
+#include <neutrino/time.h>
 
 // Standard:
 #include <cstddef>

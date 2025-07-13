@@ -22,7 +22,7 @@
 // Neutrino:
 #include <neutrino/test/auto_test.h>
 #include <neutrino/test/test_values.h>
-#include <neutrino/time_helper.h>
+#include <neutrino/time.h>
 
 // Standard:
 #include <cmath>

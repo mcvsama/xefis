@@ -20,7 +20,7 @@
 // Neutrino:
 #include <neutrino/qt/qfontmetrics.h>
 #include <neutrino/qt/qstring.h>
-#include <neutrino/time_helper.h>
+#include <neutrino/time.h>
 
 // Standard:
 #include <cstddef>

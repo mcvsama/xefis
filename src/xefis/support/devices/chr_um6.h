@@ -21,7 +21,7 @@
 // Neutrino:
 #include <neutrino/bus/serial_port.h>
 #include <neutrino/logger.h>
-#include <neutrino/time_helper.h>
+#include <neutrino/time.h>
 
 // Standard:
 #include <cstddef>

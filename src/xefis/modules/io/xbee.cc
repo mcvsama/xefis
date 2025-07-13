@@ -22,7 +22,7 @@
 #include <neutrino/bus/serial_port.h>
 #include <neutrino/qt/qdom.h>
 #include <neutrino/string.h>
-#include <neutrino/time_helper.h>
+#include <neutrino/time.h>
 
 // Qt:
 #include <QtCore/QTimer>

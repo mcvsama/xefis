@@ -22,7 +22,7 @@
 // Neutrino:
 #include <neutrino/bus/serial_port.h>
 #include <neutrino/stdexcept.h>
-#include <neutrino/time_helper.h>
+#include <neutrino/time.h>
 
 // Qt:
 #include <QTimer>

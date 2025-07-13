@@ -19,7 +19,7 @@
 #include <xefis/core/module.h>
 
 // Neutrino:
-#include <neutrino/time_helper.h>
+#include <neutrino/time.h>
 
 // Qt:
 #include <QPainter>

@@ -21,7 +21,7 @@
 #include <xefis/core/xefis.h>
 
 // Neutrino:
-#include <neutrino/time_helper.h>
+#include <neutrino/time.h>
 
 // Lib:
 #include <boost/circular_buffer.hpp>
