@@ -183,7 +183,7 @@ MasterTransceiver::Session::HandshakeRequested::HandshakeRequested (CryptoParams
 		.hmac_size = params.hmac_size,
 		.max_time_difference = params.max_time_difference,
 	}),
-	handshake_request (handshake_master.generate_handshake_blob (nu::TimeHelper::utc_now()))
+	handshake_request (handshake_master.generate_handshake_blob (nu::utc_now()))
 { }
 
 
@@ -382,7 +382,7 @@ SlaveTransceiver::Session::Session (Blob const& handshake_request,
 		.hmac_size = params.hmac_size,
 		.max_time_difference = params.max_time_difference,
 	}, key_check_callbacks);
-	auto const response_and_key = handshake_slave.generate_handshake_blob_and_key (handshake_request, nu::TimeHelper::utc_now());
+	auto const response_and_key = handshake_slave.generate_handshake_blob_and_key (handshake_request, nu::utc_now());
 	_handshake_response = response_and_key.handshake_response;
 	_transmitter.emplace (transceiver_rnd, Transmitter::Params {
 		.ephemeral_session_key = *response_and_key.ephemeral_key,

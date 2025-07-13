@@ -199,7 +199,7 @@ class ProcessingLoop:
 	 * Switches to external timer.
 	 */
 	ExternalTimer&
-	switch_to_external_timer (si::Time current_time = nu::TimeHelper::utc_now());
+	switch_to_external_timer (si::Time current_time = nu::utc_now());
 
 	/**
 	 * Execute single loop cycle assuming that the current time is

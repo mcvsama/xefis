@@ -305,10 +305,10 @@ Screen::update_instruments()
 				details->previous_size = details->computed_position->size();
 
 				auto task = instrument.paint (std::move (paint_request));
-				auto request_time = nu::TimeHelper::utc_now();
+				auto request_time = nu::utc_now();
 				auto measured_task = [t = std::move (task), request_time]() mutable noexcept {
-					auto const start_time = nu::TimeHelper::utc_now();
-					auto const painting_time = nu::TimeHelper::measure (t);
+					auto const start_time = nu::utc_now();
+					auto const painting_time = nu::measure_time (t);
 
 					return PaintPerformanceMetrics {
 						start_time - request_time,

@@ -54,7 +54,7 @@ Simulation::Simulation (Machine& machine, Models& models, si::LonLatRadius<> con
 		.max_angular_velocity	= 1e6_radps,
 	});
 
-	auto& simulator = _simulator.emplace (_rigid_body_system, _rigid_body_solver, nu::TimeHelper::utc_now(), 1_ms, _logger.with_context ("Simulator"));
+	auto& simulator = _simulator.emplace (_rigid_body_system, _rigid_body_solver, nu::utc_now(), 1_ms, _logger.with_context ("Simulator"));
 	_simulator->set_managed_machine (&machine);
 
 	_simulator_widget.emplace (simulator, nullptr);

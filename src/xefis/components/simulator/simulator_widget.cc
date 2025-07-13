@@ -295,7 +295,7 @@ SimulatorWidget::make_solar_time_controls (PaintHelper const& ph)
 
 	auto* set_to_system_time = new QPushButton ("Set to system time");
 	QObject::connect (set_to_system_time, &QPushButton::clicked, [this] {
-		_solar_simulation_time_delta = nu::TimeHelper::utc_now() - _simulator.simulation_time();
+		_solar_simulation_time_delta = nu::utc_now() - _simulator.simulation_time();
 		update_solar_time_widgets();
 	});
 

@@ -55,8 +55,8 @@ nu::AutoTest t1 ("Xefis Lossy Encryption/Handshake: correct handshake", []{
 	HandshakeMaster master (rnd, params);
 	HandshakeSlave slave (rnd, params, {});
 
-	Blob const master_handshake = master.generate_handshake_blob (nu::TimeHelper::utc_now());
-	auto const slave_handshake_and_key = slave.generate_handshake_blob_and_key (master_handshake, nu::TimeHelper::utc_now());
+	Blob const master_handshake = master.generate_handshake_blob (nu::utc_now());
+	auto const slave_handshake_and_key = slave.generate_handshake_blob_and_key (master_handshake, nu::utc_now());
 	Blob const master_key = master.compute_key (*slave_handshake_and_key.handshake_response);
 	Blob const slave_key = *slave_handshake_and_key.ephemeral_key;
 
@@ -65,7 +65,7 @@ nu::AutoTest t1 ("Xefis Lossy Encryption/Handshake: correct handshake", []{
 
 
 nu::AutoTest t2 ("Xefis Lossy Encryption/Handshake: handshake with wrong signature", []{
-	si::Time const now = nu::TimeHelper::utc_now();
+	si::Time const now = nu::utc_now();
 	auto rnd = std::random_device ("hw");
 
 	{
@@ -127,7 +127,7 @@ nu::AutoTest t2 ("Xefis Lossy Encryption/Handshake: handshake with wrong signatu
 
 
 nu::AutoTest t3 ("Xefis Lossy Encryption/Handshake: reusing handshake ID", []{
-	auto const now = nu::TimeHelper::utc_now();
+	auto const now = nu::utc_now();
 	auto rnd = std::random_device ("hw");
 	auto used_handshake_ids = std::set<HandshakeID>();
 	HandshakeMaster master (rnd, params);
@@ -162,7 +162,7 @@ nu::AutoTest t4 ("Xefis Lossy Encryption/Handshake: wrong timestamp on master si
 	HandshakeMaster master (rnd, params);
 	HandshakeSlave slave (rnd, params, {});
 
-	si::Time const now = nu::TimeHelper::utc_now();
+	si::Time const now = nu::utc_now();
 	Blob const master_handshake = master.generate_handshake_blob (now + 20_s);
 
 	bool thrown_delta_time_too_high = false;
@@ -185,7 +185,7 @@ nu::AutoTest t5 ("Xefis Lossy Encryption/Handshake: wrong timestamp on slave sid
 	HandshakeMaster master (rnd, params);
 	HandshakeSlave slave (rnd, params, {});
 
-	si::Time const now = nu::TimeHelper::utc_now();
+	si::Time const now = nu::utc_now();
 	Blob const master_handshake = master.generate_handshake_blob (now);
 	auto const slave_handshake_and_key = slave.generate_handshake_blob_and_key (master_handshake, now + 20_s);
 
@@ -205,7 +205,7 @@ nu::AutoTest t5 ("Xefis Lossy Encryption/Handshake: wrong timestamp on slave sid
 
 
 nu::AutoTest t6 ("Xefis Lossy Encryption/Handshake: mismatched handshake IDs", []{
-	auto const now = nu::TimeHelper::utc_now();
+	auto const now = nu::utc_now();
 	auto rnd = std::random_device ("hw");
 	auto used_handshake_ids = std::set<HandshakeID>();
 	HandshakeMaster master_1 (rnd, params);

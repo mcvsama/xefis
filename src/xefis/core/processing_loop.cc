@@ -39,7 +39,7 @@ ProcessingLoop::InternalTimer::InternalTimer (ProcessingLoop& loop)
 	timer.setTimerType (Qt::PreciseTimer);
 	timer.setInterval (loop.period().in<si::Millisecond>());
 	QObject::connect (&timer, &QTimer::timeout, [&loop] {
-		loop.execute_cycle (nu::TimeHelper::utc_now());
+		loop.execute_cycle (nu::utc_now());
 	});
 }
 
@@ -144,12 +144,12 @@ ProcessingLoop::execute_cycle (si::Time const now)
 	for (auto* module: _modules)
 		Module::ProcessingLoopAPI (*module).reset_cache();
 
-	_communication_times.push_back (nu::TimeHelper::measure ([this] {
+	_communication_times.push_back (nu::measure_time ([this] {
 		for (auto* module: _modules)
 			Module::ProcessingLoopAPI (*module).communicate (*_current_cycle);
 	}));
 
-	_processing_times.push_back (nu::TimeHelper::measure ([this] {
+	_processing_times.push_back (nu::measure_time ([this] {
 		for (auto* module: _modules)
 		{
 			Module::AccountingAPI (*module).set_cycle_time (period());

@@ -338,7 +338,7 @@ CHRUM6::process_packet (uint32_t address, bool failed, bool, uint32_t data)
 	if (_alive_check_callback)
 		_alive_check_callback();
 
-	si::Time const now = nu::TimeHelper::utc_now();
+	si::Time const now = nu::utc_now();
 
 	if (failed)
 	{

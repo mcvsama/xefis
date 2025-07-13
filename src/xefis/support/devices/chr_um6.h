@@ -682,7 +682,7 @@ CHRUM6::Request::duration() const noexcept
 	if (finished())
 		return data()->finish_timestamp - data()->start_timestamp;
 	else
-		return nu::TimeHelper::utc_now() - data()->start_timestamp;
+		return nu::utc_now() - data()->start_timestamp;
 }
 
 
