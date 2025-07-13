@@ -29,8 +29,6 @@
 
 namespace sim1::aircraft {
 
-class Models;
-
 class SimulatedAircraft
 {
   public:
