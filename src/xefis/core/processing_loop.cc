@@ -152,7 +152,7 @@ ProcessingLoop::execute_cycle (si::Time const now)
 	_processing_times.push_back (nu::measure_time ([this] {
 		for (auto* module: _modules)
 		{
-			Module::AccountingAPI (*module).set_cycle_time (period());
+			Module::AccountingAPI (*module).set_processing_loop_period (period());
 			Module::ProcessingLoopAPI (*module).fetch_and_process (*_current_cycle);
 		}
 	}));

@@ -62,8 +62,6 @@ ScreenWidget::ScreenWidget (Screen& screen, QWidget* parent):
 void
 ScreenWidget::refresh()
 {
-	using Milliseconds = si::Quantity<si::Millisecond>;
-
 	// TODO show total time spent on rendering instruments synchronously
 	// TODO show total time spent on rendering information asynchronous
 
@@ -77,8 +75,8 @@ ScreenWidget::refresh()
 			{
 				if (!samples.empty())
 				{
-					auto const [range, grid_lines] = nu::get_max_for_axis<Milliseconds> (*std::max_element (samples.begin(), samples.end()));
-					auto const histogram = math::Histogram<Milliseconds> (samples.begin(), samples.end(), range / 100, 0.0_ms, range);
+					auto const [range, grid_lines] = nu::get_max_for_axis<si::Time> (*std::max_element (samples.begin(), samples.end()));
+					auto const histogram = math::Histogram<si::Time> (samples.begin(), samples.end(), range / 100, 0.0_ms, range);
 
 					histogram_widget.set_data (histogram);
 					histogram_widget.set_grid_lines (grid_lines);

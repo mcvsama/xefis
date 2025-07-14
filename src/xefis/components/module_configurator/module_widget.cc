@@ -86,8 +86,6 @@ ModuleWidget::ModuleWidget (Module& module, QWidget* parent):
 void
 ModuleWidget::refresh()
 {
-	using Milliseconds = si::Quantity<si::Millisecond>;
-
 	auto const processing_loop_api = Module::ProcessingLoopAPI (_module);
 	auto const accounting_api = Module::AccountingAPI (_module);
 
@@ -99,12 +97,12 @@ ModuleWidget::refresh()
 
 		if (!samples.empty())
 		{
-			auto const [range, grid_lines] = nu::get_max_for_axis<Milliseconds> (*std::max_element (samples.begin(), samples.end()));
-			auto const histogram = math::Histogram<Milliseconds> (samples.begin(), samples.end(), range / 100, 0.0_ms, range);
+			auto const [range, grid_lines] = nu::get_max_for_axis<si::Time> (*std::max_element (samples.begin(), samples.end()));
+			auto const histogram = math::Histogram<si::Time> (samples.begin(), samples.end(), range / 100, 0.0_ms, range);
 
-			_communication_time_histogram->set_data (histogram, { accounting_api.cycle_time() });
+			_communication_time_histogram->set_data (histogram, { accounting_api.processing_loop_period() });
 			_communication_time_histogram->set_grid_lines (grid_lines);
-			_communication_time_stats->set_data (histogram, std::make_optional<Milliseconds> (accounting_api.cycle_time()));
+			_communication_time_stats->set_data (histogram, std::make_optional<si::Time> (accounting_api.processing_loop_period()));
 		}
 	}
 
@@ -116,12 +114,12 @@ ModuleWidget::refresh()
 
 		if (!samples.empty())
 		{
-			auto const [range, grid_lines] = nu::get_max_for_axis<Milliseconds> (*std::max_element (samples.begin(), samples.end()));
-			auto const histogram = math::Histogram<Milliseconds> (samples.begin(), samples.end(), range / 100, 0.0_ms, range);
+			auto const [range, grid_lines] = nu::get_max_for_axis<si::Time> (*std::max_element (samples.begin(), samples.end()));
+			auto const histogram = math::Histogram<si::Time> (samples.begin(), samples.end(), range / 100, 0.0_ms, range);
 
-			_processing_time_histogram->set_data (histogram, { accounting_api.cycle_time() });
+			_processing_time_histogram->set_data (histogram, { accounting_api.processing_loop_period() });
 			_processing_time_histogram->set_grid_lines (grid_lines);
-			_processing_time_stats->set_data (histogram, std::make_optional<Milliseconds> (accounting_api.cycle_time()));
+			_processing_time_stats->set_data (histogram, std::make_optional<si::Time> (accounting_api.processing_loop_period()));
 		}
 	}
 
@@ -129,12 +127,12 @@ ModuleWidget::refresh()
 	{
 		auto const accounting_api = Instrument::AccountingAPI (*_instrument);
 		auto const& samples = accounting_api.painting_times();
-		auto const [range, grid_lines] = nu::get_max_for_axis<Milliseconds> (*std::max_element (samples.begin(), samples.end()));
-		auto const histogram = math::Histogram<Milliseconds> (samples.begin(), samples.end(), range / 100, 0.0_ms, range);
+		auto const [range, grid_lines] = nu::get_max_for_axis<si::Time> (*std::max_element (samples.begin(), samples.end()));
+		auto const histogram = math::Histogram<si::Time> (samples.begin(), samples.end(), range / 100, 0.0_ms, range);
 
 		_painting_time_histogram->set_data (histogram, { accounting_api.frame_time() });
 		_painting_time_histogram->set_grid_lines (grid_lines);
-		_painting_time_stats->set_data (histogram, std::make_optional<Milliseconds> (accounting_api.frame_time()));
+		_painting_time_stats->set_data (histogram, std::make_optional<si::Time> (accounting_api.frame_time()));
 	}
 }
 

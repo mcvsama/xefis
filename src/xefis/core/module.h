@@ -232,13 +232,13 @@ class Module:
 		 */
 		[[nodiscard]]
 		si::Time
-		cycle_time() const noexcept;
+		processing_loop_period() const noexcept;
 
 		/**
-		 * Set cycle time of he ProcessingLoop that this module is being processed in.
+		 * Set cycle time of the ProcessingLoop that this module is being processed in.
 		 */
 		void
-		set_cycle_time (si::Time);
+		set_processing_loop_period (si::Time);
 
 		/**
 		 * Add new measured communication time (time spent in the communicate() method).
@@ -367,7 +367,7 @@ class Module:
 	bool								_set_nil_on_exception: 1	{ true };
 	boost::circular_buffer<si::Time>	_communication_times		{ kMaxProcessingTimesBackLog };
 	boost::circular_buffer<si::Time>	_processing_times			{ kMaxProcessingTimesBackLog };
-	si::Time							_cycle_time					{ 0_s };
+	si::Time							_processing_loop_period		{ 0_s };
 };
 
 
@@ -405,16 +405,16 @@ Module::AccountingAPI::AccountingAPI (Module& module):
 
 
 inline si::Time
-Module::AccountingAPI::cycle_time() const noexcept
+Module::AccountingAPI::processing_loop_period() const noexcept
 {
-	return _module._cycle_time;
+	return _module._processing_loop_period;
 }
 
 
 inline void
-Module::AccountingAPI::set_cycle_time (si::Time cycle_time)
+Module::AccountingAPI::set_processing_loop_period (si::Time const period)
 {
-	_module._cycle_time = cycle_time;
+	_module._processing_loop_period = period;
 }
 
 
