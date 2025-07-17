@@ -27,6 +27,7 @@
 // Standard:
 #include <cstddef>
 #include <optional>
+#include <vector>
 
 
 namespace xf {
@@ -98,8 +99,8 @@ class Simulator: public nu::Noncopyable
 	 * Can be nullptr to disable machine managing.
 	 */
 	void
-	set_managed_machine (Machine* machine)
-		{ _machine = machine; }
+	add_managed_machine (Machine& machine)
+		{ _machines.push_back (&machine); }
 
 	/**
 	 * Evolve the rigid body system by given Δt. Multiple evolve() calls will be made on the System.
@@ -129,7 +130,7 @@ class Simulator: public nu::Noncopyable
 	rigid_body::ImpulseSolver&	_rigid_body_solver;
 	std::optional<Evolver>		_evolver;
 	Evolver::Evolve				_additional_evolve;
-	Machine*					_machine { nullptr };
+	std::vector<Machine*>		_machines;
 };
 
 } // namespace xf

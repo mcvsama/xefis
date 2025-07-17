@@ -102,6 +102,12 @@ class Machine: private nu::Noncopyable
 		{ _screens.push_back (&screen); }
 
 	/**
+	 * Advance machine's processing loops.
+	 */
+	void
+	advance_loops (si::Time);
+
+	/**
 	 * Show configurator widget.
 	 */
 	void

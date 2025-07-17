@@ -34,6 +34,14 @@ Machine::~Machine()
 
 
 void
+Machine::advance_loops (si::Time const dt)
+{
+	for (auto* loop: _processing_loops)
+		loop->advance (dt);
+}
+
+
+void
 Machine::show_configurator()
 {
 	if (!_configurator_widget)
