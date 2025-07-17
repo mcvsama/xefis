@@ -37,6 +37,7 @@
 
 namespace xf {
 
+// Forwarded for convenience:
 class Machine;
 class Xefis;
 
