@@ -90,6 +90,7 @@ MIHAU.modules[xefis].products[xefis].sources				+= xefis/core/sockets/module_soc
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/core/sockets/socket.h
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/core/sockets/socket_converter.h
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/core/sockets/socket_traits.h
+MIHAU.modules[xefis].products[xefis].sources				+= xefis/core/clock.h
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/core/cycle.h
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/core/executable.h
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/core/graphics.cc
