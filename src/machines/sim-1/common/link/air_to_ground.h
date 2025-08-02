@@ -79,4 +79,3 @@ class AirToGroundProtocol: public LinkProtocol
 } // namespace sim1
 
 #endif
-

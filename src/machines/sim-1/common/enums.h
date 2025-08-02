@@ -36,4 +36,3 @@ enum PilotControlsMode: uint8_t
 } // namespace sim1
 
 #endif
-

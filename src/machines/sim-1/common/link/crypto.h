@@ -40,4 +40,3 @@ inline auto constinit kCryptoParams = xf::crypto::xle::Transceiver::CryptoParams
 } // namespace sim1
 
 #endif
-

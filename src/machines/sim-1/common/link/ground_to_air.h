@@ -93,4 +93,3 @@ class GroundToAirProtocol: public LinkProtocol
 } // namespace sim1
 
 #endif
-

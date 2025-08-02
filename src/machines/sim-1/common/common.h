@@ -28,4 +28,3 @@ namespace math = neutrino::math;
 } // namespace sim1
 
 #endif
-

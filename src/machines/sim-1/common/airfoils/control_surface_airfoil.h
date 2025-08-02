@@ -1064,4 +1064,3 @@ static auto const kCenterOfPressureOffsetField = math::Field<double, si::Angle, 
 };
 
 } // namespace sim1::control_surface_airfoil
-
