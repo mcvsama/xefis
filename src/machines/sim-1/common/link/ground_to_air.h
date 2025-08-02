@@ -48,9 +48,9 @@ template<template<class> class SocketType>
 class GroundToAirProtocol: public LinkProtocol
 {
   public:
-	template<class Data>
+	template<std::derived_from<xf::Module> IO>
 		explicit
-		GroundToAirProtocol (Data& data, xf::crypto::xle::Transceiver& transceiver):
+		GroundToAirProtocol (IO& data, xf::crypto::xle::Transceiver& transceiver):
 			LinkProtocol ({
 				// XLE handshake envelope:
 				envelope ({

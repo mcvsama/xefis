@@ -137,7 +137,7 @@ class GroundToAirLinkProtocol: public LinkProtocol
 {
   public:
 	// Ctor
-	template<class IO>
+	template<std::derived_from<Module> IO>
 		explicit
 		GroundToAirLinkProtocol (IO& io, xle::Transceiver* transceiver = nullptr):
 			LinkProtocol ({
@@ -234,7 +234,7 @@ class AirToGroundLinkProtocol: public LinkProtocol
 {
   public:
 	// Ctor
-	template<class IO>
+	template<std::derived_from<Module> IO>
 		explicit
 		AirToGroundLinkProtocol (IO& io, xle::Transceiver* transceiver = nullptr):
 			LinkProtocol ({

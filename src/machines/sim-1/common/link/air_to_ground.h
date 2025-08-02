@@ -39,9 +39,9 @@ template<template<class> class SocketType>
 class AirToGroundProtocol: public LinkProtocol
 {
   public:
-	template<class Data>
+	template<std::derived_from<xf::Module> IO>
 		explicit
-		AirToGroundProtocol (Data& data, xf::crypto::xle::Transceiver& transceiver):
+		AirToGroundProtocol (IO& data, xf::crypto::xle::Transceiver& transceiver):
 			LinkProtocol ({
 				// XLE handshake envelope:
 				envelope ({
