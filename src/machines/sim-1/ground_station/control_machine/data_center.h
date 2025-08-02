@@ -14,7 +14,7 @@
 #ifndef XEFIS__MACHINES__SIM_1__GROUND_STATION__CONTROL_MACHINE__DATA_CENTER_H__INCLUDED
 #define XEFIS__MACHINES__SIM_1__GROUND_STATION__CONTROL_MACHINE__DATA_CENTER_H__INCLUDED
 
-// Machine:
+// Sim-1:
 #include <machines/sim-1/common/common.h>
 #include <machines/sim-1/common/link/ground_to_air.h>
 

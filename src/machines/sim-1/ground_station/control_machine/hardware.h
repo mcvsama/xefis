@@ -14,7 +14,7 @@
 #ifndef XEFIS__MACHINES__SIM_1__GROUND_STATION__CONTROL_MACHINE__HARDWARE_H__INCLUDED
 #define XEFIS__MACHINES__SIM_1__GROUND_STATION__CONTROL_MACHINE__HARDWARE_H__INCLUDED
 
-// Machine:
+// Sim-1:
 #include <machines/sim-1/common/link/air_to_ground.h>
 #include <machines/sim-1/common/link/crypto.h>
 #include <machines/sim-1/common/link/ground_to_air.h>

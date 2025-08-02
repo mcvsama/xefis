@@ -20,7 +20,7 @@
 #include "hardware.h"
 #include "models.h"
 
-// Machine:
+// Sim-1:
 #include <machines/sim-1/common/common.h>
 
 // Xefis:
