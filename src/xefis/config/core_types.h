@@ -18,6 +18,7 @@
 #include <type_safe/integer.hpp>
 
 // Neutrino:
+#include <neutrino/blob.h>
 #include <neutrino/core_types.h>
 
 // Standard:
@@ -25,6 +26,9 @@
 
 
 namespace ts = type_safe;
+
+using neutrino::Blob;
+using neutrino::BlobView;
 
 #endif
 
