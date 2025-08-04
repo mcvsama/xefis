@@ -123,7 +123,7 @@ class LinkProtocol
 		failsafe() = 0;
 	};
 
-	using PacketList = std::initializer_list<std::shared_ptr<Packet>>;
+	using PacketList = std::vector<std::shared_ptr<Packet>>;
 
 	/**
 	 * A sequence of packets, that is also an packet. Simple.
@@ -494,7 +494,7 @@ class LinkProtocol
 		xf::crypto::xle::Transceiver*	_transceiver;
 	};
 
-	using EnvelopeList = std::initializer_list<std::shared_ptr<Envelope>>;
+	using EnvelopeList = std::vector<std::shared_ptr<Envelope>>;
 
   public:
 	// Ctor
