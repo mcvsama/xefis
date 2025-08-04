@@ -25,6 +25,8 @@
 // Standard:
 #include <cstddef>
 #include <ranges>
+#include <string>
+#include <string_view>
 #include <vector>
 
 
@@ -42,7 +44,7 @@ class Machine: private nu::Noncopyable
   public:
 	// Ctor
 	explicit
-	Machine (Xefis&);
+	Machine (Xefis&, std::u8string_view name = u8"");
 
 	/**
 	 * Dtor
@@ -58,6 +60,14 @@ class Machine: private nu::Noncopyable
 	Xefis&
 	xefis() const noexcept
 		{ return _xefis; }
+
+	/**
+	 * Return machine name.
+	 */
+	[[nodiscard]]
+	std::u8string_view
+	name() const
+		{ return _name; }
 
 	/**
 	 * A sequence of registered processing loops.
@@ -115,6 +125,7 @@ class Machine: private nu::Noncopyable
 
   private:
 	Xefis&								_xefis;
+	std::u8string						_name;
 	ProcessingLoops						_processing_loops;
 	Screens								_screens;
 	std::unique_ptr<ConfiguratorWidget>	_configurator_widget;

@@ -24,8 +24,9 @@
 
 namespace xf {
 
-Machine::Machine (Xefis& xefis):
-	_xefis (xefis)
+Machine::Machine (Xefis& xefis, std::u8string_view const name):
+	_xefis (xefis),
+	_name (name)
 { }
 
 
