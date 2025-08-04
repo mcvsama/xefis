@@ -149,7 +149,7 @@ class ProcessingLoop:
 	[[nodiscard]]
 	std::ranges::subrange<Modules::iterator>
 	modules() noexcept
-        { return { _modules.begin(), _modules.end() }; }
+		{ return _modules; }
 
 	/**
 	 * A sequence of modules loaded into this processing loop.
@@ -157,7 +157,7 @@ class ProcessingLoop:
 	[[nodiscard]]
 	std::ranges::subrange<Modules::const_iterator>
 	modules() const noexcept
-        { return { _modules.begin(), _modules.end() }; }
+		{ return _modules; }
 
 	/**
 	 * Processing times buffer.
