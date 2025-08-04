@@ -692,7 +692,7 @@ template<uint16_t B, class V>
 		_retained (params.retained)
 	{
 		_produce = [this] (Blob& blob) {
-			int64_t int_value = _socket
+			auto const int_value = _socket
 				? *_socket
 				: _value_if_nil;
 
