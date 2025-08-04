@@ -29,7 +29,7 @@ using namespace si::literals;
 class OutputLink: public xf::Module
 {
   public:
-	xf::ModuleOut<std::string>	link_output				{ this, "output" };
+	xf::ModuleOut<std::string> link_output { this, "output" };
 
   private:
 	static constexpr char kLoggerScope[] = "mod::OutputLink";
