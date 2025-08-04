@@ -75,7 +75,7 @@ class ProcessingLoop:
 	static constexpr std::size_t	kMaxProcessingTimesBackLog	= 1000;
 	static constexpr float			kLatencyFactorLogThreshold	= 2.0f;
 
-    using Modules = std::vector<Module*>;
+	using Modules = std::vector<Module*>;
 
   public:
 	// Ctor
@@ -98,8 +98,8 @@ class ProcessingLoop:
 	 * Register a module in the processing loop. The module must be destroyed
 	 * before loop is destroyed.
 	 */
-    void
-    register_module (Module&);
+	void
+	register_module (Module&);
 
 	/**
 	 * Start looping using the internal timer.
@@ -147,7 +147,7 @@ class ProcessingLoop:
 	 * A sequence of modules loaded into this processing loop.
 	 */
 	[[nodiscard]]
-    std::ranges::subrange<Modules::iterator>
+	std::ranges::subrange<Modules::iterator>
 	modules() noexcept
         { return { _modules.begin(), _modules.end() }; }
 
@@ -219,7 +219,7 @@ class ProcessingLoop:
 	std::optional<nu::Timestamp>		_previous_timestamp;
 	std::vector<Module*>				_uninitialized_modules;
 	std::optional<Cycle>				_current_cycle;
-	Modules                             _modules;
+	Modules								_modules;
 	boost::circular_buffer<si::Time>	_communication_times	{ kMaxProcessingTimesBackLog };
 	boost::circular_buffer<si::Time>	_processing_times		{ kMaxProcessingTimesBackLog };
 	boost::circular_buffer<si::Time>	_processing_latencies	{ kMaxProcessingTimesBackLog };
@@ -231,8 +231,8 @@ class ProcessingLoop:
 inline void
 ProcessingLoop::register_module (Module& module)
 {
-    _modules.push_back (&module);
-    _uninitialized_modules.push_back (&module);
+	_modules.push_back (&module);
+	_uninitialized_modules.push_back (&module);
 }
 
 
