@@ -410,11 +410,11 @@ class LinkProtocol
 	  public:
 		struct Params
 		{
-			std::string		name;
-			uint8_t			nonce_bytes;
-			uint8_t			signature_bytes;
-			Blob			key;
-			PacketList&&	packets;
+			std::string_view	name;
+			uint8_t				nonce_bytes;
+			uint8_t				signature_bytes;
+			Blob				key;
+			PacketList			packets;
 		};
 
 	  public:
@@ -450,7 +450,7 @@ class LinkProtocol
 		struct Params
 		{
 			// Name used to identify envelope eg. in logs:
-			std::string						name;
+			std::string_view				name;
 			// Magic is a unique envelope identifier vector:
 			Blob							unique_prefix;
 			// Only send this envelope every Nth time:
