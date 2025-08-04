@@ -348,7 +348,7 @@ class LinkProtocol
 
 			static constexpr BoolParams make_default()
 			{
-				return { .retained = false, .value_if_nil = false };
+				return {};
 			}
 		};
 
