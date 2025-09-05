@@ -20,5 +20,25 @@
 #include <xefis/core/sockets/module_in.h>
 #include <xefis/core/sockets/module_out.h>
 
+// Neutrino:
+#include <neutrino/types.h>
+
+
+namespace xf {
+
+template<class Socket>
+	concept ModuleInOutConcept = neutrino::is_specialization_v<Socket, ModuleIn> || neutrino::is_specialization_v<Socket, ModuleOut>;
+
+template<template<class> class SocketTemplate>
+	concept ModuleInTemplateConcept = std::same_as<SocketTemplate<int>, ModuleIn<int>>;
+
+template<template<class> class SocketTemplate>
+	concept ModuleOutTemplateConcept = std::same_as<SocketTemplate<int>, ModuleOut<int>>;
+
+template<template<class> class SocketTemplate>
+	concept ModuleInOutTemplateConcept = ModuleInTemplateConcept<SocketTemplate> || ModuleOutTemplateConcept<SocketTemplate>;
+
+} // namespace xf
+
 #endif
 
