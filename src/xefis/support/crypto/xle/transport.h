@@ -43,6 +43,7 @@ class Transport
 
 	struct Params
 	{
+		// Some fields have default initializer so they're not required.
 		BlobView	ephemeral_session_key;
 		BlobView	authentication_secret		{ };
 		BlobView	data_encryption_secret		{ };
@@ -93,19 +94,20 @@ class Transport
 		{ return sizeof (SequenceNumber) + _hmac_size + kDataSaltSize; }
 
 	/**
-	 * Return data encryption key hash.
-	 */
-	Blob
-	data_encryption_key_hash() const
-		{ return nu::compute_hash<nu::Hash::SHA3_256> (*_data_encryption_key); }
-
-	/**
-	 * Return how much larger the resulting packet will be compared to plain text.
+	 * Return how much larger the resulting packet will be compared to plain text
+	 * given the HMAC size.
 	 */
 	[[nodiscard]]
 	static size_t
 	ciphertext_expansion (size_t hmac_size)
 		{ return sizeof (SequenceNumber) + hmac_size + kDataSaltSize; }
+
+	/**
+	 * Return data encryption key hash.
+	 */
+	Blob
+	data_encryption_key_hash() const
+		{ return nu::compute_hash<nu::Hash::SHA3_256> (*_data_encryption_key); }
 
   protected:
 	size_t				_hmac_size;
