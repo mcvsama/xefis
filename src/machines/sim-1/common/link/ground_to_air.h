@@ -16,6 +16,7 @@
 
 // Xefis:
 #include <xefis/core/module.h>
+#include <xefis/core/sockets/module_socket.h>
 #include <xefis/modules/comm/link/link_protocol.h>
 #include <xefis/modules/comm/xle_transceiver.h>
 
@@ -23,6 +24,7 @@
 namespace sim1 {
 
 template<template<class> class SocketType>
+	requires xf::ModuleInOutTemplateConcept<SocketType>
 	class GroundToAirData: public xf::Module
 	{
 	  public:
