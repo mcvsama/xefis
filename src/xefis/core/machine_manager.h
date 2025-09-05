@@ -16,6 +16,8 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/components/configurator/configurator_widget.h>
+#include <xefis/core/machine.h>
 #include <xefis/core/xefis.h>
 
 // Neutrino:
@@ -23,46 +25,99 @@
 
 // Standard:
 #include <cstddef>
+#include <concepts>
+#include <functional>
+#include <memory>
 
 
 namespace xf {
 
-/**
- * This object is created from the main executable.
- */
-class MachineManager: private nu::Noncopyable
+class Xefis;
+
+
+class BasicMachineManager: private nu::Noncopyable
 {
   public:
-	// Ctor
-	explicit
-	MachineManager (Xefis&);
-
 	// Dtor
 	virtual
-	~MachineManager() = default;
+	~BasicMachineManager() = default;
 
-	/**
-	 * Return main Xefis object.
-	 */
-	Xefis&
-	xefis() const noexcept
-		{ return _xefis; }
+	virtual void
+	restart() = 0;
 
-	/**
-	 * Return the managed machine.
-	 */
-	virtual Machine&
+	[[nodiscard]]
+	virtual Machine*
 	machine() = 0;
 
-  private:
-	Xefis& _xefis;
+	virtual void
+	kill() = 0;
 };
 
 
-inline
-MachineManager::MachineManager (Xefis& xefis):
-	_xefis (xefis)
-{ }
+/**
+ * Manages machine.
+ */
+template<std::derived_from<Machine> ConcreteMachine>
+	class MachineManager: public BasicMachineManager
+	{
+	  public:
+		using MakeMachineFunction = std::function<std::unique_ptr<ConcreteMachine>()>;
+
+	  public:
+		// Ctor
+		explicit
+		MachineManager():
+			MachineManager (std::in_place)
+		{ }
+
+		/**
+		 * Machine is not created until first restart() is called.
+		 */
+		explicit
+		MachineManager (MachineManager::MakeMachineFunction const make_machine):
+			_make_machine (make_machine)
+		{ }
+
+		/**
+		 * Machine is not created until first restart() is called.
+		 */
+		template<class ...Args>
+			explicit
+			MachineManager (std::in_place_t, Args&& ...args_for_machine):
+				_make_machine ([&args_for_machine...] mutable {
+					return std::make_unique<ConcreteMachine> (std::forward<Args> (args_for_machine)...);
+				})
+			{ }
+
+		// Dtor
+		virtual
+		~MachineManager() = default;
+
+		/**
+		 * Return the managed machine or nullptr if not running.
+		 */
+		[[nodiscard]]
+		ConcreteMachine*
+		machine() override
+			{ return _machine.get(); }
+
+		/**
+		 * Start or restart the machine.
+		 * Only available if Machine can be default-constructed.
+		 */
+		void
+		restart() override
+			{ _machine = _make_machine(); }
+
+		void
+		kill() override
+			{ _machine.reset(); }
+
+	  private:
+		// TODO into a single struct as they're coupled:
+		std::function<std::unique_ptr<ConcreteMachine>()>	_make_machine;
+		std::unique_ptr<ConcreteMachine>					_machine;
+	};
 
 } // namespace xf
 

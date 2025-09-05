@@ -23,8 +23,8 @@
 
 namespace xf {
 
-SingleLoopMachine::SingleLoopMachine (Xefis& xefis, nu::Logger const& logger, si::Frequency const loop_frequency):
-	xf::Machine (xefis),
+SingleLoopMachine::SingleLoopMachine (Xefis& xefis, nu::Logger const& logger, si::Frequency const loop_frequency, std::u8string_view const name):
+	xf::Machine (xefis, name),
 	_logger (logger),
 	_loop ("Main loop", loop_frequency, _logger.with_context ("main loop"))
 { }

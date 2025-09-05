@@ -133,6 +133,9 @@ ProcessingLoop::switch_to_external_timer (si::Time const current_time)
 void
 ProcessingLoop::execute_cycle (si::Time const now)
 {
+	if (_paused)
+		return;
+
 	if (!_previous_timestamp)
 		_previous_timestamp = now - _loop_period;
 

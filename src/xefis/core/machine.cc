@@ -55,5 +55,15 @@ Machine::show_configurator()
 	_configurator_widget->show();
 }
 
+
+void
+Machine::set_paused (bool paused)
+{
+	_paused = paused;
+
+	for (auto* loop: _processing_loops)
+		loop->set_paused (_paused);
+}
+
 } // namespace xf
 

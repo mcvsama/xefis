@@ -1,0 +1,19 @@
+include machines/sim-1/aircraft/Makefile.sources
+include machines/sim-1/aircraft/flight_computer_machine/Makefile.sources
+include machines/sim-1/aircraft/hardware_machine/Makefile.sources
+include machines/sim-1/aircraft/radio_machine/Makefile.sources
+include machines/sim-1/common/Makefile.sources
+
+XEFIS_MACHINES.sim-1/simulation.sources += $(MACHINE_sim_1_COMMON_FILES)
+XEFIS_MACHINES.sim-1/simulation.sources += aircraft/hardware_machine/virtual_hardware_modules.cc
+XEFIS_MACHINES.sim-1/simulation.sources += aircraft/hardware_machine/virtual_hardware_modules.h
+XEFIS_MACHINES.sim-1/simulation.sources += make_xefis_machine.cc
+XEFIS_MACHINES.sim-1/simulation.sources += simulated_aircraft.cc
+XEFIS_MACHINES.sim-1/simulation.sources += simulated_aircraft.h
+XEFIS_MACHINES.sim-1/simulation.sources += simulation_run.cc
+XEFIS_MACHINES.sim-1/simulation.sources += simulation_run.h
+XEFIS_MACHINES.sim-1/simulation.sources += simulator_machine.cc
+XEFIS_MACHINES.sim-1/simulation.sources += simulator_machine.h
+XEFIS_MACHINES.sim-1/simulation.sources += $(addprefix ../aircraft/flight_computer_machine/,$(MACHINE_sim_1_AIRCRAFT_FLIGHT_COMPUTER_MACHINE_FILES))
+XEFIS_MACHINES.sim-1/simulation.sources += $(addprefix ../aircraft/hardware_machine/,$(MACHINE_sim_1_AIRCRAFT_HARDWARE_MACHINE_FILES))
+XEFIS_MACHINES.sim-1/simulation.sources += $(addprefix ../aircraft/radio_machine/,$(MACHINE_sim_1_AIRCRAFT_RADIO_MACHINE_FILES))

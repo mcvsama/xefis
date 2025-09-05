@@ -16,6 +16,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/machine_manager.h>
 #include <xefis/support/simulation/rigid_body/system.h>
 #include <xefis/support/simulation/rigid_body/impulse_solver.h>
 #include <xefis/support/simulation/evolver.h>
@@ -43,7 +44,7 @@ class Machine;
 class Simulator: public nu::Noncopyable
 {
   public:
-	using MachinesVector = std::vector<Machine*>;
+	using MachineManagersVector = std::vector<BasicMachineManager*>;
 
   public:
 	// Ctor
@@ -104,22 +105,22 @@ class Simulator: public nu::Noncopyable
 	 * Can be nullptr to disable machine managing.
 	 */
 	void
-	add_managed_machine (Machine& machine)
-		{ _machines.push_back (&machine); }
+	add_machine_manager (BasicMachineManager& machine_manager)
+		{ _machine_managers.push_back (&machine_manager); }
 
 	/**
 	 * Return a subrange of managed machines.
 	 */
-	std::ranges::subrange<MachinesVector::iterator>
-	managed_machines() noexcept
-		{ return { _machines.begin(), _machines.end() }; }
+	std::ranges::subrange<MachineManagersVector::iterator>
+	machine_managers() noexcept
+		{ return { _machine_managers.begin(), _machine_managers.end() }; }
 
 	/**
 	 * Return a subrange of managed machines.
 	 */
-	std::ranges::subrange<MachinesVector::const_iterator>
-	managed_machines() const noexcept
-		{ return { _machines.begin(), _machines.end() }; }
+	std::ranges::subrange<MachineManagersVector::const_iterator>
+	machine_managers() const noexcept
+		{ return { _machine_managers.begin(), _machine_managers.end() }; }
 
 	/**
 	 * Evolve the rigid body system by given Δt. Multiple evolve() calls will be made on the System.
@@ -149,7 +150,7 @@ class Simulator: public nu::Noncopyable
 	rigid_body::ImpulseSolver&	_rigid_body_solver;
 	std::optional<Evolver>		_evolver;
 	Evolver::Evolve				_additional_evolve;
-	MachinesVector				_machines;
+	MachineManagersVector		_machine_managers;
 };
 
 } // namespace xf

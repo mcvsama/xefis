@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__MACHINES__SIM_1__AIRCRAFT__SIMULATED_AIRCRAFT_H__INCLUDED
-#define XEFIS__MACHINES__SIM_1__AIRCRAFT__SIMULATED_AIRCRAFT_H__INCLUDED
+#ifndef XEFIS__MACHINES__SIM_1__SIMULATION__SIMULATED_AIRCRAFT_H__INCLUDED
+#define XEFIS__MACHINES__SIM_1__SIMULATION__SIMULATED_AIRCRAFT_H__INCLUDED
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -27,7 +27,7 @@
 #include <cstddef>
 
 
-namespace sim1::aircraft {
+namespace sim1::simulation {
 
 class SimulatedAircraft
 {
@@ -55,7 +55,6 @@ class SimulatedAircraft
 SimulatedAircraft
 make_aircraft (xf::rigid_body::System& rigid_body_system, xf::Atmosphere& simulated_atmosphere);
 
-} // namespace sim1::aircraft
+} // namespace sim1::simulation
 
 #endif
-

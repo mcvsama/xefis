@@ -1,0 +1,6 @@
+XEFIS_MACHINES += sim-1/aircraft/flight_computer_machine
+XEFIS_MACHINES += sim-1/aircraft/hardware_machine
+XEFIS_MACHINES += sim-1/aircraft/radio_machine
+XEFIS_MACHINES += sim-1/ground_station/control_machine
+XEFIS_MACHINES += sim-1/simulation
+

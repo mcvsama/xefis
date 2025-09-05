@@ -36,8 +36,9 @@ Simulator::Simulator (rigid_body::System& rigid_body_system,
 	_evolver.emplace (initial_simulation_time, frame_duration, logger.with_context ("Evolver"), [this] (si::Time const dt) {
 		_rigid_body_solver.evolve (dt);
 
-		for (auto* machine: _machines)
-			machine->advance_loops (dt);
+		for (auto* machine_manager: _machine_managers)
+			if (auto* machine = machine_manager->machine())
+				machine->advance_loops (dt);
 
 		if (_additional_evolve)
 			_additional_evolve (dt);

@@ -25,7 +25,7 @@
 namespace sim1::ground_station::control_machine {
 
 Machine::Machine (xf::Xefis& xefis):
-	xf::SingleLoopMachine (xefis, xefis.logger(), 120_Hz)
+	xf::SingleLoopMachine (xefis, xefis.logger(), 120_Hz, u8"Ground station/Control machine")
 {
 	start();
 

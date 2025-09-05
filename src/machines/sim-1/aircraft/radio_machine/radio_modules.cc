@@ -1,6 +1,6 @@
 /* vim:ts=4
  *
- * Copyleft 2012  Michał Gawron
+ * Copyleft 2025  Michał Gawron
  * Marduk Unix Labs, http://mulabs.org/
  *
  * This program is free software: you can redistribute it and/or modify
@@ -12,7 +12,7 @@
  */
 
 // Local:
-#include "computers.h"
+#include "radio_modules.h"
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -23,13 +23,9 @@
 
 namespace sim1::aircraft {
 
-Computers::Computers (xf::ProcessingLoop& loop, nu::Logger const& logger):
-	_loop (loop),
-	_logger (logger)
-{
-	this->air_data_computer.ias_valid_minimum = 1_mps;
-	this->air_data_computer.ias_valid_maximum = 100_mps;
-}
+RadioModules::RadioModules (xf::ProcessingLoop& loop, nu::Logger const& logger):
+	_logger (logger),
+	_loop (loop)
+{ }
 
-} // namespace sim1::ground_station
-
+} // namespace sim1::aircraft

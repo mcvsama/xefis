@@ -12,11 +12,9 @@
  */
 
 // Local:
-#include "machine.h"
-#include "data_center.h"
-#include "simulation.h"
+#include "simulated_aircraft.h"
 
-// Machines:
+// Sim-1:
 #include <machines/sim-1/common/airfoils/control_surface_airfoil.h>
 
 // Xefis:
@@ -43,12 +41,14 @@
 #include <cstddef>
 
 
-namespace sim1::aircraft {
+namespace sim1::simulation {
 
 SimulatedAircraft
 make_aircraft (xf::rigid_body::System& rigid_body_system, xf::Atmosphere& simulated_atmosphere)
 {
+	namespace nu = neutrino;
 	namespace rb = xf::rigid_body;
+	using namespace nu::si::literals;
 	using xf::BodyCOM;
 	using xf::WorldSpace;
 
@@ -336,5 +336,4 @@ make_aircraft (xf::rigid_body::System& rigid_body_system, xf::Atmosphere& simula
 	};
 }
 
-} // namespace sim1::aircraft
-
+} // namespace sim1::simulation

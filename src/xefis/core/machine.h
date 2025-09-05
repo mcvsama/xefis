@@ -99,6 +99,8 @@ class Machine: private nu::Noncopyable
 
 	/**
 	 * Register a processing loop.
+	 * Registered loops' time will be advanced when advance_loop() is called.
+	 * They will also be accessible in the associated ConfiguratorWidget.
 	 */
 	void
 	register_processing_loop (ProcessingLoop& processing_loop)
@@ -106,6 +108,7 @@ class Machine: private nu::Noncopyable
 
 	/**
 	 * Register a screen.
+	 * It will be accessible in the associated ConfiguratorWidget.
 	 */
 	void
 	register_screen (Screen& screen)
@@ -123,12 +126,25 @@ class Machine: private nu::Noncopyable
 	void
 	show_configurator();
 
+	/**
+	 * Pause/unpause the machine.
+	 * This is forwarded to all machine's processing loops.
+	 */
+	void
+	set_paused (bool paused);
+
+	[[nodiscard]]
+	bool
+	paused() const noexcept
+		{ return _paused; }
+
   private:
 	Xefis&								_xefis;
 	std::u8string						_name;
 	ProcessingLoops						_processing_loops;
 	Screens								_screens;
 	std::unique_ptr<ConfiguratorWidget>	_configurator_widget;
+	bool								_paused { false };
 };
 
 } // namespace xf

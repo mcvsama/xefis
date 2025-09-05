@@ -121,6 +121,16 @@ class ProcessingLoop:
 	stop();
 
 	/**
+	 * Pause/unpause.
+	 * Paused loop doesn't execute cycles regardless if internal or external
+	 * timer is used.
+	 * Loop is unpaused by default.
+	 */
+	void
+	set_paused (bool paused)
+		{ _paused = paused; }
+
+	/**
 	 * Advances loop time by given amount and executes appropriate number of cycles.
 	 * If internal timer was used, it gets stopped and the loop is switched to use
 	 * external timer.
@@ -232,6 +242,7 @@ class ProcessingLoop:
 	boost::circular_buffer<si::Time>	_processing_latencies	{ kMaxProcessingTimesBackLog };
 	Cycle::Number						_next_cycle_number		{ 1 };
 	nu::Logger							_logger;
+	bool								_paused					{ false };
 };
 
 

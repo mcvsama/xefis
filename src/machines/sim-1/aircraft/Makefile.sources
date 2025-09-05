@@ -1,18 +1,4 @@
-include machines/sim-1/common/Makefile.sources
-
-XEFIS_MACHINES.sim-1/aircraft.sources += $(MACHINE_sim_1_COMMON_FILES)
-XEFIS_MACHINES.sim-1/aircraft.sources += computers.cc
-XEFIS_MACHINES.sim-1/aircraft.sources += computers.h
-XEFIS_MACHINES.sim-1/aircraft.sources += data_center.h
-XEFIS_MACHINES.sim-1/aircraft.sources += hardware.cc
-XEFIS_MACHINES.sim-1/aircraft.sources += hardware.h
-XEFIS_MACHINES.sim-1/aircraft.sources += machine.cc
-XEFIS_MACHINES.sim-1/aircraft.sources += machine.h
-XEFIS_MACHINES.sim-1/aircraft.sources += machine_manager.cc
-XEFIS_MACHINES.sim-1/aircraft.sources += machine_manager.h
-XEFIS_MACHINES.sim-1/aircraft.sources += models.h
-XEFIS_MACHINES.sim-1/aircraft.sources += simulated_aircraft.cc
-XEFIS_MACHINES.sim-1/aircraft.sources += simulated_aircraft.h
-XEFIS_MACHINES.sim-1/aircraft.sources += simulation.cc
-XEFIS_MACHINES.sim-1/aircraft.sources += simulation.h
-
+include machines/sim-1/aircraft/common/Makefile.sources
+include machines/sim-1/aircraft/flight_computer_machine/Makefile.sources
+include machines/sim-1/aircraft/hardware_machine/Makefile.sources
+include machines/sim-1/aircraft/radio_machine/Makefile.sources

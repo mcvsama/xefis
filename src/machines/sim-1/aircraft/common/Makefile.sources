@@ -1,0 +1,3 @@
+MACHINE_sim_1_AIRCRAFT_COMMON_FILES += ../common/link/addresses.h
+MACHINE_sim_1_AIRCRAFT_COMMON_FILES += ../common/link/flight_computer_to_hardware_data.h
+MACHINE_sim_1_AIRCRAFT_COMMON_FILES += ../common/link/hardware_to_flight_computer_data.h

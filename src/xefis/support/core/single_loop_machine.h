@@ -33,7 +33,7 @@ class SingleLoopMachine: public xf::Machine
   public:
 	// Ctor
 	explicit
-	SingleLoopMachine (xf::Xefis&, nu::Logger const&, si::Frequency loop_frequency);
+	SingleLoopMachine (xf::Xefis&, nu::Logger const&, si::Frequency loop_frequency, std::u8string_view name = u8"");
 
   protected:
 	[[nodiscard]]

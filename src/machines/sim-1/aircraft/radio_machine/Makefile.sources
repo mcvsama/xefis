@@ -1,0 +1,11 @@
+include machines/sim-1/aircraft/common/Makefile.sources
+include machines/sim-1/common/Makefile.sources
+
+MACHINE_sim_1_AIRCRAFT_RADIO_MACHINE_FILES += radio_machine.cc
+MACHINE_sim_1_AIRCRAFT_RADIO_MACHINE_FILES += radio_machine.h
+MACHINE_sim_1_AIRCRAFT_RADIO_MACHINE_FILES += radio_modules.cc
+MACHINE_sim_1_AIRCRAFT_RADIO_MACHINE_FILES += radio_modules.h
+
+XEFIS_MACHINES.sim-1/aircraft/radio_machine.sources += $(MACHINE_sim_1_AIRCRAFT_COMMON_FILES)
+XEFIS_MACHINES.sim-1/aircraft/radio_machine.sources += $(MACHINE_sim_1_COMMON_FILES)
+XEFIS_MACHINES.sim-1/aircraft/radio_machine.sources += $(MACHINE_sim_1_AIRCRAFT_RADIO_MACHINE_FILES)

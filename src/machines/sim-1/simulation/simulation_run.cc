@@ -12,10 +12,7 @@
  */
 
 // Local:
-#include "machine.h"
-#include "data_center.h"
-#include "models.h"
-#include "simulation.h"
+#include "simulation_run.h"
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -33,11 +30,11 @@
 #include <cstddef>
 
 
-namespace sim1::aircraft {
+namespace sim1::simulation {
 
-Simulation::Simulation (Machine& machine, Models& models, si::LonLatRadius<> const location, neutrino::Logger const& logger):
-	_logger (logger),
-	_models (models)
+SimulationRun::SimulationRun (xf::Xefis& xefis, si::LonLatRadius<> const location, neutrino::Logger const& logger):
+	_xefis (xefis),
+	_logger (logger)
 {
 	auto const tait_bryan_angles = xf::TaitBryanAngles ({ .roll = 0_deg, .pitch = -30_deg, .yaw = 0_deg });
 	_aircraft.rigid_group.rotate_about_world_origin (math::coordinate_system_cast<xf::WorldSpace, xf::WorldSpace, xf::ECEFSpace, xf::AirframeSpace> (airframe_to_ecef_rotation (tait_bryan_angles, location)));
@@ -55,13 +52,19 @@ Simulation::Simulation (Machine& machine, Models& models, si::LonLatRadius<> con
 	});
 
 	auto& simulator = _simulator.emplace (_rigid_body_system, _rigid_body_solver, nu::utc_now(), 1_ms, _logger.with_context ("Simulator"));
-	_simulator->add_managed_machine (machine);
+	_simulator->register_machine_manager (_hardware_machine);
+	_simulator->register_machine_manager (_radio_machine);
+	_simulator->register_machine_manager (_flight_computer_machine);
+	_simulator->register_clock (_xefis_clock);
+	_simulator->register_clock (_steady_clock);
 
 	_simulator_widget.emplace (simulator, nullptr);
-	_simulator_widget->set_machine (&machine);
 	_simulator_widget->set_followed (_aircraft.rigid_group);
 	_simulator_widget->set_planet (&earth);
+
+	_hardware_machine.restart();
+	_radio_machine.restart();
+	_flight_computer_machine.restart();
 }
 
-} // namespace sim1::aircraft
-
+} // namespace sim1::simulation

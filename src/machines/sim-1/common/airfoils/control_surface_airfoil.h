@@ -1,7 +1,12 @@
 #include <xefis/support/aerodynamics/airfoil_spline.h>
 #include <neutrino/math/field.h>
+#include <neutrino/si/si.h>
 
 namespace sim1::control_surface_airfoil {
+
+namespace math = neutrino::math;
+namespace si = neutrino::si;
+using namespace si::literals;
 
 static auto const kSpline = xf::AirfoilSpline {
 	{ 1.000020,  0.001191 },

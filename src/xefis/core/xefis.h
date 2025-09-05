@@ -18,7 +18,6 @@
 #include <xefis/config/all.h>
 #include <xefis/components/configurator/configurator_widget.h>
 #include <xefis/core/graphics.h>
-#include <xefis/core/machine_manager.h>
 #include <xefis/core/system.h>
 
 // Neutrino:
@@ -38,7 +37,6 @@
 namespace xf {
 
 class Machine;
-class MachineManager;
 
 
 class Xefis: public QApplication
@@ -155,15 +153,15 @@ class Xefis: public QApplication
 	print_copyrights (std::ostream&);
 
   private:
-	nu::LoggerOutput					_logger_output	{ std::clog };
-	nu::Logger							_logger			{ _logger_output };
-	Options								_options;
-	QTimer*								_posix_signals_check_timer;
+	nu::LoggerOutput			_logger_output	{ std::clog };
+	nu::Logger					_logger			{ _logger_output };
+	Options						_options;
+	QTimer*						_posix_signals_check_timer;
 
 	// Basic subsystems:
-	std::unique_ptr<System>				_system;
-	std::unique_ptr<Graphics>			_graphics;
-	std::unique_ptr<MachineManager>		_machine_manager;
+	std::unique_ptr<System>		_system;
+	std::unique_ptr<Graphics>	_graphics;
+	std::unique_ptr<Machine>	_machine;
 };
 
 

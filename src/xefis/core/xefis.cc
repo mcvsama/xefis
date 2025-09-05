@@ -19,11 +19,9 @@
 #include <xefis/components/configurator/configurator_widget.h>
 #include <xefis/core/executable.h>
 #include <xefis/core/machine.h>
-#include <xefis/core/machine_manager.h>
 #include <xefis/core/system.h>
 #include <xefis/core/licenses.h>
 #include <xefis/support/airframe/airframe.h>
-#include <xefis/support/core/single_machine_manager.h>
 #include <xefis/support/ui/sound_manager.h>
 #include <xefis/xefis_machine.h>
 
@@ -114,17 +112,16 @@ Xefis::Xefis (int& argc, char** argv):
 
 		_system = std::make_unique<System> (_logger);
 		_graphics = std::make_unique<Graphics> (_logger);
-		_machine_manager = make_xefis_machine_manager (*this);
+		_machine = make_xefis_machine (*this);
 
-		if (!_machine_manager)
+		if (_machine)
 		{
-			if (auto machine = make_xefis_machine (*this))
-			{
-				_machine_manager = std::make_unique<SingleMachineManager> (std::move (machine), *this);
-				setup_unix_signals_handler();
-			}
-			else
-				_logger << "Neither machine manager (make_xefis_machine_manager()) nor machine (make_xefis_machine()) was compiled-in." << std::endl;
+			setup_unix_signals_handler();
+		}
+		else
+		{
+			_logger << "make_xefis_machine() was not compiled-in or didn't return a machine." << std::endl;
+			// TODO quit immediately
 		}
 	});
 }
@@ -285,15 +282,3 @@ make_xefis_machine (xf::Xefis&)
 {
 	return nullptr;
 }
-
-
-/**
- * Default make_xefis_machine_manager() function, used when there's no other provided.
- */
-[[gnu::weak]]
-std::unique_ptr<xf::MachineManager>
-make_xefis_machine_manager (xf::Xefis&)
-{
-	return nullptr;
-}
-
