@@ -97,13 +97,16 @@ ProcessingLoop::set_external_timer_time (si::Time const time)
 void
 ProcessingLoop::init_uninitialized_modules()
 {
-	for (auto* module: _uninitialized_modules)
-		Module::ModuleSocketAPI (*module).verify_settings();
+	if (!_uninitialized_modules.empty())
+	{
+		for (auto* module: _uninitialized_modules)
+			Module::ModuleSocketAPI (*module).verify_settings();
 
-	for (auto* module: _uninitialized_modules)
-		module->initialize();
+		for (auto* module: _uninitialized_modules)
+			module->initialize();
 
-	_uninitialized_modules.clear();
+		_uninitialized_modules.clear();
+	}
 }
 
 
