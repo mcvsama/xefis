@@ -156,6 +156,45 @@ class LinkProtocol
 
 	/**
 	 * Packet that refers to a particular Socket, so it can send/receive value of that module socket.
+	 * Used for local (inter-process) communication, not suited for remote links as it doesn't offer
+	 * features like 'retained' flag, value_if_nil, width reduction for arithmetic types, etc.
+	 * Always uses default Socket serialize/unserialize methods.
+	 */
+	class LocalSocket: public Packet
+	{
+	  public:
+		// Ctor
+		explicit
+		LocalSocket (xf::BasicSocket& socket);
+
+		// Ctor
+		explicit
+		LocalSocket (xf::BasicAssignableSocket& socket);
+
+		Blob::size_type
+		size() const override
+			{ return _socket.constant_blob_size(); }
+
+		void
+		produce (Blob& blob, nu::Logger const&) override
+			{ blob += _socket.to_blob(); }
+
+		Blob::const_iterator
+		consume (Blob::const_iterator const begin, Blob::const_iterator const end, nu::Logger const&) override;
+
+		void
+		apply() override;
+
+		void
+		failsafe() override;
+
+	  private:
+		xf::BasicSocket&			_socket;
+		xf::BasicAssignableSocket*	_assignable_socket { nullptr };
+	};
+
+	/**
+	 * Packet that refers to a particular Socket, so it can send/receive value of that module socket.
 	 */
 	template<uint16_t pBytes, class pValue>
 		class Socket: public Packet
@@ -513,10 +552,21 @@ class LinkProtocol
 	void
 	failsafe();
 
-  protected:
 	/*
 	 * Protocol building functions.
 	 */
+
+	static auto
+	local_socket (xf::BasicSocket& socket)
+	{
+		return std::make_shared<LocalSocket> (socket);
+	}
+
+	static auto
+	local_socket (xf::BasicAssignableSocket& assignable_socket)
+	{
+		return std::make_shared<LocalSocket> (assignable_socket);
+	}
 
 	template<size_t Bytes, std::integral Value>
 		static auto
@@ -680,6 +730,19 @@ class LinkProtocol
 	Blob::size_type								_unique_prefix_size { 0 };
 	Blob										_aux_unique_prefix_buffer;
 };
+
+
+inline
+LinkProtocol::LocalSocket::LocalSocket (xf::BasicSocket& socket):
+	_socket (socket)
+{ }
+
+
+inline
+LinkProtocol::LocalSocket::LocalSocket (xf::BasicAssignableSocket& assignable_socket):
+	_socket (assignable_socket),
+	_assignable_socket (&assignable_socket)
+{ }
 
 
 template<uint16_t B, class V>
