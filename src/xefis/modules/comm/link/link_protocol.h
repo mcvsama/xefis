@@ -356,7 +356,7 @@ class LinkProtocol
 
 		  private:
 			xf::Socket<Value>&				_socket;
-			xf::AssignableSocket<Value>*	_assignable_socket;
+			xf::AssignableSocket<Value>*	_assignable_socket	{ nullptr };
 			si::decay_quantity_t<Value>		_value_if_nil		{};
 			std::optional<Value>			_value;
 			// Retain last valid value on error (when value is NaN or failsafe kicks in):
