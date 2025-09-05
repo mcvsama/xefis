@@ -51,6 +51,9 @@ class ProcessingLoop:
 	public nu::LoggerTagProvider
 {
   private:
+	/**
+	 * The loop uses its own internal timer for advancing time.
+	 */
 	struct InternalTimer
 	{
 		explicit
@@ -59,6 +62,9 @@ class ProcessingLoop:
 		QTimer	timer;
 	};
 
+	/**
+	 * The loop has to be ticked by external actor using the advance() method.
+	 */
 	struct ExternalTimer
 	{
 		si::Time	current_time;
@@ -116,7 +122,8 @@ class ProcessingLoop:
 
 	/**
 	 * Advances loop time by given amount and executes appropriate number of cycles.
-	 * If internal timer was used, it gets stopped.
+	 * If internal timer was used, it gets stopped and the loop is switched to use
+	 * external timer.
 	 */
 	void
 	advance (si::Time);
