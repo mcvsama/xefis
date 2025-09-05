@@ -175,7 +175,8 @@ class Module:
 		 */
 		[[nodiscard]]
 		bool
-		implements_communicate_method() const noexcept;
+		implements_communicate_method() const noexcept
+			{ return !_module._did_not_communicate; }
 
 		/**
 		 * True if module implements its own process() method.
@@ -183,7 +184,8 @@ class Module:
 		 */
 		[[nodiscard]]
 		bool
-		implements_process_method() const noexcept;
+		implements_process_method() const noexcept
+			{ return !_module._did_not_process; }
 
 		/**
 		 * Request all modules to communicate with external systems (hardware systems)
@@ -204,7 +206,8 @@ class Module:
 		 * Delete cached result of fetch_and_process().
 		 */
 		void
-		reset_cache();
+		reset_cache()
+			{ _module._cached = false; }
 
 	  private:
 		/**
@@ -232,39 +235,45 @@ class Module:
 		 */
 		[[nodiscard]]
 		si::Time
-		processing_loop_period() const noexcept;
+		processing_loop_period() const noexcept
+			{ return _module._processing_loop_period; }
 
 		/**
 		 * Set cycle time of the ProcessingLoop that this module is being processed in.
 		 */
 		void
-		set_processing_loop_period (si::Time);
+		set_processing_loop_period (si::Time const period)
+			{ _module._processing_loop_period = period; }
 
 		/**
 		 * Add new measured communication time (time spent in the communicate() method).
 		 */
 		void
-		add_communication_time (si::Time);
+		add_communication_time (si::Time const t)
+			{ _module._communication_times.push_back (t); }
 
 		/**
 		 * Add new measured processing time (time spent in the process() method).
 		 */
 		void
-		add_processing_time (si::Time);
+		add_processing_time (si::Time const t)
+			{ _module._processing_times.push_back (t); }
 
 		/**
 		 * Communication times buffer.
 		 */
 		[[nodiscard]]
 		boost::circular_buffer<si::Time> const&
-		communication_times() const noexcept;
+		communication_times() const noexcept
+			{ return _module._communication_times; }
 
 		/**
 		 * Processing times buffer.
 		 */
 		[[nodiscard]]
 		boost::circular_buffer<si::Time> const&
-		processing_times() const noexcept;
+		processing_times() const noexcept
+			{ return _module._processing_times; }
 
 	  private:
 		Module& _module;
@@ -355,7 +364,8 @@ class Module:
 	 * By default it's enabled.
 	 */
 	void
-	set_nil_on_exception (bool enable) noexcept;
+	set_nil_on_exception (bool enable) noexcept
+		{ _set_nil_on_exception = enable; }
 
   private:
 	std::vector<BasicSetting*>			_registered_settings;
@@ -377,80 +387,10 @@ Module::ProcessingLoopAPI::ProcessingLoopAPI (Module& module):
 { }
 
 
-inline bool
-Module::ProcessingLoopAPI::implements_communicate_method() const noexcept
-{
-	return !_module._did_not_communicate;
-}
-
-
-inline bool
-Module::ProcessingLoopAPI::implements_process_method() const noexcept
-{
-	return !_module._did_not_process;
-}
-
-
-inline void
-Module::ProcessingLoopAPI::reset_cache()
-{
-	_module._cached = false;
-}
-
-
 inline
 Module::AccountingAPI::AccountingAPI (Module& module):
 	_module (module)
 { }
-
-
-inline si::Time
-Module::AccountingAPI::processing_loop_period() const noexcept
-{
-	return _module._processing_loop_period;
-}
-
-
-inline void
-Module::AccountingAPI::set_processing_loop_period (si::Time const period)
-{
-	_module._processing_loop_period = period;
-}
-
-
-inline void
-Module::AccountingAPI::add_communication_time (si::Time t)
-{
-	_module._communication_times.push_back (t);
-}
-
-
-inline void
-Module::AccountingAPI::add_processing_time (si::Time t)
-{
-	_module._processing_times.push_back (t);
-}
-
-
-inline boost::circular_buffer<si::Time> const&
-Module::AccountingAPI::communication_times() const noexcept
-{
-	return _module._communication_times;
-}
-
-
-inline boost::circular_buffer<si::Time> const&
-Module::AccountingAPI::processing_times() const noexcept
-{
-	return _module._processing_times;
-}
-
-
-inline void
-Module::set_nil_on_exception (bool enable) noexcept
-{
-	_set_nil_on_exception = enable;
-}
 
 
 /*
