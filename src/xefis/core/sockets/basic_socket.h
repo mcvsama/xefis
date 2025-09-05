@@ -21,6 +21,7 @@
 #include <xefis/core/sockets/socket_converter.h>
 
 // Neutrino:
+#include <neutrino/blob.h>
 #include <neutrino/noncopyable.h>
 #include <neutrino/nonmovable.h>
 #include <neutrino/numeric.h>
