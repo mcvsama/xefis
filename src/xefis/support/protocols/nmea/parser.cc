@@ -34,7 +34,7 @@ static HexTable	$hextable;
 void
 Parser::feed (Blob const& data)
 {
-	_input_buffer.insert (_input_buffer.end(), data.begin(), data.end());
+	_input_buffer.append_range (data);
 }
 
 

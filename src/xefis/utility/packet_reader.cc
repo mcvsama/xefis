@@ -61,11 +61,11 @@ PacketReader::feed (Blob const& data)
 		else
 		{
 			_buffer.erase (_buffer.begin(), _buffer.begin() + to_signed (_buffer.size()) + to_signed (data.size()) - to_signed (_capacity));
-			_buffer.insert (_buffer.end(), data.begin(), data.end());
+			_buffer.append_range (data);
 		}
 	}
 	else
-		_buffer.insert (_buffer.end(), data.begin(), data.end());
+		_buffer.append_range (data);
 
 	for (;;)
 	{

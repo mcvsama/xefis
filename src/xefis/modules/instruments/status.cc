@@ -342,7 +342,7 @@ Status::cursor_del()
 void
 Status::recall()
 {
-	_visible_messages.insert (_visible_messages.end(), _hidden_messages.begin(), _hidden_messages.end());
+	_visible_messages.append_range (_hidden_messages);
 	_hidden_messages.clear();
 	_cache->solve_scroll_and_cursor (_visible_messages);
 	mark_dirty();
@@ -354,7 +354,7 @@ Status::clear()
 {
 	if (nu::utc_now() - _last_message_timestamp > *_io.status_minimum_display_time)
 	{
-		_hidden_messages.insert (_hidden_messages.end(), _visible_messages.begin(), _visible_messages.end());
+		_hidden_messages.append_range (_visible_messages);
 		_visible_messages.clear();
 		_cache->solve_scroll_and_cursor (_visible_messages);
 		mark_dirty();

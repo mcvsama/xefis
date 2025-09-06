@@ -40,7 +40,7 @@ SocketObserver::observe (SocketObserver& observer)
 void
 SocketObserver::observe (std::initializer_list<Object> list)
 {
-	_objects.insert (_objects.end(), list.begin(), list.end());
+	_objects.append_range (list);
 }
 
 
@@ -117,7 +117,7 @@ SocketObserver::add_depending_smoother (SmootherBase& smoother)
 void
 SocketObserver::add_depending_smoothers (std::initializer_list<SmootherBase*> list)
 {
-	_smoothers.insert (_smoothers.end(), list.begin(), list.end());
+	_smoothers.append_range (list);
 	_longest_smoothing_time.reset();
 }
 

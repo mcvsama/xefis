@@ -145,10 +145,10 @@ class Shape
 inline Shape&
 operator+= (Shape& a, Shape const& b)
 {
-	a.triangles().insert (a.triangles().end(), b.triangles().begin(), b.triangles().end());
-	a.triangle_strips().insert (a.triangle_strips().end(), b.triangle_strips().begin(), b.triangle_strips().end());
-	a.triangle_fans().insert (a.triangle_fans().end(), b.triangle_fans().begin(), b.triangle_fans().end());
-	a.quads().insert (a.quads().end(), b.quads().begin(), b.quads().end());
+	a.triangles().append_range (b.triangles());
+	a.triangle_strips().append_range (b.triangle_strips());
+	a.triangle_fans().append_range (b.triangle_fans());
+	a.quads().append_range (b.quads());
 	return a;
 }
 
