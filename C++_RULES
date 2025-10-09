@@ -6,4 +6,6 @@ Rule of 5.
 %
 Never write `~Class() = default` alone unless the intent is to add the `virtual` specifier.
 %
-
+Make sure to have virtual destructor if at least one virtual method is present (virtual destructor
+can be in the base class already, so you don't have to add another one in the inherited class).
+%
