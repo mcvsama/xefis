@@ -1,11 +1,24 @@
 #!/bin/sh
 
-old=$1
-new=$2
-if [ "$old" = "" ] || [ "$new" = "" ]; then
-	echo "Usage: $0 old-year new-year"
-	echo "Example: $0 2011 2012"
-	exit 1
+if git diff --quiet --exit-code --stat && git diff --stat --cached --quiet --exit-code; then
+	total="$(git ls-files | wc -l)"
+	n=0
+	git ls-files -z | while IFS= read -r -d '' path; do
+		n=$((n+1))
+		echo -ne "$n/$total\r"
+		if [ -f "$path" ] && ! [ -L "$path" ]; then
+			year="$(git log --follow --format=%ad --date=format:%Y -- "$path" | tail -n 1)"
+			if [ "$year" != "" ]; then
+				sed -E -i 's/Copyleft ([0-9]{4})  /Copyleft '"$year"'  /g' -- "$path"
+				#printf 'file: %s %s\n' "$path" "$year"
+			else
+				echo "Warning: no year found for path -- $path"
+			fi
+		else
+			echo "Skipping non-regular file -- $path"
+		fi
+	done
+	printf '\r\033[KAll done ('"$total"' files)\n'
+else
+	echo "Uncommited changes found. Stash or commit them beforehand."
 fi
-find .. -type f -exec sed -i -e 's/Copyleft 2012…'"$old"'/Copyleft 2012…'"$new"'/g' {} \;
-
