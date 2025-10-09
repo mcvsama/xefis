@@ -562,7 +562,7 @@ template<CoordinateSystemConcept ForceSpace, CoordinateSystemConcept PositionSpa
 
 		if constexpr (std::is_same_v<PositionSpace, WorldSpace>)
 			body_space_position = _placement.rotate_translate_to_body (position);
-		else if constexpr (std::is_same_v<ForceSpace, BodyCOM>)
+		else if constexpr (std::is_same_v<PositionSpace, BodyCOM>)
 			body_space_position = position;
 		else
 			static_assert (false, "unsupported coordinate system");
