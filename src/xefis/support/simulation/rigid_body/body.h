@@ -603,7 +603,7 @@ inline void
 Body::set_shape (std::optional<Shape> const& shape)
 {
 	auto copy = shape;
-	set_shape (std::move (shape));
+	set_shape (std::move (copy));
 }
 
 
