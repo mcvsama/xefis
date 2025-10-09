@@ -24,6 +24,7 @@
 
 // Standard:
 #include <cstddef>
+#include <ranges>
 
 
 namespace xf::rigid_body {
@@ -126,9 +127,9 @@ ImpulseSolver::update_gravitational_forces()
 
 	// Gravity interactions between gravitating bodies:
 	if (gravitating_bodies.size() > 1)
-		for (auto i1: gravitating_bodies | boost::adaptors::indexed())
-			for (auto i2: gravitating_bodies | boost::adaptors::sliced (nu::to_unsigned (i1.index()) + 1u, _system.bodies().size()))
-				update_gravitational_forces (*i1.value(), *i2);
+		for (auto [i1, b1]: std::views::zip (std::views::iota (0), gravitating_bodies))
+			for (auto b2: gravitating_bodies | std::views::drop (i1 + 1))
+				update_gravitational_forces (*b1, *b2);
 
 	// Gravity interactions between gravitating bodies and the rest:
 	for (auto& b1: gravitating_bodies)
