@@ -568,7 +568,7 @@ inline ConstraintForces&
 operator+= (ConstraintForces& a, ConstraintForces const& b)
 {
 	for (std::size_t i = 0; i < 2; ++i)
-		a[i] -= b[i];
+		a[i] += b[i];
 
 	return a;
 }
