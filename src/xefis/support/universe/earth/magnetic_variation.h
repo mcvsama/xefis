@@ -1,6 +1,6 @@
 /* vim:ts=4
  *
- * Copyleft 2008…2013  Michał Gawron
+ * Copyleft 2013  Michał Gawron
  * Marduk Unix Labs, http://mulabs.org/
  *
  * This code was based on awesome source released by Written by Curtis L. Olson (started July 2000).
