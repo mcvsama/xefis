@@ -558,14 +558,14 @@ template<CoordinateSystemConcept ForceSpace, CoordinateSystemConcept PositionSpa
 		else if constexpr (std::is_same_v<ForceSpace, BodyCOM>)
 			body_space_force_moments = force_moments;
 		else
-			static_assert (false, "unsupported coordinate system");
+			static_assert (false, "unsupported coordinate system for ForceSpace");
 
 		if constexpr (std::is_same_v<PositionSpace, WorldSpace>)
 			body_space_position = _placement.rotate_translate_to_body (position);
 		else if constexpr (std::is_same_v<PositionSpace, BodyCOM>)
 			body_space_position = position;
 		else
-			static_assert (false, "unsupported coordinate system");
+			static_assert (false, "unsupported coordinate system for PositionSpace");
 
 		apply_impulse (Wrench (body_space_force_moments, body_space_position));
 	}
