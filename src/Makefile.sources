@@ -552,8 +552,10 @@ define MACHINE_TEMPLATE =
  MIHAU.modules[xefis].products[machine.$1].linker_libraries	+= $$(MIHAU.modules[xefis].products[xefis].linker_libraries)
  MIHAU.modules[xefis].products[machine.$1].sources			+= $$(MIHAU.modules[xefis].products[xefis].sources)
  MIHAU.modules[xefis].products[machine.$1].sources_moc		+= $$(MIHAU.modules[xefis].products[xefis].sources_moc)
- MIHAU.modules[xefis].products[machine.$1].sources			+= $$(addprefix machines/$1/,$$(XEFIS_MACHINES.$1.sources))
- MIHAU.modules[xefis].products[machine.$1].sources_moc		+= $$(addprefix machines/$1/,$$(XEFIS_MACHINES.$1.sources_moc))
+ # abspath() + patsubst() fixes duplicate source paths caused by relative segments like ../ in machine-specific build lists by canonicalizing each path to an absolute
+ # version and then converting back to a clean relative:
+ MIHAU.modules[xefis].products[machine.$1].sources			+= $$(patsubst $$(CURDIR)/%,%,$$(abspath $$(addprefix machines/$1/,$$(XEFIS_MACHINES.$1.sources))))
+ MIHAU.modules[xefis].products[machine.$1].sources_moc		+= $$(patsubst $$(CURDIR)/%,%,$$(abspath $$(addprefix machines/$1/,$$(XEFIS_MACHINES.$1.sources_moc))))
 endef
 
 $(foreach machine,$(XEFIS_MACHINES),$(eval $(call MACHINE_TEMPLATE,$(machine))))
