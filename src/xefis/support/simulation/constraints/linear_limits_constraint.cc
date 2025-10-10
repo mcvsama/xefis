@@ -47,7 +47,10 @@ LinearLimitsConstraint::initialize_step (si::Time const dt)
 	_min_Jw1.put (-slider_data.r1uxa, 0, 0);
 	_min_Jv2.put (~slider_data.a, 0, 0);
 	_min_Jw2.put (slider_data.r2xa, 0, 0);
-	_min_location_constraint_value = slider_data.distance - *_min_distance;
+
+	if (_min_distance)
+		_min_location_constraint_value = slider_data.distance - *_min_distance;
+
 	_min_Z = compute_Z (_min_Jv1, _min_Jw1, _min_Jv2, _min_Jw2, dt);
 
 	// TODO doesn't seem to work correctly; perhaps look at symmetry of _min_Jw1 == _max_Jw2 in angular_limits
@@ -56,7 +59,10 @@ LinearLimitsConstraint::initialize_step (si::Time const dt)
 	_max_Jw1.put (slider_data.r1uxa, 0, 0);
 	_max_Jv2.put (-~slider_data.a, 0, 0);
 	_max_Jw2.put (-slider_data.r2xa, 0, 0);
-	_max_location_constraint_value = *_max_distance - slider_data.distance;
+
+	if (_max_distance)
+		_max_location_constraint_value = *_max_distance - slider_data.distance;
+
 	_max_Z = compute_Z (_max_Jv1, _max_Jw1, _max_Jv2, _max_Jw2, dt);
 }
 

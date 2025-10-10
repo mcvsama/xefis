@@ -47,9 +47,14 @@ AngularLimitsConstraint::initialize_step (si::Time const dt)
 	_min_Jw2.put (1_m * ~hinge.a1, 0, 0);
 	// _max_* are reversed _min_*.
 	_min_Z = compute_Z (_min_Jw1, _min_Jw2, dt);
-	_min_location_constraint_value = (hinge.angle - *_min_angle) * 1_m / 1_rad;
+
+	if (_min_angle)
+		_min_location_constraint_value = (hinge.angle - *_min_angle) * 1_m / 1_rad;
+
 	_max_Z = compute_Z (_min_Jw2, _min_Jw1, dt);
-	_max_location_constraint_value = (*_max_angle - hinge.angle) * 1_m / 1_rad;
+
+	if (_max_angle)
+		_max_location_constraint_value = (*_max_angle - hinge.angle) * 1_m / 1_rad;
 }
 
 
