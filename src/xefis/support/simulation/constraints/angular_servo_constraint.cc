@@ -25,6 +25,7 @@
 
 // Standard:
 #include <cstddef>
+#include <limits>
 
 
 namespace xf::rigid_body {
@@ -94,9 +95,16 @@ AngularServoConstraint::computed_constraint_forces (ConstraintForces const& resu
 		},
 	}, _effic);
 
-	si::Current const current = electrical_power / voltage();
-	set_resistance (voltage() / current);
-	_power_loss = electrical_power - mechanical_power;
+	if (nu::near_zero (voltage(), 1e-6_V))
+	{
+		set_resistance (1_Ohm * std::numeric_limits<float>::infinity());
+		_power_loss = 0_W;
+	}
+	else
+	{
+		set_resistance (nu::square (voltage()) / electrical_power);
+		_power_loss = electrical_power - mechanical_power;
+	}
 }
 
 
