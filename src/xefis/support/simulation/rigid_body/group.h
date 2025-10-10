@@ -196,7 +196,7 @@ template<BodyConcept SpecificBody>
 	inline SpecificBody&
 	Group::add_gravitating (std::unique_ptr<SpecificBody>&& body)
 	{
-		auto& added_body = _system->add (std::move (body));
+		auto& added_body = _system->add_gravitating (std::move (body));
 		_bodies.push_back (&added_body);
 		return added_body;
 	}
