@@ -253,9 +253,9 @@ class Constraint: public ConnectedBodies
 	 * to figure out if required simulation precision has been acquired
 	 * for this constraint.
 	 */
-	std::optional<ForceMoments<WorldSpace>>&
-	previous_computation_force_moments()
-		{ return _previous_computation_force_moments; }
+	std::optional<ConstraintForces>&
+	previous_computation_constraint_forces()
+		{ return _previous_computation_constraint_forces; }
 
   protected:
 	/**
@@ -387,8 +387,7 @@ class Constraint: public ConnectedBodies
 	double							_baumgarte_factor				{ kDefaultBaumgarteFactor };
 	ConstraintMassMatrix<0>::Scalar	_constraint_force_mixing_factor { 0.0 };
 	double							_friction_factor				{ 0.0 }; // TODO implement
-	std::optional<ForceMoments<WorldSpace>>
-									_previous_computation_force_moments;
+	std::optional<ConstraintForces>	_previous_computation_constraint_forces;
 };
 
 
