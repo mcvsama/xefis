@@ -76,7 +76,7 @@ LinearLimitsConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const&
 	if (auto fc_min = min_distance_corrections (vm_1, vm_2, dt, slider_data))
 		fc = fc + *fc_min;
 
-	if (auto fc_max = max_distance_corrections (vm_2, vm_2, dt, slider_data))
+	if (auto fc_max = max_distance_corrections (vm_1, vm_2, dt, slider_data))
 		fc = fc + *fc_max;
 
 	return fc;
