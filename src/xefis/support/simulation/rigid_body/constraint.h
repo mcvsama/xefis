@@ -50,31 +50,48 @@ class Constraint: public ConnectedBodies
 	virtual
 	~Constraint() = default;
 
-	// Jacobian matrix for linear velocities:
+	// Jacobian matrix for linear velocities.
+	// It is the linear part of the constraint Jacobian. Each of its rows maps a body’s center-of-mass linear velocity into the corresponding constraint
+	// equation, telling the solver how translation along x/y/z affects that constraint error.
 	template<std::size_t N>
 		using JacobianV = math::Matrix<double, 3, N, WorldSpace, WorldSpace>;
 
-	// Jacobian matrix for angular velocities:
+	// Jacobian matrix for angular velocities.
+	// It is the angular counterpart for JacobianV. Its rows map body angular velocities (through the appropriate arms/cross products) into the same constraint
+	// equations, showing how rotations contribute to the constraint error rate.
 	template<std::size_t N>
 		using JacobianW = math::Matrix<si::Length, 3, N, WorldSpace, WorldSpace>;
 
-	// Total integrated jacobian:
+	// The Jacobian vector is the constraint velocity residual: each component is the current rate at which a position constraint is being violated. Per row it
+	// combines both bodies’ linear and angular velocities (plus any external impulses) and is the (J \dot{q}) term in the Lagrange formulation. A zero Jacobian
+	// means the bodies’ relative velocities already satisfy the constraint, while non-zero entries show how fast the joint is drifting out of compliance before
+	// corrective forces are applied.
 	template<std::size_t N>
 		using Jacobian = math::Vector<si::Velocity, N, WorldSpace>;
 
-	// Location constraint vector (angles are represented by axis-angle vector):
+	// Position-level constraint error expressed in world space. Each component is the current violation of the positional or angular joint equation (rotations
+	// stored as axis–angle). A zero vector means the constraint is perfectly satisfied and is what the Baumgarte term drives toward.
+	// Contains both linear and angular terms. Angles are represented by axis-angle vector.
 	template<std::size_t N>
 		using PositionError = math::Vector<si::Length, N, WorldSpace>;
 
-	// Lambda:
+	// Lambda holds the constraint-space Lagrange multipliers (one per constraint row), which in this formulation are literal forces. These values scale the
+	// Jacobian rows to produce the corrective force/torque impulses applied back to the connected bodies so the joint error is driven toward zero.
 	template<std::size_t N>
 		using Lambda = math::Vector<si::Force, N, WorldSpace>;
 
-	// Constraint mass matrix:
+	// Constraint mass matrix is is the constraint-space analogue of an effective mass or inertia. It’s computed as (K = J,M^{-1},J^\mathsf{T}), combining both
+	// bodies’ inverse mass and inertia tensors with the joint Jacobians. Intuitively, it tells you how "heavy" the system feels when you try to push along the
+	// constraint direction: large entries mean the solver must apply larger impulses to achieve the same positional correction, because the participating
+	// bodies resist motion more strongly in that constraint subspace.
 	template<std::size_t N>
 		using ConstraintMassMatrix = math::SquareMatrix<decltype (1 / 1_kg), N, WorldSpace, WorldSpace>;
 
-	// Z matrix is a result of -inv (K) * dt, where K is result of compute_K():
+	// Z matrix is a result of -inv (K) * dt, where K is result of compute_K().
+	// It's the pre-scaled inverse of the constraint mass matrix (optionally adjusted by the CFM term). Once you have Z, you
+	// can map the Jacobian residual plus Baumgarte bias directly to the constraint forces via (\lambda = Z ,(J + b)). Physically it encodes how much force you
+	// must apply in each constraint direction per unit of residual velocity/error during this timestep—the constraint-space "compliance" the solver uses every
+	// iteration.
 	template<std::size_t N>
 		using ConstraintZMatrix = math::SquareMatrix<decltype (1_kg / 1_s), N, WorldSpace, WorldSpace>;
 
