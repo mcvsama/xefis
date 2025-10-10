@@ -111,7 +111,10 @@ class Body: public nu::Noncopyable
 	 */
 	void
 	set_placement (Placement<WorldSpace, BodyCOM> const& placement) noexcept
-		{ _placement = placement; }
+	{
+		_placement = placement;
+		invalidate_placement_dependent_caches();
+	}
 
 	/**
 	 * Return placement of origin point (relative to center-of-mass).
@@ -362,6 +365,10 @@ class Body: public nu::Noncopyable
 	virtual void
 	update_external_forces (Atmosphere const*, [[maybe_unused]] si::Time frame_duration)
 	{ }
+
+  private:
+	void
+	invalidate_placement_dependent_caches();
 
   private:
 	std::string											_label;
@@ -633,6 +640,17 @@ template<CoordinateSystemConcept Space>
 		else
 			static_assert (false, "unsupported coordinate system");
 	}
+
+
+inline void
+Body::invalidate_placement_dependent_caches()
+{
+	std::lock_guard lock (_optionals_mutex);
+	_world_space_mass_moments.reset();
+	_body_space_velocity_moments.reset();
+	_body_space_acceleration_moments.reset();
+	_world_space_applied_impulses.reset();
+}
 
 } // namespace xf::rigid_body
 
