@@ -104,13 +104,13 @@ class LinearLimitsConstraint: public Constraint
 	JacobianV<1>				_min_Jv2;
 	JacobianW<1>				_min_Jw2;
 	ConstraintZMatrix<1>		_min_Z;
-	LocationConstraint<1>		_min_location_constraint_value;
+	PositionError<1>			_min_position_error;
 	JacobianV<1>				_max_Jv1;
 	JacobianW<1>				_max_Jw1;
 	JacobianV<1>				_max_Jv2;
 	JacobianW<1>				_max_Jw2;
 	ConstraintZMatrix<1>		_max_Z;
-	LocationConstraint<1>		_max_location_constraint_value;
+	PositionError<1>			_max_position_error;
 };
 
 

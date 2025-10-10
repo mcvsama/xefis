@@ -49,12 +49,12 @@ AngularLimitsConstraint::initialize_step (si::Time const dt)
 	_min_Z = compute_Z (_min_Jw1, _min_Jw2, dt);
 
 	if (_min_angle)
-		_min_location_constraint_value = (hinge.angle - *_min_angle) * 1_m / 1_rad;
+		_min_position_error = (hinge.angle - *_min_angle) * 1_m / 1_rad;
 
 	_max_Z = compute_Z (_min_Jw2, _min_Jw1, dt);
 
 	if (_max_angle)
-		_max_location_constraint_value = (*_max_angle - hinge.angle) * 1_m / 1_rad;
+		_max_position_error = (*_max_angle - hinge.angle) * 1_m / 1_rad;
 }
 
 
@@ -83,7 +83,7 @@ AngularLimitsConstraint::min_angle_corrections (VelocityMoments<WorldSpace> cons
 	if (_min_angle && hinge_data.angle < *_min_angle)
 	{
 		auto const J = compute_jacobian (vm_1, _Jv, _min_Jw1, vm_2, _Jv, _min_Jw2);
-		auto const lambda = compute_lambda (_min_location_constraint_value, J, _min_Z, dt);
+		auto const lambda = compute_lambda (_min_position_error, J, _min_Z, dt);
 
 		return compute_constraint_forces (_Jv, _min_Jw1, _Jv, _min_Jw2, lambda);
 	}
@@ -101,7 +101,7 @@ AngularLimitsConstraint::max_angle_corrections (VelocityMoments<WorldSpace> cons
 	if (_max_angle && hinge_data.angle > *_max_angle)
 	{
 		auto const J = compute_jacobian (vm_1, _Jv, _min_Jw2, vm_2, _Jv, _min_Jw1);
-		auto const lambda = compute_lambda (_max_location_constraint_value, J, _max_Z, dt);
+		auto const lambda = compute_lambda (_max_position_error, J, _max_Z, dt);
 
 		return compute_constraint_forces (_Jv, _min_Jw2, _Jv, _min_Jw1, lambda);
 	}

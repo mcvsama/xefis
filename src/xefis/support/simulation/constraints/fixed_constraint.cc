@@ -94,9 +94,8 @@ FixedConstraint::initialize_step (si::Time const dt)
 	_Jw1.put (+make_pseudotensor (r1), 0, 0); // Translation
 	_Jw2.put (-make_pseudotensor (r2), 0, 0); // Translation
 
-	_location_constraint_value = LocationConstraint<6>(); // TODO maybe this reset is not needed?
-	_location_constraint_value.put (x2 + r2 - x1 - r1, 0, 0);
-	_location_constraint_value.put (_fixed_orientation.rotation_constraint_value (placement_1, placement_2), 0, 3);
+	_position_error.put (x2 + r2 - x1 - r1, 0, 0);
+	_position_error.put (_fixed_orientation.rotation_constraint_value (placement_1, placement_2), 0, 3);
 
 	_Z = compute_Z (_Jv1, _Jw1, _Jv2, _Jw2, dt);
 }
@@ -106,7 +105,7 @@ ConstraintForces
 FixedConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, VelocityMoments<WorldSpace> const& vm_2, si::Time dt)
 {
 	auto const J = compute_jacobian (vm_1, _Jv1, _Jw1, vm_2, _Jv2, _Jw2);
-	auto const lambda = compute_lambda (_location_constraint_value, J, _Z, dt);
+	auto const lambda = compute_lambda (_position_error, J, _Z, dt);
 
 	// TODO this internally transposes jacobians, so store here the transposed ones and reuse them
 	return compute_constraint_forces (_Jv1, _Jw1, _Jv2, _Jw2, lambda);

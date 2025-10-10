@@ -64,7 +64,7 @@ class Constraint: public ConnectedBodies
 
 	// Location constraint vector (angles are represented by axis-angle vector):
 	template<std::size_t N>
-		using LocationConstraint = math::Vector<si::Length, N, WorldSpace>;
+		using PositionError = math::Vector<si::Length, N, WorldSpace>;
 
 	// Lambda:
 	template<std::size_t N>
@@ -299,7 +299,7 @@ class Constraint: public ConnectedBodies
 	template<std::size_t N>
 		[[nodiscard]]
 		Lambda<N>
-		compute_lambda (LocationConstraint<N> const& location_constraint,
+		compute_lambda (PositionError<N> const&,
 						Jacobian<N> const& J,
 						ConstraintMassMatrix<N> const& K,
 						si::Time dt) const;
@@ -310,7 +310,7 @@ class Constraint: public ConnectedBodies
 	template<std::size_t N>
 		[[nodiscard]]
 		Lambda<N>
-		compute_lambda (LocationConstraint<N> const& location_constraint,
+		compute_lambda (PositionError<N> const&,
 						Jacobian<N> const& J,
 						ConstraintZMatrix<N> const& Z,
 						si::Time dt) const;
@@ -467,26 +467,26 @@ template<std::size_t N>
 
 template<std::size_t N>
 	inline Constraint::Lambda<N>
-	Constraint::compute_lambda (LocationConstraint<N> const& location_constraint,
+	Constraint::compute_lambda (PositionError<N> const& position_error,
 								Jacobian<N> const& J,
 								ConstraintMassMatrix<N> const& K,
 								si::Time const dt) const
 	{
 		auto const inv_dt = 1 / dt;
-		auto const stabilization_bias = baumgarte_factor() * inv_dt * location_constraint;
+		auto const stabilization_bias = baumgarte_factor() * inv_dt * position_error;
 		return -inv_dt * inv (K) * (J + stabilization_bias);
 	}
 
 
 template<std::size_t N>
 	inline Constraint::Lambda<N>
-	Constraint::compute_lambda (LocationConstraint<N> const& location_constraint,
+	Constraint::compute_lambda (PositionError<N> const& position_error,
 								Jacobian<N> const& J,
 								ConstraintZMatrix<N> const& Z,
 								si::Time const dt) const
 	{
 		auto const inv_dt = 1 / dt;
-		auto const stabilization_bias = baumgarte_factor() * inv_dt * location_constraint;
+		auto const stabilization_bias = baumgarte_factor() * inv_dt * position_error;
 		return Z * (J + stabilization_bias);
 	}
 

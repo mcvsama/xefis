@@ -89,9 +89,9 @@ SliderConstraint::initialize_step (si::Time const dt)
 	_Jw2.put (~cross_product (slider_data.r2, slider_data.t1), 0, 0);
 	_Jw2.put (~cross_product (slider_data.r2, slider_data.t2), 0, 1);
 
-	_location_constraint_value.put (~slider_data.u * slider_data.t1, 0, 0);
-	_location_constraint_value.put (~slider_data.u * slider_data.t2, 0, 1);
-	_location_constraint_value.put (slider_data.rotation_error, 0, 2);
+	_position_error.put (~slider_data.u * slider_data.t1, 0, 0);
+	_position_error.put (~slider_data.u * slider_data.t2, 0, 1);
+	_position_error.put (slider_data.rotation_error, 0, 2);
 
 	_Z = compute_Z (_Jv1, _Jw1, _Jv2, _Jw2, dt);
 }
@@ -101,7 +101,7 @@ ConstraintForces
 SliderConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, VelocityMoments<WorldSpace> const& vm_2, si::Time dt)
 {
 	auto const J = compute_jacobian (vm_1, _Jv1, _Jw1, vm_2, _Jv2, _Jw2);
-	auto const lambda = compute_lambda (_location_constraint_value, J, _Z, dt);
+	auto const lambda = compute_lambda (_position_error, J, _Z, dt);
 
 	return compute_constraint_forces (_Jv1, _Jw1, _Jv2, _Jw2, lambda);
 }

@@ -49,7 +49,7 @@ LinearLimitsConstraint::initialize_step (si::Time const dt)
 	_min_Jw2.put (slider_data.r2xa, 0, 0);
 
 	if (_min_distance)
-		_min_location_constraint_value = slider_data.distance - *_min_distance;
+		_min_position_error = slider_data.distance - *_min_distance;
 
 	_min_Z = compute_Z (_min_Jv1, _min_Jw1, _min_Jv2, _min_Jw2, dt);
 
@@ -61,7 +61,7 @@ LinearLimitsConstraint::initialize_step (si::Time const dt)
 	_max_Jw2.put (-slider_data.r2xa, 0, 0);
 
 	if (_max_distance)
-		_max_location_constraint_value = *_max_distance - slider_data.distance;
+		_max_position_error = *_max_distance - slider_data.distance;
 
 	_max_Z = compute_Z (_max_Jv1, _max_Jw1, _max_Jv2, _max_Jw2, dt);
 }
@@ -92,7 +92,7 @@ LinearLimitsConstraint::min_distance_corrections (VelocityMoments<WorldSpace> co
 	if (_min_distance && slider_data.distance < *_min_distance)
 	{
 		auto const J = compute_jacobian (vm_1, _min_Jv1, _min_Jw1, vm_2, _min_Jv2, _min_Jw2);
-		auto const lambda = compute_lambda (_min_location_constraint_value, J, _min_Z, dt);
+		auto const lambda = compute_lambda (_min_position_error, J, _min_Z, dt);
 
 		return compute_constraint_forces (_min_Jv1, _min_Jw1, _min_Jv2, _min_Jw2, lambda);
 	}
@@ -110,7 +110,7 @@ LinearLimitsConstraint::max_distance_corrections (VelocityMoments<WorldSpace> co
 	if (_max_distance && slider_data.distance > *_max_distance)
 	{
 		auto const J = compute_jacobian (vm_1, _max_Jv1, _max_Jw1, vm_2, _max_Jv2, _max_Jw2);
-		auto const lambda = compute_lambda (_max_location_constraint_value, J, _max_Z, dt);
+		auto const lambda = compute_lambda (_max_position_error, J, _max_Z, dt);
 
 		return compute_constraint_forces (_max_Jv1, _max_Jw1, _max_Jv2, _max_Jw2, lambda);
 	}

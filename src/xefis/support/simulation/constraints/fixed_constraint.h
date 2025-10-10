@@ -56,7 +56,7 @@ class FixedConstraint: public Constraint
 	JacobianV<6>			_Jv2;
 	JacobianW<6>			_Jw2;
 	ConstraintZMatrix<6>	_Z;
-	LocationConstraint<6>	_location_constraint_value;
+	PositionError<6>		_position_error;
 };
 
 } // namespace xf::rigid_body

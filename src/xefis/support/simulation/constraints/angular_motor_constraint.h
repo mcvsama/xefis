@@ -80,7 +80,7 @@ class AngularMotorConstraint: public Constraint
 	JacobianW<1>			_Jw1;
 	JacobianW<1>			_Jw2;
 	ConstraintZMatrix<1>	_Z;
-	LocationConstraint<1>	_location_constraint_value;
+	PositionError<1>		_position_error;
 	// Even though it's a torque, it's more convenient to keep it as a force:
 	si::Force				_force;
 };

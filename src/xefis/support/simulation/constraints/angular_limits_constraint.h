@@ -105,9 +105,9 @@ class AngularLimitsConstraint: public Constraint
 	JacobianW<1>				_min_Jw2;
 	// Jw1 and Jw2 are the same for maximums as for minimums, but exchanged.
 	ConstraintZMatrix<1>		_min_Z;
-	LocationConstraint<1>		_min_location_constraint_value;
+	PositionError<1>			_min_position_error;
 	ConstraintZMatrix<1>		_max_Z;
-	LocationConstraint<1>		_max_location_constraint_value;
+	PositionError<1>			_max_position_error;
 };
 
 

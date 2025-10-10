@@ -49,7 +49,7 @@ class SliderConstraint: public Constraint
 	JacobianV<5>			_Jv2;
 	JacobianW<5>			_Jw2;
 	ConstraintZMatrix<5>	_Z;
-	LocationConstraint<5>	_location_constraint_value;
+	PositionError<5>		_position_error;
 };
 
 } // namespace xf::rigid_body

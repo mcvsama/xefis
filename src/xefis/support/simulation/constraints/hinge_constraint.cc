@@ -72,10 +72,10 @@ HingeConstraint::initialize_step (si::Time const dt)
 
 	_Z = compute_Z (_Jv1, _Jw1, _Jv2, _Jw2, dt);
 
-	_location_constraint_value.put (hinge.u, 0, 0);
+	_position_error.put (hinge.u, 0, 0);
 	auto const a1xa2 = cross_product (hinge.a1, hinge.a2);
-	_location_constraint_value[0, 3] = dot_product (hinge.t1, a1xa2);
-	_location_constraint_value[0, 4] = dot_product (hinge.t2, a1xa2);
+	_position_error[0, 3] = dot_product (hinge.t1, a1xa2);
+	_position_error[0, 4] = dot_product (hinge.t2, a1xa2);
 }
 
 
@@ -83,7 +83,7 @@ ConstraintForces
 HingeConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, VelocityMoments<WorldSpace> const& vm_2, si::Time dt)
 {
 	auto const J = compute_jacobian (vm_1, _Jv1, _Jw1, vm_2, _Jv2, _Jw2);
-	auto const lambda = compute_lambda (_location_constraint_value, J, _Z, dt);
+	auto const lambda = compute_lambda (_position_error, J, _Z, dt);
 
 	return compute_constraint_forces (_Jv1, _Jw1, _Jv2, _Jw2, lambda);
 }
