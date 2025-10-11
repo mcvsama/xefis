@@ -58,7 +58,7 @@ HingeConstraint::initialize_step (si::Time const dt)
 	auto const& hinge = _hinge_precomputation.data();
 
 	// Translation:
-	_Jw1.put (make_pseudotensor (hinge.r1), 0, 0);
+	_Jw1.put (+make_pseudotensor (hinge.r1), 0, 0);
 	// Rotation:
 	_Jw1.put (-~hinge.t1, 0, 3);
 	_Jw1.put (-~hinge.t2, 0, 4);
