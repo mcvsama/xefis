@@ -35,8 +35,11 @@ namespace xf::sim {
 struct TemperatureSensorParameters
 {
 	si::Mass				mass;
-	// X is the front face of the sensor that ideally should point into the wind:
+
+	// X is the front face of the sensor that ideally should point into the wind;
+	// sampling point (air entrance) is at the {X, 0, 0} point in BodyOrigin space.
 	SpaceLength<BodyOrigin>	dimensions;
+
 	// Correction factor for returned measured temperature:
 	float					recovery_factor	{ 1.0f };
 };
@@ -88,12 +91,9 @@ class TemperatureSensor:
 	evolve ([[maybe_unused]] si::Time dt) override;
 
   private:
-	/**
-	 * Let's say that the stagnation point is at body's origin.
-	 */
 	SpaceLength<ECEFSpace>
-	stagnation_point() const noexcept
-		{ return coordinate_system_cast<ECEFSpace, void, WorldSpace, void> (placement().position()); }
+	sampling_position() const noexcept
+		{ return coordinate_system_cast<ECEFSpace, void, WorldSpace, void> (placement().rotate_translate_to_base (origin_placement().rotate_translate_to_base (_nose_position))); }
 
 	void
 	compute_static_temperature() const;
@@ -104,6 +104,8 @@ class TemperatureSensor:
   private:
 	Atmosphere const&											_atmosphere;
 	float														_recovery_factor;
+	// Position at which the air is sampled (nose (front) of the sensor):
+	SpaceLength<BodyOrigin>										_nose_position;
 	nu::Synchronized<std::optional<si::Temperature>> mutable	_static_temperature;
 	nu::Synchronized<std::optional<si::Temperature>> mutable	_stagnation_temperature;
 	nu::Synchronized<std::optional<si::Temperature>> mutable	_measured_temperature;

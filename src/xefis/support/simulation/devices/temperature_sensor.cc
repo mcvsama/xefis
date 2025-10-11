@@ -29,7 +29,8 @@ namespace xf::sim {
 TemperatureSensor::TemperatureSensor (Atmosphere const& atmosphere, TemperatureSensorParameters const& params):
 	Body (MassMoments<BodyCOM>()),
 	_atmosphere (atmosphere),
-	_recovery_factor (params.recovery_factor)
+	_recovery_factor (params.recovery_factor),
+	_nose_position (params.dimensions.x(), 0_m, 0_m)
 {
 	auto const material = make_material ({ 0x6e, 0xb8, 0x6d });
 	auto shape = make_centered_cube_shape (params.dimensions, material);
@@ -101,7 +102,7 @@ TemperatureSensor::compute_static_temperature() const
 	auto static_temperature = _static_temperature.lock();
 
 	if (!*static_temperature)
-		*static_temperature = _atmosphere.temperature_at (stagnation_point());
+		*static_temperature = _atmosphere.temperature_at (sampling_position());
 }
 
 
@@ -118,7 +119,7 @@ TemperatureSensor::compute_stagnation_temperature() const
 		// T_stagnation is what sensor measures at the stagnation point if probe is mounted ideally (into the wind).
 		// Formula:
 		//   T_stagnation = T_static + v² / (2 * Cp), where Cp for air ~= 1005 J/(kg⋅K)
-		auto const air_velocity = _atmosphere.wind_velocity_at (stagnation_point());
+		auto const air_velocity = _atmosphere.wind_velocity_at (sampling_position());
 		auto const sensor_velocity = coordinate_system_cast<ECEFSpace, void, WorldSpace, void> (velocity_moments<WorldSpace>().velocity());
 		auto const sensor_velocity_relative_to_air = sensor_velocity - air_velocity;
 		auto const sensor_normal_vector = coordinate_system_cast<ECEFSpace, void, WorldSpace, void> (placement().body_coordinates().x_axis()); // `sensor_normal_vector` is normalized.
