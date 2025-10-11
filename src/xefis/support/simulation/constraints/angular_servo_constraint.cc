@@ -98,7 +98,7 @@ AngularServoConstraint::computed_constraint_forces (ConstraintForces const& resu
 	// Always make sure servo doesn't add electrical energy to the system:
 	electrical_power = std::max (0_W, electrical_power);
 
-	if (nu::near_zero (voltage(), 1e-6_V))
+	if (nu::near_zero (voltage(), 1e-6_V) || abs (electrical_power) < 1e-9_W)
 	{
 		set_resistance (1_Ohm * std::numeric_limits<float>::infinity());
 		_power_loss = 0_W;
