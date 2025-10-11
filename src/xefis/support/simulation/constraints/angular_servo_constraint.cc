@@ -85,7 +85,7 @@ AngularServoConstraint::computed_constraint_forces (ConstraintForces const& resu
 		[&] (double efficiency) noexcept {
 			// Because of the non-zero backlash it's possible to get torque and angular velocity having opposite signs thus giving negative values of power
 			// here. But real servo doesn't really add power to the circuit, so make sure that power is clamped here is at least 0 W.
-			electrical_power = std::max (0_W, mechanical_power) / efficiency;
+			electrical_power = mechanical_power / efficiency;
 		},
 		[&] (TorqueEfficacy efficacy) noexcept {
 			// If signs of torque and angular velocity are opposite, it means servo wants to add energy to the system. Prevent such case, because we don't
@@ -94,6 +94,9 @@ AngularServoConstraint::computed_constraint_forces (ConstraintForces const& resu
 				electrical_power = abs (_arm_torque) / efficacy;
 		},
 	}, _effic);
+
+	// Always make sure servo doesn't add electrical energy to the system:
+	electrical_power = std::max (0_W, electrical_power);
 
 	if (nu::near_zero (voltage(), 1e-6_V))
 	{
