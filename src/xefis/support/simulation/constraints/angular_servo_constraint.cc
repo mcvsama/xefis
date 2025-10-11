@@ -181,4 +181,3 @@ make_standard_9gram_servo_constraint (HingePrecomputation& hinge_precomputation,
 }
 
 } // namespace xf::rigid_body
-

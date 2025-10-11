@@ -112,4 +112,3 @@ class TemperatureSensor:
 } // namespace xf::sim
 
 #endif
-
