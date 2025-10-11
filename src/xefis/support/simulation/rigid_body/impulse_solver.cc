@@ -260,6 +260,8 @@ ImpulseSolver::update_single_constraint_forces (Constraint* constraint, si::Time
 			// Recompute velocity moments:
 			iter1.velocity_moments = b1.velocity_moments<WorldSpace>() + *iter1.acceleration_moments * dt;
 			iter2.velocity_moments = b2.velocity_moments<WorldSpace>() + *iter2.acceleration_moments * dt;
+			iter1.velocity_moments_updated = true;
+			iter2.velocity_moments_updated = true;
 		}
 	}
 
@@ -294,6 +296,7 @@ ImpulseSolver::update_velocity_moments (si::Time const dt)
 {
 	for (auto& body: _system.bodies())
 	{
+		// If during iterations we've computed new velocity moments (current VM + AM * Δt), reuse that:
 		auto vm = body->iteration().velocity_moments_updated
 			? body->iteration().velocity_moments
 			: body->velocity_moments<WorldSpace>() + body->acceleration_moments<WorldSpace>() * dt;
