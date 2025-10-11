@@ -29,9 +29,15 @@ FixedConstraint::FixedConstraint (Body& body_1, Body& body_2):
 	_fixed_orientation (body_1.placement(), body_2.placement())
 {
 	set_label ("fixed constraint");
-	SpaceLength<WorldSpace> const origin (math::zero);
-	_anchor_1 = body_1.placement().rotate_translate_to_body (origin);
-	_anchor_2 = body_2.placement().rotate_translate_to_body (origin);
+
+	auto const placement_1 = body_1.placement();
+	auto const placement_2 = body_2.placement();
+	auto const x1 = placement_1.position();
+	auto const x2 = placement_2.position();
+	SpaceLength<WorldSpace> const world_anchor = x1 + (x2 - x1) * 0.5;
+	// Use the initial midpoint between COMs so both bodies share the same weld point.
+	_anchor_1 = placement_1.rotate_translate_to_body (world_anchor);
+	_anchor_2 = placement_2.rotate_translate_to_body (world_anchor);
 
 	_Jv1 = JacobianV<6> {
 		// Translation:
