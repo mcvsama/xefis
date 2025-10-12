@@ -48,8 +48,10 @@ class Machine;
 class RigidBodyViewer: public GLAnimationWidget
 {
   public:
-	// Evolution function called before each display frame:
+	// Evolution function called before each display frame. If frame_duration has value, it's the evolution Δt, if not, evolve the simulation by single frame,
+	// as the user is doing single-stepping of the simulation.
 	using BeforePaintCallback = std::function<void (std::optional<si::Time> frame_duration)>;
+
 	using FPSMode = GLAnimationWidget::FPSMode;
 	using GroupRenderingConfig = RigidBodyPainter::GroupRenderingConfig;
 	using BodyRenderingConfig = RigidBodyPainter::BodyRenderingConfig;
@@ -460,4 +462,3 @@ class RigidBodyViewer: public GLAnimationWidget
 } // namespace xf
 
 #endif
-
