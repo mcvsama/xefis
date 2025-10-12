@@ -66,6 +66,10 @@ class GLAnimationWidget: public QOpenGLWidget
 	void
 	set_refresh_rate (RefreshRate);
 
+	virtual void
+	timer_update()
+		{ update(); }
+
 	// API of QOpenGLWidget
 	void
 	paintGL();

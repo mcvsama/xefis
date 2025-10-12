@@ -387,6 +387,10 @@ class RigidBodyViewer: public GLAnimationWidget
 	void
 	resizeEvent (QResizeEvent*) override;
 
+	// GLAnimationWidget
+	void
+	timer_update() override;
+
   private:
 	/**
 	 * Make sure that when not-previously loaded resources (textures) are needed now

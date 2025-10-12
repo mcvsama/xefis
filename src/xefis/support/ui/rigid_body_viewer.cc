@@ -227,6 +227,19 @@ RigidBodyViewer::resizeEvent (QResizeEvent* event)
 
 
 void
+RigidBodyViewer::timer_update()
+{
+	if (_playback == Playback::Running)
+	{
+		_before_paint_callback (1 / refresh_rate());
+		mark_dirty();
+	}
+
+	GLAnimationWidget::timer_update();
+}
+
+
+void
 RigidBodyViewer::start_waiting_for_resources()
 {
 	using namespace std::literals::chrono_literals;
@@ -254,8 +267,7 @@ RigidBodyViewer::paint (QOpenGLPaintDevice& canvas)
 				break;
 
 			case Playback::Running:
-				_before_paint_callback (1 / refresh_rate());
-				mark_dirty();
+				// Handled in timer_update().
 				break;
 		}
 	}
