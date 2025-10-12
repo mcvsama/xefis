@@ -103,7 +103,7 @@ run (rigid_body::System& system, rigid_body::Body* followed_body, std::function<
 	QWidget w (nullptr);
 	auto const lh = nu::default_line_height (&w);
 
-	RigidBodyViewer viewer (nullptr, 60_Hz);
+	RigidBodyViewer viewer (nullptr, RigidBodyViewer::AutoFPS);
 	viewer.set_rigid_body_system (&system);
 	viewer.set_before_paint_callback ([&evolver] (std::optional<si::Time> const frame_duration) {
 		if (frame_duration)
