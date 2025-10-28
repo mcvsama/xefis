@@ -11,27 +11,27 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Standard:
-#include <cstddef>
-#include <memory>
-#include <random>
+// Local:
+#include "udp.h"
 
-// Qt:
-#include <QtXml/QDomElement>
-
-// Lib:
-#include <boost/endian/conversion.hpp>
-#include <gsl/gsl_util>
+// Xefis:
+#include <xefis/config/all.h>
 
 // Neutrino:
 #include <neutrino/qt/qdom.h>
 #include <neutrino/qt/qstring.h>
 
-// Xefis:
-#include <xefis/config/all.h>
+// Lib:
+#include <boost/endian/conversion.hpp>
+#include <gsl/gsl_util>
 
-// Local:
-#include "udp.h"
+// Qt:
+#include <QtXml/QDomElement>
+
+// Standard:
+#include <cstddef>
+#include <memory>
+#include <random>
 
 
 UDP::UDP (xf::ProcessingLoop& loop, Parameters const parameters, nu::Logger const& logger, std::string_view const instance):

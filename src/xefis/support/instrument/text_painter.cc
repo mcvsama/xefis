@@ -17,12 +17,12 @@
 // Xefis:
 #include <xefis/config/all.h>
 
-// Qt:
-#include <QPainterPath>
-
 // Neutrino:
 #include <neutrino/numeric.h>
 #include <neutrino/qt/qfontmetrics.h>
+
+// Qt:
+#include <QPainterPath>
 
 // Standard:
 #include <cstddef>

@@ -14,9 +14,6 @@
 #ifndef XEFIS__MODULES__SIMULATION__VIRTUAL_JOYSTICK_H__INCLUDED
 #define XEFIS__MODULES__SIMULATION__VIRTUAL_JOYSTICK_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/machine.h>
@@ -24,6 +21,9 @@
 #include <xefis/core/setting.h>
 #include <xefis/core/sockets/module_socket.h>
 #include <xefis/support/ui/widget.h>
+
+// Standard:
+#include <cstddef>
 
 
 namespace nu = neutrino;

@@ -14,12 +14,12 @@
 #ifndef XEFIS__CONFIG__CORE_TYPES_H__INCLUDED
 #define XEFIS__CONFIG__CORE_TYPES_H__INCLUDED
 
-// Lib:
-#include <type_safe/integer.hpp>
-
 // Neutrino:
 #include <neutrino/blob.h>
 #include <neutrino/core_types.h>
+
+// Lib:
+#include <type_safe/integer.hpp>
 
 // Standard:
 #include <cstddef>

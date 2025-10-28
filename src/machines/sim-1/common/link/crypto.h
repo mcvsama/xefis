@@ -17,12 +17,12 @@
 // Sim-1:
 #include <machines/sim-1/common/common.h>
 
-// Neutrino:
-#include <neutrino/si/si.h>
-
 // Xefis:
 #include <xefis/core/module.h>
 #include <xefis/modules/comm/xle_transceiver.h>
+
+// Neutrino:
+#include <neutrino/si/si.h>
 
 
 namespace sim1 {

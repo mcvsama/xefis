@@ -25,11 +25,11 @@
 #include <xefis/utility/temporal.h>
 #include <xefis/support/universe/earth/navaid_storage.h>
 
-// Qt:
-#include <QPainterPath>
-
 // Neutrino:
 #include <neutrino/synchronized.h>
+
+// Qt:
+#include <QPainterPath>
 
 // Standard:
 #include <array>

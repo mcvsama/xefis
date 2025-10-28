@@ -14,12 +14,12 @@
 // Local:
 #include "gl_animation_widget.h"
 
+// Neutrino:
+#include <neutrino/variant.h>
+
 // Qt:
 #include <QResizeEvent>
 #include <QScreen>
-
-// Neutrino:
-#include <neutrino/variant.h>
 
 
 namespace xf {

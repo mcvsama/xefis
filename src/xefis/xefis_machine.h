@@ -14,14 +14,14 @@
 #ifndef XEFIS__XEFIS_MACHINE_H__INCLUDED
 #define XEFIS__XEFIS_MACHINE_H__INCLUDED
 
-// Standard:
-#include <cstddef>
-#include <memory>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/machine.h>
 #include <xefis/core/xefis.h>
+
+// Standard:
+#include <cstddef>
+#include <memory>
 
 
 extern std::unique_ptr<xf::Machine>
