@@ -63,6 +63,10 @@ class InstrumentSupport
 	get_painter (PaintRequest const&) const;
 
   private:
+	[[nodiscard]]
+	bool
+	needs_cache_update (Data const&, PaintRequest const&) const;
+
 	void
 	update_cache (PaintRequest const&, Data&) const;
 
@@ -84,7 +88,7 @@ InstrumentSupport::get_aids (PaintRequest const& paint_request) const
 {
 	auto data = _data.lock();
 
-	if (!data->cached_aids || !data->cached_canvas_metric || *data->cached_canvas_metric != paint_request.metric())
+	if (needs_cache_update (*data, paint_request))
 		update_cache (paint_request, *data);
 
 	return data->cached_aids;
@@ -100,6 +104,13 @@ InstrumentSupport::get_painter (PaintRequest const& paint_request) const
 		update_cache (paint_request, *data);
 
 	return InstrumentPainter (paint_request.canvas(), _text_painter_cache);
+}
+
+
+inline bool
+InstrumentSupport::needs_cache_update (Data const& data, PaintRequest const& paint_request) const
+{
+	return !data.cached_aids || !data.cached_canvas_metric || *data.cached_canvas_metric != paint_request.metric();
 }
 
 
