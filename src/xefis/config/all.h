@@ -34,7 +34,3 @@ using namespace neutrino::debug;
 
 using namespace neutrino::ostream_fixes;
 using namespace neutrino::string_view_plus_string_fixes;
-
-
-namespace ne = neutrino;
-
