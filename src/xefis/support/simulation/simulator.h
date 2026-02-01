@@ -27,6 +27,7 @@
 // Standard:
 #include <cstddef>
 #include <optional>
+#include <ranges>
 #include <vector>
 
 
@@ -36,10 +37,14 @@ class Machine;
 
 
 /**
- * Rigid body + electrical simulator.
+ * Rigid body + electrical simulator + some helper stuff like list of machines
+ * used in a simulation.
  */
 class Simulator: public nu::Noncopyable
 {
+  public:
+	using MachinesVector = std::vector<Machine*>;
+
   public:
 	// Ctor
 	explicit
@@ -103,6 +108,20 @@ class Simulator: public nu::Noncopyable
 		{ _machines.push_back (&machine); }
 
 	/**
+	 * Return a subrange of managed machines.
+	 */
+	std::ranges::subrange<MachinesVector::iterator>
+	managed_machines() noexcept
+		{ return { _machines.begin(), _machines.end() }; }
+
+	/**
+	 * Return a subrange of managed machines.
+	 */
+	std::ranges::subrange<MachinesVector::const_iterator>
+	managed_machines() const noexcept
+		{ return { _machines.begin(), _machines.end() }; }
+
+	/**
 	 * Evolve the rigid body system by given Δt. Multiple evolve() calls will be made on the System.
 	 */
 	void
@@ -130,7 +149,7 @@ class Simulator: public nu::Noncopyable
 	rigid_body::ImpulseSolver&	_rigid_body_solver;
 	std::optional<Evolver>		_evolver;
 	Evolver::Evolve				_additional_evolve;
-	std::vector<Machine*>		_machines;
+	MachinesVector				_machines;
 };
 
 } // namespace xf
