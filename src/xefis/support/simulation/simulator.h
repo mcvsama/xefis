@@ -16,6 +16,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/clock.h>
 #include <xefis/core/machine_manager.h>
 #include <xefis/support/simulation/rigid_body/system.h>
 #include <xefis/support/simulation/rigid_body/impulse_solver.h>
@@ -27,9 +28,9 @@
 
 // Standard:
 #include <cstddef>
+#include <list>
 #include <optional>
 #include <ranges>
-#include <vector>
 
 
 namespace xf {
@@ -44,7 +45,8 @@ class Machine;
 class Simulator: public nu::Noncopyable
 {
   public:
-	using MachineManagersVector = std::vector<BasicMachineManager*>;
+	using MachineManagers = std::list<BasicMachineManager*>;
+	using Clocks = std::list<SimulatedClock*>;
 
   public:
 	// Ctor
@@ -101,26 +103,48 @@ class Simulator: public nu::Noncopyable
 		{ return _rigid_body_system; }
 
 	/**
-	 * Set Machine to manage (start/stop and step along with the simulation).
-	 * Can be nullptr to disable machine managing.
+	 * Return a subrange of managed clocks.
 	 */
-	void
-	add_machine_manager (BasicMachineManager& machine_manager)
-		{ _machine_managers.push_back (&machine_manager); }
+	std::ranges::subrange<Clocks::iterator>
+	clocks() noexcept
+		{ return { _clocks.begin(), _clocks.end() }; }
+
+	/**
+	 * Return a subrange of managed clocks.
+	 */
+	std::ranges::subrange<Clocks::const_iterator>
+	clocks() const noexcept
+		{ return { _clocks.begin(), _clocks.end() }; }
 
 	/**
 	 * Return a subrange of managed machines.
 	 */
-	std::ranges::subrange<MachineManagersVector::iterator>
+	std::ranges::subrange<MachineManagers::iterator>
 	machine_managers() noexcept
 		{ return { _machine_managers.begin(), _machine_managers.end() }; }
 
 	/**
 	 * Return a subrange of managed machines.
 	 */
-	std::ranges::subrange<MachineManagersVector::const_iterator>
+	std::ranges::subrange<MachineManagers::const_iterator>
 	machine_managers() const noexcept
 		{ return { _machine_managers.begin(), _machine_managers.end() }; }
+
+	/**
+	 * Add SimulatedClock to manage.
+	 * The clock will be advanced along with the simulation.
+	 */
+	void
+	register_clock (SimulatedClock& clock)
+		{ _clocks.push_back (&clock); }
+
+	/**
+	 * Add MachineManager to manage.
+	 * Machine gets started/stopped and stepped along with the simulation.
+	 */
+	void
+	register_machine_manager (BasicMachineManager& machine_manager)
+		{ _machine_managers.push_back (&machine_manager); }
 
 	/**
 	 * Evolve the rigid body system by given Δt. Multiple evolve() calls will be made on the System.
@@ -150,7 +174,8 @@ class Simulator: public nu::Noncopyable
 	rigid_body::ImpulseSolver&	_rigid_body_solver;
 	std::optional<Evolver>		_evolver;
 	Evolver::Evolve				_additional_evolve;
-	MachineManagersVector		_machine_managers;
+	MachineManagers				_machine_managers;
+	Clocks						_clocks;
 };
 
 } // namespace xf
