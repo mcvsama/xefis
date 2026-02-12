@@ -460,6 +460,10 @@ class LinkProtocol
 		explicit
 		Signature (Params&&);
 
+		std::string const&
+		name() const noexcept
+			{ return _name; }
+
 		Blob::size_type
 		size() const override;
 
@@ -510,6 +514,10 @@ class LinkProtocol
 		// Ctor
 		explicit
 		Envelope (Params&&);
+
+		std::string const&
+		name() const noexcept
+			{ return _name; }
 
 		Blob const&
 		unique_prefix() const;
