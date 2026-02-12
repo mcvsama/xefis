@@ -22,6 +22,7 @@
 
 // Qt:
 #include <QBoxLayout>
+#include <QLabel>
 #include <QShortcut>
 
 // Standard:
@@ -46,6 +47,14 @@ ConfiguratorWidget::ConfiguratorWidget (Machine& machine, QWidget* parent):
 	auto* layout = new QVBoxLayout (this);
 	auto const margin = ph.em_pixels (0.15f);
 	layout->setContentsMargins (margin, margin, margin, margin);
+
+	auto name_label = new QLabel (nu::to_qstring (_machine.instance()));
+	QFont font = name_label->font();
+	font.setPixelSize (ph.em_pixels (1.4f));
+	name_label->setFont (font);
+	name_label->setStyleSheet ("margin: 0.15em;");
+
+	layout->addWidget (name_label);
 	layout->addWidget (_tabs);
 
 	auto* esc = new QShortcut (this);
