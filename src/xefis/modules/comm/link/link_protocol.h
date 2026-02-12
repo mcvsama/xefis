@@ -101,7 +101,7 @@ class LinkProtocol
 		 * Serialize data and add it to the blob.
 		 */
 		virtual void
-		produce (Blob&, nu::Logger const&) = 0;
+		produce_append (Blob&, nu::Logger const&) = 0;
 
 		/**
 		 * Parse data and set temporary variables.
@@ -139,7 +139,7 @@ class LinkProtocol
 		size() const override;
 
 		void
-		produce (Blob&, nu::Logger const&) override;
+		produce_append (Blob&, nu::Logger const&) override;
 
 		Blob::const_iterator
 		consume (Blob::const_iterator, Blob::const_iterator, nu::Logger const&) override;
@@ -158,7 +158,7 @@ class LinkProtocol
 	 * Packet that refers to a particular Socket, so it can send/receive value of that module socket.
 	 * Used for local (inter-process) communication, not suited for remote links as it doesn't offer
 	 * features like 'retained' flag, value_if_nil, width reduction for arithmetic types, etc.
-	 * Always uses default Socket serialize/unserialize methods.
+	 * Always uses default Socket serialize_append/unserialize methods.
 	 */
 	class LocalSocket: public Packet
 	{
@@ -176,7 +176,7 @@ class LinkProtocol
 			{ return _socket.constant_blob_size(); }
 
 		void
-		produce (Blob& blob, nu::Logger const&) override
+		produce_append (Blob& blob, nu::Logger const&) override
 			{ blob += _socket.to_blob(); }
 
 		Blob::const_iterator
@@ -325,7 +325,7 @@ class LinkProtocol
 			size() const override;
 
 			void
-			produce (Blob& blob, nu::Logger const&) override
+			produce_append (Blob& blob, nu::Logger const&) override
 				{ _produce (blob); }
 
 			Blob::const_iterator
@@ -344,7 +344,7 @@ class LinkProtocol
 			 */
 			template<class CastType, class SourceType>
 				void
-				serialize (SourceType, Blob&);
+				serialize_append (SourceType, Blob&);
 
 			/**
 			 * Unserialize data from Blob and put it to src.
@@ -421,7 +421,7 @@ class LinkProtocol
 		size() const override;
 
 		void
-		produce (Blob&, nu::Logger const&) override;
+		produce_append (Blob&, nu::Logger const&) override;
 
 		Blob::const_iterator
 		consume (Blob::const_iterator, Blob::const_iterator, nu::Logger const&) override;
@@ -464,7 +464,7 @@ class LinkProtocol
 		size() const override;
 
 		void
-		produce (Blob&, nu::Logger const&) override;
+		produce_append (Blob&, nu::Logger const&) override;
 
 		Blob::const_iterator
 		consume (Blob::const_iterator, Blob::const_iterator, nu::Logger const&) override;
@@ -518,7 +518,7 @@ class LinkProtocol
 		size() const override;
 
 		void
-		produce (Blob& blob, nu::Logger const&) override;
+		produce_append (Blob& blob, nu::Logger const&) override;
 
 		Blob::const_iterator
 		consume (Blob::const_iterator, Blob::const_iterator, nu::Logger const&) override;
@@ -544,7 +544,7 @@ class LinkProtocol
 	size() const;
 
 	void
-	produce (Blob&, nu::Logger const&);
+	produce_append (Blob&, nu::Logger const&);
 
 	Blob::const_iterator
 	consume (Blob::const_iterator begin, Blob::const_iterator end, InputLink*, QTimer* reacquire_timer, QTimer* failsafe_timer, nu::Logger const&);
@@ -759,7 +759,7 @@ template<uint16_t B, class V>
 				? *_socket
 				: _value_if_nil;
 
-			serialize<nu::int_for_width_t<kBytes>> (int_value, blob);
+			serialize_append<nu::int_for_width_t<kBytes>> (int_value, blob);
 		};
 
 		_consume = [this] (Blob::const_iterator begin, Blob::const_iterator end) -> Blob::const_iterator {
@@ -787,7 +787,7 @@ template<uint16_t B, class V>
 						: (*_socket).base_value()
 					: _value_if_nil;
 
-				serialize<nu::float_for_width_t<kBytes>> (value, blob);
+				serialize_append<nu::float_for_width_t<kBytes>> (value, blob);
 			}
 			else if constexpr (std::is_floating_point<Value>())
 			{
@@ -797,7 +797,7 @@ template<uint16_t B, class V>
 						: *_socket
 					: _value_if_nil;
 
-				serialize<nu::float_for_width_t<kBytes>> (value, blob);
+				serialize_append<nu::float_for_width_t<kBytes>> (value, blob);
 			}
 		};
 
@@ -818,7 +818,7 @@ template<uint16_t B, class V>
 		_produce = [this] (Blob& blob) {
 			// Only needed to see if the value changed, so modulo 16-bit is good enough:
 			_current_serial = _socket.serial() % 0xffff;
-			serialize<void> (_socket.get_optional(), blob);
+			serialize_append<void> (_socket.get_optional(), blob);
 		};
 
 		_consume = [this] (Blob::const_iterator begin, Blob::const_iterator end) -> Blob::const_iterator {
@@ -885,7 +885,7 @@ template<uint16_t B, class V>
 template<uint16_t B, class V>
 	template<class CastType, class SourceType>
 		inline void
-		LinkProtocol::Socket<B, V>::serialize (SourceType src, Blob& blob)
+		LinkProtocol::Socket<B, V>::serialize_append (SourceType src, Blob& blob)
 		{
 			if constexpr (std::is_same_v<SourceType, std::optional<std::string>>)
 			{

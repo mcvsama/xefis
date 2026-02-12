@@ -58,10 +58,10 @@ LinkProtocol::Sequence::size() const
 
 
 void
-LinkProtocol::Sequence::produce (Blob& blob, nu::Logger const& logger)
+LinkProtocol::Sequence::produce_append (Blob& blob, nu::Logger const& logger)
 {
 	for (auto const& packet: _packets)
-		packet->produce (blob, logger);
+		packet->produce_append (blob, logger);
 }
 
 
@@ -142,7 +142,7 @@ LinkProtocol::Bitfield::size() const
 
 
 void
-LinkProtocol::Bitfield::produce (Blob& blob, nu::Logger const&)
+LinkProtocol::Bitfield::produce_append (Blob& blob, nu::Logger const&)
 {
 	std::vector<bool> bits;
 	bits.reserve (8 * size());
@@ -255,12 +255,12 @@ LinkProtocol::Signature::size() const
 
 
 void
-LinkProtocol::Signature::produce (Blob& blob, nu::Logger const& logger)
+LinkProtocol::Signature::produce_append (Blob& blob, nu::Logger const& logger)
 {
 	_temp.clear();
 
 	// Add data:
-	Sequence::produce (_temp, logger);
+	Sequence::produce_append (_temp, logger);
 
 	// Append nonce:
 	std::uniform_int_distribution<uint8_t> distribution;
@@ -338,7 +338,7 @@ LinkProtocol::Envelope::size() const
 
 
 void
-LinkProtocol::Envelope::produce (Blob& blob, nu::Logger const& logger)
+LinkProtocol::Envelope::produce_append (Blob& blob, nu::Logger const& logger)
 {
 	if (!_send_predicate || _send_predicate())
 	{
@@ -350,7 +350,7 @@ LinkProtocol::Envelope::produce (Blob& blob, nu::Logger const& logger)
 					if (_transceiver->ready())
 					{
 						Blob unencrypted_blob;
-						Sequence::produce (unencrypted_blob, logger);
+						Sequence::produce_append (unencrypted_blob, logger);
 						blob += _unique_prefix + _transceiver->encrypt_packet (unencrypted_blob);
 					}
 				}
@@ -363,7 +363,7 @@ LinkProtocol::Envelope::produce (Blob& blob, nu::Logger const& logger)
 			else
 			{
 				blob += _unique_prefix;
-				Sequence::produce (blob, logger);
+				Sequence::produce_append (blob, logger);
 			}
 		}
 
@@ -422,10 +422,10 @@ LinkProtocol::LinkProtocol (EnvelopeList envelopes):
 
 
 void
-LinkProtocol::produce (Blob& blob, [[maybe_unused]] nu::Logger const& logger)
+LinkProtocol::produce_append (Blob& blob, [[maybe_unused]] nu::Logger const& logger)
 {
 	for (auto& e: _envelopes)
-		e->produce (blob, logger);
+		e->produce_append (blob, logger);
 
 #if XEFIS_LINK_SEND_DEBUG
 	logger << "Send: " << nu::to_hex_string (blob, ":") << std::endl;

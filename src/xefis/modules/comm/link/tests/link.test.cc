@@ -303,7 +303,7 @@ get_air_transceiver (ProcessingLoop& loop)
 void transmit (LinkProtocol& tx_protocol, LinkProtocol& rx_protocol)
 {
 	Blob blob;
-	tx_protocol.produce (blob, g_logger);
+	tx_protocol.produce_append (blob, g_logger);
 	auto end = rx_protocol.consume (blob.begin(), blob.end(), nullptr, nullptr, nullptr, g_logger);
 
 	test_asserts::verify ("rx_protocol ate all input bytes", end == blob.end());
@@ -487,7 +487,7 @@ nu::AutoTest t4 ("modules/io/link: protocol: invalid data transmission (wrong si
 	tx.fetch_all (cycle += 1_s);
 
 	Blob blob;
-	tx_protocol.produce (blob, g_logger);
+	tx_protocol.produce_append (blob, g_logger);
 	rx_protocol.consume (blob.begin(), blob.end(), nullptr, nullptr, nullptr, g_logger);
 
 	// Transmit invalid data:
@@ -509,7 +509,7 @@ nu::AutoTest t4 ("modules/io/link: protocol: invalid data transmission (wrong si
 	tx.fetch_all (cycle += 1_s);
 
 	blob.clear();
-	tx_protocol.produce (blob, g_logger);
+	tx_protocol.produce_append (blob, g_logger);
 	test_asserts::verify ("blob is long enough", blob.size() >= 16);
 	// Mess with both messages:
 	blob[12] = 0x00;

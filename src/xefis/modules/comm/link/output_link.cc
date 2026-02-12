@@ -47,7 +47,7 @@ void
 OutputLink::send_output()
 {
 	_output_blob.clear();
-	_protocol->produce (_output_blob, _logger);
+	_protocol->produce_append (_output_blob, _logger);
 	this->link_output = std::string (_output_blob.begin(), _output_blob.end());
 }
 
