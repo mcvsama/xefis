@@ -45,8 +45,8 @@ setup_xefis_executable (int argc, char** argv, std::function<void()> run_app_fun
 	signal (SIGSEGV, nu::fail);
 	signal (SIGHUP, [](int) { nu::g_hup_received.store (true); });
 
-	setenv ("LC_ALL", "POSIX", 1);
-	setlocale (LC_ALL, "POSIX");
+	setenv ("LC_ALL", "C.UTF-8", 1);
+	setlocale (LC_ALL, "C.UTF-8");
 
 	try {
 		if (argc == 2 && (strcmp (argv[1], "-v") == 0 || strcmp (argv[1], "--version") == 0))
