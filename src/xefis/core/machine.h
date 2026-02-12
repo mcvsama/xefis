@@ -16,18 +16,19 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/screen.h>
+#include <xefis/core/clock.h>
 #include <xefis/core/processing_loop.h>
+#include <xefis/core/screen.h>
 
 // Neutrino:
 #include <neutrino/noncopyable.h>
 
 // Standard:
 #include <cstddef>
+#include <list>
 #include <ranges>
 #include <string>
 #include <string_view>
-#include <vector>
 
 
 namespace xf {
@@ -38,6 +39,9 @@ class ConfiguratorWidget;
 class Machine: private nu::Noncopyable
 {
   private:
+	// Must be lists to make sure that iterators returned by clocks(), processing_loops(), etc
+	// won't get invalidated when new object is added.
+	using Clocks			= std::list<Clock*>;
 	using ProcessingLoops	= std::list<ProcessingLoop*>;
 	using Screens			= std::list<Screen*>;
 
@@ -70,6 +74,20 @@ class Machine: private nu::Noncopyable
 		{ return _instance; }
 
 	/**
+	 * A sequence of registered clocks.
+	 */
+	std::ranges::subrange<Clocks::iterator>
+	clocks() noexcept
+		{ return { _clocks.begin(), _clocks.end() }; }
+
+	/**
+	 * A sequence of registered processing loops.
+	 */
+	std::ranges::subrange<Clocks::const_iterator>
+	clocks() const noexcept
+		{ return { _clocks.begin(), _clocks.end() }; }
+
+	/**
 	 * A sequence of registered processing loops.
 	 */
 	std::ranges::subrange<ProcessingLoops::iterator>
@@ -96,6 +114,15 @@ class Machine: private nu::Noncopyable
 	std::ranges::subrange<Screens::const_iterator>
 	screens() const noexcept
 		{ return { _screens.begin(), _screens.end() }; }
+
+	/**
+	 * Register a clock.
+	 * They will be accessible in the associated ConfiguratorWidget.
+	 * They will not be advanced in any way when advancing processin loop.
+	 */
+	void
+	register_clock (Clock& clock)
+		{ _clocks.push_back (&clock); }
 
 	/**
 	 * Register a processing loop.
@@ -141,6 +168,7 @@ class Machine: private nu::Noncopyable
   private:
 	Xefis&								_xefis;
 	std::u8string						_instance;
+	Clocks								_clocks;
 	ProcessingLoops						_processing_loops;
 	Screens								_screens;
 	std::unique_ptr<ConfiguratorWidget>	_configurator_widget;
