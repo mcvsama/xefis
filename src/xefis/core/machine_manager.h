@@ -38,9 +38,18 @@ class Xefis;
 class BasicMachineManager: private nu::Noncopyable
 {
   public:
+	// Ctor
+	BasicMachineManager (std::u8string_view const name):
+		_name (name)
+	{ }
+
 	// Dtor
 	virtual
 	~BasicMachineManager() = default;
+
+	std::u8string const&
+	name() const
+		{ return _name; }
 
 	virtual void
 	restart() = 0;
@@ -51,6 +60,9 @@ class BasicMachineManager: private nu::Noncopyable
 
 	virtual void
 	kill() = 0;
+
+  private:
+	std::u8string _name;
 };
 
 
@@ -64,18 +76,12 @@ template<std::derived_from<Machine> ConcreteMachine>
 		using MakeMachineFunction = std::function<std::unique_ptr<ConcreteMachine>()>;
 
 	  public:
-		// Ctor
-		explicit
-		MachineManager():
-			MachineManager (std::in_place)
-		{ }
-
 		/**
 		 * Machine is not created until first restart() is called.
 		 */
 		explicit
-		MachineManager (MachineManager::MakeMachineFunction const make_machine):
-			_make_machine (make_machine)
+		MachineManager (std::u8string_view const name):
+			MachineManager (name, std::in_place)
 		{ }
 
 		/**
@@ -83,11 +89,20 @@ template<std::derived_from<Machine> ConcreteMachine>
 		 */
 		template<class ...Args>
 			explicit
-			MachineManager (std::in_place_t, Args&& ...args_for_machine):
-				_make_machine ([&args_for_machine...] mutable {
+			MachineManager (std::u8string_view const name, std::in_place_t, Args&& ...args_for_machine):
+				MachineManager (name, [&args_for_machine...] mutable {
 					return std::make_unique<ConcreteMachine> (std::forward<Args> (args_for_machine)...);
 				})
 			{ }
+
+		/**
+		 * Machine is not created until first restart() is called.
+		 */
+		explicit
+		MachineManager (std::u8string_view const name, MachineManager::MakeMachineFunction const make_machine):
+			BasicMachineManager (name),
+			_make_machine (make_machine)
+		{ }
 
 		// Dtor
 		virtual

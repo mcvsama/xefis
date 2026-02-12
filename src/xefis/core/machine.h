@@ -44,7 +44,7 @@ class Machine: private nu::Noncopyable
   public:
 	// Ctor
 	explicit
-	Machine (Xefis&, std::u8string_view name = u8"");
+	Machine (Xefis&, std::u8string_view instance = u8"");
 
 	/**
 	 * Dtor
@@ -62,12 +62,12 @@ class Machine: private nu::Noncopyable
 		{ return _xefis; }
 
 	/**
-	 * Return machine name.
+	 * Return machine instance name.
 	 */
 	[[nodiscard]]
 	std::u8string_view
-	name() const
-		{ return _name; }
+	instance() const
+		{ return _instance; }
 
 	/**
 	 * A sequence of registered processing loops.
@@ -140,7 +140,7 @@ class Machine: private nu::Noncopyable
 
   private:
 	Xefis&								_xefis;
-	std::u8string						_name;
+	std::u8string						_instance;
 	ProcessingLoops						_processing_loops;
 	Screens								_screens;
 	std::unique_ptr<ConfiguratorWidget>	_configurator_widget;
