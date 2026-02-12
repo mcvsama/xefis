@@ -15,6 +15,7 @@
 #include <xefis/core/cycle.h>
 #include <xefis/core/sockets/module_socket.h>
 #include <xefis/core/sockets/tests/test_cycle.h>
+#include <xefis/core/sockets/tests/test_enum.h>
 #include <xefis/test/test_processing_loop.h>
 
 // Neutrino:
@@ -36,79 +37,6 @@ namespace test_asserts = nu::test_asserts;
 
 using namespace nu::si::units;
 using namespace std::literals;
-
-inline namespace test_enum {
-
-enum class TestEnum
-{
-	Value1,
-	Value2,
-};
-
-
-enum class TestEnumWithNil
-{
-	Value1,
-	Value2,
-	xf_nil_value,
-};
-
-
-constexpr std::string_view
-to_string (TestEnum value)
-{
-	switch (value)
-	{
-		case TestEnum::Value1:	return "Value1";
-		case TestEnum::Value2:	return "Value2";
-	}
-
-	return "";
-}
-
-
-template<std::same_as<TestEnum> Enum>
-	Enum
-	parse (std::string_view const str)
-	{
-		if (str == "Value1")
-			return TestEnum::Value1;
-		else if (str == "Value2")
-			return TestEnum::Value2;
-		else
-			throw nu::Exception ("invalid enum string \"" + std::string (str) + "\"");
-	}
-
-
-constexpr std::string_view
-to_string (TestEnumWithNil value)
-{
-	switch (value)
-	{
-		case TestEnumWithNil::Value1:		return "Value1";
-		case TestEnumWithNil::Value2:		return "Value2";
-		case TestEnumWithNil::xf_nil_value:	return "";
-	}
-
-	return "";
-}
-
-
-template<std::same_as<TestEnumWithNil> Enum>
-	Enum
-	parse (std::string_view const str)
-	{
-		if (str == "Value1")
-			return TestEnumWithNil::Value1;
-		else if (str == "Value2")
-			return TestEnumWithNil::Value2;
-		else if (str == "")
-			return TestEnumWithNil::xf_nil_value;
-		else
-			throw nu::Exception ("invalid enum string \"" + std::string (str) + "\"");
-	}
-
-} // namespace test_enum
 
 
 nu::Logger g_null_logger;
