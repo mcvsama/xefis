@@ -103,6 +103,7 @@ class BasicSocket:
 	 * Alias for valid().
 	 */
 	[[nodiscard]]
+	explicit
 	operator bool() const noexcept
 		{ return valid(); }
 
