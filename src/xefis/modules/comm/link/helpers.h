@@ -66,7 +66,7 @@ template<std::ranges::range SocketsRange>
 	{
 		auto list = LinkProtocol::PacketList();
 
-		for (auto& socket: sockets)
+		for (auto socket: sockets)
 			list.push_back (LinkProtocol::local_socket (*socket));
 
 		return list;
