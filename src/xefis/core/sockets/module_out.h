@@ -67,7 +67,7 @@ template<class pValue>
 		 * Made private to hide it from user (ModuleOut should always belong to a Module).
 		 */
 		void
-		operator<< (NoDataSource)
+		operator<< (NoDataSource) override
 		{ }
 
 	  private:
