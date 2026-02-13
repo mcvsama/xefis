@@ -43,7 +43,7 @@ setup_xefis_executable (int argc, char** argv, std::function<void()> run_app_fun
 	signal (SIGILL, nu::fail);
 	signal (SIGFPE, nu::fail);
 	signal (SIGSEGV, nu::fail);
-	signal (SIGHUP, [](int) { nu::g_hup_received.store (true); });
+	signal (SIGHUP, [](int) { nu::global::hup_received.store (true); });
 
 	setenv ("LC_ALL", "C.UTF-8", 1);
 	setlocale (LC_ALL, "C.UTF-8");

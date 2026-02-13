@@ -32,6 +32,8 @@
 
 namespace xf::crypto::xle {
 
+namespace global {
+
 // These need to be used as user-info with HKDF for keys used for encryption.
 // Different user-info for master-to-slave and slave-to-master channels are
 // required to avoid using the same key in both ways (keys should never be
@@ -40,6 +42,8 @@ static Blob const kMasterToSlave { 0x01 };
 static Blob const kSlaveToMaster { 0x02 };
 
 static thread_local std::random_device transceiver_rnd ("hw");
+
+} // namespace global
 
 
 Transceiver::Transceiver (Role const role, size_t ciphertext_expansion, nu::Logger const& logger):
@@ -177,7 +181,7 @@ Transceiver::role_name() const
 
 
 MasterTransceiver::Session::HandshakeRequested::HandshakeRequested (CryptoParams const& params):
-	handshake_master (transceiver_rnd, {
+	handshake_master (global::transceiver_rnd, {
 		.master_signature_key = params.master_signature_key,
 		.slave_signature_key = params.slave_signature_key,
 		.hmac_size = params.hmac_size,
@@ -188,14 +192,14 @@ MasterTransceiver::Session::HandshakeRequested::HandshakeRequested (CryptoParams
 
 
 MasterTransceiver::Session::Connected::Connected (nu::Secure<Blob> const& ephemeral_key, CryptoParams const& params):
-	transmitter (transceiver_rnd, {
+	transmitter (global::transceiver_rnd, {
 		.ephemeral_session_key = *ephemeral_key,
 		.authentication_secret = params.authentication_secret,
 		.data_encryption_secret = params.data_encryption_secret,
 		.seq_num_encryption_secret = params.seq_num_encryption_secret,
 		.hmac_size = params.hmac_size,
 		// This ensures actual keys are different for both directions:
-		.hkdf_user_info = kMasterToSlave,
+		.hkdf_user_info = global::kMasterToSlave,
 	}),
 	receiver ({
 		.ephemeral_session_key = *ephemeral_key,
@@ -204,7 +208,7 @@ MasterTransceiver::Session::Connected::Connected (nu::Secure<Blob> const& epheme
 		.seq_num_encryption_secret = params.seq_num_encryption_secret,
 		.hmac_size = params.hmac_size,
 		// This ensures actual keys are different for both directions:
-		.hkdf_user_info = kSlaveToMaster,
+		.hkdf_user_info = global::kSlaveToMaster,
 	})
 { }
 
@@ -376,7 +380,7 @@ SlaveTransceiver::Session::Session (Blob const& handshake_request,
 									HandshakeSlave::KeyCheckFunctions const key_check_callbacks):
 	Transceiver::Session ("S", _id_generator)
 {
-	auto handshake_slave = HandshakeSlave (transceiver_rnd, {
+	auto handshake_slave = HandshakeSlave (global::transceiver_rnd, {
 		.master_signature_key = params.master_signature_key,
 		.slave_signature_key = params.slave_signature_key,
 		.hmac_size = params.hmac_size,
@@ -384,14 +388,14 @@ SlaveTransceiver::Session::Session (Blob const& handshake_request,
 	}, key_check_callbacks);
 	auto const response_and_key = handshake_slave.generate_handshake_blob_and_key (handshake_request, nu::utc_now());
 	_handshake_response = response_and_key.handshake_response;
-	_transmitter.emplace (transceiver_rnd, Transmitter::Params {
+	_transmitter.emplace (global::transceiver_rnd, Transmitter::Params {
 		.ephemeral_session_key = *response_and_key.ephemeral_key,
 		.authentication_secret = params.authentication_secret,
 		.data_encryption_secret = params.data_encryption_secret,
 		.seq_num_encryption_secret = params.seq_num_encryption_secret,
 		.hmac_size = params.hmac_size,
 		// This ensures actual keys are different for both directions:
-		.hkdf_user_info = kSlaveToMaster,
+		.hkdf_user_info = global::kSlaveToMaster,
 	});
 	_receiver.emplace (Receiver::Params {
 		.ephemeral_session_key = *response_and_key.ephemeral_key,
@@ -400,7 +404,7 @@ SlaveTransceiver::Session::Session (Blob const& handshake_request,
 		.seq_num_encryption_secret = params.seq_num_encryption_secret,
 		.hmac_size = params.hmac_size,
 		// This ensures actual keys are different for both directions:
-		.hkdf_user_info = kMasterToSlave,
+		.hkdf_user_info = global::kMasterToSlave,
 	});
 }
 

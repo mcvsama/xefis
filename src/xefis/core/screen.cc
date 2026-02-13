@@ -37,8 +37,12 @@
 
 namespace xf {
 
+namespace global {
+
 static constexpr char		kLogoPath[]			= "share/images/xefis.svg";
 static constexpr si::Time	kLogoDisplayTime	= 2_s;
+
+} // namespace global
 
 
 InstrumentDetails::InstrumentDetails (Instrument& instrument, nu::WorkPerformer& work_performer):
@@ -82,7 +86,7 @@ Screen::Screen (ScreenSpec const& spec, Graphics const& graphics, Machine& machi
 
 	_hide_logo_timer = new QTimer (this);
 	_hide_logo_timer->setSingleShot (true);
-	_hide_logo_timer->setInterval (kLogoDisplayTime.in<si::Millisecond>());
+	_hide_logo_timer->setInterval (global::kLogoDisplayTime.in<si::Millisecond>());
 	QObject::connect (_hide_logo_timer, &QTimer::timeout, this, &Screen::hide_logo);
 	// Start will be called in the showEvent.
 
@@ -253,7 +257,7 @@ Screen::paint_logo_to_buffer()
 		_logo_image = allocate_image (QSize (lesser_dim, lesser_dim));
 		_logo_image->fill (Qt::transparent);
 		QPainter logo_image_painter (&*_logo_image);
-		QSvgRenderer (QString (kLogoPath)).render (&logo_image_painter);
+		QSvgRenderer (QString (global::kLogoPath)).render (&logo_image_painter);
 	}
 
 	QPainter canvas_painter (&_canvas);

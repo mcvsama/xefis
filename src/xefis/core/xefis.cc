@@ -50,6 +50,8 @@
 
 namespace xf {
 
+namespace global {
+
 /**
  * Scaling in Qt6 is horribly broken. You can't get reliably physical DPI of the screen to properly draw stuff.
  * These workarounds are figured out experimentally to disable automatic scaling in Qt6 and make Xefis look more or less not-ugly.
@@ -58,10 +60,10 @@ namespace xf {
  *
  * The size of fonts on KDE/Plasma will still be wrong even with those settings, so I added an option to manually provide font size to be used by Xefis when run
  * in KDE.
+ *
+ * Needs to be executed before main(), so make it a static variable.
  */
-bool
-fix_broken_qt6_scaling()
-{
+static void* fixed_broken_qt6_scaling = []{
 	auto const overwrite_existing = 1;
 
 	// Without this Qt always reports DPI=96 (what the actual fuck):
@@ -72,12 +74,10 @@ fix_broken_qt6_scaling()
 	setenv ("QT_SCREEN_SCALE_FACTORS", "", overwrite_existing);
 	setenv ("QT_AUTO_SCREEN_SCALE_FACTOR", "0", overwrite_existing);
 
-	return true;
-}
+	return nullptr;
+}();
 
-
-// Needs to be executed before main(), so make it a static variable:
-static bool fixed = fix_broken_qt6_scaling();
+} // namespace global
 
 
 Xefis::Xefis (int& argc, char** argv):
@@ -170,7 +170,7 @@ Xefis::setup_unix_signals_handler()
 	_posix_signals_check_timer->setSingleShot (false);
 	_posix_signals_check_timer->setInterval ((100_ms).in<si::Millisecond>());
 	QObject::connect (_posix_signals_check_timer, &QTimer::timeout, [&]{
-		if (nu::g_hup_received.load())
+		if (nu::global::hup_received.load())
 		{
 			_logger << "HUP received, exiting." << std::endl;
 			quit();

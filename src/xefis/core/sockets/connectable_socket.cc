@@ -23,14 +23,18 @@
 
 namespace xf {
 
-std::optional<nu::Logger> g_connectable_socket_exception_logger;
+namespace global {
+
+std::optional<nu::Logger> connectable_socket_exception_logger;
+
+} // namespace global
 
 
 nu::Logger const*
 connectable_socket_fetch_exception_logger()
 {
-	if (g_connectable_socket_exception_logger)
-		return &*g_connectable_socket_exception_logger;
+	if (global::connectable_socket_exception_logger)
+		return &*global::connectable_socket_exception_logger;
 	else
 		return nullptr;
 }
@@ -40,9 +44,9 @@ void
 set_connectable_socket_fetch_exception_logger (nu::Logger const* logger)
 {
 	if (logger)
-		g_connectable_socket_exception_logger = *logger;
+		global::connectable_socket_exception_logger = *logger;
 	else
-		g_connectable_socket_exception_logger.reset();
+		global::connectable_socket_exception_logger.reset();
 }
 
 } // namespace xf

@@ -37,9 +37,13 @@
 #include <cstddef>
 
 
+namespace global {
+
 static constexpr auto kTransparentStyleSheet =
 	"QWidget		{ background: rgba(220, 220, 220, 0.3); } "
 	"QWidget:hover	{ background: rgba(255, 255, 255, 0.6); } ";
+
+} // namespace global
 
 
 struct MouseControl
@@ -163,7 +167,7 @@ MouseControl::delta() const noexcept
 VirtualJoystickWidget::VirtualJoystickWidget (xf::Machine* machine, QWidget* parent):
 	Widget (parent)
 {
-	setStyleSheet (kTransparentStyleSheet);
+	setStyleSheet (global::kTransparentStyleSheet);
 	setFixedSize (_paint_helper.em_pixels (20), _paint_helper.em_pixels (20));
 
 	{
@@ -308,7 +312,7 @@ VirtualLinearWidget::VirtualLinearWidget (nu::Range<float> range, Orientation or
 	_orientation (orientation),
 	_style (style)
 {
-	setStyleSheet (kTransparentStyleSheet);
+	setStyleSheet (global::kTransparentStyleSheet);
 
 	switch (_orientation)
 	{
