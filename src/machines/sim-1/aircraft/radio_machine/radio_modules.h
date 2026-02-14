@@ -18,8 +18,8 @@
 #include <xefis/core/sockets/module_in.h>
 #include <xefis/core/sockets/module_out.h>
 #include <xefis/modules/comm/link/helpers.h>
-#include <xefis/modules/comm/link/input_link.h>
-#include <xefis/modules/comm/link/output_link.h>
+#include <xefis/modules/comm/link/link_decoder.h>
+#include <xefis/modules/comm/link/link_encoder.h>
 #include <xefis/modules/comm/udp.h>
 
 // Standard:

@@ -28,8 +28,8 @@ HardwareModules::HardwareModules (xf::ProcessingLoop& loop, nu::Logger const& lo
 	_loop (loop)
 {
 	// Connect with the Flight Computer machine:
-	this->flight_computer_machine_transceiver.send << this->hardware_to_flight_computer_data_encoder.link_output;
-	this->flight_computer_to_hardware_data_decoder.link_input << this->flight_computer_machine_transceiver.receive;
+	this->flight_computer_machine_transceiver.send << this->hardware_to_flight_computer_data_encoder.encoded_output;
+	this->flight_computer_to_hardware_data_decoder.encoded_input << this->flight_computer_machine_transceiver.receive;
 }
 
 } // namespace sim1::aircraft

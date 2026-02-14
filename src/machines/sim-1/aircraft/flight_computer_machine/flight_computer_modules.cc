@@ -31,8 +31,8 @@ FlightComputerModules::FlightComputerModules (xf::ProcessingLoop& loop, nu::Logg
 	this->air_data_computer.ias_valid_maximum = 100_mps;
 
 	// Connect with the Hardware machine:
-	this->hardware_machine_transceiver.send << this->flight_computer_to_hardware_data_encoder.link_output;
-	this->hardware_to_flight_computer_data_decoder.link_input << this->hardware_machine_transceiver.receive;
+	this->hardware_machine_transceiver.send << this->flight_computer_to_hardware_data_encoder.encoded_output;
+	this->hardware_to_flight_computer_data_decoder.encoded_input << this->hardware_machine_transceiver.receive;
 
 	this->air_data_computer.pressure_use_std		<< false;
 	this->air_data_computer.pressure_qnh			<< 1013.25_hPa;

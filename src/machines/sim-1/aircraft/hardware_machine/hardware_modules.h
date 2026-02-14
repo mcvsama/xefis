@@ -66,8 +66,8 @@ class HardwareModules
 		"connection to Flight Computer machine",
 	};
 
-	OutputLink	hardware_to_flight_computer_data_encoder	{ hardware_to_flight_computer_data.make_link_encoder (_loop, _logger) };
-	InputLink	flight_computer_to_hardware_data_decoder	{ flight_computer_to_hardware_data.make_link_decoder (_loop, _logger) };
+	LinkEncoder	hardware_to_flight_computer_data_encoder	{ hardware_to_flight_computer_data.make_link_encoder (_loop, _logger) };
+	LinkDecoder	flight_computer_to_hardware_data_decoder	{ flight_computer_to_hardware_data.make_link_decoder (_loop, _logger) };
 };
 
 } // namespace sim1::aircraft

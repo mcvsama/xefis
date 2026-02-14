@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__MODULES__COMM__LINK__INPUT_H__INCLUDED
-#define XEFIS__MODULES__COMM__LINK__INPUT_H__INCLUDED
+#ifndef XEFIS__MODULES__COMM__LINK__LINK_DECODER_H__INCLUDED
+#define XEFIS__MODULES__COMM__LINK__LINK_DECODER_H__INCLUDED
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -26,17 +26,17 @@
 namespace si = nu::si;
 
 
-struct InputLinkParams
+struct LinkDecoderParams
 {
 	std::optional<si::Time>		reacquire_after;
 	std::optional<si::Time>		failsafe_after;
 };
 
 
-class InputLink: public xf::Module
+class LinkDecoder: public xf::Module
 {
   public:
-	xf::ModuleIn<std::string>	link_input				{ this, "input" };
+	xf::ModuleIn<std::string>	encoded_input			{ this, "encoded-input" };
 
 	xf::ModuleOut<bool>			link_valid				{ this, "link-valid" };
 	xf::ModuleOut<int64_t>		link_failsafes			{ this, "failsafes" };
@@ -48,12 +48,12 @@ class InputLink: public xf::Module
 	xf::ModuleOut<int64_t>		link_valid_envelopes	{ this, "valid-envelopes" };
 
   private:
-	static constexpr char kLoggerScope[] = "mod::InputLink";
+	static constexpr char kLoggerScope[] = "mod::LinkDecoder";
 
   public:
 	// Ctor
 	explicit
-	InputLink (xf::ProcessingLoop&, std::unique_ptr<LinkProtocol>, InputLinkParams const&, nu::Logger const&, std::string_view const instance = {});
+	LinkDecoder (xf::ProcessingLoop&, std::unique_ptr<LinkProtocol>, LinkDecoderParams const&, nu::Logger const&, std::string_view const instance = {});
 
 	void
 	process (xf::Cycle const&) override;
@@ -77,8 +77,8 @@ class InputLink: public xf::Module
 	std::unique_ptr<QTimer>			_reacquire_timer;
 	Blob							_input_blob;
 	std::unique_ptr<LinkProtocol>	_protocol;
-	xf::SocketChanged				_input_changed		{ link_input };
-	InputLinkParams					_params;
+	xf::SocketChanged				_input_changed		{ encoded_input };
+	LinkDecoderParams				_params;
 };
 
 #endif

@@ -16,7 +16,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/modules/comm/link/input_link.h>
+#include <xefis/modules/comm/link/link_decoder.h>
 #include <xefis/utility/hextable.h>
 
 // Neutrino:
@@ -436,7 +436,7 @@ LinkProtocol::produce_append (Blob& blob, [[maybe_unused]] nu::Logger const& log
 Blob::const_iterator
 LinkProtocol::consume (Blob::const_iterator begin,
 					   Blob::const_iterator end,
-					   InputLink* input_link,
+					   LinkDecoder* link_decoder,
 					   QTimer* reacquire_timer,
 					   QTimer* failsafe_timer,
 					   nu::Logger const& logger)
@@ -454,8 +454,8 @@ LinkProtocol::consume (Blob::const_iterator begin,
 			if (std::distance (begin, end) >= 1)
 				++begin;
 
-			if (input_link)
-				input_link->link_error_bytes = input_link->link_error_bytes.value_or (0) + 1;
+			if (link_decoder)
+				link_decoder->link_error_bytes = link_decoder->link_error_bytes.value_or (0) + 1;
 
 			// Since there was an error, stop the reacquire timer:
 			if (reacquire_timer)
@@ -493,17 +493,17 @@ LinkProtocol::consume (Blob::const_iterator begin,
 					begin = e;
 				}
 
-				if (input_link)
-					input_link->link_valid_envelopes = input_link->link_valid_envelopes.value_or (0) + 1;
+				if (link_decoder)
+					link_decoder->link_valid_envelopes = link_decoder->link_valid_envelopes.value_or (0) + 1;
 
 				// Restart failsafe timer:
 				if (failsafe_timer)
 					failsafe_timer->start();
 
-				// If input_link is not valid, and we got valid envelope,
+				// If link_decoder is not valid, and we got valid envelope,
 				// start reacquire timer:
-				if (reacquire_timer && input_link)
-					if (!input_link->link_valid.value_or (false) && !reacquire_timer->isActive())
+				if (reacquire_timer && link_decoder)
+					if (!link_decoder->link_valid.value_or (false) && !reacquire_timer->isActive())
 						reacquire_timer->start();
 			}
 			catch (LinkProtocol::ParseError&)

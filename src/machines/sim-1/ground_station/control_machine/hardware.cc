@@ -28,8 +28,8 @@ Hardware::Hardware (xf::ProcessingLoop& loop, xf::Machine* machine, nu::Logger c
 	_loop (loop),
 	_machine (machine)
 {
-	this->udp_link.send << this->ground_to_air_link.link_output;
-	this->air_to_ground_link.link_input << this->udp_link.receive;
+	this->udp_link.send << this->ground_to_air_link.encoded_output;
+	this->air_to_ground_link.encoded_input << this->udp_link.receive;
 }
 
 } // namespace sim1::ground_station::control_machine

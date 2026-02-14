@@ -23,8 +23,8 @@
 #include <xefis/core/machine.h>
 #include <xefis/core/sockets/module_in.h>
 #include <xefis/core/sockets/module_out.h>
-#include <xefis/modules/comm/link/input_link.h>
-#include <xefis/modules/comm/link/output_link.h>
+#include <xefis/modules/comm/link/link_decoder.h>
+#include <xefis/modules/comm/link/link_encoder.h>
 #include <xefis/modules/comm/udp.h>
 #include <xefis/modules/comm/xle_transceiver.h>
 #include <xefis/modules/simulation/virtual_joystick.h>
@@ -65,20 +65,20 @@ class Hardware
 		"master transceiver",
 	};
 
-	InputLink air_to_ground_link {
+	LinkDecoder air_to_ground_link {
 		_loop,
 		std::make_unique<sim1::AirToGroundProtocol> (air_to_ground_data, master_transceiver),
 		{},
-		_logger.with_context ("input link"),
-		"input link",
+		_logger.with_context ("link decoder"),
+		"link decoder",
 	};
 
-	OutputLink ground_to_air_link {
+	LinkEncoder ground_to_air_link {
 		_loop,
 		std::make_unique<sim1::GroundToAirProtocol> (ground_to_air_data, master_transceiver),
 		30_Hz,
-		_logger.with_context ("output link"),
-		"output link",
+		_logger.with_context ("link encoder"),
+		"link encoder",
 	};
 
 	UDP udp_link {

@@ -48,7 +48,7 @@
 namespace nu = neutrino;
 namespace si = nu::si;
 
-class InputLink;
+class LinkDecoder;
 
 
 class LinkProtocol
@@ -555,7 +555,7 @@ class LinkProtocol
 	produce_append (Blob&, nu::Logger const&);
 
 	Blob::const_iterator
-	consume (Blob::const_iterator begin, Blob::const_iterator end, InputLink*, QTimer* reacquire_timer, QTimer* failsafe_timer, nu::Logger const&);
+	consume (Blob::const_iterator begin, Blob::const_iterator end, LinkDecoder*, QTimer* reacquire_timer, QTimer* failsafe_timer, nu::Logger const&);
 
 	void
 	failsafe();

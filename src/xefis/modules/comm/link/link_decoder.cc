@@ -12,13 +12,13 @@
  */
 
 // Local:
-#include "input_link.h"
+#include "link_decoder.h"
 
 
 using namespace nu::si::literals;
 
 
-InputLink::InputLink (xf::ProcessingLoop& loop, std::unique_ptr<LinkProtocol> protocol, InputLinkParams const& params, nu::Logger const& logger, std::string_view const instance):
+LinkDecoder::LinkDecoder (xf::ProcessingLoop& loop, std::unique_ptr<LinkProtocol> protocol, LinkDecoderParams const& params, nu::Logger const& logger, std::string_view const instance):
 	Module (loop, instance),
 	_logger (logger.with_context (std::string (kLoggerScope) + "#" + instance)),
 	_protocol (std::move (protocol)),
@@ -45,12 +45,12 @@ InputLink::InputLink (xf::ProcessingLoop& loop, std::unique_ptr<LinkProtocol> pr
 
 
 void
-InputLink::process (xf::Cycle const& cycle)
+LinkDecoder::process (xf::Cycle const& cycle)
 {
 	try {
-		if (this->link_input && _input_changed.serial_changed())
+		if (this->encoded_input && _input_changed.serial_changed())
 		{
-			_input_blob.insert (_input_blob.end(), this->link_input->begin(), this->link_input->end());
+			_input_blob.insert (_input_blob.end(), this->encoded_input->begin(), this->encoded_input->end());
 			auto e = _protocol->consume (_input_blob.begin(), _input_blob.end(), this, _reacquire_timer.get(), _failsafe_timer.get(), cycle.logger() + _logger);
 			auto valid_bytes = std::distance (_input_blob.cbegin(), e);
 			this->link_valid_bytes = this->link_valid_bytes.value_or (0) + valid_bytes;
@@ -66,7 +66,7 @@ InputLink::process (xf::Cycle const& cycle)
 
 
 void
-InputLink::failsafe()
+LinkDecoder::failsafe()
 {
 	this->link_valid = false;
 	this->link_failsafes = this->link_failsafes.value_or (0) + 1;
@@ -75,7 +75,7 @@ InputLink::failsafe()
 
 
 void
-InputLink::reacquire()
+LinkDecoder::reacquire()
 {
 	this->link_valid = true;
 	this->link_reacquires = this->link_reacquires.value_or (0) + 1;

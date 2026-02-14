@@ -19,9 +19,9 @@
 #include <xefis/core/sockets/module_socket.h>
 #include <xefis/core/processing_loop.h>
 #include <xefis/modules/comm/link/helpers.h>
-#include <xefis/modules/comm/link/input_link.h>
+#include <xefis/modules/comm/link/link_decoder.h>
+#include <xefis/modules/comm/link/link_encoder.h>
 #include <xefis/modules/comm/link/link_protocol.h>
-#include <xefis/modules/comm/link/output_link.h>
 
 
 namespace sim1 {
@@ -50,10 +50,10 @@ template<template<class> class SocketType>
 		// Ctor
 		using Module::Module;
 
-		InputLink
+		LinkDecoder
 		make_link_decoder (xf::ProcessingLoop& loop, nu::Logger const& logger)
 		{
-		   return InputLink(
+			return LinkDecoder(
 				loop,
 				make_link_protocol_from_outputs (*this, kDir, kEnvelopePrefix),
 				{},
@@ -62,10 +62,10 @@ template<template<class> class SocketType>
 			);
 		}
 
-		OutputLink
+		LinkEncoder
 		make_link_encoder (xf::ProcessingLoop& loop, nu::Logger const& logger)
 		{
-			return OutputLink(
+			return LinkEncoder(
 				loop,
 				make_link_protocol_from_inputs (*this, kDir, kEnvelopePrefix),
 				120_Hz,

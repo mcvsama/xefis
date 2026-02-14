@@ -66,22 +66,22 @@ class RadioMachine: public xf::SingleLoopMachine
 
 	sim1::GroundToAirData<xf::ModuleOut> ground_to_air_data { loop() };
 
-	InputLink ground_to_air_link {
+	LinkDecoder ground_to_air_link {
 		loop(),
 		std::make_unique<sim1::GroundToAirProtocol> (ground_to_air_data, slave_transceiver),
 		{},
-		logger().with_context ("input link"),
-		"input link",
+		logger().with_context ("link decoder"),
+		"link decoder",
 	};
 
 	sim1::AirToGroundData<xf::ModuleIn> air_to_ground_data { loop() };
 
-	OutputLink air_to_ground_link {
+	LinkEncoder air_to_ground_link {
 		loop(),
 		std::make_unique<sim1::AirToGroundProtocol> (air_to_ground_data, slave_transceiver),
 		30_Hz,
-		logger().with_context ("output link"),
-		"output link",
+		logger().with_context ("link encoder"),
+		"link encoder",
 	};
 };
 

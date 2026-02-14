@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__MODULES__COMM__LINK__OUTPUT_H__INCLUDED
-#define XEFIS__MODULES__COMM__LINK__OUTPUT_H__INCLUDED
+#ifndef XEFIS__MODULES__COMM__LINK__LINK_ENCODER_H__INCLUDED
+#define XEFIS__MODULES__COMM__LINK__LINK_ENCODER_H__INCLUDED
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -26,18 +26,18 @@ namespace si = nu::si;
 using namespace si::literals;
 
 
-class OutputLink: public xf::Module
+class LinkEncoder: public xf::Module
 {
   public:
-	xf::ModuleOut<std::string> link_output { this, "output" };
+	xf::ModuleOut<std::string> encoded_output { this, "encoded-output" };
 
   private:
-	static constexpr char kLoggerScope[] = "mod::OutputLink";
+	static constexpr char kLoggerScope[] = "mod::LinkEncoder";
 
   public:
 	// Ctor
 	explicit
-	OutputLink (xf::ProcessingLoop&, std::unique_ptr<LinkProtocol>, si::Frequency send_frequency, nu::Logger const&, std::string_view const instance = {});
+	LinkEncoder (xf::ProcessingLoop&, std::unique_ptr<LinkProtocol>, si::Frequency send_frequency, nu::Logger const&, std::string_view const instance = {});
 
   protected:
 	// Module API

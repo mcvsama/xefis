@@ -25,8 +25,8 @@
 #include <xefis/core/sockets/module_out.h>
 #include <xefis/core/clock.h>
 #include <xefis/core/xefis.h>
-#include <xefis/modules/comm/link/input_link.h>
-#include <xefis/modules/comm/link/output_link.h>
+#include <xefis/modules/comm/link/link_decoder.h>
+#include <xefis/modules/comm/link/link_encoder.h>
 #include <xefis/support/core/single_loop_machine.h>
 
 // Standard:

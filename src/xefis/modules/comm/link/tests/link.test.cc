@@ -16,9 +16,9 @@
 #include <xefis/core/sockets/module_in.h>
 #include <xefis/core/sockets/module_out.h>
 #include <xefis/core/module.h>
-#include <xefis/modules/comm/link/input_link.h>
+#include <xefis/modules/comm/link/link_decoder.h>
+#include <xefis/modules/comm/link/link_encoder.h>
 #include <xefis/modules/comm/link/link_protocol.h>
-#include <xefis/modules/comm/link/output_link.h>
 #include <xefis/modules/comm/xle_transceiver.h>
 #include <xefis/test/test_processing_loop.h>
 
@@ -610,10 +610,10 @@ nu::AutoTest t6 ("modules/io/link: protocol: encrypted channel works", []{
 	auto air_tx_protocol = std::make_unique<AirToGroundLinkProtocol> (air_tx_data, &air_transceiver);
 	auto air_rx_protocol = std::make_unique<GroundToAirLinkProtocol> (air_rx_data, &air_transceiver);
 
-	auto ground_tx_link = OutputLink (loop, std::move (ground_tx_protocol), 30_Hz, g_logger.with_context ("ground-tx-link"), "ground/tx-link");
-	auto ground_rx_link = InputLink (loop, std::move (ground_rx_protocol), {}, g_logger.with_context ("ground-rx-link"), "ground/rx-link");
-	auto air_tx_link = OutputLink (loop, std::move (air_tx_protocol), 30_Hz, g_logger.with_context ("air-tx-link"), "air/tx-link");
-	auto air_rx_link = InputLink (loop, std::move (air_rx_protocol), {}, g_logger.with_context ("air-rx-link"), "air/rx-link");
+	auto ground_tx_link = LinkEncoder (loop, std::move (ground_tx_protocol), 30_Hz, g_logger.with_context ("ground-tx-link"), "ground/tx-link");
+	auto ground_rx_link = LinkDecoder (loop, std::move (ground_rx_protocol), {}, g_logger.with_context ("ground-rx-link"), "ground/rx-link");
+	auto air_tx_link = LinkEncoder (loop, std::move (air_tx_protocol), 30_Hz, g_logger.with_context ("air-tx-link"), "air/tx-link");
+	auto air_rx_link = LinkDecoder (loop, std::move (air_rx_protocol), {}, g_logger.with_context ("air-rx-link"), "air/rx-link");
 
 	ground_tx_data.handshake_request << ground_transceiver.handshake_request;
 	ground_transceiver.handshake_response << ground_rx_data.handshake_response;
@@ -621,8 +621,8 @@ nu::AutoTest t6 ("modules/io/link: protocol: encrypted channel works", []{
 	air_transceiver.handshake_request << air_rx_data.handshake_request;
 	air_tx_data.handshake_response << air_transceiver.handshake_response;
 
-	air_rx_link.link_input << ground_tx_link.link_output;
-	ground_rx_link.link_input << air_tx_link.link_output;
+	air_rx_link.encoded_input << ground_tx_link.encoded_output;
+	ground_rx_link.encoded_input << air_tx_link.encoded_output;
 
 	auto [session_prepared, session_activated] = ground_transceiver.start_handshake();
 	auto constexpr kMaxCycles = 6u;

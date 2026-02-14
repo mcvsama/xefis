@@ -22,8 +22,8 @@
 // Xefis:
 #include <xefis/core/sockets/module_in.h>
 #include <xefis/core/sockets/module_out.h>
-#include <xefis/modules/comm/link/input_link.h>
-#include <xefis/modules/comm/link/output_link.h>
+#include <xefis/modules/comm/link/link_decoder.h>
+#include <xefis/modules/comm/link/link_encoder.h>
 #include <xefis/modules/comm/udp.h>
 #include <xefis/modules/systems/air_data_computer.h>
 
@@ -60,8 +60,8 @@ class FlightComputerModules
 		"connection to Hardware machine",
 	};
 
-	OutputLink	flight_computer_to_hardware_data_encoder	{ _flight_computer_to_hardware_data.make_link_encoder (_loop, _logger) };
-	InputLink	hardware_to_flight_computer_data_decoder	{ _hardware_to_flight_computer_data.make_link_decoder (_loop, _logger) };
+	LinkEncoder	flight_computer_to_hardware_data_encoder	{ _flight_computer_to_hardware_data.make_link_encoder (_loop, _logger) };
+	LinkDecoder	hardware_to_flight_computer_data_decoder	{ _hardware_to_flight_computer_data.make_link_decoder (_loop, _logger) };
 };
 
 } // namespace sim1::aircraft

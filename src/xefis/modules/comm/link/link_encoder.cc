@@ -12,17 +12,17 @@
  */
 
 // Local:
-#include "output_link.h"
+#include "link_encoder.h"
 
 
 using namespace nu::si::literals;
 
 
-OutputLink::OutputLink (xf::ProcessingLoop& loop,
-						std::unique_ptr<LinkProtocol> protocol,
-						si::Frequency const send_frequency,
-						nu::Logger const& logger,
-						std::string_view const instance):
+LinkEncoder::LinkEncoder (xf::ProcessingLoop& loop,
+						  std::unique_ptr<LinkProtocol> protocol,
+						  si::Frequency const send_frequency,
+						  nu::Logger const& logger,
+						  std::string_view const instance):
 	Module (loop, instance),
 	_logger (logger.with_context (std::string (kLoggerScope) + "#" + instance)),
 	_protocol (std::move (protocol)),
@@ -33,7 +33,7 @@ OutputLink::OutputLink (xf::ProcessingLoop& loop,
 
 
 void
-OutputLink::process (xf::Cycle const& cycle)
+LinkEncoder::process (xf::Cycle const& cycle)
 {
 	if (cycle.update_time() - _previous_update_time > _send_period)
 	{
@@ -44,10 +44,10 @@ OutputLink::process (xf::Cycle const& cycle)
 
 
 void
-OutputLink::send_output()
+LinkEncoder::send_output()
 {
 	_output_blob.clear();
 	_protocol->produce_append (_output_blob, _logger);
-	this->link_output = std::string (_output_blob.begin(), _output_blob.end());
+	this->encoded_output = std::string (_output_blob.begin(), _output_blob.end());
 }
 
