@@ -20,7 +20,7 @@
 #include <xefis/modules/comm/link/helpers.h>
 #include <xefis/modules/comm/link/link_decoder.h>
 #include <xefis/modules/comm/link/link_encoder.h>
-#include <xefis/modules/comm/udp.h>
+#include <xefis/modules/comm/udp_transceiver.h>
 
 // Standard:
 #include <cstddef>
@@ -41,11 +41,11 @@ class RadioModules
 
   public:
 	// TODO move this to VirtualRadioModules:
-	UDP air_udp_link {
+	UDPTransceiver air_udp_link {
 		_loop,
-		UDP::Parameters {
-			.rx_udp_address		= UDP::Address { "127.0.0.1", 9991 },
-			.tx_udp_address		= UDP::Address { "127.0.0.1", 9990 },
+		UDPTransceiver::Parameters {
+			.rx_udp_address		= UDPTransceiver::Address { "127.0.0.1", 9991 },
+			.tx_udp_address		= UDPTransceiver::Address { "127.0.0.1", 9990 },
 			.rx_interference	= false,
 			.tx_interference	= false,
 		},

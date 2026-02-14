@@ -12,7 +12,7 @@
  */
 
 // Local:
-#include "udp.h"
+#include "udp_transceiver.h"
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -34,7 +34,7 @@
 #include <random>
 
 
-UDP::UDP (xf::ProcessingLoop& loop, Parameters const parameters, nu::Logger const& logger, std::string_view const instance):
+UDPTransceiver::UDPTransceiver (xf::ProcessingLoop& loop, Parameters const parameters, nu::Logger const& logger, std::string_view const instance):
 	Module (loop, instance),
 	_parameters (parameters),
 	_logger (logger.with_context (std::string (kLoggerScope) + "#" + instance))
@@ -58,7 +58,7 @@ UDP::UDP (xf::ProcessingLoop& loop, Parameters const parameters, nu::Logger cons
 
 
 void
-UDP::process (xf::Cycle const&)
+UDPTransceiver::process (xf::Cycle const&)
 {
 	if (_tx && _parameters.tx_udp_address)
 	{
@@ -77,7 +77,7 @@ UDP::process (xf::Cycle const&)
 
 
 void
-UDP::got_udp_packet()
+UDPTransceiver::got_udp_packet()
 {
 	while (_rx->hasPendingDatagrams())
 	{
@@ -94,7 +94,7 @@ UDP::got_udp_packet()
 
 
 void
-UDP::interfere (QByteArray& blob)
+UDPTransceiver::interfere (QByteArray& blob)
 {
 	if (!blob.isEmpty() && rand() % 3 == 0)
 	{

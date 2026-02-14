@@ -25,7 +25,7 @@
 #include <xefis/core/sockets/module_out.h>
 #include <xefis/modules/comm/link/link_decoder.h>
 #include <xefis/modules/comm/link/link_encoder.h>
-#include <xefis/modules/comm/udp.h>
+#include <xefis/modules/comm/udp_transceiver.h>
 #include <xefis/modules/comm/xle_transceiver.h>
 #include <xefis/modules/simulation/virtual_joystick.h>
 // TODO #include <xefis/modules/simulation/virtual_pressure_sensor.h>
@@ -81,11 +81,11 @@ class Hardware
 		"link encoder",
 	};
 
-	UDP udp_link {
+	UDPTransceiver udp_link {
 		_loop,
-		UDP::Parameters {
-			.rx_udp_address		= UDP::Address { "127.0.0.1", 9990 },
-			.tx_udp_address		= UDP::Address { "127.0.0.1", 9991 },
+		UDPTransceiver::Parameters {
+			.rx_udp_address		= UDPTransceiver::Address { "127.0.0.1", 9990 },
+			.tx_udp_address		= UDPTransceiver::Address { "127.0.0.1", 9991 },
 			.rx_interference	= false,
 			.tx_interference	= false,
 		},

@@ -24,7 +24,7 @@
 #include <xefis/core/sockets/module_out.h>
 #include <xefis/modules/comm/link/link_decoder.h>
 #include <xefis/modules/comm/link/link_encoder.h>
-#include <xefis/modules/comm/udp.h>
+#include <xefis/modules/comm/udp_transceiver.h>
 #include <xefis/modules/systems/air_data_computer.h>
 
 // Standard:
@@ -50,9 +50,9 @@ class FlightComputerModules
   public:
 	AirDataComputer air_data_computer { _loop, nullptr, _logger };
 
-	UDP hardware_machine_transceiver {
+	UDPTransceiver hardware_machine_transceiver {
 		_loop,
-		UDP::Parameters {
+		UDPTransceiver::Parameters {
 			.rx_udp_address = sim1::global::hardware_to_flight_computer_address,
 			.tx_udp_address = sim1::global::flight_computer_to_hardware_address,
 		},

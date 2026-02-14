@@ -16,13 +16,13 @@
 
 // Xefis:
 #include <xefis/core/module.h>
-#include <xefis/modules/comm/udp.h>
+#include <xefis/modules/comm/udp_transceiver.h>
 
 
 namespace sim1::global {
 
-static inline auto hardware_to_flight_computer_address = UDP::Address { .host = "127.0.0.1", .port = 9991 };
-static inline auto flight_computer_to_hardware_address = UDP::Address { .host = "127.0.0.1", .port = 9992 };
+static inline auto hardware_to_flight_computer_address = UDPTransceiver::Address { .host = "127.0.0.1", .port = 9991 };
+static inline auto flight_computer_to_hardware_address = UDPTransceiver::Address { .host = "127.0.0.1", .port = 9992 };
 
 } // namespace sim1::global
 

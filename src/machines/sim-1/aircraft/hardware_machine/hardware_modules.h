@@ -20,7 +20,7 @@
 #include <machines/sim-1/aircraft/common/link/hardware_to_flight_computer_data.h>
 
 // Xefis:
-#include <xefis/modules/comm/udp.h>
+#include <xefis/modules/comm/udp_transceiver.h>
 
 // Standard:
 #include <cstddef>
@@ -56,9 +56,9 @@ class HardwareModules
 	sim1::FlightComputerToHardwareData<xf::ModuleOut>	flight_computer_to_hardware_data	{ _loop };
 
   public:
-	UDP flight_computer_machine_transceiver {
+	UDPTransceiver flight_computer_machine_transceiver {
 		_loop,
-		UDP::Parameters {
+		UDPTransceiver::Parameters {
 			.rx_udp_address = sim1::global::flight_computer_to_hardware_address,
 			.tx_udp_address = sim1::global::hardware_to_flight_computer_address,
 		},

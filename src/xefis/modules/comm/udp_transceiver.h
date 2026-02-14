@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__MODULES__COMM__UDP_H__INCLUDED
-#define XEFIS__MODULES__COMM__UDP_H__INCLUDED
+#ifndef XEFIS__MODULES__COMM__UDP_TRANSCEIVER_H__INCLUDED
+#define XEFIS__MODULES__COMM__UDP_TRANSCEIVER_H__INCLUDED
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -34,7 +34,7 @@
 namespace nu = neutrino;
 
 
-class UDP: public xf::Module
+class UDPTransceiver: public xf::Module
 {
   public:
 	/*
@@ -67,12 +67,12 @@ class UDP: public xf::Module
 	};
 
   private:
-	static constexpr char kLoggerScope[] = "mod::UDP";
+	static constexpr char kLoggerScope[] = "mod::UDPTransceiver";
 
   public:
 	// Ctor
 	explicit
-	UDP (xf::ProcessingLoop&, Parameters, nu::Logger const&, std::string_view const instance = {});
+	UDPTransceiver (xf::ProcessingLoop&, Parameters, nu::Logger const&, std::string_view const instance = {});
 
 	// Module API
 	void
