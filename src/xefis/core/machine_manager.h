@@ -87,17 +87,6 @@ template<std::derived_from<Machine> ConcreteMachine>
 		/**
 		 * Machine is not created until first restart() is called.
 		 */
-		template<class ...Args>
-			explicit
-			MachineManager (std::u8string_view const name, std::in_place_t, Args&& ...args_for_machine):
-				MachineManager (name, [&args_for_machine...] mutable {
-					return std::make_unique<ConcreteMachine> (std::forward<Args> (args_for_machine)...);
-				})
-			{ }
-
-		/**
-		 * Machine is not created until first restart() is called.
-		 */
 		explicit
 		MachineManager (std::u8string_view const name, MachineManager::MakeMachineFunction const make_machine):
 			BasicMachineManager (name),

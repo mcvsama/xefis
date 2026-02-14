@@ -89,31 +89,40 @@ class SimulationRun
 
 	xf::MachineManager<sim1::aircraft::HardwareMachine> _hardware_machine {
 		u8"Aircraft/Hardware machine",
-		std::in_place,
-		_xefis,
-		_xefis_clock,
-		_steady_clock,
-		[this] (xf::ProcessingLoop& loop) {
-			return std::make_unique<aircraft::VirtualHardwareModules> (_aircraft, loop, _logger);
+		[this] {
+			return std::make_unique<sim1::aircraft::HardwareMachine> (
+				_xefis,
+				_xefis_clock,
+				_steady_clock,
+				[this] (xf::ProcessingLoop& loop) {
+					return std::make_unique<aircraft::VirtualHardwareModules> (_aircraft, loop, _logger);
+				}
+			);
 		},
 	};
 
 	xf::MachineManager<sim1::aircraft::RadioMachine> _radio_machine {
 		u8"Aircraft/Radio machine",
-		std::in_place,
-		_xefis,
-		_xefis_clock,
-		_steady_clock,
-		true,
+		[this] {
+			return std::make_unique<sim1::aircraft::RadioMachine> (
+				_xefis,
+				_xefis_clock,
+				_steady_clock,
+				true
+			);
+		},
 	};
 
 	xf::MachineManager<sim1::aircraft::FlightComputerMachine> _flight_computer_machine {
 		u8"Aircraft/Flight Computer machine",
-		std::in_place,
-		_xefis,
-		_xefis_clock,
-		_steady_clock,
-		true,
+		[this] {
+			return std::make_unique<sim1::aircraft::FlightComputerMachine> (
+				_xefis,
+				_xefis_clock,
+				_steady_clock,
+				true
+			);
+		},
 	};
 };
 
