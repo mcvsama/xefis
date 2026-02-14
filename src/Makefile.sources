@@ -565,4 +565,3 @@ $(foreach machine,$(XEFIS_MACHINES),$(eval $(call MACHINE_TEMPLATE,$(machine))))
 .PHONY: doc
 doc:
 	@cd doc && doxygen doxygen-conf/doxygen.conf
-

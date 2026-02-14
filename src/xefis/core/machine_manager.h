@@ -126,4 +126,3 @@ template<std::derived_from<Machine> ConcreteMachine>
 } // namespace xf
 
 #endif
-
