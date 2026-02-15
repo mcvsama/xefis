@@ -253,7 +253,11 @@ std::string
 identifier (Module const& module)
 {
 	auto s = nu::demangle (typeid (module));
-	return s.substr (0, s.find ("<")) + "#" + module.instance();
+	auto n = s.substr (0, s.find ("<"));
+	auto const& i = module.instance();
+	return i.empty()
+		? n
+		: n + " • " + i;
 }
 
 
