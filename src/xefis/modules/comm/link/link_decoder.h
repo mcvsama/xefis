@@ -26,13 +26,6 @@
 namespace si = nu::si;
 
 
-struct LinkDecoderParams
-{
-	std::optional<si::Time>		reacquire_after;
-	std::optional<si::Time>		failsafe_after;
-};
-
-
 class LinkDecoder: public xf::Module
 {
   public:
@@ -47,13 +40,20 @@ class LinkDecoder: public xf::Module
 	// This is set by the LinkProtocol:
 	xf::ModuleOut<int64_t>		link_valid_envelopes	{ this, "valid-envelopes" };
 
+  public:
+	struct Parameters
+	{
+		std::optional<si::Time>		reacquire_after;
+		std::optional<si::Time>		failsafe_after;
+	};
+
   private:
 	static constexpr char kLoggerScope[] = "mod::LinkDecoder";
 
   public:
 	// Ctor
 	explicit
-	LinkDecoder (xf::ProcessingLoop&, std::unique_ptr<LinkProtocol>, LinkDecoderParams const&, nu::Logger const&, std::string_view const instance = {});
+	LinkDecoder (xf::ProcessingLoop&, std::unique_ptr<LinkProtocol>, Parameters const&, nu::Logger const&, std::string_view const instance = {});
 
   protected:
 	// xf::Module API
@@ -80,7 +80,7 @@ class LinkDecoder: public xf::Module
 	Blob							_input_blob;
 	std::unique_ptr<LinkProtocol>	_protocol;
 	xf::SocketChanged				_input_changed		{ encoded_input };
-	LinkDecoderParams				_params;
+	Parameters						_params;
 };
 
 #endif

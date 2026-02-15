@@ -610,9 +610,9 @@ nu::AutoTest t6 ("modules/io/link: protocol: encrypted channel works", []{
 	auto air_tx_protocol = std::make_unique<AirToGroundLinkProtocol> (air_tx_data, &air_transceiver);
 	auto air_rx_protocol = std::make_unique<GroundToAirLinkProtocol> (air_rx_data, &air_transceiver);
 
-	auto ground_tx_link = LinkEncoder (loop, std::move (ground_tx_protocol), 30_Hz, g_logger.with_context ("ground-tx-link"), "ground/tx-link");
+	auto ground_tx_link = LinkEncoder (loop, std::move (ground_tx_protocol), { .send_frequency = 30_Hz }, g_logger.with_context ("ground-tx-link"), "ground/tx-link");
 	auto ground_rx_link = LinkDecoder (loop, std::move (ground_rx_protocol), {}, g_logger.with_context ("ground-rx-link"), "ground/rx-link");
-	auto air_tx_link = LinkEncoder (loop, std::move (air_tx_protocol), 30_Hz, g_logger.with_context ("air-tx-link"), "air/tx-link");
+	auto air_tx_link = LinkEncoder (loop, std::move (air_tx_protocol), { .send_frequency = 30_Hz }, g_logger.with_context ("air-tx-link"), "air/tx-link");
 	auto air_rx_link = LinkDecoder (loop, std::move (air_rx_protocol), {}, g_logger.with_context ("air-rx-link"), "air/rx-link");
 
 	ground_tx_data.handshake_request << ground_transceiver.handshake_request;

@@ -74,7 +74,7 @@ class Hardware
 	LinkEncoder ground_to_air_link {
 		_loop,
 		std::make_unique<sim1::GroundToAirProtocol> (ground_to_air_data, master_secure_channel),
-		30_Hz,
+		{ .send_frequency = 30_Hz },
 		_logger.with_context ("link encoder"),
 		"link encoder",
 	};

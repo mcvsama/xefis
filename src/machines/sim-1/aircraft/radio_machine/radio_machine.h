@@ -79,7 +79,7 @@ class RadioMachine: public xf::SingleLoopMachine
 	LinkEncoder air_to_ground_link {
 		loop(),
 		std::make_unique<sim1::AirToGroundProtocol> (air_to_ground_data, slave_secure_channel),
-		30_Hz,
+		{ .send_frequency = 30_Hz },
 		logger().with_context ("link encoder"),
 		"link encoder",
 	};

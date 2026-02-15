@@ -31,13 +31,19 @@ class LinkEncoder: public xf::Module
   public:
 	xf::ModuleOut<std::string> encoded_output { this, "encoded-output" };
 
+  public:
+	struct Parameters
+	{
+		si::Frequency	send_frequency;
+	};
+
   private:
 	static constexpr char kLoggerScope[] = "mod::LinkEncoder";
 
   public:
 	// Ctor
 	explicit
-	LinkEncoder (xf::ProcessingLoop&, std::unique_ptr<LinkProtocol>, si::Frequency send_frequency, nu::Logger const&, std::string_view const instance = {});
+	LinkEncoder (xf::ProcessingLoop&, std::unique_ptr<LinkProtocol>, Parameters const&, nu::Logger const&, std::string_view const instance = {});
 
   protected:
 	// Module API

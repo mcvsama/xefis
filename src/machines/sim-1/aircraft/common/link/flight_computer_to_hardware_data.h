@@ -69,7 +69,7 @@ template<template<class> class SocketType>
 			return LinkEncoder(
 				loop,
 				make_link_protocol_from_inputs (*this, kDir, kEnvelopePrefix),
-				120_Hz,
+				{ .send_frequency = 120_Hz },
 				logger.with_context (kContext),
 				kContext
 			);

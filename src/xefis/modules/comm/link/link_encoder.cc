@@ -20,13 +20,13 @@ using namespace nu::si::literals;
 
 LinkEncoder::LinkEncoder (xf::ProcessingLoop& loop,
 						  std::unique_ptr<LinkProtocol> protocol,
-						  si::Frequency const send_frequency,
+						  Parameters const& params,
 						  nu::Logger const& logger,
 						  std::string_view const instance):
 	Module (loop, instance),
 	_logger (logger.with_context (std::string (kLoggerScope) + "#" + instance)),
 	_protocol (std::move (protocol)),
-	_send_period (1 / send_frequency)
+	_send_period (1 / params.send_frequency)
 {
 	_output_blob.reserve (2 * _protocol->size());
 }
