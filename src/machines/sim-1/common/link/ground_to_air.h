@@ -18,7 +18,7 @@
 #include <xefis/core/module.h>
 #include <xefis/core/sockets/module_socket.h>
 #include <xefis/modules/comm/link/link_protocol.h>
-#include <xefis/modules/comm/xle_transceiver.h>
+#include <xefis/modules/comm/xle_secure_channel.h>
 
 
 namespace sim1 {
@@ -52,7 +52,7 @@ class GroundToAirProtocol: public LinkProtocol
   public:
 	template<std::derived_from<xf::Module> IO>
 		explicit
-		GroundToAirProtocol (IO& data, xf::crypto::xle::Transceiver& transceiver):
+		GroundToAirProtocol (IO& data, xf::crypto::xle::SecureChannel& secure_channel):
 			LinkProtocol ({
 				// XLE handshake envelope:
 				envelope ({
@@ -76,7 +76,7 @@ class GroundToAirProtocol: public LinkProtocol
 				envelope ({
 					.name			= "controls",
 					.unique_prefix	= { 0xfe, 0x5a },
-					.transceiver	= &transceiver,
+					.secure_channel	= &secure_channel,
 					.packets		= {
 						socket<4> (data.joystick_pitch),
 						socket<4> (data.joystick_roll),

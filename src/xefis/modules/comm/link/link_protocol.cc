@@ -316,7 +316,7 @@ LinkProtocol::Envelope::Envelope (Params&& params):
 	_send_every (params.send_every),
 	_send_offset (params.send_offset),
 	_send_predicate (params.send_predicate),
-	_transceiver (params.transceiver)
+	_secure_channel (params.secure_channel)
 { }
 
 
@@ -330,8 +330,8 @@ LinkProtocol::Envelope::unique_prefix() const
 Blob::size_type
 LinkProtocol::Envelope::size() const
 {
-	if (_transceiver)
-		return Sequence::size() + _transceiver->ciphertext_expansion();
+	if (_secure_channel)
+		return Sequence::size() + _secure_channel->ciphertext_expansion();
 	else
 		return Sequence::size();
 }
@@ -344,14 +344,14 @@ LinkProtocol::Envelope::produce_append (Blob& blob, nu::Logger const& logger)
 	{
 		if (_send_pos % _send_every == _send_offset)
 		{
-			if (_transceiver)
+			if (_secure_channel)
 			{
 				try {
-					if (_transceiver->ready())
+					if (_secure_channel->ready())
 					{
 						Blob unencrypted_blob;
 						Sequence::produce_append (unencrypted_blob, logger);
-						blob += _unique_prefix + _transceiver->encrypt_packet (unencrypted_blob);
+						blob += _unique_prefix + _secure_channel->encrypt_packet (unencrypted_blob);
 					}
 				}
 				catch (...)
@@ -375,14 +375,14 @@ LinkProtocol::Envelope::produce_append (Blob& blob, nu::Logger const& logger)
 Blob::const_iterator
 LinkProtocol::Envelope::consume (Blob::const_iterator begin, Blob::const_iterator end, nu::Logger const& logger)
 {
-	if (_transceiver)
+	if (_secure_channel)
 	{
 		auto const envelope_end = std::next (begin, nu::to_signed (size()));
 
 		try {
-			if (_transceiver->ready())
+			if (_secure_channel->ready())
 			{
-				auto const decrypted = _transceiver->decrypt_packet (BlobView (begin, envelope_end));
+				auto const decrypted = _secure_channel->decrypt_packet (BlobView (begin, envelope_end));
 				auto read_iterator = Sequence::consume (decrypted.begin(), decrypted.end(), logger);
 
 				if (read_iterator != decrypted.end())

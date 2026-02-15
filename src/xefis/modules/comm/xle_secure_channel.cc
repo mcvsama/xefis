@@ -12,7 +12,7 @@
  */
 
 // Local:
-#include "xle_transceiver.h"
+#include "xle_secure_channel.h"
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -46,7 +46,7 @@ static thread_local std::random_device transceiver_rnd ("hw");
 } // namespace global
 
 
-Transceiver::Transceiver (Role const role, size_t ciphertext_expansion, nu::Logger const& logger):
+SecureChannel::SecureChannel (Role const role, size_t ciphertext_expansion, nu::Logger const& logger):
 	_role (role),
 	_logger (logger),
 	_ciphertext_expansion (ciphertext_expansion)
@@ -54,7 +54,7 @@ Transceiver::Transceiver (Role const role, size_t ciphertext_expansion, nu::Logg
 
 
 bool
-Transceiver::ready() const
+SecureChannel::ready() const
 {
 	if (auto const* active_session = this->active_session();
 		active_session && active_session->connected())
@@ -79,7 +79,7 @@ Transceiver::ready() const
 
 
 Blob
-Transceiver::encrypt_packet (BlobView const packet)
+SecureChannel::encrypt_packet (BlobView const packet)
 {
 	Session* first_session_to_try = active_session();
 	Session* second_session_to_try = next_session_candidate();
@@ -127,7 +127,7 @@ Transceiver::encrypt_packet (BlobView const packet)
 
 
 Blob
-Transceiver::decrypt_packet (BlobView const packet, std::optional<Transport::SequenceNumber> const maximum_allowed_sequence_number)
+SecureChannel::decrypt_packet (BlobView const packet, std::optional<Transport::SequenceNumber> const maximum_allowed_sequence_number)
 {
 	auto const try_session = [&] (Session* session, std::string_view const session_name, bool shift_sessions, bool get_rid_of_previous_session, std::function<Blob (std::string)> const fallback = {}) -> Blob {
 		if (session)
@@ -168,19 +168,19 @@ Transceiver::decrypt_packet (BlobView const packet, std::optional<Transport::Seq
 
 
 std::string
-Transceiver::role_name() const
+SecureChannel::role_name() const
 {
 	switch (_role)
 	{
-		case Role::Master:	return "MasterTransceiver";
-		case Role::Slave:	return "SlaveTransceiver";
+		case Role::Master:	return "MasterSecureChannel";
+		case Role::Slave:	return "SlaveSecureChannel";
 	}
 
 	return {};
 }
 
 
-MasterTransceiver::Session::HandshakeRequested::HandshakeRequested (CryptoParams const& params):
+MasterSecureChannel::Session::HandshakeRequested::HandshakeRequested (CryptoParams const& params):
 	handshake_master (global::transceiver_rnd, {
 		.master_signature_key = params.master_signature_key,
 		.slave_signature_key = params.slave_signature_key,
@@ -191,7 +191,7 @@ MasterTransceiver::Session::HandshakeRequested::HandshakeRequested (CryptoParams
 { }
 
 
-MasterTransceiver::Session::Connected::Connected (nu::Secure<Blob> const& ephemeral_key, CryptoParams const& params):
+MasterSecureChannel::Session::Connected::Connected (nu::Secure<Blob> const& ephemeral_key, CryptoParams const& params):
 	transmitter (global::transceiver_rnd, {
 		.ephemeral_session_key = *ephemeral_key,
 		.authentication_secret = params.authentication_secret,
@@ -213,8 +213,8 @@ MasterTransceiver::Session::Connected::Connected (nu::Secure<Blob> const& epheme
 { }
 
 
-MasterTransceiver::Session::Session (CryptoParams const& params):
-	Transceiver::Session ("M", _id_generator),
+MasterSecureChannel::Session::Session (CryptoParams const& params):
+	SecureChannel::Session ("M", _id_generator),
 	_crypto_params (params),
 	_state (std::in_place_type_t<HandshakeRequested>(), params)
 {
@@ -223,14 +223,14 @@ MasterTransceiver::Session::Session (CryptoParams const& params):
 }
 
 
-MasterTransceiver::Session::~Session()
+MasterSecureChannel::Session::~Session()
 {
 	abort (AbortReason::Deleted);
 }
 
 
 Blob const&
-MasterTransceiver::Session::handshake_request() const
+MasterSecureChannel::Session::handshake_request() const
 {
 	if (auto* hs = std::get_if<HandshakeRequested> (&_state))
 		return hs->handshake_request;
@@ -240,7 +240,7 @@ MasterTransceiver::Session::handshake_request() const
 
 
 void
-MasterTransceiver::Session::set_handshake_response (Blob const& handshake_response)
+MasterSecureChannel::Session::set_handshake_response (Blob const& handshake_response)
 {
 	if (auto* hr = std::get_if<HandshakeRequested> (&_state))
 	{
@@ -249,12 +249,12 @@ MasterTransceiver::Session::set_handshake_response (Blob const& handshake_respon
 		_session_prepared_promise.set_value();
 	}
 	else
-		throw nu::Exception ("unexpected MasterTransceiver::Session::set_handshake_response() when not waiting for it", false);
+		throw nu::Exception ("unexpected MasterSecureChannel::Session::set_handshake_response() when not waiting for it", false);
 }
 
 
 void
-MasterTransceiver::Session::abort (AbortReason const reason)
+MasterSecureChannel::Session::abort (AbortReason const reason)
 {
 	if (!nu::ready (_session_prepared_future))
 		_session_prepared_promise.set_exception (std::make_exception_ptr (HandshakeAborted({ reason })));
@@ -265,7 +265,7 @@ MasterTransceiver::Session::abort (AbortReason const reason)
 
 
 std::optional<Blob>
-MasterTransceiver::Session::tx_key_hash() const
+MasterSecureChannel::Session::tx_key_hash() const
 {
 	if (auto *connected = std::get_if<Connected> (&_state))
 		return connected->transmitter.data_encryption_key_hash();
@@ -275,7 +275,7 @@ MasterTransceiver::Session::tx_key_hash() const
 
 
 std::optional<Blob>
-MasterTransceiver::Session::rx_key_hash() const
+MasterSecureChannel::Session::rx_key_hash() const
 {
 	if (auto *connected = std::get_if<Connected> (&_state))
 		return connected->receiver.data_encryption_key_hash();
@@ -285,7 +285,7 @@ MasterTransceiver::Session::rx_key_hash() const
 
 
 Transmitter&
-MasterTransceiver::Session::transmitter()
+MasterSecureChannel::Session::transmitter()
 {
 	if (auto* connected = std::get_if<Connected> (&_state))
 		return connected->transmitter;
@@ -295,7 +295,7 @@ MasterTransceiver::Session::transmitter()
 
 
 Receiver&
-MasterTransceiver::Session::receiver()
+MasterSecureChannel::Session::receiver()
 {
 	if (auto* connected = std::get_if<Connected> (&_state))
 		return connected->receiver;
@@ -304,15 +304,15 @@ MasterTransceiver::Session::receiver()
 }
 
 
-MasterTransceiver::MasterTransceiver (xf::ProcessingLoop& loop, CryptoParams const& params, nu::Logger const& logger, std::string_view const instance):
-	Transceiver (Role::Master, Transport::ciphertext_expansion (params.hmac_size), logger.with_context (std::string (kLoggerScope) + "#" + instance)),
-	Module (loop, "MasterTransceiver"),
+MasterSecureChannel::MasterSecureChannel (xf::ProcessingLoop& loop, CryptoParams const& params, nu::Logger const& logger, std::string_view const instance):
+	SecureChannel (Role::Master, Transport::ciphertext_expansion (params.hmac_size), logger.with_context (std::string (kLoggerScope) + "#" + instance)),
+	Module (loop, "MasterSecureChannel"),
 	_crypto_params (params)
 { }
 
 
-MasterTransceiver::StartHandshakeResult
-MasterTransceiver::start_handshake()
+MasterSecureChannel::StartHandshakeResult
+MasterSecureChannel::start_handshake()
 {
 	_next_session_candidate = std::make_unique<Session> (_crypto_params);
 	this->handshake_request = nu::to_string (_next_session_candidate->handshake_request());
@@ -325,7 +325,7 @@ MasterTransceiver::start_handshake()
 
 
 std::optional<Blob>
-MasterTransceiver::tx_key_hash() const
+MasterSecureChannel::tx_key_hash() const
 {
 	if (_active_session)
 		return _active_session->tx_key_hash();
@@ -335,7 +335,7 @@ MasterTransceiver::tx_key_hash() const
 
 
 std::optional<Blob>
-MasterTransceiver::rx_key_hash() const
+MasterSecureChannel::rx_key_hash() const
 {
 	if (_active_session)
 		return _active_session->rx_key_hash();
@@ -345,7 +345,7 @@ MasterTransceiver::rx_key_hash() const
 
 
 void
-MasterTransceiver::process (Cycle const&)
+MasterSecureChannel::process (Cycle const&)
 {
 	if (_start_handshake_button_changed.value_changed() && this->start_handshake_button.value_or (false))
 		start_handshake();
@@ -363,7 +363,7 @@ MasterTransceiver::process (Cycle const&)
 
 
 void
-MasterTransceiver::shift_sessions()
+MasterSecureChannel::shift_sessions()
 {
 	if (_next_session_candidate)
 	{
@@ -375,10 +375,10 @@ MasterTransceiver::shift_sessions()
 }
 
 
-SlaveTransceiver::Session::Session (Blob const& handshake_request,
-									CryptoParams const& params,
-									HandshakeSlave::KeyCheckFunctions const key_check_callbacks):
-	Transceiver::Session ("S", _id_generator)
+SlaveSecureChannel::Session::Session (Blob const& handshake_request,
+									  CryptoParams const& params,
+									  HandshakeSlave::KeyCheckFunctions const key_check_callbacks):
+	SecureChannel::Session ("S", _id_generator)
 {
 	auto handshake_slave = HandshakeSlave (global::transceiver_rnd, {
 		.master_signature_key = params.master_signature_key,
@@ -409,20 +409,20 @@ SlaveTransceiver::Session::Session (Blob const& handshake_request,
 }
 
 
-SlaveTransceiver::SlaveTransceiver (xf::ProcessingLoop& loop,
-									CryptoParams const& params,
-									HandshakeSlave::KeyCheckFunctions const key_check_functions,
-									nu::Logger const& logger,
-									std::string_view const instance):
-	Transceiver (Role::Slave, Transport::ciphertext_expansion (params.hmac_size), logger.with_context (std::string (kLoggerScope) + "#" + instance)),
-	Module (loop, "SlaveTransceiver"),
+SlaveSecureChannel::SlaveSecureChannel (xf::ProcessingLoop& loop,
+										CryptoParams const& params,
+										HandshakeSlave::KeyCheckFunctions const key_check_functions,
+										nu::Logger const& logger,
+										std::string_view const instance):
+	SecureChannel (Role::Slave, Transport::ciphertext_expansion (params.hmac_size), logger.with_context (std::string (kLoggerScope) + "#" + instance)),
+	Module (loop, "SlaveSecureChannel"),
 	_crypto_params (params),
 	_key_check_functions (key_check_functions)
 { }
 
 
 std::optional<Blob>
-SlaveTransceiver::tx_key_hash() const
+SlaveSecureChannel::tx_key_hash() const
 {
 	if (_active_session)
 		return _active_session->tx_key_hash();
@@ -432,7 +432,7 @@ SlaveTransceiver::tx_key_hash() const
 
 
 std::optional<Blob>
-SlaveTransceiver::rx_key_hash() const
+SlaveSecureChannel::rx_key_hash() const
 {
 	if (_active_session)
 		return _active_session->rx_key_hash();
@@ -442,7 +442,7 @@ SlaveTransceiver::rx_key_hash() const
 
 
 void
-SlaveTransceiver::process (Cycle const&)
+SlaveSecureChannel::process (Cycle const&)
 {
 	try {
 		if (_handshake_request_changed.value_changed() && this->handshake_request.valid())
@@ -459,7 +459,7 @@ SlaveTransceiver::process (Cycle const&)
 
 
 void
-SlaveTransceiver::shift_sessions()
+SlaveSecureChannel::shift_sessions()
 {
 	if (_next_session_candidate)
 	{

@@ -13,7 +13,7 @@
 
 // Xefis:
 #include <xefis/core/processing_loop.h>
-#include <xefis/modules/comm/xle_transceiver.h>
+#include <xefis/modules/comm/xle_secure_channel.h>
 #include <xefis/support/crypto/xle/handshake.h>
 #include <xefis/test/test_processing_loop.h>
 
@@ -30,13 +30,13 @@
 #include <format>
 
 
-namespace xf::xle_transceiver_test {
+namespace xf::xle_secure_channel_test {
 
 namespace test_asserts = nu::test_asserts;
 namespace xle = crypto::xle;
 
 auto constinit kKeysDebugging = false;
-auto constinit crypto_params = xle::Transceiver::CryptoParams {
+auto constinit crypto_params = xle::SecureChannel::CryptoParams {
 	.master_signature_key		= { 0x00, 0x01, 0x02, 0x03 },
 	.slave_signature_key		= { 0x0c, 0x0d, 0x0e, 0x0f },
 	.authentication_secret		= { 0x01 },
@@ -89,8 +89,8 @@ AutoTestT1::auto_test_t1()
 
 	auto constexpr kSessions = 8;
 
-	// Testing two start modes: by calling MasterTransceiver::start_handshake() and by emulating
-	// pressing a button with property MasterTransceiver::start_handshake_button.
+	// Testing two start modes: by calling MasterSecureChannel::start_handshake() and by emulating
+	// pressing a button with property MasterSecureChannel::start_handshake_button.
 	for (int start_mode: { kMethodCallStart, kButtonPressStart })
 	{
 		auto loop = TestProcessingLoop (0.01_s);
@@ -98,8 +98,8 @@ AutoTestT1::auto_test_t1()
 		// it will cause master to be processed first, since slave depends
 		// on master. So in the end master.process() will be called first,
 		// then slave.process().
-		auto slave = xle::SlaveTransceiver (loop, crypto_params, {}, TestProcessingLoop::logger);
-		auto master = xle::MasterTransceiver (loop, crypto_params, TestProcessingLoop::logger);
+		auto slave = xle::SlaveSecureChannel (loop, crypto_params, {}, TestProcessingLoop::logger);
+		auto master = xle::MasterSecureChannel (loop, crypto_params, TestProcessingLoop::logger);
 
 		slave.handshake_request << master.handshake_request;
 		master.handshake_response << slave.handshake_response;
@@ -255,7 +255,7 @@ AutoTestT1::auto_test_t1()
 				try {
 					expectations.previous_session_activated_future->get();
 				}
-				catch (xle::MasterTransceiver::HandshakeAborted const&)
+				catch (xle::MasterSecureChannel::HandshakeAborted const&)
 				{
 					got_handshake_aborted_exception = true;
 				}
@@ -573,8 +573,8 @@ auto_test_t2()
 	};
 
 	auto loop = TestProcessingLoop (0.01_s);
-	auto slave = xle::SlaveTransceiver (loop, crypto_params, {}, TestProcessingLoop::logger);
-	auto master = xle::MasterTransceiver (loop, crypto_params, TestProcessingLoop::logger);
+	auto slave = xle::SlaveSecureChannel (loop, crypto_params, {}, TestProcessingLoop::logger);
+	auto master = xle::MasterSecureChannel (loop, crypto_params, TestProcessingLoop::logger);
 
 	slave.handshake_request << std::function (make_random_loss ("master → slave")) << master.handshake_request;
 	master.handshake_response << std::function (make_random_loss ("slave → master")) << slave.handshake_response;
@@ -642,5 +642,5 @@ auto_test_t2()
 nu::AutoTest t1 ("Xefis Lossy Encryption/Protocol: handshaking gives correct keys", AutoTestT1::auto_test_t1);
 nu::AutoTest t2 ("Xefis Lossy Encryption/Protocol: handshaking eventually works even on lossy channel", auto_test_t2);
 
-} // namespace xf::xle_transceiver_test
+} // namespace xf::xle_secure_channel_test
 

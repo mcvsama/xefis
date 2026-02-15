@@ -17,7 +17,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/sockets/assignable_socket.h>
-#include <xefis/modules/comm/xle_transceiver.h>
+#include <xefis/modules/comm/xle_secure_channel.h>
 
 // Neutrino:
 #include <neutrino/endian.h>
@@ -503,9 +503,9 @@ class LinkProtocol
 			// If provided, the envelope will be sent-out if and only if this function returns true.
 			// `send_every` is not taken into account while `send_predicate()` returns false.
 			std::function<bool()>			send_predicate	{ nullptr };
-			// Optional encryption transceiver. If provided, the envelope will not be sent
-			// until the transceiver reports connected() == true.
-			xf::crypto::xle::Transceiver*	transceiver		{ nullptr };
+			// Optional encryption secure channel. If provided, the envelope will not be sent
+			// until the channel reports connected() == true.
+			xf::crypto::xle::SecureChannel*	secure_channel	{ nullptr };
 			// List of packets this envelope will comprise:
 			PacketList						packets			{};
 		};
@@ -538,7 +538,7 @@ class LinkProtocol
 		uint64_t						_send_offset;
 		uint64_t						_send_pos	{ 0 };
 		std::function<bool()>			_send_predicate;
-		xf::crypto::xle::Transceiver*	_transceiver;
+		xf::crypto::xle::SecureChannel*	_secure_channel;
 	};
 
 	using EnvelopeList = std::vector<std::shared_ptr<Envelope>>;

@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__MODULES__COMM__XLE_TRANSCEIVER_H__INCLUDED
-#define XEFIS__MODULES__COMM__XLE_TRANSCEIVER_H__INCLUDED
+#ifndef XEFIS__MODULES__COMM__XLE_SECURE_CHANNEL_H__INCLUDED
+#define XEFIS__MODULES__COMM__XLE_SECURE_CHANNEL_H__INCLUDED
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -34,7 +34,7 @@
 #include <functional>
 
 
-namespace xf::xle_transceiver_test {
+namespace xf::xle_secure_channel_test {
 
 struct AutoTestT1;
 
@@ -71,7 +71,7 @@ class WithIDs
 };
 
 
-class Transceiver
+class SecureChannel
 {
   public:
 	/**
@@ -130,11 +130,11 @@ class Transceiver
 	 *			How many bytes the encrypted packet will be bigger than the original unencrypted one.
 	 */
 	explicit
-	Transceiver (Role, size_t ciphertext_expansion, nu::Logger const&);
+	SecureChannel (Role, size_t ciphertext_expansion, nu::Logger const&);
 
 	// Dtor
 	virtual
-	~Transceiver() = default;
+	~SecureChannel() = default;
 
 	/**
 	 * Return true if protocol is currently in the Connected state, which means
@@ -155,7 +155,7 @@ class Transceiver
 		{ return !!next_session_candidate(); }
 
 	/**
-	 * Return true if the transceiver is ready to encrypt/decrypt packets.
+	 * Return true if the channel is ready to encrypt/decrypt packets.
 	 */
 	[[nodiscard]]
 	bool
@@ -175,7 +175,7 @@ class Transceiver
 	 *
 	 * \throws std::logic_error when computed HMAC size doesn't fit
 	 *		   requirements.
-	 * \throws Exception when transceiver is not connected.
+	 * \throws Exception when channel is not connected.
 	 */
 	[[nodiscard]]
 	virtual Blob
@@ -185,7 +185,7 @@ class Transceiver
 	 * Decrypt packet.
 	 *
 	 * \throws DecryptionFailure on various occassions.
-	 * \throws Exception when transceiver is not connected.
+	 * \throws Exception when channel is not connected.
 	 */
 	[[nodiscard]]
 	virtual Blob
@@ -270,11 +270,11 @@ class Transceiver
  * two encryption keys are derived (one for each direction of
  * communication).
  */
-class MasterTransceiver:
-	public Transceiver,
+class MasterSecureChannel:
+	public SecureChannel,
 	public xf::Module
 {
-	friend class xf::xle_transceiver_test::AutoTestT1;
+	friend class xf::xle_secure_channel_test::AutoTestT1;
 
   public:
 	/*
@@ -315,20 +315,20 @@ class MasterTransceiver:
 		std::shared_future<void>	session_prepared;
 
 		// session_activated is fulfilled when the prepared session becomes active, after
-		// the Transceiver has received correctly encrypted packets from the remote end.
+		// the SecureChannel has received correctly encrypted packets from the remote end.
 		// Gets rejected when session handshake is abandoned or a new start_handshake()
 		// call is made.
 		std::shared_future<void>	session_activated;
 	};
 
   private:
-	static constexpr char kLoggerScope[] = "mod::MasterTransceiver";
+	static constexpr char kLoggerScope[] = "mod::MasterSecureChannel";
 
     /**
 	 * An established communication session.
      */
 	class Session:
-		public Transceiver::Session,
+		public SecureChannel::Session,
 		public nu::Noncopyable
 	{
 		static inline size_t _id_generator = 0;
@@ -372,7 +372,7 @@ class MasterTransceiver:
 		~Session();
 
 		/**
-		 * Return the handshake request blob to be sent to the SlaveTransceiver.
+		 * Return the handshake request blob to be sent to the SlaveSecureChannel.
 		 */
 		[[nodiscard]]
 		Blob const&
@@ -388,7 +388,7 @@ class MasterTransceiver:
 			{ return std::holds_alternative<HandshakeRequested> (_state); }
 
 		/**
-		 * Use handshake response obtained from SlaveTransceiver.
+		 * Use handshake response obtained from SlaveSecureChannel.
 		 */
 		void
 		set_handshake_response (Blob const&);
@@ -474,7 +474,7 @@ class MasterTransceiver:
   public:
 	// Ctor
 	explicit
-	MasterTransceiver (xf::ProcessingLoop&, CryptoParams const&, nu::Logger const&, std::string_view const instance = {});
+	MasterSecureChannel (xf::ProcessingLoop&, CryptoParams const&, nu::Logger const&, std::string_view const instance = {});
 
 	/**
 	 * Perform a handshake.
@@ -504,47 +504,47 @@ class MasterTransceiver:
 	void
 	process (Cycle const&);
 
-	// Transceiver API
+	// SecureChannel API
 	[[nodiscard]]
 	Session*
 	previous_session() override
 		{ return _previous_session.get(); }
 
-	// Transceiver API
+	// SecureChannel API
 	[[nodiscard]]
 	Session const*
 	previous_session() const override
 		{ return _previous_session.get(); }
 
-	// Transceiver API
+	// SecureChannel API
 	[[nodiscard]]
 	Session*
 	active_session() override
 		{ return _active_session.get(); }
 
-	// Transceiver API
+	// SecureChannel API
 	[[nodiscard]]
 	Session const*
 	active_session() const override
 		{ return _active_session.get(); }
 
-	// Transceiver API
+	// SecureChannel API
 	[[nodiscard]]
 	Session*
 	next_session_candidate() override
 		{ return _next_session_candidate.get(); }
 
-	// Transceiver API
+	// SecureChannel API
 	[[nodiscard]]
 	Session const*
 	next_session_candidate() const override
 		{ return _next_session_candidate.get(); }
 
-	// Transceiver API
+	// SecureChannel API
 	void
 	shift_sessions() override;
 
-	// Transceiver API
+	// SecureChannel API
 	void
 	get_rid_of_previous_session() override
 		{ _previous_session.reset(); }
@@ -563,11 +563,11 @@ class MasterTransceiver:
 /**
  * A class used on the side that only receives and handles handshake requests.
  */
-class SlaveTransceiver:
-	public Transceiver,
+class SlaveSecureChannel:
+	public SecureChannel,
 	public xf::Module
 {
-	friend class xf::xle_transceiver_test::AutoTestT1;
+	friend class xf::xle_secure_channel_test::AutoTestT1;
 
   public:
 	xf::ModuleIn<std::string>	handshake_request		{ this, "handshake_request" };
@@ -578,13 +578,13 @@ class SlaveTransceiver:
 	xf::ModuleOut<std::string>	handshake_response		{ this, "handshake_response" };
 
   private:
-	static constexpr char kLoggerScope[] = "mod::SlaveTransceiver";
+	static constexpr char kLoggerScope[] = "mod::SlaveSecureChannel";
 
     /**
 	 * An two-way communication session.
      */
 	class Session:
-		public Transceiver::Session,
+		public SecureChannel::Session,
 		public nu::Noncopyable
 	{
 		static inline size_t _id_generator = 0;
@@ -645,11 +645,11 @@ class SlaveTransceiver:
   public:
 	// Ctor
 	explicit
-	SlaveTransceiver (xf::ProcessingLoop&,
-					  CryptoParams const&,
-					  HandshakeSlave::KeyCheckFunctions const,
-					  nu::Logger const&,
-					  std::string_view const instance = {});
+	SlaveSecureChannel (xf::ProcessingLoop&,
+						CryptoParams const&,
+						HandshakeSlave::KeyCheckFunctions const,
+						nu::Logger const&,
+						std::string_view const instance = {});
 
 	/**
 	 * Disconnect active connection if connected.
@@ -671,43 +671,43 @@ class SlaveTransceiver:
 	void
 	process (Cycle const&);
 
-	// Transceiver API
+	// SecureChannel API
 	[[nodiscard]]
 	Session*
 	previous_session() override
 		{ return nullptr; }
 
-	// Transceiver API
+	// SecureChannel API
 	[[nodiscard]]
 	Session const*
 	previous_session() const override
 		{ return nullptr; }
 
-	// Transceiver API
+	// SecureChannel API
 	[[nodiscard]]
 	Session*
 	active_session() override
 		{ return _active_session.get(); }
 
-	// Transceiver API
+	// SecureChannel API
 	[[nodiscard]]
 	Session const*
 	active_session() const override
 		{ return _active_session.get(); }
 
-	// Transceiver API
+	// SecureChannel API
 	[[nodiscard]]
 	Session*
 	next_session_candidate() override
 		{ return _next_session_candidate.get(); }
 
-	// Transceiver API
+	// SecureChannel API
 	[[nodiscard]]
 	Session const*
 	next_session_candidate() const override
 		{ return _next_session_candidate.get(); }
 
-	// Transceiver API
+	// SecureChannel API
 	void
 	shift_sessions() override;
 

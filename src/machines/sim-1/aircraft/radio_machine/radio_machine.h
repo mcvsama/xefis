@@ -31,7 +31,7 @@
 #include <xefis/core/sockets/module_out.h>
 #include <xefis/core/clock.h>
 #include <xefis/core/xefis.h>
-#include <xefis/modules/comm/xle_transceiver.h>
+#include <xefis/modules/comm/xle_secure_channel.h>
 #include <xefis/support/core/single_loop_machine.h>
 
 // Standard:
@@ -56,19 +56,19 @@ class RadioMachine: public xf::SingleLoopMachine
 	xf::Clock&		_steady_clock;
 	RadioModules	_modules;
 
-	xf::crypto::xle::SlaveTransceiver slave_transceiver {
+	xf::crypto::xle::SlaveSecureChannel slave_secure_channel {
 		loop(),
 		sim1::kCryptoParams,
 		{}, // TODO Should store used IDs somewhere
-		logger().with_context ("slave transceiver"),
-		"slave transceiver",
+		logger().with_context ("slave secure channel"),
+		"slave secure channel",
 	};
 
 	sim1::GroundToAirData<xf::ModuleOut> ground_to_air_data { loop() };
 
 	LinkDecoder ground_to_air_link {
 		loop(),
-		std::make_unique<sim1::GroundToAirProtocol> (ground_to_air_data, slave_transceiver),
+		std::make_unique<sim1::GroundToAirProtocol> (ground_to_air_data, slave_secure_channel),
 		{},
 		logger().with_context ("link decoder"),
 		"link decoder",
@@ -78,7 +78,7 @@ class RadioMachine: public xf::SingleLoopMachine
 
 	LinkEncoder air_to_ground_link {
 		loop(),
-		std::make_unique<sim1::AirToGroundProtocol> (air_to_ground_data, slave_transceiver),
+		std::make_unique<sim1::AirToGroundProtocol> (air_to_ground_data, slave_secure_channel),
 		30_Hz,
 		logger().with_context ("link encoder"),
 		"link encoder",

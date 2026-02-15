@@ -30,7 +30,7 @@
 #include <xefis/modules/comm/link/link_decoder.h>
 #include <xefis/modules/comm/link/link_encoder.h>
 #include <xefis/modules/comm/udp_transceiver.h>
-#include <xefis/modules/comm/xle_transceiver.h>
+#include <xefis/modules/comm/xle_secure_channel.h>
 #include <xefis/modules/simulation/virtual_pressure_sensor.h>
 #include <xefis/modules/simulation/virtual_servo_controller.h>
 #include <xefis/modules/simulation/virtual_temperature_sensor.h>

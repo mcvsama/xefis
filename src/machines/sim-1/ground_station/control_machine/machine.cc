@@ -30,15 +30,15 @@ Machine::Machine (xf::Xefis& xefis):
 	start();
 
 	// TODO this should happen upon pressing a virtual button:
-	_hardware.master_transceiver.start_handshake();
+	_hardware.master_secure_channel.start_handshake();
 }
 
 
 void
 Machine::connect_modules()
 {
-	_hardware.ground_to_air_data.encryption_handshake_request	<< _hardware.master_transceiver.handshake_request;
-	_hardware.master_transceiver.handshake_response				<< _hardware.air_to_ground_data.encryption_handshake_response;
+	_hardware.ground_to_air_data.encryption_handshake_request	<< _hardware.master_secure_channel.handshake_request;
+	_hardware.master_secure_channel.handshake_response			<< _hardware.air_to_ground_data.encryption_handshake_response;
 
 	_data_center.joystick_pitch					<< _hardware.joystick.y_axis;
 	_data_center.joystick_roll					<< _hardware.joystick.x_axis;

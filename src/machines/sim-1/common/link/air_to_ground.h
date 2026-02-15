@@ -18,7 +18,7 @@
 #include <xefis/core/module.h>
 #include <xefis/core/sockets/module_socket.h>
 #include <xefis/modules/comm/link/link_protocol.h>
-#include <xefis/modules/comm/xle_transceiver.h>
+#include <xefis/modules/comm/xle_secure_channel.h>
 
 
 namespace sim1 {
@@ -43,7 +43,7 @@ class AirToGroundProtocol: public LinkProtocol
   public:
 	template<std::derived_from<xf::Module> IO>
 		explicit
-		AirToGroundProtocol (IO& data, xf::crypto::xle::Transceiver& transceiver):
+		AirToGroundProtocol (IO& data, xf::crypto::xle::SecureChannel& secure_channel):
 			LinkProtocol ({
 				// XLE handshake envelope:
 				envelope ({
@@ -68,7 +68,7 @@ class AirToGroundProtocol: public LinkProtocol
 				envelope ({
 					.name			= "sensors",
 					.unique_prefix	= { 0xf6, 0x6f },
-					.transceiver	= &transceiver,
+					.secure_channel	= &secure_channel,
 					.packets		= {
 						socket<4> (data.static_pressure),
 						socket<4> (data.total_pressure),

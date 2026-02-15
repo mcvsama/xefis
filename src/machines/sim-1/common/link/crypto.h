@@ -19,7 +19,7 @@
 
 // Xefis:
 #include <xefis/core/module.h>
-#include <xefis/modules/comm/xle_transceiver.h>
+#include <xefis/modules/comm/xle_secure_channel.h>
 
 // Neutrino:
 #include <neutrino/si/si.h>
@@ -27,7 +27,7 @@
 
 namespace sim1 {
 
-inline auto constinit kCryptoParams = xf::crypto::xle::Transceiver::CryptoParams {
+inline auto constinit kCryptoParams = xf::crypto::xle::SecureChannel::CryptoParams {
 	.master_signature_key		= { 0x00, 0x01, 0x02, 0x03 },
 	.slave_signature_key		= { 0x0c, 0x0d, 0x0e, 0x0f },
 	.authentication_secret		= { 0x01 },

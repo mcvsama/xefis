@@ -26,7 +26,7 @@
 #include <xefis/modules/comm/link/link_decoder.h>
 #include <xefis/modules/comm/link/link_encoder.h>
 #include <xefis/modules/comm/udp_transceiver.h>
-#include <xefis/modules/comm/xle_transceiver.h>
+#include <xefis/modules/comm/xle_secure_channel.h>
 #include <xefis/modules/simulation/virtual_joystick.h>
 #include <xefis/modules/simulation/virtual_servo_controller.h>
 
@@ -56,16 +56,16 @@ class Hardware
 	sim1::GroundToAirData<xf::ModuleIn>		ground_to_air_data	{ _loop };
 	sim1::AirToGroundData<xf::ModuleOut>	air_to_ground_data	{ _loop };
 
-	xle::MasterTransceiver master_transceiver {
+	xle::MasterSecureChannel master_secure_channel {
 		_loop,
 		sim1::kCryptoParams,
-		_logger.with_context ("master transceiver"),
-		"master transceiver",
+		_logger.with_context ("master secure channel"),
+		"master secure channel",
 	};
 
 	LinkDecoder air_to_ground_link {
 		_loop,
-		std::make_unique<sim1::AirToGroundProtocol> (air_to_ground_data, master_transceiver),
+		std::make_unique<sim1::AirToGroundProtocol> (air_to_ground_data, master_secure_channel),
 		{},
 		_logger.with_context ("link decoder"),
 		"link decoder",
@@ -73,7 +73,7 @@ class Hardware
 
 	LinkEncoder ground_to_air_link {
 		_loop,
-		std::make_unique<sim1::GroundToAirProtocol> (ground_to_air_data, master_transceiver),
+		std::make_unique<sim1::GroundToAirProtocol> (ground_to_air_data, master_secure_channel),
 		30_Hz,
 		_logger.with_context ("link encoder"),
 		"link encoder",

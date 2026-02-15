@@ -19,7 +19,7 @@
 #include <xefis/modules/comm/link/link_decoder.h>
 #include <xefis/modules/comm/link/link_encoder.h>
 #include <xefis/modules/comm/link/link_protocol.h>
-#include <xefis/modules/comm/xle_transceiver.h>
+#include <xefis/modules/comm/xle_secure_channel.h>
 #include <xefis/test/test_processing_loop.h>
 
 // Neutrino:
@@ -139,14 +139,14 @@ class GroundToAirLinkProtocol: public LinkProtocol
 	// Ctor
 	template<std::derived_from<Module> IO>
 		explicit
-		GroundToAirLinkProtocol (IO& io, xle::Transceiver* transceiver = nullptr):
+		GroundToAirLinkProtocol (IO& io, xle::SecureChannel* secure_channel = nullptr):
 			LinkProtocol ({
 				// Must be first envelope (its data will be messed with to test
 				// if it's discarded in such case):
 				envelope ({
 					.name			= "data 1",
 					.unique_prefix	= { 0x00, 0x01 },
-					.transceiver	= transceiver,
+					.secure_channel	= secure_channel,
 					.packets		= {
 						signature ({
 							.name				= "data 1 signature",
@@ -236,7 +236,7 @@ class AirToGroundLinkProtocol: public LinkProtocol
 	// Ctor
 	template<std::derived_from<Module> IO>
 		explicit
-		AirToGroundLinkProtocol (IO& io, xle::Transceiver* transceiver = nullptr):
+		AirToGroundLinkProtocol (IO& io, xle::SecureChannel* secure_channel = nullptr):
 			LinkProtocol ({
 				// XLE handshake envelope:
 				envelope ({
@@ -260,7 +260,7 @@ class AirToGroundLinkProtocol: public LinkProtocol
 				envelope ({
 					.name			= "data",
 					.unique_prefix	= { 0xff, 0x01 },
-					.transceiver	= transceiver,
+					.secure_channel	= secure_channel,
 					.packets		= {
 						socket<4> (io.int_prop),
 					},
@@ -275,7 +275,7 @@ using Ground_Rx_Data = AirToGroundData<ModuleOut>;
 using Air_Tx_Data = AirToGroundData<ModuleIn>;
 using Air_Rx_Data = GroundToAirData<ModuleOut>;
 
-auto constinit crypto_params = xle::Transceiver::CryptoParams {
+auto constinit crypto_params = xle::SecureChannel::CryptoParams {
 	.master_signature_key		= { 0x00, 0x01, 0x02, 0x03 },
 	.slave_signature_key		= { 0x0c, 0x0d, 0x0e, 0x0f },
 	.authentication_secret		= { 0x01 },
@@ -286,17 +286,17 @@ auto constinit crypto_params = xle::Transceiver::CryptoParams {
 };
 
 
-xle::MasterTransceiver
-get_ground_transceiver (ProcessingLoop& loop)
+xle::MasterSecureChannel
+get_ground_secure_channel (ProcessingLoop& loop)
 {
-	return xle::MasterTransceiver (loop, crypto_params, g_logger.with_context ("ground-transceiver"), "ground/transceiver");
+	return xle::MasterSecureChannel (loop, crypto_params, g_logger.with_context ("ground-secure-channel"), "ground/secure-channel");
 }
 
 
-xle::SlaveTransceiver
-get_air_transceiver (ProcessingLoop& loop)
+xle::SlaveSecureChannel
+get_air_secure_channel (ProcessingLoop& loop)
 {
-	return xle::SlaveTransceiver (loop, crypto_params, {}, g_logger.with_context ("air-transceiver"), "air/transceiver");
+	return xle::SlaveSecureChannel (loop, crypto_params, {}, g_logger.with_context ("air-secure-channel"), "air/secure-channel");
 }
 
 
@@ -602,8 +602,8 @@ nu::AutoTest t6 ("modules/io/link: protocol: encrypted channel works", []{
 	Air_Tx_Data air_tx_data (loop);
 	Air_Rx_Data air_rx_data (loop);
 
-	auto ground_transceiver = get_ground_transceiver (loop);
-	auto air_transceiver = get_air_transceiver (loop);
+	auto ground_transceiver = get_ground_secure_channel (loop);
+	auto air_transceiver = get_air_secure_channel (loop);
 
 	auto ground_tx_protocol = std::make_unique<GroundToAirLinkProtocol> (ground_tx_data, &ground_transceiver);
 	auto ground_rx_protocol = std::make_unique<AirToGroundLinkProtocol> (ground_rx_data, &ground_transceiver);
