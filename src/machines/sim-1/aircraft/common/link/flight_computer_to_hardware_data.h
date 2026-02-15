@@ -42,38 +42,9 @@ template<template<class> class SocketType>
 		SocketType<si::Angle>	elevator		{ this, "flight-controls/elevator" };
 		SocketType<si::Angle>	rudder			{ this, "flight-controls/rudder" };
 
-	  private:
-		static inline auto const kEnvelopePrefix = Blob { 0x34, 0x45 };
-		static inline auto const kDir = "flight computer → hardware"s;
-		static inline auto const kContext = kDir + " (link)";
-
 	  public:
 		// Ctor
 		using Module::Module;
-
-		LinkDecoder
-		make_link_decoder (xf::ProcessingLoop& loop, nu::Logger const& logger)
-		{
-			return LinkDecoder(
-				loop,
-				make_link_protocol_from_outputs (*this, kDir, kEnvelopePrefix),
-				{},
-				logger.with_context (kContext),
-				kContext
-			);
-		}
-
-		LinkEncoder
-		make_link_encoder (xf::ProcessingLoop& loop, nu::Logger const& logger)
-		{
-			return LinkEncoder(
-				loop,
-				make_link_protocol_from_inputs (*this, kDir, kEnvelopePrefix),
-				{ .send_frequency = 120_Hz },
-				logger.with_context (kContext),
-				kContext
-			);
-		}
 	};
 
 } // namespace sim1

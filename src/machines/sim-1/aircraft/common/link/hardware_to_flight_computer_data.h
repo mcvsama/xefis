@@ -41,38 +41,9 @@ template<template<class> class SocketType>
 		SocketType<si::Pressure>	air_total_pressure		{ this, "sensors/pressure/total-pressure" };
 		SocketType<si::Pressure>	air_static_pressure		{ this, "sensors/pressure/static-pressure" };
 
-	  private:
-		static inline auto const kEnvelopePrefix = Blob { 0x12, 0x23 };
-		static inline auto const kDir = "hardware → flight computer"s;
-		static inline auto const kContext = kDir + " (link)";
-
 	  public:
 		// Ctor
 		using Module::Module;
-
-		LinkDecoder
-		make_link_decoder (xf::ProcessingLoop& loop, nu::Logger const& logger)
-		{
-			return LinkDecoder(
-				loop,
-				make_link_protocol_from_outputs (*this, kDir, kEnvelopePrefix),
-				{},
-				logger.with_context (kContext),
-				kContext
-			);
-		}
-
-		LinkEncoder
-		make_link_encoder (xf::ProcessingLoop& loop, nu::Logger const& logger)
-		{
-			return LinkEncoder(
-				loop,
-				make_link_protocol_from_inputs (*this, kDir, kEnvelopePrefix),
-				{ .send_frequency = 120_Hz },
-				logger.with_context (kContext),
-				kContext
-			);
-		}
 	};
 
 } // namespace sim1

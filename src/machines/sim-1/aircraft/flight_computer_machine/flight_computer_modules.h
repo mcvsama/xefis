@@ -20,11 +20,7 @@
 #include <machines/sim-1/aircraft/common/link/hardware_to_flight_computer_data.h>
 
 // Xefis:
-#include <xefis/core/sockets/module_in.h>
-#include <xefis/core/sockets/module_out.h>
-#include <xefis/modules/comm/link/link_decoder.h>
-#include <xefis/modules/comm/link/link_encoder.h>
-#include <xefis/modules/comm/udp_transceiver.h>
+#include <xefis/modules/comm/udp_transceiver_with_codec.h>
 #include <xefis/modules/systems/air_data_computer.h>
 
 // Standard:
@@ -50,18 +46,22 @@ class FlightComputerModules
   public:
 	AirDataComputer air_data_computer { _loop, nullptr, _logger };
 
-	UDPTransceiver hardware_machine_transceiver {
+	UDPTransceiverWithCodec hardware_machine_transceiver {
 		_loop,
 		UDPTransceiver::Parameters {
 			.rx_udp_address = sim1::global::hardware_to_flight_computer_address,
 			.tx_udp_address = sim1::global::flight_computer_to_hardware_address,
 		},
-		_logger,
-		"connection to Hardware machine",
+		make_link_protocol_from_inputs (_flight_computer_to_hardware_data, "flight computer → hardware", { 0x01, 0x12 }),
+		LinkEncoder::Parameters {
+			.send_frequency = 120_Hz,
+		},
+		make_link_protocol_from_outputs (_hardware_to_flight_computer_data, "hardware → flight computer", { 0x23, 0x34 }),
+		LinkDecoder::Parameters {
+		},
+		_logger.with_context ("↔ hardware machine"),
+		"hardware machine",
 	};
-
-	LinkEncoder	flight_computer_to_hardware_data_encoder	{ _flight_computer_to_hardware_data.make_link_encoder (_loop, _logger) };
-	LinkDecoder	hardware_to_flight_computer_data_decoder	{ _hardware_to_flight_computer_data.make_link_decoder (_loop, _logger) };
 };
 
 } // namespace sim1::aircraft
