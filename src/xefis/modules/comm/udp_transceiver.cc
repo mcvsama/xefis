@@ -18,15 +18,11 @@
 #include <xefis/config/all.h>
 
 // Neutrino:
-#include <neutrino/qt/qdom.h>
 #include <neutrino/qt/qstring.h>
 
 // Lib:
 #include <boost/endian/conversion.hpp>
 #include <gsl/gsl_util>
-
-// Qt:
-#include <QtXml/QDomElement>
 
 // Standard:
 #include <cstddef>
