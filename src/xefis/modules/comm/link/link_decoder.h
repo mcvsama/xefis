@@ -55,6 +55,8 @@ class LinkDecoder: public xf::Module
 	explicit
 	LinkDecoder (xf::ProcessingLoop&, std::unique_ptr<LinkProtocol>, LinkDecoderParams const&, nu::Logger const&, std::string_view const instance = {});
 
+  protected:
+	// xf::Module API
 	void
 	process (xf::Cycle const&) override;
 
