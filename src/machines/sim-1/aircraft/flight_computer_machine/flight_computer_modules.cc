@@ -24,7 +24,7 @@
 namespace sim1::aircraft {
 
 FlightComputerModules::FlightComputerModules (xf::ProcessingLoop& loop, nu::Logger const& logger):
-	_logger (logger.with_context ("FlightComputerModules")),
+	_logger (logger.with_context ("flight computer modules")),
 	_loop (loop)
 {
 	this->air_data_computer.ias_valid_minimum = 1_mps;

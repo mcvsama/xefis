@@ -24,7 +24,7 @@
 namespace sim1::aircraft {
 
 HardwareModules::HardwareModules (xf::ProcessingLoop& loop, nu::Logger const& logger):
-	_logger (logger.with_context ("HardwareModules")),
+	_logger (logger),
 	_loop (loop)
 {
 }

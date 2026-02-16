@@ -24,7 +24,7 @@
 namespace sim1::aircraft {
 
 RadioModules::RadioModules (xf::ProcessingLoop& loop, nu::Logger const& logger):
-	_logger (logger.with_context ("RadioModules")),
+	_logger (logger),
 	_loop (loop)
 { }
 

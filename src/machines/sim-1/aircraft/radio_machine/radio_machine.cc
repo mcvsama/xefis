@@ -31,10 +31,10 @@ RadioMachine::RadioMachine (xf::Xefis& xefis,
 							xf::Clock& xefis_clock,
 							xf::Clock& steady_clock,
 							bool const inside_simulation):
-	xf::SingleLoopMachine (xefis, xefis.logger().with_context ("radio").with_context ("machine"), 120_Hz, u8"Aircraft/Radio machine"),
+	xf::SingleLoopMachine (xefis, xefis.logger().with_context ("radio"), 120_Hz, u8"Aircraft/Radio machine"),
 	_xefis_clock (xefis_clock),
 	_steady_clock (steady_clock),
-	_modules (loop(), xefis.logger().with_context ("radio").with_context ("modules"))
+	_modules (loop(), logger().with_context ("radio modules"))
 {
 	initialize();
 

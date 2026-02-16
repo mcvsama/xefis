@@ -95,7 +95,7 @@ class SimulationRun
 				_xefis_clock,
 				_steady_clock,
 				[this] (xf::ProcessingLoop& loop) {
-					return std::make_unique<aircraft::VirtualHardwareModules> (_aircraft, loop, _logger);
+					return std::make_unique<aircraft::VirtualHardwareModules> (_aircraft, loop, _logger.with_context ("virtual hardware modules"));
 				}
 			);
 		},

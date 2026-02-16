@@ -59,7 +59,7 @@ class FlightComputerModules
 		make_link_protocol_from_outputs (_hardware_to_flight_computer_data, "hardware → flight computer", { 0x23, 0x34 }),
 		LinkDecoder::Parameters {
 		},
-		_logger.with_context ("↔ hardware machine"),
+		_logger,
 		"hardware machine",
 	};
 };

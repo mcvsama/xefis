@@ -31,10 +31,10 @@ FlightComputerMachine::FlightComputerMachine (xf::Xefis& xefis,
 											  xf::Clock& xefis_clock,
 											  xf::Clock& steady_clock,
 											  bool const inside_simulation):
-	xf::SingleLoopMachine (xefis, xefis.logger().with_context ("flight computer").with_context ("machine"), 120_Hz, u8"Aircraft/Flight computer machine"),
+	xf::SingleLoopMachine (xefis, xefis.logger().with_context ("flight computer"), 120_Hz, u8"Aircraft/Flight computer machine"),
 	_xefis_clock (xefis_clock),
 	_steady_clock (steady_clock),
-	_modules (loop(), xefis.logger().with_context ("flight computer").with_context ("modules"))
+	_modules (loop(), logger())
 {
 	initialize();
 

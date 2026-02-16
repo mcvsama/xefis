@@ -33,7 +33,7 @@ using namespace neutrino::si::literals;
 HardwareMachine::HardwareMachine (xf::Xefis& xefis,
 								  xf::Clock& xefis_clock,
 								  xf::Clock& steady_clock):
-	HardwareMachine (xefis, xefis_clock, steady_clock, [this](xf::ProcessingLoop&) { return std::make_unique<RealHardwareModules> (loop(), logger()); })
+	HardwareMachine (xefis, xefis_clock, steady_clock, [this](xf::ProcessingLoop&) { return std::make_unique<RealHardwareModules> (loop(), logger().with_context ("real hardware modules")); })
 {
 	start();
 }
@@ -43,7 +43,7 @@ HardwareMachine::HardwareMachine (xf::Xefis& xefis,
 								  xf::Clock& xefis_clock,
 								  xf::Clock& steady_clock,
 								  MakeModulesFunction const make_modules):
-	xf::SingleLoopMachine (xefis, xefis.logger().with_context ("hardware").with_context ("machine"), 120_Hz, u8"Aircraft/Hardware machine"),
+	xf::SingleLoopMachine (xefis, xefis.logger().with_context ("hardware"), 120_Hz, u8"Aircraft/Hardware machine"),
 	_xefis_clock (xefis_clock),
 	_steady_clock (steady_clock),
 	_modules (make_modules (loop()))
