@@ -257,7 +257,7 @@ identifier (Module const& module)
 	auto const& i = module.instance();
 	return i.empty()
 		? n
-		: n + " • " + i;
+		: n + " ⧉ " + i;
 }
 
 
