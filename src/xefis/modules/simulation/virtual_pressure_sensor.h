@@ -90,7 +90,7 @@ class VirtualPressureSensor: public VirtualPressureSensorIO
 	Probe										_probe;
 	// Device's noise:
 	std::default_random_engine					_random_generator;
-	nu::math::NormalDistribution<si::Pressure>	_noise				{ 0_Pa, 0_Pa };
+	nu::math::NormalDistribution<si::Pressure>	_noise				{ 0_Pa, 1_Pa };
 	si::Time									_last_measure_time	{ 0_s };
 };
 

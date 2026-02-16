@@ -84,7 +84,7 @@ class VirtualTemperatureSensor: public VirtualTemperatureSensorIO
 	xf::sim::TemperatureSensor const&				_sensor;
 	// Device's noise:
 	std::default_random_engine						_random_generator;
-	nu::math::NormalDistribution<si::Temperature>	_noise				{ 0_K, 0_K };
+	nu::math::NormalDistribution<si::Temperature>	_noise				{ 0_K, 1_K };
 	si::Time										_last_measure_time	{ 0_s };
 };
 
