@@ -43,7 +43,12 @@ class LinkDecoder: public xf::Module
   public:
 	struct Parameters
 	{
+		// Delay before marking the link as valid again after the first
+		// successfully decoded envelope; gives the protocol time to stabilize.
 		std::optional<si::Time>		reacquire_after;
+
+		// Max idle time without valid envelopes before the decoder declares a
+		// failsafe condition, clears sockets and marks the link invalid.
 		std::optional<si::Time>		failsafe_after;
 	};
 
