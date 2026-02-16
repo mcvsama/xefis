@@ -37,17 +37,17 @@ LinkEncoder::process (xf::Cycle const& cycle)
 {
 	if (cycle.update_time() - _previous_update_time > _send_period)
 	{
-		send_output();
+		send_output (cycle);
 		_previous_update_time = cycle.update_time();
 	}
 }
 
 
 void
-LinkEncoder::send_output()
+LinkEncoder::send_output (xf::Cycle const& cycle)
 {
 	_output_blob.clear();
-	_protocol->produce_append (_output_blob, _logger);
+	_protocol->produce_append (_output_blob, cycle.logger() + _logger);
 	this->encoded_output = std::string (_output_blob.begin(), _output_blob.end());
 }
 

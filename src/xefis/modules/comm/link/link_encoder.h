@@ -55,7 +55,7 @@ class LinkEncoder: public xf::Module
 	 * Called by output timer.
 	 */
 	void
-	send_output();
+	send_output (xf::Cycle const& cycle);
 
   private:
 	nu::Logger						_logger;
