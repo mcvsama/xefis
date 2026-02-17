@@ -433,18 +433,14 @@ LinkProtocol::produce_append (Blob& blob, [[maybe_unused]] nu::Logger const& log
 }
 
 
-Blob::const_iterator
-LinkProtocol::consume (Blob::const_iterator begin,
-					   Blob::const_iterator end,
-					   LinkDecoder* link_decoder,
-					   QTimer* reacquire_timer,
-					   QTimer* failsafe_timer,
-					   nu::Logger const& logger)
+LinkProtocol::ConsumeResult
+LinkProtocol::consume (Blob::const_iterator begin, Blob::const_iterator end, nu::Logger const& logger)
 {
 #if XEFIS_LINK_RECV_DEBUG
 	logger << "Recv: " << nu::to_hex_string (BlobView (begin, end), ":") << std::endl;
 #endif
 
+	auto consume_result = ConsumeResult();
 	_aux_unique_prefix_buffer.resize (_unique_prefix_size);
 
 	while (std::distance (begin, end) > static_cast<Blob::difference_type> (_unique_prefix_size + 1))
@@ -454,16 +450,11 @@ LinkProtocol::consume (Blob::const_iterator begin,
 			if (std::distance (begin, end) >= 1)
 				++begin;
 
-			if (link_decoder)
-				link_decoder->link_error_bytes = link_decoder->link_error_bytes.value_or (0) + 1;
-
-			// Since there was an error, stop the reacquire timer:
-			if (reacquire_timer)
-				reacquire_timer->stop();
+			consume_result.error_bytes += 1;
 		};
 
 		bool return_from_outer_function = false;
-		Blob::const_iterator outer_result = begin;
+		consume_result.parsing_end = begin;
 
 		nu::Exception::catch_and_log (logger, [&]{
 			try {
@@ -481,7 +472,7 @@ LinkProtocol::consume (Blob::const_iterator begin,
 				if (nu::to_unsigned (std::distance (begin, end)) - _unique_prefix_size < envelope->size())
 				{
 					return_from_outer_function = true;
-					outer_result = begin;
+					consume_result.parsing_end = begin;
 					return;
 				}
 
@@ -490,21 +481,11 @@ LinkProtocol::consume (Blob::const_iterator begin,
 				if (e != begin)
 				{
 					envelope->apply();
+					consume_result.valid_bytes += std::distance (begin, e);
 					begin = e;
 				}
 
-				if (link_decoder)
-					link_decoder->link_valid_envelopes = link_decoder->link_valid_envelopes.value_or (0) + 1;
-
-				// Restart failsafe timer:
-				if (failsafe_timer)
-					failsafe_timer->start();
-
-				// If link_decoder is not valid, and we got valid envelope,
-				// start reacquire timer:
-				if (reacquire_timer && link_decoder)
-					if (!link_decoder->link_valid.value_or (false) && !reacquire_timer->isActive())
-						reacquire_timer->start();
+				consume_result.valid_envelopes += 1;
 			}
 			catch (LinkProtocol::ParseError&)
 			{
@@ -518,10 +499,11 @@ LinkProtocol::consume (Blob::const_iterator begin,
 		});
 
 		if (return_from_outer_function)
-			return outer_result;
+			return consume_result;
 	}
 
-	return begin;
+	consume_result.parsing_end = begin;
+	return consume_result;
 }
 
 

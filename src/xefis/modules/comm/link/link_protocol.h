@@ -82,6 +82,17 @@ class LinkProtocol
 	};
 
 	/**
+	 * Returned by LinkProtocol::consume().
+	 */
+	struct ConsumeResult
+	{
+		Blob::const_iterator	parsing_end;
+		uint32_t				valid_bytes		{ 0 };
+		uint32_t				valid_envelopes	{ 0 };
+		uint32_t				error_bytes		{ 0 };
+	};
+
+	/**
 	 * An packet of data.
 	 */
 	class Packet
@@ -554,8 +565,8 @@ class LinkProtocol
 	void
 	produce_append (Blob&, nu::Logger const&);
 
-	Blob::const_iterator
-	consume (Blob::const_iterator begin, Blob::const_iterator end, LinkDecoder*, QTimer* reacquire_timer, QTimer* failsafe_timer, nu::Logger const&);
+	ConsumeResult
+	consume (Blob::const_iterator begin, Blob::const_iterator end, nu::Logger const&);
 
 	void
 	failsafe();

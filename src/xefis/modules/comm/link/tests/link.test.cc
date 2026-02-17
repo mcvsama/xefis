@@ -304,9 +304,12 @@ void transmit (LinkProtocol& tx_protocol, LinkProtocol& rx_protocol)
 {
 	Blob blob;
 	tx_protocol.produce_append (blob, g_logger);
-	auto end = rx_protocol.consume (blob.begin(), blob.end(), nullptr, nullptr, nullptr, g_logger);
+	auto const consume_result = rx_protocol.consume (blob.begin(), blob.end(), g_logger);
 
-	test_asserts::verify ("rx_protocol ate all input bytes", end == blob.end());
+	test_asserts::verify ("rx_protocol ate all input bytes", consume_result.parsing_end == blob.end());
+	test_asserts::verify_equal ("valid_bytes == blob.size()", consume_result.valid_bytes, blob.size());
+	test_asserts::verify ("valid_envelopes >= 1", consume_result.valid_envelopes >= 1u);
+	test_asserts::verify_equal ("error_bytes == 0", consume_result.error_bytes, 0u);
 }
 
 
@@ -486,9 +489,21 @@ nu::AutoTest t4 ("modules/io/link: protocol: invalid data transmission (wrong si
 	tx.uint_prop_r << 15u;
 	tx.fetch_all (cycle += 1_s);
 
-	Blob blob;
-	tx_protocol.produce_append (blob, g_logger);
-	rx_protocol.consume (blob.begin(), blob.end(), nullptr, nullptr, nullptr, g_logger);
+	{
+		Blob blob;
+		tx_protocol.produce_append (blob, g_logger);
+		auto const consume_result = rx_protocol.consume (blob.begin(), blob.end(), g_logger);
+
+		test_asserts::verify_equal ("all input is consumed", consume_result.parsing_end, blob.end());
+		test_asserts::verify_equal ("valid_bytes == sent bytes", consume_result.valid_bytes, blob.size());
+
+		// Expect 2 envelopes: "data 1" and "data 2".
+		// The handshake envelope is not sent without io.handshake_request.valid() and "data 3" is sent
+		// later (.send_every + .send_offset).
+		test_asserts::verify_equal ("valid_envelopes == 2", consume_result.valid_envelopes, 2u);
+
+		test_asserts::verify_equal ("error_bytes == 0", consume_result.error_bytes, 0u);
+	}
 
 	// Transmit invalid data:
 	tx.string_prop << "invalid string";
@@ -508,19 +523,32 @@ nu::AutoTest t4 ("modules/io/link: protocol: invalid data transmission (wrong si
 	tx.uint_prop_r << 12u;
 	tx.fetch_all (cycle += 1_s);
 
-	blob.clear();
-	tx_protocol.produce_append (blob, g_logger);
-	test_asserts::verify ("blob is long enough", blob.size() >= 16);
-	// Mess with both messages:
-	blob[12] = 0x00;
-	blob[13] = 0xff;
-	blob[14] = 0x00;
-	blob[15] = 0xff;
-	// Careful not to touch the last envelope, which shouldn't be sent in a first second:
-	blob[blob.size() - 6] = 0xff;
-	blob[blob.size() - 5] = 0x00;
-	blob[blob.size() - 4] = 0xff;
-	rx_protocol.consume (blob.begin(), blob.end(), nullptr, nullptr, nullptr, g_logger);
+	{
+		Blob blob;
+		tx_protocol.produce_append (blob, g_logger);
+		test_asserts::verify ("blob is long enough", blob.size() >= 16);
+		// Mess with both messages.
+		// Careful not to touch the last envelope "data 3", which shouldn't be sent in the first second,
+		// so we only have "data 1" and "data 2" here.
+		blob[12] = 0x00;
+		blob[13] = 0xff;
+		blob[14] = 0x00;
+		blob[15] = 0xff;
+		blob[blob.size() - 6] = 0xff;
+		blob[blob.size() - 5] = 0x00;
+		blob[blob.size() - 4] = 0xff;
+
+		auto const consume_result = rx_protocol.consume (blob.begin(), blob.end(), g_logger);
+		auto const consumed_bytes = consume_result.parsing_end - blob.begin();
+
+		test_asserts::verify ("not all input is consumed", consume_result.parsing_end != blob.end());
+		test_asserts::verify_equal ("valid_bytes == 0", consume_result.valid_bytes, 0u);
+
+		// Expect 0 envelopes consumed as they're both interferred with:
+		test_asserts::verify_equal ("valid_envelopes == 0", consume_result.valid_envelopes, 0u);
+
+		test_asserts::verify_equal ("error_bytes == consumed_bytes", consume_result.error_bytes, consumed_bytes);
+	}
 
 	// Test that values weren't changed during last invalid transmission:
 	test_asserts::verify ("string_prop didn't change", rx.string_prop.value_or ("nil!") == "non-retained string");

@@ -50,11 +50,32 @@ LinkDecoder::process (xf::Cycle const& cycle)
 	try {
 		if (this->encoded_input && _input_changed.serial_changed())
 		{
-			_input_blob.insert (_input_blob.end(), this->encoded_input->begin(), this->encoded_input->end());
-			auto e = _protocol->consume (_input_blob.begin(), _input_blob.end(), this, _reacquire_timer.get(), _failsafe_timer.get(), cycle.logger() + _logger);
-			auto valid_bytes = std::distance (_input_blob.cbegin(), e);
-			this->link_valid_bytes = this->link_valid_bytes.value_or (0) + valid_bytes;
-			_input_blob.erase (_input_blob.begin(), e);
+			_input_blob.append (this->encoded_input->begin(), this->encoded_input->end());
+			auto const consume_result = _protocol->consume (_input_blob.begin(), _input_blob.end(), cycle.logger() + _logger);
+
+			auto consumed_bytes = std::distance (_input_blob.cbegin(), consume_result.parsing_end);
+			this->link_received_bytes = this->link_received_bytes.value_or (0) + consumed_bytes;
+			this->link_valid_bytes = this->link_valid_bytes.value_or (0) + consume_result.valid_bytes;
+			this->link_valid_envelopes = this->link_valid_envelopes.value_or (0) + consume_result.valid_envelopes;
+			this->link_error_bytes = this->link_error_bytes.value_or (0) + consume_result.error_bytes;
+
+			if (this->link_valid.is_nil() && consume_result.valid_bytes > 0)
+				this->link_valid = true;
+
+			if (_reacquire_timer)
+			{
+				if (consume_result.error_bytes > 0)
+					_reacquire_timer->stop();
+
+				if (consume_result.valid_bytes > 0)
+					if (!this->link_valid.value_or (false) && !_reacquire_timer->isActive())
+						_reacquire_timer->start();
+			}
+
+			if (_failsafe_timer && consume_result.valid_envelopes > 0)
+				_failsafe_timer->start();
+
+			_input_blob.erase (_input_blob.begin(), consume_result.parsing_end);
 		}
 	}
 	catch (LinkProtocol::ParseError const&)
