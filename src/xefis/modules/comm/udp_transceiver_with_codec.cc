@@ -19,6 +19,8 @@
 
 // Standard:
 #include <cstddef>
+#include <memory>
+#include <string>
 
 
 UDPTransceiverWithCodec::UDPTransceiverWithCodec (xf::ProcessingLoop& loop,
