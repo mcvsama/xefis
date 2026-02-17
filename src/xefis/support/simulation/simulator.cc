@@ -41,7 +41,7 @@ Simulator::Simulator (rigid_body::System& rigid_body_system,
 
 		for (auto* machine_manager: _machine_managers)
 			if (auto* machine = machine_manager->machine())
-				machine->advance_loops (dt);
+				machine->advance_time (dt);
 
 		if (_additional_evolve)
 			_additional_evolve (dt);

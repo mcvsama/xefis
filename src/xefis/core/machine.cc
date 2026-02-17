@@ -35,7 +35,7 @@ Machine::~Machine()
 
 
 void
-Machine::advance_loops (si::Time const dt)
+Machine::advance_time (si::Time const dt)
 {
 	for (auto* loop: _processing_loops)
 		loop->advance (dt);

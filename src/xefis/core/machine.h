@@ -126,7 +126,7 @@ class Machine: private nu::Noncopyable
 
 	/**
 	 * Register a processing loop.
-	 * Registered loops' time will be advanced when advance_loop() is called.
+	 * Registered loops' time will be advanced when advance_time() is called.
 	 * They will also be accessible in the associated ConfiguratorWidget.
 	 */
 	void
@@ -145,7 +145,7 @@ class Machine: private nu::Noncopyable
 	 * Advance machine's processing loops.
 	 */
 	void
-	advance_loops (si::Time);
+	advance_time (si::Time);
 
 	/**
 	 * Show configurator widget.
