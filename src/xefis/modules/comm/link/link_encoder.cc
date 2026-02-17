@@ -14,6 +14,9 @@
 // Local:
 #include "link_encoder.h"
 
+// Neutrino:
+#include <neutrino/stdexcept.h>
+
 
 using namespace nu::si::literals;
 
@@ -28,6 +31,9 @@ LinkEncoder::LinkEncoder (xf::ProcessingLoop& loop,
 	_protocol (std::move (protocol)),
 	_send_period (1 / params.send_frequency)
 {
+	if (!_protocol)
+		throw nu::InvalidArgument ("LinkEncoder: 'protocol' must not be nullptr");
+
 	_output_blob.reserve (2 * _protocol->size());
 }
 

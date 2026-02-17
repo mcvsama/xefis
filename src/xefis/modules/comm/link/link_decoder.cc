@@ -14,6 +14,9 @@
 // Local:
 #include "link_decoder.h"
 
+// Neutrino:
+#include <neutrino/stdexcept.h>
+
 
 using namespace nu::si::literals;
 
@@ -24,6 +27,9 @@ LinkDecoder::LinkDecoder (xf::ProcessingLoop& loop, std::unique_ptr<LinkProtocol
 	_protocol (std::move (protocol)),
 	_params (params)
 {
+	if (!_protocol)
+		throw nu::InvalidArgument ("LinkDecoder: 'protocol' must not be nullptr");
+
 	_input_blob.reserve (2 * _protocol->size());
 
 	if (_params.failsafe_after)
