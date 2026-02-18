@@ -37,6 +37,7 @@ RigidBodyViewer::RigidBodyViewer (QWidget* parent, RefreshRate const refresh_rat
 	_rigid_body_painter (si::PixelDensity (screen()->physicalDotsPerInch()), work_performer)
 {
 	setWindowTitle("Xefis rigid body viewer");
+	setMouseTracking (true);
 
 	{
 		auto* esc = new QShortcut (this);
@@ -191,6 +192,16 @@ RigidBodyViewer::mouseMoveEvent (QMouseEvent* event)
 		_camera_translation[1] += scale * +delta.y();
 		forward_camera_translation();
 	}
+
+	update_hovered_body_from_cursor (event->pos());
+}
+
+
+void
+RigidBodyViewer::leaveEvent (QEvent* event)
+{
+	update_hovered_body_from_cursor (std::nullopt);
+	GLAnimationWidget::leaveEvent (event);
 }
 
 
@@ -277,6 +288,37 @@ RigidBodyViewer::paint (QOpenGLPaintDevice& canvas)
 		_rigid_body_painter.paint (*_rigid_body_system, canvas);
 		_dirty = false;
 	}
+}
+
+
+void
+RigidBodyViewer::update_hovered_body_from_cursor (std::optional<QPoint> const cursor_position)
+{
+	rigid_body::Body const* hovered_body = nullptr;
+
+	if (_rigid_body_system && cursor_position)
+	{
+		auto const& pos = *cursor_position;
+		auto const within_viewport = pos.x() >= 0 && pos.y() >= 0 && pos.x() < width() && pos.y() < height();
+
+		if (within_viewport)
+			hovered_body = _rigid_body_painter.body_under_cursor (*_rigid_body_system, pos, size());
+	}
+
+	if (hovered_body)
+		_rigid_body_painter.set_hovered (*hovered_body);
+	else
+		_rigid_body_painter.set_hovered_to_none();
+
+	if (_hovered_body_from_cursor != hovered_body)
+	{
+		_hovered_body_from_cursor = hovered_body;
+
+		if (_hovered_body_callback)
+			_hovered_body_callback (_hovered_body_from_cursor);
+	}
+
+	update();
 }
 
 

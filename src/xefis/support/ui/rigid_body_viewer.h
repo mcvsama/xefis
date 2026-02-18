@@ -25,6 +25,7 @@
 #include <neutrino/work_performer.h>
 
 // Qt:
+#include <QEvent>
 #include <QKeyEvent>
 #include <QMouseEvent>
 #include <QTimer>
@@ -35,6 +36,7 @@
 #include <cstddef>
 #include <functional>
 #include <optional>
+#include <utility>
 
 
 namespace xf {
@@ -51,6 +53,7 @@ class RigidBodyViewer: public GLAnimationWidget
 	// Evolution function called before each display frame. If frame_duration has value, it's the evolution Δt, if not, evolve the simulation by single frame,
 	// as the user is doing single-stepping of the simulation.
 	using BeforePaintCallback = std::function<void (std::optional<si::Time> frame_duration)>;
+	using HoveredBodyCallback = std::function<void (rigid_body::Body const*)>;
 
 	using FPSMode = GLAnimationWidget::FPSMode;
 	using GroupRenderingConfig = RigidBodyPainter::GroupRenderingConfig;
@@ -126,6 +129,16 @@ class RigidBodyViewer: public GLAnimationWidget
 	set_rigid_body_system (rigid_body::System const* system)
 	{
 		_rigid_body_system = system;
+
+		if (!system)
+		{
+			_hovered_body_from_cursor = nullptr;
+			_rigid_body_painter.set_hovered_to_none();
+
+			if (_hovered_body_callback)
+				_hovered_body_callback (nullptr);
+		}
+
 		update();
 	}
 
@@ -326,6 +339,14 @@ class RigidBodyViewer: public GLAnimationWidget
 		{ _rigid_body_painter.set_camera_position_callback (callback); }
 
 	/**
+	 * Set callback called whenever hovered body under the OpenGL cursor changes.
+	 * Can be nullptr to unset.
+	 */
+	void
+	set_hovered_body_callback (HoveredBodyCallback callback)
+		{ _hovered_body_callback = std::move (callback); }
+
+	/**
 	 * Return playback mode.
 	 */
 	[[nodiscard]]
@@ -377,6 +398,10 @@ class RigidBodyViewer: public GLAnimationWidget
 
 	// QWidget API
 	void
+	leaveEvent (QEvent*) override;
+
+	// QWidget API
+	void
 	wheelEvent (QWheelEvent*) override;
 
 	// QWidget API
@@ -414,6 +439,9 @@ class RigidBodyViewer: public GLAnimationWidget
 	float
 	precision()
 		{ return (QGuiApplication::queryKeyboardModifiers() & Qt::ShiftModifier) ? kHighPrecisionFactor : 1.0; }
+
+	void
+	update_hovered_body_from_cursor (std::optional<QPoint>);
 
 	/**
 	 * Display popup menu. Return true if user selected any action from the menu.
@@ -459,6 +487,8 @@ class RigidBodyViewer: public GLAnimationWidget
 	// Camera position relative to the followed body:
 	SpaceLength<WorldSpace>		_camera_translation				{ kDefaultCameraTranslation };
 	SpaceVector<si::Angle>		_camera_rotation				{ kDefaultCameraRotation };
+	HoveredBodyCallback			_hovered_body_callback;
+	rigid_body::Body const*		_hovered_body_from_cursor		{ nullptr };
 	// Self-deletes after a while and becomes a dangling pointer:
 	QTimer*						_painter_ready_check_timer		{ new QTimer (this) };
 };
