@@ -875,8 +875,29 @@ RigidBodyPainter::paint (rigid_body::System const& system)
 			paint (*body, get_rendering_config (*body));
 
 		if (_features_config.constraints_visible)
+		{
 			for (auto const& constraint: system.constraints())
 				paint (*constraint);
+		}
+		else
+		{
+			// Even if constraints are not set to 'visible', if a constraint is hovered or focused
+			// in the tree-widget, it will still be painted, for convenience.
+
+			auto const* focused_constraint = this->focused_constraint();
+			auto const* hovered_constraint = hovered<rigid_body::Constraint>();
+
+			if (focused_constraint || hovered_constraint)
+			{
+				for (auto const& constraint: system.constraints())
+				{
+					auto const* current_constraint = constraint.get();
+
+					if (current_constraint == focused_constraint || current_constraint == hovered_constraint)
+						paint (*constraint);
+				}
+			}
+		}
 
 		if (_features_config.gravity_visible || _features_config.aerodynamic_forces_visible || _features_config.external_forces_visible)
 			for (auto const& body: system.bodies())
