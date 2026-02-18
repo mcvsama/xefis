@@ -20,6 +20,7 @@
 #include <xefis/support/color/spaces.h>
 #include <xefis/support/math/rotations.h>
 #include <xefis/support/nature/constants.h>
+#include <xefis/support/shapes/shape_utils.h>
 #include <xefis/support/shapes/various_materials.h>
 #include <xefis/support/shapes/various_shapes.h>
 #include <xefis/support/simulation/constraints/fixed_constraint.h>
@@ -47,6 +48,7 @@
 // Standard:
 #include <cstddef>
 #include <future>
+#include <limits>
 #include <random>
 
 
@@ -60,6 +62,32 @@ constexpr auto kGLSkyLight1				= GL_LIGHT4;
 constexpr auto kGLSkyLight2				= GL_LIGHT5;
 constexpr auto kGLSkyLight3				= GL_LIGHT6;
 constexpr auto kGLSkyLight4				= GL_LIGHT7;
+
+namespace {
+
+/**
+ * Compute a conservative body-space bounding sphere radius around the center of mass.
+ *
+ * This is used as a cheap broad-phase test before the expensive exact
+ * ray-vs-mesh intersection in body_under_cursor(). If no vertex exists,
+ * the radius stays 0_m and we skip that body in picking.
+ */
+[[nodiscard]]
+si::Length
+body_picking_radius (rigid_body::Body const& body, Shape const& shape)
+{
+	auto radius = 0_m;
+
+	shape.for_each_vertex ([&] (ShapeVertex const& vertex) {
+		auto const vertex_in_com = body.origin_placement().rotate_translate_to_base (vertex.position());
+		radius = std::max (radius, abs (vertex_in_com));
+	});
+
+	return radius;
+}
+
+} // namespace
+
 
 nu::Synchronized<std::shared_future<RigidBodyPainter::PlanetTextureImages>>		RigidBodyPainter::_planet_texture_images;
 nu::Synchronized<std::shared_future<RigidBodyPainter::UniverseTextureImages>>	RigidBodyPainter::_universe_texture_images;
@@ -225,6 +253,74 @@ RigidBodyPainter::set_universe_enabled (bool enabled)
 	}
 	else
 		_universe.reset();
+}
+
+
+rigid_body::Body const*
+RigidBodyPainter::body_under_cursor (rigid_body::System const& system, QPoint const& cursor_position, QSize const& viewport_size)
+{
+	if (viewport_size.width() <= 0 || viewport_size.height() <= 0)
+		return nullptr;
+
+	// Build a world-space picking ray from cursor pixel coordinates.
+	// Pixel center (+0.5) is used to avoid edge bias, then converted to NDC and
+	// projected through the current perspective (FOV + aspect ratio).
+	auto const width = static_cast<double> (viewport_size.width());
+	auto const height = static_cast<double> (viewport_size.height());
+	auto const ndc_x = 2.0 * (cursor_position.x() + 0.5) / width - 1.0;
+	auto const ndc_y = 1.0 - 2.0 * (cursor_position.y() + 0.5) / height;
+	auto const tan_half_fov = tan (0.5 * _fov);
+	auto const aspect = width / height;
+	auto const ray_direction_camera = SpaceVector<double, WorldSpace> {
+		ndc_x * tan_half_fov * aspect,
+		ndc_y * tan_half_fov,
+		-1.0,
+	}.normalized();
+	auto const ray_direction_world = (_camera.base_rotation() * ray_direction_camera).normalized();
+	auto const ray_origin_world = _camera.position();
+	auto nearest_distance = std::numeric_limits<double>::infinity() * 1_m;
+	rigid_body::Body const* nearest_body = nullptr;
+
+	for (auto const& body_ptr: system.bodies())
+	{
+		auto const& body = *body_ptr;
+
+		if (get_rendering_config (body).body_visible)
+		{
+			auto const& body_shape = shape_for (body);
+
+			if (auto const radius = body_picking_radius (body, body_shape);
+				radius > 0_m)
+			{
+				// radius must be > 0_m, otherwise sphere intersection is degenerate
+				// (point sphere / empty geometry), so there is nothing meaningful to pick.
+				// This quick sphere hit test rejects bodies definitely not under the cursor,
+				// avoiding costly per-shape intersection for most bodies.
+				if (auto const bounding_sphere_distance = ray_sphere_intersection (ray_origin_world, ray_direction_world, body.placement().position(), radius);
+					bounding_sphere_distance && *bounding_sphere_distance < nearest_distance)
+				{
+					// bounding_sphere_distance gives the first hit distance along the ray.
+					// Keeping only distances nearer than current best lets us prune farther
+					// candidates before transforming rays and running exact mesh picking.
+					auto const ray_origin_body_com = body.placement().rotate_translate_to_body (ray_origin_world);
+					auto const ray_origin_body_origin = body.origin_placement().rotate_translate_to_body (ray_origin_body_com);
+					auto const ray_direction_body_origin = body.origin_placement().rotate_to_body (body.placement().rotate_to_body (ray_direction_world)).normalized();
+
+					// Narrow-phase: exact intersection with the body shape in body-origin space.
+					if (auto const shape_distance = ray_shape_intersection (body_shape, ray_origin_body_origin, ray_direction_body_origin))
+					{
+						if (*shape_distance < nearest_distance)
+						{
+							nearest_distance = *shape_distance;
+							nearest_body = &body;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return nearest_body;
 }
 
 

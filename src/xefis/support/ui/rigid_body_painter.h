@@ -37,8 +37,9 @@
 #include <QOpenGLFunctions>
 #include <QOpenGLPaintDevice>
 #include <QOpenGLTexture>
-#include <QRect>
 #include <QPoint>
+#include <QRect>
+#include <QSize>
 
 // Standard:
 #include <cstddef>
@@ -459,6 +460,13 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	 */
 	void
 	set_universe_enabled (bool);
+
+	/**
+	 * Return a body rendered under the specified cursor position or nullptr if none.
+	 */
+	[[nodiscard]]
+	rigid_body::Body const*
+	body_under_cursor (rigid_body::System const&, QPoint const& cursor_position, QSize const& viewport_size);
 
 	/**
 	 * Return FeaturesConfig structure. It can be modified.
