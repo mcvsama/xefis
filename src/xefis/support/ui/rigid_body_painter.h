@@ -387,7 +387,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 		}
 
 	/**
-	 * Set the hovered body. It's painted with different color.
+	 * Set hovered body or constraint. It's painted with different color.
 	 * Call set_hovered_to_none() set none as hovered.
 	 */
 	template<class Object>
@@ -401,7 +401,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 		{ _hovered = std::monostate(); }
 
 	/**
-	 * Return a hovered group, body or constraint, if set, or nullptr.
+	 * Return a hovered body or constraint, if set, or nullptr.
 	 */
 	template<class Object>
 		requires nu::SameAsAnyOf<Object, rigid_body::Body, rigid_body::Constraint>

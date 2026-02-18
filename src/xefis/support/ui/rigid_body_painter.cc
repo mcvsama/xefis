@@ -981,6 +981,16 @@ RigidBodyPainter::paint (rigid_body::Constraint const& constraint)
 			auto const& b2 = constraint.body_2();
 			auto com1 = b1.placement().position() - cp;
 			auto com2 = b2.placement().position() - cp;
+			auto const is_focused = &constraint == focused_constraint();
+			auto const is_hovered = hovered<rigid_body::Constraint>() == &constraint;
+			auto const highlighted_constraint_color = [is_focused, is_hovered] {
+				auto color = QColor (0x00, 0xaa, 0x7f);
+
+				if (is_hovered && !is_focused)
+					color = color.lighter (150);
+
+				return color;
+			};
 
 			auto const rod_from_to = [this] (si::Length const radius, auto const& from, auto const& to, bool front_back_faces, ShapeMaterial const& material)
 			{
@@ -1011,8 +1021,8 @@ RigidBodyPainter::paint (rigid_body::Constraint const& constraint)
 				auto const hinge_start_1 = com1 + a1;
 				auto const hinge_end_1 = hinge_start_1 + hinge_1;
 				auto const hinge_center = hinge_start_1 + 0.5 * hinge_1;
-				auto const color = &constraint == focused_constraint()
-					? QColor (0x00, 0xaa, 0x7f)
+				auto const color = (is_focused || is_hovered)
+					? highlighted_constraint_color()
 					: QColor (0xff, 0x99, 0x00);
 				auto const material = make_material (color);
 
@@ -1024,8 +1034,8 @@ RigidBodyPainter::paint (rigid_body::Constraint const& constraint)
 			}
 			else if (dynamic_cast<rigid_body::FixedConstraint const*> (&constraint))
 			{
-				auto const color = &constraint == focused_constraint()
-					? QColor (0x00, 0xaa, 0x7f)
+				auto const color = (is_focused || is_hovered)
+					? highlighted_constraint_color()
 					: QColor (0xff, 0x00, 0x99);
 				auto const material = make_material (color);
 				rod_from_to (kDefaultConstraintDiameter, com1, com2, false, material);
