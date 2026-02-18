@@ -26,6 +26,7 @@
 #include <xefis/support/ui/rigid_body_viewer.h>
 
 // Qt:
+#include <QBrush>
 #include <QIcon>
 #include <QTreeWidget>
 
@@ -49,6 +50,13 @@ class ItemsTree: public QTreeWidget
 	 */
 	void
 	refresh();
+
+	/**
+	 * Highlight all tree items that refer to the specified body.
+	 * Pass nullptr to clear highlight.
+	 */
+	void
+	set_hovered_body (rigid_body::Body const*);
 
   protected:
 	/**
@@ -91,6 +99,12 @@ class ItemsTree: public QTreeWidget
 	void
 	add_constraint_item_to (rigid_body::Constraint&, BodyItem&);
 
+	/**
+	 * Un-highlight hovered body items and clear the list.
+	 */
+	void
+	clear_hovered_body_items();
+
 	// QWidget API
 	void
 	contextMenuEvent (QContextMenuEvent*);
@@ -104,8 +118,11 @@ class ItemsTree: public QTreeWidget
 	RigidBodyViewer&			_rigid_body_viewer;
 	rigid_body::Group const*	_followed_group					{ nullptr };
 	rigid_body::Body const*		_followed_body					{ nullptr };
+	rigid_body::Body const*		_hovered_body					{ nullptr };
+	std::set<QTreeWidgetItem*>	_hovered_body_items;
 	std::set<rigid_body::Body const*> // TODO flat_set when compiler supports it
 								_gravitating_bodies;
+	QBrush						_hovered_body_brush;
 	QIcon						_group_icon						{ icons::group() };
 	QIcon						_body_icon						{ icons::body() };
 	QIcon						_gravitating_body_icon			{ icons::gravitating_body() };

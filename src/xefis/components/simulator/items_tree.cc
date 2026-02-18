@@ -47,12 +47,21 @@ ItemsTree::ItemsTree (QWidget* parent, rigid_body::System& system, RigidBodyView
 	setAutoScroll (true);
 	setVerticalScrollMode (QAbstractItemView::ScrollPerPixel);
 	setHeaderLabels ({ "Body" });
+
+	auto color = palette().color (QPalette::Highlight);
+	color.setAlpha (50);
+	_hovered_body_brush = QBrush (color);
 }
 
 
 void
 ItemsTree::refresh()
 {
+	// Remember hovered body for later, and forget the collected corresponding
+	// items since we'll be recreating the tree now:
+	auto const hovered_body = _hovered_body;
+	clear_hovered_body_items();
+
 	// Prevent sending itemChanged() signals when creating new items:
 	auto const signals_blocker = QSignalBlocker (this);
 
@@ -90,6 +99,37 @@ ItemsTree::refresh()
 
 	// Make sure to redraw the viewer after potential changes in the config or system:
 	_rigid_body_viewer.update();
+	// Re-set previously remembered hovered body, if possible:
+	set_hovered_body (hovered_body);
+}
+
+
+void
+ItemsTree::set_hovered_body (rigid_body::Body const* body)
+{
+	if (_hovered_body != body || _hovered_body_items.empty())
+	{
+		_hovered_body = body;
+		clear_hovered_body_items();
+
+		if (_hovered_body)
+		{
+			// Prevent itemChanged() reentrancy when setting background:
+			auto const signals_blocker = QSignalBlocker (this);
+
+			for (QTreeWidgetItemIterator item (this); *item; ++item)
+			{
+				if (auto* body_item = dynamic_cast<BodyItem*> (*item))
+				{
+					if (&body_item->body() == _hovered_body)
+					{
+						body_item->setBackground (0, _hovered_body_brush);
+						_hovered_body_items.insert (body_item);
+					}
+				}
+			}
+		}
+	}
 }
 
 
@@ -348,6 +388,20 @@ ItemsTree::add_constraint_item_to (rigid_body::Constraint& constraint, BodyItem&
 
 	auto* connected_body_item = new BodyItem (*constraint_item, connected_body);
 	set_icon (*connected_body_item);
+}
+
+
+void
+ItemsTree::clear_hovered_body_items()
+{
+	// Prevent itemChanged() reentrancy when setting background:
+	auto const signals_blocker = QSignalBlocker (this);
+	auto items = std::move (_hovered_body_items);
+	_hovered_body_items.clear();
+
+	for (auto* item: items)
+		if (item && item->treeWidget() == this)
+			item->setBackground (0, QBrush());
 }
 
 
