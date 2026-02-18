@@ -367,6 +367,99 @@ compute_horizon_angle (si::Length const sphere_radius, si::Length const distance
 }
 
 
+/**
+ * Find the first positive ray/triangle hit distance using the
+ * Möller-Trumbore ray/triangle intersection algorithm.
+ */
+template<math::CoordinateSystem Space, math::Scalar PositionScalar, math::Scalar DirectionScalar>
+	[[nodiscard]]
+	std::optional<decltype (PositionScalar{} / DirectionScalar{})>
+	ray_triangle_intersection (SpaceVector<PositionScalar, Space> const& ray_origin,
+							   SpaceVector<DirectionScalar, Space> const& ray_direction,
+							   SpaceVector<PositionScalar, Space> const& a,
+							   SpaceVector<PositionScalar, Space> const& b,
+							   SpaceVector<PositionScalar, Space> const& c)
+	{
+		using RayParameter = decltype (PositionScalar{} / DirectionScalar{});
+
+		auto constexpr kEpsilon = 1e-12;
+		auto const origin = ray_origin / PositionScalar (1);
+		auto const normalized_ray_direction = ray_direction / DirectionScalar (1);
+		auto const p0 = a / PositionScalar (1);
+		auto const p1 = b / PositionScalar (1);
+		auto const p2 = c / PositionScalar (1);
+		auto const edge_1 = p1 - p0;
+		auto const edge_2 = p2 - p0;
+		auto const pvec = cross_product (normalized_ray_direction, edge_2);
+		auto const det = dot_product (edge_1, pvec);
+
+		// Determinant close to zero means ray is parallel to the triangle plane.
+		if (std::abs (det) < kEpsilon)
+			return std::nullopt;
+
+		auto const inv_det = 1.0 / det;
+		auto const tvec = origin - p0;
+		auto const u = dot_product (tvec, pvec) * inv_det;
+
+		// First barycentric coordinate must stay within triangle bounds.
+		if (u < 0.0 || u > 1.0)
+			return std::nullopt;
+
+		auto const qvec = cross_product (tvec, edge_1);
+		auto const v = dot_product (normalized_ray_direction, qvec) * inv_det;
+
+		// Second barycentric coordinate, plus u, must also stay within bounds.
+		if (v < 0.0 || u + v > 1.0)
+			return std::nullopt;
+
+		auto const t = dot_product (edge_2, qvec) * inv_det;
+
+		// Ignore hits behind or too close to ray origin.
+		if (t <= kEpsilon)
+			return std::nullopt;
+
+		return t * RayParameter (1);
+	}
+
+
+/**
+ * Intersect a ray with a sphere and return nearest positive hit distance.
+ */
+template<math::CoordinateSystem Space, math::Scalar PositionScalar, math::Scalar DirectionScalar>
+	[[nodiscard]]
+	std::optional<decltype (PositionScalar{} / DirectionScalar{})>
+	ray_sphere_intersection (SpaceVector<PositionScalar, Space> const& ray_origin,
+							 SpaceVector<DirectionScalar, Space> const& ray_direction,
+							 SpaceVector<PositionScalar, Space> const& center,
+							 PositionScalar const radius)
+	{
+		using RayParameter = decltype (PositionScalar{} / DirectionScalar{});
+
+		auto constexpr kEpsilon = 1e-12;
+		auto const normalized_ray_direction = ray_direction / DirectionScalar (1);
+		auto const origin_to_center = (ray_origin - center) / PositionScalar (1);
+		auto const radius_value = radius / PositionScalar (1);
+		auto const b = dot_product (normalized_ray_direction, origin_to_center);
+		auto const c = nu::square (abs (origin_to_center)) - nu::square (radius_value);
+		auto const discriminant = b * b - c;
+
+		if (discriminant < 0.0)
+			return std::nullopt;
+
+		auto const sqrt_d = std::sqrt (discriminant);
+		auto const near = -b - sqrt_d;
+		auto const far = -b + sqrt_d;
+
+		if (near > kEpsilon)
+			return near * RayParameter (1);
+
+		if (far > kEpsilon)
+			return far * RayParameter (1);
+
+		return std::nullopt;
+	}
+
+
 /*
  * Polar-cartesian conversions
  */

@@ -321,6 +321,7 @@ MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/protocols/nmea/
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/shapes/shape.cc
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/shapes/shape.h
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/shapes/shape_material.h
+MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/shapes/shape_utils.h
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/shapes/shape_vertex.cc
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/shapes/shape_vertex.h
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/shapes/various_materials.h
