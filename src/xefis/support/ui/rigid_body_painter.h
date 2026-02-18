@@ -87,6 +87,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	//    the prime meridian and align Y with the correct eastward direction:
 	//        z_rotation (-90_deg)
 	static constexpr auto		kScreenToNullIslandRotation		= x_rotation<WorldSpace> (-90_deg) * z_rotation<WorldSpace> (-90_deg);
+
 	static inline const auto	kSunQColorInSpace				= qcolor_from_temperature (kSunSurfaceTemperature);
 	static inline const auto	kSunColorInSpace				= to_gl_color (kSunQColorInSpace);
 
@@ -487,7 +488,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	 * Paint the system.
 	 */
 	void
-	paint (rigid_body::System const& system, QOpenGLPaintDevice& canvas);
+	paint (rigid_body::System const&, QOpenGLPaintDevice& canvas);
 
 	/**
 	 * Deletes textures allocated on first creation of RigidBodyPainter
