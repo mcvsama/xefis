@@ -22,6 +22,7 @@
 
 // Standard:
 #include <cstddef>
+#include <concepts>
 #include <functional>
 #include <vector>
 
@@ -127,7 +128,25 @@ class Shape
 	 * Apply given function for all vertices.
 	 */
 	void
-	for_each_vertex (std::function<void (ShapeVertex&)>);
+	for_each_vertex (std::invocable<ShapeVertex&> auto&&);
+
+	/**
+	 * Apply given function for all vertices.
+	 */
+	void
+	for_each_vertex (std::invocable<ShapeVertex const&> auto&&) const;
+
+	/**
+	 * Apply given function for all triangles (including triangles in strips, fans and quads).
+	 */
+	void
+	for_each_triangle (std::invocable<ShapeVertex&, ShapeVertex&, ShapeVertex&> auto&&);
+
+	/**
+	 * Apply given function for all triangles (including triangles in strips, fans and quads).
+	 */
+	void
+	for_each_triangle (std::invocable<ShapeVertex const&, ShapeVertex const&, ShapeVertex const&> auto&&) const;
 
   private:
 	std::vector<Triangle>		_triangles;
@@ -135,6 +154,81 @@ class Shape
 	std::vector<TriangleFan>	_triangle_fans;
 	std::vector<Quad>			_quads;
 };
+
+
+inline void
+Shape::for_each_vertex (std::invocable<ShapeVertex&> auto&& vertex_function)
+{
+	for (auto* geometries: { &_triangles, &_triangle_strips, &_triangle_fans, &_quads })
+		for (auto& geometry: *geometries)
+			for (auto& vertex: geometry.vertices)
+				vertex_function (vertex);
+}
+
+
+inline void
+Shape::for_each_vertex (std::invocable<ShapeVertex const&> auto&& vertex_function) const
+{
+	const_cast<Shape&> (*this).for_each_vertex ([&vertex_function] (ShapeVertex const& vertex) {
+		vertex_function (vertex);
+	});
+}
+
+
+inline void
+Shape::for_each_triangle (std::invocable<ShapeVertex&, ShapeVertex&, ShapeVertex&> auto&& triangle_function)
+{
+	for (auto& triangle_geometry: _triangles)
+	{
+		auto const& vertices = triangle_geometry.vertices;
+
+		for (std::size_t i = 0; i + 2 < vertices.size(); i += 3)
+			triangle_function (vertices[i], vertices[i + 1], vertices[i + 2]);
+	}
+
+	for (auto& strip_geometry: _triangle_strips)
+	{
+		auto const& vertices = strip_geometry.vertices;
+
+		// Triangle strips reuse two vertices per step; swap the first two vertices
+		// on odd steps to keep a consistent winding for all emitted triangles.
+		for (std::size_t i = 0; i + 2 < vertices.size(); ++i)
+		{
+			if (i % 2 == 0)
+				triangle_function (vertices[i], vertices[i + 1], vertices[i + 2]);
+			else
+				triangle_function (vertices[i + 1], vertices[i], vertices[i + 2]);
+		}
+	}
+
+	for (auto& fan_geometry: _triangle_fans)
+	{
+		auto const& vertices = fan_geometry.vertices;
+
+		for (std::size_t i = 1; i + 1 < vertices.size(); ++i)
+			triangle_function (vertices[0], vertices[i], vertices[i + 1]);
+	}
+
+	for (auto& quad_geometry: _quads)
+	{
+		auto const& vertices = quad_geometry.vertices;
+
+		for (std::size_t i = 0; i + 3 < vertices.size(); i += 4)
+		{
+			triangle_function (vertices[i], vertices[i + 1], vertices[i + 2]);
+			triangle_function (vertices[i], vertices[i + 2], vertices[i + 3]);
+		}
+	}
+}
+
+
+inline void
+Shape::for_each_triangle (std::invocable<ShapeVertex const&, ShapeVertex const&, ShapeVertex const&> auto&& triangle_function) const
+{
+	const_cast<Shape&> (*this).for_each_triangle ([&triangle_function] (ShapeVertex const& a, ShapeVertex const& b, ShapeVertex const& c) {
+		triangle_function (a, b, c);
+	});
+}
 
 
 /*

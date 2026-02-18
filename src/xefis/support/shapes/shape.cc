@@ -49,15 +49,5 @@ Shape::translate (SpaceLength<BodyOrigin> const& translation)
 	});
 }
 
-
-void
-Shape::for_each_vertex (std::function<void (ShapeVertex&)> const vertex_function)
-{
-	for (auto* geometries: { &_triangles, &_triangle_strips, &_triangle_fans, &_quads })
-		for (auto& geometry: *geometries)
-			for (auto& vertex: geometry.vertices)
-				vertex_function (vertex);
-}
-
 } // namespace xf
 
