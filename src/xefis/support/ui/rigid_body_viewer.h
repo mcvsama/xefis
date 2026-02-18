@@ -148,8 +148,8 @@ class RigidBodyViewer: public GLAnimationWidget
 	 * Pass nullptr to unset.
 	 */
 	void
-	set_before_paint_callback (BeforePaintCallback const callback = {})
-		{ _before_paint_callback = callback; }
+	set_before_paint_callback (BeforePaintCallback callback = {})
+		{ _before_paint_callback = std::move (callback); }
 
 	/**
 	 * Set related machine. Used to show configurator widget when pressing Esc.
@@ -335,8 +335,8 @@ class RigidBodyViewer: public GLAnimationWidget
 	 * to the body, position is absolute and computed by the RigidBodyPainter.
 	 */
 	void
-	set_camera_position_callback (RigidBodyPainter::CameraPositionCallback const callback)
-		{ _rigid_body_painter.set_camera_position_callback (callback); }
+	set_camera_position_callback (RigidBodyPainter::CameraPositionCallback callback)
+		{ _rigid_body_painter.set_camera_position_callback (std::move (callback)); }
 
 	/**
 	 * Set callback called whenever hovered body under the OpenGL cursor changes.

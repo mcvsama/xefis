@@ -20,13 +20,14 @@
 // Standard:
 #include <cstddef>
 #include <algorithm>
+#include <utility>
 
 
 namespace xf {
 
 PacketReader::PacketReader (Blob const& magic, ParseCallback parse):
 	_magic (magic),
-	_parse (parse)
+	_parse (std::move (parse))
 {
 	if (_magic.empty())
 		throw nu::Exception ("magic value must not be empty");

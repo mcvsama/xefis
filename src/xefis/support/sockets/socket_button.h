@@ -43,7 +43,7 @@ class SocketButton
   public:
 	// Ctor
 	explicit
-	SocketButton (Socket<bool>&, CallbackVariant const&);
+	SocketButton (Socket<bool>&, CallbackVariant);
 
 	void
 	process();

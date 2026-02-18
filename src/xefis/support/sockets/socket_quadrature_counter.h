@@ -25,6 +25,7 @@
 #include <functional>
 #include <optional>
 #include <type_traits>
+#include <utility>
 
 
 namespace xf {
@@ -64,7 +65,7 @@ template<QuadratureDecoderValueConcept I>
 	SocketQuadratureCounter<I>::SocketQuadratureCounter (Socket<bool>& socket_a, Socket<bool>& socket_b, Integer initial_value, Callback callback):
 		SocketQuadratureDecoder<I> (socket_a, socket_b, [this] (auto delta) { decoder_callback (delta); }),
 		_total (initial_value),
-		_callback (callback)
+		_callback (std::move (callback))
 	{ }
 
 

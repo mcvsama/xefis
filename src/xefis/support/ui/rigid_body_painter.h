@@ -328,8 +328,8 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	 * Can be nullptr to unset.
 	 */
 	void
-	set_camera_position_callback (RigidBodyPainter::CameraPositionCallback const callback)
-		{ _camera_position_callback = callback; }
+	set_camera_position_callback (RigidBodyPainter::CameraPositionCallback callback)
+		{ _camera_position_callback = std::move (callback); }
 
 	/**
 	 * Draw given object as focused (painted differently).

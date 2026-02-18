@@ -28,6 +28,7 @@
 #include <cstring>
 #include <functional>
 #include <queue>
+#include <utility>
 
 
 namespace xf {
@@ -733,7 +734,7 @@ CHRUM6::Command::Command (CommandAddress address, CommandCallback callback):
 	std::shared_ptr<CommandData> (new CommandData())
 {
 	setup (static_cast<uint32_t> (address), false, 0);
-	get()->command_callback = callback;
+	get()->command_callback = std::move (callback);
 }
 
 
@@ -764,7 +765,7 @@ CHRUM6::Read::Read (ConfigurationAddress address, ReadCallback callback):
 	std::shared_ptr<ReadData> (new ReadData)
 {
 	setup (static_cast<uint32_t> (address), false, 0);
-	get()->read_callback = callback;
+	get()->read_callback = std::move (callback);
 }
 
 
@@ -773,7 +774,7 @@ CHRUM6::Read::Read (DataAddress address, ReadCallback callback):
 	std::shared_ptr<ReadData> (new ReadData)
 {
 	setup (static_cast<uint32_t> (address), false, 0);
-	get()->read_callback = callback;
+	get()->read_callback = std::move (callback);
 }
 
 
@@ -816,7 +817,7 @@ CHRUM6::Write::Write (ConfigurationAddress address, uint32_t value, WriteCallbac
 {
 	setup (static_cast<uint32_t> (address), true, value);
 	get()->value = value;
-	get()->write_callback = callback;
+	get()->write_callback = std::move (callback);
 }
 
 
@@ -838,21 +839,21 @@ CHRUM6::Write::make_callback()
 inline void
 CHRUM6::set_communication_failure_callback (std::function<void()> callback)
 {
-	_communication_failure_callback = callback;
+	_communication_failure_callback = std::move (callback);
 }
 
 
 inline void
 CHRUM6::set_alive_check_callback (std::function<void()> callback)
 {
-	_alive_check_callback = callback;
+	_alive_check_callback = std::move (callback);
 }
 
 
 inline void
 CHRUM6::set_incoming_messages_callback (std::function<void (Read)> callback)
 {
-	_incoming_messages_callback = callback;
+	_incoming_messages_callback = std::move (callback);
 }
 
 

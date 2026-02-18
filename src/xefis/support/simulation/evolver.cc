@@ -19,15 +19,16 @@
 
 // Standard:
 #include <cstddef>
+#include <utility>
 
 
 namespace xf {
 
-Evolver::Evolver (si::Time const initial_simulation_time, si::Time const frame_duration, nu::Logger const& logger, Evolve const evolve):
+Evolver::Evolver (si::Time const initial_simulation_time, si::Time const frame_duration, nu::Logger const& logger, Evolve evolve):
 	_logger (logger),
 	_initial_simulation_time (initial_simulation_time),
 	_frame_duration (frame_duration),
-	_evolve (evolve)
+	_evolve (std::move (evolve))
 {
 	if (!_evolve)
 		throw nu::InvalidArgument ("'evolve' paramter must not be nullptr");

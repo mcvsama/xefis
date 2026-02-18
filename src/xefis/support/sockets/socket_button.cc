@@ -19,13 +19,14 @@
 
 // Standard:
 #include <cstddef>
+#include <utility>
 
 
 namespace xf {
 
-SocketButton::SocketButton (Socket<bool>& socket, CallbackVariant const& callback):
+SocketButton::SocketButton (Socket<bool>& socket, CallbackVariant callback):
 	_socket (socket),
-	_callback (callback)
+	_callback (std::move (callback))
 { }
 
 

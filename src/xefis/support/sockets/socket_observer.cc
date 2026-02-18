@@ -19,6 +19,7 @@
 
 // Standard:
 #include <cstddef>
+#include <utility>
 
 
 namespace xf {
@@ -47,7 +48,7 @@ SocketObserver::observe (std::initializer_list<Object> list)
 void
 SocketObserver::set_callback (Callback callback) noexcept
 {
-	_callback = callback;
+	_callback = std::move (callback);
 }
 
 

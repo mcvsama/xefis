@@ -21,13 +21,16 @@
 #include <QResizeEvent>
 #include <QScreen>
 
+// Standard:
+#include <utility>
+
 
 namespace xf {
 
-GLAnimationWidget::GLAnimationWidget (QWidget* parent, RefreshRate const refresh_rate, std::function<void (QOpenGLPaintDevice&)> const display_function):
+GLAnimationWidget::GLAnimationWidget (QWidget* parent, RefreshRate const refresh_rate, std::function<void (QOpenGLPaintDevice&)> display_function):
 	QOpenGLWidget (parent),
 	_requested_refresh_rate (refresh_rate),
-	_display_function (display_function)
+	_display_function (std::move (display_function))
 {
 	setWindowTitle ("Xefis");
 

@@ -31,6 +31,7 @@
 #include <list>
 #include <optional>
 #include <ranges>
+#include <utility>
 
 
 namespace xf {
@@ -57,8 +58,8 @@ class Simulator: public nu::Noncopyable
 	 * Set additional evolution callback.
 	 */
 	void
-	set_additional_evolution_callback (Evolver::Evolve const evolve)
-		{ _additional_evolve = evolve; }
+	set_additional_evolution_callback (Evolver::Evolve evolve)
+		{ _additional_evolve = std::move (evolve); }
 
 	/**
 	 * Return current simulation frame Δt.
