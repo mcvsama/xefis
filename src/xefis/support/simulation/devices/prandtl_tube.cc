@@ -41,7 +41,8 @@ PrandtlTube::PrandtlTube (Atmosphere const& atmosphere, PrandtlTubeParameters co
 		.material = material,
 	});
 	// Make X point into the wind:
-	shape.rotate (xf::y_rotation<BodyOrigin> (90_deg));
+	auto const orientation = xf::y_rotation<BodyOrigin> (90_deg);
+	shape.rotate (orientation);
 	set_shape (shape);
 
 	auto const inertia_tensor_at_com = make_centered_solid_cylinder_inertia_tensor<BodyCOM> ({
@@ -49,12 +50,12 @@ PrandtlTube::PrandtlTube (Atmosphere const& atmosphere, PrandtlTubeParameters co
 		.radius = 0.5 * params.diameter,
 		.length = params.length,
 	});
-	// The inertia tensor we get is centered at space origin, but the Prandtl tube is not - it has origin at space origin. Therefore we need to shift the
-	// inertia tensor like it was viewed from the origin of the Prandtl tube, not from its COM.
-	auto const offset = SpaceLength<BodyCOM> { 0_m, 0_m, 0.5 * params.length };
-	auto const inertia_tensor_at_origin = inertia_tensor_com_to_point (params.mass, inertia_tensor_at_com, offset);
-	// From that we can build MassMomentsAtArm which then can be auto converted to MassMoments when passed to set_mass_moments():
-	set_mass_moments (MassMomentsAtArm<BodyCOM> (params.mass, offset, inertia_tensor_at_origin));
+	// Build mass moments for a Z-oriented cylinder and rotate to match shape orientation.
+	// The origin is at the tube back, so COM is at +length/2 before rotation.
+	auto const z_oriented_offset = SpaceLength<BodyCOM> { 0_m, 0_m, 0.5 * params.length };
+	auto const z_oriented_inertia_tensor_at_origin = inertia_tensor_com_to_point (params.mass, inertia_tensor_at_com, z_oriented_offset);
+	auto const z_oriented_mass_moments = MassMomentsAtArm<BodyCOM> (params.mass, z_oriented_offset, z_oriented_inertia_tensor_at_origin);
+	set_mass_moments (xf::y_rotation<BodyCOM> (90_deg) * z_oriented_mass_moments);
 }
 
 
