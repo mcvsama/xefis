@@ -262,7 +262,7 @@ copy_symmetric_0_180_materials (Shape& shape)
 void
 set_sphere_normals (Shape& shape, si::Length radius)
 {
-	shape.for_all_vertices ([&] (ShapeVertex& v) {
+	shape.for_each_vertex ([&] (ShapeVertex& v) {
 		v.set_normal (v.position() / radius);
 	});
 }

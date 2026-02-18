@@ -26,7 +26,7 @@ namespace xf {
 void
 Shape::transform (AffineTransform<BodyOrigin> const& transform)
 {
-	for_all_vertices ([&] (ShapeVertex& vertex) {
+	for_each_vertex ([&] (ShapeVertex& vertex) {
 		vertex.transform (transform);
 	});
 }
@@ -35,7 +35,7 @@ Shape::transform (AffineTransform<BodyOrigin> const& transform)
 void
 Shape::rotate (RotationQuaternion<BodyOrigin> const& rotation)
 {
-	for_all_vertices ([&] (ShapeVertex& vertex) {
+	for_each_vertex ([&] (ShapeVertex& vertex) {
 		vertex.rotate (rotation);
 	});
 }
@@ -44,14 +44,14 @@ Shape::rotate (RotationQuaternion<BodyOrigin> const& rotation)
 void
 Shape::translate (SpaceLength<BodyOrigin> const& translation)
 {
-	for_all_vertices ([&] (ShapeVertex& vertex) {
+	for_each_vertex ([&] (ShapeVertex& vertex) {
 		vertex.translate (translation);
 	});
 }
 
 
 void
-Shape::for_all_vertices (std::function<void (ShapeVertex&)> const vertex_function)
+Shape::for_each_vertex (std::function<void (ShapeVertex&)> const vertex_function)
 {
 	for (auto* geometries: { &_triangles, &_triangle_strips, &_triangle_fans, &_quads })
 		for (auto& geometry: *geometries)

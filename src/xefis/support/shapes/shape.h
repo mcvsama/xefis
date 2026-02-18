@@ -127,7 +127,7 @@ class Shape
 	 * Apply given function for all vertices.
 	 */
 	void
-	for_all_vertices (std::function<void (ShapeVertex&)>);
+	for_each_vertex (std::function<void (ShapeVertex&)>);
 
   private:
 	std::vector<Triangle>		_triangles;

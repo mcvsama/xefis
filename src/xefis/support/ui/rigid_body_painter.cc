@@ -585,7 +585,7 @@ RigidBodyPainter::paint_universe_and_sun()
 			auto const x = 0.7f; // Darken the universe a bit.
 			auto const color = GLColor (x, x, x, alpha);
 
-			_universe->sky_box_shape->for_all_vertices ([color] (ShapeVertex& vertex) {
+			_universe->sky_box_shape->for_each_vertex ([color] (ShapeVertex& vertex) {
 				vertex.material().gl_texture_color = color;
 			});
 
