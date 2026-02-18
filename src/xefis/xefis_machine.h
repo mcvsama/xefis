@@ -28,4 +28,3 @@ extern std::unique_ptr<xf::Machine>
 make_xefis_machine (xf::Xefis&);
 
 #endif
-

@@ -36,4 +36,3 @@ AirfoilCharacteristics::AirfoilCharacteristics (AirfoilSpline const& spline,
 { }
 
 } // namespace xf
-

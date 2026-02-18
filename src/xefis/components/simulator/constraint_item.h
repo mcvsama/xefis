@@ -62,4 +62,3 @@ class ConstraintItem: public QTreeWidgetItem
 } // namespace xf
 
 #endif
-

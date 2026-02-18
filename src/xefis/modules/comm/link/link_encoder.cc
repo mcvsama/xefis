@@ -56,4 +56,3 @@ LinkEncoder::send_output (xf::Cycle const& cycle)
 	_protocol->produce_append (_output_blob, cycle.logger() + _logger);
 	this->encoded_output = std::string (_output_blob.begin(), _output_blob.end());
 }
-

@@ -46,4 +46,3 @@ TemperatureSensorWidget::update_observed_values (rigid_body::Body const* planet_
 }
 
 } // namespace xf::sim
-

@@ -131,4 +131,3 @@ TemperatureSensor::compute_stagnation_temperature() const
 }
 
 } // namespace xf::sim
-

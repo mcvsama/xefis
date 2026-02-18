@@ -66,4 +66,3 @@ BodyItem::backpropagate()
 }
 
 } // namespace xf
-

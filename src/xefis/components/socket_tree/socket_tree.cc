@@ -93,4 +93,3 @@ SocketTree::hideEvent (QHideEvent*)
 }
 
 } // namespace xf
-

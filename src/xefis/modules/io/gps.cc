@@ -619,4 +619,3 @@ GPS::update_clock (xf::nmea::GPSDate const& date, xf::nmea::GPSTimeOfDay const& 
 				<< "  " + std::string (e.what()) << std::endl;
 	}
 }
-

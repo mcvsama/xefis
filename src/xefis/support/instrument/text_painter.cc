@@ -260,4 +260,3 @@ TextPainter::apply_alignment (QRectF& rect, Qt::Alignment flags)
 }
 
 } // namespace xf
-

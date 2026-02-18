@@ -252,4 +252,3 @@ HandshakeSlave::Exception::Exception (ErrorCode const error_code, std::string_vi
 } // namespace xf::crypto::xle
 
 #endif
-

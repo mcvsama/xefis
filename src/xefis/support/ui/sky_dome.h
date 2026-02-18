@@ -85,4 +85,3 @@ compute_sky_dome_shape (SkyDomeParameters const& params, nu::WorkPerformer* work
 } // namespace xf
 
 #endif
-

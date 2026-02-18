@@ -523,4 +523,3 @@ make_xefis_machine (xf::Xefis& xefis)
 {
 	return std::make_unique<TestInstrumentsMachine> (xefis);
 }
-

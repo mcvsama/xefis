@@ -89,4 +89,3 @@ template<class X, class Y>
 } // namespace xf
 
 #endif
-

@@ -369,4 +369,3 @@ JoystickInput::reset_sockets()
 	for (auto& axis: _axis_sockets)
 		*axis = xf::nil;
 }
-

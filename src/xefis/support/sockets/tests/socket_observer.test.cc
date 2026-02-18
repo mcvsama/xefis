@@ -200,4 +200,3 @@ nu::AutoTest t7 ("xf::SocketObserver observing other observers", []{
 
 } // namespace
 } // namespace xf::test
-

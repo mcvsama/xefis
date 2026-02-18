@@ -107,4 +107,3 @@ SliderConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1,
 }
 
 } // namespace xf::rigid_body
-

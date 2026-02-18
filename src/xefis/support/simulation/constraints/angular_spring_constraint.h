@@ -93,4 +93,3 @@ angular_spring_function (TorqueForAngle torque_for_angle)
 } // namespace xf::rigid_body
 
 #endif
-

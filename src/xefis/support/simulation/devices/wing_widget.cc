@@ -99,4 +99,3 @@ WingWidget::update_observed_values (rigid_body::Body const* planet_body)
 }
 
 } // namespace xf::sim
-

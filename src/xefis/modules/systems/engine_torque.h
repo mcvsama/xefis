@@ -102,4 +102,3 @@ class EngineTorque: public EngineTorqueIO
 };
 
 #endif
-

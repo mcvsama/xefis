@@ -99,4 +99,3 @@ class Wing:
 } // namespace xf::sim
 
 #endif
-

@@ -90,4 +90,3 @@ Watchdog::ping()
 
 	::fsync (_watchdog_write_fd);
 }
-

@@ -38,4 +38,3 @@ class Flaps: public LiftMod
 } // namespace xf
 
 #endif
-

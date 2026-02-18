@@ -57,4 +57,3 @@ ShadowPainter::paint (Shadow const& shadow, PaintFunction paint_function)
 }
 
 } // namespace xf
-

@@ -62,4 +62,3 @@ class GroupBox:
 } // namespace xf
 
 #endif
-

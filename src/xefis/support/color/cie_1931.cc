@@ -48,4 +48,3 @@ cie_xyz_to_rgb (math::Vector<double, 3> const& xyz)
 }
 
 } // namespace xf
-

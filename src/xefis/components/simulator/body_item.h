@@ -62,4 +62,3 @@ class BodyItem: public QTreeWidgetItem
 } // namespace xf
 
 #endif
-

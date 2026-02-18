@@ -102,4 +102,3 @@ Cycle::Cycle (Number number, si::Time update_time, si::Time update_dt, si::Time 
 } // namespace xf
 
 #endif
-

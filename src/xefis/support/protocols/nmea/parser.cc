@@ -144,4 +144,3 @@ Parser::verify_sentence (std::string const& sentence)
 }
 
 } // namespace xf::nmea
-

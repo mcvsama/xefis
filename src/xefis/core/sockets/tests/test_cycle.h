@@ -53,4 +53,3 @@ class TestCycle: public Cycle
 } // namespace xf::test
 
 #endif
-

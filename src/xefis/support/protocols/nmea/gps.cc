@@ -439,4 +439,3 @@ to_string (xf::nmea::GPSTimeOfDay const& time)
 }
 
 } // namespace xf::nmea
-

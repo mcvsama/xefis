@@ -31,4 +31,3 @@ Node::Node (Element& element, Direction direction):
 { }
 
 } // namespace xf::electrical
-

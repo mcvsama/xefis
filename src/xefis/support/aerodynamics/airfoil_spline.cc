@@ -63,4 +63,3 @@ AirfoilSpline::projected_chord_and_thickness (si::Angle const alpha, si::Angle c
 }
 
 } // namespace xf
-

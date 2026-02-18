@@ -78,4 +78,3 @@ setup_xefis_executable (int argc, char** argv, std::function<void()> run_app_fun
 } // namespace xf
 
 #endif
-

@@ -418,4 +418,3 @@ RigidBodyViewer::display_menu()
 }
 
 } // namespace xf
-

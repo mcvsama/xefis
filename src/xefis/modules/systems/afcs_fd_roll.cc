@@ -181,4 +181,3 @@ AFCS_FD_Roll::check_autonomous()
 	if (_io.autonomous.value_or (true))
 		_io.operative = true;
 }
-

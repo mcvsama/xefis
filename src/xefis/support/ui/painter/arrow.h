@@ -33,4 +33,3 @@ draw_arrow (QPainter&, QPointF const& from, QPointF const& to, double arrowhead_
 } // namespace xf
 
 #endif
-

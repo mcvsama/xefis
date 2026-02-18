@@ -190,4 +190,3 @@ ShapeVertex::ShapeVertex (SpaceLength<BodyOrigin> const& position, SpaceVector<d
 } // namespace xf
 
 #endif
-

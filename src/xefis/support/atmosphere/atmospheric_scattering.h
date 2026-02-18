@@ -185,4 +185,3 @@ AtmosphericScattering::tonemap_separately (SpaceVector<float, RGBSpace> input)
 } // namespace xf
 
 #endif
-

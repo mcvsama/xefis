@@ -50,4 +50,3 @@ class PanelWidget: public QWidget
 } // namespace xf
 
 #endif
-

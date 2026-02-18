@@ -310,4 +310,3 @@ NodeVoltageSolver::NodeVoltageSolver (Network const& network, double const accur
 } // namespace xf::electrical
 
 #endif
-

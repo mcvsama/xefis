@@ -46,4 +46,3 @@ SigmoidalTemperatureFailure::failure_probability (si::Temperature const temperat
 }
 
 } // namespace xf
-

@@ -219,4 +219,3 @@ make_standard_9gram_servo_constraint (HingePrecomputation&, float scale = 1.0);
 } // namespace xf::rigid_body
 
 #endif
-

@@ -64,4 +64,3 @@ static inline RotationMatrix<NEDSpace, ECEFSpace> const EquatorPrimeMeridian {
 } // namespace xf
 
 #endif
-

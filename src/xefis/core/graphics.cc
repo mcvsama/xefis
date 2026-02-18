@@ -58,4 +58,3 @@ Graphics::setup_fonts()
 }
 
 } // namespace xf
-

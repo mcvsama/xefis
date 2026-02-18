@@ -33,4 +33,3 @@ Hardware::Hardware (xf::ProcessingLoop& loop, xf::Machine* machine, nu::Logger c
 }
 
 } // namespace sim1::ground_station::control_machine
-

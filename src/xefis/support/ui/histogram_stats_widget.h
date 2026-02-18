@@ -88,4 +88,3 @@ template<class HistogramValue, class CriticalValue>
 } // namespace xf
 
 #endif
-

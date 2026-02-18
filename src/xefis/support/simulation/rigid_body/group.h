@@ -204,4 +204,3 @@ template<BodyConcept SpecificBody>
 } // namespace xf::rigid_body
 
 #endif
-

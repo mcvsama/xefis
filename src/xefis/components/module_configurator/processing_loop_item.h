@@ -54,4 +54,3 @@ ProcessingLoopItem::processing_loop() const noexcept
 } // namespace xf::configurator
 
 #endif
-

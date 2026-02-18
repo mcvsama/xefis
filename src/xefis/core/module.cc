@@ -268,4 +268,3 @@ identifier (Module const* module)
 }
 
 } // namespace xf
-

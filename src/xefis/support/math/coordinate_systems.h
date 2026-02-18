@@ -53,4 +53,3 @@ struct WorldSpace: public math::CoordinateSystemBase
 } // namespace xf
 
 #endif
-

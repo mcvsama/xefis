@@ -52,4 +52,3 @@ InstrumentPainter::save_context (std::function<void()> paint_callback)
 }
 
 } // namespace xf
-

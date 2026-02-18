@@ -76,4 +76,3 @@ class ScreenWidget: public ConfigWidget
 } // namespace xf::configurator
 
 #endif
-

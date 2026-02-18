@@ -80,4 +80,3 @@ XEFIS_PNG_ICON (digit_dot, "digits/digit-dot.png")
 } // namespace xf::icons
 
 #endif
-

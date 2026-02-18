@@ -238,4 +238,3 @@ template<class Target, class Source>
 } // namespace xf
 
 #endif
-

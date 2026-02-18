@@ -238,4 +238,3 @@ nu::AutoTest t6 ("Xefis Lossy Encryption/Handshake: mismatched handshake IDs", [
 
 } // namespace
 } // namespace xf::test
-

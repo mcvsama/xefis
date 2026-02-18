@@ -32,4 +32,3 @@ struct AngleOfAttack
 } // namespace xf
 
 #endif
-

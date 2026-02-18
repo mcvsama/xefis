@@ -110,4 +110,3 @@ AngularLimitsConstraint::max_angle_corrections (VelocityMoments<WorldSpace> cons
 }
 
 } // namespace xf::rigid_body
-

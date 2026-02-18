@@ -96,4 +96,3 @@ BasicModuleSocket::BasicModuleSocket (Module* owner, std::string_view const path
 #include <xefis/core/sockets/module_out.h>
 
 #endif
-

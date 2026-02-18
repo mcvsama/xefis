@@ -390,4 +390,3 @@ TestScreen1::connect_instruments()
 	this->load_factor_label.color						= xf::InstrumentAids::kCyan;
 	this->load_factor_label.font_scale					= 1.3;
 }
-

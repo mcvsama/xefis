@@ -194,4 +194,3 @@ parse_color (QString color)
 } // namespace xf
 
 #endif
-

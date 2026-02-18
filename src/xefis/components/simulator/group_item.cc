@@ -62,4 +62,3 @@ GroupItem::backpropagate()
 }
 
 } // namespace xf
-

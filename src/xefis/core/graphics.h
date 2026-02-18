@@ -80,4 +80,3 @@ Graphics::panel_font() const noexcept
 } // namespace xf
 
 #endif
-

@@ -143,4 +143,3 @@ MagneticVariation::magnetic_inclination() const
 } // namespace xf
 
 #endif
-

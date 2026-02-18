@@ -43,4 +43,3 @@ DataRecorder::DataRecorder (QWidget* parent):
 }
 
 } // namespace xf
-

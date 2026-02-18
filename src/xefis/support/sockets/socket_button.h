@@ -57,4 +57,3 @@ class SocketButton
 } // namespace xf
 
 #endif
-

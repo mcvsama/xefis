@@ -41,4 +41,3 @@ ModuleItem::ModuleItem (Module& module, QTreeWidgetItem& parent):
 }
 
 } // namespace xf::configurator
-

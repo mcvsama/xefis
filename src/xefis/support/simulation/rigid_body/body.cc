@@ -119,4 +119,3 @@ Body::rotational_kinetic_energy() const
 }
 
 } // namespace xf::rigid_body
-

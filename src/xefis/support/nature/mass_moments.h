@@ -143,4 +143,3 @@ template<math::CoordinateSystem Space>
 } // namespace xf
 
 #endif
-

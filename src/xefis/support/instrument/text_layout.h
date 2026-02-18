@@ -347,4 +347,3 @@ TextLayout::size() const
 } // namespace xf
 
 #endif
-

@@ -50,4 +50,3 @@ System::set_clock (si::Time const unix_time)
 }
 
 } // namespace xf
-

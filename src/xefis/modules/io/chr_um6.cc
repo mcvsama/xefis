@@ -653,4 +653,3 @@ CHRUM6::describe_errors (xf::CHRUM6::Request const& req)
 		_logger << "Command " << req.name() << " succeeded after " << req.retries() << str_retries << " (BadChecksum)." << std::endl;
 	}
 }
-

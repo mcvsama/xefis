@@ -43,4 +43,3 @@ identifier (BasicSocket const* socket)
 } // namespace xf
 
 #endif
-

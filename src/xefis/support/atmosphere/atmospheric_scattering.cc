@@ -191,4 +191,3 @@ AtmosphericScattering::ray_sphere_intersections (SpaceLength<> const& ray_origin
 }
 
 } // namespace xf
-

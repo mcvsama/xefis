@@ -857,4 +857,3 @@ RigidBodyPainter::compute_sun_visible_surface_factor (si::Angle const sun_altitu
 } // namespace xf
 
 #endif
-

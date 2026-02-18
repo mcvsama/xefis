@@ -38,4 +38,3 @@ else
 	$stderr.puts "Usage: "
 	$stderr.puts "#{$PROGRAM_NAME} <namespace> <spline-file (.dat)>"
 end
-

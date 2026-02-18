@@ -54,4 +54,3 @@ ScreenItem::screen() const noexcept
 } // namespace xf::configurator
 
 #endif
-

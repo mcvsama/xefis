@@ -53,4 +53,3 @@ ConfigWidget::create_performance_widget (QWidget* parent, QString const& title) 
 }
 
 } // namespace xf::configurator
-

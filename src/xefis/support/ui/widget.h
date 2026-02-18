@@ -60,4 +60,3 @@ class Widget: public QWidget
 } // namespace xf
 
 #endif
-

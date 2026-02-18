@@ -70,4 +70,3 @@ class Parser: private nu::Noncopyable
 } // namespace xf::nmea
 
 #endif
-

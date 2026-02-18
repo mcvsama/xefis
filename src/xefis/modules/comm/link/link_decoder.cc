@@ -107,4 +107,3 @@ LinkDecoder::reacquire()
 	this->link_valid = true;
 	this->link_reacquires = this->link_reacquires.value_or (0) + 1;
 }
-

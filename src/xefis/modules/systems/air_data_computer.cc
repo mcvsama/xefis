@@ -565,4 +565,3 @@ AirDataComputer::recover_total_pressure()
 	if (_io.pressure_static)
 		_io.pressure_dynamic = *_io.recovered_pressure_total - *_io.pressure_static;
 }
-

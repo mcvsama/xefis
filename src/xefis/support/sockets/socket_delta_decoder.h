@@ -102,4 +102,3 @@ template<DeltaDecoderValueConcept I>
 } // namespace xf
 
 #endif
-

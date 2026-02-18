@@ -84,4 +84,3 @@ Airframe::get_max_safe_aoa (FlapsAngle const flaps_angle, SpoilersAngle const sp
 }
 
 } // namespace xf
-

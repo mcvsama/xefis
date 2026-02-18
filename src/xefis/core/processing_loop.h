@@ -265,4 +265,3 @@ ProcessingLoop::current_cycle() const
 } // namespace xf
 
 #endif
-

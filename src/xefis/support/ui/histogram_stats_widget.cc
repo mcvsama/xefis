@@ -83,4 +83,3 @@ HistogramStatsWidget::HistogramStatsWidget (QWidget* parent):
 }
 
 } // namespace xf
-

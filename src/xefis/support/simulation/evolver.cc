@@ -81,4 +81,3 @@ Evolver::evolve (std::size_t const frames)
 }
 
 } // namespace xf
-

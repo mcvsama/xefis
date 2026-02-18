@@ -150,4 +150,3 @@ is_point_2d_inside_triangle_tester (TriangleConcept auto const& triangle)
 } // namespace xf
 
 #endif
-

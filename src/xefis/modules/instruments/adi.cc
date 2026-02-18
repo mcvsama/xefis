@@ -3439,4 +3439,3 @@ template<class FloatingPoint>
 	{
 		return is_sane (socket) && sane_range.includes (*socket);
 	}
-

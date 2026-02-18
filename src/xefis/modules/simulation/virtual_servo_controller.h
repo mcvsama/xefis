@@ -64,4 +64,3 @@ class VirtualServoController: public xf::Module
 };
 
 #endif
-

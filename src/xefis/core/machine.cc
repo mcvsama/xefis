@@ -66,4 +66,3 @@ Machine::set_paused (bool paused)
 }
 
 } // namespace xf
-

@@ -94,4 +94,3 @@ class PanelNumericDisplay: public PanelWidget
 } // namespace xf
 
 #endif
-

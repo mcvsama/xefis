@@ -166,4 +166,3 @@ TextLayout::paint (QPointF position, Qt::Alignment alignment, TextPainter& paint
 }
 
 } // namespace xf
-

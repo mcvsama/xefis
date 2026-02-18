@@ -84,4 +84,3 @@ Group::mass_moments() const
 }
 
 } // namespace xf::rigid_body
-

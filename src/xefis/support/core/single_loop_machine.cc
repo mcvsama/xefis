@@ -49,4 +49,3 @@ SingleLoopMachine::start()
 }
 
 } // namespace xf
-

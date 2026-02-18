@@ -130,4 +130,3 @@ Wing::compute_body_com_mass_moments (Airfoil const& airfoil, si::Density const m
 }
 
 } // namespace xf::sim
-

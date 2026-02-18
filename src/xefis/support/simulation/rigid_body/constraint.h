@@ -622,4 +622,3 @@ operator- (ConstraintForces a, ConstraintForces const& b)
 } // namespace xf::rigid_body
 
 #endif
-

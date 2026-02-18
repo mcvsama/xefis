@@ -97,4 +97,3 @@ parse (std::string_view const str, SpeedMode& speed_mode)
 }
 
 } // namespace afcs
-

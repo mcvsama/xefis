@@ -530,4 +530,3 @@ SimulatorWidget::update_simulation_performance_label (si::Time const dt)
 }
 
 } // namespace xf
-

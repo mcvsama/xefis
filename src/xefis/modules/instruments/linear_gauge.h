@@ -404,4 +404,3 @@ template<class Value>
 	}
 
 #endif
-

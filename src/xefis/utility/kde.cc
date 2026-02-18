@@ -50,4 +50,3 @@ set_kde_blur_background (QWidget& widget, bool enabled)
 }
 
 } // namespace xf
-

@@ -180,4 +180,3 @@ SimulatorWidget::set_followed (rigid_body::Body const& followed_body) noexcept
 } // namespace xf
 
 #endif
-

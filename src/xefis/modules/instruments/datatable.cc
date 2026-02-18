@@ -158,4 +158,3 @@ Datatable::async_paint (xf::PaintRequest const& paint_request) const
 		painter.fast_draw_text (right, Qt::AlignRight | Qt::AlignBottom, line.stringified());
 	}
 }
-

@@ -154,4 +154,3 @@ class HingePrecomputation: public FramePrecomputation<HingePrecomputationData>
 } // namespace xf::rigid_body
 
 #endif
-

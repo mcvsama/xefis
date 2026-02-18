@@ -220,4 +220,3 @@ HistogramWidget::update_canvas()
 }
 
 } // namespace xf
-

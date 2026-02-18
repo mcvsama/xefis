@@ -105,4 +105,3 @@ nu::AutoTest t_1 ("rigid_body::System: 90-minute simulation of gravitational for
 
 } // namespace
 } // namespace xf::test
-

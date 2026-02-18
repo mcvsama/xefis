@@ -269,4 +269,3 @@ CameraControls::update_rigid_body_viewer_camera_position()
 }
 
 } // namespace xf
-

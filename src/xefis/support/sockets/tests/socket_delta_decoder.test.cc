@@ -90,4 +90,3 @@ nu::AutoTest t1 ("SocketDeltaDecoder", []{
 
 } // namespace
 } // namespace xf::test
-

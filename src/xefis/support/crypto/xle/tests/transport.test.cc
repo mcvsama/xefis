@@ -52,4 +52,3 @@ nu::AutoTest t1 ("Xefis Lossy Encryption/Transport: encryption and decryption", 
 
 } // namespace
 } // namespace xf::test
-

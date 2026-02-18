@@ -139,4 +139,3 @@ template<class O>
 } // namespace xf
 
 #endif
-

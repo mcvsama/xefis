@@ -53,4 +53,3 @@ class BasicAssignableSocket: virtual public BasicSocket
 } // namespace xf
 
 #endif
-

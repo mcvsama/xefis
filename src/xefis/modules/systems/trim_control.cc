@@ -123,4 +123,3 @@ TrimControl::moved_down (xf::Socket<double> const& socket)
 {
 	return socket.valid() && *socket < -0.5;
 }
-

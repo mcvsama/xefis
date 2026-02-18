@@ -139,4 +139,3 @@ template<math::Scalar S, math::CoordinateSystem Space>
 } // namespace xf
 
 #endif
-

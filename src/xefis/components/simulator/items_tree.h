@@ -135,4 +135,3 @@ class ItemsTree: public QTreeWidget
 } // namespace xf
 
 #endif
-

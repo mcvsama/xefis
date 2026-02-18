@@ -90,4 +90,3 @@ class LinkDecoder: public xf::Module
 };
 
 #endif
-

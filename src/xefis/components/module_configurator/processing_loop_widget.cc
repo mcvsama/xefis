@@ -136,4 +136,3 @@ ProcessingLoopWidget::create_performance_tab()
 }
 
 } // namespace xf::configurator
-

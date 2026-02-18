@@ -104,4 +104,3 @@ Capacitor::flow_current (si::Time const dt)
 } // namespace xf::electrical
 
 #endif
-

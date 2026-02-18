@@ -270,4 +270,3 @@ HasObservationWidget::create_observation_widget()
 }
 
 } // namespace xf
-

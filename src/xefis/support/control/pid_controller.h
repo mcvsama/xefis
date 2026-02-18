@@ -358,4 +358,3 @@ template<class V, class C, class P>
 } // namespace xf
 
 #endif
-

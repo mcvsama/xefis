@@ -77,4 +77,3 @@ SimulatedTimeSource::SimulatedTimeSource (si::Time const initial_time):
 } // namespace xf
 
 #endif
-

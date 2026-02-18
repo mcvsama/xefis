@@ -181,4 +181,3 @@ ProcessingLoop::logger_tag() const
 }
 
 } // namespace xf
-

@@ -135,4 +135,3 @@ template<QuadratureDecoderValueConcept I>
 } // namespace xf
 
 #endif
-

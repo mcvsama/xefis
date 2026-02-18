@@ -97,4 +97,3 @@ Widget::create_colored_strip_label (QString const& text, QColor color, Qt::Align
 }
 
 } // namespace xf
-

@@ -50,4 +50,3 @@ template<class T>
 } // namespace xf::rigid_body
 
 #endif
-

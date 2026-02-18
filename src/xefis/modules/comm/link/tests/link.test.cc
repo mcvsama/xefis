@@ -693,4 +693,3 @@ nu::AutoTest t6 ("modules/io/link: protocol: encrypted channel works", []{
 
 } // namespace
 } // namespace xf::test
-

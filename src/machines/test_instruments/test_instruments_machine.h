@@ -56,4 +56,3 @@ class TestInstrumentsMachine: public xf::Machine
 };
 
 #endif
-

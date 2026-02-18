@@ -63,4 +63,3 @@ ConfiguratorWidget::ConfiguratorWidget (Machine& machine, QWidget* parent):
 }
 
 } // namespace xf
-

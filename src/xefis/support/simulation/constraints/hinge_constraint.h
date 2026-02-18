@@ -62,4 +62,3 @@ class HingeConstraint: public Constraint
 } // namespace xf::rigid_body
 
 #endif
-

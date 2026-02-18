@@ -94,4 +94,3 @@ compute_hour_angle (si::Angle const local_sidereal_time, si::Angle const sun_rig
 } // namespace xf
 
 #endif
-

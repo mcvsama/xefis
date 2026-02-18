@@ -103,4 +103,3 @@ DebugForces::async_paint (xf::PaintRequest const& paint_request, PaintingParams 
 
 	// TODO set output sockets
 }
-

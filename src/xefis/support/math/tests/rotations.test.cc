@@ -286,4 +286,3 @@ nu::AutoTest t6 ("Math: fixed orientation helper rotations", []{
 
 } // namespace
 } // namespace xf::test
-

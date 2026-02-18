@@ -655,4 +655,3 @@ Body::invalidate_placement_dependent_caches()
 } // namespace xf::rigid_body
 
 #endif
-

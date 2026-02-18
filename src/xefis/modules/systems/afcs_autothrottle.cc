@@ -113,4 +113,3 @@ AFCS_Autothrottle::compute_thrust()
 	if (disengage || !_io.disengage_at)
 		_io.disengage_at = disengage;
 }
-

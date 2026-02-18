@@ -360,4 +360,3 @@ Status::clear()
 		mark_dirty();
 	}
 }
-

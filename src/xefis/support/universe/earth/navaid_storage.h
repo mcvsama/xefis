@@ -174,4 +174,3 @@ NavaidStorage::access_position (Navaid const& navaid, std::size_t const dimensio
 } // namespace xf
 
 #endif
-

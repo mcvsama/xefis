@@ -119,4 +119,3 @@ IMU_CPF::compute_centripetal()
 		_io.centripetal_acceleration_z = xf::nil;
 	}
 }
-

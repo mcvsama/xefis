@@ -205,4 +205,3 @@ Xefis::graphics() const
 } // namespace xf
 
 #endif
-

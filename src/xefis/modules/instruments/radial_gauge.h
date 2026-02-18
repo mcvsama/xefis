@@ -479,4 +479,3 @@ template<class Value>
 	}
 
 #endif
-

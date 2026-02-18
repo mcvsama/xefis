@@ -178,4 +178,3 @@ class HasObservationWidget
 } // namespace xf
 
 #endif
-

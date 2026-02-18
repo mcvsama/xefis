@@ -55,4 +55,3 @@ class SliderConstraint: public Constraint
 } // namespace xf::rigid_body
 
 #endif
-

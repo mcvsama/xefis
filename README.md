@@ -41,5 +41,3 @@ Packages required on Ubuntu 18:
 	libboost-all-dev
 	uuid-dev
 	libmhash-dev
-
-

@@ -54,4 +54,3 @@ NamedInstance::instance() const noexcept
 } // namespace xf
 
 #endif
-

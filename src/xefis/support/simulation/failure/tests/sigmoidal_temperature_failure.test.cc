@@ -56,4 +56,3 @@ nu::AutoTest t_1 ("SigmoidalTemperatureFailure", []{
 
 } // namespace
 } // namespace xf::test
-

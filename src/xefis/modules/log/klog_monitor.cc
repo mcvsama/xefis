@@ -72,4 +72,3 @@ KLogMonitor::check_klog()
 			_io.flag_bug = true;
 	}
 }
-

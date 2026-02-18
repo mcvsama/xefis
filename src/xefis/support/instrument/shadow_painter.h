@@ -72,4 +72,3 @@ ShadowPainter::paint (Shadow const& shadow, DefaultPaintFunction paint_function)
 } // namespace xf
 
 #endif
-

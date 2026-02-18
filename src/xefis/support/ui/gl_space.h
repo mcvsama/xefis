@@ -492,4 +492,3 @@ GLSpace::extract_modelview_matrix()
 } // namespace xf
 
 #endif
-

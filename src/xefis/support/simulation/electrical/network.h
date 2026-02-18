@@ -117,4 +117,3 @@ template<ElementConcept SpecificElement>
 } // namespace xf::electrical
 
 #endif
-

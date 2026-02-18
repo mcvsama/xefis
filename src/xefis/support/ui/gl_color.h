@@ -176,4 +176,3 @@ template<std::floating_point Float>
 } // namespace xf
 
 #endif
-

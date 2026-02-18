@@ -39,4 +39,3 @@ TestGenerator::process (xf::Cycle const& cycle)
 {
 	update_all (cycle.update_dt());
 }
-

@@ -75,4 +75,3 @@ nu::AutoTest t_standard_temperature_gradient ("xf::standard_temperature_gradient
 
 } // namespace
 } // namespace xf::test
-

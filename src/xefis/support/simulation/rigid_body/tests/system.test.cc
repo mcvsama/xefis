@@ -365,4 +365,3 @@ nu::ManualTest t_5 ("rigid_body::System: intermediate axis of rotation", []{
 
 } // namespace
 } // namespace xf::test
-

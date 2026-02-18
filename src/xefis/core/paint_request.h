@@ -195,4 +195,3 @@ PaintRequest::size_changed() const noexcept
 } // namespace xf
 
 #endif
-

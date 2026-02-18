@@ -523,4 +523,3 @@ ItemsTree::leaveEvent (QEvent*)
 }
 
 } // namespace xf
-

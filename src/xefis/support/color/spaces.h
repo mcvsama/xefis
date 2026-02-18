@@ -32,4 +32,3 @@ class RGBSpace: public math::CoordinateSystemBase
 } // namespace xf
 
 #endif
-

@@ -67,4 +67,3 @@ from_svg_file (QString const& svg_file, std::optional<unsigned int> size_px_opt)
 }
 
 } // namespace xf::icons
-

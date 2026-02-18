@@ -37,4 +37,3 @@ class BasicModuleIn: public BasicModuleSocket
 } // namespace xf
 
 #endif
-

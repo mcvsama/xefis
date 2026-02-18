@@ -103,4 +103,3 @@ class TestScreen1: public xf::Screen
 };
 
 #endif
-

@@ -205,4 +205,3 @@ template<class Space>
 } // namespace xf::rigid_body
 
 #endif
-

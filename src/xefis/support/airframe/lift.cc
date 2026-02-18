@@ -92,4 +92,3 @@ Lift::get_aoa_in_normal_regime (LiftCoefficient const& cl) const noexcept
 }
 
 } // namespace xf
-

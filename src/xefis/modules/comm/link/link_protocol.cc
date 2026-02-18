@@ -525,4 +525,3 @@ LinkProtocol::failsafe()
 	for (auto& e: _envelopes)
 		e->failsafe();
 }
-

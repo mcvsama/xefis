@@ -125,4 +125,3 @@ nu::AutoTest t1 ("xf::SocketTraits", for_all_types ([](auto value) {
 
 } // namespace
 } // namespace xf::test
-

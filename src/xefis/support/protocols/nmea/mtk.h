@@ -73,4 +73,3 @@ make_mtk_sentence (std::string const& data);
 } // namespace xf::nmea
 
 #endif
-

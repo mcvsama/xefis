@@ -73,4 +73,3 @@ class CameraControls: public QWidget
 } // namespace xf
 
 #endif
-

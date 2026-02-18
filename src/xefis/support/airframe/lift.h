@@ -87,4 +87,3 @@ Lift::get_aoa_range() const noexcept
 } // namespace xf
 
 #endif
-

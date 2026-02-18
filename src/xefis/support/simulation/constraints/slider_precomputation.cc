@@ -75,4 +75,3 @@ SliderPrecomputation::compute (SliderPrecomputationData& data)
 }
 
 } // namespace xf::rigid_body
-

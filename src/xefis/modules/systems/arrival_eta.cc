@@ -107,4 +107,3 @@ ArrivalETA::compute()
 		_io.eta = xf::nil;
 	}
 }
-

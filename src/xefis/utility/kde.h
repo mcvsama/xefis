@@ -29,4 +29,3 @@ set_kde_blur_background (QWidget&, bool enabled);
 } // namespace xf
 
 #endif
-

@@ -509,4 +509,3 @@ PerformanceComputer::aoa_to_tas_now (si::Angle const aoa, std::optional<si::Acce
 	else
 		return { };
 }
-

@@ -866,4 +866,3 @@ CHRUM6::set_auto_retry (bool enable)
 } // namespace xf
 
 #endif
-

@@ -64,4 +64,3 @@ class Atmosphere
 } // namespace xf
 
 #endif
-

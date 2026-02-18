@@ -104,4 +104,3 @@ module_info.each_pair do |name, info|
 end
 
 puts errors.join("\n")
-

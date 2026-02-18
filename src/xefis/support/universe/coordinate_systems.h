@@ -60,4 +60,3 @@ struct HorizontalCoordinates
 } // namespace xf
 
 #endif
-

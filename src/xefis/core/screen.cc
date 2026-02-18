@@ -449,4 +449,3 @@ Screen::show_configurator()
 }
 
 } // namespace xf
-

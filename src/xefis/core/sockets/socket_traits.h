@@ -717,4 +717,3 @@ template<class AssignableSocketType, class Value>
 } // namespace xf::detail
 
 #endif
-

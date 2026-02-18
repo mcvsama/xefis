@@ -34,4 +34,3 @@ make_earth (bool include_actual_sphere = false);
 } // namespace xf::rigid_body
 
 #endif
-

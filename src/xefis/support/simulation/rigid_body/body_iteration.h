@@ -86,4 +86,3 @@ BodyIteration::reset (VelocityMoments<WorldSpace> const& vm)
 } // namespace xf::rigid_body
 
 #endif
-

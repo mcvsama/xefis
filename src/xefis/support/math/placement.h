@@ -323,4 +323,3 @@ template<math::CoordinateSystem BaseSpace, math::CoordinateSystem Space>
 } // namespace xf
 
 #endif
-

@@ -66,4 +66,3 @@ class SigmoidalTemperatureFailure
 } // namespace xf
 
 #endif
-

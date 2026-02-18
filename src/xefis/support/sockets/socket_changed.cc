@@ -46,4 +46,3 @@ SocketChanged::perhaps_shift_cycles()
 }
 
 } // namespace xf
-

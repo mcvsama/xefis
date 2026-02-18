@@ -208,4 +208,3 @@ ConfigurableItemsList::item_selected (QTreeWidgetItem* current, QTreeWidgetItem*
 }
 
 } // namespace xf::configurator
-

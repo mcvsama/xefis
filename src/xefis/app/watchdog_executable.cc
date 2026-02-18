@@ -226,4 +226,3 @@ main (int argc, char** argv, char** envp)
 	std::cerr << "Watchdog exits." << std::endl;
 	return result;
 }
-

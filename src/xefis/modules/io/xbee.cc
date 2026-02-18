@@ -1093,4 +1093,3 @@ XBee::clear_channel_result (ATResponseStatus status, std::string_view const resu
 		_io.cca_failures = *_io.cca_failures + failures;
 	}
 }
-

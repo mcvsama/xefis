@@ -62,4 +62,3 @@ class GroupItem: public QTreeWidgetItem
 } // namespace xf
 
 #endif
-

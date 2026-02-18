@@ -469,4 +469,3 @@ SlaveSecureChannel::shift_sessions()
 }
 
 } // namespace xf::crypto::xle
-

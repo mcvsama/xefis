@@ -42,4 +42,3 @@ ProcessingLoopItem::ProcessingLoopItem (ProcessingLoop& processing_loop, QTreeWi
 }
 
 } // namespace xf::configurator
-

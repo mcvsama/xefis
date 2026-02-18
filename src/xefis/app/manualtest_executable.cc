@@ -31,4 +31,3 @@ main (int, char**, char**)
 	neutrino::ManualTest::run_all();
 	return EXIT_SUCCESS;
 }
-

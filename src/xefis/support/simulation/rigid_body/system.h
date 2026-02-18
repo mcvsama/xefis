@@ -323,4 +323,3 @@ template<BasicFramePrecomputationConcept SpecificFramePrecomputation>
 } // namespace xf::rigid_body
 
 #endif
-

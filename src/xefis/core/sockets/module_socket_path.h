@@ -108,4 +108,3 @@ ModuleSocketPath::string() const noexcept
 } // namespace xf
 
 #endif
-

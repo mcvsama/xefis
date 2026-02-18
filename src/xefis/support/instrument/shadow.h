@@ -90,4 +90,3 @@ Shadow::width_for_pen (QPen const& pen) const
 } // namespace xf
 
 #endif
-

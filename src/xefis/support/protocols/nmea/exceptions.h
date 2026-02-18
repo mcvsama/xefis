@@ -69,4 +69,3 @@ class InvalidSentence: public nu::Exception
 } // namespace xf::nmea
 
 #endif
-

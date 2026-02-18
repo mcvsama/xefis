@@ -92,4 +92,3 @@ CanvasWidget::ensure_canvas_exists()
 }
 
 } // namespace xf
-

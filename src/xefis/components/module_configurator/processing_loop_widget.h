@@ -63,4 +63,3 @@ class ProcessingLoopWidget: public ConfigWidget
 } // namespace xf::configurator
 
 #endif
-

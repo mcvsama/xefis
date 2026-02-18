@@ -273,4 +273,3 @@ class CHRUM6:
 };
 
 #endif
-

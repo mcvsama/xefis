@@ -114,4 +114,3 @@ nu::ManualTest t_1 ("geometry: triangulate", []{
 
 } // namespace
 } // namespace xf::test
-

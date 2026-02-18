@@ -102,4 +102,3 @@ FlapsControl::update_flap_position()
 	_io.current = _current;
 	_io.control = nu::renormalize (_current, _extents, *_io.control_extents);
 }
-

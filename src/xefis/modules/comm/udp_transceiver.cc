@@ -99,4 +99,3 @@ UDPTransceiver::interfere (QByteArray& blob)
 		blob.remove (i, 1);
 	}
 }
-

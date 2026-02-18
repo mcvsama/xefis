@@ -196,4 +196,3 @@ TextPainter::Cache::Last::Last (Font const& font, Glyphs* glyphs):
 } // namespace xf
 
 #endif
-

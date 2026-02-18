@@ -72,4 +72,3 @@ make_material (QColor const& material_color, QColor const& emission_color = Qt::
 } // namespace xf
 
 #endif
-

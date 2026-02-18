@@ -39,4 +39,3 @@ class NotConverged: public nu::Exception
 } // namespace xf::electrical
 
 #endif
-

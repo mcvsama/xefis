@@ -218,4 +218,3 @@ Airframe::load_factor_limits() const
 } // namespace xf
 
 #endif
-

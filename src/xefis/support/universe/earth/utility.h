@@ -147,4 +147,3 @@ compute_ecef_to_celestial_rotation (double const julian_date);
 } // namespace xf
 
 #endif
-

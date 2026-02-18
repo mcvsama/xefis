@@ -151,4 +151,3 @@ BasicGauge::stringify (auto value, std::format_string<FloatingPoint> const& form
 }
 
 #endif
-

@@ -28,4 +28,3 @@ main (int, char**, char**)
 {
 	return neutrino::AutoTest::run_all() ? EXIT_SUCCESS : EXIT_FAILURE;
 }
-

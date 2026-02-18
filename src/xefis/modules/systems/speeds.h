@@ -84,4 +84,3 @@ class Speeds: public SpeedsIO
 };
 
 #endif
-

@@ -62,4 +62,3 @@ VirtualPressureSensor::process (xf::Cycle const& cycle)
 		_last_measure_time = cycle.update_time();
 	}
 }
-

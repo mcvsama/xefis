@@ -122,4 +122,3 @@ tait_bryan_angles (Placement<ECEFSpace, AirframeSpace> const& placement)
 } // namespace xf
 
 #endif
-

@@ -204,4 +204,3 @@ PanelRotaryEncoder::write()
 }
 
 } // namespace xf
-

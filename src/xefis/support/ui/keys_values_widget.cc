@@ -44,4 +44,3 @@ KeysValuesWidget::add (std::u8string_view const title, QLabel& value_label)
 }
 
 } // namespace xf
-

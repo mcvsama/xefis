@@ -62,4 +62,3 @@ class FixedConstraint: public Constraint
 } // namespace xf::rigid_body
 
 #endif
-

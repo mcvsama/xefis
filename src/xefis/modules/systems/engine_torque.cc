@@ -59,4 +59,3 @@ EngineTorque::compute_torque (EfficiencyField const& motor_efficiency)
 	else
 		_io.engine_torque = xf::nil;
 }
-

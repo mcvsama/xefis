@@ -41,4 +41,3 @@ class BasicModuleOut:
 } // namespace xf
 
 #endif
-

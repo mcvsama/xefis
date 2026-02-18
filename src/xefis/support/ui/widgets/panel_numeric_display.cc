@@ -201,4 +201,3 @@ PanelNumericDisplay::convert_to_digits (double value)
 }
 
 } // namespace xf
-

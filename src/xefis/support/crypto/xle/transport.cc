@@ -164,4 +164,3 @@ Receiver::decrypt_packet (BlobView const encrypted_packet, std::optional<Sequenc
 }
 
 } // namespace xf::crypto::xle
-

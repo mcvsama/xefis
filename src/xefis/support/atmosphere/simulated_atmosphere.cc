@@ -60,4 +60,3 @@ SimulatedAtmosphere::wind_velocity_at (SpaceLength<ECEFSpace> const& position) c
 }
 
 } // namespace xf
-

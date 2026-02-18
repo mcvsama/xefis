@@ -71,4 +71,3 @@ class SocketChanged
 } // namespace xf
 
 #endif
-

@@ -49,4 +49,3 @@ class TemperatureSensorWidget: public ObservationWidget
 } // namespace xf::sim
 
 #endif
-

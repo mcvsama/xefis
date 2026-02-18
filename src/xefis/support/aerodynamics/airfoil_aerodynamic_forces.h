@@ -43,4 +43,3 @@ template<class Space>
 } // namespace xf
 
 #endif
-

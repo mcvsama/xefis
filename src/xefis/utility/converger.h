@@ -134,4 +134,3 @@ template<class ValueType>
 } // namespace xf
 
 #endif
-

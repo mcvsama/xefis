@@ -50,4 +50,3 @@ SocketButton::process()
 }
 
 } // namespace xf
-

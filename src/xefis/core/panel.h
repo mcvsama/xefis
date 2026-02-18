@@ -67,4 +67,3 @@ class Panel: public QWidget
 } // namespace xf
 
 #endif
-

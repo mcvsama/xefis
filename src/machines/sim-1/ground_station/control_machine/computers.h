@@ -29,4 +29,3 @@ class Computers
 } // namespace sim1::ground_station::control_machine
 
 #endif
-

@@ -483,4 +483,3 @@ Navaid::set_runways (Runways const& runways)
 } // namespace xf
 
 #endif
-

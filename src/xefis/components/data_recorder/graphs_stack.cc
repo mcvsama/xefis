@@ -44,4 +44,3 @@ GraphsStack::add_graph (GraphWidget* graph_widget)
 }
 
 } // namespace xf
-

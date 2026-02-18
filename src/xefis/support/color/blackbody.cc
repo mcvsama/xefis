@@ -103,4 +103,3 @@ qcolor_from_temperature (si::Temperature const temperature)
 }
 
 } // namespace xf
-

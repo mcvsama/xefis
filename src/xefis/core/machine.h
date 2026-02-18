@@ -178,4 +178,3 @@ class Machine: private nu::Noncopyable
 } // namespace xf
 
 #endif
-

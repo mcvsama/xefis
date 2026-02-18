@@ -168,4 +168,3 @@ template<class Iterator>
 } // namespace xf
 
 #endif
-

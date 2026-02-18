@@ -165,4 +165,3 @@ Transport::DecryptionFailure::DecryptionFailure (ErrorCode const error_code, std
 } // namespace xf::crypto::xle
 
 #endif
-

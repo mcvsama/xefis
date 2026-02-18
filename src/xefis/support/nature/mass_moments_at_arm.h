@@ -362,4 +362,3 @@ template<math::CoordinateSystem S>
 } // namespace xf
 
 #endif
-

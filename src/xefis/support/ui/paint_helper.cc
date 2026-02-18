@@ -58,4 +58,3 @@ PaintHelper::group_box_margins() const
 }
 
 } // namespace xf
-

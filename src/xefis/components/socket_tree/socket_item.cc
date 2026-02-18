@@ -102,4 +102,3 @@ SocketItem::operator< (QTreeWidgetItem const& other) const
 }
 
 } // namespace xf
-

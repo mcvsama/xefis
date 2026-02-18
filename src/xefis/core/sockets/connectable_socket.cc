@@ -50,4 +50,3 @@ set_connectable_socket_fetch_exception_logger (nu::Logger const* logger)
 }
 
 } // namespace xf
-

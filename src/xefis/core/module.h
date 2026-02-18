@@ -413,4 +413,3 @@ identifier (Module const*);
 } // namespace xf
 
 #endif
-

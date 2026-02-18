@@ -93,4 +93,3 @@ debug_bool (std::string const& name, bool default_value, std::function<void()> c
 }
 
 } // namespace xf
-

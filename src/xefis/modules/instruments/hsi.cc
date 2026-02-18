@@ -2256,4 +2256,3 @@ HSI::paint (xf::PaintRequest paint_request) const
 		hsi_detail::PaintingWork (pr, _instrument_support, _navaid_storage, pp, *rc_lock, *cn_lock, *mu_lock, _logger).paint();
 	});
 }
-

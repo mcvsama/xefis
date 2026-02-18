@@ -47,4 +47,3 @@ class ConfiguratorWidget: public Widget
 } // namespace xf
 
 #endif
-

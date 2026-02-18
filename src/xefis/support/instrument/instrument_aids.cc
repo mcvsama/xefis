@@ -122,4 +122,3 @@ InstrumentAids::centered_rect (QRectF input_rect, WidthForHeight width_for_heigh
 }
 
 } // namespace xf
-

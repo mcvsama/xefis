@@ -119,4 +119,3 @@ LinearLimitsConstraint::max_distance_corrections (VelocityMoments<WorldSpace> co
 }
 
 } // namespace xf::rigid_body
-

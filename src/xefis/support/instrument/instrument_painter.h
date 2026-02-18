@@ -50,4 +50,3 @@ class InstrumentPainter:
 } // namespace xf
 
 #endif
-

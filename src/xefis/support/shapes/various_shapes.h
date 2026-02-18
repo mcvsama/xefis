@@ -328,4 +328,3 @@ set_material (std::vector<ShapeVertex>& vertices, ShapeMaterial const& material)
 } // namespace xf
 
 #endif
-

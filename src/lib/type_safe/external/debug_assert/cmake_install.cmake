@@ -63,4 +63,3 @@ if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_
     "/home/mcv/git/ external/type_safe/external/debug_assert/debug_assert-config-version.cmake"
     )
 endif()
-

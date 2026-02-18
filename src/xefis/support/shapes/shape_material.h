@@ -71,4 +71,3 @@ struct ShapeMaterial
 } // namespace xf
 
 #endif
-

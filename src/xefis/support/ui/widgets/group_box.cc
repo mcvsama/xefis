@@ -89,4 +89,3 @@ GroupBox::paintEvent (QPaintEvent*)
 }
 
 } // namespace xf
-

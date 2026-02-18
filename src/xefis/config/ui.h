@@ -27,4 +27,3 @@ constexpr int DialogMargin	= 6;
 } // namespace xf::config::ui
 
 #endif
-

@@ -10,4 +10,3 @@ participating in the Gaia Multilateral Agreement.
 
 Image <starmap_2020_8k.exr> downloaded from <https://svs.gsfc.nasa.gov/4851/>
 and converted to 6 separate sky-box images.
-

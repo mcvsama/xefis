@@ -49,4 +49,3 @@ ecef_to_ned_rotation_matrix (si::LonLat const& position)
 }
 
 } // namespace xf
-

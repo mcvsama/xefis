@@ -104,4 +104,3 @@ class SimulatedClock: public Clock
 } // namespace xf
 
 #endif
-

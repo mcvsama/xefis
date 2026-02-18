@@ -92,4 +92,3 @@ CanvasWidget::mark_dirty()
 } // namespace xf
 
 #endif
-

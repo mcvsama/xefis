@@ -97,4 +97,3 @@ VoltageSource::voltage_for_current (si::Current const current) const
 } // namespace xf::electrical
 
 #endif
-

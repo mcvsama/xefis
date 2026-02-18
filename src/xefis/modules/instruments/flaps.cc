@@ -130,4 +130,3 @@ Flaps::async_paint (xf::PaintRequest const& paint_request, PaintingParams const&
 		painter.fast_draw_text (QPointF (block.right() + 2.f * w, s), Qt::AlignVCenter | Qt::AlignLeft, number);
 	}
 }
-

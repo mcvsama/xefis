@@ -114,4 +114,3 @@ Node::operator<< (Node& node)
 } // namespace xf::electrical
 
 #endif
-

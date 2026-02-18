@@ -33,4 +33,3 @@ hsl_interpolation (float x, QColor const& color0, QColor const& color1);
 } // namespace xf
 
 #endif
-

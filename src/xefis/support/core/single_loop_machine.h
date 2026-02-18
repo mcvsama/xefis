@@ -83,4 +83,3 @@ class SingleLoopMachine: public xf::Machine
 } // namespace xf
 
 #endif
-

@@ -122,4 +122,3 @@ template<class Value>
 } // namespace xf
 
 #endif
-

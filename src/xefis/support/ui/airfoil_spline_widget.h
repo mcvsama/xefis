@@ -174,4 +174,3 @@ class AirfoilSplineWidget: public CanvasWidget
 } // namespace xf
 
 #endif
-

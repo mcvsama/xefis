@@ -79,4 +79,3 @@ constexpr SpaceMatrix<si::MomentOfInertia, ECEFSpace>
 } // namespace xf
 
 #endif
-

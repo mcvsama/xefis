@@ -173,4 +173,3 @@ template<math::CoordinateSystem Space, class WrenchIterator>
 } // namespace xf
 
 #endif
-

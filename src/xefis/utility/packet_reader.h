@@ -97,4 +97,3 @@ PacketReader::buffer() noexcept
 } // namespace xf
 
 #endif
-

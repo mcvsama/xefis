@@ -207,4 +207,3 @@ AFCS_FD_Pitch::check_autonomous()
 	if (_io.autonomous.value_or (true))
 		_io.operative = true;
 }
-

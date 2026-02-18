@@ -163,4 +163,3 @@ align_right (QLabel* const label)
 } // namespace xf
 
 #endif
-

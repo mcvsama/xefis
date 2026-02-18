@@ -61,4 +61,3 @@ class WingWidget: public ObservationWidget
 } // namespace xf::sim
 
 #endif
-

@@ -49,6 +49,3 @@ Simulator::Simulator (rigid_body::System& rigid_body_system,
 }
 
 } // namespace xf
-
-
-

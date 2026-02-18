@@ -59,4 +59,3 @@ class SocketItem: public QTreeWidgetItem
 } // namespace xf
 
 #endif
-

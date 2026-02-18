@@ -65,4 +65,3 @@ AFCS_YawDamper::compute()
 	else
 		_io.rudder_deflection = 0.0_deg;
 }
-

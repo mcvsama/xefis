@@ -100,4 +100,3 @@ System::set_friction_factor (double factor) noexcept
 }
 
 } // namespace xf::rigid_body
-

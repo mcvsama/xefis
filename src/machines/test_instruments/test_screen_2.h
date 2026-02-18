@@ -62,4 +62,3 @@ class TestScreen2: public xf::Screen
 };
 
 #endif
-

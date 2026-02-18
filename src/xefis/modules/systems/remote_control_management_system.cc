@@ -86,4 +86,3 @@ RemoteControlManagementSystem::compute_distances_to_home()
 		_io.true_home_direction = xf::nil;
 	}
 }
-

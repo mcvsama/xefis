@@ -147,4 +147,3 @@ template<class Scalar, class Space, class Iterator>
 } // namespace xf
 
 #endif
-

@@ -106,4 +106,3 @@ airframe_to_ned_rotation (Placement<ECEFSpace, AirframeSpace> const& pr)
 } // namespace xf
 
 #endif
-

@@ -101,4 +101,3 @@ compute_sun_azimuth (si::Angle const sun_declination, si::Angle const observer_l
 }
 
 } // namespace xf
-

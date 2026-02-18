@@ -143,4 +143,3 @@ nu::AutoTest t1 ("SocketQuadratureDecoder + SocketQuadratureCounter", []{
 
 } // namespace
 } // namespace xf::test
-

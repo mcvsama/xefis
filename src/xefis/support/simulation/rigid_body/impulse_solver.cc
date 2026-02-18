@@ -341,4 +341,3 @@ ImpulseSolver::normalize_rotations()
 }
 
 } // namespace xf::rigid_body
-

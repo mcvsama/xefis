@@ -113,4 +113,3 @@ EventTimestamper::shorter_than (si::Time time) const noexcept
 } // namespace xf
 
 #endif
-

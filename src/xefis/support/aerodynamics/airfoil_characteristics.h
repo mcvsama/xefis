@@ -175,4 +175,3 @@ class AirfoilCharacteristics
 } // namespace xf
 
 #endif
-

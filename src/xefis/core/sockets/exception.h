@@ -43,4 +43,3 @@ class NilValueException: public nu::Exception
 } // namespace xf
 
 #endif
-

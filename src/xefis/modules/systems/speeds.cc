@@ -86,4 +86,3 @@ template<class T>
 			return std::min (*opt_val, val);
 		return val;
 	}
-

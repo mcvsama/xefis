@@ -47,4 +47,3 @@ class ConfigWidget: public Widget
 } // namespace xf::configurator
 
 #endif
-

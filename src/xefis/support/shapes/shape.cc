@@ -50,4 +50,3 @@ Shape::translate (SpaceLength<BodyOrigin> const& translation)
 }
 
 } // namespace xf
-

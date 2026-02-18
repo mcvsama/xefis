@@ -38,4 +38,3 @@ class Spoilers: public LiftMod
 } // namespace xf
 
 #endif
-

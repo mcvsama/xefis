@@ -48,4 +48,3 @@ class PrandtlTubeWidget: public ObservationWidget
 } // namespace xf::sim
 
 #endif
-

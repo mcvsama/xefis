@@ -130,4 +130,3 @@ AFCS_Autopilot::diagnose()
 	if (!_io.measured_roll)
 		_logger << "Measured roll is nil!" << std::endl;
 }
-

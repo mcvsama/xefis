@@ -274,4 +274,3 @@ BMP085::write (uint8_t base_register, uint8_t value)
 {
 	_i2c_device.write_register (base_register, value);
 }
-

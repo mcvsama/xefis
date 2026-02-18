@@ -167,4 +167,3 @@ ETSAirspeed::guard (std::function<void()> guarded_code)
 		reinitialize();
 	}
 }
-

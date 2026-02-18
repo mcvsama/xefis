@@ -209,4 +209,3 @@ template<math::CoordinateSystem Space = void>
 } // namespace xf
 
 #endif
-

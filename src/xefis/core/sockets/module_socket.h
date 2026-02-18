@@ -41,4 +41,3 @@ template<template<class> class SocketTemplate>
 } // namespace xf
 
 #endif
-

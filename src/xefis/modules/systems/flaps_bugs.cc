@@ -68,4 +68,3 @@ FlapsBugs::process (xf::Cycle const&)
 		}
 	}
 }
-

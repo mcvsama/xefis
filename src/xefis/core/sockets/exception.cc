@@ -39,4 +39,3 @@ NilValueException::NilValueException (BasicSocket const& socket):
 { }
 
 } // namespace xf
-

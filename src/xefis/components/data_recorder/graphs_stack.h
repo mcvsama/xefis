@@ -51,4 +51,3 @@ class GraphsStack: public QWidget
 } // namespace xf
 
 #endif
-

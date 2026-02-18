@@ -54,4 +54,3 @@ static constexpr NoDataSource no_data_source;
 } // namespace xf
 
 #endif
-

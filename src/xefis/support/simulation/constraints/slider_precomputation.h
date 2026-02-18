@@ -109,4 +109,3 @@ class SliderPrecomputation: public FramePrecomputation<SliderPrecomputationData>
 } // namespace xf::rigid_body
 
 #endif
-

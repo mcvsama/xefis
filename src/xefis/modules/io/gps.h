@@ -367,4 +367,3 @@ class GPS:
 };
 
 #endif
-

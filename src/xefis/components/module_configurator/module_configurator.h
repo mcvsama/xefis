@@ -68,4 +68,3 @@ class ModuleConfigurator: public QWidget
 } // namespace xf
 
 #endif
-

@@ -285,4 +285,3 @@ HT16K33::update_timers()
 }
 
 } // namespace xf
-

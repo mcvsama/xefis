@@ -69,4 +69,3 @@ ConnectedBodies::ConnectedBodies (Body& body_1, Body& body_2):
 } // namespace xf::rigid_body
 
 #endif
-

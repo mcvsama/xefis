@@ -532,4 +532,3 @@ nu::AutoTest t12 ("xf::ConnectableSocket expression (reactions to nil)", []{
 
 } // namespace
 } // namespace xf::test
-

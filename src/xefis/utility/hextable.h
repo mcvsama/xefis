@@ -66,4 +66,3 @@ HexTable::operator[] (char c) const
 } // namespace xf
 
 #endif
-

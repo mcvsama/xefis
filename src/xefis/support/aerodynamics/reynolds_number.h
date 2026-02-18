@@ -46,4 +46,3 @@ reynolds_number (si::Velocity fluid_speed, si::Length characteristic_dimension, 
 } // namespace xf
 
 #endif
-

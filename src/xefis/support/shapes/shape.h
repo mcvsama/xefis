@@ -256,4 +256,3 @@ operator+ (Shape a, Shape const& b)
 } // namespace xf
 
 #endif
-

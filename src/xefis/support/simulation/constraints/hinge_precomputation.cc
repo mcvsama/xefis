@@ -117,4 +117,3 @@ HingePrecomputation::compute (HingePrecomputationData& data)
 }
 
 } // namespace xf::rigid_body
-

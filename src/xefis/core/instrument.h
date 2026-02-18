@@ -166,4 +166,3 @@ Instrument::mark_dirty() noexcept
 } // namespace xf
 
 #endif
-

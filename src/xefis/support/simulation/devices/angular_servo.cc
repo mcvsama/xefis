@@ -65,4 +65,3 @@ make_standard_9gram_servo (rigid_body::AngularServoConstraint& constraint)
 }
 
 } // namespace xf::sim
-

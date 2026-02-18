@@ -66,4 +66,3 @@ unix_time_to_days_since_J2000 (si::Time const unix_time)
 } // namespace xf
 
 #endif
-

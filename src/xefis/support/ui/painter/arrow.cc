@@ -56,4 +56,3 @@ draw_arrow (QPainter& painter, QPointF const& from, QPointF const& to, double ar
 }
 
 } // namespace xf
-

@@ -256,4 +256,3 @@ const char* lib_microsoft_gsl =
 	"THE SOFTWARE.\n";
 
 } // namespace xf::licenses
-

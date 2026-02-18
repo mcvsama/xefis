@@ -6,4 +6,3 @@ Used from Makefile:
 		cppcheck --force --std=c++17 --language=c++ --inconclusive --enable=all --template "{id}:{file}:{line} ({severity}): {message}" \
 			--suppressions-list=cppcheck.suppressions \
 			lib modules xefis $(HEADERS) 2> check.log
-

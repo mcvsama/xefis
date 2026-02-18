@@ -96,4 +96,3 @@ PacketReader::feed (Blob const& data)
 }
 
 } // namespace xf
-

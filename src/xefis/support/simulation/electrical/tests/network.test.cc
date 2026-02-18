@@ -286,4 +286,3 @@ nu::AutoTest t_v_1 ("Electrical: network V.1 (two voltage sources)", []{
 
 } // namespace
 } // namespace xf::test
-

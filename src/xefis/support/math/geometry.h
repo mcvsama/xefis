@@ -398,4 +398,3 @@ template<class Length, math::CoordinateSystem Space>
 } // namespace xf
 
 #endif
-

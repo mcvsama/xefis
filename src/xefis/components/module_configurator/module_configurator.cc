@@ -106,4 +106,3 @@ ModuleConfigurator::none_selected()
 }
 
 } // namespace xf
-

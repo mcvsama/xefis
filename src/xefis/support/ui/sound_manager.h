@@ -97,4 +97,3 @@ SoundManager::Sound::finished() const noexcept
 } // namespace xf
 
 #endif
-

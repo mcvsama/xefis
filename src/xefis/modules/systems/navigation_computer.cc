@@ -321,4 +321,3 @@ NavigationComputer::compute_ground_speed()
 		_track_ground_speed_smoother.invalidate();
 	}
 }
-

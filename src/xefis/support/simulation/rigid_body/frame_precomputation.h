@@ -115,4 +115,3 @@ template<class D>
 } // namespace xf::rigid_body
 
 #endif
-

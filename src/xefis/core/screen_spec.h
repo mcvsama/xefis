@@ -171,4 +171,3 @@ ScreenSpec::set_scale (float factor)
 } // namespace xf
 
 #endif
-

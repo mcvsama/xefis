@@ -101,4 +101,3 @@ VOR::denormalize (si::Angle const a)
 {
 	return nu::wrap_within_range<si::Angle> (a, -180_deg, +180_deg);
 }
-

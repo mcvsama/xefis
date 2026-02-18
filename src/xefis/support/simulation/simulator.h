@@ -182,4 +182,3 @@ class Simulator: public nu::Noncopyable
 } // namespace xf
 
 #endif
-

@@ -1,4 +1,3 @@
 XEFIS_MACHINES += test_instruments
 
 include machines/sim-1/Makefile.machines
-

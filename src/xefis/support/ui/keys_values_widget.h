@@ -47,4 +47,3 @@ class KeysValuesWidget: public QGroupBox
 } // namespace xf
 
 #endif
-

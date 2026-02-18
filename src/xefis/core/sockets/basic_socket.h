@@ -283,4 +283,3 @@ BasicSocket::dec_readers_count (BasicSocket* listener)
 } // namespace xf
 
 #endif
-

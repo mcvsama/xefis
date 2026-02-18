@@ -242,4 +242,3 @@ WindTriangle::get_ground_speed (si::Angle aircraft_heading) const
 } // namespace xf
 
 #endif
-

@@ -124,4 +124,3 @@ InstrumentSupport::update_cache (PaintRequest const& paint_request, Data& data) 
 } // namespace xf
 
 #endif
-

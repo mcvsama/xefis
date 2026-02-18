@@ -45,4 +45,3 @@ PanelWidget::data_updated()
 { }
 
 } // namespace xf
-

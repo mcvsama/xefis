@@ -112,4 +112,3 @@ total_pressure (Atmosphere const& atmosphere,
 }
 
 } // namespace xf
-

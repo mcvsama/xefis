@@ -39,4 +39,3 @@ class GraphWidget: public QWidget
 } // namespace xf
 
 #endif
-

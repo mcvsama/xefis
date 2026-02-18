@@ -86,4 +86,3 @@ class PanelButton: public PanelWidget
 } // namespace xf
 
 #endif
-

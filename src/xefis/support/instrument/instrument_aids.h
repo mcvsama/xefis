@@ -282,4 +282,3 @@ InstrumentAids::default_shadow() const
 } // namespace xf
 
 #endif
-

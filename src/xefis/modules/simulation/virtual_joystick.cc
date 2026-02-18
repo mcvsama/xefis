@@ -472,4 +472,3 @@ VirtualJoystick::process (xf::Cycle const&)
 	_io.throttle = _throttle_widget->value();
 	_io.pedals = _pedals_widget->value();
 }
-

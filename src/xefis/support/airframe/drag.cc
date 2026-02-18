@@ -63,4 +63,3 @@ Drag::get_cd (si::Angle const aoa) const
 }
 
 } // namespace xf
-

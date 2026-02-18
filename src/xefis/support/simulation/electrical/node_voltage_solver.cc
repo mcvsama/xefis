@@ -385,4 +385,3 @@ NodeVoltageSolver::voltage_a_k (SDirEdge const& dir_edge)
 }
 
 } // namespace xf::electrical
-

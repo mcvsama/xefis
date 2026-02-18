@@ -53,4 +53,3 @@ class FixedOrientationHelper
 } // namespace xf::rigid_body
 
 #endif
-

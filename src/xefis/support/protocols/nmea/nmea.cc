@@ -160,4 +160,3 @@ get_sentence_type (std::string const& sentence)
 }
 
 } // namespace xf::nmea
-

@@ -307,4 +307,3 @@ AirfoilSplineWidget::update_pens()
 }
 
 } // namespace xf
-

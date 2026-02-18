@@ -184,4 +184,3 @@ HorizontalTrim::stringify (double value)
 		result[0] = ' ';
 	return result;
 }
-

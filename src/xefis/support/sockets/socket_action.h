@@ -41,4 +41,3 @@ class SocketAction
 } // namespace xf
 
 #endif
-

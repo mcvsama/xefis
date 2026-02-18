@@ -131,4 +131,3 @@ LinearLimitsConstraint::set_distances (nu::Range<si::Length> const range)
 } // namespace xf::rigid_body
 
 #endif
-

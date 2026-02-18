@@ -92,4 +92,3 @@ class GLAnimationWidget: public QOpenGLWidget
 } // namespace xf
 
 #endif
-

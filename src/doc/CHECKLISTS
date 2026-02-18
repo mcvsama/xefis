@@ -6,4 +6,3 @@
 * All const-methods should be read-only-thread-safe.
   Remember when using "mutable" members in objects, or when mutating any other (global or not) state from
   const method. Use std::atomic<>, nu::Synchronized<> to help.
-

@@ -168,4 +168,3 @@ Gear::async_paint (xf::PaintRequest const& paint_request, PaintingParams const& 
 	else if (v_right_down)
 		paint_down();
 }
-

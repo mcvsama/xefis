@@ -55,4 +55,3 @@ AngularSpringConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const
 }
 
 } // namespace xf::rigid_body
-

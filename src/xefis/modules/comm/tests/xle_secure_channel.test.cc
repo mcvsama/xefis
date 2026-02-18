@@ -643,4 +643,3 @@ nu::AutoTest t1 ("Xefis Lossy Encryption/Protocol: handshaking gives correct key
 nu::AutoTest t2 ("Xefis Lossy Encryption/Protocol: handshaking eventually works even on lossy channel", auto_test_t2);
 
 } // namespace xf::xle_secure_channel_test
-

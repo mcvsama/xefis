@@ -149,4 +149,3 @@ Airfoil::wrap_angle_for_field (si::Angle angle)
 }
 
 } // namespace xf
-

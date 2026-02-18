@@ -250,4 +250,3 @@ template<class V>
 } // namespace xf
 
 #endif
-

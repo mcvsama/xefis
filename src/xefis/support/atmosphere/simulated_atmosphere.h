@@ -59,4 +59,3 @@ class SimulatedAtmosphere: public Atmosphere
 } // namespace xf
 
 #endif
-

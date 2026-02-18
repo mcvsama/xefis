@@ -52,4 +52,3 @@ TestScreen2::TestScreen2 (xf::ProcessingLoop& loop,
 
 	set_paint_bounding_boxes (false);
 }
-

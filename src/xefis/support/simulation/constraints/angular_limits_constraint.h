@@ -128,4 +128,3 @@ AngularLimitsConstraint::set_angles (nu::Range<si::Angle> const range)
 } // namespace xf::rigid_body
 
 #endif
-

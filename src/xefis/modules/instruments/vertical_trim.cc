@@ -175,4 +175,3 @@ VerticalTrim::stringify (double value)
 		result[0] = ' ';
 	return result;
 }
-

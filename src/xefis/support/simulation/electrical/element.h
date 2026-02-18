@@ -275,4 +275,3 @@ operator>> (Element& element, Node& node)
 } // namespace xf::electrical
 
 #endif
-

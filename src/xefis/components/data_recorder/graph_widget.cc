@@ -33,4 +33,3 @@ GraphWidget::GraphWidget (QWidget* parent):
 }
 
 } // namespace xf
-

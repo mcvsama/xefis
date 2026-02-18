@@ -1194,4 +1194,3 @@ template<class Target, class Source>
 		else
 			return static_cast<Target> (*source);
 	}
-

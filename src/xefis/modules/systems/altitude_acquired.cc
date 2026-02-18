@@ -95,4 +95,3 @@ AltitudeAcquired::compute_altitude_acquire_distance()
 		_output_smoother.invalidate();
 	}
 }
-

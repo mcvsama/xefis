@@ -43,4 +43,3 @@ ShapeVertex::rotate (RotationQuaternion<BodyOrigin> const& rotation)
 }
 
 } // namespace xf
-

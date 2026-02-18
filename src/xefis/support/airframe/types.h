@@ -34,4 +34,3 @@ using SpoilersAngle		= nu::StrongType<si::Angle, struct SpoilersAngleType>;
 } // namespace xf
 
 #endif
-

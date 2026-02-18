@@ -187,4 +187,3 @@ HandshakeSlave::parse_and_verify_master_handshake_blob (BlobView const master_ha
 }
 
 } // namespace xf::crypto::xle
-

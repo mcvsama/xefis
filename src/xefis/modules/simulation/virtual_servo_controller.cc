@@ -56,4 +56,3 @@ VirtualServoController::process (xf::Cycle const&)
 		if (*socket_ptr)
 			servo->set_setpoint (**socket_ptr);
 }
-

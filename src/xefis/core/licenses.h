@@ -32,4 +32,3 @@ extern const char* lib_microsoft_gsl;
 } // namespace xf::licenses
 
 #endif
-

@@ -492,4 +492,3 @@ double SGMagVarOrig( double lat, double lon, double h, long dat, double* field )
 #endif // TEST_NHV_HACKS
 
 } // namespace xf
-

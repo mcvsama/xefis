@@ -68,5 +68,3 @@ make_xefis_machine (xf::Xefis& xefis)
 {
 	return std::make_unique<sim1::ground_station::control_machine::Machine> (xefis);
 }
-
-

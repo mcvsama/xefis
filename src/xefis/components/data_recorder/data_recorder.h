@@ -45,4 +45,3 @@ class DataRecorder: public QWidget
 } // namespace xf
 
 #endif
-

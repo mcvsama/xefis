@@ -235,4 +235,3 @@ LiftMod::settings() const noexcept
 } // namespace xf
 
 #endif
-

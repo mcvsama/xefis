@@ -79,4 +79,3 @@ make_earth (bool include_actual_sphere)
 }
 
 } // namespace xf::rigid_body
-

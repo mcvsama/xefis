@@ -156,4 +156,3 @@ LiftMod::find_setting_iterator (si::Angle const surface_angle) const
 }
 
 } // namespace xf
-

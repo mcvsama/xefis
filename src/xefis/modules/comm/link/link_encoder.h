@@ -66,4 +66,3 @@ class LinkEncoder: public xf::Module
 };
 
 #endif
-

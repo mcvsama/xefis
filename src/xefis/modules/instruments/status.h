@@ -335,4 +335,3 @@ Status::Message::outdated (si::Time now) const noexcept
 }
 
 #endif
-

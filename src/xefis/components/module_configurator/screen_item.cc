@@ -42,4 +42,3 @@ ScreenItem::ScreenItem (Screen& screen, QTreeWidget& parent):
 }
 
 } // namespace xf::configurator
-

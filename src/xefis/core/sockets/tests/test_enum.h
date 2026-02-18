@@ -94,4 +94,3 @@ template<std::same_as<TestEnumWithNil> Enum>
 } // namespace xf::test
 
 #endif
-

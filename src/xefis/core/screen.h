@@ -301,4 +301,3 @@ class Screen:
 } // namespace xf
 
 #endif
-

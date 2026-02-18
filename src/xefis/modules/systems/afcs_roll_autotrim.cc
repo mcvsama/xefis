@@ -41,4 +41,3 @@ AFCS_RollAutotrim::process (xf::Cycle const&)
 	else
 		_io.ailerons_correction = xf::nil;
 }
-

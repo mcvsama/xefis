@@ -84,4 +84,3 @@ class PanelRotaryEncoder: public PanelWidget
 } // namespace xf
 
 #endif
-

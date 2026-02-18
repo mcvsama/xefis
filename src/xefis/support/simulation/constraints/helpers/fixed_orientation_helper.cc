@@ -41,4 +41,3 @@ FixedOrientationHelper::rotation_constraint_value (Placement<WorldSpace, BodyCOM
 }
 
 } // namespace xf::rigid_body
-

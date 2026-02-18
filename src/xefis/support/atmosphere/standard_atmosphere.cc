@@ -254,4 +254,3 @@ standard_temperature_gradient (si::Length geometric_altitude_amsl)
 }
 
 } // namespace xf
-

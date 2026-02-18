@@ -41,4 +41,3 @@ Atmosphere::air_at (SpaceLength<ECEFSpace> const& position) const
 }
 
 } // namespace xf
-

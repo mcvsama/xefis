@@ -70,4 +70,3 @@ template<std::floating_point Value>
 } // namespace xf
 
 #endif
-

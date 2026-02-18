@@ -173,4 +173,3 @@ template<class T>
 } // namespace xf
 
 #endif
-

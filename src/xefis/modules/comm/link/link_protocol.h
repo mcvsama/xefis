@@ -1161,4 +1161,3 @@ template<uint16_t B, class V>
 		}
 
 #endif
-

@@ -65,4 +65,3 @@ class TestProcessingLoop: public ProcessingLoop
 } // namespace xf
 
 #endif
-

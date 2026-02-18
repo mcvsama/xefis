@@ -144,4 +144,3 @@ SocketObserver::longest_smoothing_time() noexcept
 }
 
 } // namespace xf
-
