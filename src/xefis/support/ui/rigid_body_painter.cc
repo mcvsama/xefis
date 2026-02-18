@@ -867,11 +867,7 @@ RigidBodyPainter::paint (rigid_body::Body const& body, BodyRenderingConfig const
 					_gl.additional_parameters().color_override = GLColor::from_rgb (0x00, 0xaa, 0x7f).lighter (0.5);
 
 				glFrontFace (GL_CCW);
-
-				if (auto const& shape = body.shape())
-					_gl.draw (*shape);
-				else
-					_gl.draw (make_centered_cube_shape (body.mass_moments<BodyCOM>()));
+				_gl.draw (shape_for (body));
 			});
 		}
 	});
@@ -1575,5 +1571,22 @@ RigidBodyPainter::make_sun_shines_shape()
 	return sun_shines;
 }
 
-} // namespace xf
 
+[[nodiscard]]
+Shape const&
+RigidBodyPainter::shape_for (rigid_body::Body const& body)
+{
+	if (auto const& shape = body.shape())
+		return *shape;
+	else
+	{
+		auto& config = get_rendering_config (body);
+
+		if (!config.default_body_shape)
+			config.default_body_shape = make_centered_cube_shape (body.mass_moments<BodyCOM>());
+
+		return *config.default_body_shape;
+	}
+}
+
+} // namespace xf

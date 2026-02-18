@@ -203,6 +203,9 @@ class RigidBodyPainter: protected QOpenGLFunctions
 		bool	center_of_mass_visible { false };
 		bool	moments_of_inertia_visible { false };
 		// TODO forces_visible, angular_velocities visible, etc
+
+		// Created and used for bodies that don't have any shape:
+		std::optional<Shape>	default_body_shape;
 	};
 
   public:
@@ -748,6 +751,14 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	[[nodiscard]]
 	static Shape
 	make_sun_shines_shape();
+
+	/**
+	 * Return body shape of a body, or create and cache a fallback default
+	 * shape from body's mass moments.
+	 */
+	[[nodiscard]]
+	Shape const&
+	shape_for (rigid_body::Body const&);
 
   private:
 	si::PixelDensity				_pixel_density;
