@@ -299,9 +299,8 @@ RigidBodyViewer::update_hovered_body_from_cursor (std::optional<QPoint> const cu
 	if (_rigid_body_system && cursor_position)
 	{
 		auto const& pos = *cursor_position;
-		auto const within_viewport = pos.x() >= 0 && pos.y() >= 0 && pos.x() < width() && pos.y() < height();
 
-		if (within_viewport)
+		if (rect().contains (pos))
 			hovered_body = _rigid_body_painter.body_under_cursor (*_rigid_body_system, pos, size());
 	}
 
