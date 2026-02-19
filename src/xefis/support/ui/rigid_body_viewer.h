@@ -54,6 +54,7 @@ class RigidBodyViewer: public GLAnimationWidget
 	// as the user is doing single-stepping of the simulation.
 	using BeforePaintCallback = std::function<void (std::optional<si::Time> frame_duration)>;
 	using HoveredBodyCallback = std::function<void (rigid_body::Body const*)>;
+	using ClickedBodyCallback = std::function<void (rigid_body::Body const*)>;
 
 	using FPSMode = GLAnimationWidget::FPSMode;
 	using GroupRenderingConfig = RigidBodyPainter::GroupRenderingConfig;
@@ -347,6 +348,14 @@ class RigidBodyViewer: public GLAnimationWidget
 		{ _hovered_body_callback = std::move (callback); }
 
 	/**
+	 * Set callback called when a body gets focused by clicking on the OpenGL canvas.
+	 * Can be nullptr to unset.
+	 */
+	void
+	set_clicked_body_callback (ClickedBodyCallback callback)
+		{ _clicked_body_callback = std::move (callback); }
+
+	/**
 	 * Return playback mode.
 	 */
 	[[nodiscard]]
@@ -443,6 +452,9 @@ class RigidBodyViewer: public GLAnimationWidget
 	void
 	update_hovered_body_from_cursor (std::optional<QPoint>);
 
+	void
+	focus_body_from_cursor (QPoint const&);
+
 	/**
 	 * Display popup menu. Return true if user selected any action from the menu.
 	 */
@@ -478,7 +490,7 @@ class RigidBodyViewer: public GLAnimationWidget
 	QPoint						_last_pos;
 	bool						_changing_rotation: 1			{ false };
 	bool						_changing_translation: 1		{ false };
-	// Right-click and move causes rotation of the view, right-click without moving opens a popup menu:
+	// Tracks drag vs click for rotation/translation button actions:
 	bool						_mouse_moved_since_press: 1		{ true };
 	// Prevents menu reappearing immediately when trying to close it with a right click:
 	bool						_prevent_menu_reappear: 1		{ false };
@@ -487,8 +499,9 @@ class RigidBodyViewer: public GLAnimationWidget
 	// Camera position relative to the followed body:
 	SpaceLength<WorldSpace>		_camera_translation				{ kDefaultCameraTranslation };
 	SpaceVector<si::Angle>		_camera_rotation				{ kDefaultCameraRotation };
-	HoveredBodyCallback			_hovered_body_callback;
 	rigid_body::Body const*		_hovered_body_from_cursor		{ nullptr };
+	HoveredBodyCallback			_hovered_body_callback;
+	ClickedBodyCallback			_clicked_body_callback;
 	// Self-deletes after a while and becomes a dangling pointer:
 	QTimer*						_painter_ready_check_timer		{ new QTimer (this) };
 };

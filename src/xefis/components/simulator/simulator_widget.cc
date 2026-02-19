@@ -384,6 +384,10 @@ SimulatorWidget::make_body_controls()
 		_items_tree->set_hovered_body (body);
 	});
 
+	_rigid_body_viewer->set_clicked_body_callback ([this] (rigid_body::Body const* body) {
+		_items_tree->set_current_body (body);
+	});
+
 	QObject::connect (&*_items_tree, &QTreeWidget::itemChanged, [this] (QTreeWidgetItem* item, int column) {
 		if (column == 0)
 		{

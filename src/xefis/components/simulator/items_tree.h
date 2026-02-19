@@ -58,6 +58,13 @@ class ItemsTree: public QTreeWidget
 	void
 	set_hovered_body (rigid_body::Body const*);
 
+	/**
+	 * Set current item to the first tree item referring to the given body.
+	 * Pass nullptr to do nothing.
+	 */
+	void
+	set_current_body (rigid_body::Body const*);
+
   protected:
 	/**
 	 * Remove items for deleted bodies.

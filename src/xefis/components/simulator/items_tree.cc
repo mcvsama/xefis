@@ -134,6 +134,62 @@ ItemsTree::set_hovered_body (rigid_body::Body const* body)
 
 
 void
+ItemsTree::set_current_body (rigid_body::Body const* body)
+{
+	if (!body)
+		return;
+
+	QTreeWidgetItem* top_level_body_item = nullptr;
+	QTreeWidgetItem* group_item = nullptr;
+	QTreeWidgetItem* constraint_item = nullptr;
+	QTreeWidgetItem* fallback_body_item = nullptr;
+
+	for (QTreeWidgetItemIterator item (this); *item; ++item)
+	{
+		if (auto* body_item = dynamic_cast<BodyItem*> (*item))
+		{
+			if (&body_item->body() == body)
+			{
+				auto* parent = body_item->parent();
+
+				if (!parent)
+				{
+					top_level_body_item = body_item;
+					break;
+				}
+				else if (dynamic_cast<GroupItem*> (parent))
+				{
+					if (!group_item)
+						group_item = body_item;
+				}
+				else if (dynamic_cast<ConstraintItem*> (parent))
+				{
+					if (!constraint_item)
+						constraint_item = body_item;
+				}
+				else if (!fallback_body_item)
+					fallback_body_item = body_item;
+			}
+		}
+	}
+
+	auto* item_to_focus = top_level_body_item
+		? top_level_body_item
+		: group_item
+			? group_item
+			: constraint_item
+				? constraint_item
+				: fallback_body_item;
+
+	if (item_to_focus)
+	{
+		setCurrentItem (item_to_focus);
+		scrollToItem (item_to_focus);
+	}
+}
+
+
+void
 ItemsTree::remove_deleted (std::set<rigid_body::Group*>& existing_groups,
 						   std::set<GroupItem*>& group_items_to_update,
 						   std::set<rigid_body::Body*>& existing_bodies,

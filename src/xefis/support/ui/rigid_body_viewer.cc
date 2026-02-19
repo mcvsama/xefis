@@ -130,7 +130,7 @@ RigidBodyViewer::mousePressEvent (QMouseEvent* event)
 			break;
 	}
 
-	if (event->button() == Qt::RightButton)
+	if (event->button() == kRotationButton || event->button() == kTranslationButton)
 		_mouse_moved_since_press = false;
 
 	_prevent_menu_reappear = false;
@@ -156,6 +156,9 @@ RigidBodyViewer::mouseReleaseEvent (QMouseEvent* event)
 		default:
 			break;
 	}
+
+	if (event->button() == kTranslationButton && !_mouse_moved_since_press)
+		focus_body_from_cursor (event->pos());
 
 	if (event->button() == Qt::RightButton)
 		if (!_prevent_menu_reappear)
@@ -318,6 +321,27 @@ RigidBodyViewer::update_hovered_body_from_cursor (std::optional<QPoint> const cu
 	}
 
 	update();
+}
+
+
+void
+RigidBodyViewer::focus_body_from_cursor (QPoint const& cursor_position)
+{
+	if (_rigid_body_system)
+	{
+		if (rect().contains (cursor_position))
+		{
+			if (auto const* body = _rigid_body_painter.body_under_cursor (*_rigid_body_system, cursor_position, size()))
+			{
+				_rigid_body_painter.set_focused (*body);
+
+				if (_clicked_body_callback)
+					_clicked_body_callback (body);
+
+				update();
+			}
+		}
+	}
 }
 
 
