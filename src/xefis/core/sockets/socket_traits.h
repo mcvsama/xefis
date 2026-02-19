@@ -560,7 +560,7 @@ template<>
 		static constexpr bool
 		has_constant_blob_size()
 		{
-			return true;
+			return false;
 		}
 
 		static size_t
