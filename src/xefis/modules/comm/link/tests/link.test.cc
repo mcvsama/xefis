@@ -18,6 +18,7 @@
 #include <xefis/core/module.h>
 #include <xefis/modules/comm/link/link_decoder.h>
 #include <xefis/modules/comm/link/link_encoder.h>
+#include <xefis/modules/comm/link/helpers.h>
 #include <xefis/modules/comm/link/link_protocol.h>
 #include <xefis/modules/comm/xle_secure_channel.h>
 #include <xefis/test/test_processing_loop.h>
@@ -274,6 +275,34 @@ using Ground_Tx_Data = GroundToAirData<ModuleIn>;
 using Ground_Rx_Data = AirToGroundData<ModuleOut>;
 using Air_Tx_Data = AirToGroundData<ModuleIn>;
 using Air_Rx_Data = GroundToAirData<ModuleOut>;
+
+
+template<template<class> class SocketType>
+	class HelperTestIO: public Module
+	{
+	  public:
+		SocketType<bool>		bool_prop	{ this, "bool_prop" };
+		SocketType<int64_t>		int_prop	{ this, "int_prop" };
+		SocketType<float>		float_prop	{ this, "float_prop" };
+
+	  public:
+		// Ctor
+		using Module::Module;
+
+		void
+		fetch_all (Cycle const& cycle)
+		{
+			std::initializer_list<BasicSocket*> const sockets = {
+				&bool_prop,
+				&int_prop,
+				&float_prop,
+			};
+
+			for (auto* socket: sockets)
+				socket->fetch (cycle);
+		}
+	};
+
 
 auto constinit crypto_params = xle::SecureChannel::CryptoParams {
 	.master_signature_key		= { 0x00, 0x01, 0x02, 0x03 },
@@ -689,6 +718,93 @@ nu::AutoTest t6 ("modules/io/link: protocol: encrypted channel works", []{
 	ground_tx_data.string_prop << "abc123";
 	loop.next_cycles (1);
 	test_asserts::verify ("data transmitted properly", ground_tx_data.string_prop == air_rx_data.string_prop);
+});
+
+
+nu::AutoTest t7 ("modules/io/link/helpers: inputs->outputs, single module", []{
+	TestProcessingLoop loop (0.1_s);
+	HelperTestIO<ModuleIn> tx (loop);
+	HelperTestIO<ModuleOut> rx (loop);
+	auto tx_protocol = make_link_protocol_from_inputs (tx, "helper single", { 0x71, 0x01 });
+	auto rx_protocol = make_link_protocol_from_outputs (rx, "helper single", { 0x71, 0x01 });
+	TestCycle cycle;
+
+	tx.bool_prop << true;
+	tx.int_prop << -123456789LL;
+	tx.float_prop << 1234.5f;
+	tx.fetch_all (cycle += 1_s);
+	transmit (*tx_protocol, *rx_protocol);
+
+	test_asserts::verify ("sender input bool transmitted to receiver output", tx.bool_prop == rx.bool_prop);
+	test_asserts::verify ("sender input int transmitted to receiver output", tx.int_prop == rx.int_prop);
+	test_asserts::verify ("sender input float transmitted to receiver output", tx.float_prop == rx.float_prop);
+
+	rx.bool_prop = false;
+	rx.int_prop = 7LL;
+	rx.float_prop = -9.75f;
+
+	tx.bool_prop << xf::no_data_source;
+	tx.int_prop << xf::no_data_source;
+	tx.float_prop << xf::no_data_source;
+	tx.fetch_all (cycle += 1_s);
+	transmit (*tx_protocol, *rx_protocol);
+
+	test_asserts::verify ("bool nil transmitted to output nil", !rx.bool_prop);
+	test_asserts::verify ("int nil transmitted to output nil", !rx.int_prop);
+	test_asserts::verify ("float nil transmitted to output nil", !rx.float_prop);
+});
+
+
+nu::AutoTest t8 ("modules/io/link/helpers: inputs->outputs, vector modules", []{
+	TestProcessingLoop loop (0.1_s);
+	HelperTestIO<ModuleIn> tx1 (loop, "tx1");
+	HelperTestIO<ModuleIn> tx2 (loop, "tx2");
+	HelperTestIO<ModuleOut> rx1 (loop, "rx1");
+	HelperTestIO<ModuleOut> rx2 (loop, "rx2");
+	auto tx_protocol = make_link_protocol_from_inputs ({ &tx1, &tx2 }, "helper vector", { 0x72, 0x01 });
+	auto rx_protocol = make_link_protocol_from_outputs ({ &rx1, &rx2 }, "helper vector", { 0x72, 0x01 });
+	TestCycle cycle;
+
+	tx1.bool_prop << true;
+	tx1.int_prop << 111LL;
+	tx1.float_prop << 11.25f;
+	tx2.bool_prop << false;
+	tx2.int_prop << -222LL;
+	tx2.float_prop << -22.5f;
+	tx1.fetch_all (cycle += 1_s);
+	tx2.fetch_all (cycle);
+	transmit (*tx_protocol, *rx_protocol);
+
+	test_asserts::verify ("vector module 1 bool transmitted", tx1.bool_prop == rx1.bool_prop);
+	test_asserts::verify ("vector module 1 int transmitted", tx1.int_prop == rx1.int_prop);
+	test_asserts::verify ("vector module 1 float transmitted", tx1.float_prop == rx1.float_prop);
+	test_asserts::verify ("vector module 2 bool transmitted", tx2.bool_prop == rx2.bool_prop);
+	test_asserts::verify ("vector module 2 int transmitted", tx2.int_prop == rx2.int_prop);
+	test_asserts::verify ("vector module 2 float transmitted", tx2.float_prop == rx2.float_prop);
+
+	rx1.bool_prop = true;
+	rx1.int_prop = 1LL;
+	rx1.float_prop = 1.0f;
+	rx2.bool_prop = true;
+	rx2.int_prop = 2LL;
+	rx2.float_prop = 2.0f;
+
+	tx1.bool_prop << xf::no_data_source;
+	tx1.int_prop << xf::no_data_source;
+	tx1.float_prop << xf::no_data_source;
+	tx2.bool_prop << xf::no_data_source;
+	tx2.int_prop << xf::no_data_source;
+	tx2.float_prop << xf::no_data_source;
+	tx1.fetch_all (cycle += 1_s);
+	tx2.fetch_all (cycle);
+	transmit (*tx_protocol, *rx_protocol);
+
+	test_asserts::verify ("vector module 1 bool nil", !rx1.bool_prop);
+	test_asserts::verify ("vector module 1 int nil", !rx1.int_prop);
+	test_asserts::verify ("vector module 1 float nil", !rx1.float_prop);
+	test_asserts::verify ("vector module 2 bool nil", !rx2.bool_prop);
+	test_asserts::verify ("vector module 2 int nil", !rx2.int_prop);
+	test_asserts::verify ("vector module 2 float nil", !rx2.float_prop);
 });
 
 } // namespace
