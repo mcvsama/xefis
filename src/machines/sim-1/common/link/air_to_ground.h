@@ -59,7 +59,7 @@ class AirToGroundProtocol: public LinkProtocol
 							.signature_bytes	= 4,
 							.key				= neutrino::to_blob ("air-to-ground-handshake"),
 							.packets			= {
-								socket<256> (data.encryption_handshake_response, { .retained = false }),
+								socket<256> (data.encryption_handshake_response, { .retained = false, .transfer = StringTransfer::Segmented }),
 							},
 						}),
 					},

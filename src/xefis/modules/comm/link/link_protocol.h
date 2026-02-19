@@ -93,6 +93,20 @@ class LinkProtocol
 	};
 
 	/**
+	 * Mode of sending strings in envelopes.
+	 */
+	enum class StringTransfer {
+		// Truncated means the string will be truncated if it doesn't fit
+		// the configured socket size.
+		Truncated,
+
+		// Segmented means that not-fitting string will be transfered over
+		// multiple envelopes, so it'll take longer to deliver the whole string
+		// (unless it fits in one envelope).
+		Segmented,
+	};
+
+	/**
 	 * An packet of data.
 	 */
 	class Packet
@@ -220,6 +234,7 @@ class LinkProtocol
 			{
 				// True if module input should retain its last value when link is down or corrupted.
 				bool					retained	{ false };
+
 				// Value that should be used for nil-values, because integers don't have any special values
 				// that could be used as nil.
 				// Note this value_if_nil is only used on transmitting side only, if module socket is nil.
@@ -233,6 +248,7 @@ class LinkProtocol
 			{
 				// True if module input should retain its last value when link is down or corrupted.
 				bool					retained	{ false };
+
 				// If used, set to value where most precision is needed. Useful for 2-byte floats.
 				std::optional<Value>	offset		{ };
 			};
@@ -244,14 +260,25 @@ class LinkProtocol
 			{
 				// True if module input should retain its last value when link is down or corrupted.
 				bool					retained	{ false };
-				bool					truncate	{ false };
+
+				// Clipped means the string will be truncated to fit in the configured size.
+				// Not clipped means that if the string doesn't fit, it will require
+				// multiple envelope transmissions to be transmitted completely.
+				StringTransfer			transfer;
 			};
 
 			static constexpr uint16_t kBytes { pBytes };
 
+			// Truncated strings meta carry string length only:
 			static uint16_t constexpr kTruncatedStringMetaSize = 2;
-			static uint16_t constexpr kUntruncatedStringMetaSize = 6;
+
+			// Segmented strings carry additionally serial number, size and block number:
+			static uint16_t constexpr kSegmentedStringMetaSize = 6;
+
+			// Special value used as size to indicate xf::nil:
 			static uint16_t constexpr kNilStringSize = 0xffff;
+
+			// Actual maximum string size (except special values):
 			static uint16_t constexpr kMaxStringSize = kNilStringSize - 1;
 
 			static_assert ((std::integral<Value> && (kBytes == 1 || kBytes == 2 || kBytes == 4 || kBytes == 8)) ||
@@ -374,7 +401,7 @@ class LinkProtocol
 			bool							_retained;
 			std::optional<Value>			_offset;
 			std::function<void (Blob&)>		_produce;
-			bool							_truncated_string	{ true };
+			StringTransfer					_transfer			{ StringTransfer::Segmented };
 			std::function<Blob::const_iterator (Blob::const_iterator, Blob::const_iterator)>
 											_consume;
 			size_t							_cycle_number		{ 0 };
@@ -832,7 +859,7 @@ template<uint16_t B, class V>
 		_socket (socket),
 		_assignable_socket (assignable_socket),
 		_retained (params.retained),
-		_truncated_string (params.truncate)
+		_transfer (params.transfer)
 	{
 		_produce = [this] (Blob& blob) {
 			// Only needed to see if the value changed, so modulo 16-bit is good enough:
@@ -852,10 +879,10 @@ template<uint16_t B, class V>
 	{
 		if constexpr (std::is_same_v<Value, std::string>)
 		{
-			if (_truncated_string)
+			if (_transfer == StringTransfer::Truncated)
 				return kTruncatedStringMetaSize + kBytes;
 			else
-				return kUntruncatedStringMetaSize + kBytes;
+				return kSegmentedStringMetaSize + kBytes;
 		}
 		else
 			return kBytes;
@@ -910,97 +937,103 @@ template<uint16_t B, class V>
 			{
 				auto const append_pos = blob.size();
 
-				if (_truncated_string)
+				switch (_transfer)
 				{
-					auto constexpr kMetaB = kTruncatedStringMetaSize;
-					auto constexpr kBufferB = kBytes;
-
-					blob.resize (blob.size() + kMetaB + kBufferB);
-
-					if (src)
+					case StringTransfer::Truncated:
 					{
-						auto& string = *src;
-						// Strings longer than kBufferB will be truncated:
-						uint16_t const size = std::min<size_t> (kBufferB, string.size());
-						uint16_t const le_size = size;
-						nu::perhaps_native_to_little_inplace (le_size);
+						auto constexpr kMetaB = kTruncatedStringMetaSize;
+						auto constexpr kBufferB = kBytes;
 
-						auto append_iterator = blob.begin() + nu::to_signed (append_pos);
-						append_iterator = nu::copy_value_to_memory (le_size, append_iterator);
-						append_iterator = std::copy (string.begin(), string.begin() + size, append_iterator);
-						std::fill (append_iterator, blob.end(), 0);
-					}
-					else
-					{
-						uint16_t const le_nil = kNilStringSize;
-						nu::perhaps_native_to_little_inplace (le_nil);
+						blob.resize (blob.size() + kMetaB + kBufferB);
 
-						auto const append_iterator = nu::copy_value_to_memory (le_nil, blob.begin() + nu::to_signed (append_pos));
-						std::fill (append_iterator, blob.end(), 0);
-					}
-				}
-				else
-				{
-					auto constexpr kMetaB = kUntruncatedStringMetaSize;
-					auto constexpr kBufferB = kBytes;
+						if (src)
+						{
+							auto& string = *src;
+							// Strings longer than kBufferB will be truncated:
+							uint16_t const size = std::min<size_t> (kBufferB, string.size());
+							uint16_t const le_size = size;
+							nu::perhaps_native_to_little_inplace (le_size);
 
-					blob.resize (blob.size() + kMetaB + kBufferB);
-
-					auto const append_meta = []<class AppendIterator>(uint16_t serial, uint16_t size, uint16_t block_number, AppendIterator append_iterator)
-						-> AppendIterator
-					{
-						nu::perhaps_native_to_little_inplace (serial);
-						nu::perhaps_native_to_little_inplace (size);
-						nu::perhaps_native_to_little_inplace (block_number);
-
-						append_iterator = nu::copy_value_to_memory (serial, append_iterator);
-						append_iterator = nu::copy_value_to_memory (size, append_iterator);
-						append_iterator = nu::copy_value_to_memory (block_number, append_iterator);
-
-						return append_iterator;
-					};
-
-					auto append_iterator = blob.begin() + nu::to_signed (append_pos);
-
-					if (src)
-					{
-						auto& string = *src;
-
-						if (string.size() > kMaxStringSize)
-							throw nu::Exception (std::format ("LinkProtocol: can't encode string longer than {} bytes", kMaxStringSize));
-
-						if (string.empty())
-							append_iterator = append_meta (_current_serial, string.size(), 0, append_iterator);
+							auto append_iterator = blob.begin() + nu::to_signed (append_pos);
+							append_iterator = nu::copy_value_to_memory (le_size, append_iterator);
+							append_iterator = std::copy (string.begin(), string.begin() + size, append_iterator);
+							std::fill (append_iterator, blob.end(), 0);
+						}
 						else
 						{
-							uint16_t const block_size = kBufferB;
-							// num_blocks will be at least 1:
-							auto const num_blocks = (string.size() - 1u) / block_size + 1u;
+							uint16_t const le_nil = kNilStringSize;
+							nu::perhaps_native_to_little_inplace (le_nil);
 
-							uint16_t const block_number = _cycle_number % num_blocks;
-							append_iterator = append_meta (_current_serial, string.size(), block_number, append_iterator);
-
-							auto bytes_to_copy = (block_number < num_blocks - 1)
-								? block_size
-								: string.size() % block_size;
-
-							if (bytes_to_copy == 0)
-								bytes_to_copy = block_size;
-
-							auto const copy_begin = string.begin() + block_number * block_size;
-							auto const copy_end = copy_begin + nu::to_signed (bytes_to_copy);
-							append_iterator = std::copy (copy_begin, copy_end, append_iterator);
+							auto const append_iterator = nu::copy_value_to_memory (le_nil, blob.begin() + nu::to_signed (append_pos));
+							std::fill (append_iterator, blob.end(), 0);
 						}
-
-						// Fill the rest (or maybe the whole) buffer with zeros:
-						std::fill (append_iterator, blob.end(), 0);
-
-						++_cycle_number;
+						break;
 					}
-					else
+
+					case StringTransfer::Segmented:
 					{
-						append_iterator = append_meta (_current_serial, kNilStringSize, 0, append_iterator);
-						std::fill (append_iterator, blob.end(), 0);
+						auto constexpr kMetaB = kSegmentedStringMetaSize;
+						auto constexpr kBufferB = kBytes;
+
+						blob.resize (blob.size() + kMetaB + kBufferB);
+
+						auto const append_meta = []<class AppendIterator>(uint16_t serial, uint16_t size, uint16_t block_number, AppendIterator append_iterator)
+							-> AppendIterator
+						{
+							nu::perhaps_native_to_little_inplace (serial);
+							nu::perhaps_native_to_little_inplace (size);
+							nu::perhaps_native_to_little_inplace (block_number);
+
+							append_iterator = nu::copy_value_to_memory (serial, append_iterator);
+							append_iterator = nu::copy_value_to_memory (size, append_iterator);
+							append_iterator = nu::copy_value_to_memory (block_number, append_iterator);
+
+							return append_iterator;
+						};
+
+						auto append_iterator = blob.begin() + nu::to_signed (append_pos);
+
+						if (src)
+						{
+							auto& string = *src;
+
+							if (string.size() > kMaxStringSize)
+								throw nu::Exception (std::format ("LinkProtocol: can't encode string longer than {} bytes", kMaxStringSize));
+
+							if (string.empty())
+								append_iterator = append_meta (_current_serial, string.size(), 0, append_iterator);
+							else
+							{
+								uint16_t const block_size = kBufferB;
+								// num_blocks will be at least 1:
+								auto const num_blocks = (string.size() - 1u) / block_size + 1u;
+
+								uint16_t const block_number = _cycle_number % num_blocks;
+								append_iterator = append_meta (_current_serial, string.size(), block_number, append_iterator);
+
+								auto bytes_to_copy = (block_number < num_blocks - 1)
+									? block_size
+									: string.size() % block_size;
+
+								if (bytes_to_copy == 0)
+									bytes_to_copy = block_size;
+
+								auto const copy_begin = string.begin() + block_number * block_size;
+								auto const copy_end = copy_begin + nu::to_signed (bytes_to_copy);
+								append_iterator = std::copy (copy_begin, copy_end, append_iterator);
+							}
+
+							// Fill the rest (or maybe the whole) buffer with zeros:
+							std::fill (append_iterator, blob.end(), 0);
+
+							++_cycle_number;
+						}
+						else
+						{
+							append_iterator = append_meta (_current_serial, kNilStringSize, 0, append_iterator);
+							std::fill (append_iterator, blob.end(), 0);
+						}
+						break;
 					}
 				}
 			}
@@ -1023,7 +1056,7 @@ template<uint16_t B, class V>
 		{
 			if constexpr (std::is_same_v<Value, std::string>)
 			{
-				if (_truncated_string)
+				if (_transfer == StringTransfer::Truncated)
 				{
 					auto constexpr kMetaB = kTruncatedStringMetaSize;
 					auto constexpr kBufferB = kBytes;
@@ -1052,7 +1085,7 @@ template<uint16_t B, class V>
 				}
 				else
 				{
-					auto constexpr kMetaB = kUntruncatedStringMetaSize;
+					auto constexpr kMetaB = kSegmentedStringMetaSize;
 					auto constexpr kBufferB = kBytes;
 					auto const block_size = kBufferB;
 

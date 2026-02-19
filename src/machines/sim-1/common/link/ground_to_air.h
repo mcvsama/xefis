@@ -68,7 +68,7 @@ class GroundToAirProtocol: public LinkProtocol
 							.signature_bytes	= 4,
 							.key				= neutrino::to_blob ("ground-to-air-handshake"),
 							.packets			= {
-								socket<256> (data.encryption_handshake_request, { .retained = false }),
+								socket<256> (data.encryption_handshake_request, { .retained = false, .transfer = StringTransfer::Segmented }),
 							},
 						}),
 					},
