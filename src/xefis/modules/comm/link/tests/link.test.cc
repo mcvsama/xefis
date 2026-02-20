@@ -277,35 +277,6 @@ using Air_Tx_Data = AirToGroundData<ModuleIn>;
 using Air_Rx_Data = GroundToAirData<ModuleOut>;
 
 
-template<template<class> class SocketType>
-	class HelperTestIO: public Module
-	{
-	  public:
-		SocketType<bool>		bool_prop	{ this, "bool_prop" };
-		SocketType<int64_t>		int_prop	{ this, "int_prop" };
-		SocketType<float>		float_prop	{ this, "float_prop" };
-		SocketType<std::string>	string_prop	{ this, "string_prop" };
-
-	  public:
-		// Ctor
-		using Module::Module;
-
-		void
-		fetch_all (Cycle const& cycle)
-		{
-			std::initializer_list<BasicSocket*> const sockets = {
-				&bool_prop,
-				&int_prop,
-				&float_prop,
-				&string_prop,
-			};
-
-			for (auto* socket: sockets)
-				socket->fetch (cycle);
-		}
-	};
-
-
 auto constinit crypto_params = xle::SecureChannel::CryptoParams {
 	.master_signature_key		= { 0x00, 0x01, 0x02, 0x03 },
 	.slave_signature_key		= { 0x0c, 0x0d, 0x0e, 0x0f },
@@ -725,60 +696,60 @@ nu::AutoTest t6 ("modules/io/link: protocol: encrypted channel works", []{
 
 nu::AutoTest t7 ("modules/io/link/helpers: inputs->outputs, single module", []{
 	TestProcessingLoop loop (0.1_s);
-	HelperTestIO<ModuleIn> tx (loop);
-	HelperTestIO<ModuleOut> rx (loop);
+	GroundToAirData<ModuleIn> tx (loop);
+	GroundToAirData<ModuleOut> rx (loop);
 	auto tx_protocol = make_link_protocol_from_inputs (tx, "helper single", { 0x71, 0x01 });
 	auto rx_protocol = make_link_protocol_from_outputs (rx, "helper single", { 0x71, 0x01 });
 	TestCycle cycle;
 
 	tx.bool_prop << true;
 	tx.int_prop << -123456789LL;
-	tx.float_prop << 1234.5f;
+	tx.velocity_prop << 1234.5_kph;
 	tx.string_prop << "single string";
 	tx.fetch_all (cycle += 1_s);
 	transmit (*tx_protocol, *rx_protocol);
 
 	test_asserts::verify ("sender input bool transmitted to receiver output", tx.bool_prop == rx.bool_prop);
 	test_asserts::verify ("sender input int transmitted to receiver output", tx.int_prop == rx.int_prop);
-	test_asserts::verify ("sender input float transmitted to receiver output", tx.float_prop == rx.float_prop);
+	test_asserts::verify ("sender input velocity transmitted to receiver output", tx.velocity_prop == rx.velocity_prop);
 	test_asserts::verify ("sender input string transmitted to receiver output", tx.string_prop == rx.string_prop);
 
 	rx.bool_prop = false;
 	rx.int_prop = 7LL;
-	rx.float_prop = -9.75f;
+	rx.velocity_prop = -9.75_kph;
 	rx.string_prop = "fallback";
 
 	tx.bool_prop << xf::no_data_source;
 	tx.int_prop << xf::no_data_source;
-	tx.float_prop << xf::no_data_source;
+	tx.velocity_prop << xf::no_data_source;
 	tx.string_prop << xf::no_data_source;
 	tx.fetch_all (cycle += 1_s);
 	transmit (*tx_protocol, *rx_protocol);
 
 	test_asserts::verify ("bool nil transmitted to output nil", !rx.bool_prop);
 	test_asserts::verify ("int nil transmitted to output nil", !rx.int_prop);
-	test_asserts::verify ("float nil transmitted to output nil", !rx.float_prop);
+	test_asserts::verify ("velocity nil transmitted to output nil", !rx.velocity_prop);
 	test_asserts::verify ("string nil transmitted to output nil", !rx.string_prop);
 });
 
 
 nu::AutoTest t8 ("modules/io/link/helpers: inputs->outputs, vector modules", []{
 	TestProcessingLoop loop (0.1_s);
-	HelperTestIO<ModuleIn> tx1 (loop, "tx1");
-	HelperTestIO<ModuleIn> tx2 (loop, "tx2");
-	HelperTestIO<ModuleOut> rx1 (loop, "rx1");
-	HelperTestIO<ModuleOut> rx2 (loop, "rx2");
+	GroundToAirData<ModuleIn> tx1 (loop, "tx1");
+	GroundToAirData<ModuleIn> tx2 (loop, "tx2");
+	GroundToAirData<ModuleOut> rx1 (loop, "rx1");
+	GroundToAirData<ModuleOut> rx2 (loop, "rx2");
 	auto tx_protocol = make_link_protocol_from_inputs ({ &tx1, &tx2 }, "helper vector", { 0x72, 0x01 });
 	auto rx_protocol = make_link_protocol_from_outputs ({ &rx1, &rx2 }, "helper vector", { 0x72, 0x01 });
 	TestCycle cycle;
 
 	tx1.bool_prop << true;
 	tx1.int_prop << 111LL;
-	tx1.float_prop << 11.25f;
+	tx1.velocity_prop << 11.25_kph;
 	tx1.string_prop << "vector tx1";
 	tx2.bool_prop << false;
 	tx2.int_prop << -222LL;
-	tx2.float_prop << -22.5f;
+	tx2.velocity_prop << -22.5_kph;
 	tx2.string_prop << "vector tx2";
 	tx1.fetch_all (cycle += 1_s);
 	tx2.fetch_all (cycle);
@@ -786,29 +757,29 @@ nu::AutoTest t8 ("modules/io/link/helpers: inputs->outputs, vector modules", []{
 
 	test_asserts::verify ("vector module 1 bool transmitted", tx1.bool_prop == rx1.bool_prop);
 	test_asserts::verify ("vector module 1 int transmitted", tx1.int_prop == rx1.int_prop);
-	test_asserts::verify ("vector module 1 float transmitted", tx1.float_prop == rx1.float_prop);
+	test_asserts::verify ("vector module 1 velocity transmitted", tx1.velocity_prop == rx1.velocity_prop);
 	test_asserts::verify ("vector module 1 string transmitted", tx1.string_prop == rx1.string_prop);
 	test_asserts::verify ("vector module 2 bool transmitted", tx2.bool_prop == rx2.bool_prop);
 	test_asserts::verify ("vector module 2 int transmitted", tx2.int_prop == rx2.int_prop);
-	test_asserts::verify ("vector module 2 float transmitted", tx2.float_prop == rx2.float_prop);
+	test_asserts::verify ("vector module 2 velocity transmitted", tx2.velocity_prop == rx2.velocity_prop);
 	test_asserts::verify ("vector module 2 string transmitted", tx2.string_prop == rx2.string_prop);
 
 	rx1.bool_prop = true;
 	rx1.int_prop = 1LL;
-	rx1.float_prop = 1.0f;
+	rx1.velocity_prop = 1.0_kph;
 	rx1.string_prop = "fallback 1";
 	rx2.bool_prop = true;
 	rx2.int_prop = 2LL;
-	rx2.float_prop = 2.0f;
+	rx2.velocity_prop = 2.0_kph;
 	rx2.string_prop = "fallback 2";
 
 	tx1.bool_prop << xf::no_data_source;
 	tx1.int_prop << xf::no_data_source;
-	tx1.float_prop << xf::no_data_source;
+	tx1.velocity_prop << xf::no_data_source;
 	tx1.string_prop << xf::no_data_source;
 	tx2.bool_prop << xf::no_data_source;
 	tx2.int_prop << xf::no_data_source;
-	tx2.float_prop << xf::no_data_source;
+	tx2.velocity_prop << xf::no_data_source;
 	tx2.string_prop << xf::no_data_source;
 	tx1.fetch_all (cycle += 1_s);
 	tx2.fetch_all (cycle);
@@ -816,11 +787,11 @@ nu::AutoTest t8 ("modules/io/link/helpers: inputs->outputs, vector modules", []{
 
 	test_asserts::verify ("vector module 1 bool nil", !rx1.bool_prop);
 	test_asserts::verify ("vector module 1 int nil", !rx1.int_prop);
-	test_asserts::verify ("vector module 1 float nil", !rx1.float_prop);
+	test_asserts::verify ("vector module 1 velocity nil", !rx1.velocity_prop);
 	test_asserts::verify ("vector module 1 string nil", !rx1.string_prop);
 	test_asserts::verify ("vector module 2 bool nil", !rx2.bool_prop);
 	test_asserts::verify ("vector module 2 int nil", !rx2.int_prop);
-	test_asserts::verify ("vector module 2 float nil", !rx2.float_prop);
+	test_asserts::verify ("vector module 2 velocity nil", !rx2.velocity_prop);
 	test_asserts::verify ("vector module 2 string nil", !rx2.string_prop);
 });
 
