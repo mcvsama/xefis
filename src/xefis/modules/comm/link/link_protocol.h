@@ -185,45 +185,6 @@ class LinkProtocol
 
 	/**
 	 * Packet that refers to a particular Socket, so it can send/receive value of that module socket.
-	 * Used for local (inter-process) communication, not suited for remote links as it doesn't offer
-	 * features like 'retained' flag, value_if_nil, width reduction for arithmetic types, etc.
-	 * Always uses default Socket serialize_append/unserialize methods.
-	 */
-	class LocalSocket: public Packet
-	{
-	  public:
-		// Ctor
-		explicit
-		LocalSocket (xf::BasicSocket& socket);
-
-		// Ctor
-		explicit
-		LocalSocket (xf::BasicAssignableSocket& socket);
-
-		Blob::size_type
-		size() const override
-			{ return _socket.constant_blob_size(); }
-
-		void
-		produce_append (Blob& blob, nu::Logger const&) override
-			{ blob += _socket.to_blob(); }
-
-		Blob::const_iterator
-		consume (Blob::const_iterator const begin, Blob::const_iterator const end, nu::Logger const&) override;
-
-		void
-		apply() override;
-
-		void
-		failsafe() override;
-
-	  private:
-		xf::BasicSocket&			_socket;
-		xf::BasicAssignableSocket*	_assignable_socket { nullptr };
-	};
-
-	/**
-	 * Packet that refers to a particular Socket, so it can send/receive value of that module socket.
 	 */
 	template<uint16_t pBytes, class pValue>
 		class Socket: public Packet
@@ -416,6 +377,48 @@ class LinkProtocol
 			bool							_recovered			{ false };
 			std::string						_recovered_string;
 		};
+
+	/**
+	 * Packet that refers to a particular Socket, so it can send/receive value of that module socket.
+	 * Used for local (inter-process) communication, not suited for remote links as it doesn't offer
+	 * features like 'retained' flag, value_if_nil, width reduction for arithmetic types, etc.
+	 * Always uses default Socket serialize_append/unserialize methods.
+	 */
+	class LocalSocket: public Packet
+	{
+	  public:
+		// Ctor
+		explicit
+		LocalSocket (xf::BasicSocket& socket);
+
+		// Ctor
+		explicit
+		LocalSocket (xf::BasicAssignableSocket& socket);
+
+		[[nodiscard]]
+		Blob::size_type
+		size() const override;
+
+		void
+		produce_append (Blob&, nu::Logger const&) override;
+
+		[[nodiscard]]
+		Blob::const_iterator
+		consume (Blob::const_iterator const begin, Blob::const_iterator const end, nu::Logger const&) override;
+
+		void
+		apply() override;
+
+		void
+		failsafe() override;
+
+	  private:
+		xf::BasicSocket&			_socket;
+		xf::BasicAssignableSocket*	_assignable_socket		{ nullptr };
+
+		// Special support for std::string:
+		std::shared_ptr<Socket<64, std::string>> _inner_socket_packet;
+	};
 
 	/**
 	 * An packet that contains boolean or limited-width integers.
@@ -816,14 +819,24 @@ class LinkProtocol
 inline
 LinkProtocol::LocalSocket::LocalSocket (xf::BasicSocket& socket):
 	_socket (socket)
-{ }
+{
+	if (auto* s = dynamic_cast<xf::AssignableSocket<std::string>*> (&socket))
+		_inner_socket_packet = LinkProtocol::socket<64> (*s, {}); // TODO StringParams
+	else if (auto* s = dynamic_cast<xf::Socket<std::string>*> (&socket))
+		_inner_socket_packet = LinkProtocol::socket<64> (*s, {}); // TODO StringParams
+}
 
 
 inline
 LinkProtocol::LocalSocket::LocalSocket (xf::BasicAssignableSocket& assignable_socket):
 	_socket (assignable_socket),
 	_assignable_socket (&assignable_socket)
-{ }
+{
+	if (auto* s = dynamic_cast<xf::AssignableSocket<std::string>*> (&assignable_socket))
+		_inner_socket_packet = LinkProtocol::socket<64> (*s, {}); // TODO StringParams
+	else if (auto* s = dynamic_cast<xf::Socket<std::string>*> (&assignable_socket))
+		_inner_socket_packet = LinkProtocol::socket<64> (*s, {}); // TODO StringParams
+}
 
 
 template<uint16_t B, class V>

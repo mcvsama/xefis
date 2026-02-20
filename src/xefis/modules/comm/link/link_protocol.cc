@@ -91,30 +91,60 @@ LinkProtocol::Sequence::failsafe()
 }
 
 
-Blob::const_iterator
-LinkProtocol::LocalSocket::consume (Blob::const_iterator const begin, Blob::const_iterator const end, nu::Logger const&)
+Blob::size_type
+LinkProtocol::LocalSocket::size() const
 {
-	auto socket_end = std::next (begin, nu::to_signed (size()));
-	socket_end = std::min (socket_end, end);
+	if (_inner_socket_packet)
+		return _inner_socket_packet->size();
+	else
+		return _socket.constant_blob_size();
+}
 
-	if (_assignable_socket)
-		_assignable_socket->from_blob (BlobView (begin, socket_end));
 
-	return socket_end;
+void
+LinkProtocol::LocalSocket::produce_append (Blob& blob, nu::Logger const& logger)
+{
+	if (_inner_socket_packet)
+		_inner_socket_packet->produce_append (blob, logger);
+	else
+		blob += _socket.to_blob();
+}
+
+
+Blob::const_iterator
+LinkProtocol::LocalSocket::consume (Blob::const_iterator const begin, Blob::const_iterator const end, nu::Logger const& logger)
+{
+	if (_inner_socket_packet)
+		return _inner_socket_packet->consume (begin, end, logger);
+	else
+	{
+		auto socket_end = std::next (begin, nu::to_signed (size()));
+		socket_end = std::min (socket_end, end);
+
+		if (_assignable_socket)
+			_assignable_socket->from_blob (BlobView (begin, socket_end));
+
+		return socket_end;
+	}
 }
 
 
 void
 LinkProtocol::LocalSocket::apply()
 {
-	// Value was already applied in LocalSocket::consume().
+	if (_inner_socket_packet)
+		_inner_socket_packet->apply();
+	// For non-string sockets value is already applied in LocalSocket::consume().
 }
 
 
 void
 LinkProtocol::LocalSocket::failsafe()
 {
-	*_assignable_socket = xf::nil;
+	if (_inner_socket_packet)
+		_inner_socket_packet->failsafe();
+	else if (_assignable_socket)
+		*_assignable_socket = xf::nil;
 }
 
 
