@@ -119,6 +119,7 @@ class LinkProtocol
 		/**
 		 * Return size of the data which will be produced/consumed.
 		 */
+		[[nodiscard]]
 		virtual Blob::size_type
 		size() const = 0;
 
@@ -132,6 +133,7 @@ class LinkProtocol
 		 * Parse data and set temporary variables.
 		 * Data will be output when apply() is called.
 		 */
+		[[nodiscard]]
 		virtual Blob::const_iterator
 		consume (Blob::const_iterator, Blob::const_iterator, nu::Logger const&) = 0;
 
@@ -160,12 +162,14 @@ class LinkProtocol
 		explicit
 		Sequence (PacketList);
 
+		[[nodiscard]]
 		Blob::size_type
 		size() const override;
 
 		void
 		produce_append (Blob&, nu::Logger const&) override;
 
+		[[nodiscard]]
 		Blob::const_iterator
 		consume (Blob::const_iterator, Blob::const_iterator, nu::Logger const&) override;
 
@@ -359,6 +363,7 @@ class LinkProtocol
 				Socket (assignable_socket, &assignable_socket, std::move (params))
 			{ }
 
+			[[nodiscard]]
 			Blob::size_type
 			size() const override;
 
@@ -366,6 +371,7 @@ class LinkProtocol
 			produce_append (Blob& blob, nu::Logger const&) override
 				{ _produce (blob); }
 
+			[[nodiscard]]
 			Blob::const_iterator
 			consume (Blob::const_iterator const begin, Blob::const_iterator const end, nu::Logger const&) override
 				{ return _consume (begin, end); }
@@ -455,12 +461,14 @@ class LinkProtocol
 		explicit
 		Bitfield (std::initializer_list<SourceVariant>);
 
+		[[nodiscard]]
 		Blob::size_type
 		size() const override;
 
 		void
 		produce_append (Blob&, nu::Logger const&) override;
 
+		[[nodiscard]]
 		Blob::const_iterator
 		consume (Blob::const_iterator, Blob::const_iterator, nu::Logger const&) override;
 
@@ -498,16 +506,19 @@ class LinkProtocol
 		explicit
 		Signature (Params&&);
 
+		[[nodiscard]]
 		std::string const&
 		name() const noexcept
 			{ return _name; }
 
+		[[nodiscard]]
 		Blob::size_type
 		size() const override;
 
 		void
 		produce_append (Blob&, nu::Logger const&) override;
 
+		[[nodiscard]]
 		Blob::const_iterator
 		consume (Blob::const_iterator, Blob::const_iterator, nu::Logger const&) override;
 
@@ -553,19 +564,23 @@ class LinkProtocol
 		explicit
 		Envelope (Params&&);
 
+		[[nodiscard]]
 		std::string const&
 		name() const noexcept
 			{ return _name; }
 
+		[[nodiscard]]
 		Blob const&
 		unique_prefix() const;
 
+		[[nodiscard]]
 		Blob::size_type
 		size() const override;
 
 		void
 		produce_append (Blob& blob, nu::Logger const&) override;
 
+		[[nodiscard]]
 		Blob::const_iterator
 		consume (Blob::const_iterator, Blob::const_iterator, nu::Logger const&) override;
 
@@ -586,12 +601,14 @@ class LinkProtocol
 	explicit
 	LinkProtocol (EnvelopeList);
 
+	[[nodiscard]]
 	Blob::size_type
 	size() const;
 
 	void
 	produce_append (Blob&, nu::Logger const&);
 
+	[[nodiscard]]
 	ConsumeResult
 	consume (Blob::const_iterator begin, Blob::const_iterator end, nu::Logger const&);
 
@@ -602,12 +619,14 @@ class LinkProtocol
 	 * Protocol building functions.
 	 */
 
+	[[nodiscard]]
 	static auto
 	local_socket (xf::BasicSocket& socket)
 	{
 		return std::make_shared<LocalSocket> (socket);
 	}
 
+	[[nodiscard]]
 	static auto
 	local_socket (xf::BasicAssignableSocket& assignable_socket)
 	{
@@ -615,6 +634,7 @@ class LinkProtocol
 	}
 
 	template<size_t Bytes, std::integral Value>
+		[[nodiscard]]
 		static auto
 		socket (xf::Socket<Value>& socket, Socket<Bytes, Value>::IntegerParams&& params = {})
 		{
@@ -622,6 +642,7 @@ class LinkProtocol
 		}
 
 	template<size_t Bytes, std::integral Value>
+		[[nodiscard]]
 		static auto
 		socket (xf::AssignableSocket<Value>& assignable_socket, Socket<Bytes, Value>::IntegerParams&& params = {})
 		{
@@ -629,6 +650,7 @@ class LinkProtocol
 		}
 
 	template<size_t Bytes, si::FloatingPointOrQuantity Value>
+		[[nodiscard]]
 		static auto
 		socket (xf::Socket<Value>& socket, Socket<Bytes, Value>::FloatingPointParams&& params = {})
 		{
@@ -636,6 +658,7 @@ class LinkProtocol
 		}
 
 	template<size_t Bytes, si::FloatingPointOrQuantity Value>
+		[[nodiscard]]
 		static auto
 		socket (xf::AssignableSocket<Value>& assignable_socket, Socket<Bytes, Value>::FloatingPointParams&& params = {})
 		{
@@ -643,6 +666,7 @@ class LinkProtocol
 		}
 
 	template<size_t Bytes, si::FloatingPointOrQuantity Value, class Offset>
+		[[nodiscard]]
 		static auto
 		socket (xf::Socket<Value>& socket, Socket<Bytes, Value>::FloatingPointParams&& params = {})
 		{
@@ -654,6 +678,7 @@ class LinkProtocol
 		}
 
 	template<size_t Bytes, si::FloatingPointOrQuantity Value, class Offset>
+		[[nodiscard]]
 		static auto
 		socket (xf::AssignableSocket<Value>& assignable_socket, Socket<Bytes, Value>::FloatingPointParams&& params = {})
 		{
@@ -665,6 +690,7 @@ class LinkProtocol
 		}
 
 	template<size_t Bytes>
+		[[nodiscard]]
 		static auto
 		socket (xf::Socket<std::string>& socket, Socket<Bytes, std::string>::StringParams&& params = {})
 		{
@@ -672,12 +698,14 @@ class LinkProtocol
 		}
 
 	template<size_t Bytes>
+		[[nodiscard]]
 		static auto
 		socket (xf::AssignableSocket<std::string>& assignable_socket, Socket<Bytes, std::string>::StringParams&& params = {})
 		{
 			return std::make_shared<Socket<Bytes, std::string>> (assignable_socket, std::move (params));
 		}
 
+	[[nodiscard]]
 	static auto
 	bitfield (std::initializer_list<Bitfield::SourceVariant>&& sockets)
 	{
@@ -685,6 +713,7 @@ class LinkProtocol
 	}
 
 	// FIXME The = ::make_default() is a workaround for possible bug in GCC, where = {} doesn't work.
+	[[nodiscard]]
 	static Bitfield::BitSource<bool>
 	bitfield_socket (xf::Socket<bool>& socket, Bitfield::BoolParams&& params = Bitfield::BoolParams::make_default())
 	{
@@ -698,6 +727,7 @@ class LinkProtocol
 		};
 	}
 
+	[[nodiscard]]
 	static Bitfield::BitSource<bool>
 	bitfield_socket (xf::AssignableSocket<bool>& assignable_socket, Bitfield::BoolParams&& params = Bitfield::BoolParams::make_default())
 	{
@@ -716,6 +746,7 @@ class LinkProtocol
 	 * fit in given number of bits.
 	 */
 	template<class Unsigned>
+		[[nodiscard]]
 		static Bitfield::BitSource<Unsigned>
 		bitfield_socket (xf::Socket<Unsigned>& socket, Bitfield::UnsignedParams<Unsigned>&& params = {})
 		{
@@ -737,6 +768,7 @@ class LinkProtocol
 	 * fit in given number of bits.
 	 */
 	template<class Unsigned>
+		[[nodiscard]]
 		static Bitfield::BitSource<Unsigned>
 		bitfield_socket (xf::AssignableSocket<Unsigned>& assignable_socket, Bitfield::UnsignedParams<Unsigned>&& params = {})
 		{
@@ -753,12 +785,14 @@ class LinkProtocol
 			};
 		}
 
+	[[nodiscard]]
 	static auto
 	signature (Signature::Params&& params)
 	{
 		return std::make_shared<Signature> (std::move (params));
 	}
 
+	[[nodiscard]]
 	static auto
 	envelope (Envelope::Params&& params)
 	{
@@ -766,6 +800,7 @@ class LinkProtocol
 	}
 
   private:
+	[[nodiscard]]
 	static constexpr bool
 	fits_in_bits (uint_least64_t value, uint8_t bits)
 		{ return value == 0 || value < nu::static_pow<uint_least64_t> (2U, bits); }
