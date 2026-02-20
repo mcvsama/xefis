@@ -16,6 +16,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/support/nature/constants.h>
 
 // Neutrino:
 #include <neutrino/numeric.h>
@@ -44,7 +45,7 @@ compute_sun_ecliptic_position (double const days_since_J2000)
 	return {
 		.longitude = L + 1.915_deg * sin (g) + 0.020_deg * sin (2 * g),
 		.latitude = 0_deg,
-		.distance_from_earth = 1.00014 - 0.01671 * cos (g) - 0.00014 * cos (2 * g),
+		.distance_from_earth = (1.00014 - 0.01671 * cos (g) - 0.00014 * cos (2 * g)) * kAstronomicalUnit,
 	};
 }
 

@@ -31,6 +31,7 @@
 #include <xefis/support/ui/paint_helper.h>
 #include <xefis/support/universe/earth/utility.h>
 #include <xefis/support/universe/julian_calendar.h>
+#include <xefis/support/universe/moon_position.h>
 
 // Neutrino:
 #include <neutrino/stdexcept.h>
@@ -46,6 +47,7 @@
 #include <GL/glu.h>
 
 // Standard:
+#include <cmath>
 #include <cstddef>
 #include <future>
 #include <limits>
@@ -223,7 +225,10 @@ RigidBodyPainter::set_planet (rigid_body::Body const* planet_body)
 		check_planet_texture_images();
 	}
 	else
+	{
 		_planet.reset();
+		_moon_shape.reset();
+	}
 
 	compute_camera_transform();
 }
@@ -451,9 +456,15 @@ RigidBodyPainter::setup_sun_light()
 		glLightfv (kGLAtmosphericSunLight, GL_DIFFUSE, atmospheric_sun_color.scaled (0.4f));
 		glLightfv (kGLAtmosphericSunLight, GL_SPECULAR, atmospheric_sun_color.scaled (0.1f));
 
+		// When we're inside the atmosphere, the Moon light (and potentially other bodies) are too intensive when combined with SkyDome, so use darker diffuse
+		// color. When going out of atmosphere, Moon becomes too dark, so use lighter color.
+		auto const diffuse_scale_space = nu::renormalize (_planet->camera_clamped_normalized_amsl_height, nu::Range { 0.0f, 1.0f }, nu::Range { 0.3f, 2.0f });
+		// Also update the scale to take into account night (the Moon should be brighter at night for the same reason we make it brighter in space.
+		auto const diffuse_scale_night = nu::renormalize (_sky_box_visibility, nu::Range { 0.0f, 1.0f }, nu::Range { 0.3f, 2.0f });
+
 		glLightfv (kGLCosmicSunLight, GL_AMBIENT, kSunColorInSpace.scaled (0.0f));
-		glLightfv (kGLCosmicSunLight, GL_DIFFUSE, kSunColorInSpace.scaled (0.4f));
-		glLightfv (kGLCosmicSunLight, GL_SPECULAR, kSunColorInSpace.scaled (0.1f));
+		glLightfv (kGLCosmicSunLight, GL_DIFFUSE, kSunColorInSpace.scaled (std::max (diffuse_scale_space, diffuse_scale_night)));
+		glLightfv (kGLCosmicSunLight, GL_SPECULAR, kSunColorInSpace.scaled (0.0f));
 
 		_gl.save_context ([&]{
 			_gl.set_camera (_camera);
@@ -652,6 +663,11 @@ RigidBodyPainter::paint_world (rigid_body::System const& system)
 {
 	_gl.save_context ([&]{
 		paint_universe_and_sun();
+		// The known problem with Moon painting is that the Eart (and SkyDome)
+		// is always visible (in front of the Moon), even when it should be
+		// obscured by the Moon. It's because GL_DEPTH_TEST is disabled when
+		// painting SkyDome. Will fix later or never. Not important.
+		paint_moon();
 		paint_planet();
 		paint_air_particles();
 		paint (system);
@@ -750,7 +766,81 @@ RigidBodyPainter::paint_universe_and_sun()
 				_gl.draw (_sun->shines_shape);
 			});
 		});
+
 	}
+}
+
+
+void
+RigidBodyPainter::paint_moon()
+{
+	if (!_sun)
+		return;
+
+	static auto const moon_material = []{
+		auto material = ShapeMaterial {};
+		material.gl_emission_color = GLColor { 0.0f, 0.0f, 0.0f, 1.0f };
+		material.gl_ambient_color = GLColor { 0.0f, 0.0f, 0.0f, 1.0f };
+		material.gl_diffuse_color = GLColor { 1.0f, 1.0f, 1.0f, 1.0f };
+		material.gl_specular_color = GLColor { 1.0f, 1.0f, 1.0f, 1.0f };
+		material.gl_shininess = 0.0f;
+		return material;
+	}();
+
+	if (!_moon_shape)
+	{
+		_moon_shape = make_centered_sphere_shape ({
+			.radius = kMoonRadius,
+			.n_slices = 50,
+			.n_stacks = 25,
+			.material = moon_material,
+			.setup_material = [] (ShapeMaterial& material, si::LonLat const sphere_position) {
+				material.texture_position = {
+					nu::renormalize (sphere_position.lon(), nu::Range { -180_deg, +180_deg }, nu::Range { 0.0f, 1.0f }),
+					nu::renormalize (sphere_position.lat(), nu::Range { -90_deg, +90_deg }, nu::Range { 1.0f, 0.0f }),
+				};
+			},
+			.texture = _planet_textures ? _planet_textures->moon : nullptr,
+		});
+	}
+
+	bool const has_moon_texture = _planet_textures && _planet_textures->moon;
+	auto const moon_position = planet_position() + compute_moon_position_in_ecef (_time);
+	auto const direction_to_earth = (planet_position() - moon_position).normalized();
+	auto const moon_rotation = alpha_beta_from_x_to (direction_to_earth);
+
+	_gl.save_context ([&]{
+		glDisable (GL_BLEND);
+
+		if (has_moon_texture)
+		{
+			glEnable (GL_TEXTURE_2D);
+			glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+		}
+		else
+			glDisable (GL_TEXTURE_2D);
+
+		glEnable (GL_DEPTH_TEST);
+		glFrontFace (GL_CCW);
+		enable_only_lights (kCosmicSunLight);
+		// Textured vertices set only diffuse in GLSpace::set_texture(), so force
+		// non-emissive, low-ambient material here to avoid leaking sun material state.
+		glMaterialf (GL_FRONT, GL_SHININESS, 0.0f);
+		glMaterialfv (GL_FRONT, GL_EMISSION, GLArray { 0.0f, 0.0f, 0.0f, 1.0f });
+		glMaterialfv (GL_FRONT, GL_AMBIENT, GLArray { 0.0f, 0.0f, 0.0f, 1.0f });
+		glMaterialfv (GL_FRONT, GL_SPECULAR, GLArray { 0.0f, 0.0f, 0.0f, 1.0f });
+
+		// Keep translation in world/ECEF space: if we rotate after set_camera(),
+		// camera position would get rotated together with Moon model vertices.
+		_gl.set_camera_rotation_only (_camera);
+		_gl.translate (moon_position - _camera.position());
+		// Keep the same lunar hemisphere facing Earth.
+		_gl.rotate_z (moon_rotation[0]);
+		_gl.rotate_y (moon_rotation[1]);
+		_gl.draw (*_moon_shape);
+
+		glDisable (GL_TEXTURE_2D);
+	});
 }
 
 
@@ -1389,6 +1479,7 @@ RigidBodyPainter::check_planet_texture_images()
 			*images = _work_performer->submit ([]{
 				return PlanetTextureImages {
 					.earth = QImage ("share/images/textures/earth/earth-day-2004-07.jpg"),
+					.moon = QImage ("share/images/textures/moon/lroc_color_2k.jpg"),
 				};
 			});
 		}
@@ -1449,7 +1540,12 @@ RigidBodyPainter::check_planet_textures()
 
 			_planet_textures = PlanetTextures {
 				.earth = make_texture (images.earth),
+				.moon = make_texture (images.moon),
 			};
+
+			// Reset the shape so it's recalculated with texture next time
+			// instead of basic non-textured ball:
+			_moon_shape.reset();
 
 			// Reload SkyDome to include the Earth texture:
 			_planet->sky_dome_shape.reset();
@@ -1553,7 +1649,7 @@ RigidBodyPainter::compute_sky_box_visibility (si::Angle const sun_altitude_above
 		// Make the universe sky box visible when high above the surface, but also at night:
 		auto const night_time_visibility = nu::renormalize (sun_altitude_above_horizon, nu::Range { -3_deg, -8_deg }, nu::Range { 0.0f, 0.5f });
 		auto const altitude_visibility = nu::renormalize (_planet->camera_normalized_amsl_height, nu::Range { 0.8f, 1.5f }, nu::Range { 0.0f, 1.0f });
-		return std::max (altitude_visibility, night_time_visibility);
+		return std::clamp (std::max (altitude_visibility, night_time_visibility), 0.0f, 1.0f);
 	}
 	else
 		return 1.0f;

@@ -47,6 +47,7 @@ constexpr si::SpecificHeatCapacity	kDryAirSpecificConstant			= 287.058_J / 1_kg 
 constexpr auto						kPlankConstant					= 6.62607015e-34_J * 1_s;
 constexpr auto						kSpeedOfLight					= 299792458_mps;
 constexpr auto						kSunSurfaceTemperature			= 5778_K;
+constexpr auto						kAstronomicalUnit				= 149'597'871_km;
 
 /*
  * Earth

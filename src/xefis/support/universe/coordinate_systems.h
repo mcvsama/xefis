@@ -31,8 +31,8 @@ struct EclipticCoordinates
 	// Ecliptic latitude of the Sun (always nearly 0°) (AKA beta):
 	si::Angle	latitude;
 
-	// Distance of the Sun from the Earth (in astronomical units) (also known as R):
-	double		distance_from_earth;
+	// Distance of the body from the center of Earth:
+	si::Length	distance_from_earth;
 };
 
 

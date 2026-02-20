@@ -67,6 +67,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	static constexpr auto		kSunFaceAngularRadius		= 1_rad * std::atan (kSunRadius / kSunDistance);
 	static constexpr auto		kSunNoonMagnification		= 1.0f;
 	static constexpr auto		kSunSunsetMagnification		= 1.5f; // In reality it's 3% magnification at sunset/sunrise, but looks better with 50%
+	static constexpr auto		kMoonRadius					= 1'737.4_km;
 
 	static constexpr uint32_t	kAtmosphericSunLight		= 0b0001;
 	static constexpr uint32_t	kCosmicSunLight				= 0b0010;
@@ -104,6 +105,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	struct PlanetTextureImages
 	{
 		QImage	earth;
+		QImage	moon;
 	};
 
 	struct UniverseTextureImages
@@ -119,6 +121,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	struct PlanetTextures
 	{
 		std::shared_ptr<QOpenGLTexture>	earth;
+		std::shared_ptr<QOpenGLTexture>	moon;
 	};
 
 	struct UniverseTextures
@@ -591,6 +594,9 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	paint_universe_and_sun();
 
 	void
+	paint_moon();
+
+	void
 	paint_planet();
 
 	void
@@ -822,6 +828,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 									_universe_texture_images;
 	std::optional<PlanetTextures>	_planet_textures;
 	std::optional<UniverseTextures>	_universe_textures;
+	std::optional<Shape>			_moon_shape;
 };
 
 
