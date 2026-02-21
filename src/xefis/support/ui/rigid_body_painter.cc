@@ -745,7 +745,9 @@ RigidBodyPainter::paint_universe_and_sun()
 			// We drawing the 'inside' of the sphere with sun_shines:
 			glFrontFace (GL_CW);
 
-			_gl.set_camera (_camera);
+			// Keep translation in world/ECEF space for consistency with Moon/object rendering.
+			_gl.set_camera_rotation_only (_camera);
+			_gl.translate (-_camera.position());
 			make_z_towards_the_sun (_sun->position);
 			// Z is now direction towards the Sun:
 			_gl.translate (0_m, 0_m, kSunDistance);
