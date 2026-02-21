@@ -387,6 +387,16 @@ RigidBodyPainter::precompute()
 		_sun->corrected_position_cartesian_horizontal_coordinates = compute_cartesian_horizontal_coordinates (_sun->corrected_position_horizontal_coordinates);
 		_sun->color_on_body = to_gl_color (compute_sun_light_color (_camera_polar_position, _sun->corrected_position_cartesian_horizontal_coordinates, _sun->atmospheric_scattering));
 	}
+
+	if (_planet && _sun)
+	{
+		auto const sun_altitude = _sun->position.horizontal_coordinates.altitude;
+		_sun_altitude_above_horizon = sun_altitude - _planet->horizon_angle;
+	}
+
+	_sky_box_visibility = _sun_altitude_above_horizon
+		? compute_sky_box_visibility (*_sun_altitude_above_horizon)
+		: 1.0f;
 }
 
 
@@ -678,21 +688,13 @@ RigidBodyPainter::paint_world (rigid_body::System const& system)
 void
 RigidBodyPainter::paint_universe_and_sun()
 {
-	auto sun_altitude_above_horizon = std::optional<si::Angle>();
-
-	if (_planet && _sun)
-	{
-		auto const sun_altitude = _sun->position.horizontal_coordinates.altitude;
-		sun_altitude_above_horizon = sun_altitude - _planet->horizon_angle;
-	}
-
 	check_sky_box();
 
 	if (_universe && _universe->sky_box_shape)
 	{
 		_gl.save_context ([&]{
-			auto const alpha = sun_altitude_above_horizon
-				? compute_sky_box_visibility (*sun_altitude_above_horizon)
+			auto const alpha = _sun_altitude_above_horizon
+				? compute_sky_box_visibility (*_sun_altitude_above_horizon)
 				: 1.0f;
 			auto const x = 0.7f; // Darken the universe a bit.
 			auto const color = GLColor (x, x, x, alpha);
@@ -724,8 +726,8 @@ RigidBodyPainter::paint_universe_and_sun()
 	{
 		// Sun:
 		_gl.save_context ([&]{
-			auto const magnification_at_0_amsl = sun_altitude_above_horizon
-				? nu::renormalize (*sun_altitude_above_horizon, nu::Range { 0_deg, 90_deg }, nu::Range { kSunSunsetMagnification, kSunNoonMagnification })
+			auto const magnification_at_0_amsl = _sun_altitude_above_horizon
+				? nu::renormalize (*_sun_altitude_above_horizon, nu::Range { 0_deg, 90_deg }, nu::Range { kSunSunsetMagnification, kSunNoonMagnification })
 				: 1.0f;
 			// Correct for the fact that the magnification only happens inside atmosphere:
 			_sun->magnification = _planet
@@ -756,8 +758,8 @@ RigidBodyPainter::paint_universe_and_sun()
 			// Rotate sun shines when camera angle and simulation time changes:
 			_gl.rotate (_user_camera_angles[0] - 2 * _user_camera_angles[1] + time_dependent_angle, 0, 0, 1);
 
-			auto const sun_visibility = sun_altitude_above_horizon
-				? 1.0f - nu::square (1.0f - compute_sun_visible_surface_factor (*sun_altitude_above_horizon))
+			auto const sun_visibility = _sun_altitude_above_horizon
+				? 1.0f - nu::square (1.0f - compute_sun_visible_surface_factor (*_sun_altitude_above_horizon))
 				: 1.0f;
 			auto const alpha_height_factor = _planet ? _planet->camera_clamped_normalized_amsl_height : 1.0f;
 

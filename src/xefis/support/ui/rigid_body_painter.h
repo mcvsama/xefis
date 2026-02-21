@@ -829,6 +829,10 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	std::optional<PlanetTextures>	_planet_textures;
 	std::optional<UniverseTextures>	_universe_textures;
 	std::optional<Shape>			_moon_shape;
+
+	// Some cached computations:
+	std::optional<si::Angle>		_sun_altitude_above_horizon;
+	float							_sky_box_visibility			{ 1.0f };
 };
 
 
