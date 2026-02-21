@@ -147,7 +147,7 @@ RigidBodyPainter::set_time (si::Time const new_time)
 {
 	_time = new_time;
 
-	if (abs (_time - _prev_saved_time) > 5_s)
+	if (abs (_time - _prev_saved_time) > kCachedComputationTimeDelta)
 	{
 		if (_planet)
 			_planet->sky_dome_shape.reset();
@@ -155,6 +155,7 @@ RigidBodyPainter::set_time (si::Time const new_time)
 		if (_universe)
 			check_sky_box();
 
+		_moon_position_in_ecef.reset();
 		_prev_saved_time = _time;
 	}
 }
@@ -808,7 +809,11 @@ RigidBodyPainter::paint_moon()
 	}
 
 	bool const has_moon_texture = _planet_textures && _planet_textures->moon;
-	auto const moon_position = planet_position() + compute_moon_position_in_ecef (_time);
+
+	if (!_moon_position_in_ecef)
+		_moon_position_in_ecef = compute_moon_position_in_ecef (_time);
+
+	auto const moon_position = planet_position() + *_moon_position_in_ecef;
 	auto const direction_to_earth = (planet_position() - moon_position).normalized();
 	auto const moon_rotation = alpha_beta_from_x_to (direction_to_earth);
 

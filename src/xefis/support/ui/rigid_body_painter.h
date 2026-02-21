@@ -68,6 +68,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	static constexpr auto		kSunNoonMagnification		= 1.0f;
 	static constexpr auto		kSunSunsetMagnification		= 1.5f; // In reality it's 3% magnification at sunset/sunrise, but looks better with 50%
 	static constexpr auto		kMoonRadius					= 1'737.4_km;
+	static constexpr auto		kCachedComputationTimeDelta	= 5_s;
 
 	static constexpr uint32_t	kAtmosphericSunLight		= 0b0001;
 	static constexpr uint32_t	kCosmicSunLight				= 0b0010;
@@ -832,6 +833,8 @@ class RigidBodyPainter: protected QOpenGLFunctions
 
 	// Some cached computations:
 	std::optional<si::Angle>		_sun_altitude_above_horizon;
+	std::optional<SpaceLength<WorldSpace>>
+									_moon_position_in_ecef;
 	float							_sky_box_visibility			{ 1.0f };
 };
 
