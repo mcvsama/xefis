@@ -696,7 +696,7 @@ RigidBodyPainter::paint_universe_and_sun()
 			auto const alpha = _sun_altitude_above_horizon
 				? compute_sky_box_visibility (*_sun_altitude_above_horizon)
 				: 1.0f;
-			auto const x = 0.7f; // Darken the universe a bit.
+			auto const x = 0.5f; // Darken the universe a bit.
 			auto const color = GLColor (x, x, x, alpha);
 
 			_universe->sky_box_shape->for_each_vertex ([color] (ShapeVertex& vertex) {
@@ -1649,7 +1649,7 @@ RigidBodyPainter::compute_sky_box_visibility (si::Angle const sun_altitude_above
 	if (_planet)
 	{
 		// Make the universe sky box visible when high above the surface, but also at night:
-		auto const night_time_visibility = nu::renormalize (sun_altitude_above_horizon, nu::Range { -3_deg, -8_deg }, nu::Range { 0.0f, 0.5f });
+		auto const night_time_visibility = nu::renormalize (sun_altitude_above_horizon, nu::Range { -3_deg, -12_deg }, nu::Range { 0.0f, 0.5f });
 		auto const altitude_visibility = nu::renormalize (_planet->camera_normalized_amsl_height, nu::Range { 0.8f, 1.5f }, nu::Range { 0.0f, 1.0f });
 		return std::clamp (std::max (altitude_visibility, night_time_visibility), 0.0f, 1.0f);
 	}
