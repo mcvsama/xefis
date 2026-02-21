@@ -770,7 +770,6 @@ RigidBodyPainter::paint_universe_and_sun()
 				_gl.draw (_sun->shines_shape);
 			});
 		});
-
 	}
 }
 
