@@ -65,8 +65,6 @@ template<class pArgumentX, class pArgumentY>
 		Color
 		operator[] (ArgumentX const& x, ArgumentY const& y) const
 			{ return _field (x, y); }
-		// FIXME error:
-		// in Field: return renormalize (Color), Range<Color>, Range<Color>);
 
 	  private:
 		Field _field;
