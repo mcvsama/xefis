@@ -166,12 +166,6 @@ class HandshakeMaster: public Handshake
 class HandshakeSlave: public Handshake
 {
   public:
-	/**
-     * This function should return true if and only if given handshake ID
-     * has been used before. It should also store given key as 'used before'.
-     */
-	using IDReuseCheckCallback = std::function<bool (HandshakeID)>;//XXX
-
 	// This function should store provided key in a storage (mark is at used).
 	using StoreKeyFunction = std::function<void (HandshakeID)>;
 
