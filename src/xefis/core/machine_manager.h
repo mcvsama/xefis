@@ -118,7 +118,6 @@ template<std::derived_from<Machine> ConcreteMachine>
 			{ _machine.reset(); }
 
 	  private:
-		// TODO into a single struct as they're coupled:
 		std::function<std::unique_ptr<ConcreteMachine>()>	_make_machine;
 		std::unique_ptr<ConcreteMachine>					_machine;
 	};

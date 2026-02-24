@@ -500,7 +500,7 @@ TestInstrumentsMachine::TestInstrumentsMachine (xf::Xefis& xefis):
 	test_screen_2.hsi_2.radio_range_warning									<< test_generator_hsi_radio_range_warning;
 	test_screen_2.hsi_2.radio_range_critical								<< test_generator_hsi_radio_range_critical;
 
-	register_screen (test_screen_1); // TODO add option IncludeInstruments
+	register_screen (test_screen_1);
 	register_screen (test_screen_2);
 	register_processing_loop (_test_loop);
 
