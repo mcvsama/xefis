@@ -474,10 +474,6 @@ RigidBodyPainter::setup_sun_light()
 				glLightfv (kGLCosmicSunLight, GL_POSITION, GLArray { 0.0f, 0.0f, 1.0f, 0.0f });
 			}
 		});
-
-		// TODO GL_SPOT_DIRECTION
-		// TODO GL_SPOT_EXPONENT
-		// TODO GL_SPOT_CUTOFF
 	}
 }
 
