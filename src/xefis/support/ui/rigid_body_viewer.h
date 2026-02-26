@@ -79,6 +79,10 @@ class RigidBodyViewer: public GLAnimationWidget
 								kDefaultCameraTranslation	{ 0_m, 0_m, 10_m };
 	static constexpr SpaceVector<si::Angle>
 								kDefaultCameraRotation		{ 0_deg, 0_deg, 0_deg };
+	static constexpr si::Angle	kAutoZoomFOV				{ 40_deg };
+	static constexpr auto		kAutoZoomMarginFactor		{ 1.2 };
+	static constexpr nu::Range<si::Length>
+								kZoomRange					{ 2.5_m, 100 * kEarthMeanRadius };
 
 	static constexpr auto		kRotationScale				{ 2_deg / 1_mm };
 	static constexpr auto		kTranslationScale			{ 2.5_cm / 1_mm };
@@ -167,7 +171,8 @@ class RigidBodyViewer: public GLAnimationWidget
 	set_followed (auto const& object) noexcept
 	{
 		_rigid_body_painter.set_followed (object);
-		update();
+		_camera_translation = default_camera_translation();
+		forward_camera_translation();
 	}
 
 	/**
@@ -460,6 +465,22 @@ class RigidBodyViewer: public GLAnimationWidget
 	 */
 	bool
 	display_menu();
+
+	/**
+	 * Return default camera translation for current follow target.
+	 * Falls back to kDefaultCameraTranslation when nothing is followed.
+	 */
+	[[nodiscard]]
+	SpaceLength<WorldSpace>
+	default_camera_translation() const noexcept;
+
+	/**
+	 * Compute a chase-camera translation that keeps the whole followed object visible.
+	 * Uses fixed 40° FOV and 20% framing margin, with kZoomRange.min() lower bound.
+	 */
+	[[nodiscard]]
+	static SpaceLength<WorldSpace>
+	auto_zoom_camera_translation (si::Length followed_object_radius) noexcept;
 
 	/**
 	 * Forward current camera position to the RigidBodyPainter.

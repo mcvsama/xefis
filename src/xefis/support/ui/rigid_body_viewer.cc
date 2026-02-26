@@ -25,8 +25,10 @@
 #include <QShortcut>
 
 // Standard:
+#include <algorithm>
 #include <chrono>
 #include <cstddef>
+#include <cmath>
 #include <functional>
 
 
@@ -66,10 +68,35 @@ RigidBodyViewer::RigidBodyViewer (QWidget* parent, RefreshRate const refresh_rat
 void
 RigidBodyViewer::reset_camera_position()
 {
-	_camera_translation = kDefaultCameraTranslation;
+	_camera_translation = default_camera_translation();
 	forward_camera_translation();
 	_camera_rotation = kDefaultCameraRotation;
 	forward_camera_rotation();
+}
+
+
+SpaceLength<WorldSpace>
+RigidBodyViewer::default_camera_translation() const noexcept
+{
+	if (auto const* body = followed_body())
+		return auto_zoom_camera_translation (body->bounding_sphere_radius());
+
+	if (auto const* group = followed_group())
+		return auto_zoom_camera_translation (group->bounding_sphere_radius());
+
+	return kDefaultCameraTranslation;
+}
+
+
+SpaceLength<WorldSpace>
+RigidBodyViewer::auto_zoom_camera_translation (si::Length const followed_object_radius) noexcept
+{
+	if (followed_object_radius <= 0_m)
+		return kDefaultCameraTranslation;
+
+	auto const required_distance = kAutoZoomMarginFactor * followed_object_radius / sin (0.5 * kAutoZoomFOV);
+	auto const camera_distance = std::max<si::Length> (required_distance, kZoomRange.min());
+	return { 0_m, 0_m, camera_distance };
 }
 
 
@@ -215,7 +242,7 @@ RigidBodyViewer::wheelEvent (QWheelEvent* event)
 	auto const unlimited_scale = precision() * 1e-3 * distance_from_followed_object / 0.2_deg;
 	auto const scale = std::max (unlimited_scale, 0.01_m / 1_deg);
 	auto const unlimited_z = _camera_translation.z() + scale * 1_deg * (-event->angleDelta().y() / 8.0);
-	auto const z = std::clamp (unlimited_z, 3_m, 100 * kEarthMeanRadius);
+	auto const z = std::clamp (unlimited_z, kZoomRange.min(), kZoomRange.max());
 	_camera_translation.z() = z;
 
 	forward_camera_translation();
