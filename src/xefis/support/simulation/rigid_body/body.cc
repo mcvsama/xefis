@@ -18,6 +18,7 @@
 #include <xefis/config/all.h>
 
 // Standard:
+#include <algorithm>
 #include <cstddef>
 
 
@@ -116,6 +117,30 @@ Body::rotational_kinetic_energy() const
 	auto const mm = mass_moments<BodyCOM>();
 	auto const vm = velocity_moments<BodyCOM>();
 	return 0.5 * (~vm.angular_velocity() * mm.inertia_tensor() * vm.angular_velocity() / 1_rad / 1_rad).scalar();
+}
+
+
+si::Length
+Body::bounding_sphere_radius() const
+{
+	if (_shape)
+		return bounding_sphere_radius (*_shape);
+	else
+		return 0_m;
+}
+
+
+si::Length
+Body::bounding_sphere_radius (Shape const& shape) const
+{
+	auto radius = 0_m;
+
+	shape.for_each_vertex ([&] (ShapeVertex const& vertex) {
+		auto const vertex_in_com = _origin_placement.rotate_translate_to_base (vertex.position());
+		radius = std::max (radius, abs (vertex_in_com));
+	});
+
+	return radius;
 }
 
 } // namespace xf::rigid_body

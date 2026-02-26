@@ -249,6 +249,22 @@ class Body: public nu::Noncopyable
 		{ return _shape_type == ShapeIsConstant; }
 
 	/**
+	 * Return conservative radius of a sphere centered at center-of-mass that encloses body shape.
+	 * Returns 0_m if shape() is not set.
+	 * This function is computationally expensive (iterates over all shape vertices).
+	 */
+	[[nodiscard]]
+	si::Length
+	bounding_sphere_radius() const;
+
+	/**
+	 * Return conservative radius of a sphere centered at center-of-mass that encloses provided shape.
+	 */
+	[[nodiscard]]
+	si::Length
+	bounding_sphere_radius (Shape const&) const;
+
+	/**
 	 * Position of origin in chosen Space coordinate system.
 	 */
 	template<CoordinateSystemConcept Space>

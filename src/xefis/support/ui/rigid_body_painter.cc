@@ -65,31 +65,6 @@ constexpr auto kGLSkyLight2				= GL_LIGHT5;
 constexpr auto kGLSkyLight3				= GL_LIGHT6;
 constexpr auto kGLSkyLight4				= GL_LIGHT7;
 
-namespace {
-
-/**
- * Compute a conservative body-space bounding sphere radius around the center of mass.
- *
- * This is used as a cheap broad-phase test before the expensive exact
- * ray-vs-mesh intersection in body_under_cursor(). If no vertex exists,
- * the radius stays 0_m and we skip that body in picking.
- */
-[[nodiscard]]
-si::Length
-body_picking_radius (rigid_body::Body const& body, Shape const& shape)
-{
-	auto radius = 0_m;
-
-	shape.for_each_vertex ([&] (ShapeVertex const& vertex) {
-		auto const vertex_in_com = body.origin_placement().rotate_translate_to_base (vertex.position());
-		radius = std::max (radius, abs (vertex_in_com));
-	});
-
-	return radius;
-}
-
-} // namespace
-
 
 nu::Synchronized<std::shared_future<RigidBodyPainter::PlanetTextureImages>>		RigidBodyPainter::_planet_texture_images;
 nu::Synchronized<std::shared_future<RigidBodyPainter::UniverseTextureImages>>	RigidBodyPainter::_universe_texture_images;
@@ -295,7 +270,7 @@ RigidBodyPainter::body_under_cursor (rigid_body::System const& system, QPoint co
 		{
 			auto const& body_shape = shape_for (body);
 
-			if (auto const radius = body_picking_radius (body, body_shape);
+			if (auto const radius = body.bounding_sphere_radius (body_shape);
 				radius > 0_m)
 			{
 				// radius must be > 0_m, otherwise sphere intersection is degenerate
