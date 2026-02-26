@@ -165,7 +165,11 @@ void
 RigidBodyPainter::set_user_camera_translation (SpaceLength<WorldSpace> const& translation)
 {
 	_user_camera_translation = translation;
+
 	_body_basis = make_basis (_user_camera_translation.norm() / 20);
+	_body_com_ball = make_center_of_mass_symbol_shape (_user_camera_translation.norm() / 150);
+	_body_origin_ball = make_centered_sphere_shape ({ .radius = _user_camera_translation.norm() / 150, .n_slices = 8, .n_stacks = 4, .material = make_material ({ 0xff, 0xff, 0x00 }) });
+
 	compute_camera_transform();
 }
 
@@ -1176,7 +1180,7 @@ RigidBodyPainter::paint_helpers (rigid_body::Body const& body, BodyRenderingConf
 				// Paint the yellow origin ball only if explicitly requested,
 				// otherwise the user will know that the origin is where the basis is:
 				if (rendering.origin_visible)
-					paint_origin();
+					_gl.draw (_body_origin_ball);
 
 				// Rotation was taken into account in transform_gl_to_center_of_mass (Group).
 				paint_basis (_body_basis);
@@ -1189,22 +1193,11 @@ RigidBodyPainter::paint_helpers (rigid_body::Body const& body, BodyRenderingConf
 void
 RigidBodyPainter::paint_center_of_mass()
 {
-	auto const com_shape = make_center_of_mass_symbol_shape (_user_camera_translation.norm() / 150);
-
 	_gl.save_context ([&]{
 		glDisable (GL_LIGHTING);
-		_gl.draw (com_shape);
+		_gl.draw (_body_com_ball);
 		glEnable (GL_LIGHTING);
 	});
-}
-
-
-void
-RigidBodyPainter::paint_origin()
-{
-	auto const origin_material = make_material ({ 0xff, 0xff, 0x00 });
-	auto const origin_shape = make_centered_sphere_shape ({ .radius = _user_camera_translation.norm() / 150, .n_slices = 8, .n_stacks = 4, .material = origin_material });
-	_gl.draw (origin_shape);
 }
 
 

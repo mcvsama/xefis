@@ -633,9 +633,6 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	paint_center_of_mass();
 
 	void
-	paint_origin();
-
-	void
 	paint_moments_of_inertia_cuboid (MassMoments<BodyCOM> const&);
 
 	void
@@ -856,6 +853,8 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	si::Length						_followed_object_diameter	{ 0_m };
 	Shape							_ecef_basis					{ make_basis (8_cm) };
 	Shape							_body_basis					{ make_basis (1_cm) };
+	Shape							_body_com_ball;
+	Shape							_body_origin_ball;
 };
 
 
