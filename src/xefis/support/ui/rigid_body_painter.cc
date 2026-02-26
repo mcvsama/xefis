@@ -1038,35 +1038,6 @@ RigidBodyPainter::paint_helpers (rigid_body::System const& system)
 
 
 void
-RigidBodyPainter::transform_gl_to_center_of_mass (rigid_body::Group const& group)
-{
-	// Transform so that center-of-mass is at the OpenGL space origin:
-	auto const* rotation_reference_body = group.rotation_reference_body();
-	auto const rotation = rotation_reference_body
-		? rotation_reference_body->placement().body_rotation()
-		: kNoRotation<WorldSpace, BodyCOM>;
-	_gl.transform (Placement<WorldSpace, BodyCOM> (get_center_of_mass (group), rotation) - _camera_placement.position());
-}
-
-
-void
-RigidBodyPainter::transform_gl_to_center_of_mass (rigid_body::Body const& body)
-{
-	// Transform so that center-of-mass is at the OpenGL space origin.
-	// Trick with rotating camera and then subtracting camera position from the object is to avoid problems with low precision OpenGL floats:
-	// body.placement() - _camera_placement.position() uses doubles; but _gl.transform() internally reduces them to floats:
-	_gl.transform (body.placement() - _camera_placement.position());
-}
-
-
-void
-RigidBodyPainter::transform_gl_from_body_center_of_mass_to_origin (rigid_body::Body const& body)
-{
-	_gl.transform (body.origin_placement_in_com());
-}
-
-
-void
 RigidBodyPainter::paint (rigid_body::Body const& body, BodyRenderingConfig const& rendering)
 {
 	_gl.save_context ([&]{
@@ -1340,6 +1311,35 @@ RigidBodyPainter::draw_arrow (SpaceLength<WorldSpace> const& origin, SpaceLength
 			_gl.draw (make_cone_shape ({ .length = cone_length, .radius = cone_radius, .num_faces = kNumFaces, .with_bottom = true, .material = material }));
 		}
 	});
+}
+
+
+void
+RigidBodyPainter::transform_gl_to_center_of_mass (rigid_body::Group const& group)
+{
+	// Transform so that center-of-mass is at the OpenGL space origin:
+	auto const* rotation_reference_body = group.rotation_reference_body();
+	auto const rotation = rotation_reference_body
+		? rotation_reference_body->placement().body_rotation()
+		: kNoRotation<WorldSpace, BodyCOM>;
+	_gl.transform (Placement<WorldSpace, BodyCOM> (get_center_of_mass (group), rotation) - _camera_placement.position());
+}
+
+
+void
+RigidBodyPainter::transform_gl_to_center_of_mass (rigid_body::Body const& body)
+{
+	// Transform so that center-of-mass is at the OpenGL space origin.
+	// Trick with rotating camera and then subtracting camera position from the object is to avoid problems with low precision OpenGL floats:
+	// body.placement() - _camera_placement.position() uses doubles; but _gl.transform() internally reduces them to floats:
+	_gl.transform (body.placement() - _camera_placement.position());
+}
+
+
+void
+RigidBodyPainter::transform_gl_from_body_center_of_mass_to_origin (rigid_body::Body const& body)
+{
+	_gl.transform (body.origin_placement_in_com());
 }
 
 

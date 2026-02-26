@@ -611,25 +611,6 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	void
 	paint_helpers (rigid_body::System const&);
 
-	/**
-	 * Translate and rotate OpenGL space to the center of mass of the group.
-	 */
-	void
-	transform_gl_to_center_of_mass (rigid_body::Group const&);
-
-	/**
-	 * Translate and rotate OpenGL space to the center of mass of the body.
-	 */
-	void
-	transform_gl_to_center_of_mass (rigid_body::Body const&);
-
-	/**
-	 * Transform OpenGL space to the body origin, assuming that the space
-	 * is already transformed to body's center of mass.
-	 */
-	void
-	transform_gl_from_body_center_of_mass_to_origin (rigid_body::Body const&);
-
 	void
 	paint (rigid_body::Body const&, BodyRenderingConfig const&);
 
@@ -668,6 +649,25 @@ class RigidBodyPainter: protected QOpenGLFunctions
 
 	void
 	draw_arrow (SpaceLength<WorldSpace> const& origin, SpaceLength<WorldSpace> const& vector, ShapeMaterial const& material = {});
+
+	/**
+	 * Translate and rotate OpenGL space to the center of mass of the group.
+	 */
+	void
+	transform_gl_to_center_of_mass (rigid_body::Group const&);
+
+	/**
+	 * Translate and rotate OpenGL space to the center of mass of the body.
+	 */
+	void
+	transform_gl_to_center_of_mass (rigid_body::Body const&);
+
+	/**
+	 * Transform OpenGL space to the body origin, assuming that the space
+	 * is already transformed to body's center of mass.
+	 */
+	void
+	transform_gl_from_body_center_of_mass_to_origin (rigid_body::Body const&);
 
 	/**
 	 * Correct the sky colors to be less green at dusk/dawn.
