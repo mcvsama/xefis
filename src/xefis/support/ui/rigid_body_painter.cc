@@ -65,7 +65,6 @@ constexpr auto kGLSkyLight2				= GL_LIGHT5;
 constexpr auto kGLSkyLight3				= GL_LIGHT6;
 constexpr auto kGLSkyLight4				= GL_LIGHT7;
 
-
 nu::Synchronized<std::shared_future<RigidBodyPainter::PlanetTextureImages>>		RigidBodyPainter::_planet_texture_images;
 nu::Synchronized<std::shared_future<RigidBodyPainter::UniverseTextureImages>>	RigidBodyPainter::_universe_texture_images;
 
@@ -188,7 +187,7 @@ RigidBodyPainter::set_user_camera_rotation (SpaceVector<si::Angle> const& angles
 si::Length
 RigidBodyPainter::camera_distance_to_followed() const
 {
-	return (_followed_position - _camera.position()).norm();
+	return (_followed_position - _camera_placement.position()).norm();
 }
 
 
@@ -258,8 +257,8 @@ RigidBodyPainter::body_under_cursor (rigid_body::System const& system, QPoint co
 		ndc_y * tan_half_fov,
 		-1.0,
 	}.normalized();
-	auto const ray_direction_world = (_camera.base_rotation() * ray_direction_camera).normalized();
-	auto const ray_origin_world = _camera.position();
+	auto const ray_direction_world = (_camera_placement.base_rotation() * ray_direction_camera).normalized();
+	auto const ray_origin_world = _camera_placement.position();
 	auto nearest_distance = std::numeric_limits<double>::infinity() * 1_m;
 	rigid_body::Body const* nearest_body = nullptr;
 
@@ -454,13 +453,13 @@ RigidBodyPainter::setup_sun_light()
 		glLightfv (kGLCosmicSunLight, GL_SPECULAR, kSunColorInSpace.scaled (0.0f));
 
 		_gl.save_context ([&]{
-			_gl.set_camera (_camera);
+			_gl.set_camera (_camera_placement);
 
 			if (_sun)
 			{
 				_gl.save_context ([&]{
 					_gl.load_identity();
-					_gl.set_camera_rotation_only (_camera);
+					_gl.set_camera_rotation_only (_camera_placement);
 					make_z_towards_the_sun (_sun->position);
 					// Direct atmospheric sunlight:
 					glLightfv (kGLAtmosphericSunLight, GL_POSITION, GLArray { 0.0f, 0.0f, _gl.to_opengl (kSunDistance), 1.0f });
@@ -687,7 +686,7 @@ RigidBodyPainter::paint_universe_and_sun()
 			glDisable (GL_LIGHTING);
 			glEnable (GL_TEXTURE_2D);
 			glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-			_gl.set_camera_rotation_only (_camera);
+			_gl.set_camera_rotation_only (_camera_placement);
 			_gl.rotate (~(kScreenToNullIslandRotation * _universe->ecef_to_celestial_rotation));
 			_gl.draw (*_universe->sky_box_shape);
 			_gl.clear_z_buffer();
@@ -720,8 +719,8 @@ RigidBodyPainter::paint_universe_and_sun()
 			glFrontFace (GL_CW);
 
 			// Keep translation in world/ECEF space for consistency with Moon/object rendering.
-			_gl.set_camera_rotation_only (_camera);
-			_gl.translate (-_camera.position());
+			_gl.set_camera_rotation_only (_camera_placement);
+			_gl.translate (-_camera_placement.position());
 			make_z_towards_the_sun (_sun->position);
 			// Z is now direction towards the Sun:
 			_gl.translate (0_m, 0_m, kSunDistance);
@@ -816,8 +815,8 @@ RigidBodyPainter::paint_moon()
 
 		// Keep translation in world/ECEF space: if we rotate after set_camera(),
 		// camera position would get rotated together with Moon model vertices.
-		_gl.set_camera_rotation_only (_camera);
-		_gl.translate (moon_position - _camera.position());
+		_gl.set_camera_rotation_only (_camera_placement);
+		_gl.translate (moon_position - _camera_placement.position());
 		// Keep the same lunar hemisphere facing Earth.
 		_gl.rotate_z (moon_rotation[0]);
 		_gl.rotate_y (moon_rotation[1]);
@@ -835,7 +834,7 @@ RigidBodyPainter::paint_planet()
 		return;
 
 	_gl.save_context ([&]{
-		_gl.set_camera (_camera);
+		_gl.set_camera (_camera_placement);
 
 		// Ground:
 		// TODO it would be best if there was a shader that adds the dome sphere color to the drawn feature
@@ -858,7 +857,7 @@ RigidBodyPainter::paint_planet()
 		{
 			// Sky and ground dome around the observer:
 			_gl.save_context ([&]{
-				_gl.set_camera_rotation_only (_camera);
+				_gl.set_camera_rotation_only (_camera_placement);
 				// Rotate so that down is -Z.
 				make_z_sky_top_x_south();
 				// Normally the outside of the sphere shape is rendered, inside is culled.
@@ -886,11 +885,11 @@ void
 RigidBodyPainter::paint_air_particles()
 {
 	_gl.save_context ([&]{
-		_gl.set_camera_rotation_only (_camera);
+		_gl.set_camera_rotation_only (_camera_placement);
 		// Trick with rotating camera and then subtracting camera position from the object is to avoid problems with low precision OpenGL floats:
-		// _followed_position - _camera.position() uses doubles; but _gl.translate() internally reduces them to floats:
-		_gl.translate (_followed_position - _camera.position());
-		auto const camera_billboard_rotation = ~_camera.body_rotation();
+		// _followed_position - _camera_placement.position() uses doubles; but _gl.translate() internally reduces them to floats:
+		_gl.translate (_followed_position - _camera_placement.position());
+		auto const camera_billboard_rotation = ~_camera_placement.body_rotation();
 
 		glDisable (GL_LIGHTING);
 		glEnable (GL_DEPTH_TEST);
@@ -965,7 +964,7 @@ RigidBodyPainter::paint (rigid_body::System const& system)
 {
 	_gl.save_context ([&]{
 		enable_appropriate_lights();
-		_gl.set_camera_rotation_only (_camera);
+		_gl.set_camera_rotation_only (_camera_placement);
 
 		for (auto const& body: system.bodies())
 			paint (*body, get_rendering_config (*body));
@@ -1046,7 +1045,7 @@ RigidBodyPainter::transform_gl_to_center_of_mass (rigid_body::Group const& group
 	auto const rotation = rotation_reference_body
 		? rotation_reference_body->placement().body_rotation()
 		: kNoRotation<WorldSpace, BodyCOM>;
-	_gl.transform (Placement<WorldSpace, BodyCOM> (get_center_of_mass (group), rotation) - _camera.position());
+	_gl.transform (Placement<WorldSpace, BodyCOM> (get_center_of_mass (group), rotation) - _camera_placement.position());
 }
 
 
@@ -1055,8 +1054,8 @@ RigidBodyPainter::transform_gl_to_center_of_mass (rigid_body::Body const& body)
 {
 	// Transform so that center-of-mass is at the OpenGL space origin.
 	// Trick with rotating camera and then subtracting camera position from the object is to avoid problems with low precision OpenGL floats:
-	// body.placement() - _camera.position() uses doubles; but _gl.transform() internally reduces them to floats:
-	_gl.transform (body.placement() - _camera.position());
+	// body.placement() - _camera_placement.position() uses doubles; but _gl.transform() internally reduces them to floats:
+	_gl.transform (body.placement() - _camera_placement.position());
 }
 
 
@@ -1101,7 +1100,7 @@ RigidBodyPainter::paint (rigid_body::Constraint const& constraint)
 	if (constraint.enabled() && !constraint.broken())
 	{
 		_gl.save_context ([&]{
-			auto const cp = _camera.position();
+			auto const cp = _camera_placement.position();
 			auto const& b1 = constraint.body_1();
 			auto const& b2 = constraint.body_2();
 			auto com1 = b1.placement().position() - cp;
@@ -1261,7 +1260,7 @@ RigidBodyPainter::paint_forces (rigid_body::Body const& body)
 	auto const& iter = body.iteration();
 	auto const gfm = iter.gravitational_force_moments;
 	auto const efm = iter.external_force_moments;
-	auto const cp = _camera.position();
+	auto const cp = _camera_placement.position();
 	auto const com = body.placement().position() - cp;
 
 	if (_features_config.gravity_visible)
@@ -1297,7 +1296,7 @@ void
 RigidBodyPainter::paint_angular_velocity (rigid_body::Body const& body)
 {
 	auto constexpr angular_velocity_to_length = 0.1_m / 1_radps; // TODO unhardcode
-	auto const com = body.placement().position() - _camera.position();
+	auto const com = body.placement().position() - _camera_placement.position();
 	auto const omega = body.velocity_moments<WorldSpace>().angular_velocity();
 
 	draw_arrow (com, omega * angular_velocity_to_length, make_material (Qt::darkMagenta));
@@ -1308,7 +1307,7 @@ void
 RigidBodyPainter::paint_angular_momentum (rigid_body::Body const& body)
 {
 	auto constexpr angular_momentum_to_length = 0.001_m / (1_kg * 1_m2 / 1_s) / 1_rad; // TODO unhardcode
-	auto const com = body.placement().position() - _camera.position();
+	auto const com = body.placement().position() - _camera_placement.position();
 	auto const I = body.mass_moments<BodyCOM>().inertia_tensor();
 	auto const L = I * body.velocity_moments<BodyCOM>().angular_velocity();
 	auto const L_world = body.placement().rotate_to_base (L);
@@ -1389,7 +1388,7 @@ RigidBodyPainter::paint_ecef_basis (QOpenGLPaintDevice& canvas)
 		// TODO Try to use set_camera instead of manually managing the matrix:
 		_gl.load_identity();
 		_gl.translate (0_m, 0_m, -1_m);
-		_gl.rotate (_camera.body_rotation());
+		_gl.rotate (_camera_placement.body_rotation());
 		paint_basis (8_cm);
 	});
 }
@@ -1609,7 +1608,7 @@ RigidBodyPainter::check_sky_dome_and_ground_shape()
 Shape
 RigidBodyPainter::compute_sky_dome_shape()
 {
-	_camera_position_for_sky_dome = _camera.position();
+	_camera_position_for_sky_dome = _camera_placement.position();
 
 	if (_planet && _sun)
 	{
@@ -1702,38 +1701,38 @@ RigidBodyPainter::compute_camera_transform()
 					rotation = _user_camera_rotation * kAircraftToBehindViewRotation * base_rotation;
 			}
 
-			_camera.set_body_rotation (rotation);
+			_camera_placement.set_body_rotation (rotation);
 		}
 		break;
 
 		case ChaseView:
 		{
 			auto const rotation = _user_camera_rotation * gravity_down_rotation (_followed_polar_position) * kScreenToNullIslandRotation;
-			_camera.set_body_rotation (rotation);
+			_camera_placement.set_body_rotation (rotation);
 		}
 		break;
 
 		case RCPilotView:
 			// TODO unimplemented yet
 			// TODO use _requested_camera_polar_position
-			_camera.set_body_rotation (_user_camera_rotation);
+			_camera_placement.set_body_rotation (_user_camera_rotation);
 			break;
 
 		case FixedView:
 			// TODO unimplemented yet
 			// TODO use _requested_camera_polar_position
-			_camera.set_body_rotation (_user_camera_rotation);
+			_camera_placement.set_body_rotation (_user_camera_rotation);
 			break;
 	}
 
-	_camera.set_position (_followed_position - planet_position() + _camera.base_rotation() * _user_camera_translation);
-	_camera_polar_position = to_polar (_camera.position());
+	_camera_placement.set_position (_followed_position - planet_position() + _camera_placement.base_rotation() * _user_camera_translation);
+	_camera_polar_position = to_polar (_camera_placement.position());
 
 	fix_camera_position();
 
 	if (_planet)
 	{
-		if (abs (_camera_position_for_sky_dome - _camera.position()) > 10_m)
+		if (abs (_camera_position_for_sky_dome - _camera_placement.position()) > 10_m)
 		{
 			_planet->sky_dome_shape.reset();
 			_planet->ground_shape.reset();
@@ -1741,7 +1740,7 @@ RigidBodyPainter::compute_camera_transform()
 	}
 
 	if (_camera_position_callback)
-		_camera_position_callback (_camera.position());
+		_camera_position_callback (_camera_placement.position());
 }
 
 
@@ -1752,7 +1751,7 @@ RigidBodyPainter::fix_camera_position()
 	{
 		// Just a bit above the ground to ensure the earth surface is properly drawn:
 		_camera_polar_position.radius() = kEarthMeanRadius + 10_m;
-		_camera.set_position (to_cartesian<WorldSpace> (_camera_polar_position));
+		_camera_placement.set_position (to_cartesian<WorldSpace> (_camera_polar_position));
 	}
 }
 

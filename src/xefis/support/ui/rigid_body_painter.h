@@ -805,7 +805,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 									_user_camera_rotation		{ math::identity };
 	// Final computed camera rotation:
 	Placement<WorldSpace, WorldSpace>
-									_camera;
+									_camera_placement;
 	SpaceLength<WorldSpace>			_camera_position_for_sky_dome;
 	// Position of the followed body:
 	SpaceLength<WorldSpace>			_followed_position;
