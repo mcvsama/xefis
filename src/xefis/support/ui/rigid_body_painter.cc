@@ -1385,7 +1385,6 @@ RigidBodyPainter::paint_ecef_basis (QOpenGLPaintDevice& canvas)
 		// ECEF basis should be always "on top":
 		_gl.clear_z_buffer();
 		_gl.set_camera (std::nullopt);
-		// TODO Try to use set_camera instead of manually managing the matrix:
 		_gl.load_identity();
 		_gl.translate (0_m, 0_m, -1_m);
 		_gl.rotate (_camera_placement.body_rotation());
