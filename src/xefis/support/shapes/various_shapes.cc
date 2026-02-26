@@ -662,6 +662,47 @@ make_solid_circle (si::Length const radius, nu::Range<si::Angle> const range, si
 
 
 Shape
+make_blurred_circle (si::Length const radius)
+{
+	constexpr auto kSlices = 13u;
+	constexpr auto kCoreRadiusFactor = 0.45;
+	constexpr auto kCoreAlpha = 0.9f;
+
+	auto shape = Shape();
+	auto const core_radius = kCoreRadiusFactor * radius;
+	auto const core_material = white_alpha_material (kCoreAlpha);
+	auto const edge_material = white_alpha_material (0.0f);
+	auto const normal = SpaceVector<double, BodyOrigin> (0.0, 0.0, 1.0);
+	auto& core_fan = shape.triangle_fans().emplace_back();
+	auto& halo_strip = shape.triangle_strips().emplace_back();
+
+	core_fan.vertices.reserve (2 + kSlices);
+	core_fan.vertices.emplace_back (SpaceLength<BodyOrigin> (0_m, 0_m, 0_m), normal, core_material);
+	halo_strip.vertices.reserve (2 * (1 + kSlices));
+
+	auto const delta = 360_deg / kSlices;
+	auto angle = 0_deg;
+
+	for (auto i = 0u; i < kSlices + 1; ++i, angle += delta)
+	{
+		using std::cos;
+		using std::sin;
+
+		auto const x = cos (angle);
+		auto const y = sin (angle);
+		auto const inner = SpaceLength<BodyOrigin> (x * core_radius, y * core_radius, 0_m);
+		auto const outer = SpaceLength<BodyOrigin> (x * radius, y * radius, 0_m);
+
+		core_fan.vertices.emplace_back (inner, normal, core_material);
+		halo_strip.vertices.emplace_back (inner, normal, core_material);
+		halo_strip.vertices.emplace_back (outer, normal, edge_material);
+	}
+
+	return shape;
+}
+
+
+Shape
 make_airfoil_shape (AirfoilShapeParameters const& params)
 {
 	auto const n_points = params.spline.points().size();

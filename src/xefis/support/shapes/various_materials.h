@@ -56,6 +56,18 @@ auto const kTransparentBlack = ShapeMaterial {
 	.gl_shininess		= 0.0f,
 };
 
+[[nodiscard]]
+inline ShapeMaterial
+white_alpha_material (float const alpha)
+{
+	auto material = kWhiteMatte;
+	material.gl_emission_color[3] = alpha;
+	material.gl_ambient_color[3] = alpha;
+	material.gl_diffuse_color[3] = alpha;
+	material.gl_specular_color[3] = alpha;
+	return material;
+}
+
 
 inline ShapeMaterial
 make_material (QColor const& material_color, QColor const& emission_color = Qt::black)

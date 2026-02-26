@@ -246,6 +246,12 @@ Shape
 make_solid_circle (si::Length radius, nu::Range<si::Angle> range, std::size_t num_slices, ShapeMaterial const& = {});
 
 /**
+ * Make a solid blurred circle placed on X-Y plane.
+ */
+Shape
+make_blurred_circle (si::Length radius);
+
+/**
  * Make a wing shape. Extrude airfoil spline (defined in X-Y axes) along +Z axis.
  */
 Shape

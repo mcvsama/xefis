@@ -608,6 +608,9 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	void
 	paint (rigid_body::System const&);
 
+	void
+	paint_helpers (rigid_body::System const&);
+
 	/**
 	 * Translate and rotate OpenGL space to the center of mass of the group.
 	 */

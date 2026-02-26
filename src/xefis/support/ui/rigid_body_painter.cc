@@ -652,8 +652,9 @@ RigidBodyPainter::paint_world (rigid_body::System const& system)
 		// painting SkyDome. Will fix later or never. Not important.
 		paint_moon();
 		paint_planet();
-		paint_air_particles();
 		paint (system);
+		paint_air_particles();
+		paint_helpers (system);
 	});
 }
 
@@ -742,6 +743,9 @@ RigidBodyPainter::paint_universe_and_sun()
 				_gl.additional_parameters().alpha_factor = std::clamp<float> (alpha_height_factor * sun_visibility, 0.0f, 1.0f);
 				_gl.draw (_sun->shines_shape);
 			});
+
+			// Re-enable:
+			glEnable (GL_DEPTH_TEST);
 		});
 	}
 }
@@ -882,11 +886,17 @@ void
 RigidBodyPainter::paint_air_particles()
 {
 	_gl.save_context ([&]{
-		enable_appropriate_lights();
 		_gl.set_camera_rotation_only (_camera);
 		// Trick with rotating camera and then subtracting camera position from the object is to avoid problems with low precision OpenGL floats:
 		// _followed_position - _camera.position() uses doubles; but _gl.translate() internally reduces them to floats:
 		_gl.translate (_followed_position - _camera.position());
+		auto const camera_billboard_rotation = ~_camera.body_rotation();
+
+		glDisable (GL_LIGHTING);
+		glEnable (GL_DEPTH_TEST);
+		glEnable (GL_BLEND);
+		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glDisable (GL_CULL_FACE);
 
 		auto const grid_size = std::max (_followed_object_diameter, kMinDustGridSize);
 		auto const range = 3 * grid_size;
@@ -921,11 +931,16 @@ RigidBodyPainter::paint_air_particles()
 						auto const wiggled_y = y - body_pos.y() + prng_factor * _air_particles_prng() - half_grid_size;
 						auto const wiggled_z = z - body_pos.z() + prng_factor * _air_particles_prng() - half_grid_size;
 						_gl.translate (wiggled_x, wiggled_y, wiggled_z);
+						_gl.rotate (camera_billboard_rotation);
 						_gl.draw (_dust_particle);
 					});
 				}
 			}
 		}
+
+		glEnable (GL_CULL_FACE);
+		glDisable (GL_BLEND);
+		glEnable (GL_LIGHTING);
 	});
 }
 
@@ -941,13 +956,7 @@ RigidBodyPainter::recalculate_followed_object_diameter()
 		_followed_object_diameter = 0_m;
 
 	auto const dust_size = std::max<si::Length> (2_cm, 1.0 / 250 * _followed_object_diameter);
-
-	_dust_particle = make_centered_sphere_shape ({
-		.radius = dust_size,
-		.n_slices = 3,
-		.n_stacks = 3,
-		.material = kWhiteMatte,
-	});
+	_dust_particle = make_blurred_circle (dust_size);
 }
 
 
@@ -997,26 +1006,34 @@ RigidBodyPainter::paint (rigid_body::System const& system)
 		if (_features_config.angular_momenta_visible)
 			for (auto const& body: system.bodies())
 				paint_angular_momentum (*body);
+	});
+}
+
+
+void
+RigidBodyPainter::paint_helpers (rigid_body::System const& system)
+{
+	_gl.save_context ([&]{
+		enable_appropriate_lights();
+		_gl.set_camera_rotation_only (_camera_placement);
 
 		// We'll now paint features that are always visible, so clear the Z buffer
 		// in OpenGL and do the painting with blending enabled.
-		{
-			auto const* focused_group = this->focused_group();
-			auto const* focused_body = this->focused_body();
+		auto const* focused_group = this->focused_group();
+		auto const* focused_body = this->focused_body();
 
-			glEnable (GL_BLEND);
-			glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-			_gl.clear_z_buffer();
-			enable_only_lights (kFeatureLight);
+		glEnable (GL_BLEND);
+		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		_gl.clear_z_buffer();
+		enable_only_lights (kFeatureLight);
 
-			for (auto const& group: system.groups())
-				paint_helpers (*group, get_rendering_config (*group), group.get() == focused_group);
+		for (auto const& group: system.groups())
+			paint_helpers (*group, get_rendering_config (*group), group.get() == focused_group);
 
-			for (auto const& body: system.bodies())
-				paint_helpers (*body, get_rendering_config (*body), body.get() == focused_body);
+		for (auto const& body: system.bodies())
+			paint_helpers (*body, get_rendering_config (*body), body.get() == focused_body);
 
-			glDisable (GL_BLEND);
-		}
+		glDisable (GL_BLEND);
 	});
 }
 
