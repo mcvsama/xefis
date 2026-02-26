@@ -1221,8 +1221,8 @@ RigidBodyPainter::paint_forces (rigid_body::Body const& body)
 	auto constexpr external_force_color = Qt::darkYellow;
 	auto constexpr external_torque_color = Qt::cyan;
 
-	auto constexpr force_to_length = 0.1_m / 1_N; // TODO unhardcode; make autoscaling depending on aircraft total mass
-	auto constexpr torque_to_length = force_to_length / 1_m; // TODO unhardcode
+	auto const force_to_length = _followed_object_diameter / 20_N;
+	auto const torque_to_length = force_to_length / 1_m;
 
 	auto const& iter = body.iteration();
 	auto const gfm = iter.gravitational_force_moments;
@@ -1262,7 +1262,7 @@ RigidBodyPainter::paint_forces (rigid_body::Body const& body)
 void
 RigidBodyPainter::paint_angular_velocity (rigid_body::Body const& body)
 {
-	auto constexpr angular_velocity_to_length = 0.1_m / 1_radps; // TODO unhardcode
+	auto const angular_velocity_to_length = 0.01 * _followed_object_diameter / 1_radps;
 	auto const com = body.placement().position() - _camera_placement.position();
 	auto const omega = body.velocity_moments<WorldSpace>().angular_velocity();
 
@@ -1273,7 +1273,7 @@ RigidBodyPainter::paint_angular_velocity (rigid_body::Body const& body)
 void
 RigidBodyPainter::paint_angular_momentum (rigid_body::Body const& body)
 {
-	auto constexpr angular_momentum_to_length = 0.001_m / (1_kg * 1_m2 / 1_s) / 1_rad; // TODO unhardcode
+	auto const angular_momentum_to_length = _followed_object_diameter / (1_kg * 1_m2 / 1_s) / 1_rad;
 	auto const com = body.placement().position() - _camera_placement.position();
 	auto const I = body.mass_moments<BodyCOM>().inertia_tensor();
 	auto const L = I * body.velocity_moments<BodyCOM>().angular_velocity();
