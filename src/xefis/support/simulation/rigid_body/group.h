@@ -145,6 +145,16 @@ class Group: private nu::Noncopyable
 	MassMomentsAtArm<WorldSpace>
 	mass_moments() const;
 
+	/**
+	 * Return conservative radius of a sphere centered at group's center-of-mass
+	 * that encloses all grouped bodies.
+	 * This function is computationally expensive (recomputes group mass moments
+	 * and iterates over all bodies).
+	 */
+	[[nodiscard]]
+	si::Length
+	bounding_sphere_radius() const;
+
   private:
 	std::string			_label;
 	System*				_system;

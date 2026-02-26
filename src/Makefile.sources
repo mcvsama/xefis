@@ -506,6 +506,7 @@ MIHAU.modules[xefis].products[autotest].sources				+= xefis/support/math/tests/r
 MIHAU.modules[xefis].products[autotest].sources				+= xefis/support/nature/tests/nature.test.cc
 MIHAU.modules[xefis].products[autotest].sources				+= xefis/support/simulation/electrical/tests/network.test.cc
 MIHAU.modules[xefis].products[autotest].sources				+= xefis/support/simulation/failure/tests/sigmoidal_temperature_failure.test.cc
+MIHAU.modules[xefis].products[autotest].sources				+= xefis/support/simulation/rigid_body/tests/group.test.cc
 MIHAU.modules[xefis].products[autotest].sources				+= xefis/support/simulation/rigid_body/tests/simulation.test.cc
 MIHAU.modules[xefis].products[autotest].sources				+= xefis/support/simulation/rigid_body/tests/system.test.cc
 MIHAU.modules[xefis].products[autotest].sources				+= xefis/support/sockets/tests/socket_observer.test.cc

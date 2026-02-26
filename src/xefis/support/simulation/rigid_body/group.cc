@@ -18,6 +18,7 @@
 #include <xefis/config/all.h>
 
 // Standard:
+#include <algorithm>
 #include <cstddef>
 #include <ranges>
 
@@ -81,6 +82,26 @@ Group::mass_moments() const
 	};
 
 	return compute_mass_moments_at_arm<WorldSpace> (_bodies | std::views::transform (get_mass_moments_from_body));
+}
+
+
+si::Length
+Group::bounding_sphere_radius() const
+{
+	// Early check saves on computing center of mass:
+	if (_bodies.empty())
+		return 0_m;
+
+	auto const group_center_of_mass = mass_moments().center_of_mass_position();
+	auto radius = 0_m;
+
+	for (auto const& body: _bodies)
+	{
+		auto const body_distance_to_group_center = abs (body->placement().position() - group_center_of_mass);
+		radius = std::max (radius, body_distance_to_group_center + body->bounding_sphere_radius());
+	}
+
+	return radius;
 }
 
 } // namespace xf::rigid_body
