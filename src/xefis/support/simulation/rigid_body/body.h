@@ -121,15 +121,15 @@ class Body: public nu::Noncopyable
 	 */
 	[[nodiscard]]
 	Placement<BodyCOM, BodyOrigin> const&
-	origin_placement() const noexcept
-		{ return _origin_placement; }
+	origin_placement_in_com() const noexcept
+		{ return _origin_placement_in_com; }
 
 	/**
 	 * Set new placement of origin (relative to center-of-mass).
 	 */
 	void
 	set_origin_placement (Placement<BodyCOM, BodyOrigin> const& origin_placement) noexcept
-		{ _origin_placement = origin_placement; }
+		{ _origin_placement_in_com = origin_placement; }
 
 	/**
 	 * Return velocity moments of the center of mass in World coordinate system.
@@ -393,7 +393,7 @@ class Body: public nu::Noncopyable
 	// Location of center-of-mass:
 	Placement<WorldSpace, BodyCOM>						_placement;
 	// Location of origin:
-	Placement<BodyCOM, BodyOrigin>						_origin_placement;
+	Placement<BodyCOM, BodyOrigin>						_origin_placement_in_com;
 	// Velocity of center-of-mass:
 	VelocityMoments<WorldSpace>							_velocity_moments;
 	mutable std::optional<VelocityMoments<BodyCOM>>		_body_space_velocity_moments;
@@ -635,9 +635,9 @@ template<CoordinateSystemConcept Space>
 	Body::origin() const
 	{
 		if constexpr (std::is_same_v<Space, WorldSpace>)
-			return _placement.rotate_translate_to_base (_origin_placement.position());
+			return _placement.rotate_translate_to_base (_origin_placement_in_com.position());
 		else if constexpr (std::is_same_v<Space, BodyCOM>)
-			return _origin_placement.position();
+			return _origin_placement_in_com.position();
 		else if constexpr (std::is_same_v<Space, BodyOrigin>)
 			return math::zero;
 		else

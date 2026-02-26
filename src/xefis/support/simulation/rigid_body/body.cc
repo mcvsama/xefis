@@ -52,7 +52,7 @@ Body::set_mass_moments (MassMomentsAtArm<BodyCOM> const& mass_moments)
 
 	// Because the origin is defined as relative to center of mass, and we just moved center of mass
 	// while not wanting to move origin, move the origin back:
-	_origin_placement.translate_frame (-com_position);
+	_origin_placement_in_com.translate_frame (-com_position);
 }
 
 
@@ -81,7 +81,7 @@ Body::rotate_about_world_origin (RotationQuaternion<WorldSpace> const& rotation)
 void
 Body::rotate_about_body_origin (RotationQuaternion<WorldSpace> const& rotation)
 {
-	SpaceLength<WorldSpace> const about_point = _placement.rotate_translate_to_base (_origin_placement.position());
+	SpaceLength<WorldSpace> const about_point = _placement.rotate_translate_to_base (_origin_placement_in_com.position());
 
 	_placement.rotate_base_frame_about (about_point, rotation);
 	_velocity_moments = rotation * _velocity_moments;
@@ -94,7 +94,7 @@ Body::rotate_about_body_origin (RotationQuaternion<WorldSpace> const& rotation)
 void
 Body::move_origin_to (SpaceLength<WorldSpace> const& new_origin_position)
 {
-	SpaceLength<BodyCOM> const old_origin_position_in_BodyCOM = _origin_placement.position();
+	SpaceLength<BodyCOM> const old_origin_position_in_BodyCOM = _origin_placement_in_com.position();
 	SpaceLength<BodyCOM> const new_origin_position_in_BodyCOM = _placement.rotate_translate_to_body (new_origin_position);
 	SpaceLength<BodyCOM> const new_com_position_in_BodyCOM = new_origin_position_in_BodyCOM - old_origin_position_in_BodyCOM;
 	SpaceLength<WorldSpace> const new_com_position_in_WorldSpace = _placement.rotate_translate_to_base (new_com_position_in_BodyCOM);
@@ -136,7 +136,7 @@ Body::bounding_sphere_radius (Shape const& shape) const
 	auto radius = 0_m;
 
 	shape.for_each_vertex ([&] (ShapeVertex const& vertex) {
-		auto const vertex_in_com = _origin_placement.rotate_translate_to_base (vertex.position());
+		auto const vertex_in_com = _origin_placement_in_com.rotate_translate_to_base (vertex.position());
 		radius = std::max (radius, abs (vertex_in_com));
 	});
 
