@@ -30,7 +30,7 @@ identifier (BasicSocket const& socket)
 	if (auto const* module_socket = dynamic_cast<BasicModuleSocket const*> (&socket))
 		return module_socket->path().string();
 	else
-		return "(unnamed socket)";
+		return std::format ("(unnamed socket {:p})", static_cast<void const*> (&socket));
 }
 
 

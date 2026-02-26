@@ -16,6 +16,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/sockets/identifier.h>
 #include <xefis/modules/comm/link/link_decoder.h>
 #include <xefis/utility/hextable.h>
 
@@ -172,19 +173,26 @@ LinkProtocol::Bitfield::size() const
 
 
 void
-LinkProtocol::Bitfield::produce_append (Blob& blob, nu::Logger const&)
+LinkProtocol::Bitfield::produce_append (Blob& blob, nu::Logger const& logger)
 {
 	std::vector<bool> bits;
 	bits.reserve (8 * size());
 
 	for (auto const& bsvariant: _bit_sources)
 	{
-		std::visit ([&bits] (auto&& bs) {
+		std::visit ([this, &bits, &logger] (auto&& bs) {
 			uint_least64_t v = bs.value_if_nil;
 
-			if (bs.socket && fits_in_bits (*bs.socket, bs.bits))
-				v = *bs.socket;
-			// TODO signal error if doesn't fits_in_bits()?
+			if (bs.socket)
+			{
+				if (fits_in_bits (*bs.socket, bs.bits))
+					v = *bs.socket;
+				else
+				{
+					logger << std::format ("LinkProtocol::Bitfield: value of socket '{}', {}, doesn't fit in {} bits",
+										   identifier (bs.socket), *bs.socket, bs.bits);
+				}
+			}
 
 			for (uint8_t b = 0; b < bs.bits; ++b)
 				bits.push_back ((v >> b) & 1);
