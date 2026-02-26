@@ -60,6 +60,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	static constexpr auto		kDefaultPositionScale		= 0.0025_mm / 1_m;
 	static constexpr si::Length	kDefaultConstraintDiameter	= 1.5_cm;
 	static constexpr si::Length	kDefaultHingeDiameter		= 3_cm;
+	static constexpr si::Length	kMinDustGridSize			= 2.5_m;
 
 	static constexpr auto		kAtmosphereRadius			= kEarthMeanRadius + 50_km;
 	static constexpr auto		kSunRadius					= 696'340_km;
@@ -264,6 +265,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 		{
 			_followed = &object;
 			compute_followed_position();
+			recalculate_followed_object_diameter();
 			compute_camera_transform();
 		}
 
@@ -674,6 +676,9 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	void
 	compute_followed_position();
 
+	void
+	recalculate_followed_object_diameter();
+
 	[[nodiscard]]
 	SpaceLength<WorldSpace>
 	planet_position() const;
@@ -836,6 +841,8 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	std::optional<SpaceLength<WorldSpace>>
 									_moon_position_in_ecef;
 	float							_sky_box_visibility			{ 1.0f };
+	Shape							_dust_particle;
+	si::Length						_followed_object_diameter	{ 0_m };
 };
 
 

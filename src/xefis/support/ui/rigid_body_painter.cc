@@ -141,6 +141,7 @@ RigidBodyPainter::set_followed_to_none()
 {
 	_followed = std::monostate();
 	compute_followed_position();
+	recalculate_followed_object_diameter();
 	compute_camera_transform();
 }
 
@@ -887,12 +888,8 @@ RigidBodyPainter::paint_air_particles()
 		// _followed_position - _camera.position() uses doubles; but _gl.translate() internally reduces them to floats:
 		_gl.translate (_followed_position - _camera.position());
 
-		// Air 'particles' only appear if we have a planet:
-		// TODO both dust size and grid size should depend on the airplane size (max bounds?)
-		auto const dust_size = 2_cm;
-		auto const grid_size = 5_m;
-		static auto const range = 3 * grid_size;
-		static auto const dust = make_centered_sphere_shape ({ .radius = dust_size, .n_slices = 3, .n_stacks = 3, .material = kWhiteMatte });
+		auto const grid_size = std::max (_followed_object_diameter, kMinDustGridSize);
+		auto const range = 3 * grid_size;
 
 		// Figure out nearest 3D grid points.
 		// Then wiggle each one pseudo-randomly.
@@ -924,11 +921,32 @@ RigidBodyPainter::paint_air_particles()
 						auto const wiggled_y = y - body_pos.y() + prng_factor * _air_particles_prng() - half_grid_size;
 						auto const wiggled_z = z - body_pos.z() + prng_factor * _air_particles_prng() - half_grid_size;
 						_gl.translate (wiggled_x, wiggled_y, wiggled_z);
-						_gl.draw (dust);
+						_gl.draw (_dust_particle);
 					});
 				}
 			}
 		}
+	});
+}
+
+
+void
+RigidBodyPainter::recalculate_followed_object_diameter()
+{
+	if (auto const* body = followed_body())
+		_followed_object_diameter = 2 * body->bounding_sphere_radius (shape_for (*body));
+	else if (auto const* group = followed_group())
+		_followed_object_diameter = 2 * group->bounding_sphere_radius();
+	else
+		_followed_object_diameter = 0_m;
+
+	auto const dust_size = std::max<si::Length> (2_cm, 1.0 / 250 * _followed_object_diameter);
+
+	_dust_particle = make_centered_sphere_shape ({
+		.radius = dust_size,
+		.n_slices = 3,
+		.n_stacks = 3,
+		.material = kWhiteMatte,
 	});
 }
 
