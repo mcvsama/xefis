@@ -673,6 +673,11 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	SpaceVector<float, RGBSpace>
 	sky_correction (SpaceVector<float, RGBSpace> rgb, SunPosition const&) const;
 
+	/**
+	 * Update cached followed object position in cartesian and polar coordinates.
+	 * Uses body placement for followed body, group center of mass for followed group,
+	 * and origin when nothing is followed.
+	 */
 	void
 	compute_followed_position();
 
@@ -693,9 +698,17 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	void
 	check_texture_images();
 
+	/**
+	 * Ensure planet texture images are loading when planet rendering is enabled.
+	 * Starts a shared asynchronous load only once.
+	 */
 	void
 	check_planet_texture_images();
 
+	/**
+	 * Ensure universe sky-box texture images are loading when universe rendering is enabled.
+	 * Starts a shared asynchronous load of all cube-map faces only once.
+	 */
 	void
 	check_universe_texture_images();
 
@@ -706,9 +719,16 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	void
 	check_textures();
 
+	/**
+	 * Create OpenGL textures for the planet and moon when their images are ready.
+	 * Also invalidates dependent cached shapes so they are rebuilt with textures.
+	 */
 	void
 	check_planet_textures();
 
+	/**
+	 * Create OpenGL textures for universe cube-map faces when their images are ready.
+	 */
 	void
 	check_universe_textures();
 
@@ -739,6 +759,10 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	float
 	compute_sky_box_visibility (si::Angle const sun_altitude_above_horizon) const;
 
+	/**
+	 * Recompute camera rotation and position from current camera mode, followed object,
+	 * user transforms and planet settings. Also update cached polar position and callbacks.
+	 */
 	void
 	compute_camera_transform();
 
@@ -753,6 +777,10 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	gravity_down_rotation (si::LonLat const position)
 		{ return x_rotation<WorldSpace> (position.lat() - 90_deg) * y_rotation<WorldSpace> (-position.lon()); }
 
+	/**
+	 * Return what fraction of the Sun face should be considered visible near the horizon.
+	 * Maps Sun altitude around +/- face angular radius to range 0.0..1.0.
+	 */
 	[[nodiscard]]
 	constexpr float
 	compute_sun_visible_surface_factor (si::Angle const sun_altitude_above_horizon);
