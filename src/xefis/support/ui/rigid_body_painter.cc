@@ -165,6 +165,7 @@ void
 RigidBodyPainter::set_user_camera_translation (SpaceLength<WorldSpace> const& translation)
 {
 	_user_camera_translation = translation;
+	_body_basis = make_basis (_user_camera_translation.norm() / 20);
 	compute_camera_transform();
 }
 
@@ -1149,8 +1150,9 @@ RigidBodyPainter::paint_helpers (rigid_body::Group const& group, GroupRenderingC
 			transform_gl_to_center_of_mass (group);
 			paint_center_of_mass();
 
+			// Rotation was taken into account in transform_gl_to_center_of_mass (Group).
 			if (group.rotation_reference_body())
-				paint_basis (make_basis (_user_camera_translation.norm() / 20)); // Rotation was taken into account in transform_gl_to_center_of_mass (Group).
+				paint_basis (_body_basis);
 		});
 	}
 }
@@ -1176,7 +1178,8 @@ RigidBodyPainter::paint_helpers (rigid_body::Body const& body, BodyRenderingConf
 				if (rendering.origin_visible)
 					paint_origin();
 
-				paint_basis (make_basis (_user_camera_translation.norm() / 20));
+				// Rotation was taken into account in transform_gl_to_center_of_mass (Group).
+				paint_basis (_body_basis);
 			}
 		});
 	}

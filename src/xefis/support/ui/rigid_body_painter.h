@@ -855,6 +855,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	Shape							_dust_particle;
 	si::Length						_followed_object_diameter	{ 0_m };
 	Shape							_ecef_basis					{ make_basis (8_cm) };
+	Shape							_body_basis					{ make_basis (1_cm) };
 };
 
 
