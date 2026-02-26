@@ -591,7 +591,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	paint_ecef_basis (QOpenGLPaintDevice&);
 
 	void
-	paint_basis (si::Length arrow_length);
+	paint_basis (Shape const&);
 
 	void
 	paint_universe_and_sun();
@@ -776,6 +776,14 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	static Shape
 	make_sun_shines_shape();
 
+	[[nodiscard]]
+	static Shape
+	make_basis (si::Length);
+
+	[[nodiscard]]
+	static Shape
+	make_z_arrow (si::Length length, si::Length radius, ShapeMaterial const&);
+
 	/**
 	 * Return body shape of a body, or create and cache a fallback default
 	 * shape from body's mass moments.
@@ -846,6 +854,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	float							_sky_box_visibility			{ 1.0f };
 	Shape							_dust_particle;
 	si::Length						_followed_object_diameter	{ 0_m };
+	Shape							_ecef_basis					{ make_basis (8_cm) };
 };
 
 

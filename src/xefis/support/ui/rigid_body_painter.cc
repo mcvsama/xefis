@@ -1150,7 +1150,7 @@ RigidBodyPainter::paint_helpers (rigid_body::Group const& group, GroupRenderingC
 			paint_center_of_mass();
 
 			if (group.rotation_reference_body())
-				paint_basis (_user_camera_translation.norm() / 20); // Rotation was taken into account in transform_gl_to_center_of_mass (Group).
+				paint_basis (make_basis (_user_camera_translation.norm() / 20)); // Rotation was taken into account in transform_gl_to_center_of_mass (Group).
 		});
 	}
 }
@@ -1176,7 +1176,7 @@ RigidBodyPainter::paint_helpers (rigid_body::Body const& body, BodyRenderingConf
 				if (rendering.origin_visible)
 					paint_origin();
 
-				paint_basis (_user_camera_translation.norm() / 20);
+				paint_basis (make_basis (_user_camera_translation.norm() / 20));
 			}
 		});
 	}
@@ -1388,48 +1388,17 @@ RigidBodyPainter::paint_ecef_basis (QOpenGLPaintDevice& canvas)
 		_gl.load_identity();
 		_gl.translate (0_m, 0_m, -1_m);
 		_gl.rotate (_camera_placement.body_rotation());
-		paint_basis (8_cm);
+		paint_basis (_ecef_basis);
 	});
 }
 
 
 void
-RigidBodyPainter::paint_basis (si::Length const length)
+RigidBodyPainter::paint_basis (Shape const& shape)
 {
-	si::Length const radius = length / 50;
-	si::Length const cone_radius = length / 13;
-	si::Length const cone_length = length / 5;
-
-	auto const blue = make_material (QColor (0x11, 0x11, 0xff));
-	auto const red = make_material (Qt::red);
-	auto const green = make_material (Qt::green);
-	auto const kNumFaces = 12;
-
 	setup_feature_light();
-
 	glFrontFace (GL_CCW);
-	// Root ball:
-	_gl.draw (make_centered_sphere_shape ({ .radius = 2 * radius, .n_slices = 8, .n_stacks = 4 }));
-	// X axis:
-	_gl.save_context ([&]{
-		_gl.rotate_y (+90_deg);
-		_gl.draw (make_cylinder_shape ({ .length = length, .radius = radius, .num_faces = kNumFaces, .material = red }));
-		_gl.translate (0_m, 0_m, length);
-		_gl.draw (make_cone_shape ({ .length = cone_length, .radius = cone_radius, .num_faces = kNumFaces, .with_bottom = true, .material = red }));
-	});
-	// Y axis:
-	_gl.save_context ([&]{
-		_gl.rotate_x (-90_deg);
-		_gl.draw (make_cylinder_shape ({ .length = length, .radius = radius, .num_faces = kNumFaces, .material = green }));
-		_gl.translate (0_m, 0_m, length);
-		_gl.draw (make_cone_shape ({ .length = cone_length, .radius = cone_radius, .num_faces = kNumFaces, .with_bottom = true, .material = green }));
-	});
-	// Z axis:
-	_gl.save_context ([&]{
-		_gl.draw (make_cylinder_shape ({ .length = length, .radius = radius, .num_faces = kNumFaces, .material = blue }));
-		_gl.translate (0_m, 0_m, length);
-		_gl.draw (make_cone_shape ({ .length = cone_length, .radius = cone_radius, .num_faces = kNumFaces, .with_bottom = true, .material = blue }));
-	});
+	_gl.draw (shape);
 }
 
 
@@ -1804,6 +1773,39 @@ RigidBodyPainter::make_sun_shines_shape()
 	});
 	negate_normals (sun_shines);
 	return sun_shines;
+}
+
+
+Shape
+RigidBodyPainter::make_basis (si::Length const length)
+{
+	si::Length const radius = length / 50;
+
+	static auto const blue = make_material (QColor (0x11, 0x11, 0xff));
+	static auto const red = make_material (Qt::red);
+	static auto const green = make_material (Qt::green);
+
+	auto root_ball = make_centered_sphere_shape ({ .radius = 2 * radius, .n_slices = 8, .n_stacks = 4 });
+	auto x_arrow = make_z_arrow (length, radius, red);
+	auto y_arrow = make_z_arrow (length, radius, green);
+	auto z_arrow = make_z_arrow (length, radius, blue);
+	x_arrow.rotate (y_rotation<BodyOrigin> (+90_deg));
+	y_arrow.rotate (x_rotation<BodyOrigin> (-90_deg));
+
+	return root_ball + x_arrow + y_arrow + z_arrow;
+}
+
+
+Shape
+RigidBodyPainter::make_z_arrow (si::Length const length, si::Length const radius, ShapeMaterial const& material)
+{
+	auto const cone_radius = length / 13;
+	auto const cone_length = length / 5;
+	auto constexpr kNumFaces = 12;
+	auto cylinder = make_cylinder_shape ({ .length = length, .radius = radius, .num_faces = kNumFaces, .material = material });
+	auto cone = make_cone_shape ({ .length = cone_length, .radius = cone_radius, .num_faces = kNumFaces, .with_bottom = true, .material = material });
+	cone.translate ({ 0_m, 0_m, length });
+	return cylinder + cone;
 }
 
 
