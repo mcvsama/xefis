@@ -76,31 +76,6 @@ RigidBodyViewer::reset_camera_position()
 }
 
 
-SpaceLength<WorldSpace>
-RigidBodyViewer::default_camera_translation() const noexcept
-{
-	if (auto const* body = followed_body())
-		return auto_zoom_camera_translation (body->bounding_sphere_radius());
-
-	if (auto const* group = followed_group())
-		return auto_zoom_camera_translation (group->bounding_sphere_radius());
-
-	return kDefaultCameraTranslation;
-}
-
-
-SpaceLength<WorldSpace>
-RigidBodyViewer::auto_zoom_camera_translation (si::Length const followed_object_radius) noexcept
-{
-	if (followed_object_radius <= 0_m)
-		return kDefaultCameraTranslation;
-
-	auto const required_distance = kAutoZoomMarginFactor * followed_object_radius / sin (0.5 * kAutoZoomFOV);
-	auto const camera_distance = std::max<si::Length> (required_distance, kZoomRange.min());
-	return { 0_m, 0_m, camera_distance };
-}
-
-
 void
 RigidBodyViewer::toggle_pause()
 {
@@ -614,9 +589,29 @@ RigidBodyViewer::display_menu (QPoint const& cursor_position)
 }
 
 
+SpaceLength<WorldSpace>
+RigidBodyViewer::default_camera_translation() const noexcept
+{
+	if (auto const* body = followed_body())
+		return auto_zoom_camera_translation (body->bounding_sphere_radius());
+
+	if (auto const* group = followed_group())
+		return auto_zoom_camera_translation (group->bounding_sphere_radius());
+
+	return kDefaultCameraTranslation;
+}
 
 
+SpaceLength<WorldSpace>
+RigidBodyViewer::auto_zoom_camera_translation (si::Length const followed_object_radius) noexcept
+{
+	if (followed_object_radius <= 0_m)
+		return kDefaultCameraTranslation;
 
+	auto const required_distance = kAutoZoomMarginFactor * followed_object_radius / sin (0.5 * kAutoZoomFOV);
+	auto const camera_distance = std::max<si::Length> (required_distance, kZoomRange.min());
+	return { 0_m, 0_m, camera_distance };
+}
 
 
 void
