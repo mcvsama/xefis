@@ -426,9 +426,9 @@ PerformanceComputer::compute_C_L()
 void
 PerformanceComputer::compute_C_D()
 {
-	// TODO weź bieżące przyspieszenie wzdłuż osi y, oblicz z F=ma jaka jest siła przyspieszająca,
-	// oblicz różnicę między siłą ciągu a siłą przyspieszającą i to będzie drag.
-	// Ze wzoru na drag oblicz współczynnik C_D.
+	// TODO take the current acceleration along the y-axis, compute from F = ma what the accelerating force is,
+	// compute the difference between the thrust force and the accelerating force and that will be the drag.
+	// From the drag equation compute the drag coefficient C_D.
 	//   C_D = drag / (0.5 * air_density * TAS^2 * wing_area),
 }
 
