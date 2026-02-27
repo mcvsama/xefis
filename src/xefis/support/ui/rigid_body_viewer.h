@@ -490,9 +490,16 @@ class RigidBodyViewer: public GLAnimationWidget
 	precision()
 		{ return (QGuiApplication::queryKeyboardModifiers() & Qt::ShiftModifier) ? kHighPrecisionFactor : 1.0; }
 
+	/**
+	 * Update hovered body state from a cursor position, or clear hover when no position is provided.
+	 * Triggers hovered-body callback on change.
+	 */
 	void
 	set_hovered_body_from_cursor (std::optional<QPoint>);
 
+	/**
+	 * Focus body under the given cursor position and emit clicked-body callback when one is hit.
+	 */
 	void
 	focus_body_from_cursor (QPoint const&);
 
