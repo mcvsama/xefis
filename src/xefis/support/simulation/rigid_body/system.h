@@ -226,6 +226,15 @@ class System: private nu::Noncopyable
 	void
 	set_friction_factor (double factor) noexcept;
 
+	[[nodiscard]]
+	Group*
+	find_group_for (Body const&) noexcept;
+
+	[[nodiscard]]
+	Group const*
+	find_group_for (Body const& body) const noexcept
+		{ return const_cast<System*> (this)->find_group_for (body); }
+
   private:
 	FramePrecomputations	_frame_precomputations;
 	Groups					_groups;

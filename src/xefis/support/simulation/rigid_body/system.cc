@@ -99,4 +99,19 @@ System::set_friction_factor (double factor) noexcept
 		c->set_friction_factor (factor);
 }
 
+
+Group*
+System::find_group_for (Body const& body) noexcept
+{
+	for (auto const& group: _groups)
+	{
+		auto const& grouped_bodies = group->bodies();
+
+		if (std::find (grouped_bodies.begin(), grouped_bodies.end(), &body) != grouped_bodies.end())
+			return group.get();
+	}
+
+	return nullptr;
+}
+
 } // namespace xf::rigid_body
