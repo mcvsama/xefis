@@ -32,6 +32,7 @@
 #include <QLabel>
 #include <QLayout>
 #include <QPushButton>
+#include <QScrollArea>
 #include <QSignalBlocker>
 #include <QSizePolicy>
 #include <QSlider>
@@ -425,10 +426,23 @@ SimulatorWidget::make_body_controls()
 	auto* body_controls = new QWidget (this);
 	body_controls->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Expanding);
 
+	auto* editors_proxy = new QWidget();
+	editors_proxy->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Minimum);
+	auto* editors_proxy_layout = new QVBoxLayout (editors_proxy);
+	editors_proxy_layout->setSizeConstraint (QLayout::SetMinAndMaxSize);
+	editors_proxy_layout->addWidget (&*_editors_stack);
+	editors_proxy_layout->addStretch();
+
+	auto* editors_scroll_area = new QScrollArea (body_controls);
+	editors_scroll_area->setWidgetResizable (true);
+	editors_scroll_area->setHorizontalScrollBarPolicy (Qt::ScrollBarAlwaysOff);
+	editors_scroll_area->setVerticalScrollBarPolicy (Qt::ScrollBarAlwaysOn);
+	editors_scroll_area->setWidget (editors_proxy);
+
 	auto* layout = new QHBoxLayout (body_controls);
 	layout->setContentsMargins (0, 0, 0, 0);
 	layout->addWidget (&*_items_tree);
-	layout->addWidget (&*_editors_stack);
+	layout->addWidget (editors_scroll_area);
 
 	return body_controls;
 }
