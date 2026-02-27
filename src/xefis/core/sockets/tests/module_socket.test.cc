@@ -446,8 +446,6 @@ nu::AutoTest t8 ("xf::Socket << 5; xf::Socket << \"abc\"", []{
 nu::AutoTest t9 ("xf::Socket << std::unique_ptr<xf::Socket>", []{
 	TestEnvironment<int> env1;
 
-	// TODO Zabroń konstrukcji ConnectableSocket (5), bo przy następnym fetchu i tak się zniluje,
-	// albo zrób tak, że jest to ekwiwalent ConnectableSocket() << ConstantSource (5);
 	auto mid = std::make_unique<ConnectableSocket<int>>();
 	*mid << 5;
 	auto& mid_ref = env1.in << std::move (mid);

@@ -55,12 +55,6 @@ template<class pValue>
 		Socket() = default;
 
 		/**
-		 * Create a Socket with initial value.
-		 */
-		explicit
-		Socket (Value const& value, std::optional<Value> const& fallback_value = std::nullopt);
-
-		/**
 		 * Compare current values with another Socket, nil-value included.
 		 * Nothing else is compared (eg. fallback value), only the current value.
 		 */
@@ -197,14 +191,6 @@ template<class pValue>
 
 
 namespace xf {
-
-template<class V>
-	inline
-	Socket<V>::Socket (Value const& value, std::optional<Value> const& fallback_value):
-		_value (value),
-		_fallback_value (fallback_value)
-	{ }
-
 
 template<class V>
 	inline bool
