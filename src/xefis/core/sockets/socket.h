@@ -187,7 +187,8 @@ template<class pValue>
 } // namespace xf
 
 
-#include <xefis/core/sockets/socket_traits.h> // TODO move to top?
+// Must be here, SocketTraits expects definition of class Socket:
+#include <xefis/core/sockets/socket_traits.h>
 
 
 namespace xf {
