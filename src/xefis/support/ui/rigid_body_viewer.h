@@ -16,6 +16,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/base/icons.h>
 #include <xefis/support/simulation/rigid_body/system.h>
 #include <xefis/support/ui/gl_animation_widget.h>
 #include <xefis/support/ui/rigid_body_painter.h>
@@ -55,6 +56,7 @@ class RigidBodyViewer: public GLAnimationWidget
 	using BeforePaintCallback = std::function<void (std::optional<si::Time> frame_duration)>;
 	using HoveredBodyCallback = std::function<void (rigid_body::Body const*)>;
 	using ClickedBodyCallback = std::function<void (rigid_body::Body const*)>;
+	using SystemChangedCallback = std::function<void()>;
 
 	using FPSMode = GLAnimationWidget::FPSMode;
 	using GroupRenderingConfig = RigidBodyPainter::GroupRenderingConfig;
@@ -361,6 +363,13 @@ class RigidBodyViewer: public GLAnimationWidget
 		{ _clicked_body_callback = std::move (callback); }
 
 	/**
+	 * Set callback called when something changes in the rigid body system.
+	 */
+	void
+	set_system_changed_callback (SystemChangedCallback callback)
+		{ _system_changed_callback = std::move (callback); }
+
+	/**
 	 * Return playback mode.
 	 */
 	[[nodiscard]]
@@ -396,6 +405,33 @@ class RigidBodyViewer: public GLAnimationWidget
 	 */
 	void
 	update();
+
+	/**
+	 * Populate generic rendering toggles in the provided menu.
+	 */
+	void
+	populate_rendering_menu (QMenu&);
+
+	/**
+	 * Populate context actions for a body, including follow/edit and body rendering options.
+	 * If body_item is provided, it is used as an inline rename target.
+	 */
+	void
+	populate_context_menu_for (rigid_body::Body&, QMenu&, QTreeWidgetItem* body_item = nullptr);
+
+	/**
+	 * Populate context actions for a group, including follow/edit and group rendering options.
+	 * If group_item is provided, it is used as an inline rename target.
+	 */
+	void
+	populate_context_menu_for (rigid_body::Group&, QMenu&, QTreeWidgetItem* group_item = nullptr);
+
+	/**
+	 * Populate context actions for a constraint, including rename and break operations.
+	 * If constraint_item is provided, it is used as an inline rename target.
+	 */
+	void
+	populate_context_menu_for (rigid_body::Constraint&, QMenu&, QTreeWidgetItem* constraint_item = nullptr);
 
   protected:
 	// QWidget API
@@ -464,7 +500,7 @@ class RigidBodyViewer: public GLAnimationWidget
 	 * Display popup menu. Return true if user selected any action from the menu.
 	 */
 	bool
-	display_menu();
+	display_menu (QPoint const& cursor_position);
 
 	/**
 	 * Return default camera translation for current follow target.
@@ -481,6 +517,13 @@ class RigidBodyViewer: public GLAnimationWidget
 	[[nodiscard]]
 	static SpaceLength<WorldSpace>
 	auto_zoom_camera_translation (si::Length followed_object_radius) noexcept;
+
+	/**
+	 * Configure a rename action for an object.
+	 * Uses inline tree editing when item is provided, otherwise falls back to input dialog.
+	 */
+	void
+	setup_edit_action_for (HasConfigurableLabel&, QTreeWidgetItem*);
 
 	/**
 	 * Forward current camera position to the RigidBodyPainter.
@@ -500,6 +543,16 @@ class RigidBodyViewer: public GLAnimationWidget
 	{
 		_rigid_body_painter.set_user_camera_rotation (_camera_rotation);
 		update();
+	}
+
+	/**
+	 * Notify observers of the system that a change occured.
+	 */
+	void
+	notify_system_changed()
+	{
+		if (_system_changed_callback)
+			_system_changed_callback();
 	}
 
   private:
@@ -523,8 +576,12 @@ class RigidBodyViewer: public GLAnimationWidget
 	rigid_body::Body const*		_hovered_body_from_cursor		{ nullptr };
 	HoveredBodyCallback			_hovered_body_callback;
 	ClickedBodyCallback			_clicked_body_callback;
+	SystemChangedCallback		_system_changed_callback;
 	// Self-deletes after a while and becomes a dangling pointer:
 	QTimer*						_painter_ready_check_timer		{ new QTimer (this) };
+	// Context menu icons:
+	QIcon						_followed_group_icon			{ icons::followed_group() };
+	QIcon						_followed_body_icon				{ icons::followed_body() };
 };
 
 } // namespace xf

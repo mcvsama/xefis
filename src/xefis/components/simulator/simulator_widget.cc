@@ -388,6 +388,13 @@ SimulatorWidget::make_body_controls()
 		_items_tree->set_current_body (body);
 	});
 
+	_rigid_body_viewer->set_system_changed_callback ([this] {
+		_items_tree->refresh();
+		_group_editor->refresh();
+		_body_editor->refresh();
+		_constraint_editor->refresh();
+	});
+
 	QObject::connect (&*_items_tree, &QTreeWidget::itemChanged, [this] (QTreeWidgetItem* item, int column) {
 		if (column == 0)
 		{

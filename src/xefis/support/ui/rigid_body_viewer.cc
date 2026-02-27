@@ -20,6 +20,7 @@
 
 // Qt:
 #include <QCoreApplication>
+#include <QInputDialog>
 #include <QMenu>
 #include <QScreen>
 #include <QShortcut>
@@ -134,6 +135,222 @@ RigidBodyViewer::update()
 
 
 void
+RigidBodyViewer::populate_rendering_menu (QMenu& menu)
+{
+	// "Show constraints"
+	if (_rigid_body_system && !_rigid_body_system->constraints().empty())
+	{
+		auto* action = menu.addAction ("Show &constraints", [this] {
+			auto& conf = _rigid_body_painter.features_config();
+			conf.constraints_visible = !conf.constraints_visible;
+			update();
+		});
+		action->setCheckable (true);
+		action->setChecked (_rigid_body_painter.features_config().constraints_visible);
+	}
+
+	// "Show gravity"
+	{
+		auto* action = menu.addAction ("Show &gravity", [this] {
+			auto& conf = _rigid_body_painter.features_config();
+			conf.gravity_visible = !conf.gravity_visible;
+			update();
+		});
+		action->setCheckable (true);
+		action->setChecked (_rigid_body_painter.features_config().gravity_visible);
+	}
+
+	// "Show aerodynamic forces"
+	{
+		auto* action = menu.addAction ("Show &aerodynamic forces", [this] {
+			auto& conf = _rigid_body_painter.features_config();
+			conf.aerodynamic_forces_visible = !conf.aerodynamic_forces_visible;
+			update();
+		});
+		action->setCheckable (true);
+		action->setChecked (_rigid_body_painter.features_config().aerodynamic_forces_visible);
+	}
+
+	// "Show external forces"
+	{
+		auto* action = menu.addAction ("Show &external forces", [this] {
+			auto& conf = _rigid_body_painter.features_config();
+			conf.external_forces_visible = !conf.external_forces_visible;
+			update();
+		});
+		action->setCheckable (true);
+		action->setChecked (_rigid_body_painter.features_config().external_forces_visible);
+	}
+
+	// "Show angular velocities"
+	{
+		auto* action = menu.addAction ("Show angula&r velocities", [this] {
+			auto& conf = _rigid_body_painter.features_config();
+			conf.angular_velocities_visible = !conf.angular_velocities_visible;
+			update();
+		});
+		action->setCheckable (true);
+		action->setChecked (_rigid_body_painter.features_config().angular_velocities_visible);
+	}
+
+	// "Show angular momenta"
+	{
+		auto* action = menu.addAction ("Show angular &momenta", [this] {
+			auto& conf = _rigid_body_painter.features_config();
+			conf.angular_momenta_visible = !conf.angular_momenta_visible;
+			update();
+		});
+		action->setCheckable (true);
+		action->setChecked (_rigid_body_painter.features_config().angular_momenta_visible);
+	}
+
+	menu.addSeparator();
+
+	{
+		auto* action = menu.addAction ("Sun enabled", [this] {
+			set_sun_enabled (!sun_enabled());
+			start_waiting_for_resources();
+		});
+		action->setCheckable (true);
+		action->setChecked (_rigid_body_painter.sun_enabled());
+	}
+
+	{
+		auto* action = menu.addAction ("Universe enabled", [this] {
+			set_universe_enabled (!universe_enabled());
+			start_waiting_for_resources();
+		});
+		action->setCheckable (true);
+		action->setChecked (_rigid_body_painter.universe_enabled());
+	}
+}
+
+
+void
+RigidBodyViewer::populate_context_menu_for (rigid_body::Body& body, QMenu& menu, QTreeWidgetItem* body_item)
+{
+	auto& rendering = get_rendering_config (body);
+
+	{
+		auto* action = menu.addAction ("&Follow this body", [this, &body] {
+			set_followed (body);
+			notify_system_changed();
+		});
+		action->setIcon (_followed_body_icon);
+	}
+
+	menu.addAction ("&Edit name", [this, &body, body_item] {
+		setup_edit_action_for (body, body_item);
+	});
+
+	{
+		auto* action = menu.addAction ("Break this body", [this, &body] {
+			body.set_broken();
+			update();
+			notify_system_changed();
+		});
+
+		if (body.broken())
+			action->setEnabled (false);
+	}
+
+	menu.addSeparator();
+
+	{
+		auto* action = menu.addAction ("Body visible", [this, &body, &rendering] {
+			rendering.body_visible = !rendering.body_visible;
+			update();
+		});
+		action->setCheckable (true);
+		action->setChecked (rendering.body_visible);
+	}
+
+	{
+		auto* action = menu.addAction ("Origin always visible", [this, &body, &rendering] {
+			rendering.origin_visible = !rendering.origin_visible;
+			update();
+		});
+		action->setCheckable (true);
+		action->setChecked (rendering.origin_visible);
+	}
+
+	{
+		auto* action = menu.addAction ("Center of mass always visible", [this, &body, &rendering] {
+			rendering.center_of_mass_visible = !rendering.center_of_mass_visible;
+			update();
+		});
+		action->setCheckable (true);
+		action->setChecked (rendering.center_of_mass_visible);
+	}
+
+	{
+		auto* action = menu.addAction ("Moments of inertia cuboid visible", [this, &body, &rendering] {
+			rendering.moments_of_inertia_visible = !rendering.moments_of_inertia_visible;
+			update();
+		});
+		action->setCheckable (true);
+		action->setChecked (rendering.moments_of_inertia_visible);
+	}
+
+	if (_rigid_body_system)
+	{
+		if (auto const* group = _rigid_body_system->find_group_for (body))
+		{
+			menu.addSeparator();
+			auto* action = menu.addAction ("&Follow this group", [this, group] {
+				set_followed (*group);
+				notify_system_changed();
+			});
+			action->setIcon (_followed_group_icon);
+		}
+	}
+}
+
+
+void
+RigidBodyViewer::populate_context_menu_for (rigid_body::Group& group, QMenu& menu, QTreeWidgetItem* group_item)
+{
+	auto& rendering = get_rendering_config (group);
+
+	{
+		auto* action = menu.addAction ("&Follow this group", [this, &group] {
+			set_followed (group);
+			notify_system_changed();
+		});
+		action->setIcon (_followed_group_icon);
+	}
+
+	menu.addAction ("&Edit name", [this, &group, group_item] {
+		setup_edit_action_for (group, group_item);
+	});
+
+	{
+		auto* action = menu.addAction ("Center of mass always visible", [this, &group, &rendering] {
+			rendering.center_of_mass_visible = !rendering.center_of_mass_visible;
+			update();
+		});
+		action->setCheckable (true);
+		action->setChecked (rendering.center_of_mass_visible);
+	}
+}
+
+
+void
+RigidBodyViewer::populate_context_menu_for (rigid_body::Constraint& constraint, QMenu& menu, QTreeWidgetItem* constraint_item)
+{
+	menu.addAction ("&Edit name", [this, &constraint, constraint_item] {
+		setup_edit_action_for (constraint, constraint_item);
+	});
+
+	menu.addAction ("Break this constraint", [this, &constraint] {
+		constraint.set_broken();
+		update();
+		notify_system_changed();
+	});
+}
+
+
+void
 RigidBodyViewer::mousePressEvent (QMouseEvent* event)
 {
 	switch (event->button())
@@ -190,7 +407,7 @@ RigidBodyViewer::mouseReleaseEvent (QMouseEvent* event)
 	if (event->button() == Qt::RightButton)
 		if (!_prevent_menu_reappear)
 			if (!_mouse_moved_since_press)
-				if (!display_menu())
+				if (!display_menu (event->position().toPoint()))
 					_prevent_menu_reappear = true;
 
 	_last_pos = event->pos();
@@ -373,98 +590,51 @@ RigidBodyViewer::focus_body_from_cursor (QPoint const& cursor_position)
 
 
 bool
-RigidBodyViewer::display_menu()
+RigidBodyViewer::display_menu (QPoint const& cursor_position)
 {
 	QMenu menu;
 
-	// "Show constraints"
-	if (_rigid_body_system && !_rigid_body_system->constraints().empty())
+	// Menu specific to clicked object:
+	if (_rigid_body_system)
 	{
-		auto* action = menu.addAction ("Show &constraints", [this] {
-			auto& conf = _rigid_body_painter.features_config();
-			conf.constraints_visible = !conf.constraints_visible;
-			update();
-		});
-		action->setCheckable (true);
-		action->setChecked (_rigid_body_painter.features_config().constraints_visible);
+		if (auto* body = _rigid_body_painter.body_under_cursor (*_rigid_body_system, cursor_position, size()))
+		{
+			populate_context_menu_for (*body, menu);
+			menu.addSeparator();
+			auto* rendering_menu = menu.addMenu ("Rendering");
+			populate_rendering_menu (*rendering_menu);
+		}
+		else
+			populate_rendering_menu (menu);
 	}
+	else
+		populate_rendering_menu (menu);
 
-	// "Show gravity"
+	return !!menu.exec (mapToGlobal (cursor_position));
+}
+
+
+
+
+
+
+
+void
+RigidBodyViewer::setup_edit_action_for (HasConfigurableLabel& object, QTreeWidgetItem* item)
+{
+	if (item)
+		item->treeWidget()->editItem (item, 0);
+	else
 	{
-		auto* action = menu.addAction ("Show &gravity", [this] {
-			auto& conf = _rigid_body_painter.features_config();
-			conf.gravity_visible = !conf.gravity_visible;
-			update();
-		});
-		action->setCheckable (true);
-		action->setChecked (_rigid_body_painter.features_config().gravity_visible);
+		auto clicked_ok = false;
+		auto const new_name = QInputDialog::getText (this, "Edit name", "Name:", QLineEdit::Normal, QString::fromStdString (object.label()), &clicked_ok);
+
+		if (clicked_ok)
+		{
+			object.set_label (new_name.toStdString());
+			notify_system_changed();
+		}
 	}
-
-	// "Show aerodynamic forces"
-	{
-		auto* action = menu.addAction ("Show &aerodynamic forces", [this] {
-			auto& conf = _rigid_body_painter.features_config();
-			conf.aerodynamic_forces_visible = !conf.aerodynamic_forces_visible;
-			update();
-		});
-		action->setCheckable (true);
-		action->setChecked (_rigid_body_painter.features_config().aerodynamic_forces_visible);
-	}
-
-	// "Show external forces"
-	{
-		auto* action = menu.addAction ("Show &external forces", [this] {
-			auto& conf = _rigid_body_painter.features_config();
-			conf.external_forces_visible = !conf.external_forces_visible;
-			update();
-		});
-		action->setCheckable (true);
-		action->setChecked (_rigid_body_painter.features_config().external_forces_visible);
-	}
-
-	// "Show angular velocities"
-	{
-		auto* action = menu.addAction ("Show angula&r velocities", [this] {
-			auto& conf = _rigid_body_painter.features_config();
-			conf.angular_velocities_visible = !conf.angular_velocities_visible;
-			update();
-		});
-		action->setCheckable (true);
-		action->setChecked (_rigid_body_painter.features_config().angular_velocities_visible);
-	}
-
-	// "Show angular momenta"
-	{
-		auto* action = menu.addAction ("Show angular &momenta", [this] {
-			auto& conf = _rigid_body_painter.features_config();
-			conf.angular_momenta_visible = !conf.angular_momenta_visible;
-			update();
-		});
-		action->setCheckable (true);
-		action->setChecked (_rigid_body_painter.features_config().angular_momenta_visible);
-	}
-
-	menu.addSeparator();
-
-	{
-		auto* action = menu.addAction ("Sun enabled", [this] {
-			set_sun_enabled (!sun_enabled());
-			start_waiting_for_resources();
-		});
-		action->setCheckable (true);
-		action->setChecked (_rigid_body_painter.sun_enabled());
-	}
-
-	{
-		auto* action = menu.addAction ("Universe enabled", [this] {
-			set_universe_enabled (!universe_enabled());
-			start_waiting_for_resources();
-		});
-		action->setCheckable (true);
-		action->setChecked (_rigid_body_painter.universe_enabled());
-	}
-
-	return !!menu.exec (QCursor::pos());
 }
 
 } // namespace xf

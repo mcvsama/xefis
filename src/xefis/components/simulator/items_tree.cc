@@ -468,105 +468,11 @@ ItemsTree::contextMenuEvent (QContextMenuEvent* event)
 	QTreeWidgetItem* item = itemAt (event->pos());
 
 	if (auto* group_item = dynamic_cast<GroupItem*> (item))
-	{
-		auto& rendering = _rigid_body_viewer.get_rendering_config (group_item->group());
-
-		{
-			auto* action = menu.addAction ("&Follow this group", [this, group_item] {
-				_rigid_body_viewer.set_followed (group_item->group());
-				refresh();
-			});
-			action->setIcon (_followed_group_icon);
-		}
-
-		{
-			auto* action = menu.addAction ("Center of mass always visible", [this, group_item, &rendering] {
-				rendering.center_of_mass_visible = !rendering.center_of_mass_visible;
-				_rigid_body_viewer.update();
-			});
-			action->setCheckable (true);
-			action->setChecked (rendering.center_of_mass_visible);
-		}
-	}
+		_rigid_body_viewer.populate_context_menu_for (group_item->group(), menu, group_item);
 	else if (auto* body_item = dynamic_cast<BodyItem*> (item))
-	{
-		auto& rendering = _rigid_body_viewer.get_rendering_config (body_item->body());
-
-		{
-			auto* action = menu.addAction ("&Follow this body", [this, body_item] {
-				_rigid_body_viewer.set_followed (body_item->body());
-				refresh();
-			});
-			action->setIcon (_followed_body_icon);
-		}
-
-		menu.addAction ("&Edit name", [this, body_item] {
-			editItem (body_item, 0);
-		});
-
-		{
-			auto* action = menu.addAction ("Break this body", [this, body_item] {
-				body_item->body().set_broken();
-				_rigid_body_viewer.update();
-				refresh();
-			});
-
-			if (body_item->body().broken())
-				action->setEnabled (false);
-		}
-
-		menu.addSeparator();
-
-		{
-			auto* action = menu.addAction ("Body visible", [this, body_item, &rendering] {
-				rendering.body_visible = !rendering.body_visible;
-				_rigid_body_viewer.update();
-			});
-			action->setCheckable (true);
-			action->setChecked (rendering.body_visible);
-		}
-
-		{
-			auto* action = menu.addAction ("Origin always visible", [this, body_item, &rendering] {
-				rendering.origin_visible = !rendering.origin_visible;
-				_rigid_body_viewer.update();
-			});
-			action->setCheckable (true);
-			action->setChecked (rendering.origin_visible);
-		}
-
-		{
-			auto* action = menu.addAction ("Center of mass always visible", [this, body_item, &rendering] {
-				rendering.center_of_mass_visible = !rendering.center_of_mass_visible;
-				_rigid_body_viewer.update();
-			});
-			action->setCheckable (true);
-			action->setChecked (rendering.center_of_mass_visible);
-		}
-
-		{
-			auto* action = menu.addAction ("Moments of inertia cuboid visible", [this, body_item, &rendering] {
-				rendering.moments_of_inertia_visible = !rendering.moments_of_inertia_visible;
-				_rigid_body_viewer.update();
-			});
-			action->setCheckable (true);
-			action->setChecked (rendering.moments_of_inertia_visible);
-		}
-
-		// TODO For airfoils - "Center of pressure visible" (green or light blue?)
-	}
+		_rigid_body_viewer.populate_context_menu_for (body_item->body(), menu, body_item);
 	else if (auto* constraint_item = dynamic_cast<ConstraintItem*> (item))
-	{
-		menu.addAction ("&Edit name", [this, constraint_item] {
-			editItem (constraint_item, 0);
-		});
-
-		menu.addAction ("Break this constraint", [this, constraint_item] {
-			constraint_item->constraint().set_broken();
-			_rigid_body_viewer.update();
-			refresh();
-		});
-	}
+		_rigid_body_viewer.populate_context_menu_for (constraint_item->constraint(), menu, constraint_item);
 
 	menu.exec (event->globalPos());
 }
