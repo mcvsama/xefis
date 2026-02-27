@@ -165,12 +165,8 @@ void
 RigidBodyPainter::set_user_camera_translation (SpaceLength<WorldSpace> const& translation)
 {
 	_user_camera_translation = translation;
-
-	_body_basis = make_basis (_user_camera_translation.norm() / 20);
-	_body_com_ball = make_center_of_mass_symbol_shape (_user_camera_translation.norm() / 150);
-	_body_origin_ball = make_centered_sphere_shape ({ .radius = _user_camera_translation.norm() / 150, .n_slices = 8, .n_stacks = 4, .material = make_material ({ 0xff, 0xff, 0x00 }) });
-
 	compute_camera_transform();
+	compute_camera_dependend_shapes();
 }
 
 
@@ -1705,6 +1701,15 @@ RigidBodyPainter::compute_camera_transform()
 
 	if (_camera_position_callback)
 		_camera_position_callback (_camera_placement.position());
+}
+
+
+void
+RigidBodyPainter::compute_camera_dependend_shapes()
+{
+	_body_basis = make_basis (_user_camera_translation.norm() / 20);
+	_body_com_ball = make_center_of_mass_symbol_shape (_user_camera_translation.norm() / 150);
+	_body_origin_ball = make_centered_sphere_shape ({ .radius = _user_camera_translation.norm() / 150, .n_slices = 8, .n_stacks = 4, .material = make_material ({ 0xff, 0xff, 0x00 }) });
 }
 
 

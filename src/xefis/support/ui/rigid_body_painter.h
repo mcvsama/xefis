@@ -767,6 +767,12 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	compute_camera_transform();
 
 	/**
+	 * Recompute shapes that depend on camera position (sizes of XYZ-bases, arrow lengths, etc).
+	 */
+	void
+	compute_camera_dependend_shapes();
+
+	/**
 	 * Make sure camera never goes under the surface of the Earth.
 	 */
 	void
