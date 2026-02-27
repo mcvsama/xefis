@@ -491,7 +491,7 @@ class RigidBodyViewer: public GLAnimationWidget
 		{ return (QGuiApplication::queryKeyboardModifiers() & Qt::ShiftModifier) ? kHighPrecisionFactor : 1.0; }
 
 	void
-	update_hovered_body_from_cursor (std::optional<QPoint>);
+	set_hovered_body_from_cursor (std::optional<QPoint>);
 
 	void
 	focus_body_from_cursor (QPoint const&);

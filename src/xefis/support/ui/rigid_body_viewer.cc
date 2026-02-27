@@ -415,14 +415,14 @@ RigidBodyViewer::mouseMoveEvent (QMouseEvent* event)
 		forward_camera_translation();
 	}
 
-	update_hovered_body_from_cursor (event->pos());
+	set_hovered_body_from_cursor (event->pos());
 }
 
 
 void
 RigidBodyViewer::leaveEvent (QEvent* event)
 {
-	update_hovered_body_from_cursor (std::nullopt);
+	set_hovered_body_from_cursor (std::nullopt);
 	GLAnimationWidget::leaveEvent (event);
 }
 
@@ -514,7 +514,7 @@ RigidBodyViewer::paint (QOpenGLPaintDevice& canvas)
 
 
 void
-RigidBodyViewer::update_hovered_body_from_cursor (std::optional<QPoint> const cursor_position)
+RigidBodyViewer::set_hovered_body_from_cursor (std::optional<QPoint> const cursor_position)
 {
 	rigid_body::Body const* hovered_body = nullptr;
 
