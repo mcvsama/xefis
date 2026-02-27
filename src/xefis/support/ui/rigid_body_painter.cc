@@ -238,7 +238,7 @@ RigidBodyPainter::set_universe_enabled (bool enabled)
 }
 
 
-rigid_body::Body const*
+rigid_body::Body*
 RigidBodyPainter::body_under_cursor (rigid_body::System const& system, QPoint const& cursor_position, QSize const& viewport_size)
 {
 	if (viewport_size.width() <= 0 || viewport_size.height() <= 0)
@@ -261,11 +261,11 @@ RigidBodyPainter::body_under_cursor (rigid_body::System const& system, QPoint co
 	auto const ray_direction_world = (_camera_placement.base_rotation() * ray_direction_camera).normalized();
 	auto const ray_origin_world = _camera_placement.position();
 	auto nearest_distance = std::numeric_limits<double>::infinity() * 1_m;
-	rigid_body::Body const* nearest_body = nullptr;
+	rigid_body::Body* nearest_body = nullptr;
 
 	for (auto const& body_ptr: system.bodies())
 	{
-		auto const& body = *body_ptr;
+		auto& body = *body_ptr;
 
 		if (get_rendering_config (body).body_visible)
 		{
