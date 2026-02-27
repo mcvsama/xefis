@@ -25,6 +25,7 @@
 #include <xefis/support/nature/mass_moments.h>
 #include <xefis/support/nature/velocity_moments.h>
 #include <xefis/support/nature/wrench.h>
+#include <xefis/support/properties/has_configurable_label.h>
 #include <xefis/support/shapes/shape.h>
 #include <xefis/support/simulation/rigid_body/body_iteration.h>
 #include <xefis/support/simulation/rigid_body/concepts.h>
@@ -48,7 +49,9 @@ namespace xf::rigid_body {
 /**
  * Rigid body.
  */
-class Body: public nu::Noncopyable
+class Body:
+	public HasConfigurableLabel,
+	public nu::Noncopyable
 {
   public:
 	enum ShapeType
@@ -67,15 +70,6 @@ class Body: public nu::Noncopyable
 	// Dtor
 	virtual
 	~Body() = default;
-
-	[[nodiscard]]
-	std::string const&
-	label() const noexcept
-		{ return _label; }
-
-	void
-	set_label (std::string const& label)
-		{ _label = label; }
 
 	/**
 	 * Return mass moments at center-of-mass.
@@ -387,7 +381,6 @@ class Body: public nu::Noncopyable
 	invalidate_placement_dependent_caches();
 
   private:
-	std::string											_label;
 	MassMoments<BodyCOM>								_mass_moments;
 	mutable std::optional<MassMoments<WorldSpace>>		_world_space_mass_moments;
 	// Location of center-of-mass:

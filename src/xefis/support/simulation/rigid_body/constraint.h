@@ -17,6 +17,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/nature/force_moments.h>
+#include <xefis/support/properties/has_configurable_label.h>
 #include <xefis/support/simulation/rigid_body/body.h>
 #include <xefis/support/simulation/rigid_body/connected_bodies.h>
 
@@ -40,7 +41,9 @@ using ConstraintForces = std::array<ForceMoments<WorldSpace>, 2>;
  *   (there were some small mistakes in some formulas, though).
  * • "Rigid Body Dynamics: Links and Joints", 16-09-2009 by Kristina Pickl
  */
-class Constraint: public ConnectedBodies
+class Constraint:
+	public ConnectedBodies,
+	public HasConfigurableLabel
 {
   public:
 	static constexpr double kDefaultBaumgarteFactor	= 0.5;
@@ -102,15 +105,6 @@ class Constraint: public ConnectedBodies
 	// Ctor
 	explicit
 	Constraint (ConnectedBodies const&);
-
-	[[nodiscard]]
-	std::string const&
-	label() const noexcept
-		{ return _label; }
-
-	void
-	set_label (std::string const& label)
-		{ _label = label; }
 
 	/**
 	 * Return true if constraint is enabled.
@@ -396,7 +390,6 @@ class Constraint: public ConnectedBodies
 		apply_constraint_mixing_factor (ConstraintMassMatrix<N>&) const;
 
   private:
-	std::string						_label;
 	bool							_enabled						{ true };
 	bool							_broken							{ false };
 	std::optional<si::Force>		_breaking_force;

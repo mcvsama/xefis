@@ -18,6 +18,7 @@
 #include <xefis/config/all.h>
 #include <xefis/support/math/geometry.h>
 #include <xefis/support/nature/mass_moments_at_arm.h>
+#include <xefis/support/properties/has_configurable_label.h>
 #include <xefis/support/simulation/rigid_body/concepts.h>
 
 // Neutrino:
@@ -37,21 +38,14 @@ class System;
  * A set of bodies that can be translated/rotated as a whole.
  * Group does not own bodies, rigid body System does.
  */
-class Group: private nu::Noncopyable
+class Group:
+	public HasConfigurableLabel,
+	private nu::Noncopyable
 {
   public:
 	// Ctor
 	explicit
 	Group (System& system);
-
-	[[nodiscard]]
-	std::string const&
-	label() const noexcept
-		{ return _label; }
-
-	void
-	set_label (std::string const& label)
-		{ _label = label; }
 
 	/**
 	 * Add new body to the group and the system.
@@ -156,7 +150,6 @@ class Group: private nu::Noncopyable
 	bounding_sphere_radius() const;
 
   private:
-	std::string			_label;
 	System*				_system;
 	std::vector<Body*>	_bodies;
 	Body const*			_rotation_reference_body { nullptr };
