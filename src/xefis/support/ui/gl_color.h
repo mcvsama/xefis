@@ -57,7 +57,7 @@ class GLColor
 
 	// Move ctor
 	constexpr
-	GLColor (GLColor&&) = default;
+	GLColor (GLColor&&) noexcept = default;
 
 	// Copy operator
 	constexpr GLColor&

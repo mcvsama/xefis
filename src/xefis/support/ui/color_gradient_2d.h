@@ -22,6 +22,7 @@
 
 // Standard:
 #include <cstddef>
+#include <type_traits>
 
 
 namespace xf {
@@ -51,7 +52,7 @@ template<class pArgumentX, class pArgumentY>
 
 		// Move ctor
 		explicit
-		ColorGradient2D (ColorGradient2D&& other) = default;
+		ColorGradient2D (ColorGradient2D&& other) noexcept (std::is_nothrow_move_constructible_v<Field>) = default;
 
 		// Copy operator
 		ColorGradient2D&

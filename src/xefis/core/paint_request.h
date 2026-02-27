@@ -26,6 +26,7 @@
 // Standard:
 #include <cstddef>
 #include <atomic>
+#include <type_traits>
 
 
 namespace xf {
@@ -83,7 +84,7 @@ class PaintRequest
 	PaintRequest (QPaintDevice&, Metric const&, QSize previous_canvas_size);
 
 	// Move ctor
-	PaintRequest (PaintRequest&&) = default;
+	PaintRequest (PaintRequest&&) noexcept (std::is_nothrow_move_constructible_v<Metric>) = default;
 
 	// Move operator
 	PaintRequest&

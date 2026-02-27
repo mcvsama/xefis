@@ -23,6 +23,7 @@
 // Standard:
 #include <cstddef>
 #include <initializer_list>
+#include <type_traits>
 
 
 namespace xf {
@@ -65,7 +66,11 @@ class ShapeVertex
 	ShapeVertex (ShapeVertex const&) = default;
 
 	// Move ctor
-	ShapeVertex (ShapeVertex&&) = default;
+	ShapeVertex (ShapeVertex&&) noexcept(
+		std::is_nothrow_move_constructible_v<SpaceLength<BodyOrigin>> &&
+		std::is_nothrow_move_constructible_v<std::optional<SpaceVector<double, BodyOrigin>>> &&
+		std::is_nothrow_move_constructible_v<ShapeMaterial>
+	) = default;
 
 	// Copy operator
 	ShapeVertex&
