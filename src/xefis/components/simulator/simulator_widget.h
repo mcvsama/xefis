@@ -145,8 +145,8 @@ class SimulatorWidget: public QWidget
 	std::optional<ItemsTree>		_items_tree;
 	std::optional<QLabel>			_simulation_time_label;
 	std::optional<QLabel>			_simulation_performance_value_label;
-	QIcon							_start_icon						{ icons::start() };
-	QIcon							_pause_icon						{ icons::pause() };
+	QIcon							_start_icon						{ QIcon::fromTheme (QIcon::ThemeIcon::MediaPlaybackStart) };
+	QIcon							_pause_icon						{ QIcon::fromTheme (QIcon::ThemeIcon::MediaPlaybackPause) };
 	float							_simulation_speed				{ 1.0f };
 	float							_last_finite_performance		{ 1.0f };
 	Smoother<float>					_performance_smoother			{ 100_ms, 10_ms };
