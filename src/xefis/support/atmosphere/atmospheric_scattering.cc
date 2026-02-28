@@ -67,106 +67,104 @@ AtmosphericScattering::compute_incident_light (SpaceLength<> const& observer_pos
 
 	if (far < 0_m)
 		return math::zero;
-	else
+
+	// Adjust min/max distance to ensure we are sampling only within the valid range:
+	if (near > min_distance && near > 0_m)
+		min_distance = near;
+
+	if (far < max_distance)
+		max_distance = far;
+
+	// Compute the length of each sample segment along the view ray:
+	si::Length sky_segment_length = (max_distance - min_distance) / _p.num_viewing_direction_samples;
+	si::Length sky_current_distance = min_distance;
+
+	// Compute phase functions (scattering intensity based on angle between sun and view direction):
+	auto const g = 0.76; // Mie asymmetry factor (approximates forward scattering).
+	auto const gg = nu::square (g);
+	auto const mu = dot_product (ray_direction, sun_direction); // Cosine of the angle between the sun direction and the ray direction.
+	auto const phase = RayleighMie<double> {
+		.r = 3.0 / (16.0 * std::numbers::pi) * (1.0 + mu * mu),
+		.m = 3.0 / (8.0 * std::numbers::pi) * ((1.0 - gg) * (1.0 + mu * mu)) / ((2.0 + gg) * std::pow (1.0 + gg - 2.0 * g * mu, 1.5)),
+	};
+
+	// Accumulate contributions from Rayleigh and Mie scattering:
+	auto contribution = RayleighMie<SpaceVector<double>> { math::zero, math::zero };
+	auto sky_optical_depth = RayleighMie { 0.0_m, 0.0_m };
+
+	// Take multiple samples from the observer_position to the upper limit of the atmosphere:
+	for (uint32_t i = 0; i < _p.num_viewing_direction_samples; ++i)
 	{
-		// Adjust min/max distance to ensure we are sampling only within the valid range:
-		if (near > min_distance && near > 0_m)
-			min_distance = near;
+		// Compute the position of the current sample:
+		auto const sky_sample_position = observer_position + (sky_current_distance + sky_segment_length * 0.5f) * ray_direction;
+		// Find where sunlight intersects the atmosphere from this sample point:
+		auto const light_intersections = ray_sphere_intersections (sky_sample_position, sun_direction, _p.atmosphere_radius);
 
-		if (far < max_distance)
-			max_distance = far;
-
-		// Compute the length of each sample segment along the view ray:
-		si::Length sky_segment_length = (max_distance - min_distance) / _p.num_viewing_direction_samples;
-		si::Length sky_current_distance = min_distance;
-
-		// Compute phase functions (scattering intensity based on angle between sun and view direction):
-		auto const g = 0.76; // Mie asymmetry factor (approximates forward scattering).
-		auto const gg = nu::square (g);
-		auto const mu = dot_product (ray_direction, sun_direction); // Cosine of the angle between the sun direction and the ray direction.
-		auto const phase = RayleighMie<double> {
-			.r = 3.0 / (16.0 * std::numbers::pi) * (1.0 + mu * mu),
-			.m = 3.0 / (8.0 * std::numbers::pi) * ((1.0 - gg) * (1.0 + mu * mu)) / ((2.0 + gg) * std::pow (1.0 + gg - 2.0 * g * mu, 1.5)),
-		};
-
-		// Accumulate contributions from Rayleigh and Mie scattering:
-		auto contribution = RayleighMie<SpaceVector<double>> { math::zero, math::zero };
-		auto sky_optical_depth = RayleighMie { 0.0_m, 0.0_m };
-
-		// Take multiple samples from the observer_position to the upper limit of the atmosphere:
-		for (uint32_t i = 0; i < _p.num_viewing_direction_samples; ++i)
+		if (light_intersections)
 		{
-			// Compute the position of the current sample:
-			auto const sky_sample_position = observer_position + (sky_current_distance + sky_segment_length * 0.5f) * ray_direction;
-			// Find where sunlight intersects the atmosphere from this sample point:
-			auto const light_intersections = ray_sphere_intersections (sky_sample_position, sun_direction, _p.atmosphere_radius);
+			auto const sky_sample_height = sky_sample_position.norm() - _p.earth_radius;
 
-			if (light_intersections)
+			// Compute optical depth for Rayleigh and Mie scattering:
+			auto const hr = nu::fast_exp (-sky_sample_height * _inv_rayleigh_threshold) * sky_segment_length;
+			auto const hm = nu::fast_exp (-sky_sample_height * _inv_mie_threshold) * sky_segment_length;
+			sky_optical_depth.r += hr;
+			sky_optical_depth.m += hm;
+
+			// Compute optical depth along the sunlight path:
+			auto const [light_near_intersection, light_far_intersection] = *light_intersections;
+			si::Length const light_segment_length = light_far_intersection * _inv_num_light_direction_samples;
+			auto light_current_distance = 0_m;
+			auto light_optical_factor = RayleighMie { 0.0, 0.0 };
+			auto light_samples_taken = 0u;
+
+			// Trace light through the atmosphere towards the sun.
+			// At each atmospheric sampling point, calculate light reflected towards the observer by going in the direction
+			// of light source and taking multiple samples until the top of the atmosphere:
+			for (; light_samples_taken < _p.num_light_direction_samples; ++light_samples_taken)
 			{
-				auto const sky_sample_height = sky_sample_position.norm() - _p.earth_radius;
+				auto const light_sample_position = sky_sample_position + (light_current_distance + light_segment_length * 0.5f) * sun_direction;
+				auto const light_height = light_sample_position.norm() - _p.earth_radius;
 
-				// Compute optical depth for Rayleigh and Mie scattering:
-				auto const hr = nu::fast_exp (-sky_sample_height * _inv_rayleigh_threshold) * sky_segment_length;
-				auto const hm = nu::fast_exp (-sky_sample_height * _inv_mie_threshold) * sky_segment_length;
-				sky_optical_depth.r += hr;
-				sky_optical_depth.m += hm;
+				if (light_height < 0_m)
+					break;
 
-				// Compute optical depth along the sunlight path:
-				auto const [light_near_intersection, light_far_intersection] = *light_intersections;
-				si::Length const light_segment_length = light_far_intersection * _inv_num_light_direction_samples;
-				auto light_current_distance = 0_m;
-				auto light_optical_factor = RayleighMie { 0.0, 0.0 };
-				auto light_samples_taken = 0u;
-
-				// Trace light through the atmosphere towards the sun.
-				// At each atmospheric sampling point, calculate light reflected towards the observer by going in the direction
-				// of light source and taking multiple samples until the top of the atmosphere:
-				for (; light_samples_taken < _p.num_light_direction_samples; ++light_samples_taken)
-				{
-					auto const light_sample_position = sky_sample_position + (light_current_distance + light_segment_length * 0.5f) * sun_direction;
-					auto const light_height = light_sample_position.norm() - _p.earth_radius;
-
-					if (light_height < 0_m)
-						break;
-
-					light_optical_factor.r += nu::fast_exp (-light_height * _inv_rayleigh_threshold);
-					light_optical_factor.m += nu::fast_exp (-light_height * _inv_mie_threshold);
-					light_current_distance += light_segment_length;
-				}
-
-				auto const light_optical_depth = RayleighMie {
-					light_segment_length * light_optical_factor.r,
-					light_segment_length * light_optical_factor.m,
-				};
-
-				if (light_samples_taken == _p.num_light_direction_samples)
-				{
-					SpaceLength tau = kRayleighBeta * (sky_optical_depth.r + light_optical_depth.r) + kMieBeta * 1.1f * (sky_optical_depth.m + light_optical_depth.m);
-					SpaceVector<double> const tau_float = tau / 1_m;
-					SpaceVector<double> const attenuation { nu::fast_exp (-tau_float[0]), nu::fast_exp (-tau_float[1]), nu::fast_exp (-tau_float[2]) };
-					contribution.r += attenuation * hr.in<si::Meter>();
-					contribution.m += attenuation * hm.in<si::Meter>();
-				}
-
-				sky_current_distance += sky_segment_length;
+				light_optical_factor.r += nu::fast_exp (-light_height * _inv_rayleigh_threshold);
+				light_optical_factor.m += nu::fast_exp (-light_height * _inv_mie_threshold);
+				light_current_distance += light_segment_length;
 			}
+
+			auto const light_optical_depth = RayleighMie {
+				light_segment_length * light_optical_factor.r,
+				light_segment_length * light_optical_factor.m,
+			};
+
+			if (light_samples_taken == _p.num_light_direction_samples)
+			{
+				SpaceLength tau = kRayleighBeta * (sky_optical_depth.r + light_optical_depth.r) + kMieBeta * 1.1f * (sky_optical_depth.m + light_optical_depth.m);
+				SpaceVector<double> const tau_float = tau / 1_m;
+				SpaceVector<double> const attenuation { nu::fast_exp (-tau_float[0]), nu::fast_exp (-tau_float[1]), nu::fast_exp (-tau_float[2]) };
+				contribution.r += attenuation * hr.in<si::Meter>();
+				contribution.m += attenuation * hm.in<si::Meter>();
+			}
+
+			sky_current_distance += sky_segment_length;
 		}
-
-		auto const rayleigh_result = _p.rayleigh_factor * hadamard_product (contribution.r, kRayleighBeta) * phase.r;
-		auto const mie_result = _p.mie_factor * hadamard_product (contribution.m, kMieBeta) * phase.m;
-		auto const color_double = kIncidentLightScale * (rayleigh_result + mie_result);
-		auto color = SpaceVector<float, RGBSpace> { color_double[0], color_double[1], color_double[2] }; // TODO math::static_components_cast<float> ()...
-
-		if (_p.enable_tonemapping)
-			color = tonemap_separately (color);
-
-		// Change NaNs to 0 (in case we were trying to get color from some invalid out-of-atmosphere point):
-		for (auto& component: color.components())
-			if (!std::isfinite (component))
-				component = 0.0f;
-
-		return color;
 	}
+
+	auto const rayleigh_result = _p.rayleigh_factor * hadamard_product (contribution.r, kRayleighBeta) * phase.r;
+	auto const mie_result = _p.mie_factor * hadamard_product (contribution.m, kMieBeta) * phase.m;
+	auto const color_double = kIncidentLightScale * (rayleigh_result + mie_result);
+	auto color = SpaceVector<float, RGBSpace> { color_double[0], color_double[1], color_double[2] }; // TODO math::static_components_cast<float> ()...
+
+	if (_p.enable_tonemapping)
+		color = tonemap_separately (color);
+
+	// Change NaNs to 0 (in case we were trying to get color from some invalid out-of-atmosphere point):
+	for (auto& component: color.components())
+		if (!std::isfinite (component))
+			component = 0.0f;
+
+	return color;
 }
 
 
