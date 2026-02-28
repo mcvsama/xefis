@@ -40,6 +40,7 @@
 
 
 namespace xf {
+namespace {
 
 template<class Value>
 	void
@@ -48,6 +49,8 @@ template<class Value>
 		auto const signals_blocker = QSignalBlocker (spinbox);
 		spinbox->setValue (value / Value (1));
 	}
+
+} // namespace
 
 
 CameraControls::CameraControls (RigidBodyViewer& viewer, QWidget* parent):
