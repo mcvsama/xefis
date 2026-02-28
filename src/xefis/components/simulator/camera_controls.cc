@@ -118,7 +118,7 @@ CameraControls::CameraControls (RigidBodyViewer& viewer, QWidget* parent):
 	});
 
 	auto* const fov = new QSpinBox (this);
-	fov->setRange (30, 90);
+	fov->setRange (10, 90);
 	fov->setSuffix ("°");
 	QObject::connect (fov, &QSpinBox::valueChanged, [this] (int value) {
 		_rigid_body_viewer.set_fov (1_deg * value);
