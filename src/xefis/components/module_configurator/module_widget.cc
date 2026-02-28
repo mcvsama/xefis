@@ -68,7 +68,7 @@ ModuleWidget::ModuleWidget (Module& module, QWidget* parent):
 	}
 
 	auto* layout = new QVBoxLayout (this);
-	layout->setContentsMargins (0, 0, 0, 0);
+	layout->setContentsMargins (ph.widget_margins());
 	layout->addWidget (name_strip);
 	layout->addItem (ph.new_fixed_vertical_spacer (0.15f));
 	layout->addWidget (tabs);
@@ -141,7 +141,8 @@ QWidget*
 ModuleWidget::create_performance_tab()
 {
 	auto* widget = new QWidget (this);
-	QWidget* painting_time_group {};
+	auto const ph = PaintHelper (*widget);
+	QWidget* painting_time_group{};
 
 	std::tie (_communication_time_histogram, _communication_time_stats, _communication_time_group) = create_performance_widget (widget, "HW communication time");
 	std::tie (_processing_time_histogram, _processing_time_stats, _processing_time_group) = create_performance_widget (widget, "Processing time");
@@ -150,14 +151,13 @@ ModuleWidget::create_performance_tab()
 		std::tie (_painting_time_histogram, _painting_time_stats, painting_time_group) = create_performance_widget (widget, "Painting time");
 
 	auto layout = new QGridLayout (widget);
-	layout->setContentsMargins (0, 0, 0, 0);
+	layout->setContentsMargins (ph.widget_margins());
 	layout->addWidget (_communication_time_group, 0, 0);
 	layout->addWidget (_processing_time_group, 1, 0);
 
 	if (painting_time_group)
 		layout->addWidget (painting_time_group, 2, 0);
 
-	auto const ph = PaintHelper (*this);
 	layout->addItem (ph.new_expanding_horizontal_spacer(), 0, 1);
 	layout->addItem (ph.new_expanding_vertical_spacer(), 3, 0);
 

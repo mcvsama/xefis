@@ -50,6 +50,14 @@ PaintHelper::setup_painter (QPainter& painter)
 
 
 QMargins
+PaintHelper::widget_margins() const
+{
+	auto const s = em_pixels_int (0.25f);
+	return QMargins (s, s, s, s);
+}
+
+
+QMargins
 PaintHelper::group_box_margins() const
 {
 	auto const s = em_pixels_int (0.5f);

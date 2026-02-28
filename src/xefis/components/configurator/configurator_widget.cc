@@ -45,8 +45,7 @@ ConfiguratorWidget::ConfiguratorWidget (Machine& machine, QWidget* parent):
 	_tabs->addTab (_data_recorder, "&Data recorder");
 
 	auto* layout = new QVBoxLayout (this);
-	auto const margin = ph.em_pixels (0.15f);
-	layout->setContentsMargins (margin, margin, margin, margin);
+	layout->setContentsMargins (ph.widget_margins());
 
 	auto name_label = new QLabel (nu::to_qstring (_machine.instance()));
 	QFont font = name_label->font();

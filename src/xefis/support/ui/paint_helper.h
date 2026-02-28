@@ -109,6 +109,10 @@ class PaintHelper
 
 	[[nodiscard]]
 	QMargins
+	widget_margins() const;
+
+	[[nodiscard]]
+	QMargins
 	group_box_margins() const;
 
   private:

@@ -44,7 +44,7 @@ ScreenWidget::ScreenWidget (Screen& screen, QWidget* parent):
 	tabs->addTab (create_performance_tab(), "Performance");
 
 	auto* layout = new QVBoxLayout (this);
-	layout->setContentsMargins (0, 0, 0, 0);
+	layout->setContentsMargins (ph.widget_margins());
 	layout->addWidget (name_strip);
 	layout->addItem (ph.new_fixed_vertical_spacer (0.15f));
 	layout->addWidget (tabs);
@@ -97,8 +97,8 @@ ScreenWidget::refresh()
 QWidget*
 ScreenWidget::create_performance_tab()
 {
-	auto const ph = PaintHelper (*this);
 	auto* widget = new QWidget (this);
+	auto const ph = PaintHelper (*widget);
 
 	// Prepare list of Widgets objects for each WorkPerformer:
 	for (auto* const instrument: _screen.instruments())
@@ -156,7 +156,7 @@ ScreenWidget::create_performance_tab()
 	}
 
 	auto* widget_layout = new QGridLayout (widget);
-	widget_layout->setContentsMargins (0, 0, 0, 0);
+	widget_layout->setContentsMargins (ph.widget_margins());
 	widget_layout->addWidget (tabs, 0, 0);
 	widget_layout->addItem (ph.new_expanding_horizontal_spacer(), 0, 1);
 	widget_layout->addItem (ph.new_expanding_vertical_spacer(), 1, 0);

@@ -45,7 +45,7 @@ ProcessingLoopWidget::ProcessingLoopWidget (ProcessingLoop& processing_loop, QWi
 	tabs->addTab (create_performance_tab(), "Performance");
 
 	auto* layout = new QVBoxLayout (this);
-	layout->setContentsMargins (0, 0, 0, 0);
+	layout->setContentsMargins (ph.widget_margins());
 	layout->addWidget (name_strip);
 	layout->addItem (ph.new_fixed_vertical_spacer (0.15f));
 	layout->addWidget (tabs);
@@ -114,6 +114,7 @@ QWidget*
 ProcessingLoopWidget::create_performance_tab()
 {
 	auto* widget = new QWidget (this);
+	auto const ph = PaintHelper (*widget);
 	QWidget* communication_time_group {};
 	QWidget* processing_time_group {};
 	QWidget* processing_latency_group {};
@@ -123,12 +124,11 @@ ProcessingLoopWidget::create_performance_tab()
 	std::tie (_processing_latency_histogram, _processing_latency_stats, processing_latency_group) = create_performance_widget (widget, "Processing latency");
 
 	auto layout = new QGridLayout (widget);
-	layout->setContentsMargins (0, 0, 0, 0);
+	layout->setContentsMargins (ph.widget_margins());
 	layout->addWidget (communication_time_group, 0, 0);
 	layout->addWidget (processing_time_group, 1, 0);
 	layout->addWidget (processing_latency_group, 2, 0);
 
-	auto const ph = PaintHelper (*this);
 	layout->addItem (ph.new_expanding_horizontal_spacer(), 0, 1);
 	layout->addItem (ph.new_expanding_vertical_spacer(), 3, 0);
 
