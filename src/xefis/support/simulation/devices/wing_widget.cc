@@ -49,9 +49,10 @@ WingWidget::setup_airfoil_info_widget()
 	auto const ph = PaintHelper (*this);
 
 	_airfoil_spline_widget.setSizePolicy (QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
-	_airfoil_spline_widget.setMinimumSize (ph.em_pixels (20), ph.em_pixels (10)); // TODO
+	_airfoil_spline_widget.setMinimumSize (ph.em_pixels (20), ph.em_pixels (10));
+	_airfoil_spline_widget.setContentsMargins (0, 0, 0, 0);
 
-	_airfoil_frame.setFrameStyle (QFrame::StyledPanel | QFrame::Sunken);
+	_airfoil_frame.setFrameStyle (QFrame::Box | QFrame::Plain);
 
 	auto* airfoil_frame_layout = new QVBoxLayout (&_airfoil_frame);
 	airfoil_frame_layout->addWidget (&_airfoil_spline_widget);
