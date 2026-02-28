@@ -17,6 +17,9 @@
 // Xefis:
 #include <xefis/config/all.h>
 
+// Neutrino:
+#include <neutrino/qt/qpalette.h>
+
 // Qt:
 #include <QGridLayout>
 #include <QLabel>
@@ -63,7 +66,9 @@ CanvasWidget::paintEvent (QPaintEvent* paint_event)
 void
 CanvasWidget::changeEvent (QEvent* event)
 {
-	if (event->type() == QEvent::EnabledChange)
+	QWidget::changeEvent (event);
+
+	if (event->type() == QEvent::EnabledChange || nu::is_theme_change (event))
 	{
 		mark_dirty();
 		update();
