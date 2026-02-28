@@ -119,7 +119,6 @@ AirfoilSplineWidget::set_airfoil_spline (AirfoilSpline const& airfoil_spline, st
 }
 
 
-// QWidget API
 void
 AirfoilSplineWidget::resizeEvent (QResizeEvent* event)
 {

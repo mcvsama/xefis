@@ -54,7 +54,6 @@ CameraControls::CameraControls (RigidBodyViewer& viewer, QWidget* parent):
 	QWidget (parent),
 	_rigid_body_viewer (viewer)
 {
-
 	auto const ph = PaintHelper (*this);
 	_coordinates = std::make_shared<EarthCoordinates>();
 
