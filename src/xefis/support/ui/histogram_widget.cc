@@ -20,6 +20,7 @@
 
 // Neutrino:
 #include <neutrino/qt/qfontmetrics.h>
+#include <neutrino/qt/qpalette.h>
 
 // Qt:
 #include <QPainter>
@@ -36,7 +37,9 @@ namespace xf {
 
 HistogramWidget::HistogramWidget (QWidget* parent):
 	CanvasWidget (parent)
-{ }
+{
+	setBackgroundRole (QPalette::Base);
+}
 
 
 void
@@ -70,7 +73,13 @@ HistogramWidget::update_canvas()
 	auto const ph = PaintHelper (canvas, palette(), font());
 
 	QPalette const pal = palette();
-	QColor const foreground = pal.color (isEnabled() ? QPalette::Active : QPalette::Disabled, QPalette::WindowText);
+	auto const color_group = isEnabled()
+		? (isActiveWindow() ? QPalette::Active : QPalette::Inactive)
+		: QPalette::Disabled;
+	QColor const foreground = pal.color (color_group, QPalette::WindowText);
+	QColor const background = nu::is_light_theme (pal)
+		? QColor::fromRgb (0xff, 0xfe, 0xf2)
+		: QColor::fromRgb (0x2d, 0x28, 0x23);
 	QColor const axes_color = foreground;
 	QColor const line_color = foreground;
 	QColor const bar_color = foreground;
@@ -99,7 +108,7 @@ HistogramWidget::update_canvas()
 	auto const inv_max_y = chart_rect.height() / _max_y;
 	auto const bin_width = chart_rect.width() / n_bins;
 
-	canvas.fill (pal.color (QPalette::Active, QPalette::Window));
+	canvas.fill (background);
 
 	if (chart_rect.isValid())
 	{
