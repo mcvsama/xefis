@@ -43,6 +43,8 @@ class already, so you don't have to add another one in the inherited class).
 
 # Code style
 
+Use tabs of width 4 for indentation.
+
 ## Methods
 
 One-line methods should be implemented directly in the class:
