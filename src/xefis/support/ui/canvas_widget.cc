@@ -32,9 +32,7 @@ namespace xf {
 
 CanvasWidget::CanvasWidget (QWidget* parent, Qt::WindowFlags flags):
 	QWidget (parent, flags)
-{
-	setStyleSheet ("QTabWidget::pane > QWidget { margin: 0.2em; }");
-}
+{ }
 
 
 void

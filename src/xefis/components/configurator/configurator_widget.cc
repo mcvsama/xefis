@@ -52,7 +52,7 @@ ConfiguratorWidget::ConfiguratorWidget (Machine& machine, QWidget* parent):
 	QFont font = name_label->font();
 	font.setPixelSize (ph.em_pixels (1.4f));
 	name_label->setFont (font);
-	name_label->setStyleSheet ("margin: 0.15em;");
+	name_label->setMargin (ph.em_pixels (0.15f * 1.4f));
 
 	layout->addWidget (name_label);
 	layout->addWidget (_tabs);

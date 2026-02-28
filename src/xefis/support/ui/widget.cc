@@ -29,13 +29,6 @@
 
 namespace xf {
 
-Widget::Widget (QWidget* parent, Qt::WindowFlags flags):
-	QWidget (parent, flags)
-{
-	setStyleSheet ("QTabWidget::pane > QWidget { margin: 0.2em; }");
-}
-
-
 QWidget*
 Widget::create_color_widget (QColor color, QWidget* parent)
 {
@@ -61,7 +54,7 @@ Widget::create_colored_strip_label (QString const& text, QColor color, Qt::Align
 	strip->setFixedHeight (ph.em_pixels (0.3f));
 
 	auto* label = new QLabel (text, widget);
-	label->setStyleSheet ("margin: 0.15em;");
+	label->setMargin (ph.em_pixels (0.15f * 1.4f));
 	label->setAlignment (Qt::AlignLeft);
 
 	QFont font = label->font();
