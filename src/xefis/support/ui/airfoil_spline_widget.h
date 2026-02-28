@@ -134,6 +134,10 @@ class AirfoilSplineWidget: public CanvasWidget
 	void
 	resizeEvent (QResizeEvent*) override;
 
+	// QWidget API
+	void
+	changeEvent (QEvent*) override;
+
 	void
 	prepare_for_painting();
 
