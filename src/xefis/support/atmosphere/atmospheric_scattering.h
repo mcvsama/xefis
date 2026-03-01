@@ -22,6 +22,10 @@
 
 // Standard:
 #include <cstddef>
+#include <cstdint>
+#include <optional>
+#include <utility>
+#include <vector>
 
 
 namespace xf {
@@ -36,31 +40,43 @@ class AtmosphericScattering
 	struct Parameters
 	{
 		// Radius of the ground:
-		si::Length			earth_radius					{ kEarthMeanRadius };
+		si::Length			earth_radius						{ kEarthMeanRadius };
 		// Radius of the top of the sky:
-		si::Length			atmosphere_radius				{ earth_radius + 60_km };
+		si::Length			atmosphere_radius					{ earth_radius + 60_km };
 
 		// `rayleigh_threshold` and `mie_threshold` are characteristic distances over which the density falls by a factor of e, influencing the optical depth and the resulting light
 		// attenuation in the sky dome model.
 
 		// Thickness of the atmosphere if density was uniform; used for Rayleigh scattering:
-		si::Length			rayleigh_threshold				{ 7994_m };
+		si::Length			rayleigh_threshold					{ 7994_m };
 		// Thickness of the atmosphere if density was uniform; used for Mie scattering:
-		si::Length			mie_threshold					{ 1200_m };
+		si::Length			mie_threshold						{ 1200_m };
 		// Output factor for light intensity from the the Rayleigh scattering:
-		double				rayleigh_factor					{ 1.0 };
+		double				rayleigh_factor						{ 1.0 };
 		// Output factor for light intensity from the the Mie scattering:
-		double				mie_factor						{ 1.0 };
+		double				mie_factor							{ 1.0 };
 		// Automatically tonemap output values:
-		bool				enable_tonemapping				{ false };
+		bool				enable_tonemapping					{ false };
 		// Number of samples taken along the view direction (casted ray):
-		uint32_t			num_viewing_direction_samples	{ 64 };
-		// Number of samples taken to the light source:
-		uint32_t			num_light_direction_samples		{ 8 };
+		uint32_t			num_viewing_direction_samples		{ 64 };
+		// Number of samples used to integrate each transmittance LUT entry towards top-of-atmosphere:
+		uint32_t			num_light_direction_samples			{ 8 };
+		// Transmittance LUT height resolution:
+		uint32_t			transmittance_lut_height_samples	{ 64 };
+		// Transmittance LUT mu (cos(sun-direction-to-up)) resolution:
+		uint32_t			transmittance_lut_mu_samples		{ 128 };
 	};
 
 	// Used for scaling output of AtmosphericScattering::compute_incident_light(); chosen experimentally:
 	static constexpr auto kIncidentLightScale = 100.0;
+
+  private:
+	template<class Value>
+		struct RayleighMie
+		{
+			Value r;
+			Value m;
+		};
 
   public:
 	// Ctor
@@ -129,10 +145,27 @@ class AtmosphericScattering
 	ray_sphere_intersections (SpaceLength<> const& ray_origin, SpaceVector<double> const& ray_direction, si::Length const sphere_radius);
 
   private:
-	Parameters			_p;
-	decltype (1 / 1_m)	_inv_rayleigh_threshold				{ 1.0 / _p.rayleigh_threshold };
-	decltype (1 / 1_m)	_inv_mie_threshold					{ 1.0 / _p.mie_threshold };
-	double				_inv_num_light_direction_samples	{ 1.0 / _p.num_light_direction_samples };
+	void
+	build_transmittance_lut();
+
+	[[nodiscard]]
+	std::optional<RayleighMie<si::Length>>
+	sample_transmittance_lut (si::Length height, double mu) const;
+
+	[[nodiscard]]
+	std::size_t
+	transmittance_lut_index (std::size_t height_index, std::size_t mu_index) const noexcept
+		{ return height_index * _transmittance_lut_mu_samples + mu_index; }
+
+	Parameters				_p;
+	decltype (1 / 1_m)		_inv_rayleigh_threshold				{ 1.0 / _p.rayleigh_threshold };
+	decltype (1 / 1_m)		_inv_mie_threshold					{ 1.0 / _p.mie_threshold };
+	std::size_t				_transmittance_lut_height_samples	{ 0 };
+	std::size_t				_transmittance_lut_mu_samples		{ 0 };
+	std::vector<si::Length>	_transmittance_lut_rayleigh;
+	std::vector<si::Length>	_transmittance_lut_mie;
+	// Use uint8_t instead of std::vector<bool> to avoid proxy references and packed-bit overhead:
+	std::vector<uint8_t>	_transmittance_lut_reaches_toa;
 };
 
 

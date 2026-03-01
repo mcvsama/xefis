@@ -22,27 +22,164 @@
 #include <neutrino/numeric.h>
 
 // Standard:
+#include <algorithm>
 #include <cstddef>
 #include <cmath>
+#include <limits>
 #include <numbers>
 
 
 namespace xf {
 
-/**
- * Helper struct used in AtmosphericScattering::compute_incident_light().
- */
-template<class Value>
-	struct RayleighMie
-	{
-		Value r;
-		Value m;
-	};
-
-
 AtmosphericScattering::AtmosphericScattering (Parameters const& parameters):
 	_p (parameters)
-{ }
+{
+	build_transmittance_lut();
+}
+
+
+void
+AtmosphericScattering::build_transmittance_lut()
+{
+	_transmittance_lut_height_samples = std::max<std::size_t> (_p.transmittance_lut_height_samples, 2);
+	_transmittance_lut_mu_samples = std::max<std::size_t> (_p.transmittance_lut_mu_samples, 2);
+
+	auto const lut_size = _transmittance_lut_height_samples * _transmittance_lut_mu_samples;
+	_transmittance_lut_rayleigh.assign (lut_size, 0_m);
+	_transmittance_lut_mie.assign (lut_size, 0_m);
+	_transmittance_lut_reaches_toa.assign (lut_size, 0);
+
+	auto const atmosphere_height = _p.atmosphere_radius - _p.earth_radius;
+	auto const num_light_samples = std::max (_p.num_light_direction_samples, 1u);
+	auto const inv_num_light_samples = 1.0 / num_light_samples;
+
+	for (std::size_t h = 0; h < _transmittance_lut_height_samples; ++h)
+	{
+		auto const height_alpha = static_cast<double> (h) / (_transmittance_lut_height_samples - 1);
+		auto const height = height_alpha * atmosphere_height;
+		auto const sample_position = SpaceLength<> { 0_m, 0_m, _p.earth_radius + height };
+
+		for (std::size_t m = 0; m < _transmittance_lut_mu_samples; ++m)
+		{
+			auto const mu_alpha = static_cast<double> (m) / (_transmittance_lut_mu_samples - 1);
+			auto const mu = -1.0 + 2.0 * mu_alpha;
+			auto const sin_theta = std::sqrt (std::max (0.0, 1.0 - nu::square (mu)));
+			auto const light_direction = SpaceVector<double> { sin_theta, 0.0, mu };
+			auto const atmosphere_intersections = ray_sphere_intersections (sample_position, light_direction, _p.atmosphere_radius);
+
+			if (!atmosphere_intersections || atmosphere_intersections->second <= 0_m)
+				continue;
+
+			auto const distance_to_atmosphere_boundary = atmosphere_intersections->second;
+			auto reaches_top_of_atmosphere = true;
+
+			if (auto const ground_intersections = ray_sphere_intersections (sample_position, light_direction, _p.earth_radius))
+			{
+				si::Length ground_distance = std::numeric_limits<si::Length>::infinity();
+
+				if (ground_intersections->first > 0_m)
+					ground_distance = ground_intersections->first;
+				else if (ground_intersections->second > 0_m)
+					ground_distance = ground_intersections->second;
+
+				if (ground_distance < distance_to_atmosphere_boundary)
+					reaches_top_of_atmosphere = false;
+			}
+
+			if (!reaches_top_of_atmosphere)
+				continue;
+
+			si::Length const light_segment_length = distance_to_atmosphere_boundary * inv_num_light_samples;
+			auto light_current_distance = 0_m;
+			auto light_optical_depth = RayleighMie { 0.0_m, 0.0_m };
+
+			for (uint32_t i = 0; i < num_light_samples; ++i)
+			{
+				auto const light_sample_position = sample_position + (light_current_distance + light_segment_length * 0.5f) * light_direction;
+				auto const light_height = light_sample_position.norm() - _p.earth_radius;
+
+				if (light_height < 0_m)
+				{
+					reaches_top_of_atmosphere = false;
+					break;
+				}
+
+				light_optical_depth.r += std::exp (-light_height * _inv_rayleigh_threshold) * light_segment_length;
+				light_optical_depth.m += std::exp (-light_height * _inv_mie_threshold) * light_segment_length;
+				light_current_distance += light_segment_length;
+			}
+
+			if (reaches_top_of_atmosphere)
+			{
+				auto const index = transmittance_lut_index (h, m);
+				_transmittance_lut_rayleigh[index] = light_optical_depth.r;
+				_transmittance_lut_mie[index] = light_optical_depth.m;
+				_transmittance_lut_reaches_toa[index] = 1;
+			}
+		}
+	}
+}
+
+
+std::optional<AtmosphericScattering::RayleighMie<si::Length>>
+AtmosphericScattering::sample_transmittance_lut (si::Length const height, double const mu) const
+{
+	if (_transmittance_lut_height_samples < 2 || _transmittance_lut_mu_samples < 2)
+		return std::nullopt;
+
+	auto const atmosphere_height = _p.atmosphere_radius - _p.earth_radius;
+	auto const atmosphere_height_m = atmosphere_height.in<si::Meter>();
+
+	if (atmosphere_height_m <= 0.0)
+		return std::nullopt;
+
+	auto const h_alpha = std::clamp (height.in<si::Meter>() / atmosphere_height_m, 0.0, 1.0);
+	auto const mu_alpha = std::clamp (0.5 * (mu + 1.0), 0.0, 1.0);
+	auto const h_coord = h_alpha * (_transmittance_lut_height_samples - 1);
+	auto const m_coord = mu_alpha * (_transmittance_lut_mu_samples - 1);
+	auto const h0 = static_cast<std::size_t> (std::floor (h_coord));
+	auto const m0 = static_cast<std::size_t> (std::floor (m_coord));
+	auto const h1 = std::min (h0 + 1, _transmittance_lut_height_samples - 1);
+	auto const m1 = std::min (m0 + 1, _transmittance_lut_mu_samples - 1);
+	auto const h_t = h_coord - h0;
+	auto const m_t = m_coord - m0;
+
+	struct WeightedSample
+	{
+		std::size_t	h;
+		std::size_t m;
+		double		weight;
+	};
+
+	WeightedSample const samples[] = {
+		{ h0, m0, (1.0 - h_t) * (1.0 - m_t) },
+		{ h0, m1, (1.0 - h_t) * m_t },
+		{ h1, m0, h_t * (1.0 - m_t) },
+		{ h1, m1, h_t * m_t },
+	};
+
+	auto weight_sum = 0.0;
+	auto rayleigh = 0.0_m;
+	auto mie = 0.0_m;
+
+	for (auto const& sample: samples)
+	{
+		auto const index = transmittance_lut_index (sample.h, sample.m);
+
+		if (_transmittance_lut_reaches_toa[index] == 0)
+			continue;
+
+		weight_sum += sample.weight;
+		rayleigh += _transmittance_lut_rayleigh[index] * sample.weight;
+		mie += _transmittance_lut_mie[index] * sample.weight;
+	}
+
+	if (weight_sum <= 0.0)
+		return std::nullopt;
+
+	auto const inv_weight_sum = 1.0 / weight_sum;
+	return RayleighMie { rayleigh * inv_weight_sum, mie * inv_weight_sum };
+}
 
 
 [[nodiscard]]
@@ -56,7 +193,7 @@ AtmosphericScattering::compute_incident_light (SpaceLength<> const& observer_pos
 	// Precomputed values that correspond to the scattering coefficients of the sky at sea level, for wavelengths 680, 550 and 440 respectively:
 	static constexpr SpaceVector<double, RGBSpace> kRayleighBeta	= { 5.802e-6f, 13.558e-6f, 33.1e-6f };
 	// Mie scattering doesn't change the color, so the coefficients are the same:
-	static constexpr SpaceVector<double, RGBSpace> kMieBeta		= { 21e-6f, 21e-6f, 21e-6f };
+	static constexpr SpaceVector<double, RGBSpace> kMieBeta			= { 21e-6f, 21e-6f, 21e-6f };
 
 	auto intersections = ray_sphere_intersections (observer_position, ray_direction, _p.atmosphere_radius);
 
@@ -97,58 +234,35 @@ AtmosphericScattering::compute_incident_light (SpaceLength<> const& observer_pos
 	{
 		// Compute the position of the current sample:
 		auto const sky_sample_position = observer_position + (sky_current_distance + sky_segment_length * 0.5f) * ray_direction;
-		// Find where sunlight intersects the atmosphere from this sample point:
-		auto const light_intersections = ray_sphere_intersections (sky_sample_position, sun_direction, _p.atmosphere_radius);
+		auto const sky_sample_height = sky_sample_position.norm() - _p.earth_radius;
 
-		if (light_intersections)
+		if (sky_sample_height < 0_m)
 		{
-			auto const sky_sample_height = sky_sample_position.norm() - _p.earth_radius;
-
-			// Compute optical depth for Rayleigh and Mie scattering:
-			auto const hr = nu::fast_exp (-sky_sample_height * _inv_rayleigh_threshold) * sky_segment_length;
-			auto const hm = nu::fast_exp (-sky_sample_height * _inv_mie_threshold) * sky_segment_length;
-			sky_optical_depth.r += hr;
-			sky_optical_depth.m += hm;
-
-			// Compute optical depth along the sunlight path:
-			auto const [light_near_intersection, light_far_intersection] = *light_intersections;
-			si::Length const light_segment_length = light_far_intersection * _inv_num_light_direction_samples;
-			auto light_current_distance = 0_m;
-			auto light_optical_factor = RayleighMie { 0.0, 0.0 };
-			auto light_samples_taken = 0u;
-
-			// Trace light through the atmosphere towards the sun.
-			// At each atmospheric sampling point, calculate light reflected towards the observer by going in the direction
-			// of light source and taking multiple samples until the top of the atmosphere:
-			for (; light_samples_taken < _p.num_light_direction_samples; ++light_samples_taken)
-			{
-				auto const light_sample_position = sky_sample_position + (light_current_distance + light_segment_length * 0.5f) * sun_direction;
-				auto const light_height = light_sample_position.norm() - _p.earth_radius;
-
-				if (light_height < 0_m)
-					break;
-
-				light_optical_factor.r += nu::fast_exp (-light_height * _inv_rayleigh_threshold);
-				light_optical_factor.m += nu::fast_exp (-light_height * _inv_mie_threshold);
-				light_current_distance += light_segment_length;
-			}
-
-			auto const light_optical_depth = RayleighMie {
-				light_segment_length * light_optical_factor.r,
-				light_segment_length * light_optical_factor.m,
-			};
-
-			if (light_samples_taken == _p.num_light_direction_samples)
-			{
-				SpaceLength<RGBSpace> tau = kRayleighBeta * (sky_optical_depth.r + light_optical_depth.r) + kMieBeta * 1.1f * (sky_optical_depth.m + light_optical_depth.m);
-				SpaceVector<double, RGBSpace> const tau_float = tau / 1_m;
-				SpaceVector<double, RGBSpace> const attenuation { nu::fast_exp (-tau_float[0]), nu::fast_exp (-tau_float[1]), nu::fast_exp (-tau_float[2]) };
-				contribution.r += attenuation * hr.in<si::Meter>();
-				contribution.m += attenuation * hm.in<si::Meter>();
-			}
-
 			sky_current_distance += sky_segment_length;
+			continue;
 		}
+
+		// Compute optical depth for Rayleigh and Mie scattering:
+		auto const hr = nu::fast_exp (-sky_sample_height * _inv_rayleigh_threshold) * sky_segment_length;
+		auto const hm = nu::fast_exp (-sky_sample_height * _inv_mie_threshold) * sky_segment_length;
+		sky_optical_depth.r += hr;
+		sky_optical_depth.m += hm;
+
+		auto const local_up = sky_sample_position / sky_sample_position.norm();
+		auto const light_mu = dot_product (local_up, sun_direction);
+
+		if (auto const light_optical_depth = sample_transmittance_lut (sky_sample_height, light_mu))
+		{
+			SpaceLength<RGBSpace> tau_rayleigh = kRayleighBeta * (sky_optical_depth.r + light_optical_depth->r);
+			SpaceLength<RGBSpace> tau_mie = kMieBeta * 1.1f * (sky_optical_depth.m + light_optical_depth->m);
+			SpaceLength<RGBSpace> tau = tau_rayleigh + tau_mie;
+			SpaceVector<double, RGBSpace> const tau_float = tau / 1_m;
+			SpaceVector<double, RGBSpace> const attenuation { nu::fast_exp (-tau_float[0]), nu::fast_exp (-tau_float[1]), nu::fast_exp (-tau_float[2]) };
+			contribution.r += attenuation * hr.in<si::Meter>();
+			contribution.m += attenuation * hm.in<si::Meter>();
+		}
+
+		sky_current_distance += sky_segment_length;
 	}
 
 	auto const rayleigh_result = _p.rayleigh_factor * hadamard_product (contribution.r, kRayleighBeta) * phase.r;
