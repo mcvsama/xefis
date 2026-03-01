@@ -54,9 +54,9 @@ AtmosphericScattering::compute_incident_light (SpaceLength<> const& observer_pos
 											   si::Length max_distance) const
 {
 	// Precomputed values that correspond to the scattering coefficients of the sky at sea level, for wavelengths 680, 550 and 440 respectively:
-    static constexpr SpaceVector<double> kRayleighBeta	= { 5.8e-6f, 13.5e-6f, 33.1e-6f };
+	static constexpr SpaceVector<double, RGBSpace> kRayleighBeta	= { 5.8e-6f, 13.5e-6f, 33.1e-6f };
 	// Mie scattering doesn't change the color, so the coefficients are the same:
-    static constexpr SpaceVector<double> kMieBeta		= { 21e-6f, 21e-6f, 21e-6f };
+	static constexpr SpaceVector<double, RGBSpace> kMieBeta		= { 21e-6f, 21e-6f, 21e-6f };
 
 	auto intersections = ray_sphere_intersections (observer_position, ray_direction, _p.atmosphere_radius);
 
@@ -89,7 +89,7 @@ AtmosphericScattering::compute_incident_light (SpaceLength<> const& observer_pos
 	};
 
 	// Accumulate contributions from Rayleigh and Mie scattering:
-	auto contribution = RayleighMie<SpaceVector<double>> { math::zero, math::zero };
+	auto contribution = RayleighMie<SpaceVector<double, RGBSpace>> { math::zero, math::zero };
 	auto sky_optical_depth = RayleighMie { 0.0_m, 0.0_m };
 
 	// Take multiple samples from the observer_position to the upper limit of the atmosphere:
@@ -140,9 +140,9 @@ AtmosphericScattering::compute_incident_light (SpaceLength<> const& observer_pos
 
 			if (light_samples_taken == _p.num_light_direction_samples)
 			{
-				SpaceLength tau = kRayleighBeta * (sky_optical_depth.r + light_optical_depth.r) + kMieBeta * 1.1f * (sky_optical_depth.m + light_optical_depth.m);
-				SpaceVector<double> const tau_float = tau / 1_m;
-				SpaceVector<double> const attenuation { nu::fast_exp (-tau_float[0]), nu::fast_exp (-tau_float[1]), nu::fast_exp (-tau_float[2]) };
+				SpaceLength<RGBSpace> tau = kRayleighBeta * (sky_optical_depth.r + light_optical_depth.r) + kMieBeta * 1.1f * (sky_optical_depth.m + light_optical_depth.m);
+				SpaceVector<double, RGBSpace> const tau_float = tau / 1_m;
+				SpaceVector<double, RGBSpace> const attenuation { nu::fast_exp (-tau_float[0]), nu::fast_exp (-tau_float[1]), nu::fast_exp (-tau_float[2]) };
 				contribution.r += attenuation * hr.in<si::Meter>();
 				contribution.m += attenuation * hm.in<si::Meter>();
 			}
@@ -154,7 +154,7 @@ AtmosphericScattering::compute_incident_light (SpaceLength<> const& observer_pos
 	auto const rayleigh_result = _p.rayleigh_factor * hadamard_product (contribution.r, kRayleighBeta) * phase.r;
 	auto const mie_result = _p.mie_factor * hadamard_product (contribution.m, kMieBeta) * phase.m;
 	auto const color_double = kIncidentLightScale * (rayleigh_result + mie_result);
-	auto color = SpaceVector<float, RGBSpace> { color_double[0], color_double[1], color_double[2] }; // TODO math::static_components_cast<float> ()...
+	auto color = math::static_components_cast<float> (color_double);
 
 	if (_p.enable_tonemapping)
 		color = tonemap_separately (color);

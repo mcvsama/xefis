@@ -44,7 +44,8 @@ cie_xyz_to_rgb (math::Vector<double, 3> const& xyz)
 	if (max > 1.0)
 		rgb = rgb / max;
 
-	return QColor::fromRgbF (static_cast<float> (rgb[0]), static_cast<float> (rgb[1]), static_cast<float> (rgb[2]));
+	auto const rgb_f = math::static_components_cast<float> (rgb);
+	return QColor::fromRgbF (rgb_f[0], rgb_f[1], rgb_f[2]);
 }
 
 } // namespace xf
