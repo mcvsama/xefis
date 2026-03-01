@@ -24,6 +24,7 @@
 
 // Standard:
 #include <cstddef>
+#include <map>
 
 
 namespace xf {
