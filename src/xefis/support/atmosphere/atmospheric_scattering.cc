@@ -54,7 +54,7 @@ AtmosphericScattering::compute_incident_light (SpaceLength<> const& observer_pos
 											   si::Length max_distance) const
 {
 	// Precomputed values that correspond to the scattering coefficients of the sky at sea level, for wavelengths 680, 550 and 440 respectively:
-	static constexpr SpaceVector<double, RGBSpace> kRayleighBeta	= { 5.8e-6f, 13.5e-6f, 33.1e-6f };
+	static constexpr SpaceVector<double, RGBSpace> kRayleighBeta	= { 5.802e-6f, 13.558e-6f, 33.1e-6f };
 	// Mie scattering doesn't change the color, so the coefficients are the same:
 	static constexpr SpaceVector<double, RGBSpace> kMieBeta		= { 21e-6f, 21e-6f, 21e-6f };
 
