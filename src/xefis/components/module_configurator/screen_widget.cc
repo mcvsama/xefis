@@ -18,6 +18,7 @@
 #include <xefis/config/all.h>
 #include <xefis/components/module_configurator/config_widget.h>
 #include <xefis/support/ui/paint_helper.h>
+#include <xefis/support/ui/performance_widget.h>
 
 // Neutrino:
 #include <neutrino/math/histogram.h>

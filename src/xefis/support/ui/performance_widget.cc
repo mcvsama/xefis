@@ -1,6 +1,6 @@
 /* vim:ts=4
  *
- * Copyleft 2018  Michał Gawron
+ * Copyleft 2026  Michał Gawron
  * Marduk Unix Labs, http://mulabs.org/
  *
  * This program is free software: you can redistribute it and/or modify
@@ -12,30 +12,30 @@
  */
 
 // Local:
-#include "config_widget.h"
+#include "performance_widget.h"
 
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/ui/paint_helper.h>
 
 // Qt:
-#include <QBoxLayout>
 #include <QGroupBox>
-#include <QMargins>
+#include <QLayout>
+#include <QString>
+#include <QWidget>
 
 // Standard:
 #include <cstddef>
 
 
-namespace xf::configurator {
+namespace xf {
 
 std::tuple<xf::HistogramWidget*, xf::HistogramStatsWidget*, QWidget*>
-ConfigWidget::create_performance_widget (QWidget* parent, QString const& title) const
+create_performance_widget (QWidget* parent, QString const& title)
 {
-	auto const ph = PaintHelper (*this);
-	QMargins const margins (ph.em_pixels (0.5f), ph.em_pixels (0.25f), ph.em_pixels (0.5f), ph.em_pixels (0.25f));
-
 	auto* group_box = new QGroupBox (title, parent);
+
+	auto const ph = PaintHelper (*group_box);
 	group_box->setFixedSize (ph.em_pixels (50.0f), ph.em_pixels (17.0f));
 
 	auto* histogram_widget = new xf::HistogramWidget (group_box);
@@ -47,9 +47,9 @@ ConfigWidget::create_performance_widget (QWidget* parent, QString const& title) 
 	group_layout->setContentsMargins (0, 0, 0, 0);
 	group_layout->addWidget (histogram_widget);
 	group_layout->addWidget (stats_widget);
-	group_layout->setContentsMargins (margins);
+	group_layout->setContentsMargins (QMargins (ph.em_pixels (0.5f), ph.em_pixels (0.25f), ph.em_pixels (0.5f), ph.em_pixels (0.25f)));
 
 	return { histogram_widget, stats_widget, group_box };
 }
 
-} // namespace xf::configurator
+} // namespace xf

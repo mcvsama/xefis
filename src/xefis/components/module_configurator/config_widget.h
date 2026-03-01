@@ -16,32 +16,21 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/support/ui/histogram_widget.h>
-#include <xefis/support/ui/histogram_stats_widget.h>
 #include <xefis/support/ui/widget.h>
-
-// Qt:
-#include <QString>
-#include <QWidget>
 
 // Standard:
 #include <cstddef>
-#include <tuple>
 
 
 namespace xf::configurator {
 
-class ConfigWidget: public Widget
+class ConfigWidget: public xf::Widget
 {
   protected:
 	static constexpr si::Frequency kDataRefreshRate = 5_Hz;
 
   protected:
 	using Widget::Widget;
-
-  protected:
-	std::tuple<xf::HistogramWidget*, xf::HistogramStatsWidget*, QWidget*>
-	create_performance_widget (QWidget* parent, QString const& title) const;
 };
 
 } // namespace xf::configurator

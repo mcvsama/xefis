@@ -18,6 +18,7 @@
 #include <xefis/config/all.h>
 #include <xefis/components/module_configurator/config_widget.h>
 #include <xefis/support/ui/paint_helper.h>
+#include <xefis/support/ui/performance_widget.h>
 
 // Neutrino:
 #include <neutrino/math/histogram.h>
@@ -131,9 +132,9 @@ ProcessingLoopWidget::create_performance_tab()
 	QWidget* processing_time_group {};
 	QWidget* processing_latency_group {};
 
-	std::tie (_communication_time_histogram, _communication_time_stats, communication_time_group) = create_performance_widget (widget, "HW communication time");
-	std::tie (_processing_time_histogram, _processing_time_stats, processing_time_group) = create_performance_widget (widget, "Processing time");
-	std::tie (_processing_latency_histogram, _processing_latency_stats, processing_latency_group) = create_performance_widget (widget, "Processing latency");
+	std::tie (_communication_time_histogram, _communication_time_stats, communication_time_group) = xf::create_performance_widget (widget, "HW communication time");
+	std::tie (_processing_time_histogram, _processing_time_stats, processing_time_group) = xf::create_performance_widget (widget, "Processing time");
+	std::tie (_processing_latency_histogram, _processing_latency_stats, processing_latency_group) = xf::create_performance_widget (widget, "Processing latency");
 
 	auto layout = new QGridLayout (widget);
 	layout->setContentsMargins (ph.widget_margins());
