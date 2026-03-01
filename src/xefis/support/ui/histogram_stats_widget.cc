@@ -30,7 +30,7 @@
 namespace xf {
 
 HistogramStatsWidget::HistogramStatsWidget (QWidget* parent):
-	xf::Widget (parent)
+	Widget (parent)
 {
 	auto* num_samples_label = new QLabel ("Samples: ", this);
 	auto* min_label = new QLabel ("Min: ", this);

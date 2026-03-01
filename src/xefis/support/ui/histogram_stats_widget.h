@@ -35,7 +35,7 @@
 
 namespace xf {
 
-class HistogramStatsWidget: public xf::Widget
+class HistogramStatsWidget: public Widget
 {
   public:
 	// Ctor
