@@ -47,7 +47,7 @@ Use tabs of width 4 for indentation.
 
 ## Methods
 
-One-line methods should be implemented directly in the class:
+One-line methods should be implemented directly in the class (only in-class methods, not free functions):
 
     class X
     {
@@ -55,6 +55,14 @@ One-line methods should be implemented directly in the class:
         oneliner()
             { do_something(); }
     }
+
+Free functions (even one-liners) should use this style:
+
+void
+func()
+{
+    ...
+}
 
 Multi-line functions should be moved outside the class with exception that when it requires a lot of redundant
 `template<>` writing, or `requires` clause that has to be written again at the definition site it's okay to have a
