@@ -350,7 +350,7 @@ copy_symmetric_0_180_materials (Shape& shape)
  * \param	radius
  *			The radius of the sphere used to normalize the vertex positions.
  */
-void
+static void
 set_sphere_normals (Shape& shape, si::Length radius)
 {
 	shape.for_each_vertex ([&] (ShapeVertex& v) {
