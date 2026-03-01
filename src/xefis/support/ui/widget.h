@@ -22,6 +22,7 @@
 
 // Qt:
 #include <QLabel>
+#include <QString>
 #include <QWidget>
 
 // Standard:
