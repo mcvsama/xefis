@@ -41,6 +41,7 @@ class Widget: public QWidget
 	/**
 	 * Return simple uniform-color widget.
 	 */
+	[[nodiscard]]
 	static QWidget*
 	create_color_widget (QColor, QWidget* parent);
 
@@ -51,6 +52,7 @@ class Widget: public QWidget
 	 *			Qt::AlignTop, Qt::AlignBottom, Qt::AlignLeft or Qt::AlignRight.
 	 * \returns	Top widget and internal label object.
 	 */
+	[[nodiscard]]
 	static std::tuple<QWidget*, QLabel*>
 	create_colored_strip_label (QString const& label, QColor color, Qt::Alignment strip_position, QWidget* parent);
 };
