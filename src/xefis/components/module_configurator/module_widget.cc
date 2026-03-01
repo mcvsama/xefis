@@ -98,7 +98,11 @@ ModuleWidget::refresh()
 		if (!samples.empty())
 		{
 			auto const [range, grid_lines] = nu::get_max_for_axis<si::Time> (*std::max_element (samples.begin(), samples.end()));
-			auto const histogram = math::Histogram<si::Time> (samples.begin(), samples.end(), range / 100, 0.0_ms, range);
+			auto const histogram = math::Histogram<si::Time> (samples.begin(), samples.end(), {
+				.bin_width = range / 100,
+				.min_x = 0.0_ms,
+				.max_x = range,
+			});
 
 			_communication_time_histogram->set_data (histogram, { accounting_api.processing_loop_period() });
 			_communication_time_histogram->set_grid_lines (grid_lines);
@@ -115,7 +119,11 @@ ModuleWidget::refresh()
 		if (!samples.empty())
 		{
 			auto const [range, grid_lines] = nu::get_max_for_axis<si::Time> (*std::max_element (samples.begin(), samples.end()));
-			auto const histogram = math::Histogram<si::Time> (samples.begin(), samples.end(), range / 100, 0.0_ms, range);
+			auto const histogram = math::Histogram<si::Time> (samples.begin(), samples.end(), {
+				.bin_width = range / 100,
+				.min_x = 0.0_ms,
+				.max_x = range,
+			});
 
 			_processing_time_histogram->set_data (histogram, { accounting_api.processing_loop_period() });
 			_processing_time_histogram->set_grid_lines (grid_lines);
@@ -128,7 +136,11 @@ ModuleWidget::refresh()
 		auto const accounting_api = Instrument::AccountingAPI (*_instrument);
 		auto const& samples = accounting_api.painting_times();
 		auto const [range, grid_lines] = nu::get_max_for_axis<si::Time> (*std::max_element (samples.begin(), samples.end()));
-		auto const histogram = math::Histogram<si::Time> (samples.begin(), samples.end(), range / 100, 0.0_ms, range);
+		auto const histogram = math::Histogram<si::Time> (samples.begin(), samples.end(), {
+			.bin_width = range / 100,
+			.min_x = 0.0_ms,
+			.max_x = range,
+		});
 
 		_painting_time_histogram->set_data (histogram, { accounting_api.frame_time() });
 		_painting_time_histogram->set_grid_lines (grid_lines);

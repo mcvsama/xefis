@@ -76,7 +76,11 @@ ScreenWidget::refresh()
 				if (!samples.empty())
 				{
 					auto const [range, grid_lines] = nu::get_max_for_axis<si::Time> (*std::max_element (samples.begin(), samples.end()));
-					auto const histogram = math::Histogram<si::Time> (samples.begin(), samples.end(), range / 100, 0.0_ms, range);
+					auto const histogram = math::Histogram<si::Time> (samples.begin(), samples.end(), {
+						.bin_width = range / 100,
+						.min_x = 0.0_ms,
+						.max_x = range,
+					});
 
 					histogram_widget.set_data (histogram);
 					histogram_widget.set_grid_lines (grid_lines);
