@@ -69,7 +69,6 @@ MIHAU.modules[xefis].products[xefis].sources				+= xefis/components/socket_tree/
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/config/all.h
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/config/core_types.h
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/config/resources.h
-MIHAU.modules[xefis].products[xefis].sources				+= xefis/config/ui.h
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/core/sockets/assignable_socket.h
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/core/sockets/basic_assignable_socket.h
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/core/sockets/basic_module_in.h
