@@ -29,30 +29,6 @@
 
 namespace xf {
 
-QVBoxLayout&
-get_debug_window_layout()
-{
-	static thread_local std::unique_ptr<QWidget> debug_widget;
-
-	if (!debug_widget)
-	{
-		debug_widget = std::make_unique<QWidget>();
-
-		auto* label = new QLabel ("Debug controls");
-		auto font = label->font();
-		font.setPointSize (font.pointSize() * 1.2);
-		label->setFont (font);
-
-		auto* layout = new QVBoxLayout (&*debug_widget);
-		layout->addWidget (label);
-
-		debug_widget->show();
-	}
-
-	return dynamic_cast<QVBoxLayout&> (*debug_widget->layout());
-}
-
-
 bool
 debug_bool (std::string const& name, bool default_value, std::function<void()> const callback)
 {

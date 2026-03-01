@@ -16,6 +16,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/support/debug/debug.h>
 #include <xefis/support/ui/paint_helper.h>
 
 // Neutrino:
@@ -33,14 +34,6 @@
 
 
 namespace xf {
-
-/**
- * Get layout for the debug window, so that another debug-widget can be added.
- * If debug window doesn't exist, it's created.
- */
-QVBoxLayout&
-get_debug_window_layout();
-
 
 [[nodiscard]]
 bool
