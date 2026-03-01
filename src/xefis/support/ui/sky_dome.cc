@@ -271,6 +271,7 @@ compute_ground_shape (si::LonLatRadius<> const observer_position,
 			.stack_angles = ss.stack_angles,
 			.material = kBlackMatte,
 			.texture = earth_texture,
+			.optimize_poles = 0.01_deg,
 			.setup_material = [&] (ShapeMaterial& material, si::LonLat const sphere_position) {
 				material.texture_position = {
 					nu::renormalize (sphere_position.lon(), nu::Range { -180_deg, +180_deg }, nu::Range { 0.0f, 1.0f }),
@@ -301,6 +302,7 @@ compute_sky_dome_shape (SkyDomeParameters const& p, nu::WorkPerformer* const wor
 		.stack_angles = ss.stack_angles,
 		.material = kBlackMatte,
 		.symmetric_0_180 = true,
+		.optimize_poles = 0.01_deg,
 		.setup_material = [&] (ShapeMaterial& material, si::LonLat const sphere_position, nu::WaitGroup::WorkToken&& work_token) {
 			// The shape originally assumes that the sun is always at 0° (more dense net is around 0°).
 			// This needs a correction when used with AtmosphericScattering so that the sun is also always at 0° to match the mesh:

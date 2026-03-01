@@ -70,6 +70,8 @@ struct SphereShapeParameters
 	nu::Range<si::Angle>			h_range			{ -180_deg, +180_deg };
 	nu::Range<si::Angle>			v_range			{ -90_deg, +90_deg };
 	ShapeMaterial const&			material		{ };
+	// When optimize_poles is non null, setup_material will be called once for each pole.
+	std::optional<si::Angle>		optimize_poles	{ std::nullopt }; // TODO implement
 	MakeSphereMaterialCallback		setup_material	{ std::monostate() };
 	std::shared_ptr<QOpenGLTexture>	texture			{ nullptr };
 };
@@ -86,6 +88,8 @@ struct IrregularSphereShapeParameters
 	std::shared_ptr<QOpenGLTexture>	texture			{ nullptr };
 	// When symmetric_0_180 is true, user should only provide longitudes in range (0°, 180°).
 	bool							symmetric_0_180	{ false };
+	// When optimize_poles is non null, setup_material will be called once for each pole.
+	std::optional<si::Angle>		optimize_poles	{ std::nullopt }; // TODO implement
 	MakeSphereMaterialCallback		setup_material	{ std::monostate() };
 };
 

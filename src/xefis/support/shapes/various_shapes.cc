@@ -189,6 +189,94 @@ make_cube_shape (xf::MassMomentsAtArm<BodyCOM> const& mm, ShapeMaterial const& m
 
 
 /**
+ * Used by make_centered_sphere_shape() and make_centered_irregular_sphere_shape()
+ * to reduce number of calls to setup_material for poles (call it once for one vertex, then copy
+ * the set up material to remaining pole vertices).
+ */
+class SpherePoleOptimizer
+{
+  public:
+	struct HandleVertexResult
+	{
+		bool skip_setup_material;
+	};
+
+  public:
+	// Ctor
+	explicit
+	SpherePoleOptimizer (std::size_t const n_slices)
+	{
+		p90_pole_targets.reserve (n_slices);
+		n90_pole_targets.reserve (n_slices);
+	}
+
+	[[nodiscard]]
+	HandleVertexResult
+	handle_vertex (ShapeVertex& vertex, si::LonLat const lonlat, si::Angle const epsilon)
+	{
+		auto constexpr skip_setup_material = HandleVertexResult { .skip_setup_material = true };
+
+		if (is_p90_pole (lonlat, epsilon))
+		{
+			if (p90_pole_source)
+			{
+				p90_pole_targets.push_back (&vertex);
+				return skip_setup_material;
+			}
+			else
+				p90_pole_source = &vertex;
+		}
+		else if (is_n90_pole (lonlat, epsilon))
+		{
+			if (n90_pole_source)
+			{
+				n90_pole_targets.push_back (&vertex);
+				return skip_setup_material;
+			}
+			else
+				n90_pole_source = &vertex;
+		}
+
+		return { .skip_setup_material = false };
+	}
+
+	void
+	copy_pole_materials()
+	{
+		for (auto* vertex: p90_pole_targets)
+			*vertex = *p90_pole_source;
+
+		for (auto* vertex: n90_pole_targets)
+			*vertex = *n90_pole_source;
+	}
+
+  private:
+	[[nodiscard]]
+	static bool
+	is_p90_pole (si::LonLat const vertex, si::Angle const epsilon)
+	{
+		return abs (vertex.lat() - 90_deg) <= epsilon;
+	}
+
+	[[nodiscard]]
+	static bool
+	is_n90_pole (si::LonLat const vertex, si::Angle const epsilon)
+	{
+		return abs (vertex.lat() + 90_deg) <= epsilon;
+	}
+
+  private:
+	// Vertices from which the material will be copied:
+	ShapeVertex*	p90_pole_source { nullptr };
+	ShapeVertex*	n90_pole_source { nullptr };
+
+	// Vertices to which the material will be copied:
+	std::vector<ShapeVertex*>	p90_pole_targets;
+	std::vector<ShapeVertex*>	n90_pole_targets;
+};
+
+
+/**
  * Fill in missing vertex data on a sphere by copying shared vertices between adjacent triangle strips.
  *
  * In the sphere mesh, certain vertices (specifically, the odd-indexed ones in the upper triangle strip)
@@ -199,8 +287,8 @@ make_cube_shape (xf::MassMomentsAtArm<BodyCOM> const& mm, ShapeMaterial const& m
  * \param	shape
  *			The Shape object containing the triangle strips that represent the sphere.
  */
-void
-fill_in_uncomputed_points_on_sphere (Shape& shape)
+static void
+fill_in_uncomputed_points_on_sphere (Shape& shape, SpherePoleOptimizer* pole_optimizer = nullptr)
 {
 	// Copy the vertices for shared points:
 	for (auto const strips: shape.triangle_strips() | std::views::slide (2))
@@ -212,6 +300,9 @@ fill_in_uncomputed_points_on_sphere (Shape& shape)
 		for (std::size_t i = 1; i < lower.vertices.size(); i += 2)
 			upper.vertices[i] = lower.vertices[i - 1];
 	}
+
+	if (pole_optimizer)
+		pole_optimizer->copy_pole_materials();
 }
 
 
@@ -288,6 +379,11 @@ template<class SetupMaterial>
 		[[maybe_unused]] auto all_materials_set_up = std::conditional_t<asynchronous_setup_material, nu::WaitGroup, std::monostate>();
 		[[maybe_unused]] auto all_setup_material_futures = std::conditional_t<future_based_setup_material, std::vector<std::future<void>>, std::monostate>();
 
+		auto pole_optimizer = std::optional<SpherePoleOptimizer>();
+
+		if (params.optimize_poles)
+			pole_optimizer.emplace (n_slices);
+
 		if constexpr (future_based_setup_material)
 		{
 			// +1 because first stack has both lower and upper points computed:
@@ -296,7 +392,6 @@ template<class SetupMaterial>
 
 		si::Angle angle_v = params.v_range.min();
 
-		// TODO Optimize poles (setup_material is called multiple times for each pole)
 		for (size_t iv = 0; iv < n_stacks; ++iv, angle_v += dv)
 		{
 			Shape::TriangleStrip& strip = shape.triangle_strips().emplace_back();
@@ -308,6 +403,12 @@ template<class SetupMaterial>
 			auto const add_vertex = [&] (si::LonLat const lonlat) {
 				auto const cartesian_position = math::coordinate_system_cast<BodyOrigin, void, ECEFSpace, void> (to_cartesian (lonlat));
 				auto& vertex = vertices.emplace_back (cartesian_position * params.radius, params.material);
+
+				if (pole_optimizer &&
+					pole_optimizer->handle_vertex (vertex, lonlat, *params.optimize_poles).skip_setup_material)
+				{
+					return;
+				}
 
 				if constexpr (synchronous_setup_material)
 					setup_material (vertex.material(), lonlat);
@@ -335,7 +436,7 @@ template<class SetupMaterial>
 			for (auto& future: all_setup_material_futures)
 				future.wait();
 
-		fill_in_uncomputed_points_on_sphere (shape);
+		fill_in_uncomputed_points_on_sphere (shape, pole_optimizer ? &*pole_optimizer : nullptr);
 		set_sphere_normals (shape, params.radius);
 
 		return shape;
@@ -388,6 +489,11 @@ template<class SetupMaterial>
 		[[maybe_unused]] auto all_materials_set_up = std::conditional_t<asynchronous_setup_material, nu::WaitGroup, std::monostate>();
 		[[maybe_unused]] auto all_setup_material_futures = std::conditional_t<future_based_setup_material, std::vector<std::future<void>>, std::monostate>();
 
+		auto pole_optimizer = std::optional<SpherePoleOptimizer>();
+
+		if (params.optimize_poles)
+			pole_optimizer.emplace (n_slices);
+
 		if constexpr (future_based_setup_material)
 		{
 			// +1 because first stack has both lower and upper points computed:
@@ -398,7 +504,6 @@ template<class SetupMaterial>
 		// First, compute only the lower-latitude points for each stack.
 		// The top ones are shared, so we'll just copy them later. This way
 		// we'll avoid calling setup_material() twice for the same points.
-		// TODO Optimize poles (setup_material is called multiple times for each pole)
 		for (auto const latitudes: params.stack_angles | std::views::slide (2))
 		{
 			Shape::TriangleStrip& strip = shape.triangle_strips().emplace_back();
@@ -412,6 +517,12 @@ template<class SetupMaterial>
 
 				if (call_setup_material)
 				{
+					if (pole_optimizer &&
+						pole_optimizer->handle_vertex (vertex, lonlat, *params.optimize_poles).skip_setup_material)
+					{
+						return;
+					}
+
 					if constexpr (synchronous_setup_material)
 						setup_material (vertex.material(), lonlat);
 					else if constexpr (asynchronous_setup_material)
@@ -458,7 +569,7 @@ template<class SetupMaterial>
 			for (auto& future: all_setup_material_futures)
 				future.wait();
 
-		fill_in_uncomputed_points_on_sphere (shape);
+		fill_in_uncomputed_points_on_sphere (shape, pole_optimizer ? &*pole_optimizer : nullptr);
 
 		if (params.symmetric_0_180)
 			copy_symmetric_0_180_materials (shape);
