@@ -30,6 +30,8 @@
 #include <boost/range/adaptor/indexed.hpp>
 
 // Standard:
+#include <algorithm>
+#include <cmath>
 #include <cstddef>
 
 
@@ -105,8 +107,8 @@ HistogramWidget::update_canvas()
 	QRectF const chart_rect = axes_rect.adjusted (0.5f * axes_width, 0.0f, 0.0f, -0.5f * axes_width);
 
 	auto const n_bins = _bins.size();
-	auto const inv_max_y = chart_rect.height() / _max_y;
-	auto const bin_width = chart_rect.width() / n_bins;
+	auto const inv_max_y = _max_y > 0 ? chart_rect.height() / _max_y : 0.0f;
+	auto const bin_width = n_bins > 0 ? chart_rect.width() / n_bins : 0.0f;
 
 	canvas.fill (background);
 
@@ -153,37 +155,65 @@ HistogramWidget::update_canvas()
 
 		// The histogram itself:
 		{
-			switch (_style)
+			if (_normal_distribution)
 			{
-				case Style::Line:
+				QColor normal_dist_color = foreground;
+				normal_dist_color.setAlpha (0x50);
+				auto const mean_x = _normal_distribution->mean();
+				auto const stddev_x = _normal_distribution->stddev();
+
+				auto const curve_steps = std::max (64, static_cast<int> (std::ceil (chart_rect.width())));
+				auto curve = QPolygonF();
+				curve.reserve (curve_steps + 1);
+
+				for (int i = 0; i <= curve_steps; ++i)
 				{
-					QPolygonF line;
-					line << QPointF (0.0f, 0.0f);
-
-					for (auto const& bin: _bins | boost::adaptors::indexed (0))
-						line << QPointF ((bin.index() + 0.5f) * bin_width, bin.value() * inv_max_y);
-
-					line << QPointF (chart_rect.width(), 0.0f);
-
-					painter.setPen (QPen (line_color, chart_width, Qt::SolidLine, Qt::RoundCap));
-					painter.setBrush (fill_color);
-					painter.drawPolygon (line);
-					break;
+					auto const normalized_x = 1.0f * i / curve_steps;
+					auto const x = normalized_x * chart_rect.width();
+					auto const z = (normalized_x - mean_x) / stddev_x;
+					auto const y = chart_rect.height() * std::exp (-0.5f * z * z);
+					curve << QPointF (x, y);
 				}
 
-				case Style::Bars:
+				painter.setPen (QPen (normal_dist_color, chart_width, Qt::SolidLine, Qt::RoundCap));
+				painter.setBrush (Qt::NoBrush);
+				painter.drawPolyline (curve);
+			}
+
+			if (n_bins > 0)
+			{
+				switch (_style)
 				{
-					auto const bar_width = 0.6f * chart_rect.width() / n_bins;
-
-					painter.setPen (QPen (bar_color, bar_width, Qt::SolidLine, Qt::FlatCap));
-
-					for (auto const& bin: _bins | boost::adaptors::indexed (0))
+					case Style::Line:
 					{
-						auto const x = (bin.index() + 0.5f) * bin_width;
+						QPolygonF line;
+						line << QPointF (0.0f, 0.0f);
 
-						painter.drawLine (QPointF (x, 0.0f), QPointF (x, bin.value() * inv_max_y));
+						for (auto const& bin: _bins | boost::adaptors::indexed (0))
+							line << QPointF ((bin.index() + 0.5f) * bin_width, bin.value() * inv_max_y);
+
+						line << QPointF (chart_rect.width(), 0.0f);
+
+						painter.setPen (QPen (line_color, chart_width, Qt::SolidLine, Qt::RoundCap));
+						painter.setBrush (fill_color);
+						painter.drawPolygon (line);
+						break;
 					}
-					break;
+
+					case Style::Bars:
+					{
+						auto const bar_width = 0.6f * chart_rect.width() / n_bins;
+
+						painter.setPen (QPen (bar_color, bar_width, Qt::SolidLine, Qt::FlatCap));
+
+						for (auto const& bin: _bins | boost::adaptors::indexed (0))
+						{
+							auto const x = (bin.index() + 0.5f) * bin_width;
+
+							painter.drawLine (QPointF (x, 0.0f), QPointF (x, bin.value() * inv_max_y));
+						}
+						break;
+					}
 				}
 			}
 		}

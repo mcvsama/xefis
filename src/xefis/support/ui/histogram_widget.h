@@ -21,6 +21,7 @@
 // Neutrino:
 #include <neutrino/format.h>
 #include <neutrino/math/histogram.h>
+#include <neutrino/math/normal_distribution.h>
 #include <neutrino/numeric.h>
 #include <neutrino/qt/qstring.h>
 
@@ -82,11 +83,13 @@ class HistogramWidget: public CanvasWidget
 	Style						_style				{ Style::Bars };
 	std::vector<float>			_marks;
 	std::vector<std::size_t>	_bins;
-	std::size_t					_max_y;
+	std::size_t					_max_y				{ 0 };
 	QString						_min_x_str;
 	QString						_mid_x_str;
 	QString						_max_x_str;
 	QString						_max_y_str;
+	std::optional<nu::math::NormalDistribution<float>>
+								_normal_distribution;
 	std::size_t					_grid_lines			{ 10 };
 	bool						_y_legend_visible	{ false };
 };
@@ -103,6 +106,21 @@ template<class Value>
 		_mid_x_str = nu::to_qstring (nu::format_unit (0.5f * (histogram.min_x() + histogram.max_x()), precision));
 		_max_x_str = nu::to_qstring (nu::format_unit (histogram.max_x(), precision));
 		_max_y_str = nu::to_qstring (std::format ("{}", histogram.max_y()));
+		_normal_distribution = std::nullopt;
+
+		if (histogram.stddev() > Value())
+		{
+			auto const mean_x = renormalize (histogram.mean(),
+											 { histogram.min_x(), histogram.max_x() },
+											 nu::Range { 0.0f, 1.0f });
+			auto const mean_plus_stddev_x = renormalize(histogram.mean() + histogram.stddev(),
+														{ histogram.min_x(), histogram.max_x() },
+														nu::Range { 0.0f, 1.0f });
+			auto const stddev_x = mean_plus_stddev_x - mean_x;
+
+			if (stddev_x > 0.0f)
+				_normal_distribution = nu::math::NormalDistribution<float> (mean_x, stddev_x);
+		}
 
 		_marks.reserve (marks.size());
 		_marks.clear();
