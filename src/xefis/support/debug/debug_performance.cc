@@ -44,7 +44,7 @@
 #include <vector>
 
 
-namespace xf {
+namespace xf::debug {
 namespace {
 
 using TimeHistogram = math::Histogram<si::Time>;
@@ -314,7 +314,7 @@ store_performance_measurement_sample (std::string const& name, si::Time const du
 
 
 nu::ScopeExit<>
-debug_measure_performance (std::string const& name, DebugPerformanceParameters parameters)
+measure_time (std::string const& name, DebugPerformanceParameters parameters)
 {
 	if (parameters.max_samples == 0u)
 		parameters.max_samples = 1u;
@@ -330,4 +330,4 @@ debug_measure_performance (std::string const& name, DebugPerformanceParameters p
 	}));
 }
 
-} // namespace xf
+} // namespace xf::debug

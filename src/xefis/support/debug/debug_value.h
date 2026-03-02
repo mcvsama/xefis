@@ -34,20 +34,21 @@
 
 
 namespace xf {
+namespace debug {
 
 [[nodiscard]]
 bool
-debug_bool (std::string const& name, bool default_value = false, std::function<void()> const callback = nullptr);
+editable_value (std::string const& name, bool default_value = false, std::function<void()> const callback = nullptr);
 
 
 template<class Value>
 	[[nodiscard]]
 	inline Value
-	debug_slider (std::string const& name,
-				  nu::Range<Value> const range,
-				  std::optional<Value> default_value = std::nullopt,
-				  Value const step = Value (1),
-				  std::function<void()> const callback = nullptr)
+	editable_value (std::string const& name,
+					nu::Range<Value> const range,
+					std::optional<Value> default_value = std::nullopt,
+					Value const step = Value (1),
+					std::function<void()> const callback = nullptr)
 	{
 		struct Details
 		{
@@ -115,6 +116,7 @@ template<class Value>
 		}
 	}
 
+} // namespace debug
 } // namespace xf
 
 #endif

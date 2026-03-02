@@ -26,7 +26,7 @@
 #include <optional>
 
 
-namespace xf {
+namespace xf::debug {
 
 /**
  * Parameters for debug performance measurements.
@@ -48,8 +48,8 @@ struct DebugPerformanceParameters
  */
 [[nodiscard]]
 nu::ScopeExit<>
-debug_measure_performance (std::string const& name, DebugPerformanceParameters);
+measure_time (std::string const& name, DebugPerformanceParameters);
 
-} // namespace xf
+} // namespace xf::debug
 
 #endif

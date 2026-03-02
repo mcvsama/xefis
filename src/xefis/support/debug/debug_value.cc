@@ -28,9 +28,10 @@
 
 
 namespace xf {
+namespace debug {
 
 bool
-debug_bool (std::string const& name, bool default_value, std::function<void()> const callback)
+editable_value (std::string const& name, bool default_value, std::function<void()> const callback)
 {
 	struct Details
 	{
@@ -69,4 +70,5 @@ debug_bool (std::string const& name, bool default_value, std::function<void()> c
 	}
 }
 
+} // namespace debug
 } // namespace xf
