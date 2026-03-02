@@ -35,9 +35,9 @@ namespace xf {
 struct DebugPerformanceParameters
 {
 	si::Time				bin_width	{ 1_ms };
-	std::optional<si::Time>	min_x;
-	std::optional<si::Time>	max_x;
-	std::size_t				max_samples { 1u };
+	std::optional<si::Time>	min_x		{ std::nullopt };
+	std::optional<si::Time>	max_x		{ std::nullopt };
+	std::size_t				max_samples { 1000u };
 };
 
 
