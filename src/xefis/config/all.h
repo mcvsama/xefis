@@ -11,9 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Local:
-#include "resources.h"
-#include "core_types.h"
+#ifndef XEFIS__CONFIG__ALL_H__INCLUDED
+#define XEFIS__CONFIG__ALL_H__INCLUDED
 
 // Neutrino:
 #include <neutrino/core.h>
@@ -34,3 +33,10 @@ using namespace neutrino::debug;
 
 using namespace neutrino::ostream_fixes;
 using namespace neutrino::string_view_plus_string_fixes;
+
+
+// Local:
+#include "resources.h"
+#include "core_types.h"
+
+#endif
