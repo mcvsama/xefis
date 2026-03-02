@@ -274,7 +274,8 @@ ensure_debug_performance_measurement_exists (std::string const& name, DebugPerfo
 									measurement.parameters.bin_width != parameters.bin_width ||
 									measurement.parameters.min_x != parameters.min_x ||
 									measurement.parameters.max_x != parameters.max_x ||
-									measurement.parameters.max_samples != parameters.max_samples;
+									measurement.parameters.max_samples != parameters.max_samples ||
+									measurement.parameters.stop_when_full != parameters.stop_when_full;
 
 		measurement.parameters = parameters;
 		configure_sample_storage (measurement);
@@ -298,6 +299,10 @@ store_performance_measurement_sample (std::string const& name, si::Time const du
 			return;
 
 		auto& measurement = found->second;
+
+		if (measurement.parameters.stop_when_full && measurement.samples.full())
+			return;
+
 		measurement.samples.push_back (duration);
 		measurement.needs_ui_update = true;
 	}

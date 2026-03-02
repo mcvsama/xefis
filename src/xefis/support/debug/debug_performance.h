@@ -30,14 +30,15 @@ namespace xf {
 
 /**
  * Parameters for debug performance measurements.
- * Extends histogram configuration with sample retention cap.
+ * Extends histogram configuration with sample retention cap and optional stop-on-full behavior.
  */
 struct DebugPerformanceParameters
 {
-	si::Time				bin_width	{ 1_ms };
-	std::optional<si::Time>	min_x		{ std::nullopt };
-	std::optional<si::Time>	max_x		{ std::nullopt };
-	std::size_t				max_samples { 1000u };
+	si::Time				bin_width		{ 1_ms };
+	std::optional<si::Time>	min_x			{ std::nullopt };
+	std::optional<si::Time>	max_x			{ std::nullopt };
+	std::size_t				max_samples		{ 1000u };
+	bool					stop_when_full	{ false };
 };
 
 
