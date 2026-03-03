@@ -28,11 +28,7 @@ namespace xf {
 
 [[nodiscard]]
 EclipticCoordinates
-compute_moon_ecliptic_position (si::Time const unix_time);
-
-[[nodiscard]]
-SpaceLength<WorldSpace>
-compute_moon_position_in_ecef (si::Time const unix_time);
+compute_moon_ecliptic_position (double days_since_J2000);
 
 } // namespace xf
 

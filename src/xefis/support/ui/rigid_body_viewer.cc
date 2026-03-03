@@ -191,6 +191,15 @@ RigidBodyViewer::populate_rendering_menu (QMenu& menu)
 	}
 
 	{
+		auto* action = menu.addAction ("Moon enabled", [this] {
+			set_moon_enabled (!moon_enabled());
+			start_waiting_for_resources();
+		});
+		action->setCheckable (true);
+		action->setChecked (_rigid_body_painter.moon_enabled());
+	}
+
+	{
 		auto* action = menu.addAction ("Universe enabled", [this] {
 			set_universe_enabled (!universe_enabled());
 			start_waiting_for_resources();

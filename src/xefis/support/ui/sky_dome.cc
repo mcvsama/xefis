@@ -221,7 +221,7 @@ compute_dome_slices_and_stacks (si::Angle const horizon_angle)
 
 
 SunPosition
-compute_sun_position (si::LonLat const observer_position, si::Time const time)
+compute_sun_position (si::LonLat const observer_position, si::Time const time) // TODO double days_since_J2000
 {
 	// Reposition Sun according to time:
 	auto const days_since_J2000 = unix_time_to_days_since_J2000 (time);
@@ -239,6 +239,7 @@ compute_sun_position (si::LonLat const observer_position, si::Time const time)
 	return {
 		.hour_angle = hour_angle,
 		.declination = declination,
+		.ecliptic_coordinates = sun_ecliptic_position,
 		.horizontal_coordinates = horizontal_coordinates,
 		.cartesian_horizontal_coordinates = cartesian_horizontal_coordinates,
 	};
@@ -249,6 +250,20 @@ SpaceVector<float, RGBSpace>
 compute_sun_light_color (si::LonLatRadius<> const observer_position, SpaceVector<double> const sun_position, AtmosphericScattering const& atmospheric_scattering)
 {
 	return atmospheric_scattering.compute_incident_light ({ 0_m, 0_m, observer_position.radius() }, sun_position, sun_position);
+}
+
+
+MoonPosition
+compute_moon_position (si::Time const time) // TODO double days_since_J2000
+{
+	auto const days_since_J2000 = unix_time_to_days_since_J2000 (time);
+	auto const moon_ecliptic_position = compute_moon_ecliptic_position (days_since_J2000);
+	auto const moon_ecef_position = moon_ecliptic_position.to_ecef (days_since_J2000);
+
+	return {
+		.ecliptic_coordinates = moon_ecliptic_position,
+		.ecef_coordinates = moon_ecef_position,
+	};
 }
 
 

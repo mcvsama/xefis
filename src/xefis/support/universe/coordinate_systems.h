@@ -39,7 +39,7 @@ struct EclipticCoordinates
   public:
 	[[nodiscard]]
 	SpaceLength<ECEFSpace>
-	to_ecef (double days_since_j2000) const;
+	to_ecef (double days_since_J2000) const;
 
 	[[nodiscard]]
 	SpaceLength<ECEFSpace>

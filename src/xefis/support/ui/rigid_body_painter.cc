@@ -58,7 +58,12 @@ namespace xf {
 
 constexpr auto kGLAtmosphericSunLight	= GL_LIGHT0;
 constexpr auto kGLCosmicSunLight		= GL_LIGHT1;
+
+// Moon light and feature light intentionally share one OpenGL light slot.
+// They are configured differently, but never used at the same time.
+constexpr auto kGLMoonLight				= GL_LIGHT2;
 constexpr auto kGLFeatureLight			= GL_LIGHT2;
+
 constexpr auto kGLSkyLight0				= GL_LIGHT3;
 constexpr auto kGLSkyLight1				= GL_LIGHT4;
 constexpr auto kGLSkyLight2				= GL_LIGHT5;
@@ -90,6 +95,32 @@ std::array<RigidBodyPainter::SkyLight, 5> const RigidBodyPainter::Planet::sky_li
 		.position	= { 0_deg, 90_deg },
 	},
 }};
+
+
+/**
+ * Return what fraction of the celestial object face should be considered visible near the horizon.
+ * Maps object's altitude around +/- face angular radius to range 0.0..1.0.
+ */
+float
+compute_visible_surface_factor (si::Angle const altitude_above_horizon, si::Angle const face_angular_radius)
+{
+	auto const v = nu::renormalize (altitude_above_horizon,
+									nu::Range { -face_angular_radius, +face_angular_radius },
+									nu::Range { 0.0f, 1.0f });
+	return std::clamp<float> (v, 0.0f, 1.0f);
+}
+
+
+/**
+ * Return what fraction of the celestial object face should be considered visible near the horizon.
+ * Maps object's altitude around +/- face angular radius to range 0.0..1.0.
+ */
+float
+compute_visible_surface_factor (si::Angle const altitude_above_horizon, si::Length const object_radius, si::Length const distance_to_object)
+{
+	auto const face_angular_radius = 1_rad * std::atan (object_radius / distance_to_object);
+	return compute_visible_surface_factor (altitude_above_horizon, face_angular_radius);
+}
 
 
 RigidBodyPainter::RigidBodyPainter (si::PixelDensity const pixel_density, nu::WorkPerformer* work_performer):
@@ -129,7 +160,9 @@ RigidBodyPainter::set_time (si::Time const new_time)
 		if (_universe)
 			check_sky_box();
 
-		_moon_position_in_ecef.reset();
+		if (_moon)
+			_moon->brightness_factor.reset();
+
 		_prev_saved_time = _time;
 	}
 }
@@ -221,6 +254,16 @@ RigidBodyPainter::set_sun_enabled (bool enabled)
 
 	if (_planet)
 		_planet->sky_dome_shape.reset();
+}
+
+
+void
+RigidBodyPainter::set_moon_enabled (bool enabled)
+{
+	if (enabled)
+		_moon.emplace();
+	else
+		_moon.reset();
 }
 
 
@@ -363,12 +406,55 @@ RigidBodyPainter::precompute()
 		_sun->corrected_position_horizontal_coordinates = corrected_sun_position_near_horizon (_sun->position.horizontal_coordinates);
 		_sun->corrected_position_cartesian_horizontal_coordinates = compute_cartesian_horizontal_coordinates (_sun->corrected_position_horizontal_coordinates);
 		_sun->color_on_body = to_gl_color (compute_sun_light_color (_camera_polar_position, _sun->corrected_position_cartesian_horizontal_coordinates, _sun->atmospheric_scattering));
+
+		if (_planet)
+		{
+			_sun_altitude_above_horizon = _sun->position.horizontal_coordinates.altitude - _planet->horizon_angle;
+			_sun->brightness_factor = compute_visible_surface_factor (*_sun_altitude_above_horizon, kSunFaceAngularRadius);
+		}
 	}
 
-	if (_planet && _sun)
+	if (_moon && _sun && _planet)
 	{
-		auto const sun_altitude = _sun->position.horizontal_coordinates.altitude;
-		_sun_altitude_above_horizon = sun_altitude - _planet->horizon_angle;
+		_moon->position = compute_moon_position (_time);
+		_moon->world_position = math::coordinate_system_cast<WorldSpace, void, ECEFSpace, void> (_moon->position.ecef_coordinates) + planet_position();
+
+		if (!_moon->brightness_factor)
+		{
+			// Use the currently focused object as the reference point so local lighting
+			// remains stable when observing specific bodies/groups/constraints.
+			auto target_position = _followed_position;
+
+			if (auto const* body = focused_body())
+				target_position = body->placement().position();
+			else if (auto const* group = focused_group())
+				target_position = group->mass_moments().center_of_mass_position();
+			else if (auto const* constraint = focused_constraint())
+				target_position = 0.5 * (constraint->body_1().placement().position() + constraint->body_2().placement().position());
+
+			auto const camera_from_planet = _camera_placement.position() - planet_position();
+			auto const camera_to_moon = _moon->world_position - _camera_placement.position();
+			auto const phase_factor = moon_phase_brightness_factor (_moon->world_position, _sun->position.ecliptic_coordinates, target_position);
+			auto const denominator = phase_factor + 10.0f * _sun->brightness_factor;
+
+			// Dim moonlight by lunar phase and sun brightness. Guard against phase=0 and
+			// sun=0 (new moon + no sunlight), which would otherwise produce 0/0.
+			auto brightness_factor = denominator > 1e-6f
+				? phase_factor / denominator
+				: 0.0f;
+
+			// Dim the moon by visibility above the local horizon:
+			if (abs (camera_from_planet) > 1_m && abs (camera_to_moon) > 1_m)
+			{
+				auto const local_up = camera_from_planet.normalized();
+				auto const moon_altitude = 1_rad * asin (std::clamp (cos_angle_between (local_up, camera_to_moon), -1.0, +1.0));
+				auto const moon_altitude_above_horizon = moon_altitude - _planet->horizon_angle;
+				auto const distance_to_moon = abs (_moon->world_position - target_position);
+				brightness_factor *= compute_visible_surface_factor (moon_altitude_above_horizon, kMoonRadius, distance_to_moon);
+			}
+
+			_moon->brightness_factor = brightness_factor;
+		}
 	}
 
 	_sky_box_visibility = _sun_altitude_above_horizon
@@ -422,7 +508,7 @@ RigidBodyPainter::setup_lights()
 {
 	setup_sun_light();
 	setup_sky_light();
-	setup_feature_light();
+	setup_moon_light();
 
 	// Disable all lights by default:
 	enable_only_lights (0);
@@ -434,18 +520,14 @@ RigidBodyPainter::setup_sun_light()
 {
 	if (_sun)
 	{
-		auto const atmospheric_sun_visibility = _sun_altitude_above_horizon
-			? compute_sun_visible_surface_factor (*_sun_altitude_above_horizon)
-			: 1.0f;
-
 		// Blend the original sun color with color as seen through the atmosphere:
 		auto const qcolor = QColor::fromRgbF (_sun->color_on_body[0], _sun->color_on_body[1], _sun->color_on_body[2]);
 		auto const height_factor = _planet ? _planet->camera_clamped_normalized_amsl_height : 1.0f;
 		auto const atmospheric_sun_color = to_gl_color (hsl_interpolation (height_factor, qcolor, kSunQColorInSpace));
 
 		glLightfv (kGLAtmosphericSunLight, GL_AMBIENT, atmospheric_sun_color.scaled (0.0f));
-		glLightfv (kGLAtmosphericSunLight, GL_DIFFUSE, atmospheric_sun_color.scaled (0.4f * atmospheric_sun_visibility));
-		glLightfv (kGLAtmosphericSunLight, GL_SPECULAR, atmospheric_sun_color.scaled (0.1f * atmospheric_sun_visibility));
+		glLightfv (kGLAtmosphericSunLight, GL_DIFFUSE, atmospheric_sun_color.scaled (0.4f * _sun->brightness_factor));
+		glLightfv (kGLAtmosphericSunLight, GL_SPECULAR, atmospheric_sun_color.scaled (0.1f * _sun->brightness_factor));
 
 		// When we're inside the atmosphere, the Moon light (and potentially other bodies) are too intensive when combined with SkyDome, so use darker diffuse
 		// color. When going out of atmosphere, Moon becomes too dark, so use lighter color.
@@ -554,6 +636,41 @@ RigidBodyPainter::set_sky_light_enabled (bool enabled)
 
 
 void
+RigidBodyPainter::setup_moon_light()
+{
+	if (!_planet || !_sun || !_moon)
+		return;
+
+	if (!_moon->brightness_factor)
+		return;
+
+	// Moon contributes only diffuse light; ambient/specular are intentionally off.
+	auto const black = GLColor (0.0f, 0.0f, 0.0f);
+	glLightfv (kGLMoonLight, GL_AMBIENT, black);
+	glLightfv (kGLMoonLight, GL_DIFFUSE, kSunColorInSpace.scaled (0.12f * *_moon->brightness_factor));
+	glLightfv (kGLMoonLight, GL_SPECULAR, black);
+
+	_gl.save_context ([&]{
+		// Define light position in camera-relative coordinates expected by OpenGL.
+		_gl.set_camera_rotation_only (_camera_placement);
+		_gl.translate (_moon->world_position - _camera_placement.position());
+		// Set a point light originating at 0 (the Moon position now):
+		glLightfv (kGLMoonLight, GL_POSITION, GLArray { 0.0f, 0.0f, 0.0f, 1.0f });
+	});
+}
+
+
+void
+RigidBodyPainter::set_moon_light_enabled (bool enabled)
+{
+	if (enabled)
+		glEnable (kGLMoonLight);
+	else
+		glDisable (kGLMoonLight);
+}
+
+
+void
 RigidBodyPainter::setup_feature_light()
 {
 	// Enable feature light:
@@ -589,7 +706,15 @@ RigidBodyPainter::enable_only_lights (uint32_t lights)
 		set_atmospheric_sun_light_enabled (lights & kAtmosphericSunLight);
 		set_cosmic_sun_light_enabled (lights & kCosmicSunLight);
 		set_sky_light_enabled (lights & kSkyLight);
-		set_feature_light_enabled (lights & kFeatureLight);
+
+		// kMoonLight and kFeatureLight share GL_LIGHT2, so this slot must be
+		// enabled when either light role is requested.
+		auto const shared_light_enabled = lights & (kMoonLight | kFeatureLight);
+
+		if (shared_light_enabled)
+			glEnable (kGLMoonLight);
+		else
+			glDisable (kGLMoonLight);
 	}
 	else
 		glDisable (GL_LIGHTING);
@@ -601,13 +726,23 @@ RigidBodyPainter::enable_appropriate_lights()
 {
 	if (_sun)
 	{
+		uint32_t mask = 0u;
+
 		if (_planet)
-			enable_only_lights (kAtmosphericSunLight | kSkyLight);
+			mask |= kAtmosphericSunLight | kSkyLight;
 		else
-			enable_only_lights (kCosmicSunLight);
+			mask |= kCosmicSunLight;
+
+		if (_moon)
+			mask |= kMoonLight;
+
+		enable_only_lights (mask);
 	}
 	else
+	{
+		setup_feature_light();
 		enable_only_lights (kFeatureLight);
+	}
 }
 
 
@@ -739,7 +874,7 @@ RigidBodyPainter::paint_universe_and_sun()
 			_gl.rotate (_user_camera_angles[0] - 2 * _user_camera_angles[1] + time_dependent_angle, 0, 0, 1);
 
 			auto const sun_visibility = _sun_altitude_above_horizon
-				? 1.0f - nu::square (1.0f - compute_sun_visible_surface_factor (*_sun_altitude_above_horizon))
+				? 1.0f - nu::square (1.0f - compute_visible_surface_factor (*_sun_altitude_above_horizon, kSunFaceAngularRadius))
 				: 1.0f;
 			auto const alpha_height_factor = _planet ? _planet->camera_clamped_normalized_amsl_height : 1.0f;
 
@@ -758,7 +893,7 @@ RigidBodyPainter::paint_universe_and_sun()
 void
 RigidBodyPainter::paint_moon()
 {
-	if (!_sun)
+	if (!_sun || !_moon || !_planet)
 		return;
 
 	static auto const moon_material = []{
@@ -789,12 +924,7 @@ RigidBodyPainter::paint_moon()
 	}
 
 	bool const has_moon_texture = _planet_textures && _planet_textures->moon;
-
-	if (!_moon_position_in_ecef)
-		_moon_position_in_ecef = compute_moon_position_in_ecef (_time);
-
-	auto const moon_position = planet_position() + *_moon_position_in_ecef;
-	auto const direction_to_earth = (planet_position() - moon_position).normalized();
+	auto const direction_to_earth = (planet_position() - _moon->world_position).normalized();
 	auto const moon_rotation = alpha_beta_from_x_to (direction_to_earth);
 
 	_gl.save_context ([&]{
@@ -821,7 +951,7 @@ RigidBodyPainter::paint_moon()
 		// Keep translation in world/ECEF space: if we rotate after set_camera(),
 		// camera position would get rotated together with Moon model vertices.
 		_gl.set_camera_rotation_only (_camera_placement);
-		_gl.translate (moon_position - _camera_placement.position());
+		_gl.translate (_moon->world_position - _camera_placement.position());
 		// Keep the same lunar hemisphere facing Earth.
 		_gl.rotate_z (moon_rotation[0]);
 		_gl.rotate_y (moon_rotation[1]);
@@ -1029,6 +1159,7 @@ RigidBodyPainter::paint_helpers (rigid_body::System const& system)
 		glEnable (GL_BLEND);
 		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		_gl.clear_z_buffer();
+		setup_feature_light();
 		enable_only_lights (kFeatureLight);
 
 		for (auto const& group: system.groups())
@@ -1726,6 +1857,22 @@ RigidBodyPainter::fix_camera_position()
 		_camera_polar_position.radius() = kEarthMeanRadius + 10_m;
 		_camera_placement.set_position (to_cartesian<WorldSpace> (_camera_polar_position));
 	}
+}
+
+
+float
+RigidBodyPainter::moon_phase_brightness_factor (SpaceLength<WorldSpace> const moon_position, EclipticCoordinates const sun_ecliptic_position, SpaceLength<WorldSpace> const lit_object_position) const
+{
+	auto const moon_to_target = lit_object_position - moon_position;
+
+	// Degenerate case: focused object at Moon center.
+	if (abs (moon_to_target) < 1_m)
+		return 1.0f;
+
+	auto const sun_position = planet_position() + math::coordinate_system_cast<WorldSpace, void, ECEFSpace, void> (sun_ecliptic_position.to_ecef_from_unix_time (_time));
+	auto const moon_to_sun = (sun_position - moon_position).normalized();
+	auto const phase_cos = std::clamp (cos_angle_between (moon_to_sun, moon_to_target.normalized()), -1.0, +1.0);
+	return std::clamp<float> (0.5f * (1.0f + phase_cos), 0.0f, 1.0f);
 }
 
 

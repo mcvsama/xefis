@@ -19,6 +19,7 @@
 #include <xefis/support/atmosphere/atmospheric_scattering.h>
 #include <xefis/support/color/spaces.h>
 #include <xefis/support/shapes/shape.h>
+#include <xefis/support/universe/moon_position.h>
 #include <xefis/support/universe/sun_position.h>
 
 // Neutrino:
@@ -36,8 +37,16 @@ struct SunPosition
 {
 	si::Angle						hour_angle;
 	si::Angle						declination;
+	EclipticCoordinates				ecliptic_coordinates;
 	HorizontalCoordinates			horizontal_coordinates;
 	SpaceVector<double>				cartesian_horizontal_coordinates;
+};
+
+
+struct MoonPosition
+{
+	EclipticCoordinates				ecliptic_coordinates;
+	SpaceLength<ECEFSpace>			ecef_coordinates;
 };
 
 
@@ -59,11 +68,8 @@ compute_sun_position (si::LonLat const observer_position, si::Time const);
 
 
 [[nodiscard]]
-constexpr SpaceVector<double>
-compute_cartesian_horizontal_coordinates (HorizontalCoordinates const& horizontal_coordinates)
-{
-	return to_cartesian<void> (si::LonLat (-horizontal_coordinates.azimuth + 180_deg, horizontal_coordinates.altitude));
-}
+MoonPosition
+compute_moon_position (si::Time const time);
 
 
 [[nodiscard]]
@@ -81,6 +87,15 @@ compute_ground_shape (si::LonLatRadius<> const observer_position,
 [[nodiscard]]
 Shape
 compute_sky_dome_shape (SkyDomeParameters const& params, nu::WorkPerformer* work_performer = nullptr);
+
+
+// TODO to universe/coordinate_systems.h (.to_ecef()?)
+[[nodiscard]]
+constexpr SpaceVector<double>
+compute_cartesian_horizontal_coordinates (HorizontalCoordinates const& horizontal_coordinates)
+{
+	return to_cartesian<void> (si::LonLat (-horizontal_coordinates.azimuth + 180_deg, horizontal_coordinates.altitude));
+}
 
 } // namespace xf
 

@@ -39,13 +39,12 @@ normalize_angle_360 (si::Angle const angle)
 
 [[nodiscard]]
 EclipticCoordinates
-compute_moon_ecliptic_position (si::Time const time)
+compute_moon_ecliptic_position (double const days_since_J2000)
 {
 	// Low-cost analytical model with major periodic corrections.
-	// Formula set follows the classic Schlyter approximation, anchored to Julian date.
-	auto const julian_date = unix_time_to_julian_date (time);
-	auto const d = julian_date - 2451543.5;
-
+	// Formula set follows the classic Schlyter approximation, where "d" is days since
+	// 2000-01-00 00:00 UT (JD 2451543.5), not J2000 noon (JD 2451545.0).
+	auto const d = days_since_J2000 + 1.5;
 	auto const ascending_node = normalize_angle_360 (125.1228_deg - 0.0529538083_deg * d);
 	auto const inclination = 5.1454_deg;
 	auto const arg_perigee = normalize_angle_360 (318.0634_deg + 0.1643573223_deg * d);
@@ -103,33 +102,5 @@ compute_moon_ecliptic_position (si::Time const time)
 		.distance_from_earth = distance_earth_radii * kEarthMeanRadius,
 	};
 }
-
-
-[[nodiscard]]
-SpaceLength<WorldSpace>
-compute_moon_position_in_ecef (si::Time const time)
-{
-	auto const moon = compute_moon_ecliptic_position (time);
-	auto const julian_date = unix_time_to_julian_date (time);
-	auto const days_since_j2000 = julian_date - kJ2000Epoch;
-	auto const obliquity = 23.4393_deg - 0.0000003563_deg * days_since_j2000;
-
-	auto const cos_lat = cos (moon.latitude);
-	auto const x_ecl = cos (moon.longitude) * cos_lat;
-	auto const y_ecl = sin (moon.longitude) * cos_lat;
-	auto const z_ecl = sin (moon.latitude);
-
-	auto const x_eq = x_ecl;
-	auto const y_eq = y_ecl * cos (obliquity) - z_ecl * sin (obliquity);
-	auto const z_eq = y_ecl * sin (obliquity) + z_ecl * cos (obliquity);
-
-	auto const gmst = compute_greenwich_mean_sidereal_time_at_0h_ut (julian_date);
-	auto const x = +cos (gmst) * x_eq + sin (gmst) * y_eq;
-	auto const y = -sin (gmst) * x_eq + cos (gmst) * y_eq;
-	auto const z = z_eq;
-
-	return { moon.distance_from_earth * x, moon.distance_from_earth * y, moon.distance_from_earth * z };
-}
-
 
 } // namespace xf

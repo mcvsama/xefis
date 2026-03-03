@@ -30,9 +30,9 @@
 namespace xf {
 
 SpaceLength<ECEFSpace>
-EclipticCoordinates::to_ecef (double const days_since_j2000) const
+EclipticCoordinates::to_ecef (double const days_since_J2000) const
 {
-	auto const obliquity = 23.4393_deg - 0.0000003563_deg * days_since_j2000;
+	auto const obliquity = 23.4393_deg - 0.0000003563_deg * days_since_J2000;
 
 	auto const cos_lat = cos (this->latitude);
 	auto const x_ecl = cos (this->longitude) * cos_lat;
@@ -43,7 +43,7 @@ EclipticCoordinates::to_ecef (double const days_since_j2000) const
 	auto const y_eq = y_ecl * cos (obliquity) - z_ecl * sin (obliquity);
 	auto const z_eq = y_ecl * sin (obliquity) + z_ecl * cos (obliquity);
 
-	auto const julian_date = days_since_j2000 + kJ2000Epoch;
+	auto const julian_date = days_since_J2000 + kJ2000Epoch;
 	auto const gmst = compute_greenwich_mean_sidereal_time_at_0h_ut (julian_date);
 	auto const x = +cos (gmst) * x_eq + sin (gmst) * y_eq;
 	auto const y = -sin (gmst) * x_eq + cos (gmst) * y_eq;
@@ -57,8 +57,8 @@ SpaceLength<ECEFSpace>
 EclipticCoordinates::to_ecef_from_unix_time (si::Time const time) const
 {
 	auto const julian_date = unix_time_to_julian_date (time);
-	auto const days_since_j2000 = julian_date - kJ2000Epoch;
-	return to_ecef (days_since_j2000);
+	auto const days_since_J2000 = julian_date - kJ2000Epoch;
+	return to_ecef (days_since_J2000);
 }
 
 } // namespace xf

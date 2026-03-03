@@ -72,13 +72,15 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	static constexpr auto		kCachedComputationTimeDelta	= 5_s;
 
 	// Direct sun light for models inside atmosphere:
-	static constexpr uint32_t	kAtmosphericSunLight		= 0b0001;
+	static constexpr uint32_t	kAtmosphericSunLight		= 0b00001;
 	// Direct sun light used for Moon and stuff:
-	static constexpr uint32_t	kCosmicSunLight				= 0b0010;
+	static constexpr uint32_t	kCosmicSunLight				= 0b00010;
+	// Reflected sunlight from the Moon:
+	static constexpr uint32_t	kMoonLight					= 0b00100;
 	// Light emitted by the sky (cold blue):
-	static constexpr uint32_t	kSkyLight					= 0b0100;
+	static constexpr uint32_t	kSkyLight					= 0b01000;
 	// Light for helper features (basis vectors, etc):
-	static constexpr uint32_t	kFeatureLight				= 0b1000;
+	static constexpr uint32_t	kFeatureLight				= 0b10000;
 
 	// Rotates the aircraft so that it's visible from behind:
 	static constexpr auto		kAircraftToBehindViewRotation	= z_rotation<WorldSpace> (-90_deg) * y_rotation<WorldSpace> (90_deg);
@@ -181,6 +183,14 @@ class RigidBodyPainter: protected QOpenGLFunctions
 		}};
 		Shape						face_shape				{ make_solid_circle (kSunRadius, { 0_deg, 360_deg }, 19, kWhiteMatte) };
 		Shape						shines_shape			{ make_sun_shines_shape() };
+		float						brightness_factor		{ 1.0f };
+	};
+
+	struct Moon
+	{
+		MoonPosition				position;
+		SpaceLength<WorldSpace>		world_position;
+		std::optional<float>		brightness_factor;
 	};
 
 	struct Universe
@@ -446,17 +456,30 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	set_planet (rigid_body::Body const* planet_body);
 
 	/**
-	 * Return true if rendering of sun is enabled.
+	 * Return true if rendering of Sun is enabled.
 	 */
 	bool
 	sun_enabled() const
 		{ return _sun.has_value(); }
 
 	/**
-	 * Enable/disable rendering of sun.
+	 * Enable/disable rendering of the Sun.
 	 */
 	void
 	set_sun_enabled (bool);
+
+	/**
+	 * Return true if rendering of Moon is enabled.
+	 */
+	bool
+	moon_enabled() const
+		{ return _moon.has_value(); }
+
+	/**
+	 * Enable/disable rendering of the Moon.
+	 */
+	void
+	set_moon_enabled (bool);
 
 	/**
 	 * Return true if rendering of universe is enabled.
@@ -531,6 +554,9 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	void
 	setup_lights();
 
+	/**
+	 * Return sun brightness factor that depends on sun visibility at the horizon.
+	 */
 	void
 	setup_sun_light();
 
@@ -545,6 +571,12 @@ class RigidBodyPainter: protected QOpenGLFunctions
 
 	void
 	set_sky_light_enabled (bool);
+
+	void
+	setup_moon_light();
+
+	void
+	set_moon_light_enabled (bool);
 
 	void
 	setup_feature_light();
@@ -788,12 +820,14 @@ class RigidBodyPainter: protected QOpenGLFunctions
 		{ return x_rotation<WorldSpace> (position.lat() - 90_deg) * y_rotation<WorldSpace> (-position.lon()); }
 
 	/**
-	 * Return what fraction of the Sun face should be considered visible near the horizon.
-	 * Maps Sun altitude around +/- face angular radius to range 0.0..1.0.
+	 * Return reflected moon-light intensity from current lunar phase for the focused object.
+	 * 0.0 = new moon, 0.5 = half moon, 1.0 = full moon.
 	 */
 	[[nodiscard]]
-	constexpr float
-	compute_sun_visible_surface_factor (si::Angle const sun_altitude_above_horizon);
+	float
+	moon_phase_brightness_factor (SpaceLength<WorldSpace> moon_position,
+								  EclipticCoordinates sun_ecliptic_position,
+								  SpaceLength<WorldSpace> lit_object_position) const;
 
 	/**
 	 * When sun face starts to become obscured by the horizon, pretend that the center of the sun
@@ -872,6 +906,7 @@ class RigidBodyPainter: protected QOpenGLFunctions
 
 	std::optional<Planet>			_planet;
 	std::optional<Sun>				_sun;
+	std::optional<Moon>				_moon;
 	std::optional<Universe>			_universe;
 
 	static nu::Synchronized<std::shared_future<PlanetTextureImages>>
@@ -884,8 +919,6 @@ class RigidBodyPainter: protected QOpenGLFunctions
 
 	// Some cached computations:
 	std::optional<si::Angle>		_sun_altitude_above_horizon;
-	std::optional<SpaceLength<WorldSpace>>
-									_moon_position_in_ecef;
 	float							_sky_box_visibility			{ 1.0f };
 	Shape							_dust_particle;
 	si::Length						_followed_object_diameter	{ 0_m };
@@ -913,16 +946,6 @@ RigidBodyPainter::followed_body() const noexcept
 		return *body;
 	else
 		return nullptr;
-}
-
-
-constexpr float
-RigidBodyPainter::compute_sun_visible_surface_factor (si::Angle const sun_altitude_above_horizon)
-{
-	auto const v = nu::renormalize (sun_altitude_above_horizon,
-									nu::Range { -kSunFaceAngularRadius, +kSunFaceAngularRadius },
-									nu::Range { 0.0f, 1.0f });
-	return std::clamp<float> (v, 0.0f, 1.0f);
 }
 
 } // namespace xf
