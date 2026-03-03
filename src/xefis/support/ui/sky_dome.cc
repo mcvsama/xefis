@@ -271,7 +271,7 @@ compute_ground_shape (si::LonLatRadius<> const observer_position,
 			.stack_angles = ss.stack_angles,
 			.material = kBlackMatte,
 			.texture = earth_texture,
-			.optimize_poles = 0.01_deg,
+			// Keep per-slice U at poles; collapsing pole materials causes UV artifacts on textured Earth.
 			.setup_material = [&] (ShapeMaterial& material, si::LonLat const sphere_position) {
 				material.texture_position = {
 					nu::renormalize (sphere_position.lon(), nu::Range { -180_deg, +180_deg }, nu::Range { 0.0f, 1.0f }),
