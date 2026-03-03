@@ -434,14 +434,18 @@ RigidBodyPainter::setup_sun_light()
 {
 	if (_sun)
 	{
+		auto const atmospheric_sun_visibility = _sun_altitude_above_horizon
+			? compute_sun_visible_surface_factor (*_sun_altitude_above_horizon)
+			: 1.0f;
+
 		// Blend the original sun color with color as seen through the atmosphere:
 		auto const qcolor = QColor::fromRgbF (_sun->color_on_body[0], _sun->color_on_body[1], _sun->color_on_body[2]);
 		auto const height_factor = _planet ? _planet->camera_clamped_normalized_amsl_height : 1.0f;
 		auto const atmospheric_sun_color = to_gl_color (hsl_interpolation (height_factor, qcolor, kSunQColorInSpace));
 
 		glLightfv (kGLAtmosphericSunLight, GL_AMBIENT, atmospheric_sun_color.scaled (0.0f));
-		glLightfv (kGLAtmosphericSunLight, GL_DIFFUSE, atmospheric_sun_color.scaled (0.4f));
-		glLightfv (kGLAtmosphericSunLight, GL_SPECULAR, atmospheric_sun_color.scaled (0.1f));
+		glLightfv (kGLAtmosphericSunLight, GL_DIFFUSE, atmospheric_sun_color.scaled (0.4f * atmospheric_sun_visibility));
+		glLightfv (kGLAtmosphericSunLight, GL_SPECULAR, atmospheric_sun_color.scaled (0.1f * atmospheric_sun_visibility));
 
 		// When we're inside the atmosphere, the Moon light (and potentially other bodies) are too intensive when combined with SkyDome, so use darker diffuse
 		// color. When going out of atmosphere, Moon becomes too dark, so use lighter color.
