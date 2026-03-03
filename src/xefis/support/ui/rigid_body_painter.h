@@ -71,9 +71,13 @@ class RigidBodyPainter: protected QOpenGLFunctions
 	static constexpr auto		kMoonRadius					= 1'737.4_km;
 	static constexpr auto		kCachedComputationTimeDelta	= 5_s;
 
+	// Direct sun light for models inside atmosphere:
 	static constexpr uint32_t	kAtmosphericSunLight		= 0b0001;
+	// Direct sun light used for Moon and stuff:
 	static constexpr uint32_t	kCosmicSunLight				= 0b0010;
+	// Light emitted by the sky (cold blue):
 	static constexpr uint32_t	kSkyLight					= 0b0100;
+	// Light for helper features (basis vectors, etc):
 	static constexpr uint32_t	kFeatureLight				= 0b1000;
 
 	// Rotates the aircraft so that it's visible from behind:
