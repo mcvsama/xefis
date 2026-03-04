@@ -16,6 +16,8 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/support/math/coordinate_systems.h>
+#include <xefis/support/math/geometry_types.h>
 
 // Standard:
 #include <cstddef>
@@ -33,6 +35,15 @@ struct EclipticCoordinates
 
 	// Distance of the body from the center of Earth:
 	si::Length	distance_from_earth;
+
+  public:
+	[[nodiscard]]
+	SpaceLength<ECEFSpace>
+	to_ecef (double days_since_j2000) const;
+
+	[[nodiscard]]
+	SpaceLength<ECEFSpace>
+	to_ecef_from_unix_time (si::Time unix_time) const;
 };
 
 

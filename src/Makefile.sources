@@ -462,6 +462,7 @@ MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/universe/earth/
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/universe/earth/utility.cc
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/universe/earth/utility.h
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/universe/earth/wind_triangle.h
+MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/universe/coordinate_systems.cc
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/universe/coordinate_systems.h
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/universe/julian_calendar.h
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/universe/moon_position.cc
