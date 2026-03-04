@@ -67,3 +67,8 @@ func()
 Multi-line functions should be moved outside the class with exception that when it requires a lot of redundant
 `template<>` writing, or `requires` clause that has to be written again at the definition site it's okay to have a
 multi-line method directly in the class.
+
+### Arguments
+
+If an argument isn't to be modified, it should be const. It's not necessary to use `const` on function/method
+declarations as opposed to definitions.
