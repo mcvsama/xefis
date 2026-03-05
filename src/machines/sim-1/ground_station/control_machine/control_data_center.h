@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__MACHINES__SIM_1__GROUND_STATION__CONTROL_MACHINE__DATA_CENTER_H__INCLUDED
-#define XEFIS__MACHINES__SIM_1__GROUND_STATION__CONTROL_MACHINE__DATA_CENTER_H__INCLUDED
+#ifndef XEFIS__MACHINES__SIM_1__GROUND_STATION__CONTROL_MACHINE__CONTROL_DATA_CENTER_H__INCLUDED
+#define XEFIS__MACHINES__SIM_1__GROUND_STATION__CONTROL_MACHINE__CONTROL_DATA_CENTER_H__INCLUDED
 
 // Sim-1:
 #include <machines/sim-1/common/common.h>
@@ -29,9 +29,9 @@
 #include <atomic>
 
 
-namespace sim1::ground_station::control_machine {
+namespace sim1::ground_station {
 
-class DataCenter: public xf::Module
+class ControlDataCenter: public xf::Module
 {
   public:
 	xf::ModuleIn<double>			joystick_pitch		{ this, "joystick/pitch" };
@@ -48,6 +48,6 @@ class DataCenter: public xf::Module
 	using xf::Module::Module;
 };
 
-} // namespace sim1::ground_station::control_machine
+} // namespace sim1::ground_station
 
 #endif

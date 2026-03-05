@@ -2,6 +2,7 @@ include machines/sim-1/aircraft/Makefile.sources
 include machines/sim-1/aircraft/flight_computer_machine/Makefile.sources
 include machines/sim-1/aircraft/hardware_machine/Makefile.sources
 include machines/sim-1/aircraft/radio_machine/Makefile.sources
+include machines/sim-1/ground_station/control_machine/Makefile.sources
 include machines/sim-1/common/Makefile.sources
 
 XEFIS_MACHINES.sim-1/simulation.sources += $(MACHINE_sim_1_COMMON_FILES)
@@ -14,6 +15,12 @@ XEFIS_MACHINES.sim-1/simulation.sources += simulation_run.cc
 XEFIS_MACHINES.sim-1/simulation.sources += simulation_run.h
 XEFIS_MACHINES.sim-1/simulation.sources += simulator_machine.cc
 XEFIS_MACHINES.sim-1/simulation.sources += simulator_machine.h
+# Add aircraft machines:
 XEFIS_MACHINES.sim-1/simulation.sources += $(addprefix ../aircraft/flight_computer_machine/,$(MACHINE_sim_1_AIRCRAFT_FLIGHT_COMPUTER_MACHINE_FILES))
 XEFIS_MACHINES.sim-1/simulation.sources += $(addprefix ../aircraft/hardware_machine/,$(MACHINE_sim_1_AIRCRAFT_HARDWARE_MACHINE_FILES))
 XEFIS_MACHINES.sim-1/simulation.sources += $(addprefix ../aircraft/radio_machine/,$(MACHINE_sim_1_AIRCRAFT_RADIO_MACHINE_FILES))
+# Add ground station machines:
+XEFIS_MACHINES.sim-1/simulation.sources += $(addprefix ../ground_station/control_machine/,$(MACHINE_sim_1_GROUND_STATION_CONTROL_MACHINE_FILES))
+XEFIS_MACHINES.sim-1/simulation.sources += $(addprefix ../ground_station/hardware_machine/,$(MACHINE_sim_1_GROUND_STATION_HARDWARE_MACHINE_FILES))
+XEFIS_MACHINES.sim-1/simulation.sources += $(addprefix ../ground_station/radio_machine/,$(MACHINE_sim_1_GROUND_STATION_RADIO_MACHINE_FILES))
+XEFIS_MACHINES.sim-1/simulation.sources += $(addprefix ../ground_station/screens_machine/,$(MACHINE_sim_1_GROUND_STATION_SCREENS_MACHINE_FILES))

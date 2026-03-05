@@ -11,25 +11,24 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-// Local:
-#include "hardware.h"
+#ifndef XEFIS__MACHINES__SIM_1__GROUND_STATION__CONTROL_MACHINE__CONTROL_MODELS_H__INCLUDED
+#define XEFIS__MACHINES__SIM_1__GROUND_STATION__CONTROL_MACHINE__CONTROL_MODELS_H__INCLUDED
 
 // Xefis:
-#include <xefis/config/all.h>
+#include <xefis/support/atmosphere/standard_atmosphere.h>
 
 // Standard:
 #include <cstddef>
 
 
-namespace sim1::ground_station::control_machine {
+namespace sim1::ground_station {
 
-Hardware::Hardware (xf::ProcessingLoop& loop, xf::Machine* machine, nu::Logger const& logger):
-	_logger (logger),
-	_loop (loop),
-	_machine (machine)
+class ControlModels
 {
-	this->udp_link.send << this->ground_to_air_link.encoded_output;
-	this->air_to_ground_link.encoded_input << this->udp_link.receive;
-}
+  public:
+	xf::StandardAtmosphere standard_atmosphere;
+};
 
-} // namespace sim1::ground_station::control_machine
+} // namespace sim1::ground_station
+
+#endif

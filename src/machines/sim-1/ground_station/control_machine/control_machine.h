@@ -11,14 +11,13 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__MACHINES__SIM_1__GROUND_STATION__CONTROL_MACHINE__MACHINE_H__INCLUDED
-#define XEFIS__MACHINES__SIM_1__GROUND_STATION__CONTROL_MACHINE__MACHINE_H__INCLUDED
+#ifndef XEFIS__MACHINES__SIM_1__GROUND_STATION__CONTROL_MACHINE__CONTROL_MACHINE_H__INCLUDED
+#define XEFIS__MACHINES__SIM_1__GROUND_STATION__CONTROL_MACHINE__CONTROL_MACHINE_H__INCLUDED
 
 // Local:
-#include "computers.h"
-#include "data_center.h"
-#include "hardware.h"
-#include "models.h"
+#include "control_data_center.h"
+#include "control_models.h"
+#include "control_modules.h"
 
 // Sim-1:
 #include <machines/sim-1/common/common.h>
@@ -34,33 +33,33 @@
 #include <cstddef>
 
 
-namespace sim1::ground_station::control_machine {
+namespace sim1::ground_station {
 
-class Machine: public xf::SingleLoopMachine
+class ControlMachine: public xf::SingleLoopMachine
 {
   public:
 	// Ctor
-	Machine (xf::Xefis&);
+	explicit
+	ControlMachine (xf::Xefis&);
 
-	DataCenter&
+	ControlDataCenter&
 	data_center() noexcept
 		{ return _data_center; }
 
-	DataCenter const&
+	ControlDataCenter const&
 	data_center() const noexcept
 		{ return _data_center; }
 
   private:
 	void
-	connect_modules();
+	connect_modules() override;
 
   private:
-	DataCenter			_data_center	{ loop() };
-	Models				_models;
-	Hardware			_hardware		{ loop(), this, logger() };
-	Computers			_computers;
+	ControlDataCenter	_data_center	{ loop() };
+	ControlModels		_models;
+	ControlModules		_modules		{ loop(), this, logger() };
 };
 
-} // namespace sim1::ground_station::control_machine
+} // namespace sim1::ground_station
 
 #endif

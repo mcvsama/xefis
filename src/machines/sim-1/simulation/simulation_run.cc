@@ -52,9 +52,10 @@ SimulationRun::SimulationRun (xf::Xefis& xefis, si::LonLatRadius<> const locatio
 	});
 
 	auto& simulator = _simulator.emplace (_rigid_body_system, _rigid_body_solver, nu::utc_now(), 1_ms, _logger.with_context ("Simulator"));
-	_simulator->register_machine_manager (_hardware_machine);
-	_simulator->register_machine_manager (_radio_machine);
-	_simulator->register_machine_manager (_flight_computer_machine);
+	_simulator->register_machine_manager (_aircraft_hardware_machine);
+	_simulator->register_machine_manager (_aircraft_radio_machine);
+	_simulator->register_machine_manager (_aircraft_flight_computer_machine);
+	_simulator->register_machine_manager (_groundstation_control_machine);
 	_simulator->register_clock (_xefis_clock);
 	_simulator->register_clock (_steady_clock);
 
@@ -62,9 +63,10 @@ SimulationRun::SimulationRun (xf::Xefis& xefis, si::LonLatRadius<> const locatio
 	_simulator_widget->set_followed (_aircraft.rigid_group);
 	_simulator_widget->set_planet (&earth);
 
-	_hardware_machine.restart();
-	_radio_machine.restart();
-	_flight_computer_machine.restart();
+	_aircraft_hardware_machine.restart();
+	_aircraft_radio_machine.restart();
+	_aircraft_flight_computer_machine.restart();
+	_groundstation_control_machine.restart();
 }
 
 } // namespace sim1::simulation

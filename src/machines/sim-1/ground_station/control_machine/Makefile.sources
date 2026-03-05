@@ -1,10 +1,12 @@
 include machines/sim-1/common/Makefile.sources
 
+MACHINE_sim_1_GROUND_STATION_CONTROL_MACHINE_FILES += control_data_center.h
+MACHINE_sim_1_GROUND_STATION_CONTROL_MACHINE_FILES += control_machine.cc
+MACHINE_sim_1_GROUND_STATION_CONTROL_MACHINE_FILES += control_machine.h
+MACHINE_sim_1_GROUND_STATION_CONTROL_MACHINE_FILES += control_models.h
+MACHINE_sim_1_GROUND_STATION_CONTROL_MACHINE_FILES += control_modules.cc
+MACHINE_sim_1_GROUND_STATION_CONTROL_MACHINE_FILES += control_modules.h
+
 XEFIS_MACHINES.sim-1/ground_station/control_machine.sources += $(MACHINE_sim_1_COMMON_FILES)
-XEFIS_MACHINES.sim-1/ground_station/control_machine.sources += computers.h
-XEFIS_MACHINES.sim-1/ground_station/control_machine.sources += data_center.h
-XEFIS_MACHINES.sim-1/ground_station/control_machine.sources += hardware.cc
-XEFIS_MACHINES.sim-1/ground_station/control_machine.sources += hardware.h
-XEFIS_MACHINES.sim-1/ground_station/control_machine.sources += machine.cc
-XEFIS_MACHINES.sim-1/ground_station/control_machine.sources += machine.h
-XEFIS_MACHINES.sim-1/ground_station/control_machine.sources += models.h
+XEFIS_MACHINES.sim-1/ground_station/control_machine.sources += $(MACHINE_sim_1_GROUND_STATION_CONTROL_MACHINE_FILES)
+XEFIS_MACHINES.sim-1/ground_station/control_machine.sources += make_xefis_machine.cc

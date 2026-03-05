@@ -22,6 +22,8 @@
 #include <machines/sim-1/aircraft/hardware_machine/hardware_machine.h>
 #include <machines/sim-1/aircraft/radio_machine/radio_machine.h>
 #include <machines/sim-1/common/common.h>
+#include <machines/sim-1/ground_station/control_machine/control_machine.h>
+#include <machines/sim-1/ground_station/hardware_machine/hardware_machine.h>
 #include <machines/sim-1/simulation/aircraft/hardware_machine/virtual_hardware_modules.h>
 
 // Xefis:
@@ -87,7 +89,7 @@ class SimulationRun
 	xf::electrical::NodeVoltageSolver	_electrical_network_solver	{ _electrical_network, 1e-3 };
 	SimulatedAircraft					_aircraft					{ make_aircraft (_rigid_body_system, _simulated_atmosphere) };
 
-	xf::MachineManager<sim1::aircraft::HardwareMachine> _hardware_machine {
+	xf::MachineManager<sim1::aircraft::HardwareMachine> _aircraft_hardware_machine {
 		u8"Aircraft/Hardware machine",
 		[this] {
 			return std::make_unique<sim1::aircraft::HardwareMachine> (
@@ -101,7 +103,7 @@ class SimulationRun
 		},
 	};
 
-	xf::MachineManager<sim1::aircraft::RadioMachine> _radio_machine {
+	xf::MachineManager<sim1::aircraft::RadioMachine> _aircraft_radio_machine {
 		u8"Aircraft/Radio machine",
 		[this] {
 			return std::make_unique<sim1::aircraft::RadioMachine> (
@@ -113,7 +115,7 @@ class SimulationRun
 		},
 	};
 
-	xf::MachineManager<sim1::aircraft::FlightComputerMachine> _flight_computer_machine {
+	xf::MachineManager<sim1::aircraft::FlightComputerMachine> _aircraft_flight_computer_machine {
 		u8"Aircraft/Flight Computer machine",
 		[this] {
 			return std::make_unique<sim1::aircraft::FlightComputerMachine> (
@@ -122,6 +124,20 @@ class SimulationRun
 				_steady_clock,
 				true
 			);
+		},
+	};
+
+	xf::MachineManager<sim1::ground_station::ControlMachine> _groundstation_control_machine {
+		u8"Ground station/Control machine",
+		[this] {
+			return std::make_unique<sim1::ground_station::ControlMachine> (_xefis);
+		},
+	};
+
+	xf::MachineManager<sim1::ground_station::HardwareMachine> _groundstation_hardware_machine {
+		u8"Ground station/Hardware machine",
+		[this] {
+			return std::make_unique<sim1::ground_station::HardwareMachine> (_xefis);
 		},
 	};
 };

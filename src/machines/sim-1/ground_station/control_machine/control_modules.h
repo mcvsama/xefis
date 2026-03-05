@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__MACHINES__SIM_1__GROUND_STATION__CONTROL_MACHINE__HARDWARE_H__INCLUDED
-#define XEFIS__MACHINES__SIM_1__GROUND_STATION__CONTROL_MACHINE__HARDWARE_H__INCLUDED
+#ifndef XEFIS__MACHINES__SIM_1__GROUND_STATION__CONTROL_MACHINE__CONTROL_MODULES_H__INCLUDED
+#define XEFIS__MACHINES__SIM_1__GROUND_STATION__CONTROL_MACHINE__CONTROL_MODULES_H__INCLUDED
 
 // Sim-1:
 #include <machines/sim-1/common/link/air_to_ground.h>
@@ -34,17 +34,17 @@
 #include <cstddef>
 
 
-namespace sim1::ground_station::control_machine {
+namespace sim1::ground_station {
 
 namespace xle = xf::crypto::xle;
 
 
-class Hardware
+class ControlModules
 {
   public:
 	// Ctor
 	explicit
-	Hardware (xf::ProcessingLoop&, xf::Machine*, nu::Logger const&);
+	ControlModules (xf::ProcessingLoop&, xf::Machine*, nu::Logger const&);
 
   private:
 	nu::Logger			_logger;
@@ -92,6 +92,6 @@ class Hardware
 	};
 };
 
-} // namespace sim1::ground_station::control_machine
+} // namespace sim1::ground_station
 
 #endif
