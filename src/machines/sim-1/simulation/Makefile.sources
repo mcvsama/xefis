@@ -3,6 +3,9 @@ include machines/sim-1/aircraft/flight_computer_machine/Makefile.sources
 include machines/sim-1/aircraft/hardware_machine/Makefile.sources
 include machines/sim-1/aircraft/radio_machine/Makefile.sources
 include machines/sim-1/ground_station/control_machine/Makefile.sources
+include machines/sim-1/ground_station/hardware_machine/Makefile.sources
+include machines/sim-1/ground_station/radio_machine/Makefile.sources
+include machines/sim-1/ground_station/screens_machine/Makefile.sources
 include machines/sim-1/common/Makefile.sources
 
 XEFIS_MACHINES.sim-1/simulation.sources += $(MACHINE_sim_1_COMMON_FILES)

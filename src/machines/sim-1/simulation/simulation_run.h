@@ -24,6 +24,8 @@
 #include <machines/sim-1/common/common.h>
 #include <machines/sim-1/ground_station/control_machine/control_machine.h>
 #include <machines/sim-1/ground_station/hardware_machine/hardware_machine.h>
+#include <machines/sim-1/ground_station/radio_machine/radio_machine.h>
+#include <machines/sim-1/ground_station/screens_machine/screens_machine.h>
 #include <machines/sim-1/simulation/aircraft/hardware_machine/virtual_hardware_modules.h>
 
 // Xefis:
@@ -138,6 +140,20 @@ class SimulationRun
 		u8"Ground station/Hardware machine",
 		[this] {
 			return std::make_unique<sim1::ground_station::HardwareMachine> (_xefis);
+		},
+	};
+
+	xf::MachineManager<sim1::ground_station::RadioMachine> _groundstation_radio_machine {
+		u8"Ground station/Radio machine",
+		[this] {
+			return std::make_unique<sim1::ground_station::RadioMachine> (_xefis);
+		},
+	};
+
+	xf::MachineManager<sim1::ground_station::ScreensMachine> _groundstation_screens_machine {
+		u8"Ground station/Screens machine",
+		[this] {
+			return std::make_unique<sim1::ground_station::ScreensMachine> (_xefis);
 		},
 	};
 };

@@ -1,0 +1,7 @@
+include machines/sim-1/common/Makefile.sources
+
+MACHINE_sim_1_GROUND_STATION_SCREENS_MACHINE_FILES += screens_machine.cc
+MACHINE_sim_1_GROUND_STATION_SCREENS_MACHINE_FILES += screens_machine.h
+
+XEFIS_MACHINES.sim-1/ground_station/screens_machine.sources += $(MACHINE_sim_1_COMMON_FILES)
+XEFIS_MACHINES.sim-1/ground_station/screens_machine.sources += $(MACHINE_sim_1_GROUND_STATION_SCREENS_MACHINE_FILES)
