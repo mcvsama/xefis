@@ -439,19 +439,19 @@ VirtualJoystick::VirtualJoystick (xf::ProcessingLoop& loop, xf::Machine* machine
 {
 	using namespace std::literals;
 
-	_widget = new xf::Widget (nullptr);
+	_widget = std::make_unique<xf::Widget> (nullptr);
 	_widget->setWindowTitle (nu::to_qstring ("XEFIS virtual joystick" + (instance.empty() ? ""s : ": "s + instance)));
 	xf::set_kde_blur_background (*_widget, true);
 
-	_joystick_widget = new VirtualJoystickWidget (machine, _widget);
+	_joystick_widget = new VirtualJoystickWidget (machine, _widget.get());
 
-	_throttle_widget = new VirtualLinearWidget ({ 0.0f, 1.0f }, VirtualLinearWidget::Vertical, VirtualLinearWidget::Filled, _widget);
+	_throttle_widget = new VirtualLinearWidget ({ 0.0f, 1.0f }, VirtualLinearWidget::Vertical, VirtualLinearWidget::Filled, _widget.get());
 	_throttle_widget->set_value (0.0f);
 
-	_pedals_widget = new VirtualLinearWidget ({ -1.0f, 1.0f }, VirtualLinearWidget::Horizontal, VirtualLinearWidget::BarOnly, _widget);
+	_pedals_widget = new VirtualLinearWidget ({ -1.0f, 1.0f }, VirtualLinearWidget::Horizontal, VirtualLinearWidget::BarOnly, _widget.get());
 	_pedals_widget->set_value (0.0f);
 
-	auto* layout = new QGridLayout (_widget);
+	auto* layout = new QGridLayout (_widget.get());
 	layout->setContentsMargins (0, 0, 0, 0);
 	layout->setSpacing (0);
 	layout->addWidget (_throttle_widget, 0, 0);

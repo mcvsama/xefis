@@ -24,6 +24,7 @@
 
 // Standard:
 #include <cstddef>
+#include <memory>
 
 
 namespace nu = neutrino;
@@ -67,7 +68,7 @@ class VirtualJoystick: public VirtualJoystickIO
 
   private:
 	VirtualJoystickIO&		_io { *this };
-	xf::Widget*				_widget;
+	std::unique_ptr<xf::Widget>	_widget;
 	VirtualJoystickWidget*	_joystick_widget;
 	VirtualLinearWidget*	_throttle_widget;
 	VirtualLinearWidget*	_pedals_widget;
@@ -77,7 +78,7 @@ class VirtualJoystick: public VirtualJoystickIO
 inline QWidget*
 VirtualJoystick::widget() const noexcept
 {
-	return _widget;
+	return _widget.get();
 }
 
 #endif
