@@ -64,7 +64,7 @@ Airfoil::pitching_moment (si::Angle alpha, ReynoldsNumber re, si::Pressure dynam
 }
 
 
-AirfoilAerodynamicParameters<AirfoilSplineSpace>
+AerodynamicParameters<AirfoilSplineSpace>
 Airfoil::planar_aerodynamic_forces (Air<AirfoilSplineSpace> const& relative_air) const
 {
 	// Wind vector will be normalized, so make sure it's not near 0:
@@ -127,7 +127,7 @@ Airfoil::planar_aerodynamic_forces (Air<AirfoilSplineSpace> const& relative_air)
 }
 
 
-AirfoilAerodynamicParameters<AirfoilSplineSpace>
+AerodynamicParameters<AirfoilSplineSpace>
 Airfoil::aerodynamic_forces (Air<AirfoilSplineSpace> const& air) const
 {
 	auto planar = planar_aerodynamic_forces (air);

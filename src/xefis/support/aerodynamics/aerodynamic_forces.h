@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__SUPPORT__AERODYNAMICS__AIRFOIL_AERODYNAMIC_FORCES_H__INCLUDED
-#define XEFIS__SUPPORT__AERODYNAMICS__AIRFOIL_AERODYNAMIC_FORCES_H__INCLUDED
+#ifndef XEFIS__SUPPORT__AERODYNAMICS__AERODYNAMIC_FORCES_H__INCLUDED
+#define XEFIS__SUPPORT__AERODYNAMICS__AERODYNAMIC_FORCES_H__INCLUDED
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -26,7 +26,7 @@
 namespace xf {
 
 template<class Space>
-	class AirfoilAerodynamicForces
+	class AerodynamicForces
 	{
 	  public:
 		SpaceForce<Space>	lift;

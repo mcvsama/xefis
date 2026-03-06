@@ -16,7 +16,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/support/aerodynamics/airfoil_aerodynamic_parameters.h>
+#include <xefis/support/aerodynamics/aerodynamic_parameters.h>
 
 // Standard:
 #include <cstddef>
@@ -29,21 +29,21 @@ class HasAerodynamicParameters
 {
   public:
 	[[nodiscard]]
-	std::optional<AirfoilAerodynamicParameters<BodyCOM>> const&
+	std::optional<AerodynamicParameters<BodyCOM>> const&
 	aerodynamic_parameters() const noexcept
 		{ return _aerodynamic_parameters; }
 
   protected:
 	void
-	set_aerodynamic_parameters (AirfoilAerodynamicParameters<BodyCOM> const parameters)
+	set_aerodynamic_parameters (AerodynamicParameters<BodyCOM> const parameters)
 		{ _aerodynamic_parameters = parameters; }
 
 	void
-	set_aerodynamic_parameters (std::optional<AirfoilAerodynamicParameters<BodyCOM>> const parameters)
+	set_aerodynamic_parameters (std::optional<AerodynamicParameters<BodyCOM>> const parameters)
 		{ _aerodynamic_parameters = parameters; }
 
   private:
-	std::optional<AirfoilAerodynamicParameters<BodyCOM>> _aerodynamic_parameters;
+	std::optional<AerodynamicParameters<BodyCOM>> _aerodynamic_parameters;
 };
 
 } // namespace xf

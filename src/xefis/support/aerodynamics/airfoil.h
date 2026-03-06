@@ -17,7 +17,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/aerodynamics/airfoil_characteristics.h>
-#include <xefis/support/aerodynamics/airfoil_aerodynamic_parameters.h>
+#include <xefis/support/aerodynamics/aerodynamic_parameters.h>
 #include <xefis/support/aerodynamics/reynolds_number.h>
 #include <xefis/support/atmosphere/air.h>
 #include <xefis/support/math/geometry.h>
@@ -125,7 +125,7 @@ class Airfoil
 	 * Also compute angle of attack and put result into @result.angle_of_attack.
 	 */
 	[[nodiscard]]
-	AirfoilAerodynamicParameters<AirfoilSplineSpace>
+	AerodynamicParameters<AirfoilSplineSpace>
 	planar_aerodynamic_forces (Air<AirfoilSplineSpace> const& relative_air) const;
 
 	/**
@@ -133,7 +133,7 @@ class Airfoil
 	 * the airfoil (half the length).
 	 */
 	[[nodiscard]]
-	AirfoilAerodynamicParameters<AirfoilSplineSpace>
+	AerodynamicParameters<AirfoilSplineSpace>
 	aerodynamic_forces (Air<AirfoilSplineSpace> const& relative_air) const;
 
   private:
@@ -165,10 +165,10 @@ class Airfoil
 
 
 template<math::CoordinateSystem TargetSpace, math::CoordinateSystem SourceSpace>
-	AirfoilAerodynamicForces<TargetSpace>
-	operator* (RotationQuaternion<TargetSpace, SourceSpace> const& rotation, AirfoilAerodynamicForces<SourceSpace> const& source)
+	AerodynamicForces<TargetSpace>
+	operator* (RotationQuaternion<TargetSpace, SourceSpace> const& rotation, AerodynamicForces<SourceSpace> const& source)
 	{
-		AirfoilAerodynamicForces<TargetSpace> result;
+		AerodynamicForces<TargetSpace> result;
 		result.lift = rotation * source.lift;
 		result.induced_drag = rotation * source.induced_drag;
 		result.parasitic_drag = rotation * source.parasitic_drag;

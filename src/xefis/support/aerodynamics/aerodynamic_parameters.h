@@ -11,12 +11,12 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__SUPPORT__AERODYNAMICS__AIRFOIL_AERODYNAMIC_PARAMETERS_H__INCLUDED
-#define XEFIS__SUPPORT__AERODYNAMICS__AIRFOIL_AERODYNAMIC_PARAMETERS_H__INCLUDED
+#ifndef XEFIS__SUPPORT__AERODYNAMICS__AERODYNAMIC_PARAMETERS_H__INCLUDED
+#define XEFIS__SUPPORT__AERODYNAMICS__AERODYNAMIC_PARAMETERS_H__INCLUDED
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/support/aerodynamics/airfoil_aerodynamic_forces.h>
+#include <xefis/support/aerodynamics/aerodynamic_forces.h>
 #include <xefis/support/aerodynamics/angle_of_attack.h>
 #include <xefis/support/aerodynamics/reynolds_number.h>
 #include <xefis/support/atmosphere/air.h>
@@ -32,14 +32,14 @@ namespace xf {
  * and physical properties of the airfoil.
  */
 template<class Space>
-	class AirfoilAerodynamicParameters
+	class AerodynamicParameters
 	{
 	  public:
-		Air<Space>						air;
-		ReynoldsNumber					reynolds_number;
-		si::Velocity					true_air_speed;
-		AngleOfAttack					angle_of_attack;
-		AirfoilAerodynamicForces<Space>	forces;
+		Air<Space>					air;
+		ReynoldsNumber				reynolds_number;
+		si::Velocity				true_air_speed;
+		AngleOfAttack				angle_of_attack;
+		AerodynamicForces<Space>	forces;
 	};
 
 } // namespace xf
