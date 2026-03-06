@@ -111,8 +111,7 @@ template<class O>
 			if (!_edited_object_widget)
 				_edited_object_widget = std::make_unique<ObservationWidget> (_edited_object);
 
-			if (_edited_object_widget)
-				_edited_object_widget_layout.addWidget (_edited_object_widget.get());
+			_edited_object_widget_layout.addWidget (_edited_object_widget.get());
 		}
 
 		refresh();
