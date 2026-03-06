@@ -107,6 +107,7 @@ template<class O>
 				if (auto* has_observation_widget = dynamic_cast<HasObservationWidget*> (_edited_object))
 					_edited_object_widget = has_observation_widget->create_observation_widget();
 
+			// Make own widget if the object doesn't provide one:
 			if (!_edited_object_widget)
 				_edited_object_widget = std::make_unique<ObservationWidget> (_edited_object);
 
