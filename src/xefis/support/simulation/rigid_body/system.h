@@ -43,6 +43,9 @@ class Group;
 class System: private nu::Noncopyable
 {
   public:
+	// std::vector guarantees that the order of destruction is from the last to the first.
+	// So if some bodies added to the System depend on other bodies, this guarantee
+	// can be used for proper destruction order.
 	using FramePrecomputations	= std::vector<std::unique_ptr<BasicFramePrecomputation>>;
 	using Groups				= std::set<std::unique_ptr<Group>>;
 	using Bodies				= std::vector<std::unique_ptr<Body>>;
@@ -58,6 +61,7 @@ class System: private nu::Noncopyable
 
 	/**
 	 * Add new body to the system.
+	 * When the system is destroyed, bodies are deleted in reverse order of insertion.
 	 */
 	template<BodyConcept SpecificBody, class ...Args>
 		SpecificBody&
@@ -65,6 +69,7 @@ class System: private nu::Noncopyable
 
 	/**
 	 * Add new body to the system.
+	 * When the system is destroyed, bodies are deleted in reverse order of insertion.
 	 */
 	template<BodyConcept SpecificBody>
 		SpecificBody&
@@ -72,6 +77,7 @@ class System: private nu::Noncopyable
 
 	/**
 	 * Add new gravitating body to the system.
+	 * When the system is destroyed, bodies are deleted in reverse order of insertion.
 	 */
 	template<BodyConcept SpecificBody, class ...Args>
 		SpecificBody&
@@ -79,6 +85,7 @@ class System: private nu::Noncopyable
 
 	/**
 	 * Add new gravitating body to the system.
+	 * When the system is destroyed, bodies are deleted in reverse order of insertion.
 	 */
 	template<BodyConcept SpecificBody>
 		SpecificBody&
@@ -86,6 +93,7 @@ class System: private nu::Noncopyable
 
 	/**
 	 * Add new constraint to the system.
+	 * When the system is destroyed, constraints are deleted in reverse order of insertion.
 	 */
 	template<ConstraintConcept SpecificConstraint, class ...Args>
 		SpecificConstraint&
@@ -93,6 +101,7 @@ class System: private nu::Noncopyable
 
 	/**
 	 * Add new constraint to the system.
+	 * When the system is destroyed, constraints are deleted in reverse order of insertion.
 	 */
 	template<ConstraintConcept SpecificConstraint>
 		SpecificConstraint&
@@ -100,6 +109,7 @@ class System: private nu::Noncopyable
 
 	/**
 	 * Add new BasicFramePrecomputation to the system.
+	 * When the system is destroyed, those are deleted in reverse order of insertion.
 	 */
 	template<BasicFramePrecomputationConcept SpecificFramePrecomputation, class ...Args>
 		SpecificFramePrecomputation&
@@ -107,6 +117,7 @@ class System: private nu::Noncopyable
 
 	/**
 	 * Add new BasicFramePrecomputation to the system.
+	 * When the system is destroyed, those are deleted in reverse order of insertion.
 	 */
 	template<BasicFramePrecomputationConcept SpecificFramePrecomputation>
 		SpecificFramePrecomputation&
