@@ -17,6 +17,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/atmosphere/atmosphere.h>
+#include <xefis/support/properties/has_aerodynamic_parameters.h>
 #include <xefis/support/simulation/devices/prandtl_tube_widget.h>
 #include <xefis/support/simulation/rigid_body/body.h>
 #include <xefis/support/ui/observation_widget.h>
@@ -44,7 +45,8 @@ struct PrandtlTubeParameters
  */
 class PrandtlTube:
 	public rigid_body::Body,
-	public HasObservationWidget
+	public HasObservationWidget,
+	public HasAerodynamicParameters
 {
   public:
 	/**
@@ -72,8 +74,13 @@ class PrandtlTube:
 	void
 	evolve ([[maybe_unused]] si::Time dt) override;
 
+	void
+	update_external_forces (Atmosphere const*, si::Time frame_duration) override;
+
   private:
 	Atmosphere const&										_atmosphere;
+	si::Length												_length;
+	si::Length												_radius;
 	nu::Synchronized<std::optional<si::Pressure>> mutable	_static_pressure;
 	nu::Synchronized<std::optional<si::Pressure>> mutable	_total_pressure;
 };

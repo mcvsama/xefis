@@ -210,6 +210,21 @@ template<math::Scalar S, math::CoordinateSystem Space>
 
 
 /**
+ * Return normalized direction vector from any quantity-type vector.
+ */
+template<math::Scalar S, math::CoordinateSystem Space>
+	[[nodiscard]]
+	inline SpaceVector<double, Space>
+	normalized_direction_or_zero (SpaceVector<S, Space> const& value)
+	{
+		if (abs (value) <= S (1e-12))
+			return { 0.0, 0.0, 0.0 };
+
+		return value.normalized() / S (1);
+	}
+
+
+/**
  * Create orthonormal basis matrix from given vector Z.
  * Two orthonormal vectors to Z will be chosen randomly.
  */
