@@ -51,11 +51,6 @@ class WingWidget: public ObservationWidget
 	Wing&				_wing;
 	QFrame				_airfoil_frame;
 	AirfoilSplineWidget	_airfoil_spline_widget;
-	std::string			_true_air_speed;
-	std::string			_static_air_temperature;
-	std::string			_air_density;
-	std::string			_dynamic_viscosity;
-	std::string			_reynolds_number;
 };
 
 } // namespace xf::sim

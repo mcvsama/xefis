@@ -34,12 +34,6 @@ WingWidget::WingWidget (Wing& wing):
 {
 	setup_airfoil_info_widget();
 	add_widget (_airfoil_frame);
-	auto group = ObservationWidget::add_group();
-	group.add_observable ("True air speed", _true_air_speed);
-	group.add_observable ("Static air temperature", _static_air_temperature);
-	group.add_observable ("Air density", _air_density);
-	group.add_observable ("Dynamic viscosity:", _dynamic_viscosity);
-	group.add_observable ("Reynolds number:", _reynolds_number);
 }
 
 
@@ -67,33 +61,18 @@ WingWidget::update_observed_values (rigid_body::Body const* planet_body)
 
 	if (auto const aerodynamic_parameters = _wing.aerodynamic_parameters())
 	{
-		auto const& air = aerodynamic_parameters->air;
-
-		_true_air_speed = std::format ("{:.3f}", aerodynamic_parameters->true_air_speed);
-		_static_air_temperature = std::format ("{:.1f}", air.temperature.to<si::Celsius>());
-		_air_density = std::format ("{:.3f}", air.density);
-		_dynamic_viscosity = std::format ("{:.4g}", air.dynamic_viscosity);
-		_reynolds_number = std::format ("{:.0f}", *aerodynamic_parameters->reynolds_number);
-
 		// Airfoil spline widget:
-		{
-			auto const xy = []<class Value, class Space> (SpaceVector<Value, Space> const& vector3) {
-				return PlaneVector<Value, Space> (vector3.x(), vector3.y());
-			};
+		auto const xy = []<class Value, class Space> (SpaceVector<Value, Space> const& vector3) {
+			return PlaneVector<Value, Space> (vector3.x(), vector3.y());
+		};
 
-			auto const& forces = aerodynamic_parameters->forces;
-			auto const center_of_pressure_3d = forces.center_of_pressure / _wing.airfoil().chord_length();
+		auto const& forces = aerodynamic_parameters->forces;
+		auto const center_of_pressure_3d = forces.center_of_pressure / _wing.airfoil().chord_length();
 
-			_airfoil_spline_widget.set_center_of_pressure_position (xy (center_of_pressure_3d));
-			_airfoil_spline_widget.set_lift_force (xy (forces.lift));
-			_airfoil_spline_widget.set_drag_force (xy (forces.total_drag()));
-			_airfoil_spline_widget.set_pitching_moment (xy (forces.pitching_moment));
-		}
-	}
-	else
-	{
-		for (auto* str: { &_true_air_speed, &_static_air_temperature, &_air_density, &_dynamic_viscosity, &_reynolds_number })
-			*str = "–";
+		_airfoil_spline_widget.set_center_of_pressure_position (xy (center_of_pressure_3d));
+		_airfoil_spline_widget.set_lift_force (xy (forces.lift));
+		_airfoil_spline_widget.set_drag_force (xy (forces.total_drag()));
+		_airfoil_spline_widget.set_pitching_moment (xy (forces.pitching_moment));
 	}
 
 	ObservationWidget::update_observed_values (planet_body);

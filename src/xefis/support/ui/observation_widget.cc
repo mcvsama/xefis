@@ -59,6 +59,14 @@ ObservationWidgetGroup::add_observable (std::string_view const name, std::string
 }
 
 
+void
+ObservationWidget::AerodynamicVariables::reset()
+{
+	for (auto* str: { &true_air_speed, &static_air_temperature, &air_density, &dynamic_viscosity, &reynolds_number })
+		*str = "–";
+}
+
+
 ObservationWidget::ObservationWidget()
 {
 	_layout.setContentsMargins (0, 0, 0, 0);
@@ -69,11 +77,13 @@ ObservationWidget::ObservationWidget (rigid_body::Group* group):
 	ObservationWidget()
 {
 	_group = group;
+	init_variants (_group);
 
 	if (_group)
 	{
 		add_basic_observables();
 		add_position_observables();
+		add_specific_observables();
 	}
 }
 
@@ -82,6 +92,7 @@ ObservationWidget::ObservationWidget (rigid_body::Body* body):
 	ObservationWidget()
 {
 	_body = body;
+	init_variants (_body);
 
 	if (_body)
 	{
@@ -99,6 +110,7 @@ ObservationWidget::ObservationWidget (rigid_body::Body* body):
 
 		add_position_observables();
 		add_velocity_observables();
+		add_specific_observables();
 	}
 }
 
@@ -107,10 +119,12 @@ ObservationWidget::ObservationWidget (rigid_body::Constraint* constraint):
 	ObservationWidget()
 {
 	_constraint = constraint;
+	init_variants (_constraint);
 
 	if (_constraint)
 	{
-		// TODO last calculation of constraint forces
+		// TODO display last calculation of constraint forces
+		add_specific_observables();
 	}
 }
 
@@ -143,6 +157,8 @@ ObservationWidget::update_observed_values (rigid_body::Body const* planet_body)
 		if (_body)
 			_velocity_moments = _body->velocity_moments<WorldSpace>() - planet_body->velocity_moments<WorldSpace>();
 	}
+
+	update_specific_values();
 
 	for (auto& observable: _observables)
 	{
@@ -214,6 +230,39 @@ ObservationWidget::add_velocity_observables()
 
 
 void
+ObservationWidget::add_specific_observables()
+{
+	add_specific_observables (_has_aerodynamic_parameters);
+	// More in future if needed.
+}
+
+
+void
+ObservationWidget::add_specific_observables (HasAerodynamicParameters const* aerodynamic_object)
+{
+	if (aerodynamic_object)
+	{
+		if (!_aerodynamic_variables)
+		{
+			_aerodynamic_variables = std::make_unique<AerodynamicVariables>();
+
+			auto group = add_group (u8"Aerodynamic variables");
+			group.add_observable ("True air speed", _aerodynamic_variables->true_air_speed);
+			group.add_observable ("Static air temperature", _aerodynamic_variables->static_air_temperature);
+			group.add_observable ("Air density", _aerodynamic_variables->air_density);
+			group.add_observable ("Dynamic viscosity:", _aerodynamic_variables->dynamic_viscosity);
+			group.add_observable ("Reynolds number:", _aerodynamic_variables->reynolds_number);
+		}
+
+		// Initial read:
+		update_specific_values (aerodynamic_object);
+	}
+	else
+		_aerodynamic_variables.reset();
+}
+
+
+void
 ObservationWidget::add_widget (QWidget& widget)
 {
 	add_widget (widget, _layout);
@@ -253,6 +302,35 @@ ObservationWidget::add_observable (std::string_view const name, Getter const get
 	layout.addWidget (value_label, row, 1);
 
 	return *value_label;
+}
+
+
+void
+ObservationWidget::update_specific_values()
+{
+	update_specific_values (_has_aerodynamic_parameters);
+	// More in future if needed.
+}
+
+
+void
+ObservationWidget::update_specific_values (HasAerodynamicParameters const* aerodynamic_object)
+{
+	if (aerodynamic_object)
+	{
+		if (auto const aerodynamic_parameters = aerodynamic_object->aerodynamic_parameters())
+		{
+			auto const& air = aerodynamic_parameters->air;
+
+			_aerodynamic_variables->true_air_speed = std::format ("{:.3f}", aerodynamic_parameters->true_air_speed);
+			_aerodynamic_variables->static_air_temperature = std::format ("{:.1f}", air.temperature.to<si::Celsius>());
+			_aerodynamic_variables->air_density = std::format ("{:.3f}", air.density);
+			_aerodynamic_variables->dynamic_viscosity = std::format ("{:.4g}", air.dynamic_viscosity);
+			_aerodynamic_variables->reynolds_number = std::format ("{:.0f}", *aerodynamic_parameters->reynolds_number);
+		}
+		else
+			_aerodynamic_variables->reset();
+	}
 }
 
 } // namespace xf

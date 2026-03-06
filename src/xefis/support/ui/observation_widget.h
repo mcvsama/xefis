@@ -16,6 +16,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/support/properties/has_aerodynamic_parameters.h>
 #include <xefis/support/simulation/rigid_body/group.h>
 #include <xefis/support/simulation/rigid_body/body.h>
 #include <xefis/support/simulation/rigid_body/constraint.h>
@@ -30,6 +31,7 @@
 #include <cstddef>
 #include <memory>
 #include <string_view>
+#include <type_traits>
 
 
 namespace xf {
@@ -76,6 +78,19 @@ class ObservationWidget: public QWidget
 		QLabel*	value_label;
 		Getter	get;
 		Setter	set;
+	};
+
+  private:
+	struct AerodynamicVariables
+	{
+		std::string	true_air_speed;
+		std::string	static_air_temperature;
+		std::string	air_density;
+		std::string	dynamic_viscosity;
+		std::string	reynolds_number;
+
+		void
+		reset();
 	};
 
   public:
@@ -131,6 +146,15 @@ class ObservationWidget: public QWidget
 	add_observable (std::string_view name, std::string& observed_string, Setter = nullptr);
 
   private:
+	template<class T>
+		void
+		init_variants (T const* observed_object)
+		{
+			if constexpr (std::is_polymorphic_v<T>)
+				if (observed_object)
+					_has_aerodynamic_parameters = dynamic_cast<HasAerodynamicParameters const*> (observed_object);
+		}
+
 	ObservationWidgetGroup
 	add_basic_observables();
 
@@ -141,17 +165,30 @@ class ObservationWidget: public QWidget
 	add_velocity_observables();
 
 	void
+	add_specific_observables();
+
+	void
+	add_specific_observables (HasAerodynamicParameters const*);
+
+	void
 	add_widget (QWidget&, QGridLayout&);
 
 	QLabel&
 	add_observable (std::string_view name, Getter, Setter, QGridLayout&);
 
+	void
+	update_specific_values();
+
+	void
+	update_specific_values (HasAerodynamicParameters const*);
+
   private:
-	rigid_body::Group*				_group					{ nullptr };
-	rigid_body::Body*				_body					{ nullptr };
-	rigid_body::Constraint*			_constraint				{ nullptr };
-	QGridLayout						_layout					{ this };
-	rigid_body::Body const*			_planet_body			{ nullptr };
+	rigid_body::Group*				_group						{ nullptr };
+	rigid_body::Body*				_body						{ nullptr };
+	rigid_body::Constraint*			_constraint					{ nullptr };
+	HasAerodynamicParameters const*	_has_aerodynamic_parameters	{ nullptr };
+	QGridLayout						_layout						{ this };
+	rigid_body::Body const*			_planet_body				{ nullptr };
 	std::vector<Observable>			_observables;
 	// Typical observables:
 	si::Energy						_translational_kinetic_energy;
@@ -159,7 +196,9 @@ class ObservationWidget: public QWidget
 	si::LonLatRadius<>				_polar_location;
 	VelocityMoments<WorldSpace>		_velocity_moments;
 	MassMomentsAtArm<WorldSpace>	_mass_moments;
-	Smoother<float>					_load_factor_smoother	{ 100_ms, 10_ms };
+	Smoother<float>					_load_factor_smoother		{ 100_ms, 10_ms };
+	std::unique_ptr<AerodynamicVariables>
+									_aerodynamic_variables;
 };
 
 } // namespace xf
