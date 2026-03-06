@@ -16,6 +16,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/support/properties/has_observation_widget.h>
 #include <xefis/support/ui/observation_widget.h>
 #include <xefis/support/ui/paint_helper.h>
 #include <xefis/support/ui/widget.h>

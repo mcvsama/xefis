@@ -162,19 +162,6 @@ class ObservationWidget: public QWidget
 	Smoother<float>					_load_factor_smoother	{ 100_ms, 10_ms };
 };
 
-
-class HasObservationWidget
-{
-  public:
-	// Dtor
-	virtual
-	~HasObservationWidget() = default;
-
-	[[nodiscard]]
-	virtual std::unique_ptr<ObservationWidget>
-	create_observation_widget();
-};
-
 } // namespace xf
 
 #endif

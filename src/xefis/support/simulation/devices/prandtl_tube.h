@@ -18,6 +18,7 @@
 #include <xefis/config/all.h>
 #include <xefis/support/atmosphere/atmosphere.h>
 #include <xefis/support/properties/has_aerodynamic_parameters.h>
+#include <xefis/support/properties/has_observation_widget.h>
 #include <xefis/support/simulation/devices/prandtl_tube_widget.h>
 #include <xefis/support/simulation/rigid_body/body.h>
 #include <xefis/support/ui/observation_widget.h>

@@ -255,18 +255,4 @@ ObservationWidget::add_observable (std::string_view const name, Getter const get
 	return *value_label;
 }
 
-
-std::unique_ptr<ObservationWidget>
-HasObservationWidget::create_observation_widget()
-{
-	if (rigid_body::Group* group = dynamic_cast<rigid_body::Group*> (this))
-		return std::make_unique<ObservationWidget> (group);
-	else if (rigid_body::Body* body = dynamic_cast<rigid_body::Body*> (this))
-		return std::make_unique<ObservationWidget> (body);
-	else if (rigid_body::Constraint* constraint = dynamic_cast<rigid_body::Constraint*> (this))
-		return std::make_unique<ObservationWidget> (constraint);
-	else
-		return std::make_unique<ObservationWidget>();
-}
-
 } // namespace xf

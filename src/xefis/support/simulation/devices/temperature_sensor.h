@@ -17,6 +17,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/atmosphere/atmosphere.h>
+#include <xefis/support/properties/has_observation_widget.h>
 #include <xefis/support/simulation/devices/temperature_sensor_widget.h>
 #include <xefis/support/simulation/rigid_body/body.h>
 #include <xefis/support/ui/observation_widget.h>
