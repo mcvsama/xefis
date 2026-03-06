@@ -17,7 +17,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/aerodynamics/airfoil.h>
-#include <xefis/support/aerodynamics/airfoil_aerodynamic_parameters.h>
+#include <xefis/support/properties/has_aerodynamic_parameters.h>
 #include <xefis/support/simulation/devices/wing_widget.h>
 #include <xefis/support/simulation/rigid_body/body.h>
 #include <xefis/support/simulation/rigid_body/concepts.h>
@@ -31,7 +31,8 @@ namespace xf::sim {
 
 class Wing:
 	public rigid_body::Body,
-	public HasObservationWidget
+	public HasObservationWidget,
+	public HasAerodynamicParameters
 {
   public:
 	// Ctor
@@ -45,11 +46,6 @@ class Wing:
 	Airfoil const&
 	airfoil() const noexcept
 		{ return _airfoil; }
-
-	[[nodiscard]]
-	std::optional<AirfoilAerodynamicParameters<BodyCOM>> const&
-	airfoil_aerodynamic_parameters() const noexcept
-		{ return _airfoil_aerodynamic_parameters; }
 
 	// Body API
 	void
@@ -88,12 +84,11 @@ class Wing:
 	compute_body_com_mass_moments (Airfoil const&, si::Density material_density);
 
   private:
-	Airfoil													_airfoil;
-	std::optional<AirfoilAerodynamicParameters<BodyCOM>>	_airfoil_aerodynamic_parameters;
-	bool													_smoothing_enabled { false };
-	Smoother<SpaceForce<BodyCOM>>							_lift_smoother;
-	Smoother<SpaceForce<BodyCOM>>							_drag_smoother;
-	Smoother<SpaceTorque<BodyCOM>>							_pitching_moment_smoother;
+	Airfoil							_airfoil;
+	bool							_smoothing_enabled { false };
+	Smoother<SpaceForce<BodyCOM>>	_lift_smoother;
+	Smoother<SpaceForce<BodyCOM>>	_drag_smoother;
+	Smoother<SpaceTorque<BodyCOM>>	_pitching_moment_smoother;
 };
 
 } // namespace xf::sim

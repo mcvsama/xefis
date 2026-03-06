@@ -311,6 +311,7 @@ MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/nature/mass_mom
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/nature/various_inertia_tensors.h
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/nature/velocity_moments.h
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/nature/wrench.h
+MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/properties/has_aerodynamic_parameters.h
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/properties/has_configurable_label.h
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/protocols/nmea/exceptions.h
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/protocols/nmea/gps.cc

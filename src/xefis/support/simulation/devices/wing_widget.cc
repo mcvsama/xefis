@@ -65,7 +65,7 @@ WingWidget::update_observed_values (rigid_body::Body const* planet_body)
 {
 	_airfoil_spline_widget.set_airfoil (_wing.airfoil());
 
-	if (auto const aerodynamic_parameters = _wing.airfoil_aerodynamic_parameters())
+	if (auto const aerodynamic_parameters = _wing.aerodynamic_parameters())
 	{
 		auto const& air = aerodynamic_parameters->air;
 

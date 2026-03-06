@@ -81,7 +81,7 @@ Wing::update_external_forces (Atmosphere const* atmosphere, si::Time const dt)
 		}
 
 		// New parameters converted to BodyCOM:
-		_airfoil_aerodynamic_parameters = {
+		set_aerodynamic_parameters ({
 			.air = body_air,
 			.reynolds_number = spline_aeroforces_at_origin.reynolds_number,
 			.true_air_speed = spline_aeroforces_at_origin.true_air_speed,
@@ -92,7 +92,7 @@ Wing::update_external_forces (Atmosphere const* atmosphere, si::Time const dt)
 				.pitching_moment = pitching_moment,
 				.center_of_pressure = center_of_pressure,
 			},
-		};
+		});
 
 		apply_impulse (ForceMoments<BodyCOM> (lift_force, pitching_moment), center_of_pressure);
 		apply_impulse (ForceMoments<BodyCOM> (drag_force, math::zero), center_of_pressure);

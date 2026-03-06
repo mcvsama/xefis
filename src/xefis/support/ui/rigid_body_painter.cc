@@ -20,13 +20,13 @@
 #include <xefis/support/color/spaces.h>
 #include <xefis/support/math/rotations.h>
 #include <xefis/support/nature/constants.h>
+#include <xefis/support/properties/has_aerodynamic_parameters.h>
 #include <xefis/support/shapes/shape_utils.h>
 #include <xefis/support/shapes/various_materials.h>
 #include <xefis/support/shapes/various_shapes.h>
 #include <xefis/support/simulation/constraints/fixed_constraint.h>
 #include <xefis/support/simulation/constraints/hinge_constraint.h>
 #include <xefis/support/simulation/constraints/slider_constraint.h>
-#include <xefis/support/simulation/devices/wing.h>
 #include <xefis/support/ui/gl_space.h>
 #include <xefis/support/ui/paint_helper.h>
 #include <xefis/support/universe/earth/utility.h>
@@ -1366,13 +1366,13 @@ RigidBodyPainter::paint_forces (rigid_body::Body const& body)
 
 	if (_features_config.aerodynamic_forces_visible)
 	{
-		if (auto const* wing = dynamic_cast<sim::Wing const*> (&body))
+		if (auto const* aerodynamic_body = dynamic_cast<HasAerodynamicParameters const*> (&body))
 		{
-			if (auto const params = wing->airfoil_aerodynamic_parameters();
+			if (auto const params = aerodynamic_body->aerodynamic_parameters();
 				params)
 			{
 				auto const& forces = params->forces;
-				auto const& pl = wing->placement();
+				auto const& pl = body.placement();
 				auto const at = pl.rotate_translate_to_base (forces.center_of_pressure) - cp;
 
 				draw_arrow (at, pl.rotate_to_base (forces.lift) * force_to_length, make_material (lift_color));
