@@ -97,6 +97,8 @@ Wing::update_external_forces (Atmosphere const* atmosphere, si::Time const dt)
 		apply_impulse (ForceMoments<BodyCOM> (lift_force, pitching_moment), center_of_pressure);
 		apply_impulse (ForceMoments<BodyCOM> (drag_force, math::zero), center_of_pressure);
 	}
+	else
+		set_aerodynamic_parameters (std::nullopt);
 }
 
 
