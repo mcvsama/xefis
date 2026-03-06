@@ -64,7 +64,7 @@ class VirtualPressureSensor: public VirtualPressureSensorIO
 	static constexpr char kLoggerScope[] { "mod::VirtualPressureSensor" };
 
   public:
-	enum Probe
+	enum ProbeType
 	{
 		Pitot,	// Module will simulate total pressure.
 		Static,	// Module will simulate static pressure.
@@ -75,7 +75,7 @@ class VirtualPressureSensor: public VirtualPressureSensorIO
 	explicit
 	VirtualPressureSensor (xf::ProcessingLoop&,
 						   nu::NonTemporary<xf::sim::PrandtlTube const&>,
-						   Probe,
+						   ProbeType,
 						   nu::Logger const&,
 						   std::string_view const instance = {});
 
@@ -87,7 +87,7 @@ class VirtualPressureSensor: public VirtualPressureSensorIO
 	VirtualPressureSensorIO&					_io					{ *this };
 	nu::Logger									_logger;
 	xf::sim::PrandtlTube const&					_prandtl_tube;
-	Probe										_probe;
+	ProbeType									_probe_type;
 	// Device's noise:
 	std::default_random_engine					_random_generator;
 	nu::math::NormalDistribution<si::Pressure>	_noise				{ 0_Pa, 1_Pa };

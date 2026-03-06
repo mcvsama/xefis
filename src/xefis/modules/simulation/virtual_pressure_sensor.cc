@@ -27,13 +27,13 @@
 
 VirtualPressureSensor::VirtualPressureSensor (xf::ProcessingLoop& loop,
 											  nu::NonTemporary<xf::sim::PrandtlTube const&> prandtl_tube,
-											  Probe probe,
+											  ProbeType probe_type,
 											  nu::Logger const& logger,
 											  std::string_view const instance):
 	VirtualPressureSensorIO (loop, instance),
 	_logger (logger.with_context (std::string (kLoggerScope) + "#" + instance)),
 	_prandtl_tube (prandtl_tube),
-	_probe (probe)
+	_probe_type (probe_type)
 { }
 
 
@@ -47,7 +47,7 @@ VirtualPressureSensor::process (xf::Cycle const& cycle)
 	{
 		si::Pressure pressure = _noise (_random_generator);
 
-		switch (_probe)
+		switch (_probe_type)
 		{
 			case Pitot:
 				pressure += _prandtl_tube.total_pressure();
