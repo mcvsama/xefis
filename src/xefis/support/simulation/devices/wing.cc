@@ -69,14 +69,16 @@ Wing::update_external_forces (Atmosphere const* atmosphere, si::Time const dt)
 
 		// Compute 'at COM' values:
 		auto lift_force = body_aeroforces_at_origin.lift;
-		auto drag_force = body_aeroforces_at_origin.drag;
+		auto induced_drag_force = body_aeroforces_at_origin.induced_drag;
+		auto parasitic_drag_force = body_aeroforces_at_origin.parasitic_drag;
 		auto pitching_moment = body_aeroforces_at_origin.pitching_moment;
 		auto const center_of_pressure = body_aeroforces_at_origin.center_of_pressure + origin<BodyCOM>();
 
 		if (_smoothing_enabled)
 		{
 			lift_force = _lift_smoother (lift_force, dt);
-			drag_force = _drag_smoother (drag_force, dt);
+			induced_drag_force = _induced_drag_smoother (induced_drag_force, dt);
+			parasitic_drag_force = _parasitic_drag_smoother (parasitic_drag_force, dt);
 			pitching_moment = _pitching_moment_smoother (pitching_moment, dt);
 		}
 
@@ -88,14 +90,15 @@ Wing::update_external_forces (Atmosphere const* atmosphere, si::Time const dt)
 			.angle_of_attack = spline_aeroforces_at_origin.angle_of_attack,
 			.forces = {
 				.lift = lift_force,
-				.drag = drag_force,
+				.induced_drag = induced_drag_force,
+				.parasitic_drag = parasitic_drag_force,
 				.pitching_moment = pitching_moment,
 				.center_of_pressure = center_of_pressure,
 			},
 		});
 
 		apply_impulse (ForceMoments<BodyCOM> (lift_force, pitching_moment), center_of_pressure);
-		apply_impulse (ForceMoments<BodyCOM> (drag_force, math::zero), center_of_pressure);
+		apply_impulse (ForceMoments<BodyCOM> (induced_drag_force + parasitic_drag_force, math::zero), center_of_pressure);
 	}
 	else
 		set_aerodynamic_parameters (std::nullopt);
@@ -106,11 +109,13 @@ void
 Wing::set_smoothing_parameters (si::Time const smoothing_time, si::Time const precision)
 {
 	_lift_smoother.set_smoothing_time (smoothing_time);
-	_drag_smoother.set_smoothing_time (smoothing_time);
+	_induced_drag_smoother.set_smoothing_time (smoothing_time);
+	_parasitic_drag_smoother.set_smoothing_time (smoothing_time);
 	_pitching_moment_smoother.set_smoothing_time (smoothing_time);
 
 	_lift_smoother.set_precision (precision);
-	_drag_smoother.set_precision (precision);
+	_induced_drag_smoother.set_precision (precision);
+	_parasitic_drag_smoother.set_precision (precision);
 	_pitching_moment_smoother.set_precision (precision);
 }
 

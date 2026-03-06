@@ -1376,7 +1376,7 @@ RigidBodyPainter::paint_forces (rigid_body::Body const& body)
 				auto const at = pl.rotate_translate_to_base (forces.center_of_pressure) - cp;
 
 				draw_arrow (at, pl.rotate_to_base (forces.lift) * force_to_length, make_material (lift_color));
-				draw_arrow (at, pl.rotate_to_base (forces.drag) * force_to_length, make_material (drag_color));
+				draw_arrow (at, pl.rotate_to_base (forces.total_drag()) * force_to_length, make_material (drag_color));
 				draw_arrow (at, pl.rotate_to_base (forces.pitching_moment) * torque_to_length, make_material (torque_color));
 			}
 		}

@@ -30,14 +30,20 @@ template<class Space>
 	{
 	  public:
 		SpaceForce<Space>	lift;
-		SpaceForce<Space>	drag;
+		SpaceForce<Space>	induced_drag;
+		SpaceForce<Space>	parasitic_drag;
 		SpaceTorque<Space>	pitching_moment;
 		SpaceLength<Space>	center_of_pressure;
 
 	  public:
+		[[nodiscard]]
+		SpaceForce<Space>
+		total_drag() const noexcept
+			{ return induced_drag + parasitic_drag; }
+
 		Wrench<Space>
 		wrench() const
-			{ return { ForceMoments<Space> (lift + drag, pitching_moment), center_of_pressure }; }
+			{ return { ForceMoments<Space> (lift + total_drag(), pitching_moment), center_of_pressure }; }
 	};
 
 } // namespace xf

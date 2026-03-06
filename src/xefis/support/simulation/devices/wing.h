@@ -88,7 +88,8 @@ class Wing:
 	Airfoil							_airfoil;
 	bool							_smoothing_enabled { false };
 	Smoother<SpaceForce<BodyCOM>>	_lift_smoother;
-	Smoother<SpaceForce<BodyCOM>>	_drag_smoother;
+	Smoother<SpaceForce<BodyCOM>>	_induced_drag_smoother;
+	Smoother<SpaceForce<BodyCOM>>	_parasitic_drag_smoother;
 	Smoother<SpaceTorque<BodyCOM>>	_pitching_moment_smoother;
 };
 

@@ -86,7 +86,7 @@ WingWidget::update_observed_values (rigid_body::Body const* planet_body)
 
 			_airfoil_spline_widget.set_center_of_pressure_position (xy (center_of_pressure_3d));
 			_airfoil_spline_widget.set_lift_force (xy (forces.lift));
-			_airfoil_spline_widget.set_drag_force (xy (forces.drag));
+			_airfoil_spline_widget.set_drag_force (xy (forces.total_drag()));
 			_airfoil_spline_widget.set_pitching_moment (xy (forces.pitching_moment));
 		}
 	}

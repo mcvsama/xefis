@@ -149,7 +149,8 @@ PrandtlTube::update_external_forces (Atmosphere const* atmosphere, [[maybe_unuse
 		.angle_of_attack = aoa,
 		.forces = {
 			.lift = { 0_N, 0_N, 0_N },
-			.drag = drag_force_moments.force(),
+			.induced_drag = { 0_N, 0_N, 0_N },
+			.parasitic_drag = drag_force_moments.force(),
 			.pitching_moment = { 0_Nm, 0_Nm, 0_Nm },
 			.center_of_pressure = center_of_pressure,
 		},

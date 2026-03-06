@@ -81,8 +81,12 @@ Airfoil::planar_aerodynamic_forces (Air<AirfoilSplineSpace> const& relative_air)
 		ReynoldsNumber const	re						= reynolds_number (relative_air.density, planar_tas, _chord_length, relative_air.dynamic_viscosity);
 		auto const				[lift_area, drag_area]	= lift_drag_areas (aoa.alpha, aoa.beta);
 		si::Force const			lift					= lift_force (aoa.alpha, aoa.beta, re, planar_dp, lift_area);
-		si::Force const			drag					= drag_force (aoa.alpha, aoa.beta, re, planar_dp, drag_area);
+		si::Force const			total_drag				= drag_force (aoa.alpha, aoa.beta, re, planar_dp, drag_area);
 		si::Torque const		torque					= pitching_moment (aoa.alpha, re, planar_dp);
+		// Current airfoil polar provides total drag only, without induced/parasitic decomposition.
+		// Keep the split explicit in the API and assign all currently known drag to induced drag part.
+		si::Force const			parasitic_drag			= 0_N;
+		si::Force const			induced_drag			= total_drag - parasitic_drag;
 
 		// Lift force is always perpendicular to relative wind.
 		// Drag is always parallel to relative wind.
@@ -103,7 +107,8 @@ Airfoil::planar_aerodynamic_forces (Air<AirfoilSplineSpace> const& relative_air)
 			.angle_of_attack = aoa,
 			.forces = {
 				.lift = lift * lift_direction,
-				.drag = drag * drag_direction,
+				.induced_drag = induced_drag * drag_direction,
+				.parasitic_drag = parasitic_drag * drag_direction,
 				.pitching_moment = pitching_moment_vec,
 				.center_of_pressure = cp_position,
 			},

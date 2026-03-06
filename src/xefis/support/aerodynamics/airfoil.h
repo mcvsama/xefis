@@ -121,7 +121,7 @@ class Airfoil
 
 	/**
 	 * Return lift/drag Wrenches relative to the origin of AirfoilSplineSpace (their force position is at center of pressure of the wing, but at 0 in Z-axis).
-	 * Lift is perpendicular to the wind, drag is parallel to the wind.
+	 * Lift is perpendicular to the wind, drag is parallel to the wind and split into induced/parasitic components.
 	 * Also compute angle of attack and put result into @result.angle_of_attack.
 	 */
 	[[nodiscard]]
@@ -170,7 +170,8 @@ template<math::CoordinateSystem TargetSpace, math::CoordinateSystem SourceSpace>
 	{
 		AirfoilAerodynamicForces<TargetSpace> result;
 		result.lift = rotation * source.lift;
-		result.drag = rotation * source.drag;
+		result.induced_drag = rotation * source.induced_drag;
+		result.parasitic_drag = rotation * source.parasitic_drag;
 		result.pitching_moment = rotation * source.pitching_moment;
 		result.center_of_pressure = rotation * source.center_of_pressure;
 		return result;
