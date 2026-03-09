@@ -79,7 +79,7 @@ class SimulatedClock: public Clock
   public:
 	// Ctor
 	explicit
-	SimulatedClock(si::Time const initial_time):
+	SimulatedClock (si::Time const initial_time):
 		_now (initial_time)
 	{ }
 
