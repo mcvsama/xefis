@@ -30,6 +30,7 @@
 #include <xefis/support/simulation/constraints/fixed_constraint.h>
 #include <xefis/support/simulation/constraints/hinge_constraint.h>
 #include <xefis/support/simulation/devices/angular_servo.h>
+#include <xefis/support/simulation/devices/whip_antenna.h>
 #include <xefis/support/simulation/devices/wing.h>
 #include <xefis/support/simulation/rigid_body/concepts.h>
 #include <xefis/support/simulation/rigid_body/group.h>
@@ -44,7 +45,7 @@
 namespace sim1::simulation {
 
 SimulatedAircraft
-make_aircraft (xf::rigid_body::System& rigid_body_system, xf::Atmosphere& simulated_atmosphere)
+make_aircraft (xf::rigid_body::System& rigid_body_system, xf::Atmosphere& simulated_atmosphere, xf::AntennaSystem& antenna_system)
 {
 	namespace nu = neutrino;
 	namespace rb = xf::rigid_body;
@@ -74,6 +75,8 @@ make_aircraft (xf::rigid_body::System& rigid_body_system, xf::Atmosphere& simula
 	auto const kRudderLength = 50_cm;
 	auto const kWingAeroforcesSmoothing = 4_ms;
 	auto const kWingAeroforcesSmoothingPrecision = 0.5_ms;
+	auto const kRadioFrequency = 1.2_GHz;
+	auto const kQuarterWaveLength = xf::kSpeedOfLight / kRadioFrequency / 4.0;
 
 	auto const main_wing_airfoil_spline = xf::AirfoilSpline (sim1::control_surface_airfoil::kSpline);
 	auto const main_wing_airfoil_characteristics =
@@ -287,8 +290,26 @@ make_aircraft (xf::rigid_body::System& rigid_body_system, xf::Atmosphere& simula
 	elevator_servo.constraint().set_voltage (6_V);
 	rudder_servo.constraint().set_voltage (6_V);
 
+	auto& radio_antenna = aircraft_group.add<xf::sim::WhipAntenna> (
+		antenna_system,
+		xf::sim::WhipAntennaParameters {
+			.mass = 25_g,
+			.antenna_length = kQuarterWaveLength,
+			.body_length = 3 * kQuarterWaveLength,
+			.base_length = 1 * kQuarterWaveLength,
+			.shaft_diameter = 6_mm,
+			.base_diameter = 9_mm,
+			.num_faces = 9,
+			.frequency_response_sharpness = 25.0,
+		}
+	);
+	radio_antenna.set_label ("radio antenna");
+	radio_antenna.rotate_about_body_origin (xf::x_rotation<WorldSpace> (180_deg));
+	radio_antenna.move_origin_to (aileron_r_servo.origin<WorldSpace>() + xf::SpaceLength<WorldSpace> { 0_m, 20_cm, -0.5_cm });
+
 	auto& prandtl_tube_fixed_constraint = rigid_body_system.add<rb::FixedConstraint> (wing_l, prandtl_tube);
 	auto& temperature_sensor_fixed_constraint = rigid_body_system.add<rb::FixedConstraint> (wing_l, temperature_sensor);
+	auto& radio_antenna_fixed_constraint = rigid_body_system.add<rb::FixedConstraint> (wing_r, radio_antenna);
 
 	std::vector<rb::Constraint*> constraints = {
 		&rigid_body_system.add<rb::AngularSpringConstraint> (wing_l_hinge, rb::angular_spring_function (30_Nm / 1_deg)),
@@ -307,6 +328,7 @@ make_aircraft (xf::rigid_body::System& rigid_body_system, xf::Atmosphere& simula
 		&rigid_body_system.add<rb::HingeConstraint> (rudder_hinge),
 		&prandtl_tube_fixed_constraint,
 		&temperature_sensor_fixed_constraint,
+		&radio_antenna_fixed_constraint,
 		&rigid_body_system.add<rb::FixedConstraint> (wing_l, aileron_l_servo),
 		&rigid_body_system.add<rb::FixedConstraint> (wing_r, aileron_r_servo),
 		&rigid_body_system.add<rb::FixedConstraint> (tail_h, elevator_servo),
@@ -321,6 +343,7 @@ make_aircraft (xf::rigid_body::System& rigid_body_system, xf::Atmosphere& simula
 	rigid_body_system.set_constraint_force_mixing_factor (1e-3);
 	prandtl_tube_fixed_constraint.set_baumgarte_factor (0.6);
 	temperature_sensor_fixed_constraint.set_baumgarte_factor (0.6);
+	radio_antenna_fixed_constraint.set_baumgarte_factor (0.6);
 
 	aircraft_group.set_rotation_reference_body (&fuselage);
 

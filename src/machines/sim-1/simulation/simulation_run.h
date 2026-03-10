@@ -37,6 +37,7 @@
 #include <xefis/core/xefis.h>
 #include <xefis/support/atmosphere/simulated_atmosphere.h>
 #include <xefis/support/atmosphere/standard_atmosphere.h>
+#include <xefis/support/simulation/antennas/antenna_system.h>
 #include <xefis/support/simulation/constraints/angular_servo_constraint.h>
 #include <xefis/support/simulation/electrical/network.h>
 #include <xefis/support/simulation/electrical/node_voltage_solver.h>
@@ -87,9 +88,10 @@ class SimulationRun
 	std::optional<xf::SimulatorWidget>	_simulator_widget;
 	xf::rigid_body::System				_rigid_body_system			{ _simulated_atmosphere };
 	xf::rigid_body::ImpulseSolver		_rigid_body_solver			{ _rigid_body_system, 1 };
+	xf::AntennaSystem					_antenna_system				{ 2_s };
 	xf::electrical::Network				_electrical_network;
 	xf::electrical::NodeVoltageSolver	_electrical_network_solver	{ _electrical_network, 1e-3 };
-	SimulatedAircraft					_aircraft					{ make_aircraft (_rigid_body_system, _simulated_atmosphere) };
+	SimulatedAircraft					_aircraft					{ make_aircraft (_rigid_body_system, _simulated_atmosphere, _antenna_system) };
 
 	xf::MachineManager<sim1::aircraft::HardwareMachine> _aircraft_hardware_machine {
 		u8"Aircraft/Hardware machine",

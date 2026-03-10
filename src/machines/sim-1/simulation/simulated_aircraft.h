@@ -17,6 +17,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/atmosphere/atmosphere.h>
+#include <xefis/support/simulation/antennas/antenna_system.h>
 #include <xefis/support/simulation/devices/angular_servo.h>
 #include <xefis/support/simulation/devices/prandtl_tube.h>
 #include <xefis/support/simulation/devices/temperature_sensor.h>
@@ -53,7 +54,7 @@ class SimulatedAircraft
  * The aircraft uses the standard airframe coordinates (X - nose, Y - right wing, Z - down).
  */
 SimulatedAircraft
-make_aircraft (xf::rigid_body::System& rigid_body_system, xf::Atmosphere& simulated_atmosphere);
+make_aircraft (xf::rigid_body::System& rigid_body_system, xf::Atmosphere& simulated_atmosphere, xf::AntennaSystem& antenna_system);
 
 } // namespace sim1::simulation
 
