@@ -366,6 +366,7 @@ class Body:
 
 	/**
 	 * Evolve the body (eg. change the shape if it's changeable).
+	 * Called after each simulation frame.
 	 */
 	virtual void
 	evolve ([[maybe_unused]] si::Time dt)
