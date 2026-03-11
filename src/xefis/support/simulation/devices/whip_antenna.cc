@@ -16,12 +16,14 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/support/aerodynamics/cylinder_parasitic_drag.h>
 #include <xefis/support/nature/various_inertia_tensors.h>
 #include <xefis/support/shapes/various_materials.h>
 #include <xefis/support/shapes/various_shapes.h>
 
 // Standard:
 #include <algorithm>
+#include <cmath>
 #include <cstddef>
 #include <numbers>
 #include <utility>
@@ -70,6 +72,61 @@ WhipAntenna::WhipAntenna (xf::AntennaSystem& antenna_system,
 	Antenna (compute_body_com_mass_moments (params), WhipAntennaBase::antenna_model(), antenna_system, std::move (signal_reception_callback))
 {
 	set_shape (make_shape (params));
+}
+
+
+void
+WhipAntenna::update_external_forces (Atmosphere const* atmosphere, [[maybe_unused]] si::Time frame_duration)
+{
+	if (atmosphere)
+	{
+		// Rotations:
+		auto const world_to_ecef = RotationQuaternion<ECEFSpace, WorldSpace> (math::identity);
+		auto const ecef_to_world = RotationQuaternion<WorldSpace, ECEFSpace> (math::identity);
+		auto const world_to_body = placement().base_rotation();
+		RotationQuaternion<BodyCOM, ECEFSpace> const ecef_to_body = world_to_body * ecef_to_world;
+
+		auto const body_position_in_ecef = world_to_ecef * placement().position();
+		auto const body_velocity_in_ecef = world_to_ecef * velocity_moments<WorldSpace>().velocity();
+
+		auto ecef_air = atmosphere->air_at (body_position_in_ecef);
+		ecef_air.velocity -= body_velocity_in_ecef;
+		auto const body_air = ecef_to_body * ecef_air;
+		auto const true_airspeed = abs (body_air.velocity);
+		auto const radius = 0.5 * params().shaft_diameter;
+		auto const body_reynolds_number = reynolds_number (body_air.density, true_airspeed, 2.0 * radius, body_air.dynamic_viscosity);
+		auto const aoa = AngleOfAttack {
+			.alpha = 1_rad * atan2 (body_air.velocity[0], body_air.velocity[2]),
+			.beta = 1_rad * atan2 (body_air.velocity[1], body_air.velocity[2]),
+		};
+		auto const center_of_pressure = SpaceLength<BodyCOM> { 0_m, 0_m, 0_m };
+		auto const drag_force_moments = cylinder_parasitic_drag_force_moments (CylinderParasiticDragParameters<BodyCOM> {
+			.radius = radius,
+			.length = params().body_length,
+			.relative_air = body_air,
+			.axis_direction = { 0.0, 0.0, 1.0 },
+			.center_of_pressure = center_of_pressure,
+			.reference_point = center_of_pressure,
+		});
+
+		set_aerodynamic_parameters ({
+			.air = body_air,
+			.reynolds_number = body_reynolds_number,
+			.true_air_speed = true_airspeed,
+			.angle_of_attack = aoa,
+			.forces = {
+				.lift = { 0_N, 0_N, 0_N },
+				.induced_drag = { 0_N, 0_N, 0_N },
+				.parasitic_drag = drag_force_moments.force(),
+				.pitching_moment = { 0_Nm, 0_Nm, 0_Nm },
+				.center_of_pressure = center_of_pressure,
+			},
+		});
+
+		apply_impulse (drag_force_moments);
+	}
+	else
+		set_aerodynamic_parameters (std::nullopt);
 }
 
 

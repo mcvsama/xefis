@@ -19,6 +19,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/support/properties/has_aerodynamic_parameters.h>
 #include <xefis/support/simulation/antennas/whip_antenna_model.h>
 
 // Standard:
@@ -46,6 +47,7 @@ class WhipAntennaBase
 	// Ctor
 	explicit
 	WhipAntennaBase (WhipAntennaParameters const& params):
+		_params (params),
 		_antenna_model (params.antenna_length, params.frequency_response_sharpness)
 	{ }
 
@@ -68,7 +70,8 @@ class WhipAntennaBase
 
 class WhipAntenna:
 	private WhipAntennaBase,
-	public Antenna
+	public Antenna,
+	public HasAerodynamicParameters
 {
   public:
 	// Ctor
@@ -76,6 +79,10 @@ class WhipAntenna:
 	WhipAntenna (xf::AntennaSystem&,
 				 WhipAntennaParameters const& = {},
 				 xf::Antenna::SignalReceptionCallback = {});
+
+	// Body API
+	void
+	update_external_forces (Atmosphere const*, si::Time frame_duration) override;
 
   private:
 	[[nodiscard]]
