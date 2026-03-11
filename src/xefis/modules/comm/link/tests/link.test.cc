@@ -302,11 +302,12 @@ get_air_secure_channel (ProcessingLoop& loop)
 }
 
 
-void transmit (LinkProtocol& tx_protocol, LinkProtocol& rx_protocol)
+void
+transmit (LinkProtocol& tx_protocol, LinkProtocol& rx_protocol, nu::Logger const& logger = g_logger)
 {
 	Blob blob;
-	tx_protocol.produce_append (blob, g_logger);
-	auto const consume_result = rx_protocol.consume (blob.begin(), blob.end(), g_logger);
+	tx_protocol.produce_append (blob, logger);
+	auto const consume_result = rx_protocol.consume (blob.begin(), blob.end(), logger);
 
 	test_asserts::verify ("rx_protocol ate all input bytes", consume_result.parsing_end == blob.end());
 	test_asserts::verify_equal ("valid_bytes == blob.size()", consume_result.valid_bytes, blob.size());
@@ -430,7 +431,7 @@ nu::AutoTest t2 ("modules/io/link: protocol: nils and out-of range values transm
 
 	tx.uint_prop << 17u;
 	tx.fetch_all (cycle += 1_s);
-	transmit (tx_protocol, rx_protocol);
+	transmit (tx_protocol, rx_protocol, nu::Logger());
 	test_asserts::verify ("out-of-range bit-int set to fall-back value", *rx.uint_prop == kFallbackInt);
 
 	tx.uint_prop << 15u;
