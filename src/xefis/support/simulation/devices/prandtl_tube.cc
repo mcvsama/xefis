@@ -107,56 +107,55 @@ PrandtlTube::evolve ([[maybe_unused]] si::Time dt)
 void
 PrandtlTube::update_external_forces (Atmosphere const* atmosphere, [[maybe_unused]] si::Time frame_duration)
 {
-	if (!atmosphere)
+	if (atmosphere)
 	{
-		set_aerodynamic_parameters (std::nullopt);
-		return;
-	}
+		// Rotations:
+		auto const world_to_ecef = RotationQuaternion<ECEFSpace, WorldSpace> (math::identity);
+		auto const ecef_to_world = RotationQuaternion<WorldSpace, ECEFSpace> (math::identity);
+		auto const world_to_body = placement().base_rotation();
+		RotationQuaternion<BodyCOM, ECEFSpace> const ecef_to_body = world_to_body * ecef_to_world;
 
-	// Rotations:
-	auto const world_to_ecef = RotationQuaternion<ECEFSpace, WorldSpace> (math::identity);
-	auto const ecef_to_world = RotationQuaternion<WorldSpace, ECEFSpace> (math::identity);
-	auto const world_to_body = placement().base_rotation();
-	RotationQuaternion<BodyCOM, ECEFSpace> const ecef_to_body = world_to_body * ecef_to_world;
+		auto const body_position_in_ecef = world_to_ecef * placement().position();
+		auto const body_velocity_in_ecef = world_to_ecef * velocity_moments<WorldSpace>().velocity();
 
-	auto const body_position_in_ecef = world_to_ecef * placement().position();
-	auto const body_velocity_in_ecef = world_to_ecef * velocity_moments<WorldSpace>().velocity();
+		auto ecef_air = atmosphere->air_at (body_position_in_ecef);
+		ecef_air.velocity -= body_velocity_in_ecef;
+		auto const body_air = ecef_to_body * ecef_air;
+		auto const true_airspeed = abs (body_air.velocity);
+		auto const body_reynolds_number = reynolds_number (body_air.density, true_airspeed, 2.0 * _radius, body_air.dynamic_viscosity);
+		auto const aoa = AngleOfAttack {
+			.alpha = 1_rad * atan2 (body_air.velocity[1], body_air.velocity[0]),
+			.beta = 1_rad * atan2 (body_air.velocity[2], body_air.velocity[0]),
+		};
+		auto const center_of_pressure = SpaceLength<BodyCOM> { 0_m, 0_m, 0_m };
 
-	auto ecef_air = atmosphere->air_at (body_position_in_ecef);
-	ecef_air.velocity -= body_velocity_in_ecef;
-	auto const body_air = ecef_to_body * ecef_air;
-	auto const true_airspeed = abs (body_air.velocity);
-	auto const body_reynolds_number = reynolds_number (body_air.density, true_airspeed, 2.0 * _radius, body_air.dynamic_viscosity);
-	auto const aoa = AngleOfAttack {
-		.alpha = 1_rad * atan2 (body_air.velocity[1], body_air.velocity[0]),
-		.beta = 1_rad * atan2 (body_air.velocity[2], body_air.velocity[0]),
-	};
-	auto const center_of_pressure = SpaceLength<BodyCOM> { 0_m, 0_m, 0_m };
-
-	auto const drag_force_moments = cylinder_parasitic_drag_force_moments (CylinderParasiticDragParameters<BodyCOM> {
-		.radius = _radius,
-		.length = _length,
-		.relative_air = body_air,
-		.axis_direction = { 1.0, 0.0, 0.0 },
-		.center_of_pressure = center_of_pressure,
-		.reference_point = center_of_pressure,
-	});
-
-	set_aerodynamic_parameters ({
-		.air = body_air,
-		.reynolds_number = body_reynolds_number,
-		.true_air_speed = true_airspeed,
-		.angle_of_attack = aoa,
-		.forces = {
-			.lift = { 0_N, 0_N, 0_N },
-			.induced_drag = { 0_N, 0_N, 0_N },
-			.parasitic_drag = drag_force_moments.force(),
-			.pitching_moment = { 0_Nm, 0_Nm, 0_Nm },
+		auto const drag_force_moments = cylinder_parasitic_drag_force_moments (CylinderParasiticDragParameters<BodyCOM> {
+			.radius = _radius,
+			.length = _length,
+			.relative_air = body_air,
+			.axis_direction = { 1.0, 0.0, 0.0 },
 			.center_of_pressure = center_of_pressure,
-		},
-	});
+			.reference_point = center_of_pressure,
+		});
 
-	apply_impulse (drag_force_moments);
+		set_aerodynamic_parameters ({
+			.air = body_air,
+			.reynolds_number = body_reynolds_number,
+			.true_air_speed = true_airspeed,
+			.angle_of_attack = aoa,
+			.forces = {
+				.lift = { 0_N, 0_N, 0_N },
+				.induced_drag = { 0_N, 0_N, 0_N },
+				.parasitic_drag = drag_force_moments.force(),
+				.pitching_moment = { 0_Nm, 0_Nm, 0_Nm },
+				.center_of_pressure = center_of_pressure,
+			},
+		});
+
+		apply_impulse (drag_force_moments);
+	}
+	else
+		set_aerodynamic_parameters (std::nullopt);
 }
 
 } // namespace xf::sim
