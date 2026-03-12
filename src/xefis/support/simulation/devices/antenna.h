@@ -16,7 +16,9 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/support/properties/has_observation_widget.h>
 #include <xefis/support/simulation/antennas/antenna.h>
+#include <xefis/support/simulation/devices/antenna_widget.h>
 #include <xefis/support/simulation/rigid_body/body.h>
 
 // Standard:
@@ -29,7 +31,9 @@ namespace xf::sim {
  * Rigid-body antenna device. Keeps radio-antenna placement synchronized with
  * rigid-body center-of-mass/origin placements.
  */
-class Antenna: public rigid_body::Body
+class Antenna:
+	public rigid_body::Body,
+	public HasObservationWidget
 {
   public:
     // Ctor
@@ -60,6 +64,12 @@ class Antenna: public rigid_body::Body
 	xf::AntennaModel const&
 	model() const noexcept
 		{ return _antenna.model(); }
+
+	// HasObservationWidget API
+	[[nodiscard]]
+	std::unique_ptr<ObservationWidget>
+	create_observation_widget() override
+		{ return std::make_unique<AntennaWidget> (*this); }
 
 	void
 	emit_signal (xf::AntennaEmission const& antenna_emission)
