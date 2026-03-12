@@ -72,3 +72,12 @@ multi-line method directly in the class.
 
 If an argument isn't to be modified, it should be const. It's not necessary to use `const` on function/method
 declarations as opposed to definitions.
+
+### Other
+
+* Beware of Argument-Dependent Lookup, put specializations into std in the same header as the class definition.
+* boost::format bug with `uint8_t` arguments. Use `static_cast<int>` on `uint8_t` arguments.
+  Or better just use `std::format`.
+* All const-methods should be read-only-thread-safe.
+  Remember when using "mutable" members in objects, or when mutating any other (global or not) state from
+  const method. Use `std::atomic<>`, `nu::Synchronized<>` to help.
