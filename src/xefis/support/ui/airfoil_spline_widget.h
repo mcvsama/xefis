@@ -47,6 +47,14 @@ class AirfoilSplineWidget: public CanvasWidget
 		QPen	wind_line_pen;
 	};
 
+	struct ThemeColors
+	{
+		QColor	background;
+		QColor	airfoil;
+		QColor	primary;
+		QColor	wind;
+	};
+
   public:
 	// Ctor
 	explicit
@@ -150,6 +158,10 @@ class AirfoilSplineWidget: public CanvasWidget
 
 	void
 	update_pens();
+
+	[[nodiscard]]
+	static ThemeColors
+	theme_colors_for (QPalette const&, QPalette::ColorGroup);
 
   private:
 	AirfoilSpline				_airfoil_spline {};

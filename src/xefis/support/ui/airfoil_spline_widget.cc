@@ -13,6 +13,7 @@
 
 // Local:
 #include "airfoil_spline_widget.h"
+#include "widget_utils.h"
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -34,53 +35,6 @@
 
 
 namespace xf {
-namespace {
-
-QPalette::ColorGroup
-widget_color_group (QWidget const& widget)
-{
-	if (!widget.isEnabled())
-		return QPalette::Disabled;
-
-	return widget.isActiveWindow() ? QPalette::Active : QPalette::Inactive;
-}
-
-
-struct ThemeColors
-{
-	QColor	background;
-	QColor	airfoil;
-	QColor	primary;
-	QColor	wind;
-};
-
-
-ThemeColors
-theme_colors_for (QPalette const& palette, QPalette::ColorGroup color_group)
-{
-	// Keep the "ecru" feel on light themes and switch to a warm, muted palette on dark themes.
-	if (nu::is_light_theme (palette))
-	{
-		return {
-			.background	= QColor::fromRgb (0xff, 0xfe, 0xf2),
-			.airfoil	= QColor::fromRgb (0xd2, 0xc3, 0xb1),
-			.primary	= Qt::black,
-			.wind		= Qt::gray,
-		};
-	}
-	else
-	{
-		return {
-			.background	= QColor::fromRgb (0x2d, 0x28, 0x23),
-			.airfoil	= QColor::fromRgb (0x9b, 0x8a, 0x76),
-			.primary	= palette.color (color_group, QPalette::WindowText),
-			.wind		= QColor::fromRgb (0x93, 0x88, 0x79),
-		};
-	}
-}
-
-} // namespace
-
 
 AirfoilSplineWidget::AirfoilSplineWidget (QWidget* parent, Qt::WindowFlags flags):
 	CanvasWidget (parent, flags)
@@ -364,6 +318,31 @@ AirfoilSplineWidget::update_pens()
 			.drag_force_pen				= QPen (Qt::red, ph.em_pixels (0.1f) / _scale, Qt::SolidLine, Qt::RoundCap),
 			.center_of_pressure_pen		= QPen (Qt::blue, ph.em_pixels (0.1f) / _scale, Qt::SolidLine, Qt::FlatCap),
 			.wind_line_pen				= QPen (colors.wind, ph.em_pixels (0.05f) / _scale, Qt::SolidLine, Qt::FlatCap),
+		};
+	}
+}
+
+
+AirfoilSplineWidget::ThemeColors
+AirfoilSplineWidget::theme_colors_for (QPalette const& palette, QPalette::ColorGroup color_group)
+{
+	// Keep the "ecru" feel on light themes and switch to a warm, muted palette on dark themes.
+	if (nu::is_light_theme (palette))
+	{
+		return {
+			.background	= QColor::fromRgb (0xff, 0xfe, 0xf2),
+			.airfoil	= QColor::fromRgb (0xd2, 0xc3, 0xb1),
+			.primary	= Qt::black,
+			.wind		= Qt::gray,
+		};
+	}
+	else
+	{
+		return {
+			.background	= QColor::fromRgb (0x2d, 0x28, 0x23),
+			.airfoil	= QColor::fromRgb (0x9b, 0x8a, 0x76),
+			.primary	= palette.color (color_group, QPalette::WindowText),
+			.wind		= QColor::fromRgb (0x93, 0x88, 0x79),
 		};
 	}
 }

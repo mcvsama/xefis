@@ -463,6 +463,7 @@ MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/ui/sound_manage
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/ui/sound_manager.h
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/ui/widget.cc
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/ui/widget.h
+MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/ui/widget_utils.h
 #MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/ui/widgets/group_box.cc TODO
 #MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/ui/widgets/group_box.h TODO
 #MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/ui/widgets/panel_button.cc TODO
