@@ -913,7 +913,7 @@ RigidBodyPainter::paint_moon()
 			.n_slices = 50,
 			.n_stacks = 25,
 			.material = moon_material,
-			.setup_material = [] (ShapeMaterial& material, si::LonLat const sphere_position) {
+			.setup_material = [](ShapeMaterial& material, si::LonLat const sphere_position) {
 				material.texture_position = {
 					nu::renormalize (sphere_position.lon(), nu::Range { -180_deg, +180_deg }, nu::Range { 0.0f, 1.0f }),
 					nu::renormalize (sphere_position.lat(), nu::Range { -90_deg, +90_deg }, nu::Range { 1.0f, 0.0f }),
