@@ -19,7 +19,7 @@
 #include <xefis/core/module.h>
 #include <xefis/core/setting.h>
 #include <xefis/core/sockets/module_socket.h>
-#include <xefis/support/devices/chr_um6.h>
+#include <xefis/support/hardware/chr_um6.h>
 #include <xefis/support/sockets/socket_value_changed.h>
 
 // Neutrino:
