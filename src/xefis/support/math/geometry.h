@@ -180,12 +180,12 @@ template<math::Scalar S1, math::Scalar S2, math::CoordinateSystem Space>
 
 
 /**
- * Find a vector that is non-colinear with given input vector.
+ * Return an arbitrary vector that is non-colinear with given input vector.
  */
 template<math::Scalar S, math::CoordinateSystem Space>
 	[[nodiscard]]
 	constexpr SpaceVector<S, Space>
-	find_non_colinear (SpaceVector<S, Space> input)
+	arbitrary_non_colinear (SpaceVector<S, Space> input)
 	{
 		input.normalize();
 		auto output = kXRotationPlus90<Space, Space> * input;
@@ -198,14 +198,14 @@ template<math::Scalar S, math::CoordinateSystem Space>
 
 
 /**
- * Find any non-normalized perpendicular vector to given vector.
+ * Return an arbitrary non-normalized vector orthogonal to given vector.
  */
 template<math::Scalar S, math::CoordinateSystem Space>
 	[[nodiscard]]
 	constexpr SpaceVector<S, Space>
-	find_any_perpendicular (SpaceVector<S, Space> const& input)
+	arbitrary_orthogonal (SpaceVector<S, Space> const& input)
 	{
-		return cross_product (input, find_non_colinear (input));
+		return cross_product (input, arbitrary_non_colinear (input));
 	}
 
 
@@ -233,7 +233,7 @@ template<math::Scalar S, math::CoordinateSystem TargetSpace, math::CoordinateSys
 	constexpr RotationMatrix<TargetSpace, SourceSpace>
 	make_basis_from_z (SpaceVector<S, TargetSpace> const& z)
 	{
-		auto const x = find_any_perpendicular (z).normalized();
+		auto const x = arbitrary_orthogonal (z).normalized();
 		auto const y = cross_product (z, x).normalized();
 
 		return RotationMatrix<TargetSpace, SourceSpace> {

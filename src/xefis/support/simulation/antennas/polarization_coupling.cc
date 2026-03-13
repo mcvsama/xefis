@@ -48,7 +48,7 @@ polarization_coupling (AntennaModel const& tx_antenna_model,
 	if (abs (tx_to_rx_direction) > 1e-12)
 	{
 		// Shouldn't u/v be somehow related to antenna orientation?
-		transverse_u_in_world = normalized_direction_or_zero (find_any_perpendicular (tx_to_rx_direction));
+		transverse_u_in_world = normalized_direction_or_zero (arbitrary_orthogonal (tx_to_rx_direction));
 		transverse_v_in_world = normalized_direction_or_zero (cross_product (tx_to_rx_direction, transverse_u_in_world));
 	}
 

@@ -98,7 +98,7 @@ HingePrecomputation::compute (HingePrecomputationData& data)
 	auto const u = x2 + r2 - x1 - r1;
 	auto const a1 = pl_1.rotate_to_base (body_1_normalized_hinge()) / abs (body_1_normalized_hinge());
 	auto const a2 = pl_2.rotate_to_base (body_2_normalized_hinge()) / abs (body_2_normalized_hinge());
-	auto const t1 = cross_product (a1, find_non_colinear (a1) * 1_m).normalized();
+	auto const t1 = cross_product (a1, arbitrary_non_colinear (a1) * 1_m).normalized();
 	auto const t2 = cross_product (a1, t1).normalized();
 	auto const rotation_error = _fixed_orientation.rotation_constraint_value (pl_1, pl_2);
 	auto const angle = projection_onto_normalized (rotation_error, a1);

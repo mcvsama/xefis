@@ -54,7 +54,7 @@ SliderPrecomputation::compute (SliderPrecomputationData& data)
 	auto const u = x2 + r2 - x1 - r1;
 	auto const a1 = pl_1.rotate_to_base (_axis_1);
 	auto const distance = (~u * a1).scalar();
-	auto const z = find_non_colinear (a1);
+	auto const z = arbitrary_non_colinear (a1);
 	auto const t1 = cross_product (a1, z).normalized();
 	auto const t2 = cross_product (a1, t1).normalized();
 

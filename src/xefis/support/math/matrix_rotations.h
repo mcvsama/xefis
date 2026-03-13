@@ -40,7 +40,7 @@ template<math::Scalar S, std::size_t C, std::size_t R, math::CoordinateSystem Ta
 template<math::Scalar S, math::CoordinateSystem Space>
 	[[nodiscard]]
 	constexpr SpaceVector<S, Space>
-	find_any_perpendicular (SpaceVector<S, Space> const& input);
+	arbitrary_orthogonal (SpaceVector<S, Space> const& input);
 
 
 /**
@@ -174,7 +174,7 @@ template<math::CoordinateSystem TargetSpace = void, math::CoordinateSystem Sourc
 	inline si::Angle
 	angle_about_matrix_axis (RotationMatrix<TargetSpace, SourceSpace> const& rotation, SpaceVector<double, TargetSpace> normalized_axis)
 	{
-		SpaceVector<double> const x = math::coordinate_system_cast<void, void, TargetSpace, void> (find_any_perpendicular (normalized_axis).normalized());
+		SpaceVector<double> const x = math::coordinate_system_cast<void, void, TargetSpace, void> (arbitrary_orthogonal (normalized_axis).normalized());
 		SpaceVector<double> const y = math::coordinate_system_cast<void, void, TargetSpace, SourceSpace> (rotation) * x;
 
 		auto const sin_theta = abs (cross_product (x, y));
