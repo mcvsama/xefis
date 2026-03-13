@@ -29,6 +29,7 @@
 
 // Standard:
 #include <cstddef>
+#include <concepts>
 #include <memory>
 #include <string_view>
 #include <type_traits>
@@ -81,16 +82,35 @@ class ObservationWidget: public QWidget
 	};
 
   private:
+	struct BasicVariables
+	{
+		MassMomentsAtArm<WorldSpace>	mass_moments;
+		si::Energy						translational_kinetic_energy;
+		si::Energy						rotational_kinetic_energy;
+	};
+
+	struct PositionVariables
+	{
+		si::LonLatRadius<> polar_location;
+	};
+
+	struct VelocityVariables
+	{
+		VelocityMoments<WorldSpace> velocity_moments;
+	};
+
+	struct ConstraintForcesVariables
+	{
+		rigid_body::ConstraintForces constraint_forces;
+	};
+
 	struct AerodynamicVariables
 	{
-		std::string	true_air_speed;
-		std::string	static_air_temperature;
-		std::string	air_density;
-		std::string	dynamic_viscosity;
-		std::string	reynolds_number;
-
-		void
-		reset();
+		si::Velocity			true_air_speed;
+		si::Temperature			static_air_temperature;
+		si::Density				air_density;
+		si::DynamicViscosity	dynamic_viscosity;
+		ReynoldsNumber			reynolds_number;
 	};
 
   public:
@@ -148,7 +168,7 @@ class ObservationWidget: public QWidget
   private:
 	template<class T>
 		void
-		init_variants (T const* observed_object)
+		init_specific_variants (T const* observed_object)
 		{
 			if constexpr (std::is_polymorphic_v<T>)
 				if (observed_object)
@@ -165,6 +185,9 @@ class ObservationWidget: public QWidget
 	add_velocity_observables();
 
 	void
+	add_constraint_forces_observables();
+
+	void
 	add_specific_observables();
 
 	void
@@ -176,11 +199,52 @@ class ObservationWidget: public QWidget
 	QLabel&
 	add_observable (std::string_view name, Getter, Setter, QGridLayout&);
 
+	/**
+	 * Get values from observed body/group/whatever and cache them locally
+	 * for later use in the widget.
+	 */
 	void
-	update_specific_values();
+	fetch_values();
 
 	void
-	update_specific_values (HasAerodynamicParameters const*);
+	fetch_basic_values();
+
+	void
+	fetch_position_values();
+
+	void
+	fetch_velocity_values();
+
+	void
+	fetch_constraint_forces_values();
+
+	void
+	fetch_specific_values();
+
+	void
+	fetch_specific_values (HasAerodynamicParameters const*);
+
+	template<class Variables>
+		[[nodiscard]]
+		static Getter
+		make_getter_with_fallback (std::unique_ptr<Variables> const& variables, std::function<std::string (Variables const&)> getter)
+		{
+			return [&variables, getter] {
+				if (variables)
+					return getter (*variables);
+				else
+					return std::string ("–");
+			};
+		}
+
+	template<class VariablesType>
+		static auto
+		make_getter_maker (std::unique_ptr<VariablesType>& ptr)
+		{
+			return [&ptr] (std::invocable<VariablesType> auto getter) {
+				return make_getter_with_fallback<VariablesType> (ptr, getter);
+			};
+		}
 
   private:
 	rigid_body::Group*				_group						{ nullptr };
@@ -190,15 +254,13 @@ class ObservationWidget: public QWidget
 	QGridLayout						_layout						{ this };
 	rigid_body::Body const*			_planet_body				{ nullptr };
 	std::vector<Observable>			_observables;
-	// Typical observables:
-	si::Energy						_translational_kinetic_energy;
-	si::Energy						_rotational_kinetic_energy;
-	si::LonLatRadius<>				_polar_location;
-	VelocityMoments<WorldSpace>		_velocity_moments;
-	MassMomentsAtArm<WorldSpace>	_mass_moments;
-	Smoother<float>					_load_factor_smoother		{ 100_ms, 10_ms };
-	std::unique_ptr<AerodynamicVariables>
-									_aerodynamic_variables;
+
+	Smoother<float>								_load_factor_smoother		{ 100_ms, 10_ms };
+	std::unique_ptr<BasicVariables>				_basic_variables;
+	std::unique_ptr<PositionVariables>			_position_variables;
+	std::unique_ptr<VelocityVariables>			_velocity_variables;
+	std::unique_ptr<ConstraintForcesVariables>	_constraint_forces_variables;
+	std::unique_ptr<AerodynamicVariables>		_aerodynamic_variables;
 };
 
 } // namespace xf
