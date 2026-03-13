@@ -218,52 +218,58 @@ ImpulseSolver::update_single_constraint_forces (Constraint* constraint, si::Time
 {
 	bool precise_enough = _required_force_torque_precision.has_value();
 
-	if (constraint->enabled() && !constraint->broken())
+	if (!constraint->enabled() || constraint->broken())
 	{
-		auto& b1 = constraint->body_1();
-		auto& b2 = constraint->body_2();
-
-		auto& iter1 = b1.iteration();
-		auto& iter2 = b2.iteration();
-
-		if (!b1.broken() && !b2.broken())
-		{
-			auto const constraint_forces = constraint->constraint_forces (iter1.velocity_moments, iter2.velocity_moments, dt);
-
-			if (_required_force_torque_precision)
-			{
-				if (auto opt_prev = constraint->previous_computation_constraint_forces())
-				{
-					auto prev = *opt_prev;
-					auto const dF = abs (constraint_forces[0].force() - prev[0].force());
-					auto const dT = abs (constraint_forces[0].torque() - prev[0].torque());
-
-					if (dF > _required_force_torque_precision->force)
-						precise_enough = false;
-
-					if (dT > _required_force_torque_precision->torque)
-						precise_enough = false;
-				}
-				else
-					precise_enough = false;
-			}
-
-			constraint->previous_computation_constraint_forces() = constraint_forces;
-
-			iter1.all_constraints_force_moments += constraint_forces[0];
-			iter2.all_constraints_force_moments += constraint_forces[1];
-
-			// Recompute accelerations:
-			iter1.acceleration_moments = iter1.all_force_moments() / b1.mass_moments<WorldSpace>();
-			iter2.acceleration_moments = iter2.all_force_moments() / b2.mass_moments<WorldSpace>();
-
-			// Recompute velocity moments:
-			iter1.velocity_moments = b1.velocity_moments<WorldSpace>() + *iter1.acceleration_moments * dt;
-			iter2.velocity_moments = b2.velocity_moments<WorldSpace>() + *iter2.acceleration_moments * dt;
-			iter1.velocity_moments_updated = true;
-			iter2.velocity_moments_updated = true;
-		}
+		constraint->previous_computation_constraint_forces().reset();
+		return precise_enough;
 	}
+
+	auto& b1 = constraint->body_1();
+	auto& b2 = constraint->body_2();
+
+	auto& iter1 = b1.iteration();
+	auto& iter2 = b2.iteration();
+
+	if (b1.broken() || b2.broken())
+	{
+		constraint->previous_computation_constraint_forces().reset();
+		return precise_enough;
+	}
+
+	auto const constraint_forces = constraint->constraint_forces (iter1.velocity_moments, iter2.velocity_moments, dt);
+
+	if (_required_force_torque_precision)
+	{
+		if (auto opt_prev = constraint->previous_computation_constraint_forces())
+		{
+			auto prev = *opt_prev;
+			auto const dF = abs (constraint_forces[0].force() - prev[0].force());
+			auto const dT = abs (constraint_forces[0].torque() - prev[0].torque());
+
+			if (dF > _required_force_torque_precision->force)
+				precise_enough = false;
+
+			if (dT > _required_force_torque_precision->torque)
+				precise_enough = false;
+		}
+		else
+			precise_enough = false;
+	}
+
+	constraint->previous_computation_constraint_forces() = constraint_forces;
+
+	iter1.all_constraints_force_moments += constraint_forces[0];
+	iter2.all_constraints_force_moments += constraint_forces[1];
+
+	// Recompute accelerations:
+	iter1.acceleration_moments = iter1.all_force_moments() / b1.mass_moments<WorldSpace>();
+	iter2.acceleration_moments = iter2.all_force_moments() / b2.mass_moments<WorldSpace>();
+
+	// Recompute velocity moments:
+	iter1.velocity_moments = b1.velocity_moments<WorldSpace>() + *iter1.acceleration_moments * dt;
+	iter2.velocity_moments = b2.velocity_moments<WorldSpace>() + *iter2.acceleration_moments * dt;
+	iter1.velocity_moments_updated = true;
+	iter2.velocity_moments_updated = true;
 
 	return precise_enough;
 }
