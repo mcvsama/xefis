@@ -160,25 +160,32 @@ HistogramWidget::update_canvas()
 			if (_normal_distribution && n_bins > 0 && _binned_samples > 0)
 			{
 				static constexpr auto kInvSqrt2Pi = 0.3989422804014327f;
-				QColor normal_dist_color = foreground;
-				normal_dist_color.setAlpha (0x50);
+				QColor quantitative_normal_dist_color = foreground;
+				quantitative_normal_dist_color.setAlpha (0x50);
+				QColor normalized_shape_color = pal.color (color_group, QPalette::Highlight);
+				normalized_shape_color.setAlpha (0x70);
 				auto const mean_x = _normal_distribution->mean();
 				auto const stddev_x = _normal_distribution->stddev();
 				auto const expected_bin_width_x = 1.0f / n_bins;
 				auto const pdf_scale = kInvSqrt2Pi / stddev_x;
 
 				auto const curve_steps = std::max (64, static_cast<int> (std::ceil (chart_rect.width())));
-				auto curve = QPolygonF();
-				curve.reserve (curve_steps + 2);
+				auto quantitative_curve = QPolygonF();
+				quantitative_curve.reserve (curve_steps + 2);
+				auto normalized_shape_curve = QPolygonF();
+				normalized_shape_curve.reserve (curve_steps + 2);
 
 				auto const add_curve_point = [&] (float normalized_x)
 				{
 					auto const x = normalized_x * chart_rect.width();
 					auto const z = (normalized_x - mean_x) / stddev_x;
-					auto const pdf = pdf_scale * std::exp (-0.5f * z * z);
+					auto const exp_value = std::exp (-0.5f * z * z);
+					auto const pdf = pdf_scale * exp_value;
 					auto const expected_count = static_cast<float> (_binned_samples) * expected_bin_width_x * pdf;
-					auto const y = expected_count * inv_max_y;
-					curve << QPointF (x, y);
+					auto const quantitative_y = expected_count * inv_max_y;
+					auto const normalized_shape_y = chart_rect.height() * exp_value;
+					quantitative_curve << QPointF (x, quantitative_y);
+					normalized_shape_curve << QPointF (x, normalized_shape_y);
 				};
 
 				for (int i = 0; i <= curve_steps; ++i)
@@ -196,9 +203,13 @@ HistogramWidget::update_canvas()
 					add_curve_point (normalized_x);
 				}
 
-				painter.setPen (QPen (normal_dist_color, chart_width, Qt::SolidLine, Qt::RoundCap));
+				painter.setPen (QPen (normalized_shape_color, chart_width, Qt::SolidLine, Qt::RoundCap));
 				painter.setBrush (Qt::NoBrush);
-				painter.drawPolyline (curve);
+				painter.drawPolyline (normalized_shape_curve);
+
+				painter.setPen (QPen (quantitative_normal_dist_color, chart_width, Qt::SolidLine, Qt::RoundCap));
+				painter.setBrush (Qt::NoBrush);
+				painter.drawPolyline (quantitative_curve);
 			}
 
 			if (n_bins > 0)
