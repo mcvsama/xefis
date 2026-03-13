@@ -367,7 +367,36 @@ nu::AutoTest t_9 ("Orthogonal whip antenna polarization strongly suppresses rece
 });
 
 
-nu::AutoTest t_10 ("Emission expires by ttl before reaching distant receiver", []{
+nu::AutoTest t_10 ("Vertical offset reduces power for parallel whip antennas", []{
+	auto antenna_model = WhipAntennaModel (1_m);
+	auto system = AntennaSystem (10_s);
+	auto tx_antenna = TestAntenna (antenna_model, system);
+	auto rx_side_antenna = TestAntenna (antenna_model, system);
+	auto rx_side_and_up_antenna = TestAntenna (antenna_model, system);
+	auto const no_rotation = kNoRotation<WorldSpace, BodyOrigin>;
+
+	tx_antenna.set_placement (Placement<WorldSpace, BodyOrigin> ({ 0_m, 0_m, 0_m }, no_rotation));
+	rx_side_antenna.set_placement (Placement<WorldSpace, BodyOrigin> ({ 1_m, 0.25_m, 0_m }, no_rotation));
+	rx_side_and_up_antenna.set_placement (Placement<WorldSpace, BodyOrigin> ({ 1_m, 0.25_m, 0.1_m }, no_rotation));
+
+	tx_antenna.emit_signal ({
+		.time		= 0_s,
+		.power		= 1_W,
+		.frequency	= 100_MHz,
+		.payload	= "vertical offset",
+	});
+
+	system.process (1_ms);
+	test_asserts::verify_equal ("Side-offset receiver gets signal", rx_side_antenna.received_signals().size(), 1uz);
+	test_asserts::verify_equal ("Side-and-up-offset receiver gets signal", rx_side_and_up_antenna.received_signals().size(), 1uz);
+
+	auto const side_power = rx_side_antenna.received_signals().front().signal_power;
+	auto const side_and_up_power = rx_side_and_up_antenna.received_signals().front().signal_power;
+	test_asserts::verify ("Raising otherwise parallel receiver reduces received power", side_and_up_power < side_power);
+});
+
+
+nu::AutoTest t_11 ("Emission expires by ttl before reaching distant receiver", []{
 	auto antenna_model = WhipAntennaModel (1_m);
 	auto system = AntennaSystem (1_ms);
 	auto tx_antenna = TestAntenna (antenna_model, system);
@@ -393,7 +422,7 @@ nu::AutoTest t_10 ("Emission expires by ttl before reaching distant receiver", [
 });
 
 
-nu::AutoTest t_11 ("Signal payload integrity and ordering are preserved", []{
+nu::AutoTest t_12 ("Signal payload integrity and ordering are preserved", []{
 	auto antenna_model = WhipAntennaModel (1_m);
 	auto system = AntennaSystem (10_s);
 	auto tx_antenna = TestAntenna (antenna_model, system);
@@ -430,7 +459,7 @@ nu::AutoTest t_11 ("Signal payload integrity and ordering are preserved", []{
 });
 
 
-nu::AutoTest t_12 ("WhipAntennaModel rejects negative frequency-response sharpness", []{
+nu::AutoTest t_13 ("WhipAntennaModel rejects negative frequency-response sharpness", []{
 	test_asserts::verify_throws<nu::InvalidArgument> ("Negative frequency-response sharpness should be rejected", []{
 		[[maybe_unused]] auto const model = WhipAntennaModel (1_m, -1.0);
 	});
