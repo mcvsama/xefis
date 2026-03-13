@@ -152,27 +152,48 @@ HistogramWidget::update_canvas()
 		painter.resetTransform();
 		painter.translate (chart_rect.bottomLeft());
 		painter.scale (1.0f, -1.0f);
+		painter.save();
+		painter.setClipRect (QRectF (0.0f, 0.0f, chart_rect.width(), chart_rect.height()));
 
 		// The histogram itself:
 		{
-			if (_normal_distribution)
+			if (_normal_distribution && n_bins > 0 && _binned_samples > 0)
 			{
+				static constexpr auto kInvSqrt2Pi = 0.3989422804014327f;
 				QColor normal_dist_color = foreground;
 				normal_dist_color.setAlpha (0x50);
 				auto const mean_x = _normal_distribution->mean();
 				auto const stddev_x = _normal_distribution->stddev();
+				auto const expected_bin_width_x = 1.0f / n_bins;
+				auto const pdf_scale = kInvSqrt2Pi / stddev_x;
 
 				auto const curve_steps = std::max (64, static_cast<int> (std::ceil (chart_rect.width())));
 				auto curve = QPolygonF();
-				curve.reserve (curve_steps + 1);
+				curve.reserve (curve_steps + 2);
+
+				auto const add_curve_point = [&] (float normalized_x)
+				{
+					auto const x = normalized_x * chart_rect.width();
+					auto const z = (normalized_x - mean_x) / stddev_x;
+					auto const pdf = pdf_scale * std::exp (-0.5f * z * z);
+					auto const expected_count = static_cast<float> (_binned_samples) * expected_bin_width_x * pdf;
+					auto const y = expected_count * inv_max_y;
+					curve << QPointF (x, y);
+				};
 
 				for (int i = 0; i <= curve_steps; ++i)
 				{
 					auto const normalized_x = 1.0f * i / curve_steps;
-					auto const x = normalized_x * chart_rect.width();
-					auto const z = (normalized_x - mean_x) / stddev_x;
-					auto const y = chart_rect.height() * std::exp (-0.5f * z * z);
-					curve << QPointF (x, y);
+
+					if (0 < i && 0.0f < mean_x && mean_x < 1.0f)
+					{
+						auto const previous_normalized_x = 1.0f * (i - 1) / curve_steps;
+
+						if (previous_normalized_x < mean_x && mean_x < normalized_x)
+							add_curve_point (mean_x);
+					}
+
+					add_curve_point (normalized_x);
 				}
 
 				painter.setPen (QPen (normal_dist_color, chart_width, Qt::SolidLine, Qt::RoundCap));
@@ -217,6 +238,7 @@ HistogramWidget::update_canvas()
 				}
 			}
 		}
+		painter.restore();
 	}
 
 	// Axes:

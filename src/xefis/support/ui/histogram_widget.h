@@ -30,6 +30,7 @@
 
 // Standard:
 #include <cstddef>
+#include <numeric>
 #include <optional>
 #include <vector>
 
@@ -83,6 +84,7 @@ class HistogramWidget: public CanvasWidget
 	Style						_style				{ Style::Bars };
 	std::vector<float>			_marks;
 	std::vector<std::size_t>	_bins;
+	std::size_t					_binned_samples		{ 0 };
 	std::size_t					_max_y				{ 0 };
 	QString						_min_x_str;
 	QString						_mid_x_str;
@@ -100,6 +102,7 @@ template<class Value>
 	HistogramWidget::set_data (math::Histogram<Value> const& histogram, std::vector<Value> marks)
 	{
 		_bins = histogram.bins();
+		_binned_samples = std::accumulate (_bins.begin(), _bins.end(), std::size_t (0));
 		_max_y = histogram.max_y();
 		auto const precision = 3;
 		_min_x_str = nu::to_qstring (nu::format_unit (histogram.min_x(), precision));
