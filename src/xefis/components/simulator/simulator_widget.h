@@ -83,8 +83,7 @@ class SimulatorWidget: public QWidget
 	 * Sets the planet body in the internal RigidBodyViewer.
 	 */
 	void
-	set_planet (rigid_body::Body const* planet_body) noexcept
-		{ _rigid_body_viewer->set_planet (planet_body); }
+	set_planet (rigid_body::Body const* planet_body) noexcept;
 
   private:
 	[[nodiscard]]

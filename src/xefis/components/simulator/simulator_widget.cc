@@ -76,6 +76,22 @@ SimulatorWidget::SimulatorWidget (Simulator& simulator, QWidget* parent):
 }
 
 
+void
+SimulatorWidget::set_planet (rigid_body::Body const* planet_body) noexcept
+{
+	_rigid_body_viewer->set_planet (planet_body);
+
+	if (_group_editor)
+		_group_editor->refresh();
+
+	if (_body_editor)
+		_body_editor->refresh();
+
+	if (_constraint_editor)
+		_constraint_editor->refresh();
+}
+
+
 QWidget*
 SimulatorWidget::make_viewer_widget()
 {
