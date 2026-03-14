@@ -66,7 +66,6 @@ ModuleWidget::ModuleWidget (Module& module, QWidget* parent):
 	{
 		auto module_config_widget = module_with_config_widget->configurator_widget();
 		tabs->addTab (module_config_widget, "Module config");
-		nu::break_ownership (*tabs, *module_config_widget);
 	}
 
 	auto* layout = new QVBoxLayout (this);

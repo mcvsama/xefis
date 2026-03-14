@@ -24,6 +24,8 @@ namespace xf {
 
 /**
  * Defines method for accessing configuration widget if an object decides to implement one.
+ * The returned widget is meant to be embedded into some host UI, which then owns it
+ * through normal Qt parent-child lifetime rules.
  */
 class HasConfiguratorWidget
 {
