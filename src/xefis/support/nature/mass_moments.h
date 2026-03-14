@@ -38,6 +38,9 @@ namespace xf {
 /**
  * Like MassMomentsAtArm, but assumes that the inertia tensor is viewed from center of mass.
  * And the center of mass always returns a zero vector.
+ * Space is still needed, because it specifies the coordinate system in which the inertia tensor
+ * is expressed. In practice mass moments are stored in BodyCOM and rotated on demand to
+ * WorldSpace for rigid-body solver computations.
  */
 template<math::CoordinateSystem pSpace = void>
 	class MassMoments
