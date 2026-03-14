@@ -78,5 +78,33 @@ nu::AutoTest t_group_bounding_sphere_without_shapes ("rigid_body::Group: boundin
 											 1e-12_m);
 });
 
+
+nu::AutoTest t_group_mass_moments_include_parallel_axis ("rigid_body::Group: mass moments include displacement from world origin", []{
+	auto system = rb::System();
+	auto& group = system.make_group();
+
+	auto const body_mass = 2_kg;
+	auto const body_inertia_at_com = make_cuboid_inertia_tensor<BodyCOM> (body_mass, { 1_m, 1_m, 1_m });
+	auto& body = group.add<rb::Body> (MassMoments<BodyCOM> (body_mass, body_inertia_at_com));
+	body.move_to (SpaceLength<WorldSpace> { 3_m, 0_m, 0_m });
+
+	auto const group_mass_moments = group.mass_moments();
+	auto const expected_inertia_at_world_origin =
+		inertia_tensor_com_to_point<WorldSpace> (body_mass, body.mass_moments<WorldSpace>().inertia_tensor(), body.placement().position());
+
+	test_asserts::verify_equal_with_epsilon ("group mass matches body mass",
+											 group_mass_moments.mass(),
+											 body_mass,
+											 1e-12_kg);
+	test_asserts::verify_equal_with_epsilon ("group COM matches body COM",
+											 group_mass_moments.center_of_mass_position(),
+											 SpaceLength<WorldSpace> { 3_m, 0_m, 0_m },
+											 1e-12_m);
+	test_asserts::verify_equal_with_epsilon ("group inertia tensor includes parallel-axis contribution",
+											 group_mass_moments.inertia_tensor(),
+											 expected_inertia_at_world_origin,
+											 1e-12_kgm2);
+});
+
 } // namespace
 } // namespace xf::test
