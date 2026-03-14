@@ -30,6 +30,7 @@
 
 // Standard:
 #include <cstddef>
+#include <functional>
 #include <numeric>
 #include <optional>
 #include <vector>
@@ -57,6 +58,10 @@ class HistogramWidget: public CanvasWidget
 	template<class Value>
 		void
 		set_data (math::Histogram<Value> const&, std::vector<Value> marks = {});
+
+	template<class Value, class Formatter>
+		void
+		set_data (math::Histogram<Value> const&, Formatter&& formatter, std::vector<Value> marks = {});
 
 	/**
 	 * Set number of helper lines in the grid.
@@ -101,24 +106,33 @@ template<class Value>
 	inline void
 	HistogramWidget::set_data (math::Histogram<Value> const& histogram, std::vector<Value> marks)
 	{
+		set_data (histogram, [](Value const value) {
+			return nu::format_unit (value, 3);
+		}, std::move (marks));
+	}
+
+
+template<class Value, class Formatter>
+	inline void
+	HistogramWidget::set_data (math::Histogram<Value> const& histogram, Formatter&& formatter, std::vector<Value> marks)
+	{
 		_bins = histogram.bins();
 		_binned_samples = std::accumulate (_bins.begin(), _bins.end(), std::size_t (0));
 		_max_y = histogram.max_y();
-		auto const precision = 3;
-		_min_x_str = nu::to_qstring (nu::format_unit (histogram.min_x(), precision));
-		_mid_x_str = nu::to_qstring (nu::format_unit (0.5f * (histogram.min_x() + histogram.max_x()), precision));
-		_max_x_str = nu::to_qstring (nu::format_unit (histogram.max_x(), precision));
+		_min_x_str = nu::to_qstring (std::invoke (formatter, histogram.min_x()));
+		_mid_x_str = nu::to_qstring (std::invoke (formatter, 0.5f * (histogram.min_x() + histogram.max_x())));
+		_max_x_str = nu::to_qstring (std::invoke (formatter, histogram.max_x()));
 		_max_y_str = nu::to_qstring (std::format ("{}", histogram.max_y()));
 		_normal_distribution = std::nullopt;
 
 		if (histogram.stddev() > Value())
 		{
 			auto const mean_x = renormalize (histogram.mean(),
-											 { histogram.min_x(), histogram.max_x() },
+											 nu::Range { histogram.min_x(), histogram.max_x() },
 											 nu::Range { 0.0f, 1.0f });
-			auto const mean_plus_stddev_x = renormalize(histogram.mean() + histogram.stddev(),
-														{ histogram.min_x(), histogram.max_x() },
-														nu::Range { 0.0f, 1.0f });
+			auto const mean_plus_stddev_x = renormalize (histogram.mean() + histogram.stddev(),
+														 nu::Range { histogram.min_x(), histogram.max_x() },
+														 nu::Range { 0.0f, 1.0f });
 			auto const stddev_x = mean_plus_stddev_x - mean_x;
 
 			if (stddev_x > 0.0f)
@@ -130,7 +144,9 @@ template<class Value>
 
 		for (auto const& m: marks)
 		{
-			auto const pos = renormalize (m, { histogram.min_x(), histogram.max_x() }, nu::Range { 0.0f, 1.0f });
+			auto const pos = renormalize (m,
+										  nu::Range { histogram.min_x(), histogram.max_x() },
+										  nu::Range { 0.0f, 1.0f });
 
 			if (0.0f <= pos && pos <= 1.0f)
 				_marks.emplace_back (pos);

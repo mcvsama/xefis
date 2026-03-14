@@ -29,6 +29,7 @@
 
 // Standard:
 #include <cstddef>
+#include <functional>
 #include <optional>
 #include <vector>
 
@@ -49,6 +50,10 @@ class HistogramStatsWidget: public Widget
 		void
 		set_data (math::Histogram<HistogramValue> const&, std::optional<CriticalValue> critical_value = std::nullopt);
 
+	template<class HistogramValue, class Formatter, class CriticalValue = HistogramValue>
+		void
+		set_data (math::Histogram<HistogramValue> const&, Formatter&& formatter, std::optional<CriticalValue> critical_value = std::nullopt);
+
   private:
 	QLabel*	_num_samples_value;
 	QLabel*	_min_value;
@@ -65,17 +70,26 @@ template<class HistogramValue, class CriticalValue>
 	inline void
 	HistogramStatsWidget::set_data (math::Histogram<HistogramValue> const& histogram, std::optional<CriticalValue> critical_value)
 	{
-		auto const precision = 3;
+		set_data (histogram, [](auto const value) {
+			return nu::format_unit (value, 3);
+		}, critical_value);
+	}
+
+
+template<class HistogramValue, class Formatter, class CriticalValue>
+	inline void
+	HistogramStatsWidget::set_data (math::Histogram<HistogramValue> const& histogram, Formatter&& formatter, std::optional<CriticalValue> critical_value)
+	{
 		_num_samples_value->setText (QString::number (histogram.n_samples()));
-		_min_value->setText (nu::to_qstring (nu::format_unit (histogram.min(), precision)));
-		_max_value->setText (nu::to_qstring (nu::format_unit (histogram.max(), precision)));
-		_mean_value->setText (nu::to_qstring (nu::format_unit (histogram.mean(), precision)));
-		_median_value->setText (nu::to_qstring (nu::format_unit (histogram.median(), precision)));
-		_stddev_value->setText (nu::to_qstring (nu::format_unit (histogram.stddev(), precision)));
+		_min_value->setText (nu::to_qstring (std::invoke (formatter, histogram.min())));
+		_max_value->setText (nu::to_qstring (std::invoke (formatter, histogram.max())));
+		_mean_value->setText (nu::to_qstring (std::invoke (formatter, histogram.mean())));
+		_median_value->setText (nu::to_qstring (std::invoke (formatter, histogram.median())));
+		_stddev_value->setText (nu::to_qstring (std::invoke (formatter, histogram.stddev())));
 
 		if (critical_value)
 		{
-			_critical_label->setText (nu::to_qstring (std::format ("> {}: ", nu::format_unit (*critical_value, 4))));
+			_critical_label->setText (nu::to_qstring (std::format ("> {}: ", std::invoke (formatter, *critical_value))));
 			_critical_value->setText (nu::to_qstring (std::format ("{:.3f}%", 100 * histogram.normalized_percentile_for (*critical_value))));
 		}
 		else
