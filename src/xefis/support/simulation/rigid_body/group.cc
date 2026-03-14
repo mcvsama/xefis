@@ -78,7 +78,11 @@ Group::mass_moments() const
 {
 	auto const get_mass_moments_from_body = [](auto& body_ptr) -> MassMomentsAtArm<WorldSpace> {
 		auto const mm_at_com = body_ptr->template mass_moments<WorldSpace>();
-		return MassMomentsAtArm<WorldSpace> (mm_at_com.mass(), body_ptr->placement().position(), mm_at_com.inertia_tensor());
+		auto const center_of_mass_position = body_ptr->placement().position();
+		auto const inertia_tensor_at_world_origin =
+			inertia_tensor_com_to_point (mm_at_com.mass(), mm_at_com.inertia_tensor(), center_of_mass_position);
+
+		return MassMomentsAtArm<WorldSpace> (mm_at_com.mass(), center_of_mass_position, inertia_tensor_at_world_origin);
 	};
 
 	return compute_mass_moments_at_arm<WorldSpace> (_bodies | std::views::transform (get_mass_moments_from_body));
