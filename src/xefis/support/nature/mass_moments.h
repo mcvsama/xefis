@@ -80,8 +80,7 @@ template<math::CoordinateSystem pSpace = void>
 			{ return _zero_length; }
 
 		/**
-		 * Moments of inertia tensor viewed from the origin point,
-		 * not from the center of mass.
+		 * Moments of inertia tensor viewed from the center of mass.
 		 */
 		[[nodiscard]]
 		InertiaTensor<Space> const&

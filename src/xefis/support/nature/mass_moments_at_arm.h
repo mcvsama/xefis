@@ -47,7 +47,7 @@ template<math::CoordinateSystem Space>
  * Represents three moments of mass:
  *  • 0th = mass (monopole)
  *  • 1st = center of mass (dipole)
- *  • 2nd = moments of inertia tensor at the center of mass (quadrupole)
+ *  • 2nd = moments of inertia tensor viewed from the common origin point (quadrupole)
  */
 template<math::CoordinateSystem pSpace = void>
 	class MassMomentsAtArm
@@ -64,10 +64,10 @@ template<math::CoordinateSystem pSpace = void>
 
 		/**
 		 * Create a mass moments with an inertia tensor viewed from different place than center of mass.
-		 * To use a mass moments with (more useful) inertia tensor at COM, transform it with .
+		 * To use a mass moments with inertia tensor at COM, transform it with centered_at_center_of_mass().
 		 *
 		 * \param	inertia_tensor_at_origin
-		 *			Inertia tensor as viewed from the -center_of_mass_position (named origin here).
+		 *			Inertia tensor as viewed from the common origin point.
 		 */
 		MassMomentsAtArm (si::Mass, SpaceLength<Space> const& center_of_mass_position, InertiaTensor<Space> const& inertia_tensor_at_origin);
 
