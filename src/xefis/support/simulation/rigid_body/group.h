@@ -133,7 +133,9 @@ class Group:
 	rotational_kinetic_energy() const;
 
 	/**
-	 * Calculate total mass moments of the group.
+	 * Calculate total mass moments of the group in WorldSpace, viewed from the WorldSpace origin.
+	 * To get mass moments viewed from the group's center of mass, call
+	 * mass_moments().centered_at_center_of_mass().
 	 */
 	[[nodiscard]]
 	MassMomentsAtArm<WorldSpace>
