@@ -17,6 +17,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/cycle.h>
+#include <xefis/support/properties/has_configurator_widget.h>
 #include <xefis/utility/named_instance.h>
 
 // Neutrino:
@@ -34,8 +35,6 @@
 #include <ranges>
 #include <type_traits>
 
-
-class QWidget;
 
 namespace xf {
 
@@ -277,21 +276,6 @@ class Module:
 
 	  private:
 		Module& _module;
-	};
-
-	/**
-	 * Defines method for accessing configuration widget if a module decides to implement one.
-	 * This class should be inherited by the same class that inherits the Module class.
-	 */
-	class HasConfiguratorWidget
-	{
-	  public:
-		// Dtor
-		virtual
-		~HasConfiguratorWidget() = default;
-
-		virtual QWidget*
-		configurator_widget() = 0;
 	};
 
   private:

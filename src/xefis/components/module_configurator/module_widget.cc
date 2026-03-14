@@ -17,6 +17,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/components/module_configurator/config_widget.h>
+#include <xefis/support/properties/has_configurator_widget.h>
 #include <xefis/support/ui/paint_helper.h>
 #include <xefis/support/ui/performance_widget.h>
 
@@ -61,7 +62,7 @@ ModuleWidget::ModuleWidget (Module& module, QWidget* parent):
 	tabs->addTab (_inputs_socket_tree, "Data inputs");
 	tabs->addTab (_outputs_socket_tree, "Data outputs");
 
-	if (auto module_with_config_widget = dynamic_cast<Module::HasConfiguratorWidget*> (&_module))
+	if (auto module_with_config_widget = dynamic_cast<HasConfiguratorWidget*> (&_module))
 	{
 		auto module_config_widget = module_with_config_widget->configurator_widget();
 		tabs->addTab (module_config_widget, "Module config");

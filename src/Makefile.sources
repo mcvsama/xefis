@@ -314,6 +314,7 @@ MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/nature/various_
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/nature/velocity_moments.h
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/nature/wrench.h
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/properties/has_aerodynamic_parameters.h
+MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/properties/has_configurator_widget.h
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/properties/has_configurable_label.h
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/properties/has_observation_widget.cc
 MIHAU.modules[xefis].products[xefis].sources				+= xefis/support/properties/has_observation_widget.h
