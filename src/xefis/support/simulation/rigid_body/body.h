@@ -290,8 +290,7 @@ class Body:
 	 * Rotate the body about given point.
 	 */
 	void
-	rotate_about (SpaceLength<WorldSpace> const& about_point, RotationQuaternion<WorldSpace> const& rotation)
-		{ _placement.rotate_base_frame_about (about_point, rotation); }
+	rotate_about (SpaceLength<WorldSpace> const& about_point, RotationQuaternion<WorldSpace> const& rotation);
 
 	/**
 	 * Translate the body by given vector.

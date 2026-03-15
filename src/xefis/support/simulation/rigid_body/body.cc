@@ -92,6 +92,17 @@ Body::rotate_about_body_origin (RotationQuaternion<WorldSpace> const& rotation)
 
 
 void
+Body::rotate_about (SpaceLength<WorldSpace> const& about_point, RotationQuaternion<WorldSpace> const& rotation)
+{
+	_placement.rotate_base_frame_about (about_point, rotation);
+	_velocity_moments = rotation * _velocity_moments;
+	_acceleration_moments = rotation * _acceleration_moments;
+
+	invalidate_placement_dependent_caches();
+}
+
+
+void
 Body::move_origin_to (SpaceLength<WorldSpace> const& new_origin_position)
 {
 	SpaceLength<BodyCOM> const old_origin_position_in_BodyCOM = _origin_placement_in_com.position();
