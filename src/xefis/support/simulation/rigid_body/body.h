@@ -83,8 +83,7 @@ class Body:
 	 * Set new mass moments at center-of-mass.
 	 */
 	void
-	set_mass_moments (MassMoments<BodyCOM> const& mass_moments)
-		{ _mass_moments = mass_moments; }
+	set_mass_moments (MassMoments<BodyCOM> const& mass_moments);
 
 	/**
 	 * Set new mass moments at center-of-mass.

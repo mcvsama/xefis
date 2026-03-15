@@ -24,6 +24,14 @@
 
 namespace xf::rigid_body {
 
+void
+Body::set_mass_moments (MassMoments<BodyCOM> const& mass_moments)
+{
+	_mass_moments = mass_moments;
+	invalidate_placement_dependent_caches();
+}
+
+
 Body::Body (MassMoments<BodyCOM> const& mass_moments, ShapeType const shape_type):
 	_shape_type (shape_type)
 {
@@ -53,6 +61,8 @@ Body::set_mass_moments (MassMomentsAtArm<BodyCOM> const& mass_moments)
 	// Because the origin is defined as relative to center of mass, and we just moved center of mass
 	// while not wanting to move origin, move the origin back:
 	_origin_placement_in_com.translate_frame (-com_position);
+
+	invalidate_placement_dependent_caches();
 }
 
 

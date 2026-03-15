@@ -347,5 +347,46 @@ nu::AutoTest t_body_rotate_about_updates_rotated_state ("rigid_body::Body: rotat
 											 1e-12_kgm2);
 });
 
+
+nu::AutoTest t_body_set_mass_moments_refreshes_world_cache ("rigid_body::Body: set_mass_moments refreshes world cache", []{
+	auto const initial_mass = 2_kg;
+	auto const initial_inertia = make_cuboid_inertia_tensor<BodyCOM> (initial_mass, { 1_m, 2_m, 3_m });
+	auto body = rb::Body (MassMoments<BodyCOM> (initial_mass, initial_inertia));
+	body.rotate_about_center_of_mass (z_rotation<WorldSpace> (90_deg));
+
+	auto const cached_initial_world_mass_moments = body.mass_moments<WorldSpace>();
+
+	auto const updated_mass = 3_kg;
+	auto const updated_inertia = make_cuboid_inertia_tensor<BodyCOM> (updated_mass, { 4_m, 5_m, 6_m });
+	body.set_mass_moments (MassMoments<BodyCOM> (updated_mass, updated_inertia));
+
+	auto const refreshed_world_mass_moments = body.mass_moments<WorldSpace>();
+	auto const expected_world_mass_moments = body.placement().rotate_to_base (body.mass_moments<BodyCOM>());
+
+	test_asserts::verify ("direct overload replaces cached world inertia",
+						  abs (cached_initial_world_mass_moments.inertia_tensor()[0, 0] - refreshed_world_mass_moments.inertia_tensor()[0, 0]) > 1e-12_kgm2);
+	test_asserts::verify_equal_with_epsilon ("direct overload updates world-space mass moments",
+											 refreshed_world_mass_moments.inertia_tensor(),
+											 expected_world_mass_moments.inertia_tensor(),
+											 1e-12_kgm2);
+
+	auto const offset = SpaceLength<BodyCOM> { 2_m, 0_m, 0_m };
+	auto const offset_inertia_at_com = make_cuboid_inertia_tensor<BodyCOM> (updated_mass, { 2_m, 3_m, 4_m });
+	auto const offset_inertia_at_origin = inertia_tensor_com_to_point (updated_mass, offset_inertia_at_com, offset);
+	body.set_mass_moments (MassMomentsAtArm<BodyCOM> (updated_mass, offset, offset_inertia_at_origin));
+
+	auto const refreshed_offset_world_mass_moments = body.mass_moments<WorldSpace>();
+	auto const expected_offset_world_mass_moments = body.placement().rotate_to_base (body.mass_moments<BodyCOM>());
+
+	test_asserts::verify_equal_with_epsilon ("at-arm overload updates COM placement",
+											 body.placement().position(),
+											 SpaceLength<WorldSpace> { 0_m, 2_m, 0_m },
+											 1e-12_m);
+	test_asserts::verify_equal_with_epsilon ("at-arm overload updates world-space mass moments",
+											 refreshed_offset_world_mass_moments.inertia_tensor(),
+											 expected_offset_world_mass_moments.inertia_tensor(),
+											 1e-12_kgm2);
+});
+
 } // namespace
 } // namespace xf::test
