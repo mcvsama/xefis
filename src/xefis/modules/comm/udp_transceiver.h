@@ -19,22 +19,30 @@
 #include <xefis/core/module.h>
 #include <xefis/core/setting.h>
 #include <xefis/core/sockets/module_socket.h>
+#include <xefis/support/properties/has_configurator_widget.h>
+#include <xefis/support/stats/bandwidth_sampler.h>
 #include <xefis/support/sockets/socket_changed.h>
 
 // Neutrino:
 #include <neutrino/logger.h>
 
 // Qt:
+#include <QPointer>
 #include <QtNetwork/QUdpSocket>
 
 // Standard:
 #include <cstddef>
+#include <vector>
 
 
 namespace nu = neutrino;
+namespace si = nu::si;
+using namespace si::literals;
 
 
-class UDPTransceiver: public xf::Module
+class UDPTransceiver:
+	public xf::Module,
+	public xf::HasConfiguratorWidget
 {
   public:
 	/*
@@ -60,10 +68,29 @@ class UDPTransceiver: public xf::Module
 	{
 		std::optional<Address>	rx_udp_address;
 		std::optional<Address>	tx_udp_address;
+		si::Time				bandwidth_measurement_interval	{ 1_s };
+		std::size_t				bandwidth_history_size			{ 300u };
+
 		// Whether to randomly interfere with transmitted data:
-		bool					rx_interference	{ false };
+		bool					rx_interference					{ false };
+
 		// Whether to randomly interfere with received data:
-		bool					tx_interference	{ false }; // TODO std::optional<float> tx_interference_probability;
+		bool					tx_interference					{ false }; // TODO std::optional<float> tx_interference_probability;
+	};
+
+	using Bandwidth = xf::BandwidthSampler::Bandwidth;
+
+	struct BandwidthSnapshot
+	{
+		std::vector<Bandwidth>	received_samples;
+		std::vector<Bandwidth>	transmitted_samples;
+	};
+
+	struct BandwidthAccounting
+	{
+		xf::BandwidthSampler	received_bandwidth;
+		xf::BandwidthSampler	transmitted_bandwidth;
+		std::size_t				pending_received_bytes	{ 0u };
 	};
 
   private:
@@ -74,9 +101,18 @@ class UDPTransceiver: public xf::Module
 	explicit
 	UDPTransceiver (xf::ProcessingLoop&, Parameters, nu::Logger const&, std::string_view const instance = {});
 
+	[[nodiscard]]
+	BandwidthSnapshot
+	bandwidth_snapshot() const;
+
 	// Module API
 	void
 	process (xf::Cycle const&) override;
+
+	// HasConfiguratorWidget API
+	[[nodiscard]]
+	QWidget*
+	configurator_widget() override;
 
   private slots:
 	/**
@@ -93,14 +129,17 @@ class UDPTransceiver: public xf::Module
 	interfere (QByteArray& blob);
 
   private:
-	Parameters						_parameters;
-	nu::Logger						_logger;
-	QByteArray						_received_datagram;
-	xf::SocketChanged				_send_changed	{ this->send };
-	QHostAddress					_tx_qhostaddress;
-	// Destroy first to disconnect signals:
-	std::unique_ptr<QUdpSocket>		_rx;
-	std::unique_ptr<QUdpSocket>		_tx;
+	Parameters					_parameters;
+	nu::Logger					_logger;
+	QByteArray					_received_datagram;
+	xf::SocketChanged			_send_changed	{ this->send };
+	QHostAddress				_tx_qhostaddress;
+	BandwidthAccounting			_bandwidth_accounting;
+	// Cached non-owning pointer; the host Qt container owns and deletes the widget.
+	QPointer<QWidget>			_configurator_widget;
+	// Last on list to be destroyed first to disconnect signals:
+	std::unique_ptr<QUdpSocket>	_rx;
+	std::unique_ptr<QUdpSocket>	_tx;
 };
 
 #endif

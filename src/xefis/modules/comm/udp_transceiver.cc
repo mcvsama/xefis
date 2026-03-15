@@ -13,6 +13,7 @@
 
 // Local:
 #include "udp_transceiver.h"
+#include "udp_transceiver_widget.h"
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -24,16 +25,28 @@
 #include <boost/endian/conversion.hpp>
 #include <gsl/gsl_util>
 
+// Qt:
+#include <QWidget>
+
 // Standard:
+#include <cmath>
 #include <cstddef>
 #include <memory>
 #include <random>
+#include <ranges>
+
+
+using namespace nu::si::literals;
 
 
 UDPTransceiver::UDPTransceiver (xf::ProcessingLoop& loop, Parameters const parameters, nu::Logger const& logger, std::string_view const instance):
 	Module (loop, instance),
 	_parameters (parameters),
-	_logger (logger.with_context (std::string (kLoggerScope) + "#" + instance))
+	_logger (logger.with_context (std::string (kLoggerScope) + "#" + instance)),
+	_bandwidth_accounting ({
+		.received_bandwidth = xf::BandwidthSampler ({ parameters.bandwidth_measurement_interval, parameters.bandwidth_history_size }),
+		.transmitted_bandwidth = xf::BandwidthSampler ({ parameters.bandwidth_measurement_interval, parameters.bandwidth_history_size }),
+	})
 {
 	if (_parameters.tx_udp_address)
 	{
@@ -53,9 +66,28 @@ UDPTransceiver::UDPTransceiver (xf::ProcessingLoop& loop, Parameters const param
 }
 
 
-void
-UDPTransceiver::process (xf::Cycle const&)
+UDPTransceiver::BandwidthSnapshot
+UDPTransceiver::bandwidth_snapshot() const
 {
+	return {
+		.received_samples = { std::from_range, _bandwidth_accounting.received_bandwidth.samples() },
+		.transmitted_samples = { std::from_range, _bandwidth_accounting.transmitted_bandwidth.samples() },
+	};
+}
+
+
+void
+UDPTransceiver::process (xf::Cycle const& cycle)
+{
+	_bandwidth_accounting.received_bandwidth.flush (cycle.update_time());
+	_bandwidth_accounting.transmitted_bandwidth.flush (cycle.update_time());
+
+	if (_bandwidth_accounting.pending_received_bytes > 0u)
+	{
+		_bandwidth_accounting.received_bandwidth.record_bytes (_bandwidth_accounting.pending_received_bytes, cycle.update_time());
+		_bandwidth_accounting.pending_received_bytes = 0u;
+	}
+
 	if (_tx && _parameters.tx_udp_address)
 	{
 		if (this->send)
@@ -66,21 +98,40 @@ UDPTransceiver::process (xf::Cycle const&)
 			if (_parameters.tx_interference)
 				interfere (blob);
 
-			_tx->writeDatagram (blob.data(), blob.size(), _tx_qhostaddress, _parameters.tx_udp_address->port);
+			auto const written = _tx->writeDatagram (blob.data(), blob.size(), _tx_qhostaddress, _parameters.tx_udp_address->port);
+
+			if (written > 0)
+				_bandwidth_accounting.transmitted_bandwidth.record_bytes (gsl::narrow<std::size_t> (written), cycle.update_time());
 		}
 	}
+}
+
+
+QWidget*
+UDPTransceiver::configurator_widget()
+{
+	if (!_configurator_widget)
+		_configurator_widget = new UDPTransceiverWidget (*this);
+
+	return _configurator_widget;
 }
 
 
 void
 UDPTransceiver::got_udp_packet()
 {
+	std::size_t received_bytes = 0u;
+
 	while (_rx->hasPendingDatagrams())
 	{
 		auto datagram_size = _rx->pendingDatagramSize();
 		_received_datagram.resize (datagram_size);
 		_rx->readDatagram (_received_datagram.data(), datagram_size, nullptr, nullptr);
+		received_bytes += gsl::narrow<std::size_t> (datagram_size);
 	}
+
+	if (received_bytes > 0u)
+		_bandwidth_accounting.pending_received_bytes += received_bytes;
 
 	if (_parameters.rx_interference)
 		interfere (_received_datagram);
