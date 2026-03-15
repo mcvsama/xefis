@@ -43,6 +43,104 @@ make_unit_body()
 }
 
 
+nu::AutoTest t_physical_body_tests ("rigid_body::Body: Physical behavior verification", []{
+	using namespace xf::rigid_body;
+
+	auto const mass_moments = MassMoments<BodyCOM> (100_kg, make_cuboid_inertia_tensor<BodyCOM> (100_kg, { 1_m, 1_m, 1_m }));
+	auto const different_mass_moments = MassMoments<BodyCOM> (200_kg, make_cuboid_inertia_tensor<BodyCOM> (200_kg, { 1_m, 1_m, 1_m }));
+
+	// Verify mass moment storage and retrieval:
+	Body test_body (mass_moments);
+	test_asserts::verify_equal_with_epsilon ("Body correctly stores mass",
+											 test_body.mass_moments<BodyCOM>().mass(),
+											 mass_moments.mass(),
+											 1e-12_kg);
+	test_asserts::verify_equal_with_epsilon ("Body correctly stores inertia tensor",
+											 test_body.mass_moments<BodyCOM>().inertia_tensor(),
+											 mass_moments.inertia_tensor(),
+											 1e-12_kgm2);
+
+	// Check translation:
+	SpaceLength<WorldSpace> translation { 10_m, 0_m, 0_m };
+	test_body.translate (translation);
+	test_asserts::verify_equal ("Body translates correctly", test_body.placement().position(), translation);
+
+	// Check setting velocity:
+	VelocityMoments<WorldSpace> velocity { { 5_mps, 0_mps, 0_mps }, { 0_radps, 0_radps, 0_radps } };
+	test_body.set_velocity_moments (velocity);
+	test_asserts::verify_equal_with_epsilon ("Body correctly stores velocity",
+											 test_body.velocity_moments<WorldSpace>().velocity(),
+											 velocity.velocity(),
+											 1e-12_mps);
+	test_asserts::verify_equal_with_epsilon ("Body correctly stores angular velocity",
+											 test_body.velocity_moments<WorldSpace>().angular_velocity(),
+											 velocity.angular_velocity(),
+											 1e-12_radps);
+
+	// Check impulse application (simple linear force):
+	ForceMoments<WorldSpace> impulse ({ 100_N, 0_N, 0_N }, { 0_Nm, 0_Nm, 0_Nm });
+	test_body.apply_impulse (impulse);
+	test_asserts::verify_equal_with_epsilon ("Impulse force is applied correctly",
+											 test_body.external_force_moments<WorldSpace>().force(),
+											 impulse.force(),
+											 1e-12_N);
+	test_asserts::verify_equal_with_epsilon ("Impulse torque is applied correctly",
+											 test_body.external_force_moments<WorldSpace>().torque(),
+											 impulse.torque(),
+											 1e-12_Nm);
+
+	// Check reset of applied impulses:
+	test_body.reset_applied_impulses();
+	test_asserts::verify_equal_with_epsilon ("Applied impulse force is reset",
+											 test_body.external_force_moments<WorldSpace>().force(),
+											 SpaceForce<WorldSpace> { 0_N, 0_N, 0_N },
+											 1e-12_N);
+	test_asserts::verify_equal_with_epsilon ("Applied impulse torque is reset",
+											 test_body.external_force_moments<WorldSpace>().torque(),
+											 SpaceTorque<WorldSpace> { 0_Nm, 0_Nm, 0_Nm },
+											 1e-12_Nm);
+
+	// Verify rotation about center-of-mass:
+	auto const rotation = quaternion_rotation_about<WorldSpace> ({ 0.0, 1.0, 0.0 }, 90_deg);
+	test_body.rotate_about_center_of_mass (rotation);
+	test_asserts::verify_equal_with_epsilon ("Rotation about center-of-mass updates placement",
+											 to_rotation_vector (test_body.placement().body_rotation()),
+											 to_rotation_vector (rotation),
+											 1e-12_rad);
+
+	// Verify impulse applied at offset position (torque generation):
+	SpaceLength<WorldSpace> force_position { 1_m, 0_m, 0_m };
+	test_body.apply_impulse (impulse, force_position);
+	test_asserts::verify ("Impulse applied at offset generates torque", abs (test_body.external_force_moments<WorldSpace>().torque()) > 0_Nm);
+
+	// Verify kinetic energy calculation:
+	si::Energy kinetic_energy = test_body.translational_kinetic_energy() + test_body.rotational_kinetic_energy();
+	test_asserts::verify ("Kinetic energy is positive", kinetic_energy > 0_J);
+
+	// Simulate time evolution:
+	si::Energy const initial_kinetic_energy = kinetic_energy;
+	test_body.evolve (1_s);
+	si::Energy const final_kinetic_energy = test_body.translational_kinetic_energy() + test_body.rotational_kinetic_energy();
+	test_asserts::verify_equal_with_epsilon ("Kinetic energy is conserved", initial_kinetic_energy, final_kinetic_energy, 1e-12_J);
+
+	// Verify setting new mass moments:
+	test_body.set_mass_moments (different_mass_moments);
+	test_asserts::verify_equal_with_epsilon ("New mass is stored correctly",
+											 test_body.mass_moments<BodyCOM>().mass(),
+											 different_mass_moments.mass(),
+											 1e-12_kg);
+	test_asserts::verify_equal_with_epsilon ("New inertia tensor is stored correctly",
+											 test_body.mass_moments<BodyCOM>().inertia_tensor(),
+											 different_mass_moments.inertia_tensor(),
+											 1e-12_kgm2);
+
+	// Verify breaking the body:
+	test_asserts::verify ("Body is initially not broken", !test_body.broken());
+	test_body.set_broken();
+	test_asserts::verify ("Body is marked as broken", test_body.broken());
+});
+
+
 // Verify origin/placement transforms:
 nu::AutoTest t_origin ("rigid_body::Body: origin transforms", []{
 	auto body = make_unit_body();
@@ -61,6 +159,124 @@ nu::AutoTest t_origin ("rigid_body::Body: origin transforms", []{
 });
 
 
+// Verify origin/placement transforms:
+nu::AutoTest t_rotations ("rigid_body::Body: rotations", []{
+	auto body = make_unit_body();
+	auto origin_placement = Placement<BodyCOM, BodyOrigin>();
+	origin_placement.set_position ({ 1_m, 0_m, 0_m });
+	body->set_origin_placement (origin_placement);
+	body->move_to (SpaceLength<WorldSpace> (2_m, 3_m, 4_m));
+
+	auto const rotation = z_rotation<WorldSpace> (90_deg);
+	auto const inverse_rotation = z_rotation<WorldSpace> (-90_deg);
+
+	test_asserts::verify_equal ("initial COM", body->placement().position(), SpaceLength<WorldSpace> (2_m, 3_m, 4_m));
+	test_asserts::verify_equal ("initial origin", body->origin<WorldSpace>(), SpaceLength<WorldSpace> (3_m, 3_m, 4_m));
+
+	body->rotate_about_center_of_mass (rotation);
+	test_asserts::verify_equal_with_epsilon ("rotation about COM keeps COM fixed",
+											 body->placement().position(),
+											 SpaceLength<WorldSpace> (2_m, 3_m, 4_m),
+											 1e-12_m);
+	test_asserts::verify_equal_with_epsilon ("rotation about COM rotates origin around COM",
+											 body->origin<WorldSpace>(),
+											 SpaceLength<WorldSpace> (2_m, 4_m, 4_m),
+											 1e-12_m);
+	test_asserts::verify_equal_with_epsilon ("rotation about COM updates body rotation",
+											 to_rotation_vector (body->placement().body_rotation()),
+											 to_rotation_vector (rotation),
+											 1e-12_rad);
+
+	body->rotate_about_center_of_mass (inverse_rotation);
+	test_asserts::verify_equal_with_epsilon ("inverse COM rotation restores COM",
+											 body->placement().position(),
+											 SpaceLength<WorldSpace> (2_m, 3_m, 4_m),
+											 1e-12_m);
+	test_asserts::verify_equal_with_epsilon ("inverse COM rotation restores origin",
+											 body->origin<WorldSpace>(),
+											 SpaceLength<WorldSpace> (3_m, 3_m, 4_m),
+											 1e-12_m);
+	test_asserts::verify_equal_with_epsilon ("inverse COM rotation restores body rotation",
+											 to_rotation_vector (body->placement().body_rotation()),
+											 SpaceVector<si::Angle, WorldSpace> { 0_rad, 0_rad, 0_rad },
+											 1e-12_rad);
+
+	body->rotate_about_body_origin (rotation);
+	test_asserts::verify_equal_with_epsilon ("rotation about body origin moves COM around origin",
+											 body->placement().position(),
+											 SpaceLength<WorldSpace> (3_m, 2_m, 4_m),
+											 1e-12_m);
+	test_asserts::verify_equal_with_epsilon ("rotation about body origin keeps origin fixed",
+											 body->origin<WorldSpace>(),
+											 SpaceLength<WorldSpace> (3_m, 3_m, 4_m),
+											 1e-12_m);
+	test_asserts::verify_equal_with_epsilon ("rotation about body origin updates body rotation",
+											 to_rotation_vector (body->placement().body_rotation()),
+											 to_rotation_vector (rotation),
+											 1e-12_rad);
+
+	body->rotate_about_body_origin (inverse_rotation);
+	test_asserts::verify_equal_with_epsilon ("inverse body-origin rotation restores COM",
+											 body->placement().position(),
+											 SpaceLength<WorldSpace> (2_m, 3_m, 4_m),
+											 1e-12_m);
+	test_asserts::verify_equal_with_epsilon ("inverse body-origin rotation restores origin",
+											 body->origin<WorldSpace>(),
+											 SpaceLength<WorldSpace> (3_m, 3_m, 4_m),
+											 1e-12_m);
+	test_asserts::verify_equal_with_epsilon ("inverse body-origin rotation restores body rotation",
+											 to_rotation_vector (body->placement().body_rotation()),
+											 SpaceVector<si::Angle, WorldSpace> { 0_rad, 0_rad, 0_rad },
+											 1e-12_rad);
+
+	body->rotate_about_world_origin (rotation);
+	test_asserts::verify_equal_with_epsilon ("rotation about world origin rotates COM around world origin",
+											 body->placement().position(),
+											 SpaceLength<WorldSpace> (-3_m, 2_m, 4_m),
+											 1e-12_m);
+	test_asserts::verify_equal_with_epsilon ("rotation about world origin rotates origin around world origin",
+											 body->origin<WorldSpace>(),
+											 SpaceLength<WorldSpace> (-3_m, 3_m, 4_m),
+											 1e-12_m);
+	test_asserts::verify_equal_with_epsilon ("rotation about world origin updates body rotation",
+											 to_rotation_vector (body->placement().body_rotation()),
+											 to_rotation_vector (rotation),
+											 1e-12_rad);
+
+	body->rotate_about_world_origin (inverse_rotation);
+	test_asserts::verify_equal_with_epsilon ("inverse world-origin rotation restores COM",
+											 body->placement().position(),
+											 SpaceLength<WorldSpace> (2_m, 3_m, 4_m),
+											 1e-12_m);
+	test_asserts::verify_equal_with_epsilon ("inverse world-origin rotation restores origin",
+											 body->origin<WorldSpace>(),
+											 SpaceLength<WorldSpace> (3_m, 3_m, 4_m),
+											 1e-12_m);
+	test_asserts::verify_equal_with_epsilon ("inverse world-origin rotation restores body rotation",
+											 to_rotation_vector (body->placement().body_rotation()),
+											 SpaceVector<si::Angle, WorldSpace> { 0_rad, 0_rad, 0_rad },
+											 1e-12_rad);
+
+	body->move_to (SpaceLength<WorldSpace> (10_m, 20_m, 30_m));
+	test_asserts::verify_equal ("move_to sets COM position", body->placement().position(), SpaceLength<WorldSpace> (10_m, 20_m, 30_m));
+	test_asserts::verify_equal ("move_to keeps origin offset", body->origin<WorldSpace>(), SpaceLength<WorldSpace> (11_m, 20_m, 30_m));
+
+	origin_placement.set_position ({ 0_m, 2_m, 0_m });
+	body->set_origin_placement (origin_placement);
+	test_asserts::verify_equal ("set_origin_placement changes world-space origin", body->origin<WorldSpace>(), SpaceLength<WorldSpace> (10_m, 22_m, 30_m));
+
+	body->rotate_about_center_of_mass (rotation);
+	test_asserts::verify_equal_with_epsilon ("updated origin placement rotates around COM",
+											 body->origin<WorldSpace>(),
+											 SpaceLength<WorldSpace> (8_m, 20_m, 30_m),
+											 1e-12_m);
+	test_asserts::verify_equal_with_epsilon ("updated origin placement still keeps COM fixed",
+											 body->placement().position(),
+											 SpaceLength<WorldSpace> (10_m, 20_m, 30_m),
+											 1e-12_m);
+});
+
+
 // Verify kinetic energy:
 nu::AutoTest t_energy ("rigid_body::Body: kinetic energy", []{
 	auto body = make_unit_body();
@@ -74,16 +290,6 @@ nu::AutoTest t_energy ("rigid_body::Body: kinetic energy", []{
 
 	test_asserts::verify ("translational energy positive", e_trans > 0_J);
 	test_asserts::verify ("rotational energy positive", e_rot > 0_J);
-});
-
-
-// Verify broken flag:
-nu::AutoTest t_broken ("rigid_body::Body: broken flag", []{
-	auto body = make_unit_body();
-	test_asserts::verify ("initially not broken", !body->broken());
-
-	body->set_broken();
-	test_asserts::verify ("body marked broken", body->broken());
 });
 
 
