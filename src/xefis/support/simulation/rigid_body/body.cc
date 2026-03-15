@@ -73,7 +73,7 @@ Body::rotate_about_center_of_mass (RotationQuaternion<WorldSpace> const& rotatio
 	_velocity_moments = rotation * _velocity_moments;
 	_acceleration_moments = rotation * _acceleration_moments;
 
-	_world_space_applied_impulses.reset();
+	invalidate_placement_dependent_caches();
 }
 
 
@@ -84,7 +84,7 @@ Body::rotate_about_world_origin (RotationQuaternion<WorldSpace> const& rotation)
 	_velocity_moments = rotation * _velocity_moments;
 	_acceleration_moments = rotation * _acceleration_moments;
 
-	_world_space_applied_impulses.reset();
+	invalidate_placement_dependent_caches();
 }
 
 
@@ -97,7 +97,7 @@ Body::rotate_about_body_origin (RotationQuaternion<WorldSpace> const& rotation)
 	_velocity_moments = rotation * _velocity_moments;
 	_acceleration_moments = rotation * _acceleration_moments;
 
-	_world_space_applied_impulses.reset();
+	invalidate_placement_dependent_caches();
 }
 
 

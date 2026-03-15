@@ -25,6 +25,7 @@
 // Standard:
 #include <cmath>
 #include <cstddef>
+#include <string>
 
 
 namespace xf::test {
@@ -345,6 +346,47 @@ nu::AutoTest t_body_rotate_about_updates_rotated_state ("rigid_body::Body: rotat
 											 rotated_world_mass_moments.inertia_tensor(),
 											 expected_world_mass_moments.inertia_tensor(),
 											 1e-12_kgm2);
+});
+
+
+nu::AutoTest t_body_specific_rotations_refresh_world_mass_moments_cache ("rigid_body::Body: specific rotations refresh world mass moments cache", []{
+	auto verify_rotation = [] (std::string const& label, auto&& rotate) {
+		auto const mass = 2_kg;
+		auto const inertia_at_com = make_cuboid_inertia_tensor<BodyCOM> (mass, { 1_m, 2_m, 3_m });
+		auto body = rb::Body (MassMoments<BodyCOM> (mass, inertia_at_com));
+
+		auto origin_placement = Placement<BodyCOM, BodyOrigin>();
+		origin_placement.set_position ({ 1_m, 0_m, 0_m });
+		body.set_origin_placement (origin_placement);
+		body.move_to (SpaceLength<WorldSpace> { 2_m, 3_m, 4_m });
+
+		auto const cached_world_mass_moments = body.mass_moments<WorldSpace>();
+		auto const rotation = z_rotation<WorldSpace> (90_deg);
+
+		rotate (body, rotation);
+
+		auto const rotated_world_mass_moments = body.mass_moments<WorldSpace>();
+		auto const expected_world_mass_moments = body.placement().rotate_to_base (body.mass_moments<BodyCOM>());
+
+		test_asserts::verify (label + ": world inertia cache is refreshed",
+							  abs (cached_world_mass_moments.inertia_tensor()[0, 0] - rotated_world_mass_moments.inertia_tensor()[0, 0]) > 1e-12_kgm2);
+		test_asserts::verify_equal_with_epsilon (label + ": world inertia matches rotated body inertia",
+												 rotated_world_mass_moments.inertia_tensor(),
+												 expected_world_mass_moments.inertia_tensor(),
+												 1e-12_kgm2);
+	};
+
+	verify_rotation ("rotate_about_center_of_mass", [] (rb::Body& body, auto const& rotation) {
+		body.rotate_about_center_of_mass (rotation);
+	});
+
+	verify_rotation ("rotate_about_world_origin", [] (rb::Body& body, auto const& rotation) {
+		body.rotate_about_world_origin (rotation);
+	});
+
+	verify_rotation ("rotate_about_body_origin", [] (rb::Body& body, auto const& rotation) {
+		body.rotate_about_body_origin (rotation);
+	});
 });
 
 
