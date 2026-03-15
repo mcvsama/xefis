@@ -81,3 +81,8 @@ declarations as opposed to definitions.
 * All const-methods should be read-only-thread-safe.
   Remember when using "mutable" members in objects, or when mutating any other (global or not) state from
   const method. Use `std::atomic<>`, `nu::Synchronized<>` to help.
+
+### SI types
+
+* Don't downcast everything to `double` with `value.in<si::Unit>()`, just work with values directly for
+  additions/multiplications.
