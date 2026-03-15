@@ -545,6 +545,7 @@ MIHAU.modules[xefis].products[autotest].sources				+= xefis/support/simulation/e
 MIHAU.modules[xefis].products[autotest].sources				+= xefis/support/simulation/failure/tests/sigmoidal_temperature_failure.test.cc
 MIHAU.modules[xefis].products[autotest].sources				+= xefis/support/simulation/rigid_body/tests/body.test.cc
 MIHAU.modules[xefis].products[autotest].sources				+= xefis/support/simulation/rigid_body/tests/group.test.cc
+MIHAU.modules[xefis].products[autotest].sources				+= xefis/support/simulation/rigid_body/tests/precessions.test.cc
 MIHAU.modules[xefis].products[autotest].sources				+= xefis/support/simulation/rigid_body/tests/simulation.test.cc
 MIHAU.modules[xefis].products[autotest].sources				+= xefis/support/simulation/rigid_body/tests/system.test.cc
 MIHAU.modules[xefis].products[autotest].sources				+= xefis/support/sockets/tests/socket_observer.test.cc
