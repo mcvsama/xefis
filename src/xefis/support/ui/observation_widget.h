@@ -99,9 +99,17 @@ class ObservationWidget: public QWidget
 		VelocityMoments<WorldSpace> velocity_moments;
 	};
 
-	struct ConstraintForcesVariables
+	struct ConstraintVariables
 	{
-		rigid_body::ConstraintForces constraint_forces;
+		bool						enabled				{ false };
+		bool						broken				{ false };
+		std::optional<si::Force>	breaking_force;
+		std::optional<si::Torque>	breaking_torque;
+		double						baumgarte_factor	{ 0.0 };
+		double						cfm_factor			{ 0.0 };
+		double						friction_factor		{ 0.0 };
+		std::optional<rigid_body::ConstraintForces>
+									constraint_forces;
 	};
 
 	struct AerodynamicVariables
@@ -185,7 +193,7 @@ class ObservationWidget: public QWidget
 	add_velocity_observables();
 
 	void
-	add_constraint_forces_observables();
+	add_constraint_observables();
 
 	void
 	add_specific_observables();
@@ -216,7 +224,7 @@ class ObservationWidget: public QWidget
 	fetch_velocity_values();
 
 	void
-	fetch_constraint_forces_values();
+	fetch_constraint_values();
 
 	void
 	fetch_specific_values();
@@ -259,7 +267,7 @@ class ObservationWidget: public QWidget
 	std::unique_ptr<BasicVariables>				_basic_variables;
 	std::unique_ptr<PositionVariables>			_position_variables;
 	std::unique_ptr<VelocityVariables>			_velocity_variables;
-	std::unique_ptr<ConstraintForcesVariables>	_constraint_forces_variables;
+	std::unique_ptr<ConstraintVariables>		_constraint_variables;
 	std::unique_ptr<AerodynamicVariables>		_aerodynamic_variables;
 };
 

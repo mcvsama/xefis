@@ -31,6 +31,15 @@
 
 
 namespace xf {
+namespace {
+
+std::string
+format_bool (bool const value)
+{
+	return value ? "yes" : "no";
+}
+
+} // namespace
 
 ObservationWidgetGroup::ObservationWidgetGroup (ObservationWidget& widget, QGridLayout& layout):
 	_widget (&widget),
@@ -116,7 +125,7 @@ ObservationWidget::ObservationWidget (rigid_body::Constraint* constraint):
 
 	if (_constraint)
 	{
-		add_constraint_forces_observables();
+		add_constraint_observables();
 		add_specific_observables();
 	}
 }
@@ -202,21 +211,53 @@ ObservationWidget::add_velocity_observables()
 
 
 void
-ObservationWidget::add_constraint_forces_observables()
+ObservationWidget::add_constraint_observables()
 {
-	_constraint_forces_variables = std::make_unique<ConstraintForcesVariables>();
+	auto const g = make_getter_maker (_constraint_variables);
 
+	auto group_1 = add_group();
+	group_1.add_observable ("Enabled", g ([](ConstraintVariables const& properties) {
+		return format_bool (properties.enabled);
+	}));
+	group_1.add_observable ("Broken", g ([](ConstraintVariables const& properties) {
+		return format_bool (properties.broken);
+	}));
+	group_1.add_observable ("Breaking force", g ([](ConstraintVariables const& properties) {
+		return properties.breaking_force ? nu::format_unit (*properties.breaking_force, 6) : "–";
+	}));
+	group_1.add_observable ("Breaking torque", g ([](ConstraintVariables const& properties) {
+		return properties.breaking_torque ? nu::format_unit (properties.breaking_torque->in<si::NewtonMeter>(), 6, "Nm") : "–";
+	}));
+
+	auto group_2 = add_group();
+	group_2.add_observable ("Baumgarte factor", g ([](ConstraintVariables const& properties) {
+		return std::format ("{:.6f}", properties.baumgarte_factor);
+	}));
+	group_2.add_observable ("CFM factor", g ([](ConstraintVariables const& properties) {
+		return std::format ("{:.6f}", properties.cfm_factor);
+	}));
+	group_2.add_observable ("Friction factor", g ([](ConstraintVariables const& properties) {
+		return std::format ("{:.6f}", properties.friction_factor);
+	}));
+
+	// Constraint forces:
 	for (std::size_t body_index = 0; body_index < 2; ++body_index)
 	{
-		auto const g = make_getter_maker (_constraint_forces_variables);
+		auto const g = make_getter_maker (_constraint_variables);
 		auto const force_getter = [body_index, g] (std::size_t axis) {
-			return g ([body_index, axis] (ConstraintForcesVariables const& cf_vars) {
-				return nu::format_unit (cf_vars.constraint_forces[body_index].force()[axis], 6);
+			return g ([body_index, axis] (ConstraintVariables const& constraint_vars) {
+				if (!constraint_vars.constraint_forces)
+					return std::string ("–");
+
+				return nu::format_unit ((*constraint_vars.constraint_forces)[body_index].force()[axis], 6);
 			});
 		};
 		auto const torque_getter = [body_index, g] (std::size_t axis) {
-			return g ([body_index, axis] (ConstraintForcesVariables const& cf_vars) {
-				return nu::format_unit (cf_vars.constraint_forces[body_index].torque()[axis].in<si::NewtonMeter>(), 6, "Nm");
+			return g ([body_index, axis] (ConstraintVariables const& constraint_vars) {
+				if (!constraint_vars.constraint_forces)
+					return std::string ("–");
+
+				return nu::format_unit ((*constraint_vars.constraint_forces)[body_index].torque()[axis].in<si::NewtonMeter>(), 6, "Nm");
 			});
 		};
 
@@ -225,15 +266,21 @@ ObservationWidget::add_constraint_forces_observables()
 		group.add_observable ("Force X", force_getter (0));
 		group.add_observable ("Force Y", force_getter (1));
 		group.add_observable ("Force Z", force_getter (2));
-		group.add_observable ("‖Force‖", g ([body_index] (ConstraintForcesVariables const& cf_vars) {
-			return nu::format_unit (abs (cf_vars.constraint_forces[body_index].force()), 6);
+		group.add_observable ("‖Force‖", g ([body_index] (ConstraintVariables const& constraint_vars) {
+			if (!constraint_vars.constraint_forces)
+				return std::string ("–");
+
+			return nu::format_unit (abs ((*constraint_vars.constraint_forces)[body_index].force()), 6);
 		}));
 
 		group.add_observable ("Torque X", torque_getter (0));
 		group.add_observable ("Torque Y", torque_getter (1));
 		group.add_observable ("Torque Z", torque_getter (2));
-		group.add_observable ("‖Torque‖", g ([body_index] (ConstraintForcesVariables const& cf_vars) {
-			return nu::format_unit (abs (cf_vars.constraint_forces[body_index].torque()).in<si::NewtonMeter>(), 6, "Nm");
+		group.add_observable ("‖Torque‖", g ([body_index] (ConstraintVariables const& constraint_vars) {
+			if (!constraint_vars.constraint_forces)
+				return std::string ("–");
+
+			return nu::format_unit (abs ((*constraint_vars.constraint_forces)[body_index].torque()).in<si::NewtonMeter>(), 6, "Nm");
 		}));
 	}
 }
@@ -323,7 +370,7 @@ ObservationWidget::fetch_values()
 	fetch_basic_values();
 	fetch_position_values();
 	fetch_velocity_values();
-	fetch_constraint_forces_values();
+	fetch_constraint_values();
 	fetch_specific_values();
 }
 
@@ -392,24 +439,24 @@ ObservationWidget::fetch_velocity_values()
 
 
 void
-ObservationWidget::fetch_constraint_forces_values()
+ObservationWidget::fetch_constraint_values()
 {
 	if (_constraint)
 	{
-		auto optional_forces = _constraint->previous_computation_constraint_forces();
+		if (!_constraint_variables)
+			_constraint_variables = std::make_unique<ConstraintVariables>();
 
-		if (optional_forces)
-		{
-			if (!_constraint_forces_variables)
-				_constraint_forces_variables = std::make_unique<ConstraintForcesVariables>();
-
-			_constraint_forces_variables->constraint_forces = *optional_forces;
-		}
-		else
-			_constraint_forces_variables.reset();
+		_constraint_variables->enabled = _constraint->enabled();
+		_constraint_variables->broken = _constraint->broken();
+		_constraint_variables->breaking_force = _constraint->breaking_force();
+		_constraint_variables->breaking_torque = _constraint->breaking_torque();
+		_constraint_variables->baumgarte_factor = _constraint->baumgarte_factor();
+		_constraint_variables->cfm_factor = _constraint->constraint_force_mixing_factor();
+		_constraint_variables->friction_factor = _constraint->friction_factor();
+		_constraint_variables->constraint_forces = _constraint->previous_computation_constraint_forces();
 	}
 	else
-		_constraint_forces_variables.reset();
+		_constraint_variables.reset();
 }
 
 
