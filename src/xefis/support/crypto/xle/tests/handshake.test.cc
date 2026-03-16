@@ -32,6 +32,7 @@ namespace test_asserts = nu::test_asserts;
 
 using xf::crypto::xle::HandshakeID;
 using xf::crypto::xle::HandshakeMaster;
+using xf::crypto::xle::HandshakeRequestMode;
 using xf::crypto::xle::HandshakeSlave;
 
 
@@ -234,6 +235,29 @@ nu::AutoTest t6 ("Xefis Lossy Encryption/Handshake: mismatched handshake IDs", [
 	}
 
 	test_asserts::verify ("invalid-handshake-id is signalled", thrown_invalid_handshake_id);
+});
+
+
+nu::AutoTest t7 ("Xefis Lossy Encryption/Handshake: request mode is authenticated", []{
+	auto rnd = std::random_device ("hw");
+	HandshakeMaster master (rnd, params);
+	HandshakeSlave slave (rnd, params, {});
+
+	auto tampered_master_handshake = master.generate_handshake_blob (nu::utc_now(), HandshakeRequestMode::Standby);
+	tampered_master_handshake[24] = static_cast<uint8_t> (HandshakeRequestMode::Immediate);
+
+	bool thrown_wrong_signature = false;
+
+	try {
+		auto const slave_handshake_and_key [[maybe_unused]] = slave.generate_handshake_blob_and_key (tampered_master_handshake, nu::utc_now());
+	}
+	catch (xf::crypto::xle::HandshakeSlave::Exception const& exception)
+	{
+		test_asserts::verify ("correct error is signalled", exception.error_code() == HandshakeSlave::ErrorCode::WrongSignature);
+		thrown_wrong_signature = true;
+	}
+
+	test_asserts::verify ("tampered request mode is rejected", thrown_wrong_signature);
 });
 
 } // namespace

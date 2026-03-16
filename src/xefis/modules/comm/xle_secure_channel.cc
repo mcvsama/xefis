@@ -46,6 +46,19 @@ static thread_local std::random_device transceiver_rnd ("hw");
 } // namespace global
 
 
+[[nodiscard]]
+static HandshakeSlave
+make_handshake_slave (SecureChannel::CryptoParams const& params, HandshakeSlave::KeyCheckFunctions const key_check_callbacks)
+{
+	return HandshakeSlave (global::transceiver_rnd, {
+		.master_signature_key = params.master_signature_key,
+		.slave_signature_key = params.slave_signature_key,
+		.hmac_size = params.hmac_size,
+		.max_time_difference = params.max_time_difference,
+	}, key_check_callbacks);
+}
+
+
 SecureChannel::SecureChannel (Role const role, size_t ciphertext_expansion, nu::Logger const& logger):
 	_role (role),
 	_logger (logger),
@@ -180,14 +193,14 @@ SecureChannel::role_name() const
 }
 
 
-MasterSecureChannel::Session::HandshakeRequested::HandshakeRequested (CryptoParams const& params):
+MasterSecureChannel::Session::HandshakeRequested::HandshakeRequested (CryptoParams const& params, HandshakeRequestMode const request_mode):
 	handshake_master (global::transceiver_rnd, {
 		.master_signature_key = params.master_signature_key,
 		.slave_signature_key = params.slave_signature_key,
 		.hmac_size = params.hmac_size,
 		.max_time_difference = params.max_time_difference,
 	}),
-	handshake_request (handshake_master.generate_handshake_blob (nu::utc_now()))
+	handshake_request (handshake_master.generate_handshake_blob (nu::utc_now(), request_mode))
 { }
 
 
@@ -213,10 +226,10 @@ MasterSecureChannel::Session::Connected::Connected (nu::Secure<Blob> const& ephe
 { }
 
 
-MasterSecureChannel::Session::Session (CryptoParams const& params):
+MasterSecureChannel::Session::Session (CryptoParams const& params, HandshakeRequestMode const request_mode):
 	SecureChannel::Session ("M", _id_generator),
 	_crypto_params (params),
-	_state (std::in_place_type_t<HandshakeRequested>(), params)
+	_state (std::in_place_type_t<HandshakeRequested>(), params, request_mode)
 {
 	_session_prepared_future = _session_prepared_promise.get_future();
 	_session_activated_future = _session_activated_promise.get_future();
@@ -312,9 +325,9 @@ MasterSecureChannel::MasterSecureChannel (xf::ProcessingLoop& loop, CryptoParams
 
 
 MasterSecureChannel::StartHandshakeResult
-MasterSecureChannel::start_handshake()
+MasterSecureChannel::start_handshake (HandshakeRequestMode const mode)
 {
-	_next_session_candidate = std::make_unique<Session> (_crypto_params);
+	_next_session_candidate = std::make_unique<Session> (_crypto_params, mode);
 	this->handshake_request = nu::to_string (_next_session_candidate->handshake_request());
 
 	return {
@@ -371,6 +384,9 @@ MasterSecureChannel::shift_sessions()
 		_active_session = std::move (_next_session_candidate);
 		this->handshake_request = xf::nil;
 		_active_session->set_activated();
+
+		if (_keep_next_handshake_ready)
+			start_handshake (HandshakeRequestMode::Standby);
 	}
 }
 
@@ -380,12 +396,7 @@ SlaveSecureChannel::Session::Session (Blob const& handshake_request,
 									  HandshakeSlave::KeyCheckFunctions const key_check_callbacks):
 	SecureChannel::Session ("S", _id_generator)
 {
-	auto handshake_slave = HandshakeSlave (global::transceiver_rnd, {
-		.master_signature_key = params.master_signature_key,
-		.slave_signature_key = params.slave_signature_key,
-		.hmac_size = params.hmac_size,
-		.max_time_difference = params.max_time_difference,
-	}, key_check_callbacks);
+	auto handshake_slave = make_handshake_slave (params, key_check_callbacks);
 	auto const response_and_key = handshake_slave.generate_handshake_blob_and_key (handshake_request, nu::utc_now());
 	_handshake_response = response_and_key.handshake_response;
 	_transmitter.emplace (global::transceiver_rnd, Transmitter::Params {
@@ -445,10 +456,25 @@ void
 SlaveSecureChannel::process (Cycle const&)
 {
 	try {
-		if (_handshake_request_changed.value_changed() && this->handshake_request.valid())
+		bool const handshake_request_changed = _handshake_request_changed.value_changed();
+		bool const should_recheck_retained_handshake = !ready() && !connecting();
+
+		if (this->handshake_request.valid() &&
+			(handshake_request_changed || should_recheck_retained_handshake))
 		{
-			_next_session_candidate = std::make_unique<Session> (nu::to_blob (*this->handshake_request), _crypto_params, _key_check_functions);
-			this->handshake_response = nu::to_string (*_next_session_candidate->handshake_response());
+			auto handshake_slave = make_handshake_slave (_crypto_params, _key_check_functions);
+			auto const request_mode = handshake_slave.handshake_request_mode (nu::to_blob (*this->handshake_request));
+			bool const should_consume_standby_handshake = (request_mode == HandshakeRequestMode::Standby) && !ready() && !connecting();
+			bool const should_consume_request_now = handshake_request_changed || should_consume_standby_handshake;
+
+			if (should_consume_request_now)
+			{
+				if (request_mode != HandshakeRequestMode::Standby || !ready())
+				{
+					_next_session_candidate = std::make_unique<Session> (nu::to_blob (*this->handshake_request), _crypto_params, _key_check_functions);
+					this->handshake_response = nu::to_string (*_next_session_candidate->handshake_response());
+				}
+			}
 		}
 	}
 	catch (...)

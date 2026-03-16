@@ -188,7 +188,7 @@ class GroundToAirLinkProtocol: public LinkProtocol
 							.signature_bytes	= 4,
 							.key				= { 0xaa, 0xaa },
 							.packets			= {
-								socket<256> (io.handshake_request, { .retained = false, .transfer = StringTransfer::Segmented }),
+								socket<264> (io.handshake_request, { .retained = false, .transfer = StringTransfer::Segmented }),
 							},
 						}),
 					},
@@ -627,71 +627,75 @@ nu::AutoTest t5 ("modules/io/link: protocol: send-every/send-offset", []{
 
 
 nu::AutoTest t6 ("modules/io/link: protocol: encrypted channel works", []{
-	TestProcessingLoop loop (0.1_s);
-	Ground_Tx_Data ground_tx_data (loop);
-	Ground_Rx_Data ground_rx_data (loop);
-	Air_Tx_Data air_tx_data (loop);
-	Air_Rx_Data air_rx_data (loop);
-
-	auto ground_transceiver = get_ground_secure_channel (loop);
-	auto air_transceiver = get_air_secure_channel (loop);
-
-	auto ground_tx_protocol = std::make_unique<GroundToAirLinkProtocol> (ground_tx_data, &ground_transceiver);
-	auto ground_rx_protocol = std::make_unique<AirToGroundLinkProtocol> (ground_rx_data, &ground_transceiver);
-	auto air_tx_protocol = std::make_unique<AirToGroundLinkProtocol> (air_tx_data, &air_transceiver);
-	auto air_rx_protocol = std::make_unique<GroundToAirLinkProtocol> (air_rx_data, &air_transceiver);
-
-	auto ground_tx_link = LinkEncoder (loop, std::move (ground_tx_protocol), { .send_frequency = 30_Hz }, g_logger.with_context ("ground-tx-link"), "ground/tx-link");
-	auto ground_rx_link = LinkDecoder (loop, std::move (ground_rx_protocol), {}, g_logger.with_context ("ground-rx-link"), "ground/rx-link");
-	auto air_tx_link = LinkEncoder (loop, std::move (air_tx_protocol), { .send_frequency = 30_Hz }, g_logger.with_context ("air-tx-link"), "air/tx-link");
-	auto air_rx_link = LinkDecoder (loop, std::move (air_rx_protocol), {}, g_logger.with_context ("air-rx-link"), "air/rx-link");
-
-	ground_tx_data.handshake_request << ground_transceiver.handshake_request;
-	ground_transceiver.handshake_response << ground_rx_data.handshake_response;
-
-	air_transceiver.handshake_request << air_rx_data.handshake_request;
-	air_tx_data.handshake_response << air_transceiver.handshake_response;
-
-	air_rx_link.encoded_input << ground_tx_link.encoded_output;
-	ground_rx_link.encoded_input << air_tx_link.encoded_output;
-
-	auto [session_prepared, session_activated] = ground_transceiver.start_handshake();
-	auto constexpr kMaxCycles = 6u;
-
-	for (size_t cycles = 0; !nu::ready (session_prepared) && !nu::ready (session_activated); ++cycles)
+	for (auto keep_next_handshake_ready: { false, true })
 	{
-		test_asserts::verify (std::format ("handshake completes in {} cycles", cycles), cycles < kMaxCycles);
-		loop.next_cycle();
+		TestProcessingLoop loop (0.1_s);
+		Ground_Tx_Data ground_tx_data (loop);
+		Ground_Rx_Data ground_rx_data (loop);
+		Air_Tx_Data air_tx_data (loop);
+		Air_Rx_Data air_rx_data (loop);
+
+		auto ground_transceiver = get_ground_secure_channel (loop);
+		ground_transceiver.set_keep_next_handshake_ready (keep_next_handshake_ready);
+		auto air_transceiver = get_air_secure_channel (loop);
+
+		auto ground_tx_protocol = std::make_unique<GroundToAirLinkProtocol> (ground_tx_data, &ground_transceiver);
+		auto ground_rx_protocol = std::make_unique<AirToGroundLinkProtocol> (ground_rx_data, &ground_transceiver);
+		auto air_tx_protocol = std::make_unique<AirToGroundLinkProtocol> (air_tx_data, &air_transceiver);
+		auto air_rx_protocol = std::make_unique<GroundToAirLinkProtocol> (air_rx_data, &air_transceiver);
+
+		auto ground_tx_link = LinkEncoder (loop, std::move (ground_tx_protocol), { .send_frequency = 30_Hz }, g_logger.with_context ("ground-tx-link"), "ground/tx-link");
+		auto ground_rx_link = LinkDecoder (loop, std::move (ground_rx_protocol), {}, g_logger.with_context ("ground-rx-link"), "ground/rx-link");
+		auto air_tx_link = LinkEncoder (loop, std::move (air_tx_protocol), { .send_frequency = 30_Hz }, g_logger.with_context ("air-tx-link"), "air/tx-link");
+		auto air_rx_link = LinkDecoder (loop, std::move (air_rx_protocol), {}, g_logger.with_context ("air-rx-link"), "air/rx-link");
+
+		ground_tx_data.handshake_request << ground_transceiver.handshake_request;
+		ground_transceiver.handshake_response << ground_rx_data.handshake_response;
+
+		air_transceiver.handshake_request << air_rx_data.handshake_request;
+		air_tx_data.handshake_response << air_transceiver.handshake_response;
+
+		air_rx_link.encoded_input << ground_tx_link.encoded_output;
+		ground_rx_link.encoded_input << air_tx_link.encoded_output;
+
+		auto [session_prepared, session_activated] = ground_transceiver.start_handshake();
+		auto constexpr kMaxCycles = 6u;
+
+		for (size_t cycles = 0; !nu::ready (session_prepared) && !nu::ready (session_activated); ++cycles)
+		{
+			test_asserts::verify (std::format ("handshake completes in {} cycles", cycles), cycles < kMaxCycles);
+			loop.next_cycle();
+		}
+
+		// Test data transmission in both directions:
+		loop.next_cycles (5);
+
+		// Ground to air encryption:
+		{
+			auto const u = nu::to_blob ("hello!");
+			auto const e = ground_transceiver.encrypt_packet (u);
+			auto const d = air_transceiver.decrypt_packet (e);
+
+			test_asserts::verify ("encryption works from ground to air using transceivers directly", d == u);
+		}
+
+		// Air to ground encryption:
+		{
+			auto const u = nu::to_blob ("hello back!");
+			auto const e = air_transceiver.encrypt_packet (u);
+			auto const d = ground_transceiver.decrypt_packet (e);
+
+			test_asserts::verify ("encryption works from air to ground using transceivers directly", d == u);
+		}
+
+		// Test data transmission in both directions, after directly using
+		// transceivers:
+		loop.next_cycles (5);
+
+		ground_tx_data.string_prop << "abc123";
+		loop.next_cycles (1);
+		test_asserts::verify ("data transmitted properly", ground_tx_data.string_prop == air_rx_data.string_prop);
 	}
-
-	// Test data transmission in both directions:
-	loop.next_cycles (5);
-
-	// Ground to air encryption:
-	{
-		auto const u = nu::to_blob ("hello!");
-		auto const e = ground_transceiver.encrypt_packet (u);
-		auto const d = air_transceiver.decrypt_packet (e);
-
-		test_asserts::verify ("encryption works from ground to air using transceivers directly", d == u);
-	}
-
-	// Air to ground encryption:
-	{
-		auto const u = nu::to_blob ("hello back!");
-		auto const e = air_transceiver.encrypt_packet (u);
-		auto const d = ground_transceiver.decrypt_packet (e);
-
-		test_asserts::verify ("encryption works from air to ground using transceivers directly", d == u);
-	}
-
-	// Test data transmission in both directions, after directly using
-	// transceivers:
-	loop.next_cycles (5);
-
-	ground_tx_data.string_prop << "abc123";
-	loop.next_cycles (1);
-	test_asserts::verify ("data transmitted properly", ground_tx_data.string_prop == air_rx_data.string_prop);
 });
 
 
@@ -798,97 +802,102 @@ nu::AutoTest t8 ("modules/io/link/helpers: inputs->outputs, vector modules", []{
 
 
 nu::AutoTest t9 ("modules/io/link: protocol: encrypted channel recovers after master restart", []{
-	TestProcessingLoop air_loop (0.1_s);
-	Air_Tx_Data air_tx_data (air_loop);
-	Air_Rx_Data air_rx_data (air_loop);
-
-	auto air_transceiver = get_air_secure_channel (air_loop);
-	auto air_tx_protocol = std::make_unique<AirToGroundLinkProtocol> (air_tx_data, &air_transceiver);
-	auto air_rx_protocol = std::make_unique<GroundToAirLinkProtocol> (air_rx_data, &air_transceiver);
-	auto air_tx_link = std::make_unique<LinkEncoder> (air_loop, std::move (air_tx_protocol), LinkEncoder::Parameters { .send_frequency = 30_Hz }, g_logger.with_context ("air-tx-link"), "air/tx-link");
-	auto air_rx_link = std::make_unique<LinkDecoder> (air_loop, std::move (air_rx_protocol), LinkDecoder::Parameters {}, g_logger.with_context ("air-rx-link"), "air/rx-link");
-
-	struct GroundSide
+	for (auto keep_next_handshake_ready: { false, true })
 	{
-		TestProcessingLoop							loop;
-		Ground_Tx_Data								tx_data;
-		Ground_Rx_Data								rx_data;
-		xle::MasterSecureChannel					transceiver;
-		std::unique_ptr<GroundToAirLinkProtocol>	tx_protocol;
-		std::unique_ptr<AirToGroundLinkProtocol>	rx_protocol;
-		LinkEncoder									tx_link;
-		LinkDecoder									rx_link;
+		TestProcessingLoop air_loop (0.1_s);
+		Air_Tx_Data air_tx_data (air_loop);
+		Air_Rx_Data air_rx_data (air_loop);
 
-		explicit
-		GroundSide():
-			loop (0.1_s),
-			tx_data (loop),
-			rx_data (loop),
-			transceiver (get_ground_secure_channel (loop)),
-			tx_protocol (std::make_unique<GroundToAirLinkProtocol> (tx_data, &transceiver)),
-			rx_protocol (std::make_unique<AirToGroundLinkProtocol> (rx_data, &transceiver)),
-			tx_link (loop, std::move (tx_protocol), LinkEncoder::Parameters { .send_frequency = 30_Hz }, g_logger.with_context ("ground-tx-link"), "ground/tx-link"),
-			rx_link (loop, std::move (rx_protocol), LinkDecoder::Parameters {}, g_logger.with_context ("ground-rx-link"), "ground/rx-link")
-		{ }
-	};
+		auto air_transceiver = get_air_secure_channel (air_loop);
+		auto air_tx_protocol = std::make_unique<AirToGroundLinkProtocol> (air_tx_data, &air_transceiver);
+		auto air_rx_protocol = std::make_unique<GroundToAirLinkProtocol> (air_rx_data, &air_transceiver);
+		auto air_tx_link = std::make_unique<LinkEncoder> (air_loop, std::move (air_tx_protocol), LinkEncoder::Parameters { .send_frequency = 30_Hz }, g_logger.with_context ("air-tx-link"), "air/tx-link");
+		auto air_rx_link = std::make_unique<LinkDecoder> (air_loop, std::move (air_rx_protocol), LinkDecoder::Parameters {}, g_logger.with_context ("air-rx-link"), "air/rx-link");
 
-	air_transceiver.handshake_request << air_rx_data.handshake_request;
-	air_tx_data.handshake_response << air_transceiver.handshake_response;
-
-	auto exchange_packets = [&] (GroundSide& ground_side) {
-		if (ground_side.tx_link.encoded_output)
-			air_rx_link->encoded_input << *ground_side.tx_link.encoded_output;
-		else
-			air_rx_link->encoded_input << xf::no_data_source;
-
-		if (air_tx_link->encoded_output)
-			ground_side.rx_link.encoded_input << *air_tx_link->encoded_output;
-		else
-			ground_side.rx_link.encoded_input << xf::no_data_source;
-	};
-
-	auto establish_link = [&] (GroundSide& ground_side, std::string_view const context) {
-		ground_side.tx_data.handshake_request << ground_side.transceiver.handshake_request;
-		ground_side.transceiver.handshake_response << ground_side.rx_data.handshake_response;
-
-		auto const [session_prepared, session_activated] = ground_side.transceiver.start_handshake();
-
-		for (size_t cycles = 0; !nu::ready (session_prepared) || !nu::ready (session_activated); ++cycles)
+		struct GroundSide
 		{
-			test_asserts::verify (std::format ("{}: handshake completes in {} cycles", context, cycles), cycles < 20u);
-			ground_side.loop.next_cycle();
-			air_loop.next_cycle();
-			exchange_packets (ground_side);
-		}
+			TestProcessingLoop							loop;
+			Ground_Tx_Data								tx_data;
+			Ground_Rx_Data								rx_data;
+			xle::MasterSecureChannel					transceiver;
+			std::unique_ptr<GroundToAirLinkProtocol>	tx_protocol;
+			std::unique_ptr<AirToGroundLinkProtocol>	rx_protocol;
+			LinkEncoder									tx_link;
+			LinkDecoder									rx_link;
 
-		for (size_t i = 0; i < 3; ++i)
-		{
-			ground_side.loop.next_cycle();
-			air_loop.next_cycle();
-			exchange_packets (ground_side);
-		}
+			explicit
+			GroundSide (bool const keep_next_handshake_ready):
+				loop (0.1_s),
+				tx_data (loop),
+				rx_data (loop),
+				transceiver (get_ground_secure_channel (loop)),
+				tx_protocol (std::make_unique<GroundToAirLinkProtocol> (tx_data, &transceiver)),
+				rx_protocol (std::make_unique<AirToGroundLinkProtocol> (rx_data, &transceiver)),
+				tx_link (loop, std::move (tx_protocol), LinkEncoder::Parameters { .send_frequency = 30_Hz }, g_logger.with_context ("ground-tx-link"), "ground/tx-link"),
+				rx_link (loop, std::move (rx_protocol), LinkDecoder::Parameters {}, g_logger.with_context ("ground-rx-link"), "ground/rx-link")
+			{
+				transceiver.set_keep_next_handshake_ready (keep_next_handshake_ready);
+			}
+		};
 
-		ground_side.tx_data.string_prop << std::string (context);
-		air_tx_data.int_prop << 123;
+		air_transceiver.handshake_request << air_rx_data.handshake_request;
+		air_tx_data.handshake_response << air_transceiver.handshake_response;
 
-		for (size_t i = 0; i < 2; ++i)
-		{
-			ground_side.loop.next_cycle();
-			air_loop.next_cycle();
-			exchange_packets (ground_side);
-		}
+		auto exchange_packets = [&] (GroundSide& ground_side) {
+			if (ground_side.tx_link.encoded_output)
+				air_rx_link->encoded_input << *ground_side.tx_link.encoded_output;
+			else
+				air_rx_link->encoded_input << xf::no_data_source;
 
-		test_asserts::verify (std::format ("{}: ground-to-air data transmitted", context), ground_side.tx_data.string_prop == air_rx_data.string_prop);
-		test_asserts::verify (std::format ("{}: air-to-ground data transmitted", context), air_tx_data.int_prop == ground_side.rx_data.int_prop);
-	};
+			if (air_tx_link->encoded_output)
+				ground_side.rx_link.encoded_input << *air_tx_link->encoded_output;
+			else
+				ground_side.rx_link.encoded_input << xf::no_data_source;
+		};
 
-	auto ground_side = std::make_unique<GroundSide>();
-	establish_link (*ground_side, "initial session");
+		auto establish_link = [&] (GroundSide& ground_side, std::string_view const context) {
+			ground_side.tx_data.handshake_request << ground_side.transceiver.handshake_request;
+			ground_side.transceiver.handshake_response << ground_side.rx_data.handshake_response;
 
-	ground_side.reset();
+			auto const [session_prepared, session_activated] = ground_side.transceiver.start_handshake();
 
-	ground_side = std::make_unique<GroundSide>();
-	establish_link (*ground_side, "after master restart");
+			for (size_t cycles = 0; !nu::ready (session_prepared) || !nu::ready (session_activated); ++cycles)
+			{
+				test_asserts::verify (std::format ("{}: handshake completes in {} cycles", context, cycles), cycles < 20u);
+				ground_side.loop.next_cycle();
+				air_loop.next_cycle();
+				exchange_packets (ground_side);
+			}
+
+			for (size_t i = 0; i < 3; ++i)
+			{
+				ground_side.loop.next_cycle();
+				air_loop.next_cycle();
+				exchange_packets (ground_side);
+			}
+
+			ground_side.tx_data.string_prop << std::string (context);
+			air_tx_data.int_prop << 123;
+
+			for (size_t i = 0; i < 2; ++i)
+			{
+				ground_side.loop.next_cycle();
+				air_loop.next_cycle();
+				exchange_packets (ground_side);
+			}
+
+			test_asserts::verify (std::format ("{}: ground-to-air data transmitted", context), ground_side.tx_data.string_prop == air_rx_data.string_prop);
+			test_asserts::verify (std::format ("{}: air-to-ground data transmitted", context), air_tx_data.int_prop == ground_side.rx_data.int_prop);
+		};
+
+		auto ground_side = std::make_unique<GroundSide> (keep_next_handshake_ready);
+		establish_link (*ground_side, "initial session");
+
+		ground_side.reset();
+
+		ground_side = std::make_unique<GroundSide> (keep_next_handshake_ready);
+		establish_link (*ground_side, "after master restart");
+	}
 });
 
 } // namespace

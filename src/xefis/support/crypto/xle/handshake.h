@@ -34,6 +34,17 @@ namespace xf::crypto::xle {
 
 using HandshakeID = uint64_t;
 
+
+enum class HandshakeRequestMode: uint8_t
+{
+	// Tells the slave to use the handshake immediately, even if a session is already active:
+	Immediate	= 0x01,
+
+	// Keep for slave restart recovery; use only when disconnected.
+	Standby		= 0x02,
+};
+
+
 /**
  * Generates/parses handshake blobs and computes final ephemeral key from
  * the handshake for master and slave ends. The resulting ephemeral key from
@@ -58,6 +69,7 @@ class Handshake
 	 *     salt (8 B)
 	 *     handshake_id (8 B)
 	 *     unix_timestamp_ms (8 B)
+	 *     request_mode (1 B)
 	 *     dhe_exchange (variable size)
 	 *     signature (_hmac_size B)
 	 * }
@@ -65,9 +77,10 @@ class Handshake
 	class MasterHandshake
 	{
 	  public:
-		HandshakeID	handshake_id;
-		uint64_t	unix_timestamp_ms;
-		Blob		dhe_exchange_blob;
+		HandshakeID				handshake_id;
+		uint64_t				unix_timestamp_ms;
+		HandshakeRequestMode	request_mode;
+		Blob					dhe_exchange_blob;
 	};
 
 	/**
@@ -138,7 +151,7 @@ class HandshakeMaster: public Handshake
 	 */
 	[[nodiscard]]
 	Blob
-	generate_handshake_blob (si::Time unix_timestamp);
+	generate_handshake_blob (si::Time unix_timestamp, HandshakeRequestMode = HandshakeRequestMode::Immediate);
 
 	/**
 	 * Return the ephemeral key to use for encryption.
@@ -216,14 +229,21 @@ class HandshakeSlave: public Handshake
 	HandshakeAndKey
 	generate_handshake_blob_and_key (BlobView master_handshake_blob, si::Time unix_timestamp);
 
+	/**
+	 * Parse the handshake request and tell its HandshakeRequestMode.
+	 */
+	HandshakeRequestMode
+	handshake_request_mode (BlobView);
+
+  private:
+	[[nodiscard]]
+	MasterHandshake
+	parse_and_verify_master_handshake_blob (BlobView);
+
   private:
 	[[nodiscard]]
 	Blob
 	make_slave_handshake_blob (SlaveHandshake const&);
-
-	[[nodiscard]]
-	MasterHandshake
-	parse_and_verify_master_handshake_blob (BlobView);
 
   private:
 	KeyCheckFunctions _key_check_callbacks;

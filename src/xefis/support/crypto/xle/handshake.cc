@@ -42,7 +42,7 @@ Handshake::Handshake (std::random_device& random_device, Params const& params):
 
 
 Blob
-HandshakeMaster::generate_handshake_blob (si::Time const unix_timestamp)
+HandshakeMaster::generate_handshake_blob (si::Time const unix_timestamp, HandshakeRequestMode const request_mode)
 {
 	using HandshakeIDLimits = std::numeric_limits<HandshakeID>;
 
@@ -50,9 +50,10 @@ HandshakeMaster::generate_handshake_blob (si::Time const unix_timestamp)
 	_handshake_id = handshake_id_distribution (_random_device);
 
 	return make_master_handshake_blob ({
-		.handshake_id = _handshake_id,
-		.unix_timestamp_ms = nu::round_to<uint64_t> (unix_timestamp.in<si::Millisecond>()),
-		.dhe_exchange_blob = _dhe_exchange.generate_exchange_blob(),
+		.handshake_id		= _handshake_id,
+		.unix_timestamp_ms	= nu::round_to<uint64_t> (unix_timestamp.in<si::Millisecond>()),
+		.request_mode		= request_mode,
+		.dhe_exchange_blob	= _dhe_exchange.generate_exchange_blob(),
 	});
 }
 
@@ -73,7 +74,11 @@ HandshakeMaster::make_master_handshake_blob (MasterHandshake const& master_hands
 {
 	Blob const salt = nu::random_blob (8, _random_device);
 	Blob const handshake_id_blob = nu::to_blob (master_handshake.handshake_id);
-	Blob const handshake_data = salt + handshake_id_blob + nu::to_blob (master_handshake.unix_timestamp_ms) + master_handshake.dhe_exchange_blob;
+	Blob const handshake_data = salt +
+		handshake_id_blob +
+		nu::to_blob (master_handshake.unix_timestamp_ms) +
+		Blob { static_cast<uint8_t> (master_handshake.request_mode) } +
+		master_handshake.dhe_exchange_blob;
 	Blob const signature = nu::compute_hmac<kHashAlgorithm> ({ .data = handshake_data, .key = *_master_signature_key }).substr (0, _hmac_size);
 
 	return handshake_data + signature;
@@ -150,23 +155,19 @@ HandshakeSlave::generate_handshake_blob_and_key (BlobView const master_handshake
 }
 
 
-Blob
-HandshakeSlave::make_slave_handshake_blob (SlaveHandshake const& slave_handshake)
+HandshakeRequestMode
+HandshakeSlave::handshake_request_mode (BlobView const master_handshake)
 {
-	Blob const salt = nu::random_blob (8, _random_device);
-	Blob const handshake_id_blob = nu::to_blob (slave_handshake.handshake_id);
-	Blob const handshake_data = salt + handshake_id_blob + nu::to_blob (slave_handshake.unix_timestamp_ms) + slave_handshake.dhe_exchange_blob;
-	Blob const signature = nu::compute_hmac<kHashAlgorithm> ({ .data = handshake_data, .key = *_slave_signature_key }).substr (0, _hmac_size);
-
-	return handshake_data + signature;
+	auto const parsed = parse_and_verify_master_handshake_blob (master_handshake);
+	return parsed.request_mode;
 }
 
 
 Handshake::MasterHandshake
 HandshakeSlave::parse_and_verify_master_handshake_blob (BlobView const master_handshake)
 {
-	// Skip salt, handshake_id and timestamp:
-	BlobView const extracted_dhe_exchange_blob_and_signature = master_handshake.substr (24);
+	// Skip salt, handshake_id, timestamp and request mode:
+	BlobView const extracted_dhe_exchange_blob_and_signature = master_handshake.substr (25);
 	BlobView extracted_dhe_exchange_blob = extracted_dhe_exchange_blob_and_signature;
 	BlobView extracted_signature = extracted_dhe_exchange_blob_and_signature;
 	extracted_dhe_exchange_blob.remove_suffix (_hmac_size);
@@ -178,12 +179,32 @@ HandshakeSlave::parse_and_verify_master_handshake_blob (BlobView const master_ha
 	MasterHandshake extracted;
 	extracted.handshake_id = nu::parse<decltype (extracted.handshake_id)> (master_handshake.substr (8, 8));
 	extracted.unix_timestamp_ms = nu::parse<decltype (extracted.unix_timestamp_ms)> (master_handshake.substr (16, 8));
+	extracted.request_mode = static_cast<HandshakeRequestMode> (master_handshake.at (24));
 	extracted.dhe_exchange_blob = extracted_dhe_exchange_blob;
 
 	if (extracted_signature != computed_signature)
 		throw Exception (ErrorCode::WrongSignature, "wrong signature");
 
-	return extracted;
+	switch (extracted.request_mode)
+	{
+		case HandshakeRequestMode::Immediate:
+		case HandshakeRequestMode::Standby:
+			return extracted;
+	}
+
+	throw Exception (ErrorCode::WrongSignature, "invalid handshake request mode");
+}
+
+
+Blob
+HandshakeSlave::make_slave_handshake_blob (SlaveHandshake const& slave_handshake)
+{
+	Blob const salt = nu::random_blob (8, _random_device);
+	Blob const handshake_id_blob = nu::to_blob (slave_handshake.handshake_id);
+	Blob const handshake_data = salt + handshake_id_blob + nu::to_blob (slave_handshake.unix_timestamp_ms) + slave_handshake.dhe_exchange_blob;
+	Blob const signature = nu::compute_hmac<kHashAlgorithm> ({ .data = handshake_data, .key = *_slave_signature_key }).substr (0, _hmac_size);
+
+	return handshake_data + signature;
 }
 
 } // namespace xf::crypto::xle

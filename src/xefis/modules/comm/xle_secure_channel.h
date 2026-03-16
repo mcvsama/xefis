@@ -347,7 +347,7 @@ class MasterSecureChannel:
 
 			// Ctor
 			explicit
-			HandshakeRequested (CryptoParams const&);
+			HandshakeRequested (CryptoParams const&, HandshakeRequestMode);
 		};
 
 		/**
@@ -366,7 +366,7 @@ class MasterSecureChannel:
 
 		// Ctor
 		explicit
-		Session (CryptoParams const&);
+		Session (CryptoParams const&, HandshakeRequestMode);
 
 		// Dtor
 		~Session();
@@ -476,13 +476,17 @@ class MasterSecureChannel:
 	explicit
 	MasterSecureChannel (xf::ProcessingLoop&, CryptoParams const&, nu::Logger const&, std::string_view const instance = {});
 
+	void
+	set_keep_next_handshake_ready (bool const enabled) noexcept
+		{ _keep_next_handshake_ready = enabled; }
+
 	/**
 	 * Perform a handshake.
 	 * Same effect can be achieved by using start_handshake_button input socket.
 	 *
 	 */
 	StartHandshakeResult
-	start_handshake();
+	start_handshake (HandshakeRequestMode = HandshakeRequestMode::Immediate);
 
 	/**
 	 * Disconnect active connection if connected.
@@ -557,6 +561,7 @@ class MasterSecureChannel:
 	std::unique_ptr<Session>			_previous_session;
 	std::unique_ptr<Session>			_active_session;
 	std::unique_ptr<Session>			_next_session_candidate;
+	bool								_keep_next_handshake_ready		{ true };
 };
 
 

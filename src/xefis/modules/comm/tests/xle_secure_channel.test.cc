@@ -100,6 +100,7 @@ AutoTestT1::auto_test_t1()
 		// then slave.process().
 		auto slave = xle::SlaveSecureChannel (loop, crypto_params, {}, TestProcessingLoop::logger);
 		auto master = xle::MasterSecureChannel (loop, crypto_params, TestProcessingLoop::logger);
+		master.set_keep_next_handshake_ready (false);
 
 		slave.handshake_request << master.handshake_request;
 		master.handshake_response << slave.handshake_response;
@@ -575,6 +576,7 @@ auto_test_t2()
 	auto loop = TestProcessingLoop (0.01_s);
 	auto slave = xle::SlaveSecureChannel (loop, crypto_params, {}, TestProcessingLoop::logger);
 	auto master = xle::MasterSecureChannel (loop, crypto_params, TestProcessingLoop::logger);
+	master.set_keep_next_handshake_ready (false);
 
 	slave.handshake_request << std::function (make_random_loss ("master → slave")) << master.handshake_request;
 	master.handshake_response << std::function (make_random_loss ("slave → master")) << slave.handshake_response;
@@ -639,7 +641,125 @@ auto_test_t2()
 }
 
 
+void
+auto_test_t3()
+{
+	auto loop = TestProcessingLoop (0.01_s);
+	auto slave = xle::SlaveSecureChannel (loop, crypto_params, {}, TestProcessingLoop::logger);
+	auto master = xle::MasterSecureChannel (loop, crypto_params, TestProcessingLoop::logger);
+
+	slave.handshake_request << master.handshake_request;
+	master.handshake_response << slave.handshake_response;
+
+	auto const [session_prepared, session_activated] = master.start_handshake();
+
+	do {
+		loop.next_cycles (2);
+	} while (!nu::ready (session_prepared));
+
+	static auto const p1 = nu::to_blob ("(master → slave) restart message");
+	static auto const p2 = nu::to_blob ("(slave → master) restart message");
+
+	do {
+		loop.next_cycles (2);
+
+		auto const e1 = master.encrypt_packet (p1);
+		auto const d1 = slave.decrypt_packet (e1);
+		auto const e2 = slave.encrypt_packet (p2);
+		auto const d2 = master.decrypt_packet (e2);
+
+		test_asserts::verify ("master → slave communication works during initial handshake activation", d1 == p1);
+		test_asserts::verify ("slave → master communication works during initial handshake activation", d2 == p2);
+	} while (!nu::ready (session_activated));
+
+	session_prepared.get();
+	session_activated.get();
+
+	test_asserts::verify ("master keeps standby handshake ready", master.handshake_request && !master.handshake_request->empty());
+	test_asserts::verify ("slave ignores standby handshake while connected", slave.handshake_response.is_nil());
+	test_asserts::verify ("slave does not prepare next session while connected", !slave.connecting());
+
+	auto const previous_master_tx_key_hash = master.tx_key_hash();
+	auto const previous_slave_tx_key_hash = slave.tx_key_hash();
+
+	slave.disconnect();
+
+	do {
+		loop.next_cycles (2);
+	} while (slave.handshake_response.is_nil());
+
+	auto const e1 = master.encrypt_packet (p1);
+	auto const d1 = slave.decrypt_packet (e1);
+	auto const e2 = slave.encrypt_packet (p2);
+	auto const d2 = master.decrypt_packet (e2);
+
+	test_asserts::verify ("master → slave communication works after slave restart", d1 == p1);
+	test_asserts::verify ("slave → master communication works after slave restart", d2 == p2);
+	test_asserts::verify ("master switches to a new key after slave restart", master.tx_key_hash() != previous_master_tx_key_hash);
+	test_asserts::verify ("slave switches to a new key after slave restart", slave.tx_key_hash() != previous_slave_tx_key_hash);
+}
+
+
+void
+auto_test_t4()
+{
+	auto loop = TestProcessingLoop (0.01_s);
+	auto slave = xle::SlaveSecureChannel (loop, crypto_params, {}, TestProcessingLoop::logger);
+	auto master = xle::MasterSecureChannel (loop, crypto_params, TestProcessingLoop::logger);
+
+	slave.handshake_request << master.handshake_request;
+	master.handshake_response << slave.handshake_response;
+
+	auto const activate_session = [&] (std::shared_future<void> const& session_prepared, std::shared_future<void> const& session_activated, std::string_view const phase) {
+		do {
+			loop.next_cycles (2);
+		} while (!nu::ready (session_prepared));
+
+		static auto const p1 = nu::to_blob ("(master → slave) immediate rekey message");
+		static auto const p2 = nu::to_blob ("(slave → master) immediate rekey message");
+
+		do {
+			loop.next_cycles (2);
+
+			auto const e1 = master.encrypt_packet (p1);
+			auto const d1 = slave.decrypt_packet (e1);
+			auto const e2 = slave.encrypt_packet (p2);
+			auto const d2 = master.decrypt_packet (e2);
+
+			test_asserts::verify (std::format ("{}: master → slave communication works", phase), d1 == p1);
+			test_asserts::verify (std::format ("{}: slave → master communication works", phase), d2 == p2);
+		} while (!nu::ready (session_activated));
+
+		session_prepared.get();
+		session_activated.get();
+	};
+
+	auto const first_session = master.start_handshake();
+	activate_session (first_session.session_prepared, first_session.session_activated, "initial session");
+
+	test_asserts::verify ("slave ignores standby handshake while connected before immediate rekey", slave.handshake_response.is_nil());
+
+	auto const previous_master_tx_key_hash = master.tx_key_hash();
+	auto const previous_slave_tx_key_hash = slave.tx_key_hash();
+
+	auto const immediate_rekey = master.start_handshake();
+
+	do {
+		loop.next_cycles (2);
+	} while (slave.handshake_response.is_nil() && !nu::ready (immediate_rekey.session_prepared));
+
+	test_asserts::verify ("slave responds to explicit immediate rekey while connected", slave.handshake_response && !slave.handshake_response->empty());
+
+	activate_session (immediate_rekey.session_prepared, immediate_rekey.session_activated, "immediate rekey");
+
+	test_asserts::verify ("master switches to a new key after immediate rekey", master.tx_key_hash() != previous_master_tx_key_hash);
+	test_asserts::verify ("slave switches to a new key after immediate rekey", slave.tx_key_hash() != previous_slave_tx_key_hash);
+}
+
+
 nu::AutoTest t1 ("Xefis Lossy Encryption/Protocol: handshaking gives correct keys", AutoTestT1::auto_test_t1);
 nu::AutoTest t2 ("Xefis Lossy Encryption/Protocol: handshaking eventually works even on lossy channel", auto_test_t2);
+nu::AutoTest t3 ("Xefis Lossy Encryption/Protocol: standby handshake survives slave restart", auto_test_t3);
+nu::AutoTest t4 ("Xefis Lossy Encryption/Protocol: immediate rekey overrides standby behavior", auto_test_t4);
 
 } // namespace xf::xle_secure_channel_test
