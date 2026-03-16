@@ -73,6 +73,14 @@ multi-line method directly in the class.
 If an argument isn't to be modified, it should be const. It's not necessary to use `const` on function/method
 declarations as opposed to definitions.
 
+### Member names
+
+Private member fields should use underscore as a prefix, but then it must not be followed by a capital letter.
+Public member fields should not use that underscore.
+
+When accessing member fields that don't have underscore, use `this->`. If there's an underscore, `this` can be skipped
+(underscore means it's a member anyway).
+
 ### Other
 
 * Beware of Argument-Dependent Lookup, put specializations into std in the same header as the class definition.
