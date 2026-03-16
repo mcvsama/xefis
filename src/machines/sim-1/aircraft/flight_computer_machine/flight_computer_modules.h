@@ -25,6 +25,7 @@
 #include <xefis/core/sockets/module_in.h>
 #include <xefis/core/sockets/module_out.h>
 #include <xefis/modules/comm/udp_transceiver_with_codec.h>
+#include <xefis/modules/helpers/mixer.h>
 #include <xefis/modules/systems/air_data_computer.h>
 
 // Standard:
@@ -50,11 +51,15 @@ class FlightComputerModules
 	sim1::FlightComputerToRadioData<xf::ModuleIn>		flight_computer_to_radio_data		{ _loop };
 	sim1::RadioToFlightComputerData<xf::ModuleOut>		radio_to_flight_computer_data		{ _loop };
 
-  public:
-	// TODO does it need to be public?
-	AirDataComputer air_data_computer { _loop, nullptr, _logger };
-
   private:
+	AirDataComputer _air_data_computer { _loop, nullptr, _logger };
+
+	Mixer<double> _pitch_control_mixer { _loop, _logger, "pitch control mixer" };
+
+	Mixer<double> _roll_control_mixer { _loop, _logger, "roll control mixer" };
+
+	Mixer<double> _yaw_control_mixer { _loop, _logger, "yaw control mixer" };
+
 	UDPTransceiverWithCodec _udp_link_to_hardware_machine {
 		_loop,
 		UDPTransceiver::Parameters {

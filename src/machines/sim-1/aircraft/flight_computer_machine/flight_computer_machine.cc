@@ -46,7 +46,6 @@ FlightComputerMachine::FlightComputerMachine (xf::Xefis& xefis,
 void
 FlightComputerMachine::connect_modules()
 {
-	// TODO
 }
 
 } // namespace sim1::aircraft
