@@ -1151,21 +1151,45 @@ template<uint16_t B, class V>
 
 					if (size == kNilStringSize)
 					{
-						if (!_recovered)
+						if (serial != _current_serial || !_recovered || _value)
 						{
+							_current_serial = serial;
+							_received_blocks.clear();
+							_recovered_string.clear();
 							_recovered = true;
 							_value.reset();
 						}
 					}
 					else
 					{
-						if (serial != _current_serial)
-						{
+						auto const num_blocks = (size > 0)
+							? (size - 1u) / block_size + 1u
+							: 0u;
+
+						if (block_number >= num_blocks && size > 0)
+							throw ParseError();
+
+						auto const bytes_to_copy = [=] -> std::size_t {
+							if (size == 0)
+								return 0u;
+
+							auto const bytes = (block_number < num_blocks - 1)
+								? std::size_t (block_size)
+								: size % block_size;
+
+							return bytes == 0
+								? std::size_t (block_size)
+								: bytes;
+						}();
+
+						auto const block_offset = std::size_t (block_number) * block_size;
+
+						auto reset_recovery = [&] {
 							_current_serial = serial;
 
 							if (size > 0)
 							{
-								_received_blocks.resize ((size - 1u) / block_size + 1u);
+								_received_blocks.resize (num_blocks);
 								std::ranges::fill (_received_blocks, false);
 								_recovered = false;
 								_recovered_string.resize (size);
@@ -1173,10 +1197,32 @@ template<uint16_t B, class V>
 							else
 							{
 								_received_blocks.clear();
+								_recovered_string.clear();
 								_recovered = true;
 								_value = "";
 							}
+						};
+
+						auto const fragment_differs_from = [&] (std::string const& string) {
+							return !std::equal (read_iterator, read_iterator + nu::to_signed (bytes_to_copy), string.begin() + nu::to_signed (block_offset));
+						};
+
+						if (serial != _current_serial)
+							reset_recovery();
+						else if (size == 0)
+						{
+							if (!_recovered || !_value || *_value != "")
+								reset_recovery();
 						}
+						else if (size != _recovered_string.size())
+							reset_recovery();
+						else if (_recovered)
+						{
+							if (fragment_differs_from (_recovered_string))
+								reset_recovery();
+						}
+						else if (_received_blocks[block_number] && fragment_differs_from (_recovered_string))
+							reset_recovery();
 
 						if (!_recovered)
 						{
@@ -1186,21 +1232,10 @@ template<uint16_t B, class V>
 							if (block_number >= _received_blocks.size())
 								throw ParseError();
 
-							// num_blocks will be at least 1:
-							auto const num_blocks = (size - 1u) / block_size + 1u;
-
 							if (!_received_blocks[block_number])
 							{
 								_received_blocks[block_number] = true;
-
-								auto bytes_to_copy = (block_number < num_blocks - 1)
-									? block_size
-									: size % block_size;
-
-								if (bytes_to_copy == 0)
-									bytes_to_copy = block_size;
-
-								std::copy (read_iterator, read_iterator + bytes_to_copy, &_recovered_string[block_number * block_size]);
+								std::copy (read_iterator, read_iterator + nu::to_signed (bytes_to_copy), &_recovered_string[block_offset]);
 
 								if (std::ranges::all_of (_received_blocks, [](bool value) { return value; }))
 								{

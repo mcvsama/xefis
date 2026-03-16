@@ -796,5 +796,100 @@ nu::AutoTest t8 ("modules/io/link/helpers: inputs->outputs, vector modules", []{
 	test_asserts::verify ("vector module 2 string nil", !rx2.string_prop);
 });
 
+
+nu::AutoTest t9 ("modules/io/link: protocol: encrypted channel recovers after master restart", []{
+	TestProcessingLoop air_loop (0.1_s);
+	Air_Tx_Data air_tx_data (air_loop);
+	Air_Rx_Data air_rx_data (air_loop);
+
+	auto air_transceiver = get_air_secure_channel (air_loop);
+	auto air_tx_protocol = std::make_unique<AirToGroundLinkProtocol> (air_tx_data, &air_transceiver);
+	auto air_rx_protocol = std::make_unique<GroundToAirLinkProtocol> (air_rx_data, &air_transceiver);
+	auto air_tx_link = std::make_unique<LinkEncoder> (air_loop, std::move (air_tx_protocol), LinkEncoder::Parameters { .send_frequency = 30_Hz }, g_logger.with_context ("air-tx-link"), "air/tx-link");
+	auto air_rx_link = std::make_unique<LinkDecoder> (air_loop, std::move (air_rx_protocol), LinkDecoder::Parameters {}, g_logger.with_context ("air-rx-link"), "air/rx-link");
+
+	struct GroundSide
+	{
+		TestProcessingLoop							loop;
+		Ground_Tx_Data								tx_data;
+		Ground_Rx_Data								rx_data;
+		xle::MasterSecureChannel					transceiver;
+		std::unique_ptr<GroundToAirLinkProtocol>	tx_protocol;
+		std::unique_ptr<AirToGroundLinkProtocol>	rx_protocol;
+		LinkEncoder									tx_link;
+		LinkDecoder									rx_link;
+
+		explicit
+		GroundSide():
+			loop (0.1_s),
+			tx_data (loop),
+			rx_data (loop),
+			transceiver (get_ground_secure_channel (loop)),
+			tx_protocol (std::make_unique<GroundToAirLinkProtocol> (tx_data, &transceiver)),
+			rx_protocol (std::make_unique<AirToGroundLinkProtocol> (rx_data, &transceiver)),
+			tx_link (loop, std::move (tx_protocol), LinkEncoder::Parameters { .send_frequency = 30_Hz }, g_logger.with_context ("ground-tx-link"), "ground/tx-link"),
+			rx_link (loop, std::move (rx_protocol), LinkDecoder::Parameters {}, g_logger.with_context ("ground-rx-link"), "ground/rx-link")
+		{ }
+	};
+
+	air_transceiver.handshake_request << air_rx_data.handshake_request;
+	air_tx_data.handshake_response << air_transceiver.handshake_response;
+
+	auto exchange_packets = [&] (GroundSide& ground_side) {
+		if (ground_side.tx_link.encoded_output)
+			air_rx_link->encoded_input << *ground_side.tx_link.encoded_output;
+		else
+			air_rx_link->encoded_input << xf::no_data_source;
+
+		if (air_tx_link->encoded_output)
+			ground_side.rx_link.encoded_input << *air_tx_link->encoded_output;
+		else
+			ground_side.rx_link.encoded_input << xf::no_data_source;
+	};
+
+	auto establish_link = [&] (GroundSide& ground_side, std::string_view const context) {
+		ground_side.tx_data.handshake_request << ground_side.transceiver.handshake_request;
+		ground_side.transceiver.handshake_response << ground_side.rx_data.handshake_response;
+
+		auto const [session_prepared, session_activated] = ground_side.transceiver.start_handshake();
+
+		for (size_t cycles = 0; !nu::ready (session_prepared) || !nu::ready (session_activated); ++cycles)
+		{
+			test_asserts::verify (std::format ("{}: handshake completes in {} cycles", context, cycles), cycles < 20u);
+			ground_side.loop.next_cycle();
+			air_loop.next_cycle();
+			exchange_packets (ground_side);
+		}
+
+		for (size_t i = 0; i < 3; ++i)
+		{
+			ground_side.loop.next_cycle();
+			air_loop.next_cycle();
+			exchange_packets (ground_side);
+		}
+
+		ground_side.tx_data.string_prop << std::string (context);
+		air_tx_data.int_prop << 123;
+
+		for (size_t i = 0; i < 2; ++i)
+		{
+			ground_side.loop.next_cycle();
+			air_loop.next_cycle();
+			exchange_packets (ground_side);
+		}
+
+		test_asserts::verify (std::format ("{}: ground-to-air data transmitted", context), ground_side.tx_data.string_prop == air_rx_data.string_prop);
+		test_asserts::verify (std::format ("{}: air-to-ground data transmitted", context), air_tx_data.int_prop == ground_side.rx_data.int_prop);
+	};
+
+	auto ground_side = std::make_unique<GroundSide>();
+	establish_link (*ground_side, "initial session");
+
+	ground_side.reset();
+
+	ground_side = std::make_unique<GroundSide>();
+	establish_link (*ground_side, "after master restart");
+});
+
 } // namespace
 } // namespace xf::test
