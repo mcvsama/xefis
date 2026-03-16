@@ -16,11 +16,13 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/logger.h>
 #include <xefis/core/module.h>
 #include <xefis/core/setting.h>
-#include <xefis/core/socket.h>
+#include <xefis/core/sockets/socket.h>
 #include <xefis/support/sockets/socket_value_changed.h>
+
+// Neutrino:
+#include <neutrino/logger.h>
 
 // Standard:
 #include <cstddef>
@@ -69,7 +71,7 @@ template<class pValue>
 	  public:
 		// Ctor
 		explicit
-		Mixer (nu::Logger const&, std::string_view const instance = {});
+		Mixer (xf::ProcessingLoop&, nu::Logger const&, std::string_view const instance = {});
 
 	  protected:
 		// Module API
@@ -81,7 +83,7 @@ template<class pValue>
 		process (xf::Cycle const&) override;
 
 	  private:
-		MixerIO&						_io					{ *this };
+		MixerIO<Value>&					_io					{ *this };
 		nu::Logger						_logger;
 		xf::SocketValueChanged<Value>	_input_a_changed	{ _io.input_a_value };
 		xf::SocketValueChanged<Value>	_input_b_changed	{ _io.input_b_value };
@@ -94,9 +96,9 @@ template<class pValue>
 
 
 template<class V>
-	Mixer<V>::Mixer (nu::Logger const& logger, std::string const& instance):
-		MixerIO<V> (instance),
-		_logger (logger.with_context (std::string (kLoggerScope) + "#" + instance))
+	Mixer<V>::Mixer (xf::ProcessingLoop& loop, nu::Logger const& logger, std::string_view const instance):
+		MixerIO<V> (loop, instance),
+		_logger (logger.with_context (std::string (kLoggerScope) + "#" + std::string (instance)))
 	{ }
 
 
@@ -104,7 +106,7 @@ template<class V>
 	void
 	Mixer<V>::initialize()
 	{
-		if (_io.setting_output_minimum && _io.setting_output_maximum && *_io.setting_output_minimum > *_io.setting_output_maximum)
+		if (_io.output_minimum && _io.output_maximum && *_io.output_minimum > *_io.output_maximum)
 			_logger << "Settings error: maximum value is less than the minimum value." << std::endl;
 	}
 
@@ -115,28 +117,28 @@ template<class V>
 	{
 		if (_input_a_changed.value_changed() || _input_b_changed.value_changed())
 		{
-			auto& a = input_a_value;
-			auto& b = input_b_value;
+			auto& a = _io.input_a_value;
+			auto& b = _io.input_b_value;
 
 			if (a || b)
 			{
 				Value sum{};
 
 				if (a)
-					sum += *_io.setting_input_a_factor * *a;
+					sum += *_io.input_a_factor * *a;
 				if (b)
-					sum += *_io.setting_input_b_factor * *b;
+					sum += *_io.input_b_factor * *b;
 
-				if (_io.setting_output_minimum && sum < *_io.setting_output_minimum)
-					sum = *setting_output_minimum;
+				if (_io.output_minimum && sum < *_io.output_minimum)
+					sum = *_io.output_minimum;
 
-				if (_io.setting_output_maximum && sum > *_io.setting_output_maximum)
-					sum = *setting_output_maximum;
+				if (_io.output_maximum && sum > *_io.output_maximum)
+					sum = *_io.output_maximum;
 
-				output_value = sum;
+				_io.output_value = sum;
 			}
 			else
-				output_value = xf::nil;
+				_io.output_value = xf::nil;
 		}
 	}
 
