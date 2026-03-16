@@ -25,6 +25,7 @@
 #include <neutrino/logger.h>
 
 // Standard:
+#include <algorithm>
 #include <cstddef>
 #include <optional>
 
@@ -217,7 +218,8 @@ class Constraint:
 		{ return _friction_factor; }
 
 	/**
-	 * Apply friction factor to simulate energy dissipation on the constraint.
+	 * Apply friction factor to damp constraint-space velocity correction and simulate
+	 * energy dissipation on the constraint.
 	 * The factor should be small, usually between 0.001 and 0.01 for realism.
 	 * By default it's 0.
 	 */
@@ -389,6 +391,15 @@ class Constraint:
 		ConstraintMassMatrix<N>&
 		apply_constraint_mixing_factor (ConstraintMassMatrix<N>&) const;
 
+	/**
+	 * Return the fraction of the constraint-space velocity correction that should
+	 * remain after applying friction damping.
+	 */
+	[[nodiscard]]
+	double
+	effective_velocity_correction_factor() const noexcept
+		{ return std::clamp (1.0 - _friction_factor, 0.0, 1.0); }
+
   private:
 	bool							_enabled						{ true };
 	bool							_broken							{ false };
@@ -396,7 +407,7 @@ class Constraint:
 	std::optional<si::Torque>		_breaking_torque;
 	double							_baumgarte_factor				{ kDefaultBaumgarteFactor };
 	ConstraintMassMatrix<0>::Scalar	_constraint_force_mixing_factor { 0.0 };
-	double							_friction_factor				{ 0.0 }; // TODO implement
+	double							_friction_factor				{ 0.0 };
 	std::optional<ConstraintForces>	_previous_computation_constraint_forces;
 };
 
@@ -483,8 +494,9 @@ template<std::size_t N>
 								si::Time const dt) const
 	{
 		auto const inv_dt = 1 / dt;
+		auto const damped_jacobian = effective_velocity_correction_factor() * J;
 		auto const stabilization_bias = baumgarte_factor() * inv_dt * position_error;
-		return -inv_dt * inv (K) * (J + stabilization_bias);
+		return -inv_dt * inv (K) * (damped_jacobian + stabilization_bias);
 	}
 
 
@@ -496,8 +508,9 @@ template<std::size_t N>
 								si::Time const dt) const
 	{
 		auto const inv_dt = 1 / dt;
+		auto const damped_jacobian = effective_velocity_correction_factor() * J;
 		auto const stabilization_bias = baumgarte_factor() * inv_dt * position_error;
-		return Z * (J + stabilization_bias);
+		return Z * (damped_jacobian + stabilization_bias);
 	}
 
 

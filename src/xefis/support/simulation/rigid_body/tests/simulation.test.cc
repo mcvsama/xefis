@@ -16,6 +16,8 @@
 #include <xefis/support/math/transforms.h>
 #include <xefis/support/nature/constants.h>
 #include <xefis/support/nature/mass_moments.h>
+#include <xefis/support/nature/various_inertia_tensors.h>
+#include <xefis/support/simulation/constraints/fixed_constraint.h>
 #include <xefis/support/simulation/rigid_body/concepts.h>
 #include <xefis/support/simulation/rigid_body/impulse_solver.h>
 #include <xefis/support/simulation/rigid_body/system.h>
@@ -64,6 +66,37 @@ make_iss()
 }
 
 
+si::Velocity
+fixed_constraint_relative_speed_after_step (double const friction_factor)
+{
+	auto system = rigid_body::System();
+	auto solver = rigid_body::ImpulseSolver (system, 1);
+
+	auto const mass_moments = MassMoments<BodyCOM> {
+		1_kg,
+		make_cuboid_inertia_tensor<BodyCOM> (1_kg, 1_m),
+	};
+
+	auto& body_1 = system.add<rigid_body::Body> (mass_moments);
+	auto& body_2 = system.add<rigid_body::Body> (mass_moments);
+
+	body_1.move_to ({ -0.5_m, 0_m, 0_m });
+	body_2.move_to ({ +0.5_m, 0_m, 0_m });
+
+	body_1.set_velocity_moments (VelocityMoments<WorldSpace> ({ -1_mps, 0_mps, 0_mps }, { 0_radps, 0_radps, 0_radps }));
+	body_2.set_velocity_moments (VelocityMoments<WorldSpace> ({ +1_mps, 0_mps, 0_mps }, { 0_radps, 0_radps, 0_radps }));
+
+	system.add<rigid_body::FixedConstraint> (body_1, body_2);
+	system.set_baumgarte_factor (0.0);
+	system.set_constraint_force_mixing_factor (0.0);
+	system.set_friction_factor (friction_factor);
+
+	solver.evolve (1_ms);
+
+	return abs (body_2.velocity_moments<WorldSpace>().velocity() - body_1.velocity_moments<WorldSpace>().velocity());
+}
+
+
 nu::AutoTest t_1 ("rigid_body::System: 90-minute simulation of gravitational forces", []{
 	auto rigid_body_system = rigid_body::System();
 	auto rigid_body_solver = rigid_body::ImpulseSolver (rigid_body_system);
@@ -101,6 +134,21 @@ nu::AutoTest t_1 ("rigid_body::System: 90-minute simulation of gravitational for
 
 	test_asserts::verify_equal_with_epsilon ("ISS is back at its original position", iss.placement().position(), iss_position_4_of_4, final_precision);
 	test_asserts::verify_equal_with_epsilon ("Earth didn't travel much", earth.placement().position(), earth_initial_position, 1_cm);
+});
+
+
+nu::AutoTest t_constraint_friction_factor_affects_velocity_correction ("rigid_body::Constraint: friction factor damps velocity correction", []{
+	auto const relative_speed_without_friction = fixed_constraint_relative_speed_after_step (0.0);
+	auto const relative_speed_with_full_friction = fixed_constraint_relative_speed_after_step (1.0);
+
+	test_asserts::verify_equal_with_epsilon ("Without friction the violating relative velocity is fully corrected",
+											 relative_speed_without_friction,
+											 0_mps,
+											 1e-9_mps);
+	test_asserts::verify_equal_with_epsilon ("With full friction the velocity correction is suppressed",
+											 relative_speed_with_full_friction,
+											 2_mps,
+											 1e-9_mps);
 });
 
 } // namespace
