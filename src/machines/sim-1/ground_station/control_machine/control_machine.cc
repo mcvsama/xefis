@@ -43,9 +43,10 @@ ControlMachine::connect_modules()
 	_data_center.trim_pitch						<< 0.0;
 	_data_center.trim_roll						<< 0.0;
 	_data_center.trim_yaw						<< 0.0;
-	// TODO if pass through function that, if ganged, calculates average of both:
+	// TODO if pass through function that, if ganged, calculates average of both, and raises an alert if difference is too big:
 	_data_center.throttle_left					<< _modules.joystick.throttle;
 	_data_center.throttle_right					<< _modules.joystick.throttle;
+	_data_center.throttle_gang					<< true; // TODO unhardcode
 
 	_modules.ground_to_air_data.joystick_pitch	<< _data_center.joystick_pitch;
 	_modules.ground_to_air_data.joystick_roll	<< _data_center.joystick_roll;

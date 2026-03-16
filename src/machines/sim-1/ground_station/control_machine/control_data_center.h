@@ -42,7 +42,7 @@ class ControlDataCenter: public xf::Module
 	xf::ModuleIn<double>			trim_yaw			{ this, "trim/yaw" };
 	xf::ModuleIn<double>			throttle_left		{ this, "throttle/left" };
 	xf::ModuleIn<double>			throttle_right		{ this, "throttle/right" };
-//	xf::ModuleIn<bool>				throttle_gang		{ this, "throttle/gang" };
+	xf::ModuleIn<bool>				throttle_gang		{ this, "throttle/gang" };
 
   public:
 	using xf::Module::Module;
