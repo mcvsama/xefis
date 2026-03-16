@@ -330,7 +330,7 @@ nu::AutoTest t_8 ("Zero-distance received signal power is finite", []{
 
 	system.process (0_s);
 	test_asserts::verify_equal ("Zero-distance signal is delivered immediately", rx_antenna.received_signals().size(), 1uz);
-	test_asserts::verify ("Zero-distance received signal power is finite", std::isfinite (rx_antenna.received_signals().front().signal_power.value()));
+	test_asserts::verify ("Zero-distance received signal power is finite", std::isfinite (rx_antenna.received_signals().front().signal_power.to_floating_point()));
 	test_asserts::verify ("Zero-distance received signal power is non-negative", rx_antenna.received_signals().front().signal_power >= 0_W);
 });
 

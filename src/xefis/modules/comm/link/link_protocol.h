@@ -877,8 +877,8 @@ template<uint16_t B, class V>
 			{
 				typename Value::Value const value = _socket
 					? _offset
-						? (*_socket - *_offset).base_value()
-						: (*_socket).base_value()
+						? (*_socket - *_offset).to_base_unit_floating_point()
+						: (*_socket).to_base_unit_floating_point()
 					: _value_if_nil;
 
 				serialize_append<nu::float_for_width_t<kBytes>> (value, blob);

@@ -80,7 +80,7 @@ make_body_mass_moments (si::Mass const mass, si::Length const edge_length)
 MassMoments<BodyCOM>
 make_body_mass_moments (si::Mass const mass, si::Density const density = 1000_kg / 1_m3)
 {
-	auto const edge_length = 1_m * std::pow ((mass / density).value(), 1.0 / 3.0);
+	auto const edge_length = 1_m * std::pow ((mass / density).to_floating_point(), 1.0 / 3.0);
 	return make_body_mass_moments (mass, edge_length);
 }
 

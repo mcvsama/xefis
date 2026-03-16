@@ -199,7 +199,7 @@ class Constraint:
 	[[nodiscard]]
 	double
 	constraint_force_mixing_factor() const noexcept
-		{ return _constraint_force_mixing_factor.value(); }
+		{ return _constraint_force_mixing_factor.to_floating_point(); }
 
 	/**
 	 * Set Constraint Force Mixing factor.
@@ -573,7 +573,7 @@ template<std::size_t N>
 	inline Constraint::ConstraintMassMatrix<N>&
 	Constraint::apply_constraint_mixing_factor (ConstraintMassMatrix<N>& K) const
 	{
-		if (_constraint_force_mixing_factor.value() != 0.0)
+		if (_constraint_force_mixing_factor.to_floating_point() != 0.0)
 			for (std::size_t i = 0; i < N; ++i)
 				K[i, i] += _constraint_force_mixing_factor;
 

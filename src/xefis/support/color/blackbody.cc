@@ -54,7 +54,7 @@ compute_cie_xy_blackbody_color (si::Temperature const temperature, std::function
 			radiance = radiance * std::exp (-scattering);
 
 		// Basic rectangular integration:
-		auto const bar = (radiance * wavelength_delta.in<si::Meter>()).base_value(); // TODO si::convert?
+		auto const bar = (radiance * wavelength_delta.in<si::Meter>()).to_base_unit_floating_point(); // TODO si::convert?
 
 		// Multiply by the color matching functions and add to the integrated x/y/z values:
 		x += bar * wc.color.x();
