@@ -89,8 +89,8 @@ class ControlModules
 			.rx_interference	= false,
 			.tx_interference	= false,
 		},
-		_logger.with_context ("udp"),
-		"udp",
+		_logger.with_context ("aircraft"),
+		"aircraft",
 	};
 };
 

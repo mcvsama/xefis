@@ -72,8 +72,8 @@ class RadioModules
 			.rx_interference	= false,
 			.tx_interference	= false,
 		},
-		_logger.with_context ("udp"),
-		"udp",
+		_logger.with_context ("ground station"),
+		"ground station",
 	};
 
 	UDPTransceiverWithCodec _udp_link_to_flight_computer_machine {
