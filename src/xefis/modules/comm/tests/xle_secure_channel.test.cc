@@ -29,6 +29,7 @@
 #include <chrono>
 #include <cstddef>
 #include <format>
+#include <set>
 #include <thread>
 
 
@@ -823,10 +824,68 @@ auto_test_t5()
 }
 
 
+void
+auto_test_t6()
+{
+	auto short_lived_crypto_params = crypto_params;
+	short_lived_crypto_params.max_time_difference = 100_ms;
+
+	std::set<xle::HandshakeID> used_handshake_ids;
+	size_t contains_key_calls = 0;
+	size_t store_key_calls = 0;
+
+	auto loop = TestProcessingLoop (0.01_s);
+	auto slave = xle::SlaveSecureChannel (loop, short_lived_crypto_params, {
+		.store_key_function = [&] (xle::HandshakeID const handshake_id) {
+			++store_key_calls;
+			used_handshake_ids.insert (handshake_id);
+		},
+		.contains_key_function = [&] (xle::HandshakeID const handshake_id) {
+			++contains_key_calls;
+			return used_handshake_ids.contains (handshake_id);
+		},
+	}, TestProcessingLoop::logger);
+
+	auto const handshake_params = xle::Handshake::Params {
+		.master_signature_key = short_lived_crypto_params.master_signature_key,
+		.slave_signature_key = short_lived_crypto_params.slave_signature_key,
+		.hmac_size = short_lived_crypto_params.hmac_size,
+		.max_time_difference = short_lived_crypto_params.max_time_difference,
+	};
+
+	auto rnd = std::random_device ("hw");
+	auto handshake_master = xle::HandshakeMaster (rnd, handshake_params);
+	auto const stale_handshake = handshake_master.generate_handshake_blob (nu::utc_now() - 1_s, xle::HandshakeRequestMode::Standby);
+
+	slave.handshake_request << nu::to_string (stale_handshake);
+	loop.next_cycle();
+
+	test_asserts::verify ("stale standby handshake is rejected", slave.handshake_response.is_nil());
+	test_asserts::verify ("stale standby handshake is checked once", contains_key_calls == 1u);
+	test_asserts::verify ("stale standby handshake is stored once", store_key_calls == 1u);
+
+	loop.next_cycles (5);
+
+	test_asserts::verify ("rejected retained standby handshake is not retried", contains_key_calls == 1u);
+	test_asserts::verify ("rejected retained standby handshake is not stored again", store_key_calls == 1u);
+
+	auto fresh_handshake_master = xle::HandshakeMaster (rnd, handshake_params);
+	auto const fresh_handshake = fresh_handshake_master.generate_handshake_blob (nu::utc_now(), xle::HandshakeRequestMode::Standby);
+
+	slave.handshake_request << nu::to_string (fresh_handshake);
+	loop.next_cycle();
+
+	test_asserts::verify ("new standby handshake clears rejection cache and is processed", slave.handshake_response && !slave.handshake_response->empty());
+	test_asserts::verify ("fresh standby handshake is checked after request change", contains_key_calls == 2u);
+	test_asserts::verify ("fresh standby handshake is stored after request change", store_key_calls == 2u);
+}
+
+
 nu::AutoTest t1 ("Xefis Lossy Encryption/Protocol: handshaking gives correct keys", AutoTestT1::auto_test_t1);
 nu::AutoTest t2 ("Xefis Lossy Encryption/Protocol: handshaking eventually works even on lossy channel", auto_test_t2);
 nu::AutoTest t3 ("Xefis Lossy Encryption/Protocol: standby handshake survives slave restart", auto_test_t3);
 nu::AutoTest t4 ("Xefis Lossy Encryption/Protocol: immediate rekey overrides standby behavior", auto_test_t4);
 nu::AutoTest t5 ("Xefis Lossy Encryption/Protocol: standby handshake is refreshed before expiry", auto_test_t5);
+nu::AutoTest t6 ("Xefis Lossy Encryption/Protocol: rejected retained standby handshake is not retried", auto_test_t6);
 
 } // namespace xf::xle_secure_channel_test

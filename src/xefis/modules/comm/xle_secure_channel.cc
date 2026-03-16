@@ -466,27 +466,45 @@ SlaveSecureChannel::rx_key_hash() const
 void
 SlaveSecureChannel::process (Cycle const&)
 {
+	bool const handshake_request_changed = _handshake_request_changed.value_changed();
+
+	if (handshake_request_changed)
+		_rejected_handshake_request.reset();
+
 	try {
-		bool const handshake_request_changed = _handshake_request_changed.value_changed();
 		bool const should_recheck_retained_handshake = !ready() && !connecting();
 
-		if (this->handshake_request.valid() &&
-			(handshake_request_changed || should_recheck_retained_handshake))
+		if (this->handshake_request.valid())
 		{
-			auto handshake_slave = make_handshake_slave (_crypto_params, _key_check_functions);
-			auto const request_mode = handshake_slave.handshake_request_mode (nu::to_blob (*this->handshake_request));
-			bool const should_consume_standby_handshake = (request_mode == HandshakeRequestMode::Standby) && !ready() && !connecting();
-			bool const should_consume_request_now = handshake_request_changed || should_consume_standby_handshake;
+			auto const current_request_was_not_previously_rejected = !_rejected_handshake_request || *_rejected_handshake_request != *this->handshake_request;
 
-			if (should_consume_request_now)
+			if (handshake_request_changed || (should_recheck_retained_handshake && current_request_was_not_previously_rejected))
 			{
-				if (request_mode != HandshakeRequestMode::Standby || !ready())
+				auto handshake_slave = make_handshake_slave (_crypto_params, _key_check_functions);
+				auto const request_mode = handshake_slave.handshake_request_mode (nu::to_blob (*this->handshake_request));
+				bool const should_consume_standby_handshake = (request_mode == HandshakeRequestMode::Standby) && !ready() && !connecting();
+				bool const should_consume_request_now = handshake_request_changed || should_consume_standby_handshake;
+
+				if (should_consume_request_now)
 				{
-					_next_session_candidate = std::make_unique<Session> (nu::to_blob (*this->handshake_request), _crypto_params, _key_check_functions);
-					this->handshake_response = nu::to_string (*_next_session_candidate->handshake_response());
+					if (request_mode != HandshakeRequestMode::Standby || !ready())
+					{
+						_next_session_candidate = std::make_unique<Session> (nu::to_blob (*this->handshake_request), _crypto_params, _key_check_functions);
+						this->handshake_response = nu::to_string (*_next_session_candidate->handshake_response());
+					}
 				}
 			}
 		}
+	}
+	catch (HandshakeSlave::Exception const&)
+	{
+		_next_session_candidate.reset();
+		this->handshake_response = xf::nil;
+
+		if (this->handshake_request.valid())
+			_rejected_handshake_request = *this->handshake_request;
+
+		logger() << std::format ("Exception when handling handshake request: {}\n", nu::describe_exception (std::current_exception()));
 	}
 	catch (...)
 	{

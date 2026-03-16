@@ -745,6 +745,7 @@ class SlaveSecureChannel:
 	CryptoParams						_crypto_params;
 	xf::SocketValueChanged<std::string>	_handshake_request_changed { handshake_request };
 	HandshakeSlave::KeyCheckFunctions	_key_check_functions;
+	std::optional<std::string>			_rejected_handshake_request;
 	// Active session means connected and confirmed correct encryption+authentication:
 	std::unique_ptr<Session>			_active_session;
 	std::unique_ptr<Session>			_next_session_candidate;
