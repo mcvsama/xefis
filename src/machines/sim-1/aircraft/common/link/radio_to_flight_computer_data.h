@@ -1,6 +1,6 @@
 /* vim:ts=4
  *
- * Copyleft 2025  Michał Gawron
+ * Copyleft 2026  Michał Gawron
  * Marduk Unix Labs, http://mulabs.org/
  *
  * This program is free software: you can redistribute it and/or modify
@@ -11,13 +11,13 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__MACHINES__SIM_1__AIRCRAFT__COMMON__LINK__FLIGHT_COMPUTER_TO__HARDWARE_DATA_H__INCLUDED
-#define XEFIS__MACHINES__SIM_1__AIRCRAFT__COMMON__LINK__FLIGHT_COMPUTER_TO__HARDWARE_DATA_H__INCLUDED
+#ifndef XEFIS__MACHINES__SIM_1__AIRCRAFT__COMMON__LINK__RADIO_TO__FLIGHT_COMPUTER_DATA_H__INCLUDED
+#define XEFIS__MACHINES__SIM_1__AIRCRAFT__COMMON__LINK__RADIO_TO__FLIGHT_COMPUTER_DATA_H__INCLUDED
 
 // Xefis:
 #include <xefis/core/module.h>
-#include <xefis/core/sockets/module_socket.h>
 #include <xefis/core/processing_loop.h>
+#include <xefis/core/sockets/module_socket.h>
 #include <xefis/modules/comm/link/helpers.h>
 #include <xefis/modules/comm/link/link_decoder.h>
 #include <xefis/modules/comm/link/link_encoder.h>
@@ -31,13 +31,17 @@ namespace sim1 {
  */
 template<template<class> class SocketType>
 	requires xf::ModuleInOutTemplateConcept<SocketType>
-	class FlightComputerToHardwareData: public xf::Module
+	class RadioToFlightComputerData: public xf::Module
 	{
 	  public:
-		SocketType<si::Angle>	left_aileron	{ this, "flight-controls/left-aileron" };
-		SocketType<si::Angle>	right_aileron	{ this, "flight-controls/right-aileron" };
-		SocketType<si::Angle>	elevator		{ this, "flight-controls/elevator" };
-		SocketType<si::Angle>	rudder			{ this, "flight-controls/rudder" };
+		SocketType<double>	joystick_pitch	{ this, "joystick/pitch" };
+		SocketType<double>	joystick_roll	{ this, "joystick/roll" };
+		SocketType<double>	joystick_yaw	{ this, "joystick/yaw" };
+		SocketType<double>	trim_pitch		{ this, "trim/pitch" };
+		SocketType<double>	trim_roll		{ this, "trim/roll" };
+		SocketType<double>	trim_yaw		{ this, "trim/yaw" };
+		SocketType<double>	throttle_left	{ this, "throttle/left" };
+		SocketType<double>	throttle_right	{ this, "throttle/right" };
 
 	  public:
 		// Ctor

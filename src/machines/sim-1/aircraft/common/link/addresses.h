@@ -21,8 +21,10 @@
 
 namespace sim1::global {
 
-static inline auto hardware_to_flight_computer_address = UDPTransceiver::Address { .host = "127.0.0.1", .port = 17881 };
-static inline auto flight_computer_to_hardware_address = UDPTransceiver::Address { .host = "127.0.0.1", .port = 17882 };
+static inline auto hardware_to_flight_computer_address	= UDPTransceiver::Address { .host = "127.0.0.1", .port = 17881 };
+static inline auto flight_computer_to_hardware_address	= UDPTransceiver::Address { .host = "127.0.0.1", .port = 17882 };
+static inline auto radio_to_flight_computer_address		= UDPTransceiver::Address { .host = "127.0.0.1", .port = 17883 };
+static inline auto flight_computer_to_radio_address		= UDPTransceiver::Address { .host = "127.0.0.1", .port = 17884 };
 
 } // namespace sim1::global
 

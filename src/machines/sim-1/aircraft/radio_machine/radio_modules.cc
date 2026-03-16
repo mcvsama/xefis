@@ -26,6 +26,24 @@ namespace sim1::aircraft {
 RadioModules::RadioModules (xf::ProcessingLoop& loop, nu::Logger const& logger):
 	_logger (logger),
 	_loop (loop)
-{ }
+{
+	_udp_link_to_ground_station.send							<< _air_to_ground_link.encoded_output;
+	_ground_to_air_link.encoded_input							<< _udp_link_to_ground_station.receive;
+
+	_slave_secure_channel.handshake_request						<< _ground_to_air_data.encryption_handshake_request;
+	_air_to_ground_data.encryption_handshake_response			<< _slave_secure_channel.handshake_response;
+
+	this->radio_to_flight_computer_data.joystick_pitch			<< _ground_to_air_data.joystick_pitch;
+	this->radio_to_flight_computer_data.joystick_roll			<< _ground_to_air_data.joystick_roll;
+	this->radio_to_flight_computer_data.joystick_yaw			<< _ground_to_air_data.joystick_yaw;
+	this->radio_to_flight_computer_data.trim_pitch				<< _ground_to_air_data.trim_pitch;
+	this->radio_to_flight_computer_data.trim_roll				<< _ground_to_air_data.trim_roll;
+	this->radio_to_flight_computer_data.trim_yaw				<< _ground_to_air_data.trim_yaw;
+	this->radio_to_flight_computer_data.throttle_left			<< _ground_to_air_data.throttle_left;
+	this->radio_to_flight_computer_data.throttle_right			<< _ground_to_air_data.throttle_right;
+
+	_air_to_ground_data.static_pressure							<< this->flight_computer_to_radio_data.static_pressure;
+	_air_to_ground_data.total_pressure							<< this->flight_computer_to_radio_data.total_pressure;
+}
 
 } // namespace sim1::aircraft

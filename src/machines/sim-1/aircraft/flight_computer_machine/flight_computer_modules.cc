@@ -32,9 +32,12 @@ FlightComputerModules::FlightComputerModules (xf::ProcessingLoop& loop, nu::Logg
 
 	this->air_data_computer.pressure_use_std		<< false;
 	this->air_data_computer.pressure_qnh			<< 1013.25_hPa;
-	this->air_data_computer.pressure_static			<< _hardware_to_flight_computer_data.air_static_pressure;
-	this->air_data_computer.pressure_total			<< _hardware_to_flight_computer_data.air_total_pressure;
-	this->air_data_computer.total_air_temperature	<< _hardware_to_flight_computer_data.air_total_temperature;
+	this->air_data_computer.pressure_static			<< this->hardware_to_flight_computer_data.air_static_pressure;
+	this->air_data_computer.pressure_total			<< this->hardware_to_flight_computer_data.air_total_pressure;
+	this->air_data_computer.total_air_temperature	<< this->hardware_to_flight_computer_data.air_total_temperature;
+
+	this->flight_computer_to_radio_data.static_pressure	<< this->hardware_to_flight_computer_data.air_static_pressure;
+	this->flight_computer_to_radio_data.total_pressure	<< this->hardware_to_flight_computer_data.air_total_pressure;
 }
 
 } // namespace sim1::aircraft

@@ -55,18 +55,18 @@ class HardwareModules
 	sim1::HardwareToFlightComputerData<xf::ModuleIn>	hardware_to_flight_computer_data	{ _loop };
 	sim1::FlightComputerToHardwareData<xf::ModuleOut>	flight_computer_to_hardware_data	{ _loop };
 
-  public:
-	UDPTransceiverWithCodec flight_computer_machine_transceiver {
+  private:
+	UDPTransceiverWithCodec _udp_link_to_flight_computer_machine {
 		_loop,
 		UDPTransceiver::Parameters {
 			.rx_udp_address = sim1::global::flight_computer_to_hardware_address,
 			.tx_udp_address = sim1::global::hardware_to_flight_computer_address,
 		},
-		make_link_protocol_from_inputs (hardware_to_flight_computer_data, "hardware → flight computer", { 0x23, 0x34 }),
+		make_link_protocol_from_inputs (this->hardware_to_flight_computer_data, "hardware → flight computer", { 0x23, 0x34 }),
 		LinkEncoder::Parameters {
 			.send_frequency = 120_Hz,
 		},
-		make_link_protocol_from_outputs (flight_computer_to_hardware_data, "flight computer → hardware", { 0x01, 0x12 }),
+		make_link_protocol_from_outputs (this->flight_computer_to_hardware_data, "flight computer → hardware", { 0x01, 0x12 }),
 		LinkDecoder::Parameters {
 		},
 		_logger,

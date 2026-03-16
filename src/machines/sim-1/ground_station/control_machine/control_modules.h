@@ -64,7 +64,8 @@ class ControlModules
 		"master secure channel",
 	};
 
-	LinkDecoder air_to_ground_link {
+  private:
+	LinkDecoder _air_to_ground_link {
 		_loop,
 		std::make_unique<sim1::AirToGroundProtocol> (air_to_ground_data, master_secure_channel),
 		{},
@@ -72,7 +73,7 @@ class ControlModules
 		"link decoder",
 	};
 
-	LinkEncoder ground_to_air_link {
+	LinkEncoder _ground_to_air_link {
 		_loop,
 		std::make_unique<sim1::GroundToAirProtocol> (ground_to_air_data, master_secure_channel),
 		{ .send_frequency = 30_Hz },
@@ -80,7 +81,7 @@ class ControlModules
 		"link encoder",
 	};
 
-	UDPTransceiver udp_link_to_aircraft {
+	UDPTransceiver _udp_link_to_aircraft {
 		_loop,
 		UDPTransceiver::Parameters {
 			.rx_udp_address		= global::aircraft_to_ground_station_address,

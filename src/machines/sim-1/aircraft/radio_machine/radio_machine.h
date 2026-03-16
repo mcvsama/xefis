@@ -17,14 +17,6 @@
 // Local:
 #include "radio_modules.h"
 
-// Sim-1:
-#include <machines/sim-1/aircraft/common/link/flight_computer_to_hardware_data.h>
-#include <machines/sim-1/aircraft/common/link/hardware_to_flight_computer_data.h>
-#include <machines/sim-1/common/common.h>
-#include <machines/sim-1/common/link/air_to_ground.h>
-#include <machines/sim-1/common/link/crypto.h>
-#include <machines/sim-1/common/link/ground_to_air.h>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/sockets/module_in.h>
@@ -55,34 +47,6 @@ class RadioMachine: public xf::SingleLoopMachine
 	xf::Clock&		_xefis_clock;
 	xf::Clock&		_steady_clock;
 	RadioModules	_modules;
-
-	xf::crypto::xle::SlaveSecureChannel slave_secure_channel {
-		loop(),
-		sim1::kCryptoParams,
-		{}, // TODO Should store used IDs somewhere
-		logger().with_context ("slave secure channel"),
-		"slave secure channel",
-	};
-
-	sim1::GroundToAirData<xf::ModuleOut> ground_to_air_data { loop() };
-
-	LinkDecoder ground_to_air_link {
-		loop(),
-		std::make_unique<sim1::GroundToAirProtocol> (ground_to_air_data, slave_secure_channel),
-		{},
-		logger().with_context ("link decoder"),
-		"link decoder",
-	};
-
-	sim1::AirToGroundData<xf::ModuleIn> air_to_ground_data { loop() };
-
-	LinkEncoder air_to_ground_link {
-		loop(),
-		std::make_unique<sim1::AirToGroundProtocol> (air_to_ground_data, slave_secure_channel),
-		{ .send_frequency = 30_Hz },
-		logger().with_context ("link encoder"),
-		"link encoder",
-	};
 };
 
 } // namespace sim1::aircraft
