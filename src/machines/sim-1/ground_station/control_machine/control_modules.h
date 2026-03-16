@@ -15,6 +15,7 @@
 #define XEFIS__MACHINES__SIM_1__GROUND_STATION__CONTROL_MACHINE__CONTROL_MODULES_H__INCLUDED
 
 // Sim-1:
+#include <machines/sim-1/common/link/addresses.h>
 #include <machines/sim-1/common/link/air_to_ground.h>
 #include <machines/sim-1/common/link/crypto.h>
 #include <machines/sim-1/common/link/ground_to_air.h>
@@ -79,11 +80,11 @@ class ControlModules
 		"link encoder",
 	};
 
-	UDPTransceiver udp_link {
+	UDPTransceiver udp_link_to_aircraft {
 		_loop,
 		UDPTransceiver::Parameters {
-			.rx_udp_address		= UDPTransceiver::Address { "127.0.0.1", 9990 },
-			.tx_udp_address		= UDPTransceiver::Address { "127.0.0.1", 9991 },
+			.rx_udp_address		= global::aircraft_to_ground_station_address,
+			.tx_udp_address		= global::ground_station_to_aircraft_address,
 			.rx_interference	= false,
 			.tx_interference	= false,
 		},

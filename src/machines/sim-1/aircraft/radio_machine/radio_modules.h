@@ -14,6 +14,9 @@
 #ifndef XEFIS__MACHINES__SIM_1__AIRCRAFT__RADIO_MACHINE__RADIO_MODULES_H__INCLUDED
 #define XEFIS__MACHINES__SIM_1__AIRCRAFT__RADIO_MACHINE__RADIO_MODULES_H__INCLUDED
 
+// Sim-1:
+#include <machines/sim-1/common/link/addresses.h>
+
 // Xefis:
 #include <xefis/core/sockets/module_in.h>
 #include <xefis/core/sockets/module_out.h>
@@ -41,11 +44,11 @@ class RadioModules
 
   public:
 	// TODO move this to VirtualRadioModules:
-	UDPTransceiver air_udp_link {
+	UDPTransceiver udp_link_to_ground_station {
 		_loop,
 		UDPTransceiver::Parameters {
-			.rx_udp_address		= UDPTransceiver::Address { "127.0.0.1", 9991 },
-			.tx_udp_address		= UDPTransceiver::Address { "127.0.0.1", 9990 },
+			.rx_udp_address		= global::ground_station_to_aircraft_address,
+			.tx_udp_address		= global::aircraft_to_ground_station_address,
 			.rx_interference	= false,
 			.tx_interference	= false,
 		},
