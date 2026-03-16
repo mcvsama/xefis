@@ -342,8 +342,10 @@ class MasterSecureChannel:
 		 */
 		struct HandshakeRequested
 		{
-			HandshakeMaster	handshake_master;
-			Blob			handshake_request;
+			HandshakeMaster			handshake_master;
+			HandshakeRequestMode	request_mode;
+			si::Time				unix_timestamp;
+			Blob					handshake_request;
 
 			// Ctor
 			explicit
@@ -387,6 +389,16 @@ class MasterSecureChannel:
 		waiting_for_handshake_response() const noexcept
 			{ return std::holds_alternative<HandshakeRequested> (_state); }
 
+		[[nodiscard]]
+		bool
+		waiting_for_handshake_response (HandshakeRequestMode const expected_mode) const noexcept
+		{
+			if (auto const* handshake_requested = std::get_if<HandshakeRequested> (&_state))
+				return handshake_requested->request_mode == expected_mode;
+			else
+				return false;
+		}
+
 		/**
 		 * Use handshake response obtained from SlaveSecureChannel.
 		 */
@@ -421,6 +433,19 @@ class MasterSecureChannel:
 		std::shared_future<void>
 		session_activated()
 			{ return _session_activated_future; }
+
+		[[nodiscard]]
+		bool
+		standby_handshake_needs_refresh (si::Time const now) const noexcept
+		{
+			if (auto const* handshake_requested = std::get_if<HandshakeRequested> (&_state))
+			{
+				return handshake_requested->request_mode == HandshakeRequestMode::Standby &&
+					now - handshake_requested->unix_timestamp >= 0.5 * _crypto_params.max_time_difference;
+			}
+			else
+				return false;
+		}
 
 		[[nodiscard]]
 		std::optional<Blob>

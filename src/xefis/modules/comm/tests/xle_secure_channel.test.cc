@@ -26,8 +26,10 @@
 #include <boost/random.hpp>
 
 // Standard:
+#include <chrono>
 #include <cstddef>
 #include <format>
+#include <thread>
 
 
 namespace xf::xle_secure_channel_test {
@@ -757,9 +759,74 @@ auto_test_t4()
 }
 
 
+void
+auto_test_t5()
+{
+	auto short_lived_crypto_params = crypto_params;
+	short_lived_crypto_params.max_time_difference = 100_ms;
+
+	auto loop = TestProcessingLoop (0.01_s);
+	auto slave = xle::SlaveSecureChannel (loop, short_lived_crypto_params, {}, TestProcessingLoop::logger);
+	auto master = xle::MasterSecureChannel (loop, short_lived_crypto_params, TestProcessingLoop::logger);
+
+	slave.handshake_request << master.handshake_request;
+	master.handshake_response << slave.handshake_response;
+
+	auto const [session_prepared, session_activated] = master.start_handshake();
+
+	do {
+		loop.next_cycles (2);
+	} while (!nu::ready (session_prepared));
+
+	static auto const p1 = nu::to_blob ("(master -> slave) refreshed standby message");
+	static auto const p2 = nu::to_blob ("(slave -> master) refreshed standby message");
+
+	do {
+		loop.next_cycles (2);
+
+		auto const e1 = master.encrypt_packet (p1);
+		auto const d1 = slave.decrypt_packet (e1);
+		auto const e2 = slave.encrypt_packet (p2);
+		auto const d2 = master.decrypt_packet (e2);
+
+		test_asserts::verify ("master -> slave communication works during standby refresh setup", d1 == p1);
+		test_asserts::verify ("slave -> master communication works during standby refresh setup", d2 == p2);
+	} while (!nu::ready (session_activated));
+
+	session_prepared.get();
+	session_activated.get();
+
+	test_asserts::verify ("master keeps standby handshake ready before refresh wait", master.handshake_request && !master.handshake_request->empty());
+	auto const initial_standby_handshake = *master.handshake_request;
+
+	std::this_thread::sleep_for (std::chrono::milliseconds (150));
+	loop.next_cycles (4);
+
+	test_asserts::verify ("master refreshes standby handshake before it expires", master.handshake_request && *master.handshake_request != initial_standby_handshake);
+	test_asserts::verify ("slave still ignores refreshed standby handshake while connected", slave.handshake_response.is_nil());
+
+	slave.disconnect();
+
+	for (size_t cycles = 0; slave.handshake_response.is_nil(); ++cycles)
+	{
+		test_asserts::verify (std::format ("slave restart is recovered by refreshed standby handshake in {} cycles", cycles), cycles < 20u);
+		loop.next_cycles (2);
+	}
+
+	auto const e1 = master.encrypt_packet (p1);
+	auto const d1 = slave.decrypt_packet (e1);
+	auto const e2 = slave.encrypt_packet (p2);
+	auto const d2 = master.decrypt_packet (e2);
+
+	test_asserts::verify ("master -> slave communication works after delayed slave restart", d1 == p1);
+	test_asserts::verify ("slave -> master communication works after delayed slave restart", d2 == p2);
+}
+
+
 nu::AutoTest t1 ("Xefis Lossy Encryption/Protocol: handshaking gives correct keys", AutoTestT1::auto_test_t1);
 nu::AutoTest t2 ("Xefis Lossy Encryption/Protocol: handshaking eventually works even on lossy channel", auto_test_t2);
 nu::AutoTest t3 ("Xefis Lossy Encryption/Protocol: standby handshake survives slave restart", auto_test_t3);
 nu::AutoTest t4 ("Xefis Lossy Encryption/Protocol: immediate rekey overrides standby behavior", auto_test_t4);
+nu::AutoTest t5 ("Xefis Lossy Encryption/Protocol: standby handshake is refreshed before expiry", auto_test_t5);
 
 } // namespace xf::xle_secure_channel_test

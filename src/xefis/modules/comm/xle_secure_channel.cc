@@ -200,7 +200,9 @@ MasterSecureChannel::Session::HandshakeRequested::HandshakeRequested (CryptoPara
 		.hmac_size = params.hmac_size,
 		.max_time_difference = params.max_time_difference,
 	}),
-	handshake_request (handshake_master.generate_handshake_blob (nu::utc_now(), request_mode))
+	request_mode (request_mode),
+	unix_timestamp (nu::utc_now()),
+	handshake_request (handshake_master.generate_handshake_blob (unix_timestamp, request_mode))
 { }
 
 
@@ -371,6 +373,15 @@ MasterSecureChannel::process (Cycle const&)
 	catch (...)
 	{
 		logger() << std::format ("Exception when handling handshake response: {}\n", nu::describe_exception (std::current_exception()));
+	}
+
+	// If current standby handshake offer expired, make a new one:
+	if (_keep_next_handshake_ready &&
+		_active_session &&
+		_next_session_candidate &&
+		_next_session_candidate->standby_handshake_needs_refresh (nu::utc_now()))
+	{
+		start_handshake (HandshakeRequestMode::Standby);
 	}
 }
 
