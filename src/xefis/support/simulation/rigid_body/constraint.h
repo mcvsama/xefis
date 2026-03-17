@@ -176,6 +176,14 @@ class Constraint:
 		{ return _broken; }
 
 	/**
+	 * Return true if constraint can participate in simulation computations.
+	 */
+	[[nodiscard]]
+	bool
+	usable() const noexcept
+		{ return enabled() && !broken() && !body_1().broken() && !body_2().broken(); }
+
+	/**
 	 * Break the constraint.
 	 */
 	void

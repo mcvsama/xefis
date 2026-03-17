@@ -210,21 +210,18 @@ ImpulseSolver::update_constraint_forces (si::Time const dt)
 
 		for (auto const& constraint: _system.constraints())
 		{
-			if (!constraint->enabled() || constraint->broken())
-				continue;
-
-			auto& b1 = constraint->body_1();
-			auto& b2 = constraint->body_2();
-
-			if (b1.broken() || b2.broken())
-				continue;
-
-			if (auto const& opt_cf = constraint->previous_computation_constraint_forces())
+			if (constraint->usable())
 			{
-				b1.iteration().all_constraints_force_moments += (*opt_cf)[0];
-				b2.iteration().all_constraints_force_moments += (*opt_cf)[1];
-				recompute_iteration_state (b1, dt);
-				recompute_iteration_state (b2, dt);
+				auto& b1 = constraint->body_1();
+				auto& b2 = constraint->body_2();
+
+				if (auto const& opt_cf = constraint->previous_computation_constraint_forces())
+				{
+					b1.iteration().all_constraints_force_moments += (*opt_cf)[0];
+					b2.iteration().all_constraints_force_moments += (*opt_cf)[1];
+					recompute_iteration_state (b1, dt);
+					recompute_iteration_state (b2, dt);
+				}
 			}
 		}
 
@@ -261,60 +258,53 @@ ImpulseSolver::update_single_constraint_forces (Constraint* constraint, si::Time
 {
 	bool precise_enough = _required_force_torque_precision.has_value();
 
-	if (!constraint->enabled() || constraint->broken())
+	if (constraint->usable())
 	{
-		constraint->previous_computation_constraint_forces().reset();
-		return precise_enough;
-	}
+		auto& b1 = constraint->body_1();
+		auto& b2 = constraint->body_2();
 
-	auto& b1 = constraint->body_1();
-	auto& b2 = constraint->body_2();
+		auto& iter1 = b1.iteration();
+		auto& iter2 = b2.iteration();
 
-	auto& iter1 = b1.iteration();
-	auto& iter2 = b2.iteration();
+		auto const previous_constraint_forces = constraint->previous_computation_constraint_forces();
 
-	if (b1.broken() || b2.broken())
-	{
-		constraint->previous_computation_constraint_forces().reset();
-		return precise_enough;
-	}
+		if (previous_constraint_forces)
+		{
+			iter1.all_constraints_force_moments -= (*previous_constraint_forces)[0];
+			iter2.all_constraints_force_moments -= (*previous_constraint_forces)[1];
+			recompute_iteration_state (b1, dt);
+			recompute_iteration_state (b2, dt);
+		}
 
-	auto const previous_constraint_forces = constraint->previous_computation_constraint_forces();
+		auto const constraint_forces = constraint->constraint_forces (iter1.velocity_moments, iter2.velocity_moments, dt);
 
-	if (previous_constraint_forces)
-	{
-		iter1.all_constraints_force_moments -= (*previous_constraint_forces)[0];
-		iter2.all_constraints_force_moments -= (*previous_constraint_forces)[1];
+		if (_required_force_torque_precision)
+		{
+			if (previous_constraint_forces)
+			{
+				auto prev = *previous_constraint_forces;
+				auto const dF = abs (constraint_forces[0].force() - prev[0].force());
+				auto const dT = abs (constraint_forces[0].torque() - prev[0].torque());
+
+				if (dF > _required_force_torque_precision->force)
+					precise_enough = false;
+
+				if (dT > _required_force_torque_precision->torque)
+					precise_enough = false;
+			}
+			else
+				precise_enough = false;
+		}
+
+		constraint->previous_computation_constraint_forces() = constraint_forces;
+
+		iter1.all_constraints_force_moments += constraint_forces[0];
+		iter2.all_constraints_force_moments += constraint_forces[1];
 		recompute_iteration_state (b1, dt);
 		recompute_iteration_state (b2, dt);
 	}
-
-	auto const constraint_forces = constraint->constraint_forces (iter1.velocity_moments, iter2.velocity_moments, dt);
-
-	if (_required_force_torque_precision)
-	{
-		if (previous_constraint_forces)
-		{
-			auto prev = *previous_constraint_forces;
-			auto const dF = abs (constraint_forces[0].force() - prev[0].force());
-			auto const dT = abs (constraint_forces[0].torque() - prev[0].torque());
-
-			if (dF > _required_force_torque_precision->force)
-				precise_enough = false;
-
-			if (dT > _required_force_torque_precision->torque)
-				precise_enough = false;
-		}
-		else
-			precise_enough = false;
-	}
-
-	constraint->previous_computation_constraint_forces() = constraint_forces;
-
-	iter1.all_constraints_force_moments += constraint_forces[0];
-	iter2.all_constraints_force_moments += constraint_forces[1];
-	recompute_iteration_state (b1, dt);
-	recompute_iteration_state (b2, dt);
+	else
+		constraint->previous_computation_constraint_forces().reset();
 
 	return precise_enough;
 }
