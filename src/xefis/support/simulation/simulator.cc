@@ -18,6 +18,9 @@
 #include <xefis/config/all.h>
 #include <xefis/core/machine.h>
 
+// Neutrino:
+#include <neutrino/time.h>
+
 // Standard:
 #include <cstddef>
 
@@ -34,7 +37,12 @@ Simulator::Simulator (rigid_body::System& rigid_body_system,
 	_rigid_body_solver (rigid_body_solver)
 {
 	_evolver.emplace (initial_simulation_time, frame_duration, logger.with_context ("Evolver"), [this] (si::Time const dt) {
-		_rigid_body_solver.evolve (dt);
+		auto details = rigid_body::EvolutionDetails();
+		auto const real_time_taken = nu::measure_time ([&]{
+			details = _rigid_body_solver.evolve (dt);
+		});
+		_iterations_run_history.push_back (details.iterations_run);
+		_real_time_taken_history.push_back (real_time_taken);
 
 		for (auto* clock: _clocks)
 			clock->advance (dt);

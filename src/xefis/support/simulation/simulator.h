@@ -26,6 +26,9 @@
 #include <neutrino/logger.h>
 #include <neutrino/noncopyable.h>
 
+// Lib:
+#include <boost/circular_buffer.hpp>
+
 // Standard:
 #include <cstddef>
 #include <list>
@@ -45,9 +48,15 @@ class Machine;
  */
 class Simulator: public nu::Noncopyable
 {
+	static constexpr std::size_t kMaxEvolutionDetailsHistory { 5000 };
+
   public:
 	using MachineManagers = std::list<BasicMachineManager*>;
 	using Clocks = std::list<SimulatedClock*>;
+	using IterationsRunHistory = boost::circular_buffer<double>;
+	using RealTimeTakenHistory = boost::circular_buffer<si::Time>;
+	using IterationsRunHistoryRange = std::ranges::subrange<IterationsRunHistory::const_iterator>;
+	using RealTimeTakenHistoryRange = std::ranges::subrange<RealTimeTakenHistory::const_iterator>;
 
   public:
 	// Ctor
@@ -169,12 +178,24 @@ class Simulator: public nu::Noncopyable
 	performance() const noexcept
 		{ return _evolver->performance(); }
 
+	[[nodiscard]]
+	IterationsRunHistoryRange
+	iterations_run_history() const noexcept
+		{ return { _iterations_run_history.begin(), _iterations_run_history.end() }; }
+
+	[[nodiscard]]
+	RealTimeTakenHistoryRange
+	real_time_taken_history() const noexcept
+		{ return { _real_time_taken_history.begin(), _real_time_taken_history.end() }; }
+
   private:
 	nu::Logger					_logger;
 	rigid_body::System&			_rigid_body_system;
 	rigid_body::ImpulseSolver&	_rigid_body_solver;
 	std::optional<Evolver>		_evolver;
 	Evolver::Evolve				_additional_evolve;
+	IterationsRunHistory		_iterations_run_history		{ kMaxEvolutionDetailsHistory };
+	RealTimeTakenHistory		_real_time_taken_history	{ kMaxEvolutionDetailsHistory };
 	MachineManagers				_machine_managers;
 	Clocks						_clocks;
 };
