@@ -95,6 +95,11 @@ class ImpulseSolver: private nu::Noncopyable
 	set_max_iterations (size_t const max_iterations) noexcept
 		{ _max_iterations = max_iterations; }
 
+	[[nodiscard]]
+	size_t
+	max_iterations() const noexcept
+		{ return _max_iterations; }
+
 	/**
 	 * Set required precision for computed force moments of constraints.
 	 */
