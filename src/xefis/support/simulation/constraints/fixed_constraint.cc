@@ -110,7 +110,7 @@ FixedConstraint::initialize_step (si::Time const dt)
 ConstraintForces
 FixedConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, VelocityMoments<WorldSpace> const& vm_2, si::Time dt)
 {
-	auto const J = compute_jacobian (vm_1, _Jv1, _Jw1, vm_2, _Jv2, _Jw2);
+	auto const J = compute_two_jacobians (vm_1, _Jv1, _Jw1, vm_2, _Jv2, _Jw2);
 	auto const lambda = compute_lambda (_position_error, J, _Z, dt);
 
 	// TODO this internally transposes jacobians, so store here the transposed ones and reuse them

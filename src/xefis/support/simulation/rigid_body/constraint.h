@@ -99,6 +99,14 @@ class Constraint:
 	template<std::size_t N>
 		using ConstraintZMatrix = math::SquareMatrix<decltype (1_kg / 1_s), N, WorldSpace, WorldSpace>;
 
+	// Carries two jacobians for convenience.
+	template<std::size_t N>
+		struct TwoJacobians
+		{
+			Jacobian<N>	internal;
+			Jacobian<N>	external;
+		};
+
   public:
 	// Ctor
 	using ConnectedBodies::ConnectedBodies;
@@ -307,13 +315,53 @@ class Constraint:
 						  JacobianW<N> const& Jw2) const;
 
 	/**
+	 * Calculate the part of the total Jacobian residual that comes from the
+	 * current iteration velocity moments, excluding the external impulses that
+	 * compute_jacobian() adds separately.
+	 */
+	template<std::size_t N>
+		[[nodiscard]]
+		Jacobian<N>
+		compute_internal_impulse_jacobian (VelocityMoments<WorldSpace> const& vm_1,
+										   JacobianV<N> const& Jv1,
+										   JacobianW<N> const& Jw1,
+										   VelocityMoments<WorldSpace> const& vm_2,
+										   JacobianV<N> const& Jv2,
+										   JacobianW<N> const& Jw2) const;
+
+	/**
+	 * Calculate the part of the total Jacobian residual that comes from external
+	 * impulses accumulated for the current simulation step.
+	 */
+	template<std::size_t N>
+		[[nodiscard]]
+		Jacobian<N>
+		compute_external_impulse_jacobian (JacobianV<N> const& Jv1,
+										   JacobianW<N> const& Jw1,
+										   JacobianV<N> const& Jv2,
+										   JacobianW<N> const& Jw2) const;
+
+	/**
+	 * Calculate both internal and external Jacobians in one function.
+	 */
+	template<std::size_t N>
+		[[nodiscard]]
+		TwoJacobians<N>
+		compute_two_jacobians (VelocityMoments<WorldSpace> const& vm_1,
+							   JacobianV<N> const& Jv1,
+							   JacobianW<N> const& Jw1,
+							   VelocityMoments<WorldSpace> const& vm_2,
+							   JacobianV<N> const& Jv2,
+							   JacobianW<N> const& Jw2) const;
+
+	/**
 	 * Calculate lambda (a vector of si::Force).
 	 */
 	template<std::size_t N>
 		[[nodiscard]]
 		Lambda<N>
 		compute_lambda (PositionError<N> const&,
-						Jacobian<N> const& J,
+						TwoJacobians<N> const& J,
 						ConstraintMassMatrix<N> const& K,
 						si::Time dt) const;
 
@@ -324,7 +372,7 @@ class Constraint:
 		[[nodiscard]]
 		Lambda<N>
 		compute_lambda (PositionError<N> const&,
-						Jacobian<N> const& J,
+						TwoJacobians<N> const& J,
 						ConstraintZMatrix<N> const& Z,
 						si::Time dt) const;
 
@@ -487,14 +535,90 @@ template<std::size_t N>
 
 
 template<std::size_t N>
+	inline Constraint::Jacobian<N>
+	Constraint::compute_internal_impulse_jacobian (VelocityMoments<WorldSpace> const& vm_1,
+												   JacobianV<N> const& Jv1,
+												   JacobianW<N> const& Jw1,
+												   VelocityMoments<WorldSpace> const& vm_2,
+												   JacobianV<N> const& Jv2,
+												   JacobianW<N> const& Jw2) const
+	{
+		constexpr auto inv_radian = decltype (1.0 / 1_rad) { 1 };
+		auto const& b1_iter = body_1().iteration();
+		auto const& b2_iter = body_2().iteration();
+
+		// Solver iterations start from the bodies' current velocity and then fold
+		// in external impulses together with accumulated constraint forces. Once a
+		// body's temporary velocity has been updated in this pass, remove the
+		// external step contribution here so friction damps only the constraint-
+		// driven motion while compute_external_impulse_jacobian() adds the load
+		// support term exactly once.
+		auto const v1 =
+			b1_iter.velocity_moments_updated
+				? vm_1.velocity() - b1_iter.external_impulses_over_mass
+				: vm_1.velocity();
+		auto const w1 =
+			b1_iter.velocity_moments_updated
+				? vm_1.angular_velocity() * inv_radian - b1_iter.external_angular_impulses_over_inertia_tensor
+				: vm_1.angular_velocity() * inv_radian;
+		auto const v2 =
+			b2_iter.velocity_moments_updated
+				? vm_2.velocity() - b2_iter.external_impulses_over_mass
+				: vm_2.velocity();
+		auto const w2 =
+			b2_iter.velocity_moments_updated
+				? vm_2.angular_velocity() * inv_radian - b2_iter.external_angular_impulses_over_inertia_tensor
+				: vm_2.angular_velocity() * inv_radian;
+
+		return Jv1 * v1
+			 + Jw1 * w1
+			 + Jv2 * v2
+			 + Jw2 * w2;
+	}
+
+
+template<std::size_t N>
+	inline Constraint::Jacobian<N>
+	Constraint::compute_external_impulse_jacobian (JacobianV<N> const& Jv1,
+												   JacobianW<N> const& Jw1,
+												   JacobianV<N> const& Jv2,
+												   JacobianW<N> const& Jw2) const
+	{
+		auto const& b1_iter = body_1().iteration();
+		auto const& b2_iter = body_2().iteration();
+
+		return Jv1 * b1_iter.external_impulses_over_mass
+			 + Jw1 * b1_iter.external_angular_impulses_over_inertia_tensor
+			 + Jv2 * b2_iter.external_impulses_over_mass
+			 + Jw2 * b2_iter.external_angular_impulses_over_inertia_tensor;
+	}
+
+
+template<std::size_t N>
+	inline Constraint::TwoJacobians<N>
+	Constraint::compute_two_jacobians (VelocityMoments<WorldSpace> const& vm_1,
+									   JacobianV<N> const& Jv1,
+									   JacobianW<N> const& Jw1,
+									   VelocityMoments<WorldSpace> const& vm_2,
+									   JacobianV<N> const& Jv2,
+									   JacobianW<N> const& Jw2) const
+	{
+		return {
+			.internal = compute_internal_impulse_jacobian (vm_1, Jv1, Jw1, vm_2, Jv2, Jw2),
+			.external = compute_external_impulse_jacobian (Jv1, Jw1, Jv2, Jw2),
+		};
+	}
+
+
+template<std::size_t N>
 	inline Constraint::Lambda<N>
 	Constraint::compute_lambda (PositionError<N> const& position_error,
-								Jacobian<N> const& J,
+								TwoJacobians<N> const& J,
 								ConstraintMassMatrix<N> const& K,
 								si::Time const dt) const
 	{
 		auto const inv_dt = 1 / dt;
-		auto const damped_jacobian = effective_velocity_correction_factor() * J;
+		auto const damped_jacobian = effective_velocity_correction_factor() * J.internal + J.external;
 		auto const stabilization_bias = baumgarte_factor() * inv_dt * position_error;
 		return -inv_dt * inv (K) * (damped_jacobian + stabilization_bias);
 	}
@@ -503,12 +627,12 @@ template<std::size_t N>
 template<std::size_t N>
 	inline Constraint::Lambda<N>
 	Constraint::compute_lambda (PositionError<N> const& position_error,
-								Jacobian<N> const& J,
+								TwoJacobians<N> const& J,
 								ConstraintZMatrix<N> const& Z,
 								si::Time const dt) const
 	{
 		auto const inv_dt = 1 / dt;
-		auto const damped_jacobian = effective_velocity_correction_factor() * J;
+		auto const damped_jacobian = effective_velocity_correction_factor() * J.internal + J.external;
 		auto const stabilization_bias = baumgarte_factor() * inv_dt * position_error;
 		return Z * (damped_jacobian + stabilization_bias);
 	}

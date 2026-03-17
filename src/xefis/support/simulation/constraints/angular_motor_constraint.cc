@@ -45,7 +45,7 @@ AngularMotorConstraint::initialize_step (si::Time const dt)
 ConstraintForces
 AngularMotorConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, VelocityMoments<WorldSpace> const& vm_2, si::Time dt)
 {
-	auto const J = compute_jacobian (vm_1, _Jv, _Jw1, vm_2, _Jv, _Jw2);
+	auto const J = compute_two_jacobians (vm_1, _Jv, _Jw1, vm_2, _Jv, _Jw2);
 	auto lambda = compute_lambda (_position_error, J, _Z, dt);
 	lambda = std::clamp (lambda.scalar(), -_force, +_force); // TODO scalar?
 

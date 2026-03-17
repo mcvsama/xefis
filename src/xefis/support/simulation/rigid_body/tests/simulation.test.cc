@@ -66,34 +66,57 @@ make_iss()
 }
 
 
+class TwoBodySystem
+{
+  public:
+	// Ctor
+	explicit
+	TwoBodySystem (uint32_t const iterations, double const friction_factor):
+		solver (system, iterations)
+	{
+		auto const mass_moments = MassMoments<BodyCOM> {
+			1_kg,
+			make_cuboid_inertia_tensor<BodyCOM> (1_kg, 1_m),
+		};
+
+		this->body_1 = &system.add<rigid_body::Body> (mass_moments);
+		this->body_2 = &system.add<rigid_body::Body> (mass_moments);
+
+		this->body_1->move_to ({ -0.5_m, 0_m, 0_m });
+		this->body_2->move_to ({ +0.5_m, 0_m, 0_m });
+
+		this->system.add<rigid_body::FixedConstraint> (*body_1, *body_2);
+		this->system.set_baumgarte_factor (0.0);
+		this->system.set_constraint_force_mixing_factor (0.0);
+		this->system.set_friction_factor (friction_factor);
+	}
+
+	rigid_body::System			system;
+	rigid_body::ImpulseSolver	solver;
+	rigid_body::Body*			body_1;
+	rigid_body::Body*			body_2;
+};
+
+
 si::Velocity
 fixed_constraint_relative_speed_after_step (double const friction_factor)
 {
-	auto system = rigid_body::System();
-	auto solver = rigid_body::ImpulseSolver (system, 1);
+	auto system = TwoBodySystem (1, friction_factor);
+	system.body_1->set_velocity_moments (VelocityMoments<WorldSpace> ({ -1_mps, 0_mps, 0_mps }, { 0_radps, 0_radps, 0_radps }));
+	system.body_2->set_velocity_moments (VelocityMoments<WorldSpace> ({ +1_mps, 0_mps, 0_mps }, { 0_radps, 0_radps, 0_radps }));
+	system.solver.evolve (1_ms);
+	return abs (system.body_2->velocity_moments<WorldSpace>().velocity() - system.body_1->velocity_moments<WorldSpace>().velocity());
+}
 
-	auto const mass_moments = MassMoments<BodyCOM> {
-		1_kg,
-		make_cuboid_inertia_tensor<BodyCOM> (1_kg, 1_m),
-	};
 
-	auto& body_1 = system.add<rigid_body::Body> (mass_moments);
-	auto& body_2 = system.add<rigid_body::Body> (mass_moments);
-
-	body_1.move_to ({ -0.5_m, 0_m, 0_m });
-	body_2.move_to ({ +0.5_m, 0_m, 0_m });
-
-	body_1.set_velocity_moments (VelocityMoments<WorldSpace> ({ -1_mps, 0_mps, 0_mps }, { 0_radps, 0_radps, 0_radps }));
-	body_2.set_velocity_moments (VelocityMoments<WorldSpace> ({ +1_mps, 0_mps, 0_mps }, { 0_radps, 0_radps, 0_radps }));
-
-	system.add<rigid_body::FixedConstraint> (body_1, body_2);
-	system.set_baumgarte_factor (0.0);
-	system.set_constraint_force_mixing_factor (0.0);
-	system.set_friction_factor (friction_factor);
-
-	solver.evolve (1_ms);
-
-	return abs (body_2.velocity_moments<WorldSpace>().velocity() - body_1.velocity_moments<WorldSpace>().velocity());
+si::Velocity
+fixed_constraint_relative_speed_under_load_after_step (double const friction_factor, uint32_t iterations)
+{
+	auto system = TwoBodySystem (iterations, friction_factor);
+	system.body_1->apply_impulse (ForceMoments<WorldSpace> ({ -1_N, 0_N, 0_N }, { 0_Nm, 0_Nm, 0_Nm }));
+	system.body_2->apply_impulse (ForceMoments<WorldSpace> ({ +1_N, 0_N, 0_N }, { 0_Nm, 0_Nm, 0_Nm }));
+	system.solver.evolve (1_ms);
+	return abs (system.body_2->velocity_moments<WorldSpace>().velocity() - system.body_1->velocity_moments<WorldSpace>().velocity());
 }
 
 
@@ -148,6 +171,31 @@ nu::AutoTest t_constraint_friction_factor_affects_velocity_correction ("rigid_bo
 	test_asserts::verify_equal_with_epsilon ("With full friction the velocity correction is suppressed",
 											 relative_speed_with_full_friction,
 											 2_mps,
+											 1e-9_mps);
+});
+
+
+nu::AutoTest t_constraint_friction_factor_does_not_weaken_external_load_support ("rigid_body::Constraint: friction factor does not weaken external load support", []{
+	auto const relative_speed_without_friction = fixed_constraint_relative_speed_under_load_after_step (0.0, 1);
+	auto const relative_speed_with_full_friction = fixed_constraint_relative_speed_under_load_after_step (1.0, 1);
+
+	test_asserts::verify_equal_with_epsilon ("Without friction the fixed constraint cancels the applied separating load",
+											 relative_speed_without_friction,
+											 0_mps,
+											 1e-9_mps);
+	test_asserts::verify_equal_with_epsilon ("Full friction still lets the fixed constraint hold against external load from rest",
+											 relative_speed_with_full_friction,
+											 0_mps,
+											 1e-9_mps);
+});
+
+
+nu::AutoTest t_constraint_friction_factor_does_not_redamp_external_load_on_later_iterations ("rigid_body::Constraint: friction factor does not redamp external load on later solver iterations", []{
+	auto const relative_speed_with_partial_friction = fixed_constraint_relative_speed_under_load_after_step (0.5, 1000);
+
+	test_asserts::verify_equal_with_epsilon ("Partial friction still lets the fixed constraint hold against external load after repeated solver iterations",
+											 relative_speed_with_partial_friction,
+											 0_mps,
 											 1e-9_mps);
 });
 

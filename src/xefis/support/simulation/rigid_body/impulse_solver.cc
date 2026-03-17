@@ -181,9 +181,13 @@ ImpulseSolver::update_constraint_forces (si::Time const dt)
 
 	for (iteration = 0; iteration < _max_iterations && !precise_enough; ++iteration)
 	{
-		// Reset constraint forces:
+		// Recompute each solver iteration from the bodies' current state and
+		// the constraint forces accumulated in this pass only.
 		for (auto& body: _system.bodies())
+		{
+			body->iteration().reset (body->velocity_moments<WorldSpace>());
 			body->iteration().all_constraints_force_moments = ForceMoments<WorldSpace>();
+		}
 
 		precise_enough = true;
 

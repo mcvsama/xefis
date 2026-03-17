@@ -82,7 +82,7 @@ AngularLimitsConstraint::min_angle_corrections (VelocityMoments<WorldSpace> cons
 {
 	if (_min_angle && hinge_data.angle < *_min_angle)
 	{
-		auto const J = compute_jacobian (vm_1, _Jv, _min_Jw1, vm_2, _Jv, _min_Jw2);
+		auto const J = compute_two_jacobians (vm_1, _Jv, _min_Jw1, vm_2, _Jv, _min_Jw2);
 		auto const lambda = compute_lambda (_min_position_error, J, _min_Z, dt);
 
 		return compute_constraint_forces (_Jv, _min_Jw1, _Jv, _min_Jw2, lambda);
@@ -100,7 +100,7 @@ AngularLimitsConstraint::max_angle_corrections (VelocityMoments<WorldSpace> cons
 {
 	if (_max_angle && hinge_data.angle > *_max_angle)
 	{
-		auto const J = compute_jacobian (vm_1, _Jv, _min_Jw2, vm_2, _Jv, _min_Jw1);
+		auto const J = compute_two_jacobians (vm_1, _Jv, _min_Jw2, vm_2, _Jv, _min_Jw1);
 		auto const lambda = compute_lambda (_max_position_error, J, _max_Z, dt);
 
 		return compute_constraint_forces (_Jv, _min_Jw2, _Jv, _min_Jw1, lambda);

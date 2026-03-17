@@ -91,7 +91,7 @@ LinearLimitsConstraint::min_distance_corrections (VelocityMoments<WorldSpace> co
 {
 	if (_min_distance && slider_data.distance < *_min_distance)
 	{
-		auto const J = compute_jacobian (vm_1, _min_Jv1, _min_Jw1, vm_2, _min_Jv2, _min_Jw2);
+		auto const J = compute_two_jacobians (vm_1, _min_Jv1, _min_Jw1, vm_2, _min_Jv2, _min_Jw2);
 		auto const lambda = compute_lambda (_min_position_error, J, _min_Z, dt);
 
 		return compute_constraint_forces (_min_Jv1, _min_Jw1, _min_Jv2, _min_Jw2, lambda);
@@ -109,7 +109,7 @@ LinearLimitsConstraint::max_distance_corrections (VelocityMoments<WorldSpace> co
 {
 	if (_max_distance && slider_data.distance > *_max_distance)
 	{
-		auto const J = compute_jacobian (vm_1, _max_Jv1, _max_Jw1, vm_2, _max_Jv2, _max_Jw2);
+		auto const J = compute_two_jacobians (vm_1, _max_Jv1, _max_Jw1, vm_2, _max_Jv2, _max_Jw2);
 		auto const lambda = compute_lambda (_max_position_error, J, _max_Z, dt);
 
 		return compute_constraint_forces (_max_Jv1, _max_Jw1, _max_Jv2, _max_Jw2, lambda);
