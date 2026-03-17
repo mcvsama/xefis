@@ -18,7 +18,7 @@
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
 #include <xefis/core/setting.h>
-#include <xefis/core/sockets/socket.h>
+#include <xefis/core/sockets/module_socket.h>
 #include <xefis/support/sockets/socket_value_changed.h>
 
 // Neutrino:
@@ -26,6 +26,9 @@
 
 // Standard:
 #include <cstddef>
+
+
+namespace nu = neutrino;
 
 
 template<class Value>
