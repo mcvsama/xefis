@@ -87,7 +87,7 @@ class SimulationRun
 	std::optional<xf::Simulator>		_simulator;
 	std::optional<xf::SimulatorWidget>	_simulator_widget;
 	xf::rigid_body::System				_rigid_body_system			{ _simulated_atmosphere };
-	xf::rigid_body::ImpulseSolver		_rigid_body_solver			{ _rigid_body_system, 1 };
+	xf::rigid_body::ImpulseSolver		_rigid_body_solver			{ _rigid_body_system, 20 };
 	xf::AntennaSystem					_antenna_system				{ 2_s };
 	xf::electrical::Network				_electrical_network;
 	xf::electrical::NodeVoltageSolver	_electrical_network_solver	{ _electrical_network, 1e-3 };
