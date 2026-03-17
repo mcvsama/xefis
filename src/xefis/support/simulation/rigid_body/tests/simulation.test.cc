@@ -197,11 +197,11 @@ nu::AutoTest t_constraint_friction_factor_affects_velocity_correction ("rigid_bo
 	auto const relative_speed_without_friction = fixed_constraint_relative_speed_after_step (0.0);
 	auto const relative_speed_with_full_friction = fixed_constraint_relative_speed_after_step (1.0);
 
-	test_asserts::verify_equal_with_epsilon ("Without friction the violating relative velocity is fully corrected",
+	test_asserts::verify_equal_with_epsilon ("without friction the violating relative velocity is fully corrected",
 											 relative_speed_without_friction,
 											 0_mps,
 											 1e-9_mps);
-	test_asserts::verify_equal_with_epsilon ("With full friction the velocity correction is suppressed",
+	test_asserts::verify_equal_with_epsilon ("with full friction the velocity correction is suppressed",
 											 relative_speed_with_full_friction,
 											 2_mps,
 											 1e-9_mps);
@@ -214,11 +214,11 @@ nu::AutoTest t_constraint_friction_factor_does_not_weaken_external_load_support 
 		auto const relative_speed_without_friction = fixed_constraint_relative_speed_under_load_after_step (0.0, iterations);
 		auto const relative_speed_with_full_friction = fixed_constraint_relative_speed_under_load_after_step (1.0, iterations);
 
-		test_asserts::verify_equal_with_epsilon ("Without friction the fixed constraint cancels the applied separating load",
+		test_asserts::verify_equal_with_epsilon ("without friction the fixed constraint cancels the applied separating load",
 												 relative_speed_without_friction,
 												 0_mps,
 												 1e-9_mps);
-		test_asserts::verify_equal_with_epsilon ("Full friction still lets the fixed constraint hold against external load from rest",
+		test_asserts::verify_equal_with_epsilon ("full friction still lets the fixed constraint hold against external load from rest",
 												 relative_speed_with_full_friction,
 												 0_mps,
 												 1e-9_mps);
@@ -231,7 +231,7 @@ nu::AutoTest t_constraint_friction_factor_does_not_redamp_external_load_on_later
 	{
 		auto const relative_speed_with_partial_friction = fixed_constraint_relative_speed_under_load_after_step (0.5, iterations);
 
-		test_asserts::verify_equal_with_epsilon ("Partial friction still lets the fixed constraint hold against external load after repeated solver iterations",
+		test_asserts::verify_equal_with_epsilon ("partial friction still lets the fixed constraint hold against external load after repeated solver iterations",
 												 relative_speed_with_partial_friction,
 												 0_mps,
 												 1e-9_mps);
