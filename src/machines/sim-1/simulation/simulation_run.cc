@@ -43,6 +43,10 @@ SimulationRun::SimulationRun (xf::Xefis& xefis, si::LonLatRadius<> const locatio
 	auto& earth = _rigid_body_system.add_gravitating (xf::rigid_body::make_earth());
 	earth.set_label ("Earth");
 
+	_rigid_body_system.set_baumgarte_factor (1e-4);
+	_rigid_body_system.set_constraint_force_mixing_factor (1e-4);
+	_rigid_body_system.set_friction_factor (1e-4);
+
 	_rigid_body_solver.set_required_precision (0.01_N, 0.001_Nm);
 	_rigid_body_solver.set_limits (xf::rigid_body::Limits {
 		.max_force				= 1e6_N,

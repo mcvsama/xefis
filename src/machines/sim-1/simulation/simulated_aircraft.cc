@@ -339,12 +339,6 @@ make_aircraft (xf::rigid_body::System& rigid_body_system, xf::Atmosphere& simula
 	for (auto& constraint: constraints)
 		constraint->set_breaking_force_torque (10'000_N, 1'000_Nm);
 
-	rigid_body_system.set_baumgarte_factor (0.3);
-	rigid_body_system.set_constraint_force_mixing_factor (1e-3);
-	prandtl_tube_fixed_constraint.set_baumgarte_factor (0.6);
-	temperature_sensor_fixed_constraint.set_baumgarte_factor (0.6);
-	radio_antenna_fixed_constraint.set_baumgarte_factor (0.6);
-
 	aircraft_group.set_rotation_reference_body (&fuselage);
 
 	return SimulatedAircraft {
