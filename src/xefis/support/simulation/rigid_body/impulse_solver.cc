@@ -29,6 +29,24 @@
 
 namespace xf::rigid_body {
 
+/**
+ * Refresh a body's temporary solver state from the currently accumulated
+ * force sum for current sweep. The solver stores constraint forces in
+ * all_constraints_force_moments, then derives acceleration_moments and
+ * velocity_moments from the frame-start body velocity plus dt * a.
+ * This is used both after warm-starting a sweep and after removing or
+ * reapplying one constraint's previous contribution.
+ */
+static void
+recompute_iteration_state (Body& body, si::Time const dt)
+{
+	auto& iter = body.iteration();
+	iter.acceleration_moments = iter.all_force_moments() / body.mass_moments<WorldSpace>();
+	iter.velocity_moments = body.velocity_moments<WorldSpace>() + *iter.acceleration_moments * dt;
+	iter.velocity_moments_updated = true;
+}
+
+
 ImpulseSolver::ImpulseSolver (System& system, uint32_t const max_iterations):
 	_system (system),
 	_max_iterations (max_iterations)
@@ -181,12 +199,33 @@ ImpulseSolver::update_constraint_forces (si::Time const dt)
 
 	for (iteration = 0; iteration < _max_iterations && !precise_enough; ++iteration)
 	{
-		// Recompute each solver iteration from the bodies' current state and
-		// the constraint forces accumulated in this pass only.
+		// Rebuild this sweep from the frame-start state, then warm-start it with
+		// the previous sweep's constraint forces so coupled constraints can still
+		// influence one another across outer iterations.
 		for (auto& body: _system.bodies())
 		{
 			body->iteration().reset (body->velocity_moments<WorldSpace>());
 			body->iteration().all_constraints_force_moments = ForceMoments<WorldSpace>();
+		}
+
+		for (auto const& constraint: _system.constraints())
+		{
+			if (!constraint->enabled() || constraint->broken())
+				continue;
+
+			auto& b1 = constraint->body_1();
+			auto& b2 = constraint->body_2();
+
+			if (b1.broken() || b2.broken())
+				continue;
+
+			if (auto const& opt_cf = constraint->previous_computation_constraint_forces())
+			{
+				b1.iteration().all_constraints_force_moments += (*opt_cf)[0];
+				b2.iteration().all_constraints_force_moments += (*opt_cf)[1];
+				recompute_iteration_state (b1, dt);
+				recompute_iteration_state (b2, dt);
+			}
 		}
 
 		precise_enough = true;
@@ -240,13 +279,23 @@ ImpulseSolver::update_single_constraint_forces (Constraint* constraint, si::Time
 		return precise_enough;
 	}
 
+	auto const previous_constraint_forces = constraint->previous_computation_constraint_forces();
+
+	if (previous_constraint_forces)
+	{
+		iter1.all_constraints_force_moments -= (*previous_constraint_forces)[0];
+		iter2.all_constraints_force_moments -= (*previous_constraint_forces)[1];
+		recompute_iteration_state (b1, dt);
+		recompute_iteration_state (b2, dt);
+	}
+
 	auto const constraint_forces = constraint->constraint_forces (iter1.velocity_moments, iter2.velocity_moments, dt);
 
 	if (_required_force_torque_precision)
 	{
-		if (auto opt_prev = constraint->previous_computation_constraint_forces())
+		if (previous_constraint_forces)
 		{
-			auto prev = *opt_prev;
+			auto prev = *previous_constraint_forces;
 			auto const dF = abs (constraint_forces[0].force() - prev[0].force());
 			auto const dT = abs (constraint_forces[0].torque() - prev[0].torque());
 
@@ -264,16 +313,8 @@ ImpulseSolver::update_single_constraint_forces (Constraint* constraint, si::Time
 
 	iter1.all_constraints_force_moments += constraint_forces[0];
 	iter2.all_constraints_force_moments += constraint_forces[1];
-
-	// Recompute accelerations:
-	iter1.acceleration_moments = iter1.all_force_moments() / b1.mass_moments<WorldSpace>();
-	iter2.acceleration_moments = iter2.all_force_moments() / b2.mass_moments<WorldSpace>();
-
-	// Recompute velocity moments:
-	iter1.velocity_moments = b1.velocity_moments<WorldSpace>() + *iter1.acceleration_moments * dt;
-	iter2.velocity_moments = b2.velocity_moments<WorldSpace>() + *iter2.acceleration_moments * dt;
-	iter1.velocity_moments_updated = true;
-	iter2.velocity_moments_updated = true;
+	recompute_iteration_state (b1, dt);
+	recompute_iteration_state (b2, dt);
 
 	return precise_enough;
 }

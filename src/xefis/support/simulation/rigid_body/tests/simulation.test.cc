@@ -120,6 +120,39 @@ fixed_constraint_relative_speed_under_load_after_step (double const friction_fac
 }
 
 
+si::Velocity
+fixed_constraint_chain_first_link_relative_speed_after_step (uint32_t const iterations)
+{
+	auto system = rigid_body::System();
+	auto solver = rigid_body::ImpulseSolver (system, iterations);
+
+	auto const mass_moments = MassMoments<BodyCOM> {
+		1_kg,
+		make_cuboid_inertia_tensor<BodyCOM> (1_kg, 1_m),
+	};
+
+	auto& body_1 = system.add<rigid_body::Body> (mass_moments);
+	auto& body_2 = system.add<rigid_body::Body> (mass_moments);
+	auto& body_3 = system.add<rigid_body::Body> (mass_moments);
+
+	body_1.move_to ({ -1_m, 0_m, 0_m });
+	body_2.move_to ({  0_m, 0_m, 0_m });
+	body_3.move_to ({ +1_m, 0_m, 0_m });
+
+	system.add<rigid_body::FixedConstraint> (body_1, body_2);
+	system.add<rigid_body::FixedConstraint> (body_2, body_3);
+	system.set_baumgarte_factor (0.0);
+	system.set_constraint_force_mixing_factor (0.0);
+	system.set_friction_factor (0.0);
+
+	body_3.apply_impulse (ForceMoments<WorldSpace> ({ +1_N, 0_N, 0_N }, { 0_Nm, 0_Nm, 0_Nm }));
+
+	solver.evolve (1_ms);
+
+	return abs (body_2.velocity_moments<WorldSpace>().velocity() - body_1.velocity_moments<WorldSpace>().velocity());
+}
+
+
 nu::AutoTest t_1 ("rigid_body::System: 90-minute simulation of gravitational forces", []{
 	auto rigid_body_system = rigid_body::System();
 	auto rigid_body_solver = rigid_body::ImpulseSolver (rigid_body_system);
@@ -195,6 +228,19 @@ nu::AutoTest t_constraint_friction_factor_does_not_redamp_external_load_on_later
 
 	test_asserts::verify_equal_with_epsilon ("Partial friction still lets the fixed constraint hold against external load after repeated solver iterations",
 											 relative_speed_with_partial_friction,
+											 0_mps,
+											 1e-9_mps);
+});
+
+
+nu::AutoTest t_constraint_solver_iterations_propagate_across_constraint_chain ("rigid_body::Constraint: solver iterations propagate corrections across a constraint chain", []{
+	auto const relative_speed_with_one_iteration = fixed_constraint_chain_first_link_relative_speed_after_step (1);
+	auto const relative_speed_with_many_iterations = fixed_constraint_chain_first_link_relative_speed_after_step (1000);
+
+	test_asserts::verify ("Many iterations reduce the first-link residual in a coupled constraint chain",
+						  relative_speed_with_many_iterations < relative_speed_with_one_iteration);
+	test_asserts::verify_equal_with_epsilon ("Many iterations can propagate the load correction back to the first link",
+											 relative_speed_with_many_iterations,
 											 0_mps,
 											 1e-9_mps);
 });
