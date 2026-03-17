@@ -33,7 +33,6 @@
 #include <cstddef>
 #include <memory>
 #include <type_traits>
-#include <vector>
 
 
 namespace xf::rigid_body {
