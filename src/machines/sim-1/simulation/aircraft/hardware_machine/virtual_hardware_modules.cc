@@ -52,10 +52,20 @@ VirtualHardwareModules::VirtualHardwareModules (simulation::SimulatedAircraft& a
 	h2f.air_total_pressure		<< this->air_total_pressure_sensor.pressure;
 	h2f.air_static_pressure		<< this->air_static_pressure_sensor.pressure;
 
-	this->servo_controller.socket_for (_aircraft.aileron_l_servo, "aileron-left")	<< f2h.left_aileron;
-	this->servo_controller.socket_for (_aircraft.aileron_r_servo, "aileron-right")	<< f2h.right_aileron;
-	this->servo_controller.socket_for (_aircraft.elevator_servo, "elevator")		<< f2h.elevator;
-	this->servo_controller.socket_for (_aircraft.rudder_servo, "rudder")			<< f2h.rudder;
+	auto& aileron_left	= this->servo_controller.socket_for (_aircraft.aileron_l_servo, "aileron-left");
+	auto& aileron_right	= this->servo_controller.socket_for (_aircraft.aileron_r_servo, "aileron-right");
+	auto& elevator		= this->servo_controller.socket_for (_aircraft.elevator_servo, "elevator");
+	auto& rudder		= this->servo_controller.socket_for (_aircraft.rudder_servo, "rudder");
+
+	aileron_left.set_fallback (0_deg);
+	aileron_right.set_fallback (0_deg);
+	elevator.set_fallback (0_deg);
+	rudder.set_fallback (0_deg);
+
+	aileron_left	<< f2h.left_aileron;
+	aileron_right	<< f2h.right_aileron;
+	elevator		<< f2h.elevator;
+	rudder			<< f2h.rudder;
 }
 
 } // namespace sim1::simulation::aircraft
