@@ -86,7 +86,7 @@ ImpulseSolver::evolve (si::Time const dt)
 
 	++_processed_frames;
 
-    return details;
+	return details;
 }
 
 
@@ -246,10 +246,10 @@ ImpulseSolver::update_constraint_forces (si::Time const dt)
 		}
 	}
 
-    return {
-        .iterations_run = iteration,
-        .converged = precise_enough,
-    };
+	return {
+		.iterations_run = iteration,
+		.converged = precise_enough,
+	};
 }
 
 
