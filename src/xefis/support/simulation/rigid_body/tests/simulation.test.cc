@@ -209,40 +209,53 @@ nu::AutoTest t_constraint_friction_factor_affects_velocity_correction ("rigid_bo
 
 
 nu::AutoTest t_constraint_friction_factor_does_not_weaken_external_load_support ("rigid_body::Constraint: friction factor does not weaken external load support", []{
-	auto const relative_speed_without_friction = fixed_constraint_relative_speed_under_load_after_step (0.0, 1);
-	auto const relative_speed_with_full_friction = fixed_constraint_relative_speed_under_load_after_step (1.0, 1);
+	for (auto iterations: { 1u, 10u, 100u, 1000u })
+	{
+		auto const relative_speed_without_friction = fixed_constraint_relative_speed_under_load_after_step (0.0, iterations);
+		auto const relative_speed_with_full_friction = fixed_constraint_relative_speed_under_load_after_step (1.0, iterations);
 
-	test_asserts::verify_equal_with_epsilon ("Without friction the fixed constraint cancels the applied separating load",
-											 relative_speed_without_friction,
-											 0_mps,
-											 1e-9_mps);
-	test_asserts::verify_equal_with_epsilon ("Full friction still lets the fixed constraint hold against external load from rest",
-											 relative_speed_with_full_friction,
-											 0_mps,
-											 1e-9_mps);
+		test_asserts::verify_equal_with_epsilon ("Without friction the fixed constraint cancels the applied separating load",
+												 relative_speed_without_friction,
+												 0_mps,
+												 1e-9_mps);
+		test_asserts::verify_equal_with_epsilon ("Full friction still lets the fixed constraint hold against external load from rest",
+												 relative_speed_with_full_friction,
+												 0_mps,
+												 1e-9_mps);
+	}
 });
 
 
 nu::AutoTest t_constraint_friction_factor_does_not_redamp_external_load_on_later_iterations ("rigid_body::Constraint: friction factor does not redamp external load on later solver iterations", []{
-	auto const relative_speed_with_partial_friction = fixed_constraint_relative_speed_under_load_after_step (0.5, 1000);
+	for (auto iterations: { 1u, 10u, 100u, 1000u })
+	{
+		auto const relative_speed_with_partial_friction = fixed_constraint_relative_speed_under_load_after_step (0.5, iterations);
 
-	test_asserts::verify_equal_with_epsilon ("Partial friction still lets the fixed constraint hold against external load after repeated solver iterations",
-											 relative_speed_with_partial_friction,
-											 0_mps,
-											 1e-9_mps);
+		test_asserts::verify_equal_with_epsilon ("Partial friction still lets the fixed constraint hold against external load after repeated solver iterations",
+												 relative_speed_with_partial_friction,
+												 0_mps,
+												 1e-9_mps);
+	}
 });
 
 
 nu::AutoTest t_constraint_solver_iterations_propagate_across_constraint_chain ("rigid_body::Constraint: solver iterations propagate corrections across a constraint chain", []{
-	auto const relative_speed_with_one_iteration = fixed_constraint_chain_first_link_relative_speed_after_step (1);
-	auto const relative_speed_with_many_iterations = fixed_constraint_chain_first_link_relative_speed_after_step (1000);
+	si::Velocity previous_relative_speed = 10_mps;
 
-	test_asserts::verify ("Many iterations reduce the first-link residual in a coupled constraint chain",
-						  relative_speed_with_many_iterations < relative_speed_with_one_iteration);
-	test_asserts::verify_equal_with_epsilon ("Many iterations can propagate the load correction back to the first link",
-											 relative_speed_with_many_iterations,
-											 0_mps,
-											 1e-9_mps);
+	for (auto iterations: { 1u, 2u, 3u, 4u, 5u, 6u, 7u, 8u, 9u, 10u, 20u, 1000u })
+	{
+		auto const context = std::format ("{} iterations", iterations);
+		auto const relative_speed = fixed_constraint_chain_first_link_relative_speed_after_step (iterations);
+
+		test_asserts::verify ("many iterations reduce the first-link residual in a coupled constraint chain; " + context,
+							  relative_speed < previous_relative_speed);
+		test_asserts::verify_equal_with_epsilon ("many iterations can propagate the load correction back to the first link",
+												 relative_speed,
+												 0_mps,
+												 1e-3_mps / iterations);
+
+		previous_relative_speed = relative_speed;
+	}
 });
 
 } // namespace
