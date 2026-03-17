@@ -29,6 +29,7 @@
 // Qt:
 #include <QMainWindow>
 #include <QMenu>
+#include <QPointer>
 
 // Standard:
 #include <cstddef>
@@ -62,6 +63,7 @@ class SimulatorMachine: public xf::Machine
 	QMainWindow						_main_window;
 	std::optional<SimulationRun>	_simulation_run;
 	QMenu*							_machines_menu	{ nullptr };
+	QPointer<QWidget>				_impulse_solver_details_widget;
 };
 
 } // namespace sim1::simulation

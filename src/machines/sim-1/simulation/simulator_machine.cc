@@ -29,6 +29,7 @@
 // Standard:
 #include <cstddef>
 #include <memory>
+#include <optional>
 
 
 namespace sim1::simulation {
@@ -87,6 +88,11 @@ SimulatorMachine::create_main_window()
 			restart_simulation (si::LonLatRadius (90_deg, 0_deg, _height));
 		});
 	}
+
+	simulation_menu->addAction ("&Show impulse solver details…", [this] {
+		if (_simulation_run)
+			_simulation_run->simulator().stats_widget().show();
+	});
 
 	_machines_menu = main_menu->addMenu ("&Machines");
 

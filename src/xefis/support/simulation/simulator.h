@@ -29,6 +29,10 @@
 // Lib:
 #include <boost/circular_buffer.hpp>
 
+// Qt:
+#include <QWidget>
+#include <QPointer>
+
 // Standard:
 #include <cstddef>
 #include <list>
@@ -62,6 +66,9 @@ class Simulator: public nu::Noncopyable
 	// Ctor
 	explicit
 	Simulator (rigid_body::System&, rigid_body::ImpulseSolver&, si::Time initial_simulation_time, si::Time frame_duration, nu::Logger const&);
+
+	// Dtor
+	~Simulator();
 
 	/**
 	 * Set additional evolution callback.
@@ -188,6 +195,10 @@ class Simulator: public nu::Noncopyable
 	real_time_taken_history() const noexcept
 		{ return { _real_time_taken_history.begin(), _real_time_taken_history.end() }; }
 
+	[[nodiscard]]
+	QWidget&
+	stats_widget();
+
   private:
 	nu::Logger					_logger;
 	rigid_body::System&			_rigid_body_system;
@@ -198,6 +209,7 @@ class Simulator: public nu::Noncopyable
 	RealTimeTakenHistory		_real_time_taken_history	{ kMaxEvolutionDetailsHistory };
 	MachineManagers				_machine_managers;
 	Clocks						_clocks;
+	QPointer<QWidget>			_stats_widget;
 };
 
 } // namespace xf

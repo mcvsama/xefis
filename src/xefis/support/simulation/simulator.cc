@@ -17,6 +17,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/machine.h>
+#include <xefis/support/ui/iterative_solver_stats_widget.h>
 
 // Neutrino:
 #include <neutrino/time.h>
@@ -54,6 +55,32 @@ Simulator::Simulator (rigid_body::System& rigid_body_system,
 		if (_additional_evolve)
 			_additional_evolve (dt);
 	});
+}
+
+
+Simulator::~Simulator()
+{
+	if (_stats_widget)
+		delete _stats_widget.get();
+}
+
+
+QWidget&
+Simulator::stats_widget()
+{
+	if (!_stats_widget)
+	{
+		_stats_widget = new IterativeSolverStatsWidget ([this] {
+			return IterativeSolverStatsWidget::Snapshot {
+				.iterations_run	= iterations_run_history(),
+				.real_time_taken = real_time_taken_history(),
+				.max_iterations = _rigid_body_solver.max_iterations(),
+				.frame_duration = frame_duration(),
+			};
+		});
+	}
+
+	return *_stats_widget;
 }
 
 } // namespace xf
