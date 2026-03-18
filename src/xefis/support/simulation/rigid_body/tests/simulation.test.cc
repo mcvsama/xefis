@@ -88,9 +88,9 @@ class TwoBodySystem
 		this->body_2->move_to ({ +0.5_m, 0_m, 0_m });
 
 		this->system.add<rigid_body::FixedConstraint> (*body_1, *body_2);
-		this->system.set_baumgarte_factor (0.0);
-		this->system.set_constraint_force_mixing_factor (0.0);
-		this->system.set_friction_factor (friction_factor);
+		this->system.set_default_baumgarte_factor (0.0);
+		this->system.set_default_constraint_force_mixing_factor (0.0);
+		this->system.set_default_friction_factor (friction_factor);
 	}
 
 	rigid_body::System			system;
@@ -143,9 +143,9 @@ fixed_constraint_chain_first_link_relative_speed_after_step (uint32_t const iter
 
 	system.add<rigid_body::FixedConstraint> (body_1, body_2);
 	system.add<rigid_body::FixedConstraint> (body_2, body_3);
-	system.set_baumgarte_factor (0.0);
-	system.set_constraint_force_mixing_factor (0.0);
-	system.set_friction_factor (0.0);
+	system.set_default_baumgarte_factor (0.0);
+	system.set_default_constraint_force_mixing_factor (0.0);
+	system.set_default_friction_factor (0.0);
 
 	body_3.apply_impulse (ForceMoments<WorldSpace> ({ +1_N, 0_N, 0_N }, { 0_Nm, 0_Nm, 0_Nm }));
 
@@ -182,15 +182,102 @@ motor_angle_after_motion (double const system_baumgarte_factor, double const sys
 
 	system.add<rigid_body::AngularMotorConstraint> (hinge, 180_deg / 1_s, 2_Nm);
 
-	system.set_baumgarte_factor (system_baumgarte_factor);
-	system.set_constraint_force_mixing_factor (0.0);
-	system.set_friction_factor (system_friction_factor);
+	system.set_default_baumgarte_factor (system_baumgarte_factor);
+	system.set_default_constraint_force_mixing_factor (0.0);
+	system.set_default_friction_factor (system_friction_factor);
 
 	for (auto i = 0; i < 250; ++i)
 		solver.evolve (1_ms);
 
 	return hinge.data().angle;
 }
+
+
+nu::AutoTest t_constraint_factors_inherit_system_defaults ("rigid_body::Constraint: factors inherit and can revert to system defaults", []{
+	auto system = rigid_body::System();
+
+	auto const mass_moments = MassMoments<BodyCOM> {
+		1_kg,
+		make_cuboid_inertia_tensor<BodyCOM> (1_kg, 1_m),
+	};
+
+	auto& body_1 = system.add<rigid_body::Body> (mass_moments);
+	auto& body_2 = system.add<rigid_body::Body> (mass_moments);
+
+	system.set_default_baumgarte_factor (0.125);
+	system.set_default_constraint_force_mixing_factor (0.25);
+	system.set_default_friction_factor (0.5);
+
+	auto& constraint = system.add (std::make_unique<rigid_body::FixedConstraint> (body_1, body_2));
+
+	test_asserts::verify_equal_with_epsilon ("newly attached constraint inherits Baumgarte factor",
+											 constraint.baumgarte_factor(),
+											 0.125,
+											 1e-12);
+	test_asserts::verify_equal_with_epsilon ("newly attached constraint inherits CFM factor",
+											 constraint.constraint_force_mixing_factor(),
+											 0.25,
+											 1e-12);
+	test_asserts::verify_equal_with_epsilon ("newly attached constraint inherits friction factor",
+											 constraint.friction_factor(),
+											 0.5,
+											 1e-12);
+
+	system.set_default_baumgarte_factor (0.375);
+	system.set_default_constraint_force_mixing_factor (0.625);
+	system.set_default_friction_factor (0.75);
+
+	test_asserts::verify_equal_with_epsilon ("inherited Baumgarte factor tracks later system changes",
+											 constraint.baumgarte_factor(),
+											 0.375,
+											 1e-12);
+	test_asserts::verify_equal_with_epsilon ("inherited CFM factor tracks later system changes",
+											 constraint.constraint_force_mixing_factor(),
+											 0.625,
+											 1e-12);
+	test_asserts::verify_equal_with_epsilon ("inherited friction factor tracks later system changes",
+											 constraint.friction_factor(),
+											 0.75,
+											 1e-12);
+
+	constraint.set_baumgarte_factor (0.2);
+	constraint.set_constraint_force_mixing_factor (0.3);
+	constraint.set_friction_factor (0.4);
+
+	system.set_default_baumgarte_factor (0.8);
+	system.set_default_constraint_force_mixing_factor (0.9);
+	system.set_default_friction_factor (1.0);
+
+	test_asserts::verify_equal_with_epsilon ("explicit Baumgarte override wins over system default",
+											 constraint.baumgarte_factor(),
+											 0.2,
+											 1e-12);
+	test_asserts::verify_equal_with_epsilon ("explicit CFM override wins over system default",
+											 constraint.constraint_force_mixing_factor(),
+											 0.3,
+											 1e-12);
+	test_asserts::verify_equal_with_epsilon ("explicit friction override wins over system default",
+											 constraint.friction_factor(),
+											 0.4,
+											 1e-12);
+
+	constraint.set_baumgarte_factor (std::nullopt);
+	constraint.set_constraint_force_mixing_factor (std::nullopt);
+	constraint.set_friction_factor (std::nullopt);
+
+	test_asserts::verify_equal_with_epsilon ("Baumgarte factor can return to system default inheritance",
+											 constraint.baumgarte_factor(),
+											 0.8,
+											 1e-12);
+	test_asserts::verify_equal_with_epsilon ("CFM factor can return to system default inheritance",
+											 constraint.constraint_force_mixing_factor(),
+											 0.9,
+											 1e-12);
+	test_asserts::verify_equal_with_epsilon ("friction factor can return to system default inheritance",
+											 constraint.friction_factor(),
+											 1.0,
+											 1e-12);
+});
 
 
 nu::AutoTest t_1 ("rigid_body::System: 90-minute simulation of gravitational forces", []{

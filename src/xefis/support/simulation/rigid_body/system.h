@@ -219,23 +219,65 @@ class System: private nu::Noncopyable
 	void
 	translate (SpaceLength<WorldSpace> const&);
 
-	/**
-	 * Apply given Baumgarte stabilization factor to all constraints.
-	 */
-	void
-	set_baumgarte_factor (double factor) noexcept;
+	[[nodiscard]]
+	double
+	default_baumgarte_factor() const noexcept
+		{ return _default_baumgarte_factor; }
 
 	/**
-	 * Apply given Constraint Force Mixing factor to all constraints.
+	 * Set default Baumgarte factor to use by constraint if it doesn't
+	 * have its own settings. 0.0 by default.
 	 */
 	void
-	set_constraint_force_mixing_factor (double factor) noexcept;
+	set_default_baumgarte_factor (double const factor) noexcept
+		{ _default_baumgarte_factor = factor; }
 
 	/**
-	 * Apply velocity damping factors to all constraints.
+	 * Apply given Baumgarte stabilization factor to all constraints,
+	 * overwriting their current settings.
 	 */
 	void
-	set_friction_factor (double factor) noexcept;
+	set_all_baumgarte_factors (double factor) noexcept;
+
+	[[nodiscard]]
+	double
+	default_constraint_force_mixing_factor() const noexcept
+		{ return _default_constraint_force_mixing_factor; }
+
+	/**
+	 * Set default CFM factor to use by constraint if it doesn't
+	 * have its own settings. 0.0 by default.
+	 */
+	void
+	set_default_constraint_force_mixing_factor (double const factor) noexcept
+		{ _default_constraint_force_mixing_factor = factor; }
+
+	/**
+	 * Apply given Constraint Force Mixing factor to all constraints,
+	 * overwriting their current settings.
+	 */
+	void
+	set_all_constraint_force_mixing_factors (double factor) noexcept;
+
+	[[nodiscard]]
+	double
+	default_friction_factor() const noexcept
+		{ return _default_friction_factor; }
+
+	/**
+	 * Set default friction factor to use by constraint if it doesn't
+	 * have its own settings. 0.0 by default.
+	 */
+	void
+	set_default_friction_factor (double const factor) noexcept
+		{ _default_friction_factor = factor; }
+
+	/**
+	 * Apply velocity damping factors to all constraints,
+	 * overwriting their current settings.
+	 */
+	void
+	set_all_friction_factors (double factor) noexcept;
 
 	[[nodiscard]]
 	Group*
@@ -254,7 +296,11 @@ class System: private nu::Noncopyable
 	// Bodies acting on all bodies gravitationally (contains pointers to elements in _bodies):
 	BodyPointers			_gravitating_bodies;
 	BodyPointers			_non_gravitating_bodies;
-	Atmosphere const*		_atmosphere { nullptr };
+	Atmosphere const*		_atmosphere								{ nullptr };
+	// Default values to use by constraints:
+	double					_default_baumgarte_factor				{ 0.0 };
+	double					_default_constraint_force_mixing_factor	{ 0.0 };
+	double					_default_friction_factor				{ 0.0 };
 };
 
 } // namespace xf::rigid_body
@@ -319,6 +365,7 @@ template<ConstraintConcept SpecificConstraint>
 	inline SpecificConstraint&
 	System::add (std::unique_ptr<SpecificConstraint>&& constraint)
 	{
+		static_cast<Constraint&> (*constraint).attach_to (*this);
 		_constraints.push_back (std::move (constraint));
 		return static_cast<SpecificConstraint&> (*_constraints.back());
 	}

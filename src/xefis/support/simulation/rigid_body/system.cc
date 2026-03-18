@@ -77,7 +77,7 @@ System::translate (SpaceLength<WorldSpace> const& translation)
 
 
 void
-System::set_baumgarte_factor (double factor) noexcept
+System::set_all_baumgarte_factors (double factor) noexcept
 {
 	for (auto& c: _constraints)
 		c->set_baumgarte_factor (factor);
@@ -85,7 +85,7 @@ System::set_baumgarte_factor (double factor) noexcept
 
 
 void
-System::set_constraint_force_mixing_factor (double factor) noexcept
+System::set_all_constraint_force_mixing_factors (double factor) noexcept
 {
 	for (auto& c: _constraints)
 		c->set_constraint_force_mixing_factor (factor);
@@ -93,7 +93,7 @@ System::set_constraint_force_mixing_factor (double factor) noexcept
 
 
 void
-System::set_friction_factor (double factor) noexcept
+System::set_all_friction_factors (double factor) noexcept
 {
 	for (auto& c: _constraints)
 		c->set_friction_factor (factor);

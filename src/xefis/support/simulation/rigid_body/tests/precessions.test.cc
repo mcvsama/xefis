@@ -113,9 +113,9 @@ void
 evolve (rb::System& system, si::Time duration, si::Time max_dt, std::function<void (si::Time)> const& before_step = {})
 {
 	rb::ImpulseSolver solver (system, 1);
-	system.set_baumgarte_factor (0.5);
-	system.set_constraint_force_mixing_factor (0.0);
-	system.set_friction_factor (0.0);
+	system.set_default_baumgarte_factor (0.5);
+	system.set_default_constraint_force_mixing_factor (0.0);
+	system.set_default_friction_factor (0.0);
 
 	for (auto remaining = duration; remaining > 0_s; )
 	{

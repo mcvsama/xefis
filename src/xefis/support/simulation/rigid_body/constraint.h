@@ -32,6 +32,8 @@
 
 namespace xf::rigid_body {
 
+class System;
+
 using ConstraintForces = std::array<ForceMoments<WorldSpace>, 2>;
 
 
@@ -119,6 +121,14 @@ class Constraint:
 	Constraint (ConnectedBodies const&);
 
 	/**
+	 * Return true if constraint can participate in simulation computations.
+	 */
+	[[nodiscard]]
+	bool
+	usable() const noexcept
+		{ return enabled() && !broken() && !body_1().broken() && !body_2().broken(); }
+
+	/**
 	 * Return true if constraint is enabled.
 	 * Constraint is enabled by default.
 	 */
@@ -179,14 +189,6 @@ class Constraint:
 		{ return _broken; }
 
 	/**
-	 * Return true if constraint can participate in simulation computations.
-	 */
-	[[nodiscard]]
-	bool
-	usable() const noexcept
-		{ return enabled() && !broken() && !body_1().broken() && !body_2().broken(); }
-
-	/**
 	 * Break the constraint.
 	 */
 	void
@@ -198,15 +200,15 @@ class Constraint:
 	 */
 	[[nodiscard]]
 	double
-	baumgarte_factor() const noexcept
-		{ return _baumgarte_factor; }
+	baumgarte_factor() const noexcept;
 
 	/**
 	 * Set Baumgarte stabilization factor.
+	 * Set to std::nullopt to inherit the system default.
 	 */
 	void
-	set_baumgarte_factor (double factor) noexcept
-		{ _baumgarte_factor = factor; }
+	set_baumgarte_factor (std::optional<double> factor) noexcept
+		{ _baumgarte_factor_override = factor; }
 
 	/**
 	 * Constraint Force Mixing (CFM) factor.
@@ -217,34 +219,32 @@ class Constraint:
 	 */
 	[[nodiscard]]
 	double
-	constraint_force_mixing_factor() const noexcept
-		{ return _constraint_force_mixing_factor.to_floating_point(); }
+	constraint_force_mixing_factor() const noexcept;
 
 	/**
 	 * Set Constraint Force Mixing factor.
-	 * By default it's set to 0.
+	 * Set to std::nullopt to inherit the system default.
 	 */
 	void
-	set_constraint_force_mixing_factor (double factor) noexcept
-		{ _constraint_force_mixing_factor = ConstraintMassMatrix<0>::Scalar (factor); }
+	set_constraint_force_mixing_factor (std::optional<double> factor) noexcept
+		{ _constraint_force_mixing_factor_override = factor; }
 
 	/**
 	 * Return the friction factor.
 	 */
 	[[nodiscard]]
 	double
-	friction_factor() const noexcept
-		{ return _friction_factor; }
+	friction_factor() const noexcept;
 
 	/**
 	 * Apply friction factor to damp constraint-space velocity correction and simulate
 	 * energy dissipation on the constraint.
 	 * The factor should be small, usually between 0.001 and 0.01 for realism.
-	 * By default it's 0.
+	 * Set to std::nullopt to inherit the system default.
 	 */
 	void
-	set_friction_factor (double factor) noexcept
-		{ _friction_factor = factor; }
+	set_friction_factor (std::optional<double> factor) noexcept
+		{ _friction_factor_override = factor; }
 
 	/**
 	 * Initialize the constraint for the next simulation step (frame).
@@ -481,16 +481,23 @@ class Constraint:
 	[[nodiscard]]
 	double
 	effective_velocity_correction_factor() const noexcept
-		{ return std::clamp (1.0 - _friction_factor, 0.0, 1.0); }
+		{ return std::clamp (1.0 - friction_factor(), 0.0, 1.0); }
 
   private:
+	friend class System;
+
+	void
+	attach_to (System const& system) noexcept
+		{ _system = &system; }
+
 	bool							_enabled						{ true };
 	bool							_broken							{ false };
 	std::optional<si::Force>		_breaking_force;
 	std::optional<si::Torque>		_breaking_torque;
-	double							_baumgarte_factor				{ 0.0 };
-	ConstraintMassMatrix<0>::Scalar	_constraint_force_mixing_factor { 0.0 };
-	double							_friction_factor				{ 0.0 };
+	System const*					_system							{ nullptr };
+	std::optional<double>			_baumgarte_factor_override;
+	std::optional<double>			_constraint_force_mixing_factor_override;
+	std::optional<double>			_friction_factor_override;
 	std::optional<ConstraintForces>	_previous_computation_constraint_forces;
 };
 
@@ -754,9 +761,11 @@ template<std::size_t N>
 	inline Constraint::ConstraintMassMatrix<N>&
 	Constraint::apply_constraint_mixing_factor (ConstraintMassMatrix<N>& K) const
 	{
-		if (_constraint_force_mixing_factor.to_floating_point() != 0.0)
+		auto const constraint_force_mixing_factor = this->constraint_force_mixing_factor();
+
+		if (constraint_force_mixing_factor != 0.0)
 			for (std::size_t i = 0; i < N; ++i)
-				K[i, i] += _constraint_force_mixing_factor;
+				K[i, i] += typename ConstraintMassMatrix<N>::Scalar (constraint_force_mixing_factor);
 
 		return K;
 	}
