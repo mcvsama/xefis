@@ -55,6 +55,9 @@ AngularServoConstraint::AngularServoConstraint (HingePrecomputation& hinge_preco
 void
 AngularServoConstraint::initialize_step (si::Time const dt)
 {
+	_motor_constraint.set_baumgarte_factor (baumgarte_factor());
+	_motor_constraint.set_constraint_force_mixing_factor (constraint_force_mixing_factor());
+	_motor_constraint.set_friction_factor (friction_factor());
 	_motor_constraint.initialize_step (dt);
 }
 
