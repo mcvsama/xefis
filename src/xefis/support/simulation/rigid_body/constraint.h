@@ -521,7 +521,6 @@ Constraint::constraint_forces (VelocityMoments<WorldSpace> const& vm_1, Velocity
 	}
 	else
 		return do_constraint_forces (vm_1, vm_2, dt);
-
 }
 
 
