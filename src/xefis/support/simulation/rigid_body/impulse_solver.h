@@ -38,19 +38,6 @@
 namespace xf::rigid_body {
 
 /**
- * Physical quantities limits applied during system evolution.
- */
-class Limits
-{
-  public:
-	si::Force			max_force				{ 1e3_N };
-	si::Torque			max_torque				{ 1e3_Nm };
-	si::Velocity		max_velocity			{ 1e3_mps };
-	si::AngularVelocity	max_angular_velocity	{ 1e3_radps };
-};
-
-
-/**
  * Used by ImpulseSolver to give information about each evolution details.
  */
 class EvolutionDetails
@@ -79,13 +66,6 @@ class ImpulseSolver: private nu::Noncopyable
 	 */
 	explicit
 	ImpulseSolver (System&, uint32_t max_iterations = kDefaultMaxIterations);
-
-	/**
-	 * Set limits applied during evolution.
-	 */
-	void
-	set_limits (std::optional<Limits> const& limits)
-		{ _limits = limits; }
 
 	/**
 	 * Set number of iterations of the converging algorithm.
@@ -165,46 +145,13 @@ class ImpulseSolver: private nu::Noncopyable
 	void
 	normalize_rotations();
 
-	template<class Space>
-		void
-		apply_limits (ForceMoments<Space>&) const;
-
-	template<class Space>
-		void
-		apply_limits (VelocityMoments<Space>&) const;
-
   private:
 	System&						_system;
-	std::optional<Limits>		_limits;
 	size_t						_max_iterations		{ kDefaultMaxIterations };
 	uint64_t					_processed_frames	{ 0 };
 	std::optional<ForceTorque>	_required_force_torque_precision;
 	bool						_warm_starting		{ true };
 };
-
-
-template<class Space>
-	inline void
-	ImpulseSolver::apply_limits (ForceMoments<Space>& force_moments) const
-	{
-		if (_limits)
-		{
-			force_moments.set_force (length_limited (force_moments.force(), _limits->max_force));
-			force_moments.set_torque (length_limited (force_moments.torque(), _limits->max_torque));
-		}
-	}
-
-
-template<class Space>
-	inline void
-	ImpulseSolver::apply_limits (VelocityMoments<Space>& velocity_moments) const
-	{
-		if (_limits)
-		{
-			velocity_moments.set_velocity (length_limited (velocity_moments.velocity(), _limits->max_velocity));
-			velocity_moments.set_angular_velocity (length_limited (velocity_moments.angular_velocity(), _limits->max_angular_velocity));
-		}
-	}
 
 } // namespace xf::rigid_body
 

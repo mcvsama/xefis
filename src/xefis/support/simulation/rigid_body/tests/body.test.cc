@@ -310,7 +310,7 @@ nu::AutoTest t_bounding_sphere ("rigid_body::Body: bounding sphere radius", []{
 });
 
 
-nu::AutoTest t_body_rotate_about_updates_rotated_state ("rigid_body::Body: rotate_about updates rotated state", []{
+nu::AutoTest t_rotations_1 ("rigid_body::Body: rotate_about updates rotated state", []{
 	auto const mass = 2_kg;
 	auto const inertia_at_com = make_cuboid_inertia_tensor<BodyCOM> (mass, { 1_m, 2_m, 3_m });
 	auto body = rb::Body (MassMoments<BodyCOM> (mass, inertia_at_com));
@@ -349,7 +349,63 @@ nu::AutoTest t_body_rotate_about_updates_rotated_state ("rigid_body::Body: rotat
 });
 
 
-nu::AutoTest t_body_specific_rotations_refresh_world_mass_moments_cache ("rigid_body::Body: specific rotations refresh world mass moments cache", []{
+nu::AutoTest t_rotations_2 ("rigid_body::Body: specific rotations update acceleration except gravity", []{
+	auto verify_rotation = [] (std::string const& label, auto&& rotate) {
+		auto body = make_unit_body();
+		auto const acceleration_except_gravity = AccelerationMoments<WorldSpace> (
+			{ 2_mps2, 3_mps2, 4_mps2 },
+			{ 5_radps2, 6_radps2, 7_radps2 }
+		);
+		auto const rotation = z_rotation<WorldSpace> (90_deg);
+
+		body->set_acceleration_moments_except_gravity (acceleration_except_gravity);
+		(void) body->acceleration_moments_except_gravity<BodyCOM>();
+
+		rotate (*body, rotation);
+
+		auto const rotated_world_acceleration_except_gravity = body->acceleration_moments_except_gravity<WorldSpace>();
+		auto const rotated_body_acceleration_except_gravity = body->acceleration_moments_except_gravity<BodyCOM>();
+		auto const expected_world_acceleration_except_gravity = rotation * acceleration_except_gravity;
+		auto const expected_body_acceleration_except_gravity =
+			body->placement().rotate_to_body (expected_world_acceleration_except_gravity);
+
+		test_asserts::verify_equal_with_epsilon (label + ": world-space non-gravitational acceleration rotates with the body",
+												 rotated_world_acceleration_except_gravity.acceleration(),
+												 expected_world_acceleration_except_gravity.acceleration(),
+												 1e-12_mps2);
+		test_asserts::verify_equal_with_epsilon (label + ": world-space non-gravitational angular acceleration rotates with the body",
+												 rotated_world_acceleration_except_gravity.angular_acceleration(),
+												 expected_world_acceleration_except_gravity.angular_acceleration(),
+												 1e-12_radps2);
+		test_asserts::verify_equal_with_epsilon (label + ": body-space cache is refreshed after rotation",
+												 rotated_body_acceleration_except_gravity.acceleration(),
+												 expected_body_acceleration_except_gravity.acceleration(),
+												 1e-12_mps2);
+		test_asserts::verify_equal_with_epsilon (label + ": body-space angular cache is refreshed after rotation",
+												 rotated_body_acceleration_except_gravity.angular_acceleration(),
+												 expected_body_acceleration_except_gravity.angular_acceleration(),
+												 1e-12_radps2);
+	};
+
+	verify_rotation ("rotate_about_center_of_mass", [] (rb::Body& body, auto const& rotation) {
+		body.rotate_about_center_of_mass (rotation);
+	});
+
+	verify_rotation ("rotate_about_world_origin", [] (rb::Body& body, auto const& rotation) {
+		body.rotate_about_world_origin (rotation);
+	});
+
+	verify_rotation ("rotate_about_body_origin", [] (rb::Body& body, auto const& rotation) {
+		auto origin_placement = Placement<BodyCOM, BodyOrigin>();
+		origin_placement.set_position ({ 1_m, 0_m, 0_m });
+		body.set_origin_placement (origin_placement);
+		body.move_to (SpaceLength<WorldSpace> { 2_m, 3_m, 4_m });
+		body.rotate_about_body_origin (rotation);
+	});
+});
+
+
+nu::AutoTest t_rotations_3 ("rigid_body::Body: specific rotations refresh world mass moments cache", []{
 	auto verify_rotation = [] (std::string const& label, auto&& rotate) {
 		auto const mass = 2_kg;
 		auto const inertia_at_com = make_cuboid_inertia_tensor<BodyCOM> (mass, { 1_m, 2_m, 3_m });
@@ -390,7 +446,7 @@ nu::AutoTest t_body_specific_rotations_refresh_world_mass_moments_cache ("rigid_
 });
 
 
-nu::AutoTest t_body_set_mass_moments_refreshes_world_cache ("rigid_body::Body: set_mass_moments refreshes world cache", []{
+nu::AutoTest t_mass_moments ("rigid_body::Body: set_mass_moments refreshes world cache", []{
 	auto const initial_mass = 2_kg;
 	auto const initial_inertia = make_cuboid_inertia_tensor<BodyCOM> (initial_mass, { 1_m, 2_m, 3_m });
 	auto body = rb::Body (MassMoments<BodyCOM> (initial_mass, initial_inertia));

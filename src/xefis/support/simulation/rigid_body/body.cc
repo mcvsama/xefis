@@ -72,6 +72,7 @@ Body::rotate_about_center_of_mass (RotationQuaternion<WorldSpace> const& rotatio
 	_placement.rotate_body_frame (rotation);
 	_velocity_moments = rotation * _velocity_moments;
 	_acceleration_moments = rotation * _acceleration_moments;
+	_acceleration_moments_except_gravity = rotation * _acceleration_moments_except_gravity;
 
 	invalidate_placement_dependent_caches();
 }
@@ -83,6 +84,7 @@ Body::rotate_about_world_origin (RotationQuaternion<WorldSpace> const& rotation)
 	_placement.rotate_base_frame (rotation);
 	_velocity_moments = rotation * _velocity_moments;
 	_acceleration_moments = rotation * _acceleration_moments;
+	_acceleration_moments_except_gravity = rotation * _acceleration_moments_except_gravity;
 
 	invalidate_placement_dependent_caches();
 }
@@ -96,6 +98,7 @@ Body::rotate_about_body_origin (RotationQuaternion<WorldSpace> const& rotation)
 	_placement.rotate_base_frame_about (about_point, rotation);
 	_velocity_moments = rotation * _velocity_moments;
 	_acceleration_moments = rotation * _acceleration_moments;
+	_acceleration_moments_except_gravity = rotation * _acceleration_moments_except_gravity;
 
 	invalidate_placement_dependent_caches();
 }
@@ -107,6 +110,7 @@ Body::rotate_about (SpaceLength<WorldSpace> const& about_point, RotationQuaterni
 	_placement.rotate_base_frame_about (about_point, rotation);
 	_velocity_moments = rotation * _velocity_moments;
 	_acceleration_moments = rotation * _acceleration_moments;
+	_acceleration_moments_except_gravity = rotation * _acceleration_moments_except_gravity;
 
 	invalidate_placement_dependent_caches();
 }

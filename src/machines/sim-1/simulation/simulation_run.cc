@@ -48,12 +48,6 @@ SimulationRun::SimulationRun (xf::Xefis& xefis, si::LonLatRadius<> const locatio
 	_rigid_body_system.set_default_friction_factor (1e-4);
 
 	_rigid_body_solver.set_required_precision (0.01_N, 0.001_Nm);
-	_rigid_body_solver.set_limits (xf::rigid_body::Limits {
-		.max_force				= 1e6_N,
-		.max_torque				= 1e6_Nm,
-		.max_velocity			= 1e6_mps,
-		.max_angular_velocity	= 1e6_radps,
-	});
 
 	auto& simulator = _simulator.emplace (_rigid_body_system, _rigid_body_solver, nu::utc_now(), 1_ms, _logger.with_context ("Simulator"));
 	_simulator->register_machine_manager (_aircraft_hardware_machine);

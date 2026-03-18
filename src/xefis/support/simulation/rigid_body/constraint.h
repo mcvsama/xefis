@@ -341,8 +341,9 @@ class Constraint:
 										   JacobianW<N> const& Jw2) const;
 
 	/**
-	 * Calculate the part of the total Jacobian residual that comes from external
-	 * impulses accumulated for the current simulation step.
+	 * Calculate the part of the total Jacobian residual that comes from
+	 * undamped free-motion predictor terms accumulated for the current
+	 * simulation step.
 	 */
 	template<std::size_t N>
 		[[nodiscard]]
@@ -567,9 +568,9 @@ template<std::size_t N>
 
 		// Total jacobian: J * (v + Δt * a)
 		auto const J = Jv1 * (vm_1.velocity() + b1_iter.external_impulses_over_mass)
-					 + Jw1 * (vm_1.angular_velocity() * inv_radian + b1_iter.external_angular_impulses_over_inertia_tensor)
+					 + Jw1 * (vm_1.angular_velocity() * inv_radian + b1_iter.undamped_angular_impulses_over_inertia_tensor())
 					 + Jv2 * (vm_2.velocity() + b2_iter.external_impulses_over_mass)
-					 + Jw2 * (vm_2.angular_velocity() * inv_radian + b2_iter.external_angular_impulses_over_inertia_tensor);
+					 + Jw2 * (vm_2.angular_velocity() * inv_radian + b2_iter.undamped_angular_impulses_over_inertia_tensor());
 
 		return J;
 	}
@@ -589,18 +590,18 @@ template<std::size_t N>
 		auto const& b2_iter = body_2().iteration();
 
 		// Solver iterations start from the bodies' current velocity and then fold
-		// in external impulses together with accumulated constraint forces. Once a
-		// body's temporary velocity has been updated in this pass, remove the
-		// external step contribution here so friction damps only the constraint-
-		// driven motion while compute_external_impulse_jacobian() adds the load
-		// support term exactly once.
+		// in the undamped free-motion predictor together with accumulated
+		// constraint forces. Once a body's temporary velocity has been updated in
+		// this pass, remove that predictor contribution here so friction damps
+		// only the constraint-driven motion while
+		// compute_external_impulse_jacobian() adds the undamped term exactly once.
 		auto const v1 =
 			b1_iter.velocity_moments_updated
 				? vm_1.velocity() - b1_iter.external_impulses_over_mass
 				: vm_1.velocity();
 		auto const w1 =
 			b1_iter.velocity_moments_updated
-				? vm_1.angular_velocity() * inv_radian - b1_iter.external_angular_impulses_over_inertia_tensor
+				? vm_1.angular_velocity() * inv_radian - b1_iter.undamped_angular_impulses_over_inertia_tensor()
 				: vm_1.angular_velocity() * inv_radian;
 		auto const v2 =
 			b2_iter.velocity_moments_updated
@@ -608,7 +609,7 @@ template<std::size_t N>
 				: vm_2.velocity();
 		auto const w2 =
 			b2_iter.velocity_moments_updated
-				? vm_2.angular_velocity() * inv_radian - b2_iter.external_angular_impulses_over_inertia_tensor
+				? vm_2.angular_velocity() * inv_radian - b2_iter.undamped_angular_impulses_over_inertia_tensor()
 				: vm_2.angular_velocity() * inv_radian;
 
 		return Jv1 * v1
@@ -629,9 +630,9 @@ template<std::size_t N>
 		auto const& b2_iter = body_2().iteration();
 
 		return Jv1 * b1_iter.external_impulses_over_mass
-			 + Jw1 * b1_iter.external_angular_impulses_over_inertia_tensor
+			 + Jw1 * b1_iter.undamped_angular_impulses_over_inertia_tensor()
 			 + Jv2 * b2_iter.external_impulses_over_mass
-			 + Jw2 * b2_iter.external_angular_impulses_over_inertia_tensor;
+			 + Jw2 * b2_iter.undamped_angular_impulses_over_inertia_tensor();
 	}
 
 

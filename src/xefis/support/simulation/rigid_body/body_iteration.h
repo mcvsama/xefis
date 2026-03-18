@@ -46,7 +46,8 @@ class BodyIteration
 	ForceMoments<WorldSpace>									external_force_moments_except_gravity; // Excluding gravitation.
 	ForceMoments<WorldSpace>									external_force_moments; // Gravity + external_force_moments_except_gravity
 	SpaceVector<ImpulseOverMass, WorldSpace>					external_impulses_over_mass;
-	SpaceVector<AngularImpulseOverInertia, WorldSpace>			external_angular_impulses_over_inertia_tensor;
+	SpaceVector<AngularImpulseOverInertia, WorldSpace>			external_angular_impulses_over_inertia_tensor; // Torque-only.
+	SpaceVector<AngularImpulseOverInertia, WorldSpace>			gyroscopic_angular_impulses_over_inertia_tensor; // Free-motion predictor only.
 
 	// Those are used temporarily when calculating all_constraints_force_moments:
 	VelocityMoments<WorldSpace>									velocity_moments;
@@ -72,6 +73,11 @@ class BodyIteration
 	ForceMoments<WorldSpace>
 	force_moments_except_gravity() const noexcept
 		{ return external_force_moments_except_gravity + all_constraints_force_moments; }
+
+	[[nodiscard]]
+	SpaceVector<AngularImpulseOverInertia, WorldSpace>
+	undamped_angular_impulses_over_inertia_tensor() const noexcept
+		{ return external_angular_impulses_over_inertia_tensor + gyroscopic_angular_impulses_over_inertia_tensor; }
 };
 
 

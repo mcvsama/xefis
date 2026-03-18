@@ -189,6 +189,23 @@ template<math::CoordinateSystem Space = void>
 template<math::CoordinateSystem Space = void>
 	[[nodiscard]]
 	constexpr AccelerationMoments<Space>
+	compute_acceleration_moments (ForceMoments<Space> const& fm,
+								  MassMoments<Space> const& mm,
+								  VelocityMoments<Space> const& vm)
+	{
+		auto const angular_momentum = mm.inertia_tensor() * vm.angular_velocity() / 1_rad;
+		auto const gyroscopic_torque = cross_product (vm.angular_velocity(), angular_momentum) / 1_rad;
+
+		return {
+			fm.force() / mm.mass(),
+			1_rad * mm.inverse_inertia_tensor() * (fm.torque() - gyroscopic_torque),
+		};
+	}
+
+
+template<math::CoordinateSystem Space = void>
+	[[nodiscard]]
+	constexpr AccelerationMoments<Space>
 	compute_acceleration_moments (VelocityMoments<Space> const& vm, si::Time const time)
 	{
 		return {

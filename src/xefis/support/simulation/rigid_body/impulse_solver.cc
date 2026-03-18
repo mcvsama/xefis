@@ -41,7 +41,11 @@ static void
 recompute_iteration_state (Body& body, si::Time const dt)
 {
 	auto& iter = body.iteration();
-	iter.acceleration_moments = iter.all_force_moments() / body.mass_moments<WorldSpace>();
+	iter.acceleration_moments = compute_acceleration_moments (
+		iter.all_force_moments(),
+		body.mass_moments<WorldSpace>(),
+		body.velocity_moments<WorldSpace>()
+	);
 	iter.velocity_moments = body.velocity_moments<WorldSpace>() + *iter.acceleration_moments * dt;
 	iter.velocity_moments_updated = true;
 }
@@ -169,8 +173,18 @@ ImpulseSolver::update_external_forces (si::Time const dt)
 		auto& iter = body->iteration();
 		iter.external_force_moments_except_gravity = body->external_force_moments<WorldSpace>();
 		iter.external_force_moments = iter.gravitational_force_moments + iter.external_force_moments_except_gravity;
+		auto const mass_moments = body->mass_moments<WorldSpace>();
+		auto const free_acceleration = compute_acceleration_moments (
+			iter.external_force_moments,
+			mass_moments,
+			body->velocity_moments<WorldSpace>()
+		);
+		auto const torque_only_acceleration = compute_acceleration_moments (iter.external_force_moments, mass_moments);
+
 		iter.external_impulses_over_mass = dt * iter.inv_M * iter.external_force_moments.force();
 		iter.external_angular_impulses_over_inertia_tensor = dt * iter.inv_I * iter.external_force_moments.torque();
+		iter.gyroscopic_angular_impulses_over_inertia_tensor =
+			dt * (free_acceleration.angular_acceleration() - torque_only_acceleration.angular_acceleration()) / 1_rad;
 		body->reset_applied_impulses();
 	}
 }
@@ -206,6 +220,7 @@ ImpulseSolver::update_constraint_forces (si::Time const dt)
 		{
 			body->iteration().reset (body->velocity_moments<WorldSpace>());
 			body->iteration().all_constraints_force_moments = ForceMoments<WorldSpace>();
+			recompute_iteration_state (*body, dt);
 		}
 
 		for (auto const& constraint: _system.constraints())
@@ -231,10 +246,6 @@ ImpulseSolver::update_constraint_forces (si::Time const dt)
 			if (!update_single_constraint_forces (constraint.get(), dt))
 				precise_enough = false;
 	}
-
-	// Update acceleration moments except gravity (used by eg. acceleration sensors):
-	for (auto& body: _system.bodies())
-		body->set_acceleration_moments_except_gravity (body->iteration().force_moments_except_gravity() / body->mass_moments<WorldSpace>());
 
 	// Tell each constraint that we finally computed its forces:
 	for (auto& constraint: _system.constraints())
@@ -316,18 +327,21 @@ ImpulseSolver::update_acceleration_moments()
 	for (auto& body: _system.bodies())
 	{
 		auto const& iter = body->iteration();
-		auto am = AccelerationMoments<WorldSpace>();
-
-		if (iter.acceleration_moments)
-			am = *iter.acceleration_moments;
-		else
-		{
-			auto fm = iter.all_force_moments();
-			apply_limits (fm); // TODO should also be applied during iterations
-			am = fm / body->mass_moments<WorldSpace>();
-		}
+		auto const mass_moments = body->mass_moments<WorldSpace>();
+		auto const am =
+			iter.acceleration_moments
+				? *iter.acceleration_moments
+				: compute_acceleration_moments (
+					iter.all_force_moments(),
+					mass_moments,
+					body->velocity_moments<WorldSpace>()
+				);
 
 		body->set_acceleration_moments<WorldSpace> (am);
+
+		auto acceleration_except_gravity = am;
+		acceleration_except_gravity.set_acceleration (am.acceleration() - iter.gravitational_force_moments.force() / mass_moments.mass());
+		body->set_acceleration_moments_except_gravity<WorldSpace> (acceleration_except_gravity);
 	}
 }
 
@@ -341,7 +355,6 @@ ImpulseSolver::update_velocity_moments (si::Time const dt)
 		auto vm = body->iteration().velocity_moments_updated
 			? body->iteration().velocity_moments
 			: body->velocity_moments<WorldSpace>() + body->acceleration_moments<WorldSpace>() * dt;
-		apply_limits (vm);
 		body->set_velocity_moments<WorldSpace> (vm);
 	}
 }

@@ -156,7 +156,8 @@ class Body:
 
 	/**
 	 * Return acceleration moments excluding gravitational acceleration moments.
-	 * This is what an onboard accelerometer would return.
+	 * The linear component is the body's specific force; the angular component
+	 * remains the total non-gravitational angular acceleration.
 	 */
 	template<CoordinateSystemConcept Space>
 		[[nodiscard]]
@@ -394,7 +395,8 @@ class Body:
 	// Acceleration moments of center-of-mass:
 	AccelerationMoments<WorldSpace>						_acceleration_moments;
 	mutable std::optional<AccelerationMoments<BodyCOM>>	_body_space_acceleration_moments;
-	AccelerationMoments<BodyCOM>						_body_space_acceleration_moments_except_gravity;
+	AccelerationMoments<WorldSpace>						_acceleration_moments_except_gravity;
+	mutable std::optional<AccelerationMoments<BodyCOM>>	_body_space_acceleration_moments_except_gravity;
 	// Impulses applied for the duration of the simulation frame:
 	mutable std::optional<ForceMoments<WorldSpace>>		_world_space_applied_impulses;
 	ForceMoments<BodyCOM>								_applied_impulses;
@@ -505,9 +507,16 @@ template<CoordinateSystemConcept Space>
 	Body::acceleration_moments_except_gravity() const
 	{
 		if constexpr (std::is_same_v<Space, WorldSpace>)
-			return _placement.rotate_to_base (_body_space_acceleration_moments_except_gravity);
+			return _acceleration_moments_except_gravity;
 		else if constexpr (std::is_same_v<Space, BodyCOM>)
-			return _body_space_acceleration_moments_except_gravity;
+		{
+			std::lock_guard lock (_optionals_mutex);
+
+			if (!_body_space_acceleration_moments_except_gravity)
+				_body_space_acceleration_moments_except_gravity = _placement.rotate_to_body (_acceleration_moments_except_gravity);
+
+			return *_body_space_acceleration_moments_except_gravity;
+		}
 		else
 			static_assert (false, "unsupported coordinate system");
 	}
@@ -517,10 +526,12 @@ template<CoordinateSystemConcept Space>
 	inline void
 	Body::set_acceleration_moments_except_gravity (AccelerationMoments<Space> const& acceleration_moments)
 	{
+		_body_space_acceleration_moments_except_gravity.reset();
+
 		if constexpr (std::is_same_v<Space, WorldSpace>)
-			_body_space_acceleration_moments_except_gravity = _placement.rotate_to_body (acceleration_moments);
+			_acceleration_moments_except_gravity = acceleration_moments;
 		else if constexpr (std::is_same_v<Space, BodyCOM>)
-			_body_space_acceleration_moments_except_gravity = acceleration_moments;
+			_acceleration_moments_except_gravity = _placement.rotate_to_base (acceleration_moments);
 		else
 			static_assert (false, "unsupported coordinate system");
 	}
@@ -659,6 +670,7 @@ Body::invalidate_placement_dependent_caches()
 	_world_space_mass_moments.reset();
 	_body_space_velocity_moments.reset();
 	_body_space_acceleration_moments.reset();
+	_body_space_acceleration_moments_except_gravity.reset();
 	_world_space_applied_impulses.reset();
 }
 
