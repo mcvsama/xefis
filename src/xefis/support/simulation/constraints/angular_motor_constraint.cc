@@ -38,7 +38,7 @@ AngularMotorConstraint::initialize_step (si::Time const dt)
 	_Jw1.put (1_m * ~hinge.a1, 0, 0);
 	_Jw2.put (1_m * -~hinge.a1, 0, 0);
 	_Z = compute_Z (_Jw1, _Jw2, dt);
-	_position_error = _max_angular_velocity * 1_m / 1_rad * 1_s;
+	_velocity_bias[0, 0] = _max_angular_velocity * 1_m / 1_rad;
 }
 
 
@@ -46,7 +46,7 @@ ConstraintForces
 AngularMotorConstraint::do_constraint_forces (VelocityMoments<WorldSpace> const& vm_1, VelocityMoments<WorldSpace> const& vm_2, si::Time dt)
 {
 	auto const J = compute_two_jacobians (vm_1, _Jv, _Jw1, vm_2, _Jv, _Jw2);
-	auto lambda = compute_lambda (_position_error, J, _Z, dt);
+	auto lambda = compute_lambda (_velocity_bias, J, _Z, dt);
 	lambda = std::clamp (lambda.scalar(), -_force, +_force); // TODO scalar?
 
 	return compute_constraint_forces (_Jv, _Jw1, _Jv, _Jw2, lambda);

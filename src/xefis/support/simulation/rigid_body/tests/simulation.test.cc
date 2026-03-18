@@ -17,7 +17,9 @@
 #include <xefis/support/nature/constants.h>
 #include <xefis/support/nature/mass_moments.h>
 #include <xefis/support/nature/various_inertia_tensors.h>
+#include <xefis/support/simulation/constraints/angular_motor_constraint.h>
 #include <xefis/support/simulation/constraints/fixed_constraint.h>
+#include <xefis/support/simulation/constraints/hinge_constraint.h>
 #include <xefis/support/simulation/rigid_body/concepts.h>
 #include <xefis/support/simulation/rigid_body/impulse_solver.h>
 #include <xefis/support/simulation/rigid_body/system.h>
@@ -153,6 +155,44 @@ fixed_constraint_chain_first_link_relative_speed_after_step (uint32_t const iter
 }
 
 
+si::Angle
+motor_angle_after_motion (double const system_baumgarte_factor, double const system_friction_factor)
+{
+	auto system = rigid_body::System();
+	auto solver = rigid_body::ImpulseSolver (system, 100);
+
+	auto const mass_moments = MassMoments<BodyCOM> {
+		1_kg,
+		make_cuboid_inertia_tensor<BodyCOM> (1_kg, 1_m),
+	};
+
+	auto& body_1 = system.add<rigid_body::Body> (mass_moments);
+	auto& body_2 = system.add<rigid_body::Body> (mass_moments);
+
+	body_1.move_to ({ 0_m, 0_m, 0_m });
+	body_2.move_to ({ 0_m, 1_m, 0_m });
+
+	auto& hinge = system.add<rigid_body::HingePrecomputation> (
+		body_1,
+		body_2,
+		SpaceLength<BodyCOM> { 0_m, -0.5_m, 0_m },
+		SpaceLength<BodyCOM> { 0_m, -0.5_m, 1_m }
+	);
+	system.add<rigid_body::HingeConstraint> (hinge);
+
+	system.add<rigid_body::AngularMotorConstraint> (hinge, 180_deg / 1_s, 2_Nm);
+
+	system.set_baumgarte_factor (system_baumgarte_factor);
+	system.set_constraint_force_mixing_factor (0.0);
+	system.set_friction_factor (system_friction_factor);
+
+	for (auto i = 0; i < 250; ++i)
+		solver.evolve (1_ms);
+
+	return hinge.data().angle;
+}
+
+
 nu::AutoTest t_1 ("rigid_body::System: 90-minute simulation of gravitational forces", []{
 	auto rigid_body_system = rigid_body::System();
 	auto rigid_body_solver = rigid_body::ImpulseSolver (rigid_body_system);
@@ -256,6 +296,25 @@ nu::AutoTest t_constraint_solver_iterations_propagate_across_constraint_chain ("
 
 		previous_relative_speed = relative_speed;
 	}
+});
+
+
+nu::AutoTest t_motor_drive_does_not_depend_on_baumgarte ("rigid_body::AngularMotorConstraint: motor drive still moves with zero Baumgarte", []{
+	auto const angle_with_zero_baumgarte = motor_angle_after_motion (0.0, 0.0);
+
+	test_asserts::verify ("with zero Baumgarte the motor still rotates the hinge toward its commanded velocity",
+						  angle_with_zero_baumgarte > 10_deg);
+});
+
+
+nu::AutoTest t_motor_drive_does_not_depend_on_friction_factor ("rigid_body::AngularMotorConstraint: motor drive ignores solver friction damping", []{
+	auto const angle_without_friction = motor_angle_after_motion (0.0, 0.0);
+	auto const angle_with_full_friction = motor_angle_after_motion (0.0, 1.0);
+
+	test_asserts::verify_equal_with_epsilon ("solver friction does not change the motor's driven hinge motion",
+											 angle_with_full_friction,
+											 angle_without_friction,
+											 1_deg);
 });
 
 } // namespace

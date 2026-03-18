@@ -76,6 +76,12 @@ class Constraint:
 	template<std::size_t N>
 		using PositionError = math::Vector<si::Length, N, WorldSpace>;
 
+	// Direct velocity-space bias for constraints that need to inject a commanded
+	// relative velocity into the solver instead of reusing Baumgarte position
+	// stabilization.
+	template<std::size_t N>
+		using VelocityBias = Jacobian<N>;
+
 	// Lambda holds the constraint-space Lagrange multipliers (one per constraint row), which in this formulation are literal forces. These values scale the
 	// Jacobian rows to produce the corrective force/torque impulses applied back to the connected bodies so the joint error is driven toward zero.
 	template<std::size_t N>
@@ -382,6 +388,30 @@ class Constraint:
 						si::Time dt) const;
 
 	/**
+	 * Calculate lambda (a vector of si::Force) with an explicit velocity-space
+	 * drive bias that is independent of Baumgarte stabilization.
+	 */
+	template<std::size_t N>
+		[[nodiscard]]
+		Lambda<N>
+		compute_lambda (VelocityBias<N> const&,
+						TwoJacobians<N> const& J,
+						ConstraintMassMatrix<N> const& K,
+						si::Time dt) const;
+
+	/**
+	 * Calculate lambda (a vector of si::Force) with an explicit velocity-space
+	 * drive bias that is independent of Baumgarte stabilization.
+	 */
+	template<std::size_t N>
+		[[nodiscard]]
+		Lambda<N>
+		compute_lambda (VelocityBias<N> const&,
+						TwoJacobians<N> const& J,
+						ConstraintZMatrix<N> const& Z,
+						si::Time dt) const;
+
+	/**
 	 * Calculate mass matrix K in a generic way.
 	 * It's also called the "constraint matrix".
 	 */
@@ -640,6 +670,29 @@ template<std::size_t N>
 		auto const damped_jacobian = effective_velocity_correction_factor() * J.internal + J.external;
 		auto const stabilization_bias = baumgarte_factor() * inv_dt * position_error;
 		return Z * (damped_jacobian + stabilization_bias);
+	}
+
+
+template<std::size_t N>
+	inline Constraint::Lambda<N>
+	Constraint::compute_lambda (VelocityBias<N> const& velocity_bias,
+								TwoJacobians<N> const& J,
+								ConstraintMassMatrix<N> const& K,
+								si::Time const dt) const
+	{
+		auto const inv_dt = 1 / dt;
+		return -inv_dt * inv (K) * (J.internal + J.external + velocity_bias);
+	}
+
+
+template<std::size_t N>
+	inline Constraint::Lambda<N>
+	Constraint::compute_lambda (VelocityBias<N> const& velocity_bias,
+								TwoJacobians<N> const& J,
+								ConstraintZMatrix<N> const& Z,
+								[[maybe_unused]] si::Time const dt) const
+	{
+		return Z * (J.internal + J.external + velocity_bias);
 	}
 
 
