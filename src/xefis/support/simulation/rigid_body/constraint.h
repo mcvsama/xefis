@@ -47,9 +47,6 @@ class Constraint:
 	public HasConfigurableLabel
 {
   public:
-	static constexpr double kDefaultBaumgarteFactor	= 0.5;
-
-  public:
 	// Dtor
 	virtual
 	~Constraint() = default;
@@ -461,7 +458,7 @@ class Constraint:
 	bool							_broken							{ false };
 	std::optional<si::Force>		_breaking_force;
 	std::optional<si::Torque>		_breaking_torque;
-	double							_baumgarte_factor				{ kDefaultBaumgarteFactor };
+	double							_baumgarte_factor				{ 0.0 };
 	ConstraintMassMatrix<0>::Scalar	_constraint_force_mixing_factor { 0.0 };
 	double							_friction_factor				{ 0.0 };
 	std::optional<ConstraintForces>	_previous_computation_constraint_forces;
