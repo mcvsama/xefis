@@ -52,26 +52,6 @@ class TestAntenna: public xf::sim::Antenna
 		})
 	{ }
 
-	void
-	set_placement (Placement<WorldSpace, BodyOrigin> const& placement)
-	{
-		Antenna::set_placement (Placement<WorldSpace, BodyCOM> (
-			{ 0_m, 0_m, 0_m },
-			placement.body_rotation() * ~origin_placement_in_com().body_rotation()
-		));
-		move_origin_to (placement.position());
-	}
-
-	[[nodiscard]]
-	Placement<WorldSpace, BodyOrigin>
-	origin_placement() const
-	{
-		return Placement<WorldSpace, BodyOrigin> (
-			origin<WorldSpace>(),
-			placement().body_rotation() * origin_placement_in_com().body_rotation()
-		);
-	}
-
 	[[nodiscard]]
 	std::vector<Antenna::ReceivedSignal> const&
 	received_signals() const noexcept
@@ -95,15 +75,15 @@ nu::AutoTest t_origin_placement ("Antenna body-origin placement stays exact for 
 		z_rotation<WorldSpace, BodyOrigin> (30_deg)
 	);
 
-	antenna.set_origin_placement (origin_placement_in_com);
-	antenna.set_placement (expected_origin_placement);
+	antenna.set_origin_placement<BodyCOM> (origin_placement_in_com);
+	antenna.set_origin_placement<WorldSpace> (expected_origin_placement);
 
 	test_asserts::verify_equal_with_epsilon ("Antenna origin position is preserved",
-											 antenna.origin_placement().position(),
+											 antenna.origin_placement<WorldSpace>().position(),
 											 expected_origin_placement.position(),
 											 1e-12_m);
 	test_asserts::verify_equal_with_epsilon ("Antenna origin rotation is preserved",
-											 to_rotation_vector (antenna.origin_placement().body_rotation()),
+											 to_rotation_vector (antenna.origin_placement<WorldSpace>().body_rotation()),
 											 to_rotation_vector (expected_origin_placement.body_rotation()),
 											 1e-12_rad);
 	test_asserts::verify_equal_with_epsilon ("Antenna COM reflects origin offset",
@@ -130,10 +110,10 @@ nu::AutoTest t_1 ("Antenna signals get propagated", []{
 		{ 1_m, 0_m, 0_m },
 		x_rotation<WorldSpace, BodyOrigin> (45_deg)
 	);
-	tx_antenna.set_placement (tx_placement);
-	rx_matched_antenna.set_placement (rx_placement);
-	rx_mismatched_antenna.set_placement (rx_placement);
-	rx_misaligned_antenna.set_placement (rx_misaligned_placement);
+	tx_antenna.set_origin_placement<WorldSpace> (tx_placement);
+	rx_matched_antenna.set_origin_placement<WorldSpace> (rx_placement);
+	rx_mismatched_antenna.set_origin_placement<WorldSpace> (rx_placement);
+	rx_misaligned_antenna.set_origin_placement<WorldSpace> (rx_misaligned_placement);
 
 	tx_antenna.emit_signal ({
 		.time		= 0_s,
@@ -195,8 +175,8 @@ nu::AutoTest t_2 ("Antenna signal arrives exactly at propagation-time boundary",
 	auto const no_rotation = kNoRotation<WorldSpace, BodyOrigin>;
 	auto const boundary_distance = kSpeedOfLight * 1_ms;
 
-	tx_antenna.set_placement (Placement<WorldSpace, BodyOrigin> ({ 0_m, 0_m, 0_m }, no_rotation));
-	rx_antenna.set_placement (Placement<WorldSpace, BodyOrigin> ({ boundary_distance, 0_m, 0_m }, no_rotation));
+	tx_antenna.set_origin_placement<WorldSpace> (Placement<WorldSpace, BodyOrigin> ({ 0_m, 0_m, 0_m }, no_rotation));
+	rx_antenna.set_origin_placement<WorldSpace> (Placement<WorldSpace, BodyOrigin> ({ boundary_distance, 0_m, 0_m }, no_rotation));
 
 	tx_antenna.emit_signal ({
 		.time		= 0_s,
@@ -221,8 +201,8 @@ nu::AutoTest t_3 ("Antenna signal is delivered only once", []{
 	auto rx_antenna = TestAntenna (antenna_model, system);
 	auto const no_rotation = kNoRotation<WorldSpace, BodyOrigin>;
 
-	tx_antenna.set_placement (Placement<WorldSpace, BodyOrigin> ({ 0_m, 0_m, 0_m }, no_rotation));
-	rx_antenna.set_placement (Placement<WorldSpace, BodyOrigin> ({ 1_m, 0_m, 0_m }, no_rotation));
+	tx_antenna.set_origin_placement<WorldSpace> (Placement<WorldSpace, BodyOrigin> ({ 0_m, 0_m, 0_m }, no_rotation));
+	rx_antenna.set_origin_placement<WorldSpace> (Placement<WorldSpace, BodyOrigin> ({ 1_m, 0_m, 0_m }, no_rotation));
 
 	tx_antenna.emit_signal ({
 		.time		= 0_s,
@@ -252,9 +232,9 @@ nu::AutoTest t_4 ("Antenna signals reach nearer receivers first", []{
 	auto const near_distance = kSpeedOfLight * 1_ms;
 	auto const far_distance = kSpeedOfLight * 2_ms;
 
-	tx_antenna.set_placement (Placement<WorldSpace, BodyOrigin> ({ 0_m, 0_m, 0_m }, no_rotation));
-	rx_near_antenna.set_placement (Placement<WorldSpace, BodyOrigin> ({ near_distance, 0_m, 0_m }, no_rotation));
-	rx_far_antenna.set_placement (Placement<WorldSpace, BodyOrigin> ({ far_distance, 0_m, 0_m }, no_rotation));
+	tx_antenna.set_origin_placement<WorldSpace> (Placement<WorldSpace, BodyOrigin> ({ 0_m, 0_m, 0_m }, no_rotation));
+	rx_near_antenna.set_origin_placement<WorldSpace> (Placement<WorldSpace, BodyOrigin> ({ near_distance, 0_m, 0_m }, no_rotation));
+	rx_far_antenna.set_origin_placement<WorldSpace> (Placement<WorldSpace, BodyOrigin> ({ far_distance, 0_m, 0_m }, no_rotation));
 
 	tx_antenna.emit_signal ({
 		.time		= 0_s,
@@ -280,8 +260,8 @@ nu::AutoTest t_5 ("In-flight signal uses emitter placement at emission time", []
 		auto rx_antenna = TestAntenna (antenna_model, system);
 		auto const no_rotation = kNoRotation<WorldSpace, BodyOrigin>;
 
-		tx_antenna.set_placement (Placement<WorldSpace, BodyOrigin> ({ 0_m, 0_m, 0_m }, no_rotation));
-		rx_antenna.set_placement (Placement<WorldSpace, BodyOrigin> ({ 1_m, 0_m, 0_m }, no_rotation));
+		tx_antenna.set_origin_placement<WorldSpace> (Placement<WorldSpace, BodyOrigin> ({ 0_m, 0_m, 0_m }, no_rotation));
+		rx_antenna.set_origin_placement<WorldSpace> (Placement<WorldSpace, BodyOrigin> ({ 1_m, 0_m, 0_m }, no_rotation));
 
 		tx_antenna.emit_signal ({
 			.time		= 0_s,
@@ -292,7 +272,7 @@ nu::AutoTest t_5 ("In-flight signal uses emitter placement at emission time", []
 
 		if (move_emitter_after_emit)
 		{
-			tx_antenna.set_placement (Placement<WorldSpace, BodyOrigin> (
+			tx_antenna.set_origin_placement<WorldSpace> (Placement<WorldSpace, BodyOrigin> (
 				{ 0_m, 0_m, 0_m },
 				y_rotation<WorldSpace, BodyOrigin> (90_deg)
 			));
@@ -323,12 +303,12 @@ nu::AutoTest t_6 ("Antenna deregistration before arrival does not break propagat
 	auto const no_rotation = kNoRotation<WorldSpace, BodyOrigin>;
 	auto const boundary_distance = kSpeedOfLight * 1_ms;
 
-	tx_antenna.set_placement (Placement<WorldSpace, BodyOrigin> ({ 0_m, 0_m, 0_m }, no_rotation));
-	rx_survivor_antenna.set_placement (Placement<WorldSpace, BodyOrigin> ({ boundary_distance, 0_m, 0_m }, no_rotation));
+	tx_antenna.set_origin_placement<WorldSpace> (Placement<WorldSpace, BodyOrigin> ({ 0_m, 0_m, 0_m }, no_rotation));
+	rx_survivor_antenna.set_origin_placement<WorldSpace> (Placement<WorldSpace, BodyOrigin> ({ boundary_distance, 0_m, 0_m }, no_rotation));
 
 	{
 		auto rx_removed_antenna = TestAntenna (antenna_model, system);
-		rx_removed_antenna.set_placement (Placement<WorldSpace, BodyOrigin> ({ boundary_distance, 0_m, 0_m }, no_rotation));
+		rx_removed_antenna.set_origin_placement<WorldSpace> (Placement<WorldSpace, BodyOrigin> ({ boundary_distance, 0_m, 0_m }, no_rotation));
 
 		tx_antenna.emit_signal ({
 			.time		= 0_s,
@@ -350,7 +330,7 @@ nu::AutoTest t_7 ("Receiver registered after emission receives in-flight signal"
 	auto const no_rotation = kNoRotation<WorldSpace, BodyOrigin>;
 	auto const boundary_distance = kSpeedOfLight * 1_ms;
 
-	tx_antenna.set_placement (Placement<WorldSpace, BodyOrigin> ({ 0_m, 0_m, 0_m }, no_rotation));
+	tx_antenna.set_origin_placement<WorldSpace> (Placement<WorldSpace, BodyOrigin> ({ 0_m, 0_m, 0_m }, no_rotation));
 	tx_antenna.emit_signal ({
 		.time		= 0_s,
 		.power		= 1_W,
@@ -359,7 +339,7 @@ nu::AutoTest t_7 ("Receiver registered after emission receives in-flight signal"
 	});
 
 	auto rx_late_antenna = TestAntenna (antenna_model, system);
-	rx_late_antenna.set_placement (Placement<WorldSpace, BodyOrigin> ({ boundary_distance, 0_m, 0_m }, no_rotation));
+	rx_late_antenna.set_origin_placement<WorldSpace> (Placement<WorldSpace, BodyOrigin> ({ boundary_distance, 0_m, 0_m }, no_rotation));
 
 	system.process (0_s);
 	test_asserts::verify_equal ("Late receiver gets nothing before arrival", rx_late_antenna.received_signals().size(), 0uz);
@@ -376,8 +356,8 @@ nu::AutoTest t_8 ("Zero-distance received signal power is finite", []{
 	auto rx_antenna = TestAntenna (antenna_model, system);
 	auto const no_rotation = kNoRotation<WorldSpace, BodyOrigin>;
 
-	tx_antenna.set_placement (Placement<WorldSpace, BodyOrigin> ({ 0_m, 0_m, 0_m }, no_rotation));
-	rx_antenna.set_placement (Placement<WorldSpace, BodyOrigin> ({ 0_m, 0_m, 0_m }, no_rotation));
+	tx_antenna.set_origin_placement<WorldSpace> (Placement<WorldSpace, BodyOrigin> ({ 0_m, 0_m, 0_m }, no_rotation));
+	rx_antenna.set_origin_placement<WorldSpace> (Placement<WorldSpace, BodyOrigin> ({ 0_m, 0_m, 0_m }, no_rotation));
 
 	tx_antenna.emit_signal ({
 		.time		= 0_s,
@@ -401,9 +381,9 @@ nu::AutoTest t_9 ("Orthogonal whip antenna polarization strongly suppresses rece
 	auto rx_orthogonal_antenna = TestAntenna (antenna_model, system);
 	auto const no_rotation = kNoRotation<WorldSpace, BodyOrigin>;
 
-	tx_antenna.set_placement (Placement<WorldSpace, BodyOrigin> ({ 0_m, 0_m, 0_m }, no_rotation));
-	rx_aligned_antenna.set_placement (Placement<WorldSpace, BodyOrigin> ({ 1_m, 0_m, 0_m }, no_rotation));
-	rx_orthogonal_antenna.set_placement (Placement<WorldSpace, BodyOrigin> (
+	tx_antenna.set_origin_placement<WorldSpace> (Placement<WorldSpace, BodyOrigin> ({ 0_m, 0_m, 0_m }, no_rotation));
+	rx_aligned_antenna.set_origin_placement<WorldSpace> (Placement<WorldSpace, BodyOrigin> ({ 1_m, 0_m, 0_m }, no_rotation));
+	rx_orthogonal_antenna.set_origin_placement<WorldSpace> (Placement<WorldSpace, BodyOrigin> (
 		{ 1_m, 0_m, 0_m },
 		x_rotation<WorldSpace, BodyOrigin> (90_deg)
 	));
@@ -433,9 +413,9 @@ nu::AutoTest t_10 ("Vertical offset reduces power for parallel whip antennas", [
 	auto rx_side_and_up_antenna = TestAntenna (antenna_model, system);
 	auto const no_rotation = kNoRotation<WorldSpace, BodyOrigin>;
 
-	tx_antenna.set_placement (Placement<WorldSpace, BodyOrigin> ({ 0_m, 0_m, 0_m }, no_rotation));
-	rx_side_antenna.set_placement (Placement<WorldSpace, BodyOrigin> ({ 1_m, 0.25_m, 0_m }, no_rotation));
-	rx_side_and_up_antenna.set_placement (Placement<WorldSpace, BodyOrigin> ({ 1_m, 0.25_m, 0.1_m }, no_rotation));
+	tx_antenna.set_origin_placement<WorldSpace> (Placement<WorldSpace, BodyOrigin> ({ 0_m, 0_m, 0_m }, no_rotation));
+	rx_side_antenna.set_origin_placement<WorldSpace> (Placement<WorldSpace, BodyOrigin> ({ 1_m, 0.25_m, 0_m }, no_rotation));
+	rx_side_and_up_antenna.set_origin_placement<WorldSpace> (Placement<WorldSpace, BodyOrigin> ({ 1_m, 0.25_m, 0.1_m }, no_rotation));
 
 	tx_antenna.emit_signal ({
 		.time		= 0_s,
@@ -462,8 +442,8 @@ nu::AutoTest t_11 ("Emission expires by ttl before reaching distant receiver", [
 	auto const no_rotation = kNoRotation<WorldSpace, BodyOrigin>;
 	auto const far_distance = kSpeedOfLight * 2_ms;
 
-	tx_antenna.set_placement (Placement<WorldSpace, BodyOrigin> ({ 0_m, 0_m, 0_m }, no_rotation));
-	rx_antenna.set_placement (Placement<WorldSpace, BodyOrigin> ({ far_distance, 0_m, 0_m }, no_rotation));
+	tx_antenna.set_origin_placement<WorldSpace> (Placement<WorldSpace, BodyOrigin> ({ 0_m, 0_m, 0_m }, no_rotation));
+	rx_antenna.set_origin_placement<WorldSpace> (Placement<WorldSpace, BodyOrigin> ({ far_distance, 0_m, 0_m }, no_rotation));
 
 	tx_antenna.emit_signal ({
 		.time		= 0_s,
@@ -487,8 +467,8 @@ nu::AutoTest t_12 ("Signal payload integrity and ordering are preserved", []{
 	auto rx_antenna = TestAntenna (antenna_model, system);
 	auto const no_rotation = kNoRotation<WorldSpace, BodyOrigin>;
 
-	tx_antenna.set_placement (Placement<WorldSpace, BodyOrigin> ({ 0_m, 0_m, 0_m }, no_rotation));
-	rx_antenna.set_placement (Placement<WorldSpace, BodyOrigin> ({ 1_m, 0_m, 0_m }, no_rotation));
+	tx_antenna.set_origin_placement<WorldSpace> (Placement<WorldSpace, BodyOrigin> ({ 0_m, 0_m, 0_m }, no_rotation));
+	rx_antenna.set_origin_placement<WorldSpace> (Placement<WorldSpace, BodyOrigin> ({ 1_m, 0_m, 0_m }, no_rotation));
 
 	tx_antenna.emit_signal ({
 		.time		= 0_s,

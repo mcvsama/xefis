@@ -328,8 +328,8 @@ RigidBodyPainter::body_under_cursor (rigid_body::System const& system, QPoint co
 					// Keeping only distances nearer than current best lets us prune farther
 					// candidates before transforming rays and running exact mesh picking.
 					auto const ray_origin_body_com = body.placement().rotate_translate_to_body (ray_origin_world);
-					auto const ray_origin_body_origin = body.origin_placement_in_com().rotate_translate_to_body (ray_origin_body_com);
-					auto const ray_direction_body_origin = body.origin_placement_in_com().rotate_to_body (body.placement().rotate_to_body (ray_direction_world)).normalized();
+					auto const ray_origin_body_origin = body.origin_placement<BodyCOM>().rotate_translate_to_body (ray_origin_body_com);
+					auto const ray_direction_body_origin = body.origin_placement<BodyCOM>().rotate_to_body (body.placement().rotate_to_body (ray_direction_world)).normalized();
 
 					// Narrow-phase: exact intersection with the body shape in body-origin space.
 					if (auto const shape_distance = ray_shape_intersection (body_shape, ray_origin_body_origin, ray_direction_body_origin))
@@ -1466,7 +1466,7 @@ RigidBodyPainter::transform_gl_to_center_of_mass (rigid_body::Body const& body)
 void
 RigidBodyPainter::transform_gl_from_body_center_of_mass_to_origin (rigid_body::Body const& body)
 {
-	_gl.transform (body.origin_placement_in_com());
+	_gl.transform (body.origin_placement<BodyCOM>());
 }
 
 

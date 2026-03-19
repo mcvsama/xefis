@@ -166,7 +166,7 @@ nu::AutoTest t_rotations ("rigid_body::Body: rotations", []{
 	auto body = make_unit_body();
 	auto origin_placement = Placement<BodyCOM, BodyOrigin>();
 	origin_placement.set_position ({ 1_m, 0_m, 0_m });
-	body->set_origin_placement (origin_placement);
+	body->set_origin_placement<BodyCOM> (origin_placement);
 	body->move_to (SpaceLength<WorldSpace> (2_m, 3_m, 4_m));
 
 	auto const rotation = z_rotation<WorldSpace> (90_deg);
@@ -264,7 +264,7 @@ nu::AutoTest t_rotations ("rigid_body::Body: rotations", []{
 	test_asserts::verify_equal ("move_to keeps origin offset", body->origin<WorldSpace>(), SpaceLength<WorldSpace> (11_m, 20_m, 30_m));
 
 	origin_placement.set_position ({ 0_m, 2_m, 0_m });
-	body->set_origin_placement (origin_placement);
+	body->set_origin_placement<BodyCOM> (origin_placement);
 	test_asserts::verify_equal ("set_origin_placement changes world-space origin", body->origin<WorldSpace>(), SpaceLength<WorldSpace> (10_m, 22_m, 30_m));
 
 	body->rotate_about_center_of_mass (rotation);
@@ -306,7 +306,7 @@ nu::AutoTest t_bounding_sphere ("rigid_body::Body: bounding sphere radius", []{
 
 	auto origin_placement = Placement<BodyCOM, BodyOrigin>();
 	origin_placement.set_position ({ 1_m, 0_m, 0_m });
-	body->set_origin_placement (origin_placement);
+	body->set_origin_placement<BodyCOM> (origin_placement);
 	test_asserts::verify_equal_with_epsilon ("offset origin affects radius", body->bounding_sphere_radius(), std::sqrt (6.0) * 1_m, 1e-12_m);
 });
 
@@ -399,7 +399,7 @@ nu::AutoTest t_rotations_2 ("rigid_body::Body: specific rotations update acceler
 	verify_rotation ("rotate_about_body_origin", [] (rb::Body& body, auto const& rotation) {
 		auto origin_placement = Placement<BodyCOM, BodyOrigin>();
 		origin_placement.set_position ({ 1_m, 0_m, 0_m });
-		body.set_origin_placement (origin_placement);
+		body.set_origin_placement<BodyCOM> (origin_placement);
 		body.move_to (SpaceLength<WorldSpace> { 2_m, 3_m, 4_m });
 		body.rotate_about_body_origin (rotation);
 	});
@@ -414,7 +414,7 @@ nu::AutoTest t_rotations_3 ("rigid_body::Body: specific rotations refresh world 
 
 		auto origin_placement = Placement<BodyCOM, BodyOrigin>();
 		origin_placement.set_position ({ 1_m, 0_m, 0_m });
-		body.set_origin_placement (origin_placement);
+		body.set_origin_placement<BodyCOM> (origin_placement);
 		body.move_to (SpaceLength<WorldSpace> { 2_m, 3_m, 4_m });
 
 		auto const cached_world_mass_moments = body.mass_moments<WorldSpace>();

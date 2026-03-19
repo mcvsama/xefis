@@ -110,19 +110,19 @@ class Body:
 	}
 
 	/**
-	 * Return placement of origin point (relative to center-of-mass).
+	 * Return placement of origin point in requested coordinate system.
 	 */
-	[[nodiscard]]
-	Placement<BodyCOM, BodyOrigin> const&
-	origin_placement_in_com() const noexcept
-		{ return _origin_placement_in_com; }
+	template<CoordinateSystemConcept BaseSpace>
+		[[nodiscard]]
+		Placement<BaseSpace, BodyOrigin>
+		origin_placement() const noexcept;
 
 	/**
-	 * Set new placement of origin (relative to center-of-mass).
+	 * Set new placement of origin point in requested coordinate system.
 	 */
-	void
-	set_origin_placement (Placement<BodyCOM, BodyOrigin> const& origin_placement) noexcept
-		{ _origin_placement_in_com = origin_placement; }
+	template<CoordinateSystemConcept BaseSpace>
+		void
+		set_origin_placement (Placement<BaseSpace, BodyOrigin> const& origin_placement) noexcept;
 
 	/**
 	 * Return velocity moments of the center of mass in World coordinate system.
@@ -633,6 +633,36 @@ Body::set_shape (std::optional<Shape> const& shape)
 	auto copy = shape;
 	set_shape (std::move (copy));
 }
+
+
+template<CoordinateSystemConcept BaseSpace>
+	inline Placement<BaseSpace, BodyOrigin>
+	Body::origin_placement() const noexcept
+	{
+		if constexpr (std::is_same_v<BaseSpace, BodyCOM>)
+			return _origin_placement_in_com;
+		else if constexpr (std::is_same_v<BaseSpace, WorldSpace>)
+			return Placement<WorldSpace, BodyOrigin> (origin<WorldSpace>(), _placement.body_rotation() * _origin_placement_in_com.body_rotation());
+		else
+			static_assert (false, "unsupported coordinate system");
+	}
+
+
+template<CoordinateSystemConcept BaseSpace>
+	inline void
+	Body::set_origin_placement (Placement<BaseSpace, BodyOrigin> const& origin_placement) noexcept
+	{
+		if constexpr (std::is_same_v<BaseSpace, BodyCOM>)
+			_origin_placement_in_com = origin_placement;
+		else if constexpr (std::is_same_v<BaseSpace, WorldSpace>)
+		{
+			auto const com_body_rotation = origin_placement.body_rotation() * ~_origin_placement_in_com.body_rotation();
+			auto const com_placement = Placement<WorldSpace, BodyCOM> (origin_placement.position() - com_body_rotation * _origin_placement_in_com.position(), com_body_rotation);
+			set_placement (com_placement);
+		}
+		else
+			static_assert (false, "unsupported coordinate system");
+	}
 
 
 template<CoordinateSystemConcept Space>

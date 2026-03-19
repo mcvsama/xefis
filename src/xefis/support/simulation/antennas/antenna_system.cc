@@ -30,15 +30,6 @@
 
 namespace xf {
 
-static Placement<WorldSpace, BodyOrigin>
-body_origin_placement (sim::Antenna const& antenna)
-{
-	return Placement<WorldSpace, BodyOrigin> (
-		antenna.origin<WorldSpace>(),
-		antenna.placement().body_rotation() * antenna.origin_placement_in_com().body_rotation()
-	);
-}
-
 
 AntennaSystem::AntennaSystem (si::Time const max_ttl):
 	_max_ttl (max_ttl)
@@ -74,7 +65,7 @@ AntennaSystem::emit_signal (sim::Antenna& emitter, AntennaEmission const& antenn
 	auto const emission = Emission {
 		.emitter = emitter,
 		.antenna_emission = antenna_emission,
-		.placement = body_origin_placement (emitter),
+		.placement = emitter.origin_placement<WorldSpace>(),
 		.receivers = _antennas,
 	};
 	_emissions.push_back (emission);
@@ -101,7 +92,7 @@ AntennaSystem::propagate_signals (si::Time const now)
 		{
 			auto receiver = *receiver_it;
 			auto const& antenna_emission = emission.antenna_emission;
-			auto const receiver_placement = body_origin_placement (*receiver);
+			auto const receiver_placement = receiver->origin_placement<WorldSpace>();
 			auto const distance = abs (emission.placement.position() - receiver_placement.position());
 			auto const time_due_to_distance = distance / kSpeedOfLight;
 			auto const elapsed_time = now - emission.antenna_emission.time;

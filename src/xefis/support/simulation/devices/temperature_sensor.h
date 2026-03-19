@@ -94,7 +94,7 @@ class TemperatureSensor:
   private:
 	SpaceLength<ECEFSpace>
 	sampling_position() const noexcept
-		{ return coordinate_system_cast<ECEFSpace, void, WorldSpace, void> (placement().rotate_translate_to_base (origin_placement_in_com().rotate_translate_to_base (_nose_position))); }
+		{ return coordinate_system_cast<ECEFSpace, void, WorldSpace, void> (placement().rotate_translate_to_base (origin_placement<BodyCOM>().rotate_translate_to_base (_nose_position))); }
 
 	void
 	compute_static_temperature() const;
