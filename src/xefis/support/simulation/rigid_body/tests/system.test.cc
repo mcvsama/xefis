@@ -41,6 +41,7 @@
 #include <memory>
 #include <optional>
 #include <string>
+#include <vector>
 
 
 namespace xf::test {
@@ -82,6 +83,43 @@ make_body_mass_moments (si::Mass const mass, si::Density const density = 1000_kg
 {
 	auto const edge_length = 1_m * std::pow ((mass / density).to_floating_point(), 1.0 / 3.0);
 	return make_body_mass_moments (mass, edge_length);
+}
+
+
+MassMoments<BodyCOM>
+make_cuboid_body_mass_moments (si::Mass const mass, SpaceLength<BodyOrigin> const& dimensions)
+{
+	return {
+		mass,
+		make_cuboid_inertia_tensor<BodyCOM> (mass, SpaceLength<> { dimensions[0], dimensions[1], dimensions[2] }),
+	};
+}
+
+
+Placement<WorldSpace, BodyCOM>
+make_pendulum_link_placement (SpaceLength<WorldSpace> const& top_anchor,
+							  si::Length const half_length,
+							  RotationQuaternion<WorldSpace> const& rotation)
+{
+	auto const body_rotation = math::coordinate_system_cast<WorldSpace, BodyCOM, WorldSpace, WorldSpace> (rotation);
+	auto const orientation = Placement<WorldSpace, BodyCOM> ({ 0_m, 0_m, 0_m }, body_rotation);
+	auto const com_position = top_anchor - orientation.rotate_to_base (SpaceLength<BodyCOM> { 0_m, +half_length, 0_m });
+
+	return Placement<WorldSpace, BodyCOM> (com_position, body_rotation);
+}
+
+
+rigid_body::Body&
+add_cuboid_body (rigid_body::System& system,
+				 MassMoments<BodyCOM> const& mass_moments,
+				 Placement<WorldSpace, BodyCOM> const& placement,
+				 SpaceLength<BodyOrigin> const& dimensions,
+				 ShapeMaterial const& material)
+{
+	auto& body = system.add<rigid_body::Body> (mass_moments);
+	body.set_placement (placement);
+	body.set_shape (make_centered_cube_shape (dimensions, material));
+	return body;
 }
 
 
@@ -361,6 +399,149 @@ nu::ManualTest t_5 ("rigid_body::System: intermediate axis of rotation", []{
 		}
 
 		total_t += dt;
+	});
+});
+
+
+nu::ManualTest t_6 ("rigid_body::System: 3-layer 3D pendulums", []{
+	rigid_body::System system;
+
+	struct WeightedBody
+	{
+		rigid_body::Body*	body;
+		si::Mass			mass;
+	};
+
+	struct CounterweightedBody
+	{
+		rigid_body::Body*	body;
+		si::Mass			supported_mass;
+	};
+
+	auto constexpr kSupportMass = 1000_kg;
+	auto constexpr kLink1Mass = 8_kg;
+	auto constexpr kLink2Mass = 5_kg;
+	auto constexpr kLink3Mass = 3_kg;
+
+	auto const support_dimensions = SpaceLength<BodyOrigin> { 70_cm, 25_cm, 70_cm };
+	auto const link_1_dimensions = SpaceLength<BodyOrigin> { 18_cm, 120_cm, 18_cm };
+	auto const link_2_dimensions = SpaceLength<BodyOrigin> { 16_cm, 100_cm, 16_cm };
+	auto const link_3_dimensions = SpaceLength<BodyOrigin> { 14_cm, 80_cm, 14_cm };
+
+	auto constexpr kSupportHalfHeight = 12.5_cm;
+	auto constexpr kLink1HalfLength = 60_cm;
+	auto constexpr kLink2HalfLength = 50_cm;
+
+	std::vector<WeightedBody> weighted_bodies;
+	weighted_bodies.reserve (9);
+
+	std::vector<CounterweightedBody> counterweighted_bodies;
+	counterweighted_bodies.reserve (3);
+
+	auto const add_pendulum =
+		[&] (SpaceLength<WorldSpace> const& support_position,
+			 RotationQuaternion<WorldSpace> const& link_1_rotation,
+			 RotationQuaternion<WorldSpace> const& link_2_rotation,
+			 RotationQuaternion<WorldSpace> const& link_3_rotation,
+			 SpaceVector<double, WorldSpace> const& hinge_axis_1,
+			 SpaceVector<double, WorldSpace> const& hinge_axis_2,
+			 SpaceVector<double, WorldSpace> const& hinge_axis_3)
+	{
+		auto& support = add_cuboid_body (
+			system,
+			make_cuboid_body_mass_moments (kSupportMass, support_dimensions),
+			Placement<WorldSpace, BodyCOM> (support_position, no_rotation),
+			support_dimensions,
+			kGreyMatte);
+
+		auto const anchor_1 = support_position + SpaceLength<WorldSpace> { 0_m, -kSupportHalfHeight, 0_m };
+
+		auto const link_1_placement = make_pendulum_link_placement (anchor_1, kLink1HalfLength, link_1_rotation);
+		auto& link_1 = add_cuboid_body (
+			system,
+			make_cuboid_body_mass_moments (kLink1Mass, link_1_dimensions),
+			link_1_placement,
+			link_1_dimensions,
+			kWhiteMatte);
+
+		auto const anchor_2 = link_1_placement.rotate_translate_to_base (SpaceLength<BodyCOM> { 0_m, -kLink1HalfLength, 0_m });
+		auto const link_2_placement = make_pendulum_link_placement (anchor_2, kLink2HalfLength, link_2_rotation);
+		auto& link_2 = add_cuboid_body (
+			system,
+			make_cuboid_body_mass_moments (kLink2Mass, link_2_dimensions),
+			link_2_placement,
+			link_2_dimensions,
+			kGreyMatte);
+
+		auto const anchor_3 = link_2_placement.rotate_translate_to_base (SpaceLength<BodyCOM> { 0_m, -kLink2HalfLength, 0_m });
+		auto const link_3_placement = make_pendulum_link_placement (anchor_3, 40_cm, link_3_rotation);
+		auto& link_3 = add_cuboid_body (
+			system,
+			make_cuboid_body_mass_moments (kLink3Mass, link_3_dimensions),
+			link_3_placement,
+			link_3_dimensions,
+			kWhiteMatte);
+
+		auto& h1 = system.add<rigid_body::HingePrecomputation> (
+			support,
+			anchor_1,
+			anchor_1 + hinge_axis_1.normalized() * 1_m,
+			link_1);
+		system.add<rigid_body::HingeConstraint> (h1);
+
+		auto& h2 = system.add<rigid_body::HingePrecomputation> (
+			link_1,
+			anchor_2,
+			anchor_2 + hinge_axis_2.normalized() * 1_m,
+			link_2);
+		system.add<rigid_body::HingeConstraint> (h2);
+
+		auto& h3 = system.add<rigid_body::HingePrecomputation> (
+			link_2,
+			anchor_3,
+			anchor_3 + hinge_axis_3.normalized() * 1_m,
+			link_3);
+		system.add<rigid_body::HingeConstraint> (h3);
+
+		weighted_bodies.push_back ({ &link_1, kLink1Mass });
+		weighted_bodies.push_back ({ &link_2, kLink2Mass });
+		weighted_bodies.push_back ({ &link_3, kLink3Mass });
+		counterweighted_bodies.push_back ({ &support, kLink1Mass + kLink2Mass + kLink3Mass });
+	};
+
+	add_pendulum (
+		{ -4_m, 4_m, 0_m },
+		z_rotation<WorldSpace> (+18_deg) * x_rotation<WorldSpace> (-10_deg),
+		z_rotation<WorldSpace> (+9_deg) * x_rotation<WorldSpace> (+7_deg),
+		z_rotation<WorldSpace> (-12_deg) * x_rotation<WorldSpace> (+6_deg),
+		SpaceVector<double, WorldSpace> { +0.05, +0.01, 1.0 },
+		SpaceVector<double, WorldSpace> { -0.07, +0.03, 1.0 },
+		SpaceVector<double, WorldSpace> { +0.04, -0.05, 1.0 });
+
+	add_pendulum (
+		{ 0_m, 4_m, 0_m },
+		z_rotation<WorldSpace> (-16_deg) * x_rotation<WorldSpace> (+11_deg),
+		z_rotation<WorldSpace> (+13_deg) * x_rotation<WorldSpace> (-8_deg),
+		z_rotation<WorldSpace> (+7_deg) * x_rotation<WorldSpace> (+9_deg),
+		SpaceVector<double, WorldSpace> { -0.06, -0.01, 1.0 },
+		SpaceVector<double, WorldSpace> { +0.03, +0.06, 1.0 },
+		SpaceVector<double, WorldSpace> { -0.05, +0.04, 1.0 });
+
+	add_pendulum (
+		{ +4_m, 4_m, 0_m },
+		z_rotation<WorldSpace> (+12_deg) * x_rotation<WorldSpace> (+13_deg),
+		z_rotation<WorldSpace> (-15_deg) * x_rotation<WorldSpace> (-6_deg),
+		z_rotation<WorldSpace> (+10_deg) * x_rotation<WorldSpace> (-9_deg),
+		SpaceVector<double, WorldSpace> { +0.02, +0.08, 1.0 },
+		SpaceVector<double, WorldSpace> { -0.08, -0.02, 1.0 },
+		SpaceVector<double, WorldSpace> { +0.06, +0.05, 1.0 });
+
+	run (system, nullptr, [&] (si::Time const) {
+		for (auto const& [ body, mass ]: weighted_bodies)
+			body->apply_impulse (ForceMoments<WorldSpace> ({ 0_N, -gravity_acceleration * mass, 0_N }, kNoTorque));
+
+		for (auto const& [ body, supported_mass ]: counterweighted_bodies)
+			body->apply_impulse (ForceMoments<WorldSpace> ({ 0_N, +gravity_acceleration * supported_mass, 0_N }, kNoTorque));
 	});
 });
 
