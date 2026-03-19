@@ -35,6 +35,7 @@ namespace rb = rigid_body;
 namespace test_asserts = nu::test_asserts;
 
 
+[[nodiscard]]
 std::unique_ptr<rb::Body>
 make_unit_body()
 {

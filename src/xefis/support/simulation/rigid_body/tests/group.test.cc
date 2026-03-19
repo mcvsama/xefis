@@ -33,6 +33,7 @@ namespace rb = rigid_body;
 namespace test_asserts = nu::test_asserts;
 
 
+[[nodiscard]]
 MassMoments<BodyCOM>
 make_mass_moments (si::Mass const mass = 1_kg)
 {

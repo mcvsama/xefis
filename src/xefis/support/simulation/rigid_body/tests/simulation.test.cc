@@ -46,6 +46,7 @@ constexpr auto	kISSHeight = kEarthMeanRadius + 405.5_km;
 nu::Logger g_null_logger;
 
 
+[[nodiscard]]
 MassMoments<BodyCOM>
 unit_cuboid_mass_moments()
 {
@@ -56,6 +57,7 @@ unit_cuboid_mass_moments()
 }
 
 
+[[nodiscard]]
 MassMoments<BodyCOM>
 gyroscopic_test_mass_moments()
 {
@@ -66,6 +68,7 @@ gyroscopic_test_mass_moments()
 }
 
 
+[[nodiscard]]
 VelocityMoments<WorldSpace>
 gyroscopic_test_velocity_moments()
 {
@@ -73,6 +76,7 @@ gyroscopic_test_velocity_moments()
 }
 
 
+[[nodiscard]]
 std::unique_ptr<rigid_body::Body>
 make_iss()
 {
@@ -158,6 +162,7 @@ class ThreeBodyFixedConstraintSystem
 };
 
 
+[[nodiscard]]
 si::Velocity
 fixed_constraint_relative_speed_after_step (double const friction_factor)
 {
@@ -169,6 +174,7 @@ fixed_constraint_relative_speed_after_step (double const friction_factor)
 }
 
 
+[[nodiscard]]
 si::Velocity
 fixed_constraint_relative_speed_under_load_after_step (double const friction_factor, uint32_t iterations)
 {
@@ -180,6 +186,7 @@ fixed_constraint_relative_speed_under_load_after_step (double const friction_fac
 }
 
 
+[[nodiscard]]
 si::Velocity
 fixed_constraint_chain_first_link_relative_speed_after_step (uint32_t const iterations)
 {
@@ -190,6 +197,7 @@ fixed_constraint_chain_first_link_relative_speed_after_step (uint32_t const iter
 }
 
 
+[[nodiscard]]
 si::Angle
 motor_angle_after_motion (double const system_baumgarte_factor, double const system_friction_factor)
 {
