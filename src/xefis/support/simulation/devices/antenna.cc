@@ -24,32 +24,11 @@
 
 namespace xf::sim {
 
-Antenna::Antenna (MassMoments<BodyCOM> const& mass_moments,
-                  xf::AntennaModel const& antenna_model,
-                  xf::AntennaSystem& antenna_system,
-                  xf::Antenna::SignalReceptionCallback signal_reception_callback):
-    Body (mass_moments),
-    _antenna (antenna_model, antenna_system, std::move (signal_reception_callback))
-{ }
-
-
-Antenna::Antenna (MassMomentsAtArm<BodyCOM> const& mass_moments,
-                  xf::AntennaModel const& antenna_model,
-                  xf::AntennaSystem& antenna_system,
-                  xf::Antenna::SignalReceptionCallback signal_reception_callback):
-    Body (mass_moments),
-    _antenna (antenna_model, antenna_system, std::move (signal_reception_callback))
-{ }
-
-
 void
-Antenna::synchronize_antenna_placement() noexcept
+Antenna::receive_signal (ReceivedSignal const& signal)
 {
-	auto const placement = this->placement();
-	auto const origin_placement_in_com = this->origin_placement_in_com();
-	auto const origin_position_in_world = placement.rotate_translate_to_base (origin_placement_in_com.position());
-	auto const origin_rotation_in_world = placement.body_rotation() * origin_placement_in_com.body_rotation();
-	_antenna.set_placement (Placement<WorldSpace, BodyOrigin> (origin_position_in_world, origin_rotation_in_world));
+	if (_signal_reception_callback)
+		_signal_reception_callback (signal);
 }
 
 } // namespace xf::sim

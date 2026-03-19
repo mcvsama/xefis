@@ -15,9 +15,9 @@
 #include <xefis/config/all.h>
 #include <xefis/support/math/rotations.h>
 #include <xefis/support/nature/constants.h>
-#include <xefis/support/simulation/antennas/antenna.h>
 #include <xefis/support/simulation/antennas/antenna_system.h>
 #include <xefis/support/simulation/antennas/whip_antenna_model.h>
+#include <xefis/support/simulation/devices/antenna.h>
 
 // Neutrino:
 #include <neutrino/test/auto_test.h>
@@ -35,15 +35,42 @@ namespace {
 namespace test_asserts = nu::test_asserts;
 using namespace nu::si::literals;
 
-class TestAntenna: public Antenna
+class TestAntenna: public xf::sim::Antenna
 {
   public:
 	explicit
 	TestAntenna (AntennaModel const& antenna_model, AntennaSystem& antenna_system):
-		Antenna (antenna_model, antenna_system, [this] (Antenna::ReceivedSignal const& signal) {
+		Antenna (MassMoments<BodyCOM>::zero(), antenna_model, antenna_system, [this] (Antenna::ReceivedSignal const& signal) {
 			_received_signals.push_back (signal);
 		})
 	{ }
+
+	explicit
+	TestAntenna (MassMomentsAtArm<BodyCOM> const& mass_moments, AntennaModel const& antenna_model, AntennaSystem& antenna_system):
+		Antenna (mass_moments, antenna_model, antenna_system, [this] (Antenna::ReceivedSignal const& signal) {
+			_received_signals.push_back (signal);
+		})
+	{ }
+
+	void
+	set_placement (Placement<WorldSpace, BodyOrigin> const& placement)
+	{
+		Antenna::set_placement (Placement<WorldSpace, BodyCOM> (
+			{ 0_m, 0_m, 0_m },
+			placement.body_rotation() * ~origin_placement_in_com().body_rotation()
+		));
+		move_origin_to (placement.position());
+	}
+
+	[[nodiscard]]
+	Placement<WorldSpace, BodyOrigin>
+	origin_placement() const
+	{
+		return Placement<WorldSpace, BodyOrigin> (
+			origin<WorldSpace>(),
+			placement().body_rotation() * origin_placement_in_com().body_rotation()
+		);
+	}
 
 	[[nodiscard]]
 	std::vector<Antenna::ReceivedSignal> const&
@@ -53,6 +80,37 @@ class TestAntenna: public Antenna
   private:
 	std::vector<Antenna::ReceivedSignal> _received_signals;
 };
+
+
+nu::AutoTest t_origin_placement ("Antenna body-origin placement stays exact for COM-offset bodies", []{
+	auto antenna_model = WhipAntennaModel (1_m);
+	auto system = AntennaSystem (1_s);
+	auto antenna = TestAntenna (MassMomentsAtArm<BodyCOM> (1_kg, { 0_m, 0_m, 1_m }, math::identity), antenna_model, system);
+	auto const origin_placement_in_com = Placement<BodyCOM, BodyOrigin> (
+		{ 0_m, 0_m, -1_m },
+		x_rotation<BodyCOM, BodyOrigin> (15_deg)
+	);
+	auto const expected_origin_placement = Placement<WorldSpace, BodyOrigin> (
+		{ 10_m, 20_m, 30_m },
+		z_rotation<WorldSpace, BodyOrigin> (30_deg)
+	);
+
+	antenna.set_origin_placement (origin_placement_in_com);
+	antenna.set_placement (expected_origin_placement);
+
+	test_asserts::verify_equal_with_epsilon ("Antenna origin position is preserved",
+											 antenna.origin_placement().position(),
+											 expected_origin_placement.position(),
+											 1e-12_m);
+	test_asserts::verify_equal_with_epsilon ("Antenna origin rotation is preserved",
+											 to_rotation_vector (antenna.origin_placement().body_rotation()),
+											 to_rotation_vector (expected_origin_placement.body_rotation()),
+											 1e-12_rad);
+	test_asserts::verify_equal_with_epsilon ("Antenna COM reflects origin offset",
+											 antenna.placement().position(),
+											 expected_origin_placement.position() - antenna.placement().body_rotation() * origin_placement_in_com.position(),
+											 1e-12_m);
+});
 
 
 nu::AutoTest t_1 ("Antenna signals get propagated", []{

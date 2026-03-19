@@ -16,77 +16,126 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/support/math/coordinate_systems.h>
+#include <xefis/support/math/placement.h>
 #include <xefis/support/properties/has_observation_widget.h>
-#include <xefis/support/simulation/antennas/antenna.h>
+#include <xefis/support/simulation/antennas/antenna_emission.h>
+#include <xefis/support/simulation/antennas/antenna_model.h>
+#include <xefis/support/simulation/antennas/antenna_system.h>
 #include <xefis/support/simulation/devices/antenna_widget.h>
 #include <xefis/support/simulation/rigid_body/body.h>
 
+// Neutrino:
+#include <neutrino/concepts.h>
+#include <neutrino/nonmovable.h>
+
 // Standard:
 #include <cstddef>
+#include <functional>
 
 
 namespace xf::sim {
 
-/**
- * Rigid-body antenna device. Keeps radio-antenna placement synchronized with
- * rigid-body center-of-mass/origin placements.
- */
 class Antenna:
 	public rigid_body::Body,
-	public HasObservationWidget
+	public HasObservationWidget,
+	public nu::Nonmovable
 {
   public:
-    // Ctor
-    explicit
-    Antenna (MassMoments<BodyCOM> const&,
-             xf::AntennaModel const&,
-             xf::AntennaSystem&,
-             xf::Antenna::SignalReceptionCallback = {});
+	struct ReceivedSignal
+	{
+		si::Power		signal_power;
+		std::string		payload;
+	};
 
-    // Ctor
-    explicit
-    Antenna (MassMomentsAtArm<BodyCOM> const&,
-             xf::AntennaModel const&,
-             xf::AntennaSystem&,
-             xf::Antenna::SignalReceptionCallback = {});
+	using SignalReceptionCallback = std::function<void (ReceivedSignal const&)>;
 
+  public:
+	// Ctor
+	explicit
+	Antenna (MassMoments<BodyCOM> const&,
+			 nu::NonTemporaryReference<AntennaModel const&> auto&& model,
+			 AntennaSystem& system,
+			 SignalReceptionCallback signal_reception_callback);
+
+	// Ctor
+	explicit
+	Antenna (MassMomentsAtArm<BodyCOM> const&,
+			 nu::NonTemporaryReference<AntennaModel const&> auto&& model,
+			 AntennaSystem& system,
+			 SignalReceptionCallback signal_reception_callback);
+
+	// Dtor
+	virtual
+	~Antenna()
+		{ _system.deregister_antenna (*this); }
+
+	/**
+	 * Access the stored antenna model.
+	 */
 	[[nodiscard]]
-	xf::Antenna&
-	antenna() noexcept
-		{ return _antenna; }
-
-	[[nodiscard]]
-	xf::Antenna const&
-	antenna() const noexcept
-		{ return _antenna; }
-
-	[[nodiscard]]
-	xf::AntennaModel const&
+	AntennaModel const&
 	model() const noexcept
-		{ return _antenna.model(); }
+		{ return _model; }
+
+	/**
+	 * Emit signal.
+	 * Due to a bug in Qt (or a really stupid decision, but I want to believe it was just a bug)
+	 * there's an "emit" macro left by Qt headers. So this needs a redundant "_signal" suffix.
+	 */
+	void
+	emit_signal (AntennaEmission const& antenna_emission)
+		{ _system.emit_signal (*this, antenna_emission); }
+
+	/**
+	 * Called by the AntennaSystem when antenna receives a signal.
+	 * Calls the configured SignalReceptionCallback.
+	 */
+	void
+	receive_signal (ReceivedSignal const& signal);
 
 	// HasObservationWidget API
 	[[nodiscard]]
 	std::unique_ptr<ObservationWidget>
 	create_observation_widget() override
-		{ return std::make_unique<AntennaWidget> (*this); }
-
-	void
-	emit_signal (xf::AntennaEmission const& antenna_emission)
-		{ _antenna.emit_signal (antenna_emission); }
-
-	// Body API
-	void
-	evolve (si::Time) override
-		{ synchronize_antenna_placement(); }
+		{ return std::make_unique<sim::AntennaWidget> (*this); }
 
   private:
-	void
-	synchronize_antenna_placement() noexcept;
-
-  private:
-	xf::Antenna _antenna;
+	AntennaModel const&		_model;
+	AntennaSystem&			_system;
+	SignalReceptionCallback	_signal_reception_callback;
 };
+
+
+// Has to be inline because of use of nu::NonTemporaryReference<>
+inline
+Antenna::Antenna (MassMoments<BodyCOM> const& mass_moments,
+				  nu::NonTemporaryReference<AntennaModel const&> auto&& model,
+				  AntennaSystem& system,
+				  SignalReceptionCallback signal_reception_callback):
+	Body (mass_moments),
+	_model (model),
+	_system (system),
+	_signal_reception_callback (std::move (signal_reception_callback))
+{
+	_system.register_antenna (*this);
+}
+
+
+// Has to be inline because of use of nu::NonTemporaryReference<>
+inline
+Antenna::Antenna (MassMomentsAtArm<BodyCOM> const& mass_moments,
+				  nu::NonTemporaryReference<AntennaModel const&> auto&& model,
+				  AntennaSystem& system,
+				  SignalReceptionCallback signal_reception_callback):
+	Body (mass_moments),
+	_model (model),
+	_system (system),
+	_signal_reception_callback (std::move (signal_reception_callback))
+{
+	_system.register_antenna (*this);
+}
+
 
 } // namespace xf::sim
 

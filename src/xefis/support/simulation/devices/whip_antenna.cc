@@ -30,9 +30,8 @@
 
 
 namespace xf::sim {
-namespace {
 
-WhipAntennaParameters const&
+static WhipAntennaParameters const&
 validate_parameters (WhipAntennaParameters const& params)
 {
 	if (params.mass <= 0_kg)
@@ -62,12 +61,10 @@ validate_parameters (WhipAntennaParameters const& params)
 	return params;
 }
 
-} // namespace
-
 
 WhipAntenna::WhipAntenna (xf::AntennaSystem& antenna_system,
 						  WhipAntennaParameters const& params,
-						  xf::Antenna::SignalReceptionCallback signal_reception_callback):
+						  Antenna::SignalReceptionCallback signal_reception_callback):
 	WhipAntennaBase (validate_parameters (params)),
 	Antenna (compute_body_com_mass_moments (params), WhipAntennaBase::antenna_model(), antenna_system, std::move (signal_reception_callback))
 {

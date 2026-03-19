@@ -78,7 +78,7 @@ class WhipAntenna:
 	explicit
 	WhipAntenna (xf::AntennaSystem&,
 				 WhipAntennaParameters const& = {},
-				 xf::Antenna::SignalReceptionCallback = {});
+				 Antenna::SignalReceptionCallback = {});
 
 	// Body API
 	void

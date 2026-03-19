@@ -32,7 +32,9 @@
 
 namespace xf {
 
-class Antenna;
+namespace sim {
+	class Antenna;
+} // namespace sim
 
 
 class AntennaSystem:
@@ -43,10 +45,10 @@ class AntennaSystem:
 	class Emission
 	{
 	  public:
-		Antenna const&						emitter;
+		sim::Antenna const&					emitter;
 		AntennaEmission						antenna_emission;
 		Placement<WorldSpace, BodyOrigin>	placement;
-		std::set<Antenna*>					receivers;
+		std::set<sim::Antenna*>				receivers;
 	};
 
   public:
@@ -55,13 +57,13 @@ class AntennaSystem:
 	AntennaSystem (si::Time max_ttl);
 
 	void
-	register_antenna (Antenna&);
+	register_antenna (sim::Antenna&);
 
 	void
-	deregister_antenna (Antenna&);
+	deregister_antenna (sim::Antenna&);
 
 	void
-	emit_signal (Antenna& emitter, AntennaEmission const&);
+	emit_signal (sim::Antenna& emitter, AntennaEmission const&);
 
 	/**
 	 * Propagates signals and does the cleanup of old signals.
@@ -76,10 +78,10 @@ class AntennaSystem:
 	cleanup_emissions (si::Time now);
 
   private:
-	si::Time			_max_ttl	{ 1_s };
+	si::Time				_max_ttl	{ 1_s };
 	// A list preserves order, which is needed for correct-order delivery of signals:
-	std::list<Emission>	_emissions;
-	std::set<Antenna*>	_antennas;
+	std::list<Emission>		_emissions;
+	std::set<sim::Antenna*>	_antennas;
 };
 
 } // namespace xf

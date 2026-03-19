@@ -17,7 +17,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/nature/constants.h>
-#include <xefis/support/simulation/antennas/antenna.h>
+#include <xefis/support/simulation/devices/antenna.h>
 
 // Neutrino:
 #include <neutrino/stdexcept.h>
@@ -30,13 +30,23 @@
 
 namespace xf {
 
+static Placement<WorldSpace, BodyOrigin>
+body_origin_placement (sim::Antenna const& antenna)
+{
+	return Placement<WorldSpace, BodyOrigin> (
+		antenna.origin<WorldSpace>(),
+		antenna.placement().body_rotation() * antenna.origin_placement_in_com().body_rotation()
+	);
+}
+
+
 AntennaSystem::AntennaSystem (si::Time const max_ttl):
 	_max_ttl (max_ttl)
 { }
 
 
 void
-AntennaSystem::register_antenna (Antenna& antenna)
+AntennaSystem::register_antenna (sim::Antenna& antenna)
 {
 	_antennas.insert (&antenna);
 
@@ -46,7 +56,7 @@ AntennaSystem::register_antenna (Antenna& antenna)
 
 
 void
-AntennaSystem::deregister_antenna (Antenna& antenna)
+AntennaSystem::deregister_antenna (sim::Antenna& antenna)
 {
 	_antennas.erase (&antenna);
 
@@ -56,7 +66,7 @@ AntennaSystem::deregister_antenna (Antenna& antenna)
 
 
 void
-AntennaSystem::emit_signal (Antenna& emitter, AntennaEmission const& antenna_emission)
+AntennaSystem::emit_signal (sim::Antenna& emitter, AntennaEmission const& antenna_emission)
 {
 	if (antenna_emission.frequency <= 0_Hz)
 		throw nu::InvalidArgument ("emitted signal frequency must be positive");
@@ -64,7 +74,7 @@ AntennaSystem::emit_signal (Antenna& emitter, AntennaEmission const& antenna_emi
 	auto const emission = Emission {
 		.emitter = emitter,
 		.antenna_emission = antenna_emission,
-		.placement = emitter.placement(),
+		.placement = body_origin_placement (emitter),
 		.receivers = _antennas,
 	};
 	_emissions.push_back (emission);
@@ -91,7 +101,7 @@ AntennaSystem::propagate_signals (si::Time const now)
 		{
 			auto receiver = *receiver_it;
 			auto const& antenna_emission = emission.antenna_emission;
-			auto const receiver_placement = receiver->placement();
+			auto const receiver_placement = body_origin_placement (*receiver);
 			auto const distance = abs (emission.placement.position() - receiver_placement.position());
 			auto const time_due_to_distance = distance / kSpeedOfLight;
 			auto const elapsed_time = now - emission.antenna_emission.time;
@@ -102,15 +112,15 @@ AntennaSystem::propagate_signals (si::Time const now)
 				auto const& rx_antenna_model = receiver->model();
 				auto const frequency = antenna_emission.frequency;
 				auto const wavelength = kSpeedOfLight / frequency;
-				auto const tx_to_rx_direction = normalized_direction_or_zero (receiver->placement().position() - emission.placement.position());
+				auto const tx_to_rx_direction = normalized_direction_or_zero (receiver_placement.position() - emission.placement.position());
 
 				auto const tx_antenna_gain = tx_antenna_model.gain (frequency, emission.placement.rotate_to_body (+tx_to_rx_direction));
-				auto const rx_antenna_gain = rx_antenna_model.gain (frequency, receiver->placement().rotate_to_body (-tx_to_rx_direction));
+				auto const rx_antenna_gain = rx_antenna_model.gain (frequency, receiver_placement.rotate_to_body (-tx_to_rx_direction));
 				auto const L_pol = polarization_coupling (
 					tx_antenna_model,
 					emission.placement,
 					rx_antenna_model,
-					receiver->placement(),
+					receiver_placement,
 					frequency,
 					tx_to_rx_direction
 				);
