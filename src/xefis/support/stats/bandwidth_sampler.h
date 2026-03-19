@@ -64,6 +64,13 @@ class BandwidthSampler
 	record_bytes (std::size_t bytes, si::Time at_time);
 
 	/**
+	 * Add bytes accumulated since the previous observation and close any buckets ending at the provided time.
+	 * If no prior bucket exists, assume the bytes cover the interval immediately preceding @at_time.
+	 */
+	void
+	record_bytes_up_to (std::size_t bytes, si::Time at_time);
+
+	/**
 	 * Advance histogram buckets up to the provided time and emit completed bandwidth samples.
 	 */
 	void

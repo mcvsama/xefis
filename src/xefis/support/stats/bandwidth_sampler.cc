@@ -50,19 +50,50 @@ BandwidthSampler::record_bytes (std::size_t const bytes, si::Time const at_time)
 
 
 void
-BandwidthSampler::flush (si::Time const now)
+BandwidthSampler::record_bytes_up_to (std::size_t const bytes, si::Time const at_time)
 {
 	auto const interval = bandwidth_measurement_interval();
 
 	if (!_bucket_start_time)
-		_bucket_start_time = now;
+		_bucket_start_time = at_time - interval;
 
-	while (*_bucket_start_time + interval <= now)
+	_bucket_bytes += bytes;
+	flush (at_time);
+}
+
+
+void
+BandwidthSampler::flush (si::Time const now)
+{
+	auto const interval = bandwidth_measurement_interval();
+
+	if (_bucket_start_time)
 	{
-		_samples.push_back (_bucket_bytes / interval);
-		*_bucket_start_time += interval;
-		_bucket_bytes = 0u;
+		if (*_bucket_start_time + interval <= now)
+		{
+			auto const elapsed_intervals = static_cast<std::size_t> (std::floor ((now - *_bucket_start_time) / interval));
+
+			if (elapsed_intervals > _samples.capacity())
+			{
+				_samples.clear();
+
+				for (std::size_t i = 0u; i < _samples.capacity(); ++i)
+					_samples.push_back (Bandwidth());
+			}
+			else
+			{
+				_samples.push_back (_bucket_bytes / interval);
+
+				for (std::size_t i = 1u; i < elapsed_intervals; ++i)
+					_samples.push_back (Bandwidth());
+			}
+
+			*_bucket_start_time += elapsed_intervals * interval;
+			_bucket_bytes = 0u;
+		}
 	}
+	else
+		_bucket_start_time = now;
 }
 
 

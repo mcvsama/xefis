@@ -79,14 +79,15 @@ UDPTransceiver::bandwidth_snapshot() const
 void
 UDPTransceiver::process (xf::Cycle const& cycle)
 {
-	_bandwidth_accounting.received_bandwidth.flush (cycle.update_time());
 	_bandwidth_accounting.transmitted_bandwidth.flush (cycle.update_time());
 
 	if (_bandwidth_accounting.pending_received_bytes > 0u)
 	{
-		_bandwidth_accounting.received_bandwidth.record_bytes (_bandwidth_accounting.pending_received_bytes, cycle.update_time());
+		_bandwidth_accounting.received_bandwidth.record_bytes_up_to (_bandwidth_accounting.pending_received_bytes, cycle.update_time());
 		_bandwidth_accounting.pending_received_bytes = 0u;
 	}
+	else
+		_bandwidth_accounting.received_bandwidth.flush (cycle.update_time());
 
 	if (_tx && _parameters.tx_udp_address)
 	{

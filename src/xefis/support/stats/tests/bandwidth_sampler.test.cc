@@ -71,5 +71,84 @@ nu::AutoTest t2 ("xf::BandwidthSampler distributes sparse timestamped events acr
 	test_asserts::verify_equal ("third sample matches third bucket", *it++, xf::BandwidthSampler::Bandwidth (100.0));
 });
 
+
+nu::AutoTest t3 ("xf::BandwidthSampler credits bytes accumulated up to an interval boundary", []{
+	auto sampler = xf::BandwidthSampler ({
+		.bandwidth_measurement_interval = 1_s,
+		.bandwidth_history_size = 8u,
+	});
+
+	sampler.record_bytes_up_to (256u, 1_h + 1_s);
+
+	auto samples = sampler.samples();
+	test_asserts::verify_equal ("closing the first interval emits one sample",
+								std::ranges::distance (samples), 1l);
+	test_asserts::verify_equal ("boundary bytes are attributed to the elapsed interval",
+								*samples.begin(), xf::BandwidthSampler::Bandwidth (256.0));
+});
+
+
+nu::AutoTest t4 ("xf::BandwidthSampler closes accumulated bytes at a later observed boundary", []{
+	auto sampler = xf::BandwidthSampler ({
+		.bandwidth_measurement_interval = 1_s,
+		.bandwidth_history_size = 8u,
+	});
+
+	sampler.flush (1_h);
+	sampler.record_bytes_up_to (128u, 1_h + 1_s);
+
+	auto samples = sampler.samples();
+	test_asserts::verify_equal ("closing the observed interval emits one sample",
+								std::ranges::distance (samples), 1l);
+	test_asserts::verify_equal ("accumulated bytes belong to the elapsed interval",
+								*samples.begin(), xf::BandwidthSampler::Bandwidth (128.0));
+});
+
+
+nu::AutoTest t5 ("xf::BandwidthSampler keeps boundary events in the next interval", []{
+	auto sampler = xf::BandwidthSampler ({
+		.bandwidth_measurement_interval = 1_s,
+		.bandwidth_history_size = 8u,
+	});
+
+	sampler.flush (1_h);
+	sampler.record_bytes (128u, 1_h + 1_s);
+
+	auto samples = sampler.samples();
+	test_asserts::verify_equal ("recording at a boundary closes the previous empty interval",
+								std::ranges::distance (samples), 1l);
+	test_asserts::verify_equal ("previous interval remains empty",
+								*samples.begin(), xf::BandwidthSampler::Bandwidth());
+
+	sampler.flush (1_h + 2_s);
+
+	samples = sampler.samples();
+	test_asserts::verify_equal ("the next interval carries the boundary event",
+								std::ranges::distance (samples), 2l);
+	auto it = samples.begin();
+	++it;
+	test_asserts::verify_equal ("boundary event remains in the current bucket",
+								*it, xf::BandwidthSampler::Bandwidth (128.0));
+});
+
+
+nu::AutoTest t6 ("xf::BandwidthSampler keeps only retained history after long idle gaps", []{
+	auto sampler = xf::BandwidthSampler ({
+		.bandwidth_measurement_interval = 1_s,
+		.bandwidth_history_size = 4u,
+	});
+
+	sampler.record_bytes (100u, 1_h + 0.2_s);
+	sampler.flush (1_h + 5.2_s);
+
+	auto samples = sampler.samples();
+	test_asserts::verify_equal ("history remains bounded after a long gap",
+								std::ranges::distance (samples), 4l);
+
+	for (auto const sample: samples)
+		test_asserts::verify_equal ("old non-zero samples fall out of retained history",
+									sample, xf::BandwidthSampler::Bandwidth());
+});
+
 } // namespace
 } // namespace xf::test
