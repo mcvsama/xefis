@@ -76,9 +76,7 @@ class WhipAntenna:
   public:
 	// Ctor
 	explicit
-	WhipAntenna (xf::AntennaSystem&,
-				 WhipAntennaParameters const& = {},
-				 Antenna::SignalReceptionCallback = {});
+	WhipAntenna (xf::AntennaSystem&, WhipAntennaParameters const& = {});
 
 	// Body API
 	void

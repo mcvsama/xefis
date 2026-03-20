@@ -55,15 +55,13 @@ class Antenna:
 	explicit
 	Antenna (MassMoments<BodyCOM> const&,
 			 nu::NonTemporaryReference<AntennaModel const&> auto&& model,
-			 AntennaSystem& system,
-			 SignalReceptionCallback signal_reception_callback);
+			 AntennaSystem& system);
 
 	// Ctor
 	explicit
 	Antenna (MassMomentsAtArm<BodyCOM> const&,
 			 nu::NonTemporaryReference<AntennaModel const&> auto&& model,
-			 AntennaSystem& system,
-			 SignalReceptionCallback signal_reception_callback);
+			 AntennaSystem& system);
 
 	// Dtor
 	virtual
@@ -77,6 +75,13 @@ class Antenna:
 	AntennaModel const&
 	model() const noexcept
 		{ return _model; }
+
+	/**
+	 * Set signal reception callback. Can be nullptr.
+	 */
+	void
+	set_signal_reception_callback (SignalReceptionCallback callback)
+		{ _signal_reception_callback = std::move (callback); }
 
 	/**
 	 * Emit signal.
@@ -111,12 +116,10 @@ class Antenna:
 inline
 Antenna::Antenna (MassMoments<BodyCOM> const& mass_moments,
 				  nu::NonTemporaryReference<AntennaModel const&> auto&& model,
-				  AntennaSystem& system,
-				  SignalReceptionCallback signal_reception_callback):
+				  AntennaSystem& system):
 	Body (mass_moments),
 	_model (model),
-	_system (system),
-	_signal_reception_callback (std::move (signal_reception_callback))
+	_system (system)
 {
 	_system.register_antenna (*this);
 }
@@ -126,16 +129,13 @@ Antenna::Antenna (MassMoments<BodyCOM> const& mass_moments,
 inline
 Antenna::Antenna (MassMomentsAtArm<BodyCOM> const& mass_moments,
 				  nu::NonTemporaryReference<AntennaModel const&> auto&& model,
-				  AntennaSystem& system,
-				  SignalReceptionCallback signal_reception_callback):
+				  AntennaSystem& system):
 	Body (mass_moments),
 	_model (model),
-	_system (system),
-	_signal_reception_callback (std::move (signal_reception_callback))
+	_system (system)
 {
 	_system.register_antenna (*this);
 }
-
 
 } // namespace xf::sim
 

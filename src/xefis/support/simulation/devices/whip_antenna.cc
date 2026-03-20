@@ -62,11 +62,9 @@ validate_parameters (WhipAntennaParameters const& params)
 }
 
 
-WhipAntenna::WhipAntenna (xf::AntennaSystem& antenna_system,
-						  WhipAntennaParameters const& params,
-						  Antenna::SignalReceptionCallback signal_reception_callback):
+WhipAntenna::WhipAntenna (xf::AntennaSystem& antenna_system, WhipAntennaParameters const& params):
 	WhipAntennaBase (validate_parameters (params)),
-	Antenna (compute_body_com_mass_moments (params), WhipAntennaBase::antenna_model(), antenna_system, std::move (signal_reception_callback))
+	Antenna (compute_body_com_mass_moments (params), WhipAntennaBase::antenna_model(), antenna_system)
 {
 	set_shape (make_shape (params));
 }

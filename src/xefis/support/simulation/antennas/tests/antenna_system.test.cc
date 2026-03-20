@@ -40,22 +40,31 @@ class TestAntenna: public xf::sim::Antenna
   public:
 	explicit
 	TestAntenna (AntennaModel const& antenna_model, AntennaSystem& antenna_system):
-		Antenna (MassMoments<BodyCOM>::zero(), antenna_model, antenna_system, [this] (Antenna::ReceivedSignal const& signal) {
-			_received_signals.push_back (signal);
-		})
-	{ }
+		Antenna (MassMoments<BodyCOM>::zero(), antenna_model, antenna_system)
+	{
+		set_signal_reception_callback();
+	}
 
 	explicit
 	TestAntenna (MassMomentsAtArm<BodyCOM> const& mass_moments, AntennaModel const& antenna_model, AntennaSystem& antenna_system):
-		Antenna (mass_moments, antenna_model, antenna_system, [this] (Antenna::ReceivedSignal const& signal) {
-			_received_signals.push_back (signal);
-		})
-	{ }
+		Antenna (mass_moments, antenna_model, antenna_system)
+	{
+		set_signal_reception_callback();
+	}
 
 	[[nodiscard]]
 	std::vector<Antenna::ReceivedSignal> const&
 	received_signals() const noexcept
 		{ return _received_signals; }
+
+  private:
+	void
+	set_signal_reception_callback()
+	{
+		Antenna::set_signal_reception_callback ([this] (Antenna::ReceivedSignal const& signal) {
+			_received_signals.push_back (signal);
+		});
+	}
 
   private:
 	std::vector<Antenna::ReceivedSignal> _received_signals;
