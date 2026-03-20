@@ -148,9 +148,9 @@ nu::AutoTest t_1 ("Antenna signals get propagated", []{
 	test_asserts::verify_equal ("Mismatched antenna receives both signals", rx_mismatched_antenna.received_signals().size(), 2uz);
 	test_asserts::verify_equal ("Misaligned antenna receives both signals", rx_misaligned_antenna.received_signals().size(), 2uz);
 
-	auto const matched_signal_power = rx_matched_antenna.received_signals().front().signal_power;
-	auto const mismatched_signal_power = rx_mismatched_antenna.received_signals().front().signal_power;
-	auto const misaligned_signal_power = rx_misaligned_antenna.received_signals().front().signal_power;
+	auto const matched_signal_power = rx_matched_antenna.received_signals().front().power;
+	auto const mismatched_signal_power = rx_mismatched_antenna.received_signals().front().power;
+	auto const misaligned_signal_power = rx_misaligned_antenna.received_signals().front().power;
 
 	test_asserts::verify ("Mismatched antenna receives weaker signal", mismatched_signal_power < matched_signal_power);
 	test_asserts::verify ("Misaligned antenna receives weaker signal", misaligned_signal_power < matched_signal_power);
@@ -172,7 +172,7 @@ nu::AutoTest t_1 ("Antenna signals get propagated", []{
 	test_asserts::verify_equal ("Misaligned antenna receives tuned signal", rx_misaligned_antenna.received_signals().size(), 3uz);
 	test_asserts::verify_equal ("Matched antenna receives tuned payload", rx_matched_antenna.received_signals().back().payload, "tuned signal");
 	test_asserts::verify ("Tuned signal is stronger than before",
-						  rx_matched_antenna.received_signals().back().signal_power > matched_signal_power);
+						  rx_matched_antenna.received_signals().back().power > matched_signal_power);
 });
 
 
@@ -289,7 +289,7 @@ nu::AutoTest t_5 ("In-flight signal uses emitter placement at emission time", []
 
 		system.process (1_ms);
 		test_asserts::verify_equal ("Scenario receiver gets exactly one signal", rx_antenna.received_signals().size(), 1uz);
-		return rx_antenna.received_signals().front().signal_power;
+		return rx_antenna.received_signals().front().power;
 	};
 
 	auto const reference_power = run_scenario (false);
@@ -377,8 +377,8 @@ nu::AutoTest t_8 ("Zero-distance received signal power is finite", []{
 
 	system.process (0_s);
 	test_asserts::verify_equal ("Zero-distance signal is delivered immediately", rx_antenna.received_signals().size(), 1uz);
-	test_asserts::verify ("Zero-distance received signal power is finite", std::isfinite (rx_antenna.received_signals().front().signal_power.to_floating_point()));
-	test_asserts::verify ("Zero-distance received signal power is non-negative", rx_antenna.received_signals().front().signal_power >= 0_W);
+	test_asserts::verify ("Zero-distance received signal power is finite", isfinite (rx_antenna.received_signals().front().power));
+	test_asserts::verify ("Zero-distance received signal power is non-negative", rx_antenna.received_signals().front().power >= 0_W);
 });
 
 
@@ -408,8 +408,8 @@ nu::AutoTest t_9 ("Orthogonal whip antenna polarization strongly suppresses rece
 	test_asserts::verify_equal ("Aligned receiver gets signal", rx_aligned_antenna.received_signals().size(), 1uz);
 	test_asserts::verify_equal ("Orthogonal receiver gets signal object", rx_orthogonal_antenna.received_signals().size(), 1uz);
 
-	auto const aligned_power = rx_aligned_antenna.received_signals().front().signal_power;
-	auto const orthogonal_power = rx_orthogonal_antenna.received_signals().front().signal_power;
+	auto const aligned_power = rx_aligned_antenna.received_signals().front().power;
+	auto const orthogonal_power = rx_orthogonal_antenna.received_signals().front().power;
 	test_asserts::verify ("Orthogonal polarization strongly suppresses power", orthogonal_power < 1e-6 * aligned_power);
 });
 
@@ -437,8 +437,8 @@ nu::AutoTest t_10 ("Vertical offset reduces power for parallel whip antennas", [
 	test_asserts::verify_equal ("Side-offset receiver gets signal", rx_side_antenna.received_signals().size(), 1uz);
 	test_asserts::verify_equal ("Side-and-up-offset receiver gets signal", rx_side_and_up_antenna.received_signals().size(), 1uz);
 
-	auto const side_power = rx_side_antenna.received_signals().front().signal_power;
-	auto const side_and_up_power = rx_side_and_up_antenna.received_signals().front().signal_power;
+	auto const side_power = rx_side_antenna.received_signals().front().power;
+	auto const side_and_up_power = rx_side_and_up_antenna.received_signals().front().power;
 	test_asserts::verify ("Raising otherwise parallel receiver reduces received power", side_and_up_power < side_power);
 });
 
