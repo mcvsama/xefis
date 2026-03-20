@@ -120,8 +120,9 @@ AntennaSystem::propagate_signals (si::Time const now)
 				auto const k = nu::square (wavelength / (4.0 * std::numbers::pi * effective_distance));
 				auto const received_signal_power = antenna_emission.power * tx_antenna_gain * rx_antenna_gain * L_pol * k;
 				receiver->receive_signal ({
-					.power = received_signal_power,
-					.payload = antenna_emission.payload,
+					.power		= received_signal_power,
+					.frequency	= antenna_emission.frequency,
+					.payload	= antenna_emission.payload,
 				});
 
 				receiver_it = emission.receivers.erase (receiver_it);

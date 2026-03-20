@@ -171,6 +171,7 @@ nu::AutoTest t_1 ("Antenna signals get propagated", []{
 	test_asserts::verify_equal ("Mismatched antenna receives tuned signal", rx_mismatched_antenna.received_signals().size(), 3uz);
 	test_asserts::verify_equal ("Misaligned antenna receives tuned signal", rx_misaligned_antenna.received_signals().size(), 3uz);
 	test_asserts::verify_equal ("Matched antenna receives tuned payload", rx_matched_antenna.received_signals().back().payload, "tuned signal");
+	test_asserts::verify_equal ("Matched antenna receives tuned frequency", rx_matched_antenna.received_signals().back().frequency, tuned_frequency);
 	test_asserts::verify ("Tuned signal is stronger than before",
 						  rx_matched_antenna.received_signals().back().power > matched_signal_power);
 });
@@ -200,6 +201,7 @@ nu::AutoTest t_2 ("Antenna signal arrives exactly at propagation-time boundary",
 	system.process (1_ms);
 	test_asserts::verify_equal ("Signal received exactly at propagation boundary", rx_antenna.received_signals().size(), 1uz);
 	test_asserts::verify_equal ("Boundary payload propagated", rx_antenna.received_signals().front().payload, "boundary signal");
+	test_asserts::verify_equal ("Boundary frequency propagated", rx_antenna.received_signals().front().frequency, 100_MHz);
 });
 
 
@@ -543,6 +545,7 @@ nu::AutoTest t_recording ("Antenna optionally records and drains received signal
 	auto recorded_signals = rx_antenna.take_recorded_signals();
 	test_asserts::verify_equal ("Drain returns recorded signal", recorded_signals.size(), 1uz);
 	test_asserts::verify_equal ("Drain preserves payload", recorded_signals.front().payload, "recorded");
+	test_asserts::verify_equal ("Drain preserves frequency", recorded_signals.front().frequency, 100_MHz);
 	test_asserts::verify_equal ("Drain clears internal buffer", rx_antenna.take_recorded_signals().size(), 0uz);
 
 	rx_antenna.set_recording_enabled (false);

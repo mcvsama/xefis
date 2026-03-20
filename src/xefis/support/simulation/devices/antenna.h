@@ -47,8 +47,9 @@ class Antenna:
   public:
 	struct ReceivedSignal
 	{
-		si::Power	power;
-		std::string	payload;
+		si::Power		power;
+		si::Frequency	frequency;
+		std::string		payload;
 	};
 
 	using SignalReceptionCallback = std::function<void (ReceivedSignal const&)>;
