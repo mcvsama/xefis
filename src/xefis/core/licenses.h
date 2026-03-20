@@ -25,6 +25,7 @@ namespace xf::licenses {
 
 extern const char* main;
 extern const char* font_crystal;
+extern const char* nasa_images;
 extern const char* lib_kdtreeplusplus;
 extern const char* lib_type_safe;
 extern const char* lib_microsoft_gsl;

@@ -31,6 +31,35 @@ const char* font_crystal =
 	"The Crystal font was crated by Jerry Fitzpatrick.\n"
 	"Read LICENSE.fonts for more information.";
 
+const char* nasa_images =
+	"Some textures in share/images/textures were obtained from NASA sources.\n"
+	"\n"
+	"Earth textures:\n"
+	"https://visibleearth.nasa.gov/images/74092/july-blue-marble-next-generation/74094l\n"
+	"	world.200407.3x16000x8000.jpg\n"
+	"	Photo by Reto Stockli, NASA Earth Observatory.\n"
+	"\n"
+	"https://visibleearth.nasa.gov/images/144898/earth-at-night-black-marble-2016-color-maps/144947l\n"
+	"	BlackMarble_2016_3km.jpg\n"
+	"	NASA Earth Observatory images by Joshua Stevens, using Suomi NPP VIIRS data from Miguel Roman, NASA GSFC.\n"
+	"\n"
+	"Moon texture:\n"
+	"https://svs.gsfc.nasa.gov/4720\n"
+	"\n"
+	"Universe textures:\n"
+	"NASA/Goddard Space Flight Center Scientific Visualization Studio.\n"
+	"Gaia DR2: ESA/Gaia/DPAC.\n"
+	"\n"
+	"This work has made use of data from the European Space Agency (ESA) mission\n"
+	"Gaia (https://www.cosmos.esa.int/gaia), processed by the Gaia Data Processing\n"
+	"and Analysis Consortium (DPAC,\n"
+	"https://www.cosmos.esa.int/web/gaia/dpac/consortium). Funding for the DPAC has\n"
+	"been provided by national institutions, in particular the institutions\n"
+	"participating in the Gaia Multilateral Agreement.\n"
+	"\n"
+	"Image <starmap_2020_8k.exr> downloaded from <https://svs.gsfc.nasa.gov/4851/>\n"
+	"and converted to 6 separate sky-box images.";
+
 const char* lib_kdtreeplusplus =
 	"\"The Artistic Licence 2.0\"\n"
 	"Copyright (c) 2000-2006, The Perl Foundation.\n"

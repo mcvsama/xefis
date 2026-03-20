@@ -253,6 +253,10 @@ Xefis::print_copyrights (std::ostream& out)
 		<< "=====" << endl
 		<< licenses::font_crystal << endl
 		<< endl;
+	out << "NASA images" << endl
+		<< "===========" << endl
+		<< licenses::nasa_images << endl
+		<< endl;
 	out << "The 'kdtree++' library is distributed under the following license" << endl
 		<< "=================================================================" << endl
 		<< endl
