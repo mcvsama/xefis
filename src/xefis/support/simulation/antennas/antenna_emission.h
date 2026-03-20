@@ -29,6 +29,7 @@ struct AntennaEmission
 	si::Time		time;
 	si::Power		power;
 	si::Frequency	frequency;
+	si::Frequency	bandwidth;
 	std::string		payload;
 };
 

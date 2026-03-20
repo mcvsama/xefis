@@ -128,6 +128,7 @@ nu::AutoTest t_1 ("Antenna signals get propagated", []{
 		.time		= 0_s,
 		.power		= 1_W,
 		.frequency	= 100_MHz,
+		.bandwidth	= 25_kHz,
 		.payload	= "test signal",
 	});
 
@@ -135,6 +136,7 @@ nu::AutoTest t_1 ("Antenna signals get propagated", []{
 		.time				= 0_s,
 		.power				= 1_W,
 		.frequency			= 100_MHz,
+		.bandwidth			= 25_kHz,
 		.payload			= "test signal",
 	});
 
@@ -163,6 +165,7 @@ nu::AutoTest t_1 ("Antenna signals get propagated", []{
 		.time		= 2_ms,
 		.power		= 1_W,
 		.frequency	= tuned_frequency,
+		.bandwidth	= 8_kHz,
 		.payload	= "tuned signal",
 	});
 	system.process (3_ms);
@@ -172,6 +175,7 @@ nu::AutoTest t_1 ("Antenna signals get propagated", []{
 	test_asserts::verify_equal ("Misaligned antenna receives tuned signal", rx_misaligned_antenna.received_signals().size(), 3uz);
 	test_asserts::verify_equal ("Matched antenna receives tuned payload", rx_matched_antenna.received_signals().back().payload, "tuned signal");
 	test_asserts::verify_equal ("Matched antenna receives tuned frequency", rx_matched_antenna.received_signals().back().frequency, tuned_frequency);
+	test_asserts::verify_equal ("Matched antenna receives tuned bandwidth", rx_matched_antenna.received_signals().back().bandwidth, 8_kHz);
 	test_asserts::verify ("Tuned signal is stronger than before",
 						  rx_matched_antenna.received_signals().back().power > matched_signal_power);
 });
@@ -192,6 +196,7 @@ nu::AutoTest t_2 ("Antenna signal arrives exactly at propagation-time boundary",
 		.time		= 0_s,
 		.power		= 1_W,
 		.frequency	= 100_MHz,
+		.bandwidth	= 25_kHz,
 		.payload	= "boundary signal",
 	});
 
@@ -202,6 +207,7 @@ nu::AutoTest t_2 ("Antenna signal arrives exactly at propagation-time boundary",
 	test_asserts::verify_equal ("Signal received exactly at propagation boundary", rx_antenna.received_signals().size(), 1uz);
 	test_asserts::verify_equal ("Boundary payload propagated", rx_antenna.received_signals().front().payload, "boundary signal");
 	test_asserts::verify_equal ("Boundary frequency propagated", rx_antenna.received_signals().front().frequency, 100_MHz);
+	test_asserts::verify_equal ("Boundary bandwidth propagated", rx_antenna.received_signals().front().bandwidth, 25_kHz);
 });
 
 
@@ -219,6 +225,7 @@ nu::AutoTest t_3 ("Antenna signal is delivered only once", []{
 		.time		= 0_s,
 		.power		= 1_W,
 		.frequency	= 100_MHz,
+		.bandwidth	= 25_kHz,
 		.payload	= "single delivery",
 	});
 
@@ -251,6 +258,7 @@ nu::AutoTest t_4 ("Antenna signals reach nearer receivers first", []{
 		.time		= 0_s,
 		.power		= 1_W,
 		.frequency	= 100_MHz,
+		.bandwidth	= 25_kHz,
 		.payload	= "distance ordering",
 	});
 
@@ -278,6 +286,7 @@ nu::AutoTest t_5 ("In-flight signal uses emitter placement at emission time", []
 			.time		= 0_s,
 			.power		= 1_W,
 			.frequency	= 100_MHz,
+			.bandwidth	= 25_kHz,
 			.payload	= "snapshot",
 		});
 
@@ -325,6 +334,7 @@ nu::AutoTest t_6 ("Antenna deregistration before arrival does not break propagat
 			.time		= 0_s,
 			.power		= 1_W,
 			.frequency	= 100_MHz,
+			.bandwidth	= 25_kHz,
 			.payload	= "deregistered receiver",
 		});
 	}
@@ -346,6 +356,7 @@ nu::AutoTest t_7 ("Receiver registered after emission receives in-flight signal"
 		.time		= 0_s,
 		.power		= 1_W,
 		.frequency	= 100_MHz,
+		.bandwidth	= 25_kHz,
 		.payload	= "late receiver",
 	});
 
@@ -374,6 +385,7 @@ nu::AutoTest t_8 ("Zero-distance received signal power is finite", []{
 		.time		= 0_s,
 		.power		= 1_W,
 		.frequency	= 100_MHz,
+		.bandwidth	= 25_kHz,
 		.payload	= "zero distance",
 	});
 
@@ -403,6 +415,7 @@ nu::AutoTest t_9 ("Orthogonal whip antenna polarization strongly suppresses rece
 		.time		= 0_s,
 		.power		= 1_W,
 		.frequency	= 100_MHz,
+		.bandwidth	= 25_kHz,
 		.payload	= "orthogonal polarization",
 	});
 
@@ -432,6 +445,7 @@ nu::AutoTest t_10 ("Vertical offset reduces power for parallel whip antennas", [
 		.time		= 0_s,
 		.power		= 1_W,
 		.frequency	= 100_MHz,
+		.bandwidth	= 25_kHz,
 		.payload	= "vertical offset",
 	});
 
@@ -460,6 +474,7 @@ nu::AutoTest t_11 ("Emission expires by ttl before reaching distant receiver", [
 		.time		= 0_s,
 		.power		= 1_W,
 		.frequency	= 100_MHz,
+		.bandwidth	= 25_kHz,
 		.payload	= "ttl",
 	});
 
@@ -485,26 +500,32 @@ nu::AutoTest t_12 ("Signal payload integrity and ordering are preserved", []{
 		.time		= 0_s,
 		.power		= 1_W,
 		.frequency	= 100_MHz,
+		.bandwidth	= 25_kHz,
 		.payload	= "alpha",
 	});
 	tx_antenna.emit_signal ({
 		.time		= 0_s,
 		.power		= 1_W,
 		.frequency	= 100_MHz,
+		.bandwidth	= 50_kHz,
 		.payload	= "bravo",
 	});
 	tx_antenna.emit_signal ({
 		.time		= 0_s,
 		.power		= 1_W,
 		.frequency	= 100_MHz,
+		.bandwidth	= 75_kHz,
 		.payload	= "charlie",
 	});
 
 	system.process (1_ms);
 	test_asserts::verify_equal ("Receiver got all payloads", rx_antenna.received_signals().size(), 3uz);
 	test_asserts::verify_equal ("Payload #1 preserved", rx_antenna.received_signals()[0].payload, "alpha");
+	test_asserts::verify_equal ("Bandwidth #1 preserved", rx_antenna.received_signals()[0].bandwidth, 25_kHz);
 	test_asserts::verify_equal ("Payload #2 preserved", rx_antenna.received_signals()[1].payload, "bravo");
+	test_asserts::verify_equal ("Bandwidth #2 preserved", rx_antenna.received_signals()[1].bandwidth, 50_kHz);
 	test_asserts::verify_equal ("Payload #3 preserved", rx_antenna.received_signals()[2].payload, "charlie");
+	test_asserts::verify_equal ("Bandwidth #3 preserved", rx_antenna.received_signals()[2].bandwidth, 75_kHz);
 });
 
 
@@ -524,6 +545,7 @@ nu::AutoTest t_recording ("Antenna optionally records and drains received signal
 		.time		= 0_s,
 		.power		= 1_W,
 		.frequency	= 100_MHz,
+		.bandwidth	= 25_kHz,
 		.payload	= "ignored",
 	});
 
@@ -537,6 +559,7 @@ nu::AutoTest t_recording ("Antenna optionally records and drains received signal
 		.time		= 1_s,
 		.power		= 1_W,
 		.frequency	= 100_MHz,
+		.bandwidth	= 12.5_kHz,
 		.payload	= "recorded",
 	});
 
@@ -546,6 +569,7 @@ nu::AutoTest t_recording ("Antenna optionally records and drains received signal
 	test_asserts::verify_equal ("Drain returns recorded signal", recorded_signals.size(), 1uz);
 	test_asserts::verify_equal ("Drain preserves payload", recorded_signals.front().payload, "recorded");
 	test_asserts::verify_equal ("Drain preserves frequency", recorded_signals.front().frequency, 100_MHz);
+	test_asserts::verify_equal ("Drain preserves bandwidth", recorded_signals.front().bandwidth, 12.5_kHz);
 	test_asserts::verify_equal ("Drain clears internal buffer", rx_antenna.take_recorded_signals().size(), 0uz);
 
 	rx_antenna.set_recording_enabled (false);

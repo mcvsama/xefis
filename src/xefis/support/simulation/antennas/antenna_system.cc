@@ -62,6 +62,9 @@ AntennaSystem::emit_signal (sim::Antenna& emitter, AntennaEmission const& antenn
 	if (antenna_emission.frequency <= 0_Hz)
 		throw nu::InvalidArgument ("emitted signal frequency must be positive");
 
+	if (antenna_emission.bandwidth <= 0_Hz)
+		throw nu::InvalidArgument ("emitted signal bandwidth must be positive");
+
 	auto const emission = Emission {
 		.emitter = emitter,
 		.antenna_emission = antenna_emission,
@@ -122,6 +125,7 @@ AntennaSystem::propagate_signals (si::Time const now)
 				receiver->receive_signal ({
 					.power		= received_signal_power,
 					.frequency	= antenna_emission.frequency,
+					.bandwidth	= antenna_emission.bandwidth,
 					.payload	= antenna_emission.payload,
 				});
 

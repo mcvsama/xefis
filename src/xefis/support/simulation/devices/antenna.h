@@ -49,6 +49,7 @@ class Antenna:
 	{
 		si::Power		power;
 		si::Frequency	frequency;
+		si::Frequency	bandwidth;
 		std::string		payload;
 	};
 
