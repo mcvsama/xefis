@@ -203,6 +203,11 @@ Module::Module (std::string_view const instance):
 }
 
 
+Module::Module (ModuleParameters const params):
+	Module (params.loop, params.instance)
+{ }
+
+
 Module::Module (ProcessingLoop& loop, std::string_view const instance):
 	NamedInstance (instance)
 {

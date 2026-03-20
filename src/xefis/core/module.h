@@ -45,6 +45,18 @@ class ProcessingLoop;
 
 
 /**
+ * Standard module parameters required by Module class.
+ */
+struct ModuleParameters
+{
+	ProcessingLoop&		loop;
+
+	// Instance name for GUI identification and debugging purposes:
+	std::string_view	instance = {};
+};
+
+
+/**
  * Exception thrown when some settings in a module have not been initialized as required.
  */
 class UninitializedSettings: public nu::Exception
@@ -290,6 +302,10 @@ class Module:
 	Module (std::string_view const instance = {});
 
   public:
+	// Ctor
+	explicit
+	Module (ModuleParameters);
+
 	/**
 	 * Ctor
 	 *
