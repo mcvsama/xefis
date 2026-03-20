@@ -21,7 +21,6 @@
 #include <xefis/core/sockets/module_socket.h>
 #include <xefis/support/properties/has_configurator_widget.h>
 #include <xefis/support/stats/bandwidth_sampler.h>
-#include <xefis/support/sockets/socket_changed.h>
 
 // Neutrino:
 #include <neutrino/logger.h>
@@ -132,7 +131,6 @@ class UDPTransceiver:
 	Parameters					_parameters;
 	nu::Logger					_logger;
 	QByteArray					_received_datagram;
-	xf::SocketChanged			_send_changed	{ this->send };
 	QHostAddress				_tx_qhostaddress;
 	BandwidthAccounting			_bandwidth_accounting;
 	// Cached non-owning pointer; the host Qt container owns and deletes the widget.
