@@ -506,6 +506,50 @@ nu::AutoTest t_12 ("Signal payload integrity and ordering are preserved", []{
 });
 
 
+nu::AutoTest t_recording ("Antenna optionally records and drains received signals", []{
+	auto antenna_model = WhipAntennaModel (1_m);
+	auto system = AntennaSystem (10_s);
+	auto tx_antenna = TestAntenna (antenna_model, system);
+	auto rx_antenna = TestAntenna (antenna_model, system);
+	auto const no_rotation = kNoRotation<WorldSpace, BodyOrigin>;
+
+	tx_antenna.set_origin_placement<WorldSpace> (Placement<WorldSpace, BodyOrigin> ({ 0_m, 0_m, 0_m }, no_rotation));
+	rx_antenna.set_origin_placement<WorldSpace> (Placement<WorldSpace, BodyOrigin> ({ 1_m, 0_m, 0_m }, no_rotation));
+
+	test_asserts::verify_equal ("Recording is disabled by default", rx_antenna.take_recorded_signals().size(), 0uz);
+
+	tx_antenna.emit_signal ({
+		.time		= 0_s,
+		.power		= 1_W,
+		.frequency	= 100_MHz,
+		.payload	= "ignored",
+	});
+
+	system.process (1_ms);
+	test_asserts::verify_equal ("Disabled recording stores nothing", rx_antenna.take_recorded_signals().size(), 0uz);
+
+	rx_antenna.set_recording_enabled (true);
+	test_asserts::verify_equal ("Fresh recording buffer is empty", rx_antenna.take_recorded_signals().size(), 0uz);
+
+	tx_antenna.emit_signal ({
+		.time		= 1_s,
+		.power		= 1_W,
+		.frequency	= 100_MHz,
+		.payload	= "recorded",
+	});
+
+	system.process (1001_ms);
+
+	auto recorded_signals = rx_antenna.take_recorded_signals();
+	test_asserts::verify_equal ("Drain returns recorded signal", recorded_signals.size(), 1uz);
+	test_asserts::verify_equal ("Drain preserves payload", recorded_signals.front().payload, "recorded");
+	test_asserts::verify_equal ("Drain clears internal buffer", rx_antenna.take_recorded_signals().size(), 0uz);
+
+	rx_antenna.set_recording_enabled (false);
+	test_asserts::verify_equal ("Disabling recording resets the buffer", rx_antenna.take_recorded_signals().size(), 0uz);
+});
+
+
 nu::AutoTest t_13 ("WhipAntennaModel rejects negative frequency-response sharpness", []{
 	test_asserts::verify_throws<nu::InvalidArgument> ("Negative frequency-response sharpness should be rejected", []{
 		[[maybe_unused]] auto const model = WhipAntennaModel (1_m, -1.0);

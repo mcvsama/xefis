@@ -32,6 +32,9 @@
 // Standard:
 #include <cstddef>
 #include <functional>
+#include <optional>
+#include <string>
+#include <vector>
 
 
 namespace xf::sim {
@@ -84,6 +87,19 @@ class Antenna:
 		{ _signal_reception_callback = std::move (callback); }
 
 	/**
+	 * Enable or disable storing received signals in the internal recording buffer.
+	 */
+	void
+	set_recording_enabled (bool enabled);
+
+	/**
+	 * Move out recorded signals and keep recording enabled with an empty buffer.
+	 */
+	[[nodiscard]]
+	std::vector<ReceivedSignal>
+	take_recorded_signals();
+
+	/**
 	 * Emit signal.
 	 * Due to a bug in Qt (or a really stupid decision, but I want to believe it was just a bug)
 	 * there's an "emit" macro left by Qt headers. So this needs a redundant "_signal" suffix.
@@ -109,6 +125,8 @@ class Antenna:
 	AntennaModel const&		_model;
 	AntennaSystem&			_system;
 	SignalReceptionCallback	_signal_reception_callback;
+	std::optional<std::vector<ReceivedSignal>>
+							_recorded_signals;
 };
 
 

@@ -25,8 +25,34 @@
 namespace xf::sim {
 
 void
+Antenna::set_recording_enabled (bool enabled)
+{
+	if (enabled)
+	{
+		if (!_recorded_signals)
+			_recorded_signals.emplace();
+	}
+	else
+		_recorded_signals.reset();
+}
+
+
+std::vector<Antenna::ReceivedSignal>
+Antenna::take_recorded_signals()
+{
+	if (!_recorded_signals)
+		return {};
+
+	return std::exchange (*_recorded_signals, {});
+}
+
+
+void
 Antenna::receive_signal (ReceivedSignal const& signal)
 {
+	if (_recorded_signals)
+		_recorded_signals->push_back (signal);
+
 	if (_signal_reception_callback)
 		_signal_reception_callback (signal);
 }
